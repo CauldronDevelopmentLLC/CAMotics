@@ -6,7 +6,7 @@ At home manufacturing is one of the next big technology revolutions. Much like t
 
 Being able to simulate is a critical part of creating CNC tool paths. Programming a CNC with out a simulator is cutting with out measuring; it's both dangerous and expensive. With OpenSCAM you can preview the results of your cutting operation before you fire up your machine. This will save you time and money and open up a world of creative possibilities by allowing you to rapidly visualize and improve upon designs with out wasting material or breaking tools.
 
-See http://openscam.com/
+See http://openscam.org/
 
 # License
 GNU General Public License version 2.  See the file COPYING.
@@ -35,6 +35,14 @@ After installing the prerequisites.  Build C! with the following command:
 Then build OpenSCAM with the following command:
 
     scons
+
+# Using It
+
+Run the GUI:
+
+    ./openscam
+
+Try out some of the examples in the File menu.
 
 
 [1]: https://raw.github.com/jcoffland/OpenSCAM/master/images/openscam-logo.png
