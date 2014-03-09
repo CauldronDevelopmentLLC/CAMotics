@@ -1,0 +1,15 @@
+feed(400); // Set the feed rate to 400 millimeters per minute
+tool(1); // Select tool 1
+
+rapid({z: 5}); // Move to a safe height of 5mm
+rapid({x: 1, y: 1});  // Go to start position
+speed(2000); // Spin at 2000 RPM in the clockwise direction
+
+cut({z: -3}); // Cut down to depth
+cut({x: 11}); // Cut to second corner
+cut({y: 11}); // Cut to third corner
+cut({x: 1}); // Cut to forth corner
+cut({y: 1}); // Cut back to begining
+
+rapid({z: 5}); // Move back to safe position
+speed(0); // Stop spinning

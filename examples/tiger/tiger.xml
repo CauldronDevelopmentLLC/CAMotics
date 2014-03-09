@@ -1,0 +1,21 @@
+<openscam>
+  <!-- Note, all units are in mm regardless of 'units' option. -->
+  <!-- NC Files -->
+  <nc-files>
+    tiger.nc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='1.026897'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-margin v='0'/>
+  <workpiece-max v='(92,89,0)'/>
+  <workpiece-min v='(-2,-1,-32)'/>
+
+  <tool_table>
+    <tool length='20' number='1' radius='1.25' shape='CYLINDRICAL' units='MM'/>
+  </tool_table>
+</openscam>

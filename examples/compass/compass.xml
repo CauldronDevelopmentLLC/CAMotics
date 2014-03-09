@@ -1,0 +1,19 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    compass.tpl
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.674104'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(62,85,0)'/>
+  <workpiece-min v='(-5,-5,-12.7)'/>
+
+  <tool_table>
+    <tool length='1' number='1' radius='0.0625' shape='CYLINDRICAL' units='INCH'/>
+  </tool_table>
+</openscam>

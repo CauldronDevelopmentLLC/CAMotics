@@ -1,0 +1,20 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    rhodonea.tpl
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.4'/>
+  <resolution-mode v='MANUAL'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='true'/>
+  <workpiece-max v='(34.7462,34.7462,0)'/>
+  <workpiece-min v='(-34.7462,-34.7463,-14.7)'/>
+
+  <tool_table>
+    <tool length='0.25' number='1' radius='0.25' shape='CONICAL' units='INCH'/>
+    <tool length='1' number='2' radius='0.0625' shape='CYLINDRICAL' units='INCH'/>
+  </tool_table>
+</openscam>

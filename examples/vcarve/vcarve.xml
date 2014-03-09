@@ -1,0 +1,19 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    vcarve.ngc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.06304'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(13.5167,5.56491,0.25)'/>
+  <workpiece-min v='(-2.89442,0.476477,-0.5)'/>
+
+  <tool_table>
+    <tool length='2' number='1' radius='1' shape='CONICAL' units='MM'/>
+  </tool_table>
+</openscam>

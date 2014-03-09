@@ -1,0 +1,19 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    scorpion.nc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.313222'/>
+  <resolution-mode v='HIGH'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(216.309,247.905,0)'/>
+  <workpiece-min v='(14.1468,-5.4365,-3)'/>
+
+  <tool_table>
+    <tool cutter_length='12.7' length='12.7' number='1' radius='0.5' shape='CYLINDER' units='MM'/>
+  </tool_table>
+</openscam>

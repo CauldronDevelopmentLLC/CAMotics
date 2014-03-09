@@ -1,0 +1,20 @@
+<openscam>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
+  <!-- NC Files -->
+  <nc-files>
+    flower_mold.nc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.3'/>
+  <resolution-mode v='MANUAL'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(61.0796,61.0529,0)'/>
+  <workpiece-min v='(-3.92956,-3.92829,-9.95121)'/>
+
+  <tool_table>
+    <tool length='10' number='1' radius='0.5' shape='CYLINDRICAL' units='MM'/>
+  </tool_table>
+</openscam>

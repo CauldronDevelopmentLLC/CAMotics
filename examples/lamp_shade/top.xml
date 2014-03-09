@@ -1,0 +1,19 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    top.ngc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.777719'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(140,140,0)'/>
+  <workpiece-min v='(0,0,-6)'/>
+
+  <tool_table>
+    <tool length='10' number='1' radius='0.79375' shape='CYLINDRICAL'/>
+  </tool_table>
+</openscam>

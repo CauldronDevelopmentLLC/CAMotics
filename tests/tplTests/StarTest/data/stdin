@@ -1,0 +1,31 @@
+function square(size, depth, safe) {
+  cut({z: depth}); // Cut down to depth
+  icut({x: size}); // Cut to second corner
+  icut({y: size}); // Cut to third corner
+  icut({x: -size}); // Cut to forth corner
+  icut({y: -size}); // Cut back to begining
+  rapid({z: safe}); // Move back to safe position
+}
+
+
+function squares(count, space, depth, safe) {
+    for (var i = 1; i <= count; i++) {
+        rapid({x: -space * i, y: -space * i});
+        square(i * 2 * space, depth, safe);
+    }
+}
+
+
+feed(400); // Set the feed rate to 40 millimeters per second
+tool(1); // Select tool 1
+
+rapid({z: 5}); // Move to a safe height of 5mm
+rapid({x: 0, y: 0});  // Go to center position
+speed(2000); // Spin at 2000 RPM in the clockwise direction
+
+for (var i = 0; i < 4; i++) {
+    squares(10, 5, -3, 5);
+    rotate(PI / 8);
+}
+
+speed(0); // Stop spinning

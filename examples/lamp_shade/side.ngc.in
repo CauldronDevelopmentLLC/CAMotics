@@ -1,0 +1,20 @@
+G21
+F400
+M06 T1
+
+#<_safe_z> = 5
+
+o100 sub
+#include "side_inside.ngc"
+o100 endsub
+
+o200 sub
+#include "side_outside.ngc"
+o200 endsub
+
+o100 call [#<_safe_z>] [-3]
+o100 call [#<_safe_z>] [-6]
+o200 call [#<_safe_z>] [-3]
+o200 call [#<_safe_z>] [-6]
+
+M2

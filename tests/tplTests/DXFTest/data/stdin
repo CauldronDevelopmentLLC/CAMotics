@@ -1,0 +1,68 @@
+zSafe = 5;
+zCut = -5;
+feed(50);
+
+
+function samePos(x, y) {
+  small = 0.0001;
+  return getX() - small < x && x < getX() + small &&
+    getY() - small < y && y < getY() + small;
+}
+
+
+function cut_layer(layer) {
+  for (entity in layer) {
+    entity = layer[entity];
+
+    switch (entity.type) {
+    case POINT: print('point\n'); break;
+
+    case LINE:
+      print('(line)\n');
+      if (samePos(entity.x2, entity.y2))
+        cut(entity.x1, entity.y1);
+
+      else {
+        if (!samePos(entity.x1, entity.y1)) {
+          rapid({z: zSafe});
+          rapid(entity.x1, entity.y1);
+          cut({z: zCut});
+        }
+
+        cut(entity.x2, entity.y2);
+      }
+      break;
+
+    case ARC: print('(arc)\n'); break;
+
+    case POLYLINE:
+      if (!entity.vertices.length) break;
+      print('(polyline)\n');
+      v = entity.vertices[0];
+
+      if (!samePos(v.x, v.y)) {
+        rapid({z: zSafe});
+        rapid(v.x, v.y);
+        cut({z: zCut});
+      }
+
+      for (i = 1; i < entity.vertices.length; i++) {
+        v = entity.vertices[i];
+        cut(v.x, v.y);
+      }
+
+      break;
+
+    case SPLINE: print('(spline)\n'); break;
+    }
+  }
+}
+
+
+dxf = open('pattern.dxf');
+
+for (name in dxf) {
+  print('(Layer: ', name, ')\n');
+  cut_layer(dxf[name]);
+}
+

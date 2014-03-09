@@ -1,0 +1,18 @@
+G21
+F400
+M06 T1
+
+o100 sub
+#include "top_inside.ngc"
+o100 endsub
+
+o200 sub
+#include "top_outside.ngc"
+o200 endsub
+
+o100 call [5] [-3.5]
+o100 call [5] [-7]
+o200 call [5] [-3.5]
+o200 call [5] [-7]
+
+M2

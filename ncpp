@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# ncpp uses the C preprocessor to process NC files.
+#
+# Author: Joseph Coffland, Cauldron Development LLC
+# License: GPL 2.0+
+#
+# Some numeric and named references need to be escaped in order to pass G-Code
+# to the C preprocessor with out generating errors.  Added escapes are removed
+# after processing.
+
+if [ "$1" == "" ]; then
+    echo "NC file, a.k.a. G-Code, preprocessor."
+    echo "Usage: $0 <input.ngc>..."
+    exit 1
+fi
+
+for i in "$@"; do
+    sed 's/^\([[:space:]]*\)#\([<0-9]\)/\1\\#\2/' "$i" |
+    cpp -I$(dirname "$i") |
+    grep -v '^#' |
+	sed 's/^\([[:space:]]*\)\\#/\1#/'
+done

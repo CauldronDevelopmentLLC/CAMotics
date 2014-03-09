@@ -1,0 +1,15 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    slant_test.nc
+  </nc-files>
+
+  <!-- Workpiece -->
+  <workpiece-margin v='1'/>
+  <workpiece-max v='(10.61,10.61,0.05)'/>
+  <workpiece-min v='(-0.61,-0.61,-5.05)'/>
+
+  <tool_table>
+    <tool cone_angle='45' front_angle='0' length='5.5' number='3' radius='0.5' shape='CONICAL'/>
+  </tool_table>
+</openscam>

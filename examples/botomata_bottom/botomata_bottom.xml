@@ -1,0 +1,27 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    botomata_bottom.nc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='1.121903'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <workpiece-margin v='0'/>
+  <workpiece-max v='(45.7195,45.7195,0)'/>
+  <workpiece-min v='(-45.7195,-147.319,-20)'/>
+
+  <tool_table>
+    <tool length='1.5' number='1' radius='0.125' shape='CYLINDRICAL' units='INCH'>
+      1/4 end mill
+    </tool>
+    <tool length='1.5' number='2' orientation='1' radius='0.0625' shape='CYLINDRICAL' units='INCH'>
+      1/8 end mill
+    </tool>
+    <tool length='1.5' number='3' orientation='1' radius='0.03125' shape='CYLINDRICAL' units='INCH'>
+      1/16 end mill
+    </tool>
+  </tool_table>
+</openscam>

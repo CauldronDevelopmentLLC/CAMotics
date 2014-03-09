@@ -1,0 +1,4 @@
+openscam (0.0.1) unstable; urgency=low
+  * Initial Debian package.
+
+ -- Joseph Coffland <joseph@cauldrondevelopment.com>  Thu, 13 Jan 2011 20:38:52 -0800

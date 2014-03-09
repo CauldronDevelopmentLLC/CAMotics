@@ -1,0 +1,20 @@
+<openscam>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
+  <!-- NC Files -->
+  <nc-files>
+    tiny_cat_outline.ngc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.508957'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-margin v='1'/>
+  <workpiece-max v='(100,110,0)'/>
+  <workpiece-min v='(0,0.134404,-3)'/>
+
+  <tool_table>
+    <tool length='1' number='1' radius='0.03125' shape='BALLNOSE' units='INCH'/>
+  </tool_table>
+</openscam>

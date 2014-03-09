@@ -1,0 +1,229 @@
+( spindle-encoder.ngc )
+( by Lawrence Glaister VE7IT )
+( Sept 15 2007 )
+( lerman - thankyou for named variables and owords.... very cool )
+( Cut from arborite stock with 0.049" endmill. )
+( This encoder ring mounts on the lathe spindle drive pulley. )
+( Ring encoder provides A,B,Z phases using 3 H21TLB slot sensors. )
+( The H21TLB sensor use 5v and can directly drive parallel port pins. )
+( The sensor apeture is 0.035", so I used double that for the slot length )
+( to allow for some runout on mounting the ring. )
+( The main constraint is that the main track opto has to be able to physically )
+( read the inner track... reaching over the outer index track )
+( To preview what it will look like, set _endmill_dia = 0.0 below. )
+( With a high speed spindle you may be able to cut to depth in 1 pass. )
+( This example only cuts to -0.020... this can be edited and the program )
+( rerun to do 2 passes )
+( Edited to make a much smaller wheel with fewer slots by Gene Heskett )
+
+(======================================================================)
+(============================= Subroutines ============================)
+( cuts a circle at request diameter around x,y to requested depth )
+o100 sub
+  (Subroutine to do a circle)
+  ( P1=X center P2=Y center P3-diameter P4=depth P5=feedrate )
+  g0 z#<_safe_Z>
+  g0 x[#1-[#3/2]] y#2
+  g1 F[#5/1.5] z#4
+  g2 F[#5/1.5] x[#1-[#3/2]] y#2 i[#3/2] j0
+  g0 z#<_safe_Z>
+o100 endsub
+
+(======================================================================)
+(=================== Define Constants/Variables =======================)
+#<_endmill_dia> = 0.0625 			  	  ( 1/16" endmill diameter )
+
+#<_safe_Z> = 0.100		                  ( safe Z height )
+#<_zstart> = 0.0025	(run down to there fast, then ramp into slot)
+( This Zcut is not through but safe for bits )
+( Increase and rerun to get full depth & part cut out )
+#<_Zcut> = -0.020                 ( Z depth to cut encoder elements NOT USED! )
+#<_feedrate> = 5.5			              ( cutting feedrate )
+S1000 (spindle speed?)
+( define characteristics of encoder and index tracks )
+#<_main_track_dia> = 2.2350		          ( diameter of main signal track )
+#<_index_track_dia> = [#<_main_track_dia> - 0.130] ( diameter of index track )
+#<_inside_cutout> = 1.0510                ( diameter of interior cutout == inside of pulley)
+#<_outside_cutout> = 2.410	  ( diameter of exterior cutout ~= enough space for tracks)
+#<_encoder_cycles> = 45	  	  ( number of slots to cut * 4 == 180 edges or about 2 degree resolution)
+#<_slotlen> = 0.155               ( finished slot length for 1 encoder element ~= sensor aperture + runout )
+
+( define 3 params for the mounting arrangement )
+#<_mount_circle> = 1.600				  ( mounting bolt circle diameter )
+#<_mount_holes> = 6					  ( number of holes to mill for mounting bolts )
+#<_mount_hdia> = 0.130					  ( sloppy #6 or a #8 bolt )
+
+#<_PI> = 3.14159265359 (more decimal places can't hurt GH)
+#<_endmill_rad> = [#<_endmill_dia>/2.0]   ( endmill radius )
+#<_encoder_theta>=[360.0/#<_encoder_cycles>]  ( angular step around circle  - degrees=8 here)
+
+(======================================================================)
+(========================= Start of Main Code =========================)
+
+
+G20 G90 G49 G54
+G64 P.002
+G0 X0 Y0
+(G00 Z3) ( tool change height )
+M06 T7 ( 0.0625 mill )
+(o<tedautoz> call) ( UNCOMMENT FOR REAL RUN! )
+G54 (tedautoz will put in G55, cancel it )
+G00 X0 Y0
+G00 z#<_safe_Z>
+
+m0(DEBUG,spindle_encoder.ngc: #<_encoder_cycles> cycle disk uses #<_endmill_dia> dia endmill, material top,center at 0,0,0 ... unpause[S] when ready)
+M03 (start spindle)
+o100 call [0.0] [0.0] [#<_outside_cutout>+#<_endmill_dia>] [#<_safe_Z>] [50.0]
+
+
+( cut the main encoder slots )
+
+( compute angular size of cutter at cutting extremes )
+#<inner_dia> = [#<_main_track_dia> - #<_slotlen> +  #<_endmill_dia>]
+#<outer_dia> = [#<_main_track_dia> + #<_slotlen> -  #<_endmill_dia>]
+#<icutter_deg> = [[#<_endmill_dia>*360.0/[#<inner_dia>*#<_PI>]] + 0.55000]
+#<ocutter_deg> = [[#<_endmill_dia>*360.0/[#<outer_dia>*#<_PI>]] + 0.55000]
+#<slot_deg> = [#<_encoder_theta>/2.0 ]
+(debug, slot width is #<slot_deg>)
+#<slots> = #<_encoder_cycles>     ( counter for cutting this many slots )
+#<angle> = 360                    ( starting angle to cut )
+
+( rough check to see if cutter dia and disk resolution are feasible )
+(o5 if [#<icutter_deg> GT #<slot_deg>])
+  (debug,icutter_deg= #<icutter_deg>, slot_deg= #<slot_deg>)
+  (DEBUG, Unable to cut encoder because #<_endmill_dia> cutter is too large for a #<_encoder_cycles> cycle #<_main_track_dia> dia disk)
+(  m2)
+(o5 endif)
+
+( check to see if we can machine mounting holes )
+o7 if [ #<_mount_hdia> LE #<_endmill_dia> ]
+  (print,Unable to machine mounting holes as #<_endmill_dia> endmill is too big to cut #<_mount_hdia> dia holes )
+  (DEBUG,Unable to machine mounting holes as #<_endmill_dia> endmill is too big to cut #<_mount_hdia> dia holes )
+  m2
+o7 endif
+( setup for main loop )
+#<_ztmp> = 0.000
+#<_zend> = -0.043
+#<_zinc> = [-0.037 / 9.000] ( should give .004625 )
+
+(loop this for 9 passes so we get nice clean cuts)
+o300 while [#<_ztmp> gt #<_zend>]
+#<_ztmp> = [#<_ztmp> + #<_zinc>]
+#<slots> = #<_encoder_cycles>
+( main loop to cut encoder slots around disk )
+o10 do
+  #<centerx> = [#<_main_track_dia>/2.0 * cos[#<angle>]]	 ( x center of slot )
+  #<centery> = [#<_main_track_dia>/2.0 * sin[#<angle>]]  ( y center of slot )
+(debug, centery = #<centery>)
+  g0 z#<_safe_Z>
+  g0 x[#<centerx>] y[#<centery>]
+  ( do a cut to the final depth at the cw inner corner of the slot )
+  #<myangle> = [#<angle> - [#<slot_deg>/2.0] + [#<icutter_deg>/2.0]]
+  #<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
+  #<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]
+  g0 z[#<_ztmp> - #<_zinc>]
+  g1 x[#<myx>] y[#<myy>] z[#<_ztmp>] f[#<_feedrate>]  ( decend to cut depth )
+
+  #<myangle> = [#<angle> + [#<slot_deg>/2.0] - [#<icutter_deg>/2.0]]
+  #<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
+  #<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]
+  #<myr> = SQRT[#<myx>*#<myx> + #<myy>*#<myy>]
+  g3 x[#<myx>] y[#<myy>]  r[#<myr>] f[#<_feedrate>] ( cut inside edge of slot )
+
+  #<myangle> = [#<angle> + [#<slot_deg>/2.0] - [#<ocutter_deg>/2.0]]
+  #<myx> = [#<outer_dia>/2.0 * cos[#<myangle>]]
+  #<myy> = [#<outer_dia>/2.0 * sin[#<myangle>]]
+  g1 x[#<myx>] y[#<myy>]                  ( cut ccw edge of slot )
+
+  #<myangle> = [#<angle> - [#<slot_deg>/2.0] + [#<ocutter_deg>/2.0]]
+  #<myx> = [#<outer_dia>/2.0 * cos[#<myangle>]]
+  #<myy> = [#<outer_dia>/2.0 * sin[#<myangle>]]
+  #<myr> = SQRT[#<myx>*#<myx> + #<myy>*#<myy>]
+  g2 x[#<myx>] y[#<myy>] r[#<myr>]                ( cut outer edge of slot )
+
+  #<myangle> = [#<angle> - [#<slot_deg>/2.0] + [#<icutter_deg>/2.0]]
+  #<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
+  #<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]
+  g1 x[#<myx>] y[#<myy>]                  ( cut back to inner cw point of slot )
+
+  g0 z#<_safe_Z>
+  #<slots> = [#<slots> -1]
+  #<angle> = [#<angle> - #<_encoder_theta>]
+o10 while [#<slots> GT 0]
+
+( cutout index hole)
+
+( compute angular size of cutter at cutting extremes )
+#<inner_dia> = [#<_index_track_dia> - #<_slotlen> +  #<_endmill_dia>]
+#<outer_dia> = [#<_index_track_dia> + #<_slotlen> -  #<_endmill_dia>]
+#<icutter_deg> = [#<_endmill_dia>*360.0/[#<inner_dia>*#<_PI>]]
+#<ocutter_deg> = [#<_endmill_dia>*360.0/[#<outer_dia>*#<_PI>]]
+#<slot_deg> = [#<_encoder_theta>/2.0 ]
+#<angle> = 360                    ( starting angle to cut )
+
+#<centerx> = [#<_index_track_dia>/2.0 * cos[#<angle>]]	 ( x center of slot )
+#<centery> = [#<_index_track_dia>/2.0 * sin[#<angle>]]  ( y center of slot )
+g0 z#<_safe_Z>
+g0 x[#<centerx>] y[#<centery>] 
+( do a cut to the final depth at the cw inner corner of the slot )
+#<myangle> = [#<angle> - [#<slot_deg>/2.0] + [#<icutter_deg>/2.0]]
+#<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
+#<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]
+g0 z[#<_ztmp> - #<_zinc>]
+g1 x[#<myx>] y[#<myy>] z[#<_ztmp>] f[#<_feedrate>]  ( decend to cut depth )
+
+#<myangle> = [#<angle> + [#<slot_deg>/2.0] - [#<icutter_deg>/2.0]]
+#<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
+#<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]  
+#<myr> = SQRT[#<myx>*#<myx> + #<myy>*#<myy>]
+g3 x[#<myx>] y[#<myy>]  r[#<myr>] f[#<_feedrate>] ( cut inside edge of slot )
+
+#<myangle> = [#<angle> + [#<slot_deg>/2.0] - [#<ocutter_deg>/2.0]]
+#<myx> = [#<outer_dia>/2.0 * cos[#<myangle>]]
+#<myy> = [#<outer_dia>/2.0 * sin[#<myangle>]]
+g1 x[#<myx>] y[#<myy>]                  ( cut ccw edge of slot )
+
+#<myangle> = [#<angle> - [#<slot_deg>/2.0] + [#<ocutter_deg>/2.0]]
+#<myx> = [#<outer_dia>/2.0 * cos[#<myangle>]]
+#<myy> = [#<outer_dia>/2.0 * sin[#<myangle>]]
+#<myr> = SQRT[#<myx>*#<myx> + #<myy>*#<myy>]
+g2 x[#<myx>] y[#<myy>] r[#<myr>]              ( cut outer edge of slot )
+
+#<myangle> = [#<angle> - [#<slot_deg>/2.0] + [#<icutter_deg>/2.0]]
+#<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
+#<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]
+g1 x[#<myx>] y[#<myy>]                   ( cut back to inner cw point of slot )
+
+g0 z#<_safe_Z>
+
+( mill some mounting bolt holes )
+
+#<holes> = #<_mount_holes>
+#<myangle> = 0
+o20 do
+    #<myx> = [#<_mount_circle>/2.0 * cos[#<myangle>]]
+    #<myy> = [#<_mount_circle>/2.0 * sin[#<myangle>]]
+              ( X )      ( Y )             ( Diameter )           ( Depth )    ( Feed )
+    o100 call [#<myx>] [#<myy>] [#<_mount_hdia>-#<_endmill_dia>] [#<_ztmp>] [#<_feedrate>] ( one mounting hole )
+    #<myangle> = [#<myangle> + [ 360.0/#<_mount_holes>] ]
+    #<holes> = [#<holes> -1]
+o20 while [ #<holes> GT 0 ]
+
+( cutout encoder ring )
+          ( X ) ( Y )             ( Diameter )             ( Depth )    ( Feed )
+o100 call [0.0] [0.0] [#<_inside_cutout>-#<_endmill_dia>] [#<_ztmp>]  [#<_feedrate>/1.25]      ( interior cutout )
+( restore screwed up stuff for next pass!)
+#<inner_dia> = [#<_main_track_dia> - #<_slotlen> +  #<_endmill_dia>]
+#<outer_dia> = [#<_main_track_dia> + #<_slotlen> -  #<_endmill_dia>]
+
+o300 endwhile
+
+(reset for outer ring cutout )
+#<_ztmp> = 0.00
+o400 while [#<_ztmp> gt #<_zend>]
+#<_ztmp> = [#<_ztmp> + #<_zinc>]
+o100 call [0.0] [0.0] [#<_outside_cutout>+#<_endmill_dia>] [#<_ztmp>] [#<_feedrate>/2.00]      ( exterior cutout )
+o400 endwhile
+G49 ( cancel g43.1 TLO that tedautoz.ngc installs )
+M5
+M2

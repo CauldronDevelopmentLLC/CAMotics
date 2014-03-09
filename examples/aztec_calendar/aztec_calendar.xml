@@ -1,0 +1,22 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    aztec_calendar.nc
+  </nc-files>
+
+  <!-- Project -->
+  <notes>This project has a lot of intricate detail which can take a very long time to simulate.</notes>
+  <units v='INCH'/>
+
+  <!-- Renderer -->
+  <resolution v='0.5'/>
+  <resolution-mode v='MANUAL'/>
+
+  <!-- Workpiece -->
+  <workpiece-max v='(203.2,203.2,3.81)'/>
+  <workpiece-min v='(-203.2,-203.2,-15.24)'/>
+
+  <tool_table>
+    <tool length='10' number='30' radius='1.25' shape='CONICAL' units='MM'/>
+  </tool_table>
+</openscam>

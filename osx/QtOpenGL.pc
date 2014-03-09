@@ -1,0 +1,12 @@
+package=QtOpenGL
+prefix=/Library/Frameworks/${package}.framework
+exec_prefix=${prefix}
+libdir=${exec_prefix}
+includedir=${prefix}/Headers
+
+Name: QtOpenGL
+Description: QtOpenGL
+Version: 4.8.5
+
+Libs: -L${libdir} ${libdir}/${package}
+Cflags: -I${includedir}

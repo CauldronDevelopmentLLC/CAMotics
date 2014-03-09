@@ -1,0 +1,36 @@
+%
+M3
+G21 (All units in mm)
+T1
+
+O100 sub
+#include "path_small.ngc"
+O100 endsub
+
+O200 sub
+  g0 Z5
+  g10 L2 P2 X#1 Y#2
+  g55 (coorindate system 2)
+  O100 call [-2.6]
+  O100 call [-5.2]
+  O100 call [-7.6]
+  O100 call [-10.4]
+O200 endsub
+
+()#<x> = 0
+O101 repeat [2]
+  ()#<y> = 0
+
+  O102 repeat [4]
+    O200 call [#<x>] [#<y>]
+    ()#<y> = [#<y> + 50.8]
+  O102 endrepeat
+
+  ()#<x> = [#<x> + 50.8]
+O101 endrepeat
+
+g0 Z5
+
+M5
+M2
+%

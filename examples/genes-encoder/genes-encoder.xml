@@ -1,0 +1,18 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    genes-encoder.ngc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.25'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(35.4139,35.4139,0)'/>
+  <workpiece-min v='(-35.4139,-35.4139,-0.5)'/>
+
+  <tool_table>
+    <tool back_angle='0' length='10' number='7' radius='0.79375' shape='CYLINDRICAL'/>
+  </tool_table>
+</openscam>

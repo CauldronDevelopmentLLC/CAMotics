@@ -1,0 +1,19 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    text.tpl
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.125146'/>
+  <resolution-mode v='VERY_HIGH'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(56,70,0)'/>
+  <workpiece-min v='(0,0,-5)'/>
+
+  <tool_table>
+    <tool length='0.25' number='1' radius='0.0625' shape='CONICAL' units='INCH'/>
+  </tool_table>
+</openscam>

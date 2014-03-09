@@ -11,3 +11,16 @@
 *.lai
 *.la
 *.a
+
+# Compiled Python
+*.pyc
+
+# SCons
+.sconf_temp
+.sconsign.dblite
+
+# Build byproducts
+build
+config.log
+package.txt
+

@@ -1,0 +1,11 @@
+()#2 = -2.6
+#include "path_small.ngc"
+
+()#2 = -5.2
+#include "path_small.ngc"
+
+()#2 = -7.8
+#include "path_small.ngc"
+
+()#2 = -10.4
+#include "path_small.ngc"

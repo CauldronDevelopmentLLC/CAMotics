@@ -1,0 +1,19 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    box.tpl
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.714092'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(32,110,0)'/>
+  <workpiece-min v='(-32,-2,-12.7)'/>
+
+  <tool_table>
+    <tool length='1' number='1' radius='0.0625' shape='CYLINDRICAL' units='INCH'/>
+  </tool_table>
+</openscam>

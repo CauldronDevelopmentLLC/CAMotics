@@ -1,0 +1,20 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    bear.nc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.294723'/>
+  <resolution-mode v='HIGH'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-margin v='0'/>
+  <workpiece-max v='(80,80,0)'/>
+  <workpiece-min v='(0,0,-20)'/>
+
+  <tool_table>
+    <tool cutter_length='1' length='1' number='1' radius='0.0625' shape='CYLINDER' units='INCH'/>
+  </tool_table>
+</openscam>

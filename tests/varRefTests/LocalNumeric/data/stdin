@@ -1,0 +1,7 @@
+G21
+
+o100 sub
+G0 X#1 Y#2
+o100 endsub
+
+o100 call [10] [15]

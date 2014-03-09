@@ -1,0 +1,20 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    side.ngc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.780793'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-margin v='0'/>
+  <workpiece-max v='(140,170,0)'/>
+  <workpiece-min v='(0,0,-5)'/>
+
+  <tool_table>
+    <tool length='0.393701' number='1' radius='0.03125' shape='CYLINDER' units='INCH'/>
+  </tool_table>
+</openscam>

@@ -1,0 +1,19 @@
+<openscam>
+  <!-- NC Files -->
+  <nc-files>
+    stretching_cat.ngc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.928318'/>
+  <resolution-mode v='MEDIUM'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(100,200,0)'/>
+  <workpiece-min v='(0,0,-10)'/>
+
+  <tool_table>
+    <tool length='10' number='1' radius='0.79375' shape='CYLINDRICAL' units='MM'/>
+  </tool_table>
+</openscam>

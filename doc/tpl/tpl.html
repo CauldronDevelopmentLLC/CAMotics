@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tool Path Language</title>
+    <script
+       src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+    </script>
+
+    <link rel="stylesheet" href="solarized-light.css"/>
+    <script src="rainbow-custom.min.js"></script>
+
+    <link rel="stylesheet" href="tpl.css"/>
+    <script src="tpl.js"></script>
+  </head>
+  <body>
+    <div id="sidebar"></div>
+    <div id="content">
+      <div class="L0" id="about" title="Tool Path Language"></div>
+      <p>TPLang or Tool Path Language is a programming language for creating
+        machine tool paths for
+        <a href="http://en.wikipedia.org/wiki/CNC">CNCs</a>.  It is based on
+        <a href="http://en.wikipedia.org/wiki/JavaScript">JavaScript</a> and is
+        a powerful replacement for the venerable but horribly outdated
+        <a href="http://en.wikipedia.org/wiki/G-code">G-code</a>
+        language.
+
+        However, TPLang can output G-code so it remains compatible with existing
+        machine control software like
+        <a href="http://www.linuxcnc.org/">LinuxCNC</a>
+      </p>
+
+      <p>
+        TPLang is part of the <a href="http://openscam.org/">OpenSCAM
+          project</a> and can be used in conjunction with the OpenSCAM CNC
+        simulator.
+      </p>
+
+      <div class="L0" id="downloads" title="Downloads"></div>
+      <p>TPLang is part of the OpenSCAM project.
+        See <a href="http://openscam.org/">openscam.org</a> for information
+        on downloading and installing the software.</p>
+
+      <div class="L0" id="examples" title="An Example">
+        <p>This section aims to give you a quick and dirty introduction to TPL
+          and some of it's features via a few simple examples.</p>
+
+        <p>TPL code is JavaScript with a library of built-in functions which
+          allow you to generate tool paths.  It looks like this:</p>
+
+        <div class="example">
+          feed(400); // Set the feed rate to 400 millimeters per minute
+          tool(1); // Select tool 1
+
+          rapid({z: 5}); // Move to a safe height of 5mm
+          rapid({x: 1, y: 1});  // Go to start position
+          speed(2000); // Spin at 2000 RPM in the clockwise direction
+
+          cut({z: -3}); // Cut down to depth
+          cut({x: 11}); // Cut to second corner
+          cut({y: 11}); // Cut to third corner
+          cut({x: 1}); // Cut to forth corner
+          cut({y: 1}); // Cut back to begining
+
+          rapid({z: 5}); // Move back to safe position
+          speed(0); // Stop spinning
+        </div>
+
+        <p>The OpenSCAM simulator shows the result:</p>
+        <img class="sim-image" src="images/square.png"/>
+
+        <p>
+          The previous example initializes the machine then cuts a square.
+          Note, you must always set the feed rate to something other than zero
+          before making a cut.  It's also a good idea to select a tool and
+          set the spindle speed.  Also note thate, TPL uses metric units by
+          default but you can switch to imperial units by calling
+          <b>units(IMPERIAL)</b>.
+        </p>
+
+        <p>Note, the bracket notation <b>{}</b> used above lets you specify
+          specific arguments and leave others to their default values.  The
+          following function calls are all equivalent:</p>
+
+        <div class="example">
+          rapid(5, 10, 15);
+          rapid({x: 5, y: 10, z: 15});
+          rapid({z: 15, x: 5, y: 10});
+        </div>
+
+        <p>The code in the square example may be more readable than typical
+          GCode but TPL's real power comes from its ability to use more
+          advanced language constructs such as functions.  The above square
+          example could be wrapped in a function like this:</p>
+
+        <div class="example">
+          function square(size, depth, safe) {
+            cut({z: depth}); // Cut down to depth
+            icut({x: size}); // Cut to second corner
+            icut({y: size}); // Cut to third corner
+            icut({x: -size}); // Cut to forth corner
+            icut({y: -size}); // Cut back to begining
+            rapid({z: safe}); // Move back to safe position
+          }
+
+          feed(400); // Set the feed rate to 400 millimeters per minute
+          tool(1); // Select tool 1
+
+          rapid({z: 5}); // Move to a safe height of 5mm
+          rapid({x: 1, y: 1});  // Go to start position
+          speed(2000); // Spin at 2000 RPM in the clockwise direction
+
+          square(10, -3, 5);
+
+          speed(0); // Stop spinning
+        </div>
+
+        <p>Note the <b>square()</b> function uses <b>icut()</b> the incremental
+          version of <b>cut()</b>.</p>
+
+        <p>Given the <b>square()</b> function you can now cut repeated squares
+          like this:
+        </p>
+
+        <div class="example">
+          for (i = 1; i <= 10; i++) square(i * 5, -3, 5);
+        </div>
+
+        <p>Here is the result of running the <b>squares</b> function as in the
+          for loop above.</p>
+        <img class="sim-image" src="images/squares.png"/>
+
+        <p>To continue the example a bit further and show more of the power
+          of TPL we can repeat and rotate the squares to create an interesting
+          pattern using the following program:</p>
+
+        <div class="example">
+          function square(size, depth, safe) {
+            cut({z: depth}); // Cut down to depth
+            icut({x: size}); // Cut to second corner
+            icut({y: size}); // Cut to third corner
+            icut({x: -size}); // Cut to forth corner
+            icut({y: -size}); // Cut back to begining
+            rapid({z: safe}); // Move back to safe position
+          }
+
+
+          function squares(count, space, depth, safe) {
+              for (var i = 1; i <= count; i++) {
+                  rapid({x: -space * i, y: -space * i});
+                  square(i * 2 * space, depth, safe);
+              }
+          }
+
+
+          feed(400); // Set the feed rate to 40 millimeters per second
+          tool(1); // Select tool 1
+
+          rapid({z: 5}); // Move to a safe height of 5mm
+          rapid({x: 0, y: 0});  // Go to center position
+          speed(2000); // Spin at 2000 RPM in the clockwise direction
+
+          for (var i = 0; i < 4; i++) {
+              squares(10, 5, -3, 5);
+              rotate(PI / 8); // Rotate clockwise 15 degrees
+          }
+
+          speed(0); // Stop spinning
+        </div>
+
+        <p>The simulator shows the final result:</p>
+        <img class="sim-image" src="images/star.png"/>
+      </div>
+
+      <div class="L0" id="usage" title="Using TPLang"></div>
+      <p>
+        After downloading and installing the latest OpenSCAM you can write
+        a TPLang program, or try out one of the examples.  TPLang programs
+        usually have the file extension <b>.tpl</b>.  You can execute a TPLang
+        program like this:
+      </p>
+      <div class="example">
+        tplang input.tpl
+      </div>
+
+      <p>
+        This will print the resulting G-code to the screen.  You can also
+        save the output to a file like this:
+      </p>
+      <div class="example">
+        tplang input.tpl > output.gc
+      </div>
+
+      <p>You can then view the results in the OpenSCAM simulator like this:</p>
+      <div class="example">
+        openscam output.gc
+      </div>
+
+      <p>
+        You will also probably have to configure a tool table and
+        define the workpeice (the material being cut) in order to get a correct
+        simulation.  See <a href="http://openscam.org/">openscam.org</a> for
+        more information on using the simulator.
+      </p>
+
+      <div class="L0" id="api" title="API"></div>
+      <p>The TPLang Application Programming Interface allows you to duplicate
+        any G-code program easily in a much more readable way but you also have
+        the full power of the JavaScript language at your finger tips so
+        much more is possible.  In fact you don't even need CAM software
+        you can model the shapes you want to cut directly in TPLang.
+      </p>
+
+      <!-- Machine Motion Functions -->
+      <div class="L2" id="motion" title="Tool Movement"></div>
+
+      <div class="L3 func" id="rapid">
+        <div class="decl">rapid(x, y, z, a, b, c, u, v, w, incremental=false)
+        </div>
+        <p>Issue a linear motion at the rapid feed rate from the current
+          position to the new position defined by the provided axes arguments.
+        </p>
+
+        <div class="example">
+          rapid(0, 0, 0);          // Rapid to x=0, y=0, z=0
+          rapid(10, 10);           // Rapid to x=10, y=10, z remains 0
+          rapid({z: 10, y: 10});   // Rapid to y=10, z=10, x remains 10
+        </div>
+      </div>
+
+      <div class="L3 func" id="irapid">
+        <div class="decl">irapid(x, y, z, a, b, c, u, v, w, incremental=true)
+        </div>
+        <p>The same as <b>rapid()</b> but <b>incremental</b> defaults to true.
+      </div>
+
+      <div class="L3 func" id="cut">
+        <div class="decl">cut(x, y, z, a, b, c, u, v, w, incremental=false)
+        </div>
+        <p>The same as <b>rapid()</b> except moves are at the current feed
+          rate set by a call to <b>feed()</b>.
+      </div>
+
+      <div class="L3 func" id="icut">
+        <div class="decl">icut(x, y, z, a, b, c, u, v, w, incremental=true)
+        </div>
+        <p>The same as <b>cut()</b> but <b>incremental</b> defaults to true.
+      </div>
+
+      <div class="L3 func" id="arc">
+        <div class="decl">arc(x, y, z, angle, plane, incremental=true)</div>
+      </div>
+
+      <div class="L3 func" id="probe">
+        <div class="decl">probe(x, y, z, a, b, c, u, v, w, toward=true,
+          error=true, index=0, port=-1, invert=false)</div>
+        <p>Make a linear move in the direction indicated until the probe
+          state changes to the target state.  If <b>toward</b> is true the
+          probe motion will stop on contact.  Otherwise it will stop on loss
+          of contact.</p>
+        <p><b>probe()</b> will return the coordinates of the position at the
+          time the probe changed state.  If the programmed point was reached
+          before the state changed then the programmed point will be returend
+          instead.</p>
+
+        <div class="example">
+          probe(z = -10);  // Probe towards z=-10
+          probe(z = 10, toward = false);  // Probe away from current z
+        </div>
+
+        <p>
+          It is an error if:
+          <ul>
+            <li>The current point is the same as the programed point.</li>
+            <li>The current feed rate is zero.</li>
+            <li>The probe is already in the target state.</li>
+          </ul>
+        </p>
+      </div>
+
+      <div class="L3 func" id="dwell">
+        <div class="decl">dwell(seconds)</div>
+        <p><b>seconds</b> indicate the time in seconds that all axes will
+          remain unmoving.  Fractions of a second may be used.</p>
+        <div class="example">
+          dwell(0.5);  // Dwell for half a second.
+        </div>
+      </div>
+
+      <!-- Machine State Functions -->
+      <div class="L2" id="mstate" title="Machine State"></div>
+
+      <div class="L3 func" id="feed">
+        <div class="decl">feed(rate, mode = FEED_UNITS_PER_MIN)</div>
+        <p><b>rate</b> indicates the units per minute in the XYZ cartesian
+          system of all subsequent non-rapid moves until the feed rate is
+          changed.</p>
+
+        <p>
+          <b>mode</b> may be one of the following:
+          <ul>
+            <li><i>FEED_UNITS_PER_MIN</i> - The feed rate is in units per
+              minute.  The unit may be inches, millimeters or degrees
+              depending on the current unit of length and which axes are
+              moving.</li>
+            <li><i>FEED_INVERSE_TIME</i> - Indicates that moves should be
+              completed in one divided by <b>rate</b> minutes.  For example,
+              if <b>rate</b> is 2.0, moves should be completed in half a
+              minute.</li>
+            <li><i>FEED_UNITS_PER_REV</i> - Means that the controlled point
+              should move a certain number of units per revolution.</li>
+          </ul>
+
+          Note, these names are case sensitive.
+        </p>
+
+        <p>If no arguments are given, returns the current feed rate and
+          mode.</p>
+
+        <div class="example">
+          feed(4);           // Move at 4 units per minute
+          rate = feed()[0];  // Get the current feed rate
+        </div>
+      </div>
+
+      <div class="L3 func" id="spin">
+        <div class="decl">speed(rate, surface, max)</div>
+        <p><b>rate</b> indicates the revolutions per minute of the spindle.
+        </p>
+        <p>If <b>rate</b> is positive the spindle will turn in the
+          clockwise direction.  If negative in the counterclockwise direction.
+        </p>
+        <p>A <b>rate</b> of zero turns the spindle off.</p>
+
+        <p>
+          If <b>surface</b> is specified it selects a constant surface speed
+          of <b>surface</b> feet per minute if <i>IMPERIAL</i> units are
+          selected or meters per minute if <i>METRIC</i> units are selected.
+          If <b>max</b> is also specified it indicates the maximum spindle
+          RPM.
+        </p>
+
+        <p>If no arguments are given, returns the current spindle speed,
+          surface speed and maximum RPM.</p>
+
+        <div class="example">
+          spin(1000);  // Spin clockwise at 1K RPM.
+          spin(-20000);  // Spin counterclockwise at 20K RPM.
+        </div>
+      </div>
+
+      <div class="L3 func" id="tool">
+        <div class="decl">tool(number)</div>
+        <p>Make tool <b>number</b> the current tool.</p>
+        <p>If no arguments are given the current tool number is returned.</p>
+        <div class="example">tool(1);  // Select tool 1</div>
+      </div>
+
+      <div class="L3 func" id="units">
+        <div class="decl">units(type)</div>
+        <p><b>type</b> may be either <i>METRIC</i> which selects millimeters
+          as the unit of measure or <i>IMPERIAL</i> which selects inches.</p>
+        <p>If no arguments are given the current <b>type</b> is returned.</p>
+        <div class="example">units(METRIC);  // Select millimeters</div>
+      </div>
+
+      <div class="L3 func" id="pause">
+        <div class="decl">pause(optional=false)</div>
+        <p>Pause the program until the user resumes.  If <b>optional</b> is
+          true then only pause if the stop switch is activated.</p>
+        <div class="example">pause(true);</div>
+      </div>
+
+      <!--
+      <div class="L3 func" id="getX">
+        <div class="decl">getX()</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+
+      <div class="L3 func" id="getY">
+        <div class="decl">getY()</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+
+      <div class="L3 func" id="getZ">
+        <div class="decl">getZ()</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      -->
+
+      <!-- Matrix Functions -->
+      <div class="L2" id="matrix" title="Matrix"></div>
+
+      <div class="L3 func" id="pushMatrix">
+        <div class="decl">pushMatrix(matrix)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      <div class="L3 func" id="popMatrix">
+        <div class="decl">popMatrix(matrix)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      <div class="L3 func" id="loadIdentity">
+        <div class="decl">loadIdentity(matrix)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      <div class="L3 func" id="scale">
+        <div class="decl">scale(x=1, y=1, z=1, matrix)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      <div class="L3 func" id="translate">
+        <div class="decl">translate(x=0, y=0, z=0, matrix)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      <div class="L3 func" id="rotate">
+        <div class="decl">rotate(angle, x=0, y=0, z=1, matrix)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      <!--
+      <div class="L3 func" id="setMatrix">
+        <div class="decl">setMatrix(m, matrix)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      <div class="L3 func" id="getMatrix">
+        <div class="decl">getMatrix(m)</div>
+        <p></p>
+        <div class="example"></div>
+      </div>
+      -->
+
+      <!-- Math Functions -->
+      <div class="L2" id="math" title="Math"></div>
+      <p>JavaScript has built in math functions and constants which are members
+        of the built-in Math object.  The Math object is defined in the
+        <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.8"
+           target="_blank">EMCAScript specification, section 15.8</a> or in a
+        perhaps more readable format at
+        <a href="http://www.w3schools.com/js/js_obj_math.asp" target="_blank">W3
+          Schools, Math object reference</a>.
+
+      <!-- Standard IO Functions -->
+      <div class="L2" id="stdio" title="Standard IO"></div>
+      <div class="L3 func" id="print">
+        <div class="decl">print(...)</div>
+        <p>Convert all arguments to strings and print them to the output
+          stream.</p>
+        <p>Note that print() writes to the same output stream as the gcode
+          functions so if you don't want to interfere with the gcode output
+          you should wrap text in parentheses '()' so that it is treated as a
+          gcode comment.</p>
+        <div class="example">print("Hello World!\n");</div>
+        <div class="example">print("(A gcode comment)\n");</div>
+      </div>
+
+
+      <!-- Tool Length Compensation -->
+      <!-- Cutter Radius Compensation -->
+      <!-- Path Modes -->
+      <!-- Input / Output -->
+
+      <!-- Lathe Modes -->
+      <!-- Rigid Tapping -->
+
+      <!-- Machine Physical Constraint Functions -->
+
+      <!-- Tool Table -->
+      <!-- Axes: min, max, speed, etc. -->
+      <!-- Workpiece -->
+      <!-- Fixtures -->
+
+      <div class="L0" id="bugs" title="Bug Reports"></div>
+      <p>See <a href="http://openscam.org/">openscam.org</a>.</p>
+
+      <div class="L0" id="donations" title="Donations"></div>
+      <p>See <a href="http://openscam.org/">openscam.org</a>.</p>
+    </div>
+
+    <div style="visible:hidden">
+      <!-- Objects -->
+      <div class="L2 object" id="machine"></div>
+      <div class="L2 object" id="vector"></div>
+      <div class="L2 object" id="arc"></div>
+      <div class="L2 object" id="spline"></div>
+      <div class="L2 object" id="nurb"></div>
+      <div class="L2 object" id="surface"></div>
+
+      <div class="L2" id="api_user" title="User Interaction">
+        <!-- Print / Debug -->
+        <!-- Dialogs -->
+        <!-- GUI -->
+      </div>
+
+      <div class="L2" id="api_io" title="Input Output">
+        <!-- GCode -->
+        <!-- DXF -->
+        <!-- STL -->
+        <!-- JSON -->
+        <!-- Text -->
+      </div>
+
+      <div class="L2" id="api_geom" title="Geometry">
+        <!-- Transform / Scale / Rotate -->
+        <!-- Path Optimization -->
+      </div>
+
+      <div class="L2" id="api_cam" title="Computer Aided Machining">
+        <!-- Profile -->
+        <!-- Pocket -->
+        <!-- Offset -->
+      </div>
+    </div>
+  </body>
+</html>
