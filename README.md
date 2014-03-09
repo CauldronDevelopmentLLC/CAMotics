@@ -1,4 +1,4 @@
-![OpenSCAM Logo][1]
+<img src="https://raw.github.com/jcoffland/OpenSCAM/master/images/openscam-logo.png" width="100%"/>
 
 OpenSCAM is an ​Open-Source software which can simulate 3-axis NC machining. It is a fast, flexible and user friendly simulation software for the DIY and Open-Source community.
 
@@ -35,6 +35,3 @@ After installing the prerequisites.  Build C! with the following command:
 Then build OpenSCAM with the following command:
 
     scons
-
-
-[1]: https://raw.github.com/jcoffland/OpenSCAM/master/images/openscam-logo.png
