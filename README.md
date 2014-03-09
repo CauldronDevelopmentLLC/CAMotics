@@ -1,3 +1,5 @@
+[1]
+
 OpenSCAM is an ​Open-Source software which can simulate 3-axis NC machining. It is a fast, flexible and user friendly simulation software for the DIY and Open-Source community.
 
 At home manufacturing is one of the next big technology revolutions. Much like the PC was 30 years ago. There have been major advances in desktop 3D printing (e.g. ​Maker Bot) yet uptake of desktop CNCs has lagged despite the availability of ​cheap CNC machines. One of the major reasons for this is a lack of Open-Source simulation and CAM (3D model to tool path conversion) software. CAM and NC machine simulation present some very difficult programming problems as evidenced by 30+ years of academic papers on these topics. Whereas 3D printing simulation and tool path generation is much easier. However, such software is essential to using a CNC.
@@ -33,3 +35,6 @@ After installing the prerequisites.  Build C! with the following command:
 Then build OpenSCAM with the following command:
 
     scons
+
+
+[1]: https://raw.github.com/jcoffland/OpenSCAM/master/images/openscam-logo.png
