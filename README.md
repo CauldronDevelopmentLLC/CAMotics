@@ -39,14 +39,12 @@ GNU General Public License version 2.  See the file COPYING.
 Note, C! is provided in the 'cbang' sub-directory of OpenSCAM.  OpenGL
 is usually provided by your OS.
 
-On Debian based systems all the prerequisites can be installed with
-the following command line:
+On Debian based systems all the prerequisites, including thoese needed
+by C!, can be installed with the following command line:
 
-    sudo apt-get install scons subversion build-essential libbz2-dev \
-      zlib1g-dev libexpat1-dev libssl-dev libboost-dev libsqlite3-dev \
-      libxml2-dev libgl1-mesa-dev qt4-dev-tools libqt4-dev libqt4-opengl-dev \
-      libcairo2-dev
-
+    sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
+      libexpat1-dev libssl-dev libboost-dev libsqlite3-dev libgl1-mesa-dev \
+      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev
 
 # Building
 After installing the prerequisites.  Build C! with the following command:
