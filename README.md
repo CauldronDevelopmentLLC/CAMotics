@@ -1,4 +1,4 @@
-[![OpenSCAM Logo][1]][http://openscam.com/]
+![OpenSCAM Logo][1]
 
 OpenSCAM is an ​Open-Source software which can simulate 3-axis NC machining. It is a fast, flexible and user friendly simulation software for the DIY and Open-Source community.
 
