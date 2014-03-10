@@ -22,10 +22,14 @@
 
 #include "QtWin.h"
 
+#include <QGLFormat>
+
 using namespace OpenSCAM;
 
 
-GLView::GLView(QWidget *parent) : QGLWidget(parent), id(0), qtWin(0) {}
+GLView::GLView(QWidget *parent) :
+  QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::SampleBuffers), parent), id(0),
+  qtWin(0) {}
 
 
 void GLView::mousePressEvent(QMouseEvent *event) {

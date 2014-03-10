@@ -135,7 +135,7 @@ void ViewPort::glInit() const {
   static const float materialSpecular[] = {0.25, 0.25, 0.25, 0.70};
 
   glColor4f(1, 1, 1, 1);
-  glClearColor(0, 0, 0, 1);
+  glClearColor(0, 0, 0, 0);
   glClearDepth(1);
 
   glEnable(GL_LINE_SMOOTH);
