@@ -1,7 +1,8 @@
 {
-    title_text: '<img src="images/banner.png" alt="OpenSCAM banner"/>',
+    titleText: '<img src="images/banner.png" alt="OpenSCAM banner"/>',
     subtext: 'Open-Source Simulation & Computer Aided Machining',
     version: '0.2.0 beta',
+    repoURL: 'https://github.com/CauldronDevelopmentLLC/OpenSCAM',
     releases: [
         ['Windows', 'windows-128.png',
          'http://openscam.org/builds/release/openscam/windows-xp-32bit/v0.2/r393-b166/openscam_0.2.0_x86.exe'],

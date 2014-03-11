@@ -1,19 +1,19 @@
 doctype html
 html(lang='en')
 head
-  include head
+  include ../head
 body
-  include header
+  include ../header
 
   .container.docs-container
     .row
       .col-md-3
         .sidebar.hidden-print(role='complementary')
           #toc
-            include manual-menu
+            include menu
 
       .col-md-9(role='main')
         .docs-section
-          include about
+          //include about
 
-  include footer
+  include ../footer

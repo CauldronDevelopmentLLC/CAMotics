@@ -30,8 +30,8 @@ ul
   li Add height probing to 2D GCode files.  Very useful for circuit board
     | cutting and metal engraving.
   li 2D GCode path optimization. (in progress
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/11'
-    | >#11</a>)
+    +issue(11)
+    | )
   li Operates in Windows and Linux.
   li
     | Released under the
@@ -39,12 +39,12 @@ ul
 
 h2#limitations Limitations
 ul
-  li Simulates only snapshots of the cutting process. See ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/2'
-    | >#2</a>.
-  li No 5-axis simulation.  See ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/17'
-    | >#17</a>.
+  li Simulates only snapshots of the cutting process. See issue
+    +issue(2)
+    | .
+  li No 5-axis simulation.  See issue
+    +issue(17)
+    | .
   li No Lathe simulation.
   li No CAM facilities yet, e.g. 3D model to tool path conversion.
   li No CNC machine control, not a replacement for LinuxCNC or MACH3.
@@ -58,30 +58,24 @@ p
   | implemented in OpenSCAM:
 
 ul
-  li
-    | More than 3-axis movements. Ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/17'
-    | >#17</a>.
-  li
-    | Tool offset compensation. Ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/15'
-    | >#15</a>.
-  li
-    | Incremental distance mode. G91. Ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/42'
-    | >#42</a>.
-  li
-    | Plane rotation. G10 L2 R#. Ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/41'
-    | >#41</a>.
-  li
-    | Canned cycles. G73, G76, G81-G89. Ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/39'
-    | >#39</a>.
-  li
-    | Feed modes: inverse time, units per revolution. G93 & G95. Ticket
-    | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues/40'
-    | >#40</a>. (Only important for estimating run time)
+  li More than 3-axis movements. Issue
+    +issue(17)
+    | .
+  li Tool offset compensation. Issue
+    +issue(15)
+    | .
+  li Incremental distance mode. G91. Issue
+    +issue(42)
+    | .
+  li Plane rotation. G10 L2 R#. Issue
+    +issue(41)
+    | .
+  li Canned cycles. G73, G76, G81-G89. Issue
+    +issue(39)
+    | .
+  li Feed modes: inverse time, units per revolution. G93 & G95. Issue
+    +issue(40)
+    | . (Only important for estimating run time)
   li Quadratic B-spline. G5.1. (Experimental in LinuxCNC)
   li NURBS. G5.2 & G5.3. (Experimental in LinuxCNC)
   li Spindle Constant Surface Speed mode. G96. (Doesn't really apply)
