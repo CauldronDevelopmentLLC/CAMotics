@@ -1,6 +1,15 @@
 {
-    titleText: '<img src="images/banner.png" alt="OpenSCAM banner"/>',
-    subtext: 'Open-Source Simulation & Computer Aided Machining',
+    pages: {
+        main: {
+            titleText:
+            '<div><img src="images/banner.png" alt="OpenSCAM"/></div>',
+            subtext: 'Open-Source Simulation & Computer Aided Machining',
+        },
+        manual: {
+            titleText: "<h1>User's Manual</h1>",
+            subtext: 'A guide to using OpenSCAM v0.2.0 or newer.',
+        }
+    },
     version: '0.2.0 beta',
     repoURL: 'https://github.com/CauldronDevelopmentLLC/OpenSCAM',
     releases: [

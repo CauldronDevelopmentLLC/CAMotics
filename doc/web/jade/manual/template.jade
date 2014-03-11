@@ -1,8 +1,9 @@
+- var page = 'manual';
 doctype html
 html(lang='en')
 head
   include ../head
-body
+body(class = 'page-' + page)
   include ../header
 
   .container.docs-container
@@ -13,7 +14,22 @@ body
             include menu
 
       .col-md-9(role='main')
+
         .docs-section
-          //include about
+          include overview
+        .docs-section
+          include projects
+        .docs-section
+          include simulation
+        .docs-section
+          include layout
+        .docs-section
+          include playback
+        .docs-section
+          include nc-files
+        .docs-section
+          include tools
+        .docs-section
+          include workpiece
 
   include ../footer

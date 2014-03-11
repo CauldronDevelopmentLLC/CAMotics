@@ -42,8 +42,8 @@ header.navbar.navbar-inverse.navbar-fixed-top.docs-nav(role='banner')
 
 #content.docs-header
   .container
-    h1!= titleText
-    != subtext
+    != pages[page].titleText
+    != pages[page].subtext
 
 .banner
   .container

@@ -1,0 +1,15 @@
+doctype html
+html(lang='en')
+head
+  include ../head
+body(class = 'page-' + page)
+  include ../header
+
+  .container.docs-container
+    .row
+      .col-md-3
+        .sidebar.hidden-print(role='complementary')
+          #toc
+            include menu
+
+      .col-md-9(role='main')

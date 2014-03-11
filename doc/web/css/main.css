@@ -68,6 +68,12 @@
     font-size: 9px;
 }
 
+.page-manual .docs-section img {
+    border: 1px solid #666;
+    border-radius: 4px;
+}
+
+
 pre code {
     display: block; padding: 0.5em;
     color: #333;

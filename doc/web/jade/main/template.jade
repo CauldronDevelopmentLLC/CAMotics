@@ -1,8 +1,9 @@
+- var page = 'main';
 doctype html
 html(lang='en')
 head
   include ../head
-body
+body(class = 'page-' + page)
   include ../header
 
   .container.docs-container
@@ -13,6 +14,7 @@ body
             include menu
 
       .col-md-9(role='main')
+
         .docs-section
           include about
         .docs-section
