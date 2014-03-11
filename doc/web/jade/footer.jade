@@ -1,0 +1,44 @@
+footer.bs-footer(role='contentinfo')
+  .container
+    .bs-social
+      ul.bs-social-buttons
+        li
+          iframe.github-btn(src='http://ghbtns.com/github-btn.html?user=jcoffland&repo=OpenSCAM&type=watch&count=true', width='100', height='20', title='Star on GitHub')
+        li
+          iframe.github-btn(src='http://ghbtns.com/github-btn.html?user=jcoffland&repo=OpenSCAM&type=fork&count=true', width='102', height='20', title='Fork on GitHub')
+        li
+          a.footer-button(href='http://groups.google.com/group/openscam-announcements/boxsubscribe')
+            h1 Subscribe
+            h2 to Email Updates
+        li
+          a.footer-button(href='http://groups.google.com/group/openscam-users/boxsubscribe')
+            h1 Join
+            h2 the Users Forum
+
+    p
+      | OpenSCAM and these docs are maintained by
+      | <a href='http://cauldrondevelopment.com/'>Cauldron Development LLC</a>.
+
+    p
+      | Source code released under the
+      | <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GLPv2+ License</a>,
+      | documentation under
+      | <a href='http://creativecommons.org/licenses/by/3.0/'>CC BY 3.0</a>.
+
+    ul.footer-links
+      li= 'Current version ' + version
+      li.muted ·
+      li
+        a(href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/issues?state=open') Open Issues
+      li.muted ·
+      li
+        a(href='https://github.com/CauldronDevelopmentLLC/OpenSCAM/blob/master/CHANGELOG.md') Changelog
+
+// Placed at the end of the document so the pages load faster
+script(src='//code.jquery.com/jquery-1.10.2.min.js')
+script(src='//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js')
+      
+script(src='//cdnjs.cloudflare.com/ajax/libs/holder/2.2.0/holder.min.js')
+      
+script(src='js/shadowbox.js')
+script(src='js/main.js')

@@ -1,0 +1,40 @@
+.page-header
+  h1#downloads Downloads
+
+h4= 'Current release: Version ' + version
+p Click on the icons below to download OpenSCAM for your platform:
+
+p
+  each release in releases
+    a(title=release[0], href=release[2])
+      img(src='images/' + release[1], alt=release[0])
+
+h2#source-code Source Code
+p
+  | Visit the
+  | <a href='https://github.com/CauldronDevelopmentLLC/OpenSCAM'>GitHub page</a>
+  | for information on building the source code.
+
+h2#previous-releases Previous Releases
+p
+  | You can browse previous releases here:
+  | <a href='//openscam.org/releases/'>/releases/</a>
+
+p
+  | The directory layout is as follows:
+  strong= '/releases/<status>/<mode>/<project>/<build>/<version>'
+
+table
+  tr
+    th status
+    td - alpha, beta or public
+  tr
+    th mode
+    td - release or debug
+  tr
+    th build
+    td -
+      strong= '<os>-<os version>-<bits>'
+  tr
+    th version
+    td - Major and minor version

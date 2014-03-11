@@ -1,0 +1,19 @@
+doctype html
+html(lang='en')
+head
+  include head
+body
+  include header
+
+  .container.docs-container
+    .row
+      .col-md-3
+        .sidebar.hidden-print(role='complementary')
+          #toc
+            include manual-menu
+
+      .col-md-9(role='main')
+        .docs-section
+          include about
+
+  include footer

@@ -1,0 +1,29 @@
+.page-header
+  h1#donations Donations
+
+p
+  | This project is funded through donations.  If you find
+  | OpenSCAM useful please consider donating $25 or more.
+  | Your donations will make new features, bug fixes
+  | and the continued development of this software possible.
+
+h3 Paypal
+p To donate with Paypal click the button below:
+
+p
+  form(action='https://www.paypal.com/cgi-bin/webscr', method='post')
+    input(name='cmd', value='_s-xclick', type='hidden')
+    input(name='hosted_button_id', value='FDP4SVEVT68NG', type='hidden')
+    input.donate-button(src='images/donate.png', name='submit', type='image',
+     alt='PayPal - The safer, easier way to pay online!')
+
+h3 BitCoin
+p
+  | Make a donation by sending <a href='http://bitcoin.org/'
+  | ><img src='images/bitcoin.svg', height='24'/></a> to the address or QR
+  | code below:
+
+p
+  p 182aJsBrnmcWxqZ9VCACJyFYNWSH7eKS9R
+  img(src='images/openscam-bitcoin-donations.gif')
+
