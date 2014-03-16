@@ -9,7 +9,7 @@ version = '0.2.1'
 major, minor, revision = version.split('.')
 
 # Setup
-env = Environment()
+env = Environment(ENV = os.environ)
 env.Tool('config', toolpath = [cbang])
 env.CBAddVariables(
     ('install_prefix', 'Instalation directory prefix', '/usr/local/'))
