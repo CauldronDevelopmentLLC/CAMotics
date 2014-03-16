@@ -198,7 +198,7 @@ pkg = env.Packager(
     documents = ['README.md', 'CHANGELOG.md'] + examples,
     programs = map(lambda x: str(x[0]), execs),
     desktop_menu = ['OpenSCAM.desktop'],
-    changelog = 'ChangeLog',
+    changelog = 'CHANGELOG.md',
 
     nsi = 'openscam.nsi',
 
