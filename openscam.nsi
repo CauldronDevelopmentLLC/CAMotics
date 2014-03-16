@@ -60,8 +60,8 @@ Section -Install
   File "tplang.exe"
   File "images\${PRODUCT_ICON}"
   File ${PRODUCT_LICENSE}
-  File "README"
-  File "ChangeLog"
+  File "README.md"
+  File "CHANGELOG.md"
 
   ; Qt DLLs
   File "$%%QT4DIR%%\bin\QtCore4.dll"
@@ -71,7 +71,7 @@ Section -Install
   ; Examples
   SetOverwrite on
   SetOutPath "$INSTDIR\examples"
-  File /r /x .svn "examples\*.*"
+  File /r "examples\*.*"
 
   ; Desktop
   CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}" \
