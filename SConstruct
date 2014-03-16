@@ -82,8 +82,6 @@ if not env.GetOption('clean'):
 conf.Finish()
 
 # Source
-import glob
-
 src = ['src/glew/glew.c']
 for subdir in [
     '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'pcb', 'stl',
@@ -96,7 +94,9 @@ for subdir in ['']:
 
 
 # Build in 'build'
-VariantDir('build', 'src', duplicate = False)
+import re
+VariantDir('build', 'src')
+src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 env.AppendUnique(CPPPATH = ['#/build'])
 
 
@@ -126,10 +126,10 @@ Precious(resLib)
 libs += [resLib]
 
 # 3rd-party libs
-libs.append(env.Library('clipper', glob.glob('src/clipper/*.cpp')))
-#kbool = env.Library('kbool', glob.glob('src/kbool/src/*.cpp'))
-#kurve = env.Library('kurve', glob.glob('src/kurve/*.cpp'))
-#area = env.Library('area', glob.glob('src/libarea/*.cpp'))
+libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
+#kbool = env.Library('kbool', Glob('src/kbool/src/*.cpp'))
+#kurve = env.Library('kurve', Glob('src/kurve/*.cpp'))
+#area = env.Library('area', Glob('src/libarea/*.cpp'))
 #libs += [area, kurve, kbool]
 
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
