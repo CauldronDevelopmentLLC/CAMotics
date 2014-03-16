@@ -96,9 +96,7 @@ for subdir in ['']:
 
 
 # Build in 'build'
-import re
-VariantDir('build', 'src')
-src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+VariantDir('build', 'src', duplicate = False)
 env.AppendUnique(CPPPATH = ['#/build'])
 
 
