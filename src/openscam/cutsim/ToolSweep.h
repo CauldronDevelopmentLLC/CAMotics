@@ -40,7 +40,7 @@ namespace OpenSCAM {
   class ToolSweep : public FieldFunction, public AABBTree {
     cb::SmartPointer<ToolPath> path;
     std::vector<cb::SmartPointer<Sweep> > sweeps;
-    ToolTable &tools;
+    cb::SmartPointer<ToolTable> tools;
     uint64_t hitTests;
     real time;
 

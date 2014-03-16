@@ -5,7 +5,6 @@
   </nc-files>
 
   <!-- Project -->
-  <notes>This project has a lot of intricate detail which can take a very long time to simulate.</notes>
   <units v='INCH'/>
 
   <!-- Renderer -->

@@ -109,7 +109,7 @@ namespace OpenSCAM {
     virtual ~Controller() {}
 
     // State variables
-    ToolTable &getToolTable() {return *tools;}
+    const cb::SmartPointer<ToolTable> &getToolTable() {return tools;}
     Tool &getTool(unsigned tool) {return *tools->get(tool);}
     const Tool &getTool(unsigned tool) const {return *tools->get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}

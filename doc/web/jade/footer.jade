@@ -1,17 +1,17 @@
+- var ggroup = 'http://groups.google.com/group/openscam-';
+
 footer.bs-footer(role='contentinfo')
   .container
     .bs-social
       ul.bs-social-buttons
+        li.github-star
+        li.github-fork
         li
-          iframe.github-btn(src='http://ghbtns.com/github-btn.html?user=jcoffland&repo=OpenSCAM&type=watch&count=true', width='100', height='20', title='Star on GitHub')
-        li
-          iframe.github-btn(src='http://ghbtns.com/github-btn.html?user=jcoffland&repo=OpenSCAM&type=fork&count=true', width='102', height='20', title='Fork on GitHub')
-        li
-          a.footer-button(href='http://groups.google.com/group/openscam-announcements/boxsubscribe')
+          a.footer-button(href = ggroup + '-announcements/boxsubscribe')
             h1 Subscribe
             h2 to Email Updates
         li
-          a.footer-button(href='http://groups.google.com/group/openscam-users/boxsubscribe')
+          a.footer-button(href = ggroup + '-users/boxsubscribe')
             h1 Join
             h2 the Users Forum
 

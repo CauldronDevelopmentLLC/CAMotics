@@ -23,6 +23,8 @@
 
 #include "GCodeInterpreter.h"
 
+#include <openscam/Task.h>
+
 #include <cbang/SmartPointer.h>
 
 #include <map>
@@ -34,6 +36,8 @@ namespace OpenSCAM {
   class Program;
 
   class OCodeInterpreter : public GCodeInterpreter {
+    cb::SmartPointer<Task> task;
+
     typedef std::map<unsigned, cb::SmartPointer<Program> > subroutines_t;
     subroutines_t subroutines;
     typedef std::map<std::string, cb::SmartPointer<Program> >
@@ -62,8 +66,11 @@ namespace OpenSCAM {
     std::set<std::string> loadedFiles;
 
   public:
-    OCodeInterpreter(Controller &controller);
+    OCodeInterpreter(Controller &controller,
+                     const cb::SmartPointer<Task> &task = new Task);
     virtual ~OCodeInterpreter();
+
+    const cb::SmartPointer<Task> &getTask() const {return task;}
 
     void checkExpressions(OCode *ocode, const char *name, unsigned count);
     void upScope();

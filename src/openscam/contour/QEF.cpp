@@ -85,7 +85,7 @@ void QEF::factorize(real mat[12][3], real tau_u[3], real tau_v[2], int rows) {
     // set up a vector to reference into the matrix from mat(i,i) to
     // mat(m,i), that is, from the i'th column of the i'th row and
     // down all the way through that column
-    real *ptrs[MAXROWS];
+    real *ptrs[MAXROWS * 2];
     int num_ptrs = rows - i;
     for (int q = 0; q < num_ptrs; ++q) ptrs[q] = &mat[q + i][i];
 

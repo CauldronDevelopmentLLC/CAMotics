@@ -28,9 +28,10 @@
 #include <openscam/view/Viewer.h>
 #include <openscam/cutsim/CutSim.h>
 #include <openscam/cutsim/Project.h>
+#include <openscam/cutsim/CutWorkpiece.h>
 #include <openscam/remote/ConnectionManager.h>
-#include <openscam/render/Renderer.h>
 #include <openscam/stl/STL.h>
+#include <openscam/render/Renderer.h>
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>
@@ -48,6 +49,7 @@
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
 #include <QImageWriter>
+#include <QMovie>
 
 #include <vector>
 
@@ -63,12 +65,16 @@ QtWin::QtWin(Application &app) :
   QMainWindow(0), ui(new Ui::OpenSCAMWindow), fileDialog(this),
   app(app), options(app.getOptions()), cutSim(new CutSim(options)),
   connectionManager(new ConnectionManager(options)),
-  renderer(new Renderer(options)), view(new View(valueSet, renderer)),
-  viewer(new Viewer), toolView(new ToolView), dirty(false), simDirty(false),
-  inUIUpdate(false), lastProgress(0), currentUIView(NULL_VIEW) {
+  view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
+  dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
+  lastStatusActive(false), smooth(true), currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
   ui->simulationView->init(SIMULATION_VIEW, this);
+
+  // Register user events
+  toolPathCompleteEvent = QEvent::registerEventType();
+  surfaceCompleteEvent = QEvent::registerEventType();
 
   // Disable view bounds
   view->setShowBounds(false);
@@ -111,7 +117,6 @@ QtWin::QtWin(Application &app) :
 
 QtWin::~QtWin() {
   saveAllState();
-  if (!renderer.isNull()) renderer->join();
 }
 
 
@@ -121,7 +126,6 @@ void QtWin::init() {
   restoreAllState();
 
   connectionManager->init();
-  renderer->start();
 
   // Observe values
   valueSet["play_speed"]->add(this, &QtWin::updatePlaySpeed);
@@ -256,6 +260,20 @@ void QtWin::restoreDefaultLayout() {
 }
 
 
+void QtWin::minimalLayout() {
+  // Hide all closable docks
+  QList<QDockWidget *> docks = findChildren<QDockWidget *>();
+  for (int i = 0; i < docks.size(); i++)
+    if (docks.at(i)->features() & QDockWidget::DockWidgetClosable)
+      docks.at(i)->setVisible(false);
+
+  // Hide all toolbars
+  QList<QToolBar *> toolBars = findChildren<QToolBar *>();
+  for (int i = 0; i < toolBars.size(); i++)
+    toolBars.at(i)->setVisible(false);
+}
+
+
 SmartPointer<ViewPort> QtWin::getCurrentViewPort() const {
   switch (currentUIView) {
   case SIMULATION_VIEW: return view;
@@ -362,6 +380,58 @@ void QtWin::warning(const string &msg) {
 }
 
 
+void QtWin::toolPathComplete() {
+  toolPath = toolPathThread->getPath();
+
+  // Update changed Project settings
+  project->updateAutomaticWorkpiece(*toolPath);
+  project->updateResolution();
+
+  // Setup view
+  view->setToolPath(toolPath);
+  view->setWorkpiece(project->getWorkpieceBounds());
+
+  // Load resolution settings
+  LOCK_UI_UPDATES;
+  ui->resolutionDoubleSpinBox->setValue(project->getResolution());
+  ui->resolutionComboBox->setCurrentIndex(project->getResolutionMode());
+
+  // Units
+  ui->unitsComboBox->setCurrentIndex(project->getUnits());
+
+  // Update UI
+  loadWorkpiece();
+  updateBounds();
+
+  redraw();
+
+  // Start surface thread
+  surfaceThread = new SurfaceThread(surfaceCompleteEvent, this, cutSim,
+                                    toolPath, project->getWorkpieceBounds(),
+                                    project->getResolution(), view->getTime(),
+                                    smooth);
+  surfaceThread->start();
+}
+
+
+void QtWin::surfaceComplete() {
+  if (!surfaceThread->getSurface().isNull()) {
+    surface = surfaceThread->getSurface();
+    view->setSurface(surface);
+    redraw();
+  }
+
+  setStatusActive(false);
+}
+
+
+void QtWin::stop() {
+  if (!toolPathThread.isNull()) toolPathThread->join();
+  if (!surfaceThread.isNull()) surfaceThread->join();
+  setStatusActive(false);
+}
+
+
 void QtWin::reload(bool now) {
   if (!now) {
     simDirty = true;
@@ -370,29 +440,16 @@ void QtWin::reload(bool now) {
   simDirty = false;
 
   try {
-    cutSim->init(*project);
+    stop();
 
-    SmartPointer<CutWorkpiece> cutWP = cutSim->getCutWorkpiece();
-    SmartPointer<ToolPath> path = cutSim->getToolPath();
+    // Start tool path thread
+    toolPathThread = new ToolPathThread(toolPathCompleteEvent, this, cutSim,
+                                        project->getToolTable(),
+                                        project->getAbsoluteFiles());
+    toolPathThread->start();
 
-    view->setToolPath(path);
-    view->setWorkpiece(project->getWorkpieceBounds());
-    cutWP->getToolSweep()->setTime(view->getTime());
-    renderer->setResolution(project->getResolution());
-    renderer->setCutWorkpiece(cutWP);
+    setStatusActive(true);
 
-    // Load resolution settings
-    LOCK_UI_UPDATES;
-    ui->resolutionDoubleSpinBox->setValue(project->getResolution());
-    ui->resolutionComboBox->setCurrentIndex(project->getResolutionMode());
-
-    // Units
-    ui->unitsComboBox->setCurrentIndex(project->getUnits());
-
-    loadWorkpiece();
-    updateBounds();
-
-    redraw();
   } CBANG_CATCH_ERROR;
 }
 
@@ -453,9 +510,6 @@ void QtWin::snapshot() {
 
 void QtWin::exportData() {
   // Check what we have to export
-
-  SmartPointer<Surface> surface = view->renderer->getSurface();
-  SmartPointer<ToolPath> toolPath = cutSim->getToolPath();
 
   if (surface.isNull() && toolPath.isNull()) {
     warning("Nothing to export.\nAdd a tool path or run a simulation.");
@@ -536,14 +590,10 @@ void QtWin::loadProject() {
 
   ui->projectTreeView->expandAll();
   project->markClean();
-  renderer->releaseSurface();
 }
 
 
 void QtWin::resetProject() {
-  cutSim->reset();
-  renderer->setCutWorkpiece(0);
-  renderer->stopRender();
   view->setToolPath(0);
   view->setWorkpiece(Rectangle3R());
   currentTool.release();
@@ -555,7 +605,7 @@ void QtWin::newProject() {
   if (!checkSave()) return;
 
   resetProject();
-  project = new Project(options, cutSim->getToolTable());
+  project = new Project(options);
 
   reload();
   loadProject();
@@ -573,7 +623,7 @@ void QtWin::openProject(const string &_filename) {
     if (filename.empty()) return;
   }
 
-  LOG_INFO(1, "Opening " << filename);
+  showMessage("Opening " + filename);
 
   try {
     // Check if the file appears to be XML
@@ -588,20 +638,16 @@ void QtWin::openProject(const string &_filename) {
 
     resetProject();
 
-    if (xml) project = new Project(options, cutSim->getToolTable(), filename);
+    if (xml) project = new Project(options, filename);
     else {
       // Assume TPL or G-Code and create a new project with the file
-      project = new Project(options, cutSim->getToolTable());
+      project = new Project(options);
       project->addFile(filename);
     }
-
-    if (project->hasNotes()) message(project->getNotes());
-
-    showMessage("Opened " + filename);
   } CATCH_ERROR;
 
   reload();
-  view->getToolPathView()->setByRatio(1);
+  view->path->setByRatio(1);
   loadProject();
 }
 
@@ -687,9 +733,11 @@ void QtWin::updateUnits() {
 
 
 void QtWin::loadTool(unsigned number) {
+  if (project.isNull()) return;
+
   if (!number) {
     // Find a tool which is not the current tool
-    ToolTable &tools = *cutSim->getToolTable();
+    ToolTable &tools = *project->getToolTable();
     for (ToolTable::iterator it = tools.begin(); it != tools.end(); it++)
       if (it->first &&
           (currentTool.isNull() || it->first != currentTool->getNumber())) {
@@ -703,7 +751,7 @@ void QtWin::loadTool(unsigned number) {
     }
   }
 
-  currentTool = cutSim->getToolTable()->get(number);
+  currentTool = project->getToolTable()->get(number);
 
   real scale =
     currentTool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
@@ -728,7 +776,8 @@ void QtWin::loadTool(unsigned number) {
 
 
 void QtWin::addTool() {
-  ToolTable &tools = *cutSim->getToolTable();
+  if (project.isNull()) return;
+  ToolTable &tools = *project->getToolTable();
 
   for (unsigned i = 1; i < 1000; i++)
     if (!tools.has(i)) {
@@ -744,7 +793,7 @@ void QtWin::addTool() {
 
 
 void QtWin::removeTool() {
-  cutSim->getToolTable()->erase(currentTool->getNumber());
+  project->getToolTable()->erase(currentTool->getNumber());
   project->markDirty();
   projectModel->invalidate();
   loadTool(0);
@@ -852,7 +901,7 @@ void QtWin::updateBounds() {
 
 
 void QtWin::updateToolPathBounds() {
-  Rectangle3R bounds = *cutSim->getToolPath();
+  Rectangle3R bounds = *toolPath;
   Vector3R bMin = bounds.getMin();
   Vector3R bMax = bounds.getMax();
   Vector3R bDim = bounds.getDimensions();
@@ -893,6 +942,33 @@ void QtWin::updateWorkpieceBounds() {
 }
 
 
+void QtWin::setStatusActive(bool active) {
+  if (active == lastStatusActive) return;
+  lastStatusActive = active;
+
+  if (active) {
+    ui->statusLabel->clear();
+    QMovie *movie = new QMovie(":/icons/running.gif");
+    ui->statusLabel->setMovie(movie);
+    movie->start();
+
+    ui->statusLabel->setToolTip("Simulation is running");
+    ui->stopPushButton->setEnabled(true);
+
+  } else {
+    QMovie *movie = ui->statusLabel->movie();
+    if (movie) {
+      ui->statusLabel->clear();
+      delete movie;
+    }
+
+    ui->statusLabel->setPixmap(QPixmap(":/icons/idle.png"));
+    ui->statusLabel->setToolTip("Simulation has ended");
+    ui->stopPushButton->setEnabled(false);
+  }
+}
+
+
 void QtWin::setUIView(ui_view_t uiView) {
   if (uiView == currentUIView) return;
   currentUIView = uiView;
@@ -918,17 +994,19 @@ void QtWin::setUIView(ui_view_t uiView) {
 
 
 void QtWin::updatePlaySpeed(const string &name, unsigned value) {
-  showMessage(String::printf("Playback speed %dx", view->speed));
+  ui->playbackSpeedLabel->setText(QString().sprintf("%dx", view->speed));
 }
 
 
 void QtWin::updateViewFlags(const std::string &name, unsigned flags) {
   ui->actionPlay->setIcon(flags & View::PLAY_FLAG ? pauseIcon : playIcon);
+  ui->playPushButton->setIcon(flags & View::PLAY_FLAG ? pauseIcon : playIcon);
 }
 
 
 void QtWin::updatePlayDirection(const string &name, bool reverse) {
   ui->actionDirection->setIcon(reverse ? backwardIcon : forwardIcon);
+  ui->directionPushButton->setIcon(reverse ? backwardIcon : forwardIcon);
 }
 
 
@@ -1025,6 +1103,14 @@ void QtWin::updateProgramLine(const string &name, unsigned value) {
 }
 
 
+bool QtWin::event(QEvent *event) {
+  if (event->type() == toolPathCompleteEvent) toolPathComplete();
+  else if (event->type() == surfaceCompleteEvent) surfaceComplete();
+  else return QMainWindow::event(event);
+  return true;
+}
+
+
 void QtWin::closeEvent(QCloseEvent *event) {
   if (checkSave()) event->accept();
   else event->ignore();
@@ -1035,18 +1121,19 @@ void QtWin::animate() {
   try {
     dirty = connectionManager->update() || dirty;
     dirty = view->update() || dirty;
-    dirty = renderer->wasUpdated() || dirty;
 
     if (dirty) redraw(true);
     if (simDirty) reload(true);
 
-    // Update render progress
-    double progress = renderer->getProgress();
-    if (lastProgress != progress) {
+    // Update progress
+    double progress = cutSim->getProgress();
+    string status = cutSim->getStatus();
+    if (lastProgress != progress || lastStatus != status) {
       lastProgress = progress;
+      lastStatus = status;
 
       if (progress) {
-        double eta = renderer->getETA();
+        double eta = cutSim->getETA();
         ui->progressBar->setValue(10000 * progress);
         string s = String::printf("%.2f%% ", progress * 100);
         if (eta) s += TimeInterval(eta).toString();
@@ -1055,8 +1142,8 @@ void QtWin::animate() {
         showMessage("Simulation progress: " + s);
 
       } else {
-        ui->progressBar->setValue(10000);
-        ui->progressBar->setFormat("Idle");
+        ui->progressBar->setValue(0);
+        ui->progressBar->setFormat(status.c_str());
       }
     }
   } CBANG_CATCH_ERROR;
@@ -1065,6 +1152,7 @@ void QtWin::animate() {
   if (isWindowModified() != modified) setWindowModified(modified);
 
   if (app.shouldQuit()) {
+    stop();
     checkSave(false);
     QCoreApplication::exit();
   }
@@ -1097,6 +1185,57 @@ void QtWin::on_unitsComboBox_currentIndexChanged(int value) {
   if (project.isNull() || project->getUnits() == units) return;
   project->setUnits(units);
   updateUnits();
+}
+
+
+void QtWin::on_smoothPushButton_clicked(bool active) {
+  smooth = active;
+}
+
+
+void QtWin::on_stopPushButton_clicked() {
+  stop();
+}
+
+
+void QtWin::on_rerunPushButton_clicked() {
+  reload(true);
+}
+
+
+void QtWin::on_beginingPushButton_clicked() {
+  view->path->setByRatio(0);
+  view->clearFlag(View::PLAY_FLAG);
+  view->reverse = false;
+  redraw();
+}
+
+
+void QtWin::on_slowerPushButton_clicked() {
+  view->decSpeed();
+}
+
+
+void QtWin::on_playPushButton_clicked() {
+  view->toggleFlag(View::PLAY_FLAG);
+}
+
+
+void QtWin::on_fasterPushButton_clicked() {
+  view->incSpeed();
+}
+
+
+void QtWin::on_endPushButton_clicked() {
+  view->path->setByRatio(1);
+  view->clearFlag(View::PLAY_FLAG);
+  view->reverse = true;
+  redraw();
+}
+
+
+void QtWin::on_directionPushButton_clicked() {
+  view->changeDirection();
 }
 
 
@@ -1169,7 +1308,7 @@ void QtWin::on_toolSpinBox_valueChanged(int value) {
 
   if (newNum == current) return;
 
-  ToolTable &tools = *cutSim->getToolTable();
+  ToolTable &tools = *project->getToolTable();
 
   while (newNum && newNum < current && tools.has(newNum)) newNum--;
   while (current < newNum && tools.has(newNum)) newNum++;
@@ -1315,7 +1454,7 @@ void QtWin::on_automaticCuboidRadioButton_clicked() {
   if (project->getAutomaticWorkpiece()) return;
 
   project->setAutomaticWorkpiece(true);
-  project->updateAutomaticWorkpiece(*cutSim->getToolPath());
+  project->updateAutomaticWorkpiece(*toolPath);
   loadWorkpiece();
 
   redraw(true);
@@ -1326,8 +1465,7 @@ void QtWin::on_marginDoubleSpinBox_valueChanged(double value) {
   PROTECT_UI_UPDATE;
 
   project->setWorkpieceMargin(value);
-  if (!cutSim->getToolPath().isNull())
-    project->updateAutomaticWorkpiece(*cutSim->getToolPath());
+  if (!toolPath.isNull()) project->updateAutomaticWorkpiece(*toolPath);
   loadWorkpiece();
 
   redraw(true);
@@ -1438,6 +1576,11 @@ void QtWin::on_actionResetLayout_triggered() {
 }
 
 
+void QtWin::on_actionMinimalLayout_triggered() {
+  minimalLayout();
+}
+
+
 void QtWin::on_actionAbout_triggered() {
   aboutDialog.exec();
 }
@@ -1445,57 +1588,6 @@ void QtWin::on_actionAbout_triggered() {
 
 void QtWin::on_actionDonate_triggered() {
   donateDialog.exec();
-}
-
-
-void QtWin::on_actionSmooth_triggered(bool active) {
-  renderer->setSmooth(active);
-}
-
-
-void QtWin::on_actionStop_triggered() {
-  renderer->stopRender();
-}
-
-
-void QtWin::on_actionRerun_triggered() {
-  reload();
-}
-
-
-void QtWin::on_actionBegining_triggered() {
-  view->path->setByRatio(0);
-  view->clearFlag(View::PLAY_FLAG);
-  view->reverse = false;
-  redraw();
-}
-
-
-void QtWin::on_actionSlower_triggered() {
-  view->decSpeed();
-}
-
-
-void QtWin::on_actionPlay_triggered() {
-  view->toggleFlag(View::PLAY_FLAG);
-}
-
-
-void QtWin::on_actionFaster_triggered() {
-  view->incSpeed();
-}
-
-
-void QtWin::on_actionEnd_triggered() {
-  view->path->setByRatio(1);
-  view->clearFlag(View::PLAY_FLAG);
-  view->reverse = true;
-  redraw();
-}
-
-
-void QtWin::on_actionDirection_triggered() {
-  view->changeDirection();
 }
 
 

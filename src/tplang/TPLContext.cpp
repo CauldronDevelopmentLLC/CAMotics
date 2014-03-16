@@ -28,7 +28,7 @@ using namespace tplang;
 
 
 TPLContext::TPLContext(ostream &out, MachineInterface &machine,
-                       OpenSCAM::ToolTable &tools) :
+                       const SmartPointer<OpenSCAM::ToolTable> &tools) :
   js::LibraryContext(out), machine(machine), tools(tools) {
   pushPath(".");
 }

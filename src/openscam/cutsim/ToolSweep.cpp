@@ -43,7 +43,7 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
     unsigned tool = move.getTool();
 
     if (sweeps.size() <= tool) sweeps.resize(tool + 1);
-    if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool)->getSweep();
+    if (sweeps[tool].isNull()) sweeps[tool] = tools->get(tool)->getSweep();
 
     sweeps[tool]->getBBoxes(move.getStartPt(), move.getEndPt(), bboxes);
 

@@ -73,7 +73,7 @@ void Viewer::init() {
 void Viewer::draw(const View &view) {
   init();
 
-  SmartPointer<Surface> surface = view.renderer->getSurface();
+  SmartPointer<Surface> surface = view.surface;
 
   // Setup view port
   Rectangle3R bounds = view.path->getBounds();
@@ -125,7 +125,8 @@ void Viewer::draw(const View &view) {
   }
 
   // Bounding box tree
-  if (view.isFlagSet(View::SHOW_BBTREE_FLAG)) view.renderer->drawBB();
+  // TODO revive this
+  //if (view.isFlagSet(View::SHOW_BBTREE_FLAG)) cutWP->drawBB();
 
   // Tool
   if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->getPath().isNull()) {
@@ -133,7 +134,7 @@ void Viewer::draw(const View &view) {
     glTranslatef(currentPosition.x(), currentPosition.y(),
                  currentPosition.z());
 
-    ToolTable &tools = view.path->getPath()->getTools();
+    ToolTable &tools = *view.path->getPath()->getTools();
     const Move &move = view.path->getMove();
     const Tool &tool = *tools.get(move.getTool());
     double diameter = tool.getDiameter();

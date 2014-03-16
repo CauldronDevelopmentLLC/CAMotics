@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '0.2.0'
+version = '0.2.1'
 major, minor, revision = version.split('.')
 
 # Setup
@@ -219,7 +219,7 @@ pkg = env.Packager(
     rpm_group = 'Applications/Engineering',
     rpm_requires = 'expat, bzip2-libs',
 
-    app_id = 'org.openscam',
+    app_id = 'org.openscam.pkg',
     app_resources = [['osx/Resources', '.']],
     pkg_resources = [['osx/Resources', '.']],
     app_copyright = 'Copyright 2011-2014, Cauldron Development LLC',
@@ -228,6 +228,7 @@ pkg = env.Packager(
         'CFBundleExecutable': 'openscam', # Overrides 'programs'
         'CFBundleIconFile': 'openscam.icns',
         },
+    app_finish_cmd = 'macdeployqt',
     )
 
 AlwaysBuild(pkg)

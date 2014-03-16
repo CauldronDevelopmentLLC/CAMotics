@@ -23,14 +23,16 @@
 
 #include "OCodeInterpreter.h"
 
+#include <cbang/SmartPointer.h>
 #include <cbang/io/Reader.h>
 
 
 namespace OpenSCAM {
   class Interpreter : public OCodeInterpreter, public cb::Reader {
   public:
-    Interpreter(Controller &controller) :
-      OCodeInterpreter(controller) {}
+    Interpreter(Controller &controller,
+                const cb::SmartPointer<Task> &task = new Task) :
+      OCodeInterpreter(controller, task) {}
 
     // From cb::Reader
     void read(const cb::InputSource &source);

@@ -24,6 +24,7 @@
 #include "QApplication.h"
 
 #include <cbang/Info.h>
+#include <cbang/log/Logger.h>
 
 #include <vector>
 

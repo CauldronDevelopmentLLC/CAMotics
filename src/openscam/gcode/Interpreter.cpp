@@ -32,7 +32,7 @@ using namespace OpenSCAM;
 
 void Interpreter::read(const InputSource &source) {
   try {
-    Parser().parse(source, *this);
+    Parser(getTask()).parse(source, *this);
   } catch (const EndProgram &) {}
 }
 

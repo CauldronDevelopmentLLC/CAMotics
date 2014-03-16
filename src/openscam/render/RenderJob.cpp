@@ -32,7 +32,7 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-RenderJob::RenderJob(const SmartPointer<FieldFunction> &func, RenderMode mode,
+RenderJob::RenderJob(FieldFunction &func, RenderMode mode,
                      real resolution, const Rectangle3R &bbox) :
   func(func), resolution(resolution), bbox(bbox) {
   switch (mode) {
@@ -47,7 +47,7 @@ RenderJob::RenderJob(const SmartPointer<FieldFunction> &func, RenderMode mode,
 
 void RenderJob::run() {
   try {
-    generator->run(*func, bbox, resolution);
+    generator->run(func, bbox, resolution);
   } CBANG_CATCH_WARNING;
 }
 

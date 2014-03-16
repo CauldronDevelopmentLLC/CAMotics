@@ -40,15 +40,23 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="simulationTab">
+       <property name="styleSheet">
+        <string notr="true">QPushButton:hover {
+  border: 1px outset #71869c;
+  border-radius: 2px;
+  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 #c5d3df, stop: 1 #b2c1d1);
+} </string>
+       </property>
        <attribute name="title">
         <string>Simulation View</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <property name="spacing">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="margin">
          <number>0</number>
@@ -76,7 +84,373 @@
          </widget>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="statusLabel">
+            <property name="text">
+             <string>Status</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stopPushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Stop the simulation</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="rerunPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Rerun the simulation</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="smoothPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Smooth the resulting surface for better visualization</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>13</width>
+              <height>14</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_29">
+            <property name="text">
+             <string>Playback:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="beginingPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Jump to start of tool path animation</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="playPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Start or stop tool path animation</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="endPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Jump to end of tool path animation</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/end.png</normaloff>:/icons/end.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>13</width>
+              <height>17</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_36">
+            <property name="text">
+             <string>Speed:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="slowerPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Slow down tool path animation</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/slower.png</normaloff>:/icons/slower.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="fasterPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Speed up tool path animation</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/faster.png</normaloff>:/icons/faster.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="playbackSpeedLabel">
+            <property name="minimumSize">
+             <size>
+              <width>72</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>72</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Tool path playback speed.</string>
+            </property>
+            <property name="text">
+             <string>1x</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>13</width>
+              <height>14</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_35">
+            <property name="text">
+             <string>Direction:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="directionPushButton">
+            <property name="minimumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Change tool path animation direction</string>
+            </property>
+            <property name="icon">
+             <iconset resource="openscam.qrc">
+              <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <layout class="QGridLayout" name="gridLayout_9">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="label_28">
             <property name="font">
@@ -94,6 +468,9 @@
           </item>
           <item row="0" column="1">
            <widget class="QSlider" name="positionSlider">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
             <property name="toolTip">
              <string>Set tool path position</string>
             </property>
@@ -218,6 +595,7 @@
      <string>&amp;Layout</string>
     </property>
     <addaction name="actionResetLayout"/>
+    <addaction name="actionMinimalLayout"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -229,8 +607,36 @@
     <addaction name="actionExport"/>
     <addaction name="actionSnapshot"/>
    </widget>
+   <widget class="QMenu" name="menuView_2">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionCutSurface"/>
+    <addaction name="actionWireSurface"/>
+    <addaction name="actionWorkpieceSurface"/>
+    <addaction name="actionHideSurface"/>
+    <addaction name="separator"/>
+    <addaction name="actionToolPath"/>
+    <addaction name="actionTool"/>
+    <addaction name="actionWorkpieceBounds"/>
+    <addaction name="actionAxes"/>
+   </widget>
+   <widget class="QMenu" name="menuPerspective">
+    <property name="title">
+     <string>Perspective</string>
+    </property>
+    <addaction name="actionIsoView"/>
+    <addaction name="actionFrontView"/>
+    <addaction name="actionBackView"/>
+    <addaction name="actionLeftView"/>
+    <addaction name="actionRightView"/>
+    <addaction name="actionTopView"/>
+    <addaction name="actionBottomView"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProject"/>
+   <addaction name="menuView_2"/>
+   <addaction name="menuPerspective"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -247,33 +653,9 @@
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
-  </widget>
-  <widget class="QToolBar" name="exportToolBar">
-   <property name="windowTitle">
-    <string>Export Toolbar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
+   <addaction name="separator"/>
    <addaction name="actionExport"/>
    <addaction name="actionSnapshot"/>
-  </widget>
-  <widget class="QToolBar" name="simToolBar">
-   <property name="windowTitle">
-    <string>Simulation Toolbar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionStop"/>
-   <addaction name="actionRerun"/>
-   <addaction name="actionSmooth"/>
   </widget>
   <widget class="QToolBar" name="viewToolBar">
    <property name="windowTitle">
@@ -303,7 +685,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionIsoView"/>
    <addaction name="actionFrontView"/>
@@ -312,23 +694,6 @@
    <addaction name="actionRightView"/>
    <addaction name="actionTopView"/>
    <addaction name="actionBottomView"/>
-  </widget>
-  <widget class="QToolBar" name="toolpathToolBar">
-   <property name="windowTitle">
-    <string>Tool Path Toolbar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionBegining"/>
-   <addaction name="actionSlower"/>
-   <addaction name="actionPlay"/>
-   <addaction name="actionFaster"/>
-   <addaction name="actionEnd"/>
-   <addaction name="actionDirection"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="positionDockWidget">
@@ -347,6 +712,9 @@
      <height>150</height>
     </size>
    </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Tool Position</string>
    </property>
@@ -358,7 +726,16 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -407,7 +784,6 @@
             </property>
             <property name="font">
              <font>
-              <family>Sans Serif</family>
               <pointsize>20</pointsize>
               <underline>true</underline>
              </font>
@@ -430,7 +806,6 @@
             </property>
             <property name="font">
              <font>
-              <family>Sans Serif</family>
               <pointsize>20</pointsize>
               <underline>true</underline>
              </font>
@@ -472,7 +847,6 @@
             </property>
             <property name="font">
              <font>
-              <family>Sans Serif</family>
               <pointsize>20</pointsize>
               <underline>true</underline>
              </font>
@@ -519,6 +893,9 @@
      <height>170</height>
     </size>
    </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Estimates</string>
    </property>
@@ -530,7 +907,16 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -550,6 +936,9 @@
         </property>
         <item>
          <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1,2">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
           <item row="0" column="1">
            <widget class="QLabel" name="label_20">
             <property name="font">
@@ -765,6 +1154,9 @@
      <height>170</height>
     </size>
    </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Machine Status</string>
    </property>
@@ -776,7 +1168,16 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -796,6 +1197,9 @@
         </property>
         <item>
          <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,1">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="label_30">
             <property name="sizePolicy">
@@ -961,7 +1365,7 @@
   </widget>
   <widget class="QDockWidget" name="projectDockWidget">
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -1019,7 +1423,7 @@
     </sizepolicy>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string>Context</string>
@@ -1860,6 +2264,9 @@
      <height>125</height>
     </size>
    </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Tool Path Bounds</string>
    </property>
@@ -1871,7 +2278,16 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -2077,6 +2493,9 @@
      <height>125</height>
     </size>
    </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <property name="windowTitle">
     <string>Workpiece Bounds</string>
    </property>
@@ -2088,7 +2507,16 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -2108,6 +2536,9 @@
         </property>
         <item>
          <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,1,1,1">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
           <item row="0" column="1">
            <widget class="QLabel" name="label_13">
             <property name="font">
@@ -2384,7 +2815,7 @@
      <normaloff>:/icons/wire.png</normaloff>:/icons/wire.png</iconset>
    </property>
    <property name="text">
-    <string>Show wire surface</string>
+    <string>Show Wire Surface</string>
    </property>
   </action>
   <action name="actionWorkpieceBounds">
@@ -2399,7 +2830,7 @@
      <normaloff>:/icons/bbox.png</normaloff>:/icons/bbox.png</iconset>
    </property>
    <property name="text">
-    <string>Show workpiece bounds</string>
+    <string>Show Workpiece Bounds</string>
    </property>
    <property name="toolTip">
     <string>Show workpiece bounds</string>
@@ -2417,7 +2848,7 @@
      <normaloff>:/icons/tool.png</normaloff>:/icons/tool.png</iconset>
    </property>
    <property name="text">
-    <string>Show tool</string>
+    <string>Show Tool</string>
    </property>
   </action>
   <action name="actionCutSurface">
@@ -2432,7 +2863,7 @@
      <normaloff>:/icons/cut_surface.png</normaloff>:/icons/cut_surface.png</iconset>
    </property>
    <property name="text">
-    <string>Show cut surface</string>
+    <string>Show Cut Surface</string>
    </property>
    <property name="toolTip">
     <string>Show cut surface</string>
@@ -2450,7 +2881,7 @@
      <normaloff>:/icons/axes.png</normaloff>:/icons/axes.png</iconset>
    </property>
    <property name="text">
-    <string>Show axes</string>
+    <string>Show Axes</string>
    </property>
   </action>
   <action name="actionToolPath">
@@ -2465,7 +2896,7 @@
      <normaloff>:/icons/path.png</normaloff>:/icons/path.png</iconset>
    </property>
    <property name="text">
-    <string>Show tool path</string>
+    <string>Show Tool Path</string>
    </property>
   </action>
   <action name="actionIsoView">
@@ -2474,7 +2905,7 @@
      <normaloff>:/icons/isometric.png</normaloff>:/icons/isometric.png</iconset>
    </property>
    <property name="text">
-    <string>Isometric View</string>
+    <string>Isometric</string>
    </property>
    <property name="toolTip">
     <string>Snap to isometric view</string>
@@ -2486,7 +2917,7 @@
      <normaloff>:/icons/front.png</normaloff>:/icons/front.png</iconset>
    </property>
    <property name="text">
-    <string>Front View</string>
+    <string>Front</string>
    </property>
    <property name="toolTip">
     <string>Snap to front view</string>
@@ -2498,7 +2929,7 @@
      <normaloff>:/icons/back.png</normaloff>:/icons/back.png</iconset>
    </property>
    <property name="text">
-    <string>Back View</string>
+    <string>Back</string>
    </property>
    <property name="toolTip">
     <string>Snap to back view</string>
@@ -2510,7 +2941,7 @@
      <normaloff>:/icons/left.png</normaloff>:/icons/left.png</iconset>
    </property>
    <property name="text">
-    <string>Left View</string>
+    <string>Left</string>
    </property>
    <property name="toolTip">
     <string>Snap to left view</string>
@@ -2522,7 +2953,7 @@
      <normaloff>:/icons/right.png</normaloff>:/icons/right.png</iconset>
    </property>
    <property name="text">
-    <string>Right View</string>
+    <string>Right</string>
    </property>
    <property name="toolTip">
     <string>Snap to right view</string>
@@ -2534,7 +2965,7 @@
      <normaloff>:/icons/top.png</normaloff>:/icons/top.png</iconset>
    </property>
    <property name="text">
-    <string>Top View</string>
+    <string>Top</string>
    </property>
    <property name="toolTip">
     <string>Snap to top view</string>
@@ -2546,7 +2977,7 @@
      <normaloff>:/icons/bottom.png</normaloff>:/icons/bottom.png</iconset>
    </property>
    <property name="text">
-    <string>Bottom View</string>
+    <string>Bottom</string>
    </property>
    <property name="toolTip">
     <string>Snap to bottom view</string>
@@ -2681,7 +3112,7 @@
      <normaloff>:/icons/no-surface.png</normaloff>:/icons/no-surface.png</iconset>
    </property>
    <property name="text">
-    <string>Hide surface</string>
+    <string>Hide Surface</string>
    </property>
   </action>
   <action name="actionStop">
@@ -2767,7 +3198,7 @@
   </action>
   <action name="actionResetLayout">
    <property name="text">
-    <string>Restore Default Layout</string>
+    <string>Default Layout</string>
    </property>
   </action>
   <action name="actionExamples">
@@ -2776,6 +3207,11 @@
    </property>
    <property name="text">
     <string>Examples</string>
+   </property>
+  </action>
+  <action name="actionMinimalLayout">
+   <property name="text">
+    <string>Minimal Layout</string>
    </property>
   </action>
  </widget>

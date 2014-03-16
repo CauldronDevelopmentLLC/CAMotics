@@ -41,8 +41,9 @@ namespace {
 }
 
 
-OCodeInterpreter::OCodeInterpreter(Controller &controller) :
-  GCodeInterpreter(controller), condition(true) {}
+OCodeInterpreter::OCodeInterpreter(Controller &controller,
+                                   const cb::SmartPointer<Task> &task) :
+  GCodeInterpreter(controller), task(task), condition(true) {}
 
 
 OCodeInterpreter::~OCodeInterpreter() {} // Hide member destructors
@@ -157,7 +158,7 @@ void OCodeInterpreter::doCall(OCode *ocode) {
           if (loadedFiles.insert(name).second) {
             string path = SystemUtilities::findInPath(scriptPath, name);
             InputSource source(path);
-            Parser().parse(InputSource(path), *this);
+            Parser(task).parse(InputSource(path), *this);
           }
 
           // Look up again

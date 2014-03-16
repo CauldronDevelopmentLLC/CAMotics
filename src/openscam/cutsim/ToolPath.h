@@ -36,13 +36,13 @@ namespace OpenSCAM {
   class STL;
 
   class ToolPath : public std::vector<Move>, public Rectangle3R {
-    ToolTable &tools;
+    cb::SmartPointer<ToolTable> tools;
 
   public:
-    ToolPath(ToolTable &tools) : tools(tools) {}
+    ToolPath(const cb::SmartPointer<ToolTable> &tools) : tools(tools) {}
 
     const Rectangle3R &getBounds() const {return *this;}
-    ToolTable &getTools() const {return tools;}
+    const cb::SmartPointer<ToolTable> &getTools() const {return tools;}
 
     void add(const Move &move);
     void print(std::ostream &stream) const;

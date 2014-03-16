@@ -46,18 +46,24 @@ using namespace OpenSCAM;
 
 namespace OpenSCAM {
   class TPLangApp : public Application {
-    ToolTable tools;
+    cb::SmartPointer<ToolTable> tools;
     tplang::MachinePipeline pipeline;
 
   public:
     TPLangApp() :
-      Application("Tool Path Language") {
+      Application("Tool Path Language"), tools(new ToolTable) {
 
       pipeline.add(new MachineUnitAdapter);
       pipeline.add(new MachineLinearizer);
       pipeline.add(new MachineMatrix);
       pipeline.add(new GCodeMachine(cout));
       pipeline.add(new MachineState);
+    }
+
+    // From cb::Application
+    void requestExit() {
+      Application::requestExit();
+      cb::js::Javascript::terminate();
     }
 
     // From cb::Reader

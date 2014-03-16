@@ -23,13 +23,19 @@
 #include "Workpiece.h"
 #include "ToolPath.h"
 #include "CutWorkpiece.h"
-#include "Project.h"
 #include "Sweep.h"
 
 #include <tplang/TPLContext.h>
 #include <tplang/Interpreter.h>
 
+#include <openscam/contour/Surface.h>
 #include <openscam/gcode/Interpreter.h>
+#include <openscam/render/Renderer.h>
+#include <openscam/sim/Controller.h>
+
+#include <cbang/js/Javascript.h>
+#include <cbang/os/SystemInfo.h>
+#include <cbang/util/DefaultCatch.h>
 
 #include <limits>
 
@@ -39,47 +45,71 @@ using namespace OpenSCAM;
 
 
 CutSim::CutSim(Options &options) :
-  Machine(options), tools(new ToolTable), controller(*this, tools) {}
+  Machine(options), threads(SystemInfo::instance().getCPUCount()),
+  task(SmartPointer<Task>::ProtectedNull(this)) {
+  options.pushCategory("Simulation");
+  options.addTarget("threads", threads, "Number of simulation threads.");
+  options.popCategory();
+}
 
 
 CutSim::~CutSim() {}
 
 
-void CutSim::init(Project &project) {
-  // Reset
+SmartPointer<ToolPath>
+CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
+                        const vector<string> &files) {
+  // Setup
+  task->begin();
   Machine::reset();
-  controller.reset();
+  Controller controller(*this, tools);
+  path = new ToolPath(tools);
 
-  // Load G code
-  path = new ToolPath(*tools);
+  // Interpret code
+  try {
+    for (unsigned i = 0; i < files.size() && !task->shouldQuit(); i++) {
+      task->update(0, "Running " + files[i]);
 
-  // Reload interpret code
-  vector<string> files = project.getAbsoluteFiles();
-  for (unsigned i = 0; i < files.size(); i++) {
-    if (String::endsWith(files[i], ".tpl")) {
-      tplang::TPLContext ctx(cout, *this, controller.getToolTable());
-      ctx.pushPath(files[i]);
-      tplang::Interpreter(ctx).read(files[i]);
+      if (String::endsWith(files[i], ".tpl")) {
+        tplang::TPLContext ctx(cout, *this, controller.getToolTable());
+        ctx.pushPath(files[i]);
+        tplang::Interpreter(ctx).read(files[i]);
 
-    } else Interpreter(controller).read(files[i]); // Assume GCode
-  }
+      } else Interpreter(controller, task).read(files[i]); // Assume GCode
+    }
+  } CATCH_ERROR;
 
-  // Update changed Project settings
-  project.updateAutomaticWorkpiece(*path);
-  project.updateResolution();
-
-  // Setup cut simulation
-  Rectangle3R wpBounds = project.getWorkpieceBounds();
-  cutWP = new CutWorkpiece(new ToolSweep(path), new Workpiece(wpBounds));
+  task->end();
+  return path.adopt();
 }
 
 
-void CutSim::reset() {
-  Machine::reset();
-  controller.reset();
-  tools->clear();
-  path = 0;
-  cutWP = 0;
+cb::SmartPointer<Surface>
+CutSim::computeSurface(const SmartPointer<ToolPath> &path,
+                       const Rectangle3R &bounds, double resolution,
+                       double time, bool smooth) {
+  // Setup cut simulation
+  CutWorkpiece cutWP(new ToolSweep(path, time), new Workpiece(bounds));
+
+  // Render
+  Renderer renderer(SmartPointer<Task>::Null(this));
+  SmartPointer<Surface> surface = renderer.render(cutWP, threads, resolution);
+
+  // Smooth
+  if (smooth && !task->shouldQuit()) {
+    task->begin();
+    task->update(0, "Smoothing...");
+    surface->smooth();
+    task->end();
+  }
+
+  return surface;
+}
+
+
+void CutSim::interrupt() {
+  js::Javascript::terminate(); // End TPL code
+  Task::interrupt();
 }
 
 

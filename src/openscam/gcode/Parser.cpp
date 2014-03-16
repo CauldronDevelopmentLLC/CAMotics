@@ -42,11 +42,7 @@ using namespace OpenSCAM;
 
 
 void Parser::parse(Tokenizer &tokenizer, Processor &processor) {
-  try {
-    while (tokenizer.hasMore()) processor(block(tokenizer));
-  } catch (const Exception &e) {
-    THROWCS("Exception @" << tokenizer.getLocation(), e);
-  }
+  while (!task->shouldQuit() && parseOne(tokenizer, processor)) continue;
 }
 
 
@@ -55,6 +51,17 @@ void Parser::parse(const InputSource &source, Processor &processor) {
   Tokenizer tokenizer(scanner);
 
   parse(tokenizer, processor);
+}
+
+
+bool Parser::parseOne(Tokenizer &tokenizer, Processor &processor) {
+  try {
+    if (!tokenizer.hasMore()) return false;
+    processor(block(tokenizer));
+    return true;
+  } catch (const Exception &e) {
+    THROWCS("Exception @" << tokenizer.getLocation(), e);
+  }
 }
 
 

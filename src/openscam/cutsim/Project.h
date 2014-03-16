@@ -57,8 +57,7 @@ namespace OpenSCAM {
     bool dirty;
 
   public:
-    Project(cb::Options &options, const cb::SmartPointer<ToolTable> &tools,
-            const std::string &filename = std::string());
+    Project(cb::Options &options, const std::string &filename = std::string());
     ~Project();
 
     bool isDirty() const {return dirty;}
@@ -72,10 +71,6 @@ namespace OpenSCAM {
     std::string makeAbsolute(const std::string &path) const;
 
     const cb::SmartPointer<ToolTable> &getToolTable() const {return tools;}
-
-    bool hasNotes() const {return options["notes"].hasValue();}
-    const std::string &getNotes() const {return options["notes"];}
-    void setNotes(const std::string &notes) {options["notes"].set(notes);}
 
     void setUnits(ToolUnits units);
     ToolUnits getUnits() const;

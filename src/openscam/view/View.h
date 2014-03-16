@@ -25,8 +25,8 @@
 #include "ToolPathView.h"
 #include "CuboidView.h"
 
-#include <openscam/render/Renderer.h>
 #include <openscam/Geom.h>
+#include <openscam/contour/Surface.h>
 #include <openscam/value/ValueGroup.h>
 
 #include <cbang/SmartPointer.h>
@@ -41,7 +41,7 @@ namespace OpenSCAM {
   public:
     cb::SmartPointer<ToolPathView> path;
     cb::SmartPointer<CuboidView> workpiece;
-    cb::SmartPointer<Renderer> renderer;
+    cb::SmartPointer<Surface> surface;
 
     enum {
       WIRE_FLAG                  = 1 << 0,
@@ -69,9 +69,7 @@ namespace OpenSCAM {
 
     double lastTime;
 
-    View(ValueSet &valueSet, const cb::SmartPointer<Renderer> &renderer);
-
-    const cb::SmartPointer<ToolPathView> &getToolPathView() const {return path;}
+    View(ValueSet &valueSet);
 
     bool isFlagSet(unsigned flag) const {return flags & flag;}
     void setFlag(unsigned flag, bool on = true)
@@ -86,6 +84,7 @@ namespace OpenSCAM {
 
     void setToolPath(const cb::SmartPointer<ToolPath> &toolPath);
     void setWorkpiece(const Rectangle3R &bounds);
+    void setSurface(const cb::SmartPointer<Surface> &surface);
     double getTime() const {return path.isNull() ? 0 : path->getTime();}
 
     bool update();

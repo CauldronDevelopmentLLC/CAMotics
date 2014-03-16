@@ -35,13 +35,13 @@ namespace OpenSCAM {
 
     cb::SmartPointer<ContourGenerator> generator;
 
-    cb::SmartPointer<FieldFunction> func;
+    FieldFunction &func;
     real resolution;
     Rectangle3R bbox;
 
   public:
-    RenderJob(const cb::SmartPointer<FieldFunction> &func, RenderMode mode,
-              real resolution, const Rectangle3R &bbox);
+    RenderJob(FieldFunction &func, RenderMode mode, real resolution,
+              const Rectangle3R &bbox);
 
     cb::SmartPointer<Surface> getSurface() const
     {return generator->getSurface();}

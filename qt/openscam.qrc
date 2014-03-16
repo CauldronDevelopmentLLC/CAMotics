@@ -46,5 +46,7 @@
         <file>images/paypal_donate.gif</file>
         <file>images/paypal.gif</file>
         <file>icons/cut_surface.png</file>
+        <file>icons/running.gif</file>
+        <file>icons/idle.png</file>
     </qresource>
 </RCC>

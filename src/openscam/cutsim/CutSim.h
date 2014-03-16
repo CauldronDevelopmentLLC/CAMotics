@@ -21,8 +21,14 @@
 #ifndef OPENSCAM_CUT_SIM_H
 #define OPENSCAM_CUT_SIM_H
 
+#include <cbang/SmartPointer.h>
+
+#include <openscam/Task.h>
+#include <openscam/Geom.h>
 #include <openscam/sim/Machine.h>
-#include <openscam/sim/Controller.h>
+
+#include <vector>
+#include <string>
 
 
 namespace cb {class Options;}
@@ -30,28 +36,27 @@ namespace cb {class Options;}
 namespace OpenSCAM {
   class ToolTable;
   class ToolPath;
-  class CutWorkpiece;
-  class Project;
+  class Surface;
 
-  class CutSim : public Machine {
-    cb::SmartPointer<ToolTable> tools;
+  class CutSim : public Machine, public Task {
+    unsigned threads;
+    cb::SmartPointer<Task> task;
     cb::SmartPointer<ToolPath> path;
-    cb::SmartPointer<CutWorkpiece> cutWP;
-
-    Controller controller;
 
   public:
     CutSim(cb::Options &options);
     ~CutSim();
 
-    cb::SmartPointer<ToolTable> getToolTable() {return tools;}
-    cb::SmartPointer<ToolPath> getToolPath() const {return path;}
-    cb::SmartPointer<CutWorkpiece> getCutWorkpiece() const {return cutWP;}
-    Controller &getController() {return controller;}
-    const Controller &getController() const {return controller;}
+    cb::SmartPointer<ToolPath>
+    computeToolPath(const cb::SmartPointer<ToolTable> &tools,
+                    const std::vector<std::string> &files);
+    cb::SmartPointer<Surface>
+    computeSurface(const cb::SmartPointer<ToolPath> &path,
+                   const Rectangle3R &bounds, double resolution,
+                   double time, bool smooth);
 
-    void init(Project &project);
-    void reset();
+    // From Task
+    void interrupt();
 
     // From Machine
     void move(const Move &move);

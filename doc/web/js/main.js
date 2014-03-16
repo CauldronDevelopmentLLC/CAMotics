@@ -47,4 +47,18 @@ $(function() {
 
     // Enable shadow box
     Shadowbox.init({displayNav: true});
+
+    // Load GitHub iframes
+    var base = 'http://ghbtns.com/github-btn.html?' +
+        'user=CauldronDevelopmentLLC&repo=OpenSCAM&count=true'
+    $('<iframe>')
+        .attr({src: base + '&type=watch', title: 'Star on GitHub',
+               width: 100, height: 20})
+        .addClass('github-btn')
+        .appendTo('.github-star');
+    $('<iframe>')
+        .attr({src: base + '&type=fork', title: 'Fork on GitHub',
+               width: 100, height: 20})
+        .addClass('github-btn')
+        .appendTo('.github-fork');
 });

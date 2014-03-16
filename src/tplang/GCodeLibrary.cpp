@@ -223,7 +223,7 @@ js::Value GCodeLibrary::toolCB(const js::Arguments &args) {
   if (!args.getCount()) return ctx.machine.getTool();
 
   uint32_t number = args["number"].toUint32();
-  ctx.tools.get(number); // Make sure it exists
+  ctx.tools->get(number); // Make sure it exists
   ctx.machine.setTool(number);
 
   return ctx.machine.getTool();
@@ -256,7 +256,7 @@ js::Value GCodeLibrary::pauseCB(const js::Arguments &args) {
 
 
 js::Value GCodeLibrary::toolSetCB(const js::Arguments &args) {
-  SmartPointer<OpenSCAM::Tool> tool = ctx.tools.get(args["number"].toUint32());
+  SmartPointer<OpenSCAM::Tool> tool = ctx.tools->get(args["number"].toUint32());
 
   uint32_t units;
   double scale = 1;

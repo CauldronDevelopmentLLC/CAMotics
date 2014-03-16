@@ -22,57 +22,17 @@
 
 #include "RenderJob.h"
 
+#include <openscam/cutsim/CutWorkpiece.h>
 #include <openscam/contour/CompositeSurface.h>
 
 #include <cbang/log/Logger.h>
 #include <cbang/time/TimeInterval.h>
 #include <cbang/time/Timer.h>
-#include <cbang/os/SystemInfo.h>
-#include <cbang/config/Options.h>
 #include <cbang/String.h>
 
 using namespace std;
 using namespace cb;
 using namespace OpenSCAM;
-
-
-Renderer::Renderer(cb::Options &options) :
-  mode(RenderMode::MCUBES_MODE), resolution(1),
-  threads(SystemInfo::instance().getCPUCount()), autoRender(true), smooth(true),
-  progress(0), eta(0), dirty(true), interrupt(false), updated(false) {
-
-  options.pushCategory("Renderer");
-  options.addTarget("threads", threads, "The number of render threads");
-  options.addTarget("auto_render", autoRender,
-                    "Automatically render when simulation changes");
-  options.addTarget("smooth", smooth, "Smooth the rendered results by "
-                    "averaging adjacent vertex normals.");
-  options.popCategory();
-}
-
-
-void Renderer::setCutWorkpiece(const SmartPointer<CutWorkpiece> &cutWorkpiece) {
-  SmartLock lock(this);
-  if (autoRender) dirty = interrupt = true;
-  this->cutWorkpiece = cutWorkpiece;
-}
-
-
-uint64_t Renderer::getSamples() const {
-  return cutWorkpiece.isNull() ? 0 : cutWorkpiece->getSampleCount();
-}
-
-
-SmartPointer<Surface> Renderer::getSurface() {
-  SmartLock lock(this);
-
-  if (!nextSurface.isNull()) {
-    surface = nextSurface;
-    nextSurface = 0;
-  }
-
-  return surface;
-}
 
 
 static void boxSplit(vector<Rectangle3R> &boxes, Rectangle3R box,
@@ -100,112 +60,95 @@ static void boxSplit(vector<Rectangle3R> &boxes, Rectangle3R box,
 }
 
 
-void Renderer::run() {
-  while (!shouldShutdown()) {
-    interrupt = false;
-    if (!dirty) {
-      Timer::sleep(0.1);
-      continue;
-    }
-    dirty = false;
-    lock();
-    SmartPointer<CutWorkpiece> cutWorkpiece = this->cutWorkpiece;
-    unlock();
-    if (cutWorkpiece.isNull() || !cutWorkpiece->isValid()) continue;
+cb::SmartPointer<Surface>
+Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
+                 double resolution, RenderMode mode) {
+  // Setup
+  task->begin();
 
-    double start = Timer::now();
+  cutWorkpiece.clearSampleCount();
+  cutWorkpiece.getToolSweep()->clearHitTests();
 
-    cutWorkpiece->clearSampleCount();
-    cutWorkpiece->getToolSweep()->clearHitTests();
+  // Increase bounds a little
+  Rectangle3R bbox = cutWorkpiece.getBounds();
+  real off = 2 * resolution - 0.00001;
+  bbox = bbox.grow(Vector3R(off, off, off));
 
-    // Increase bounds a little
-    Rectangle3R bbox = cutWorkpiece->getBounds();
-    real off = 2 * resolution - 0.00001;
-    bbox = bbox.grow(Vector3R(off, off, off));
+  // Divide work
+  vector<Rectangle3R> jobBoxes;
+  boxSplit(jobBoxes, bbox, threads);
+  unsigned totalJobCount = jobBoxes.size();
 
-    // Divide work
-    vector<Rectangle3R> jobBoxes;
-    boxSplit(jobBoxes, bbox, threads);
-    unsigned totalJobCount = jobBoxes.size();
+  LOG_INFO(1, "Computing surface bounded by " << bbox << " at "
+           << resolution << " grid resolution in " << jobBoxes.size()
+           << " boxes");
 
-    LOG_INFO(1, "Computing surface bounded by " << bbox << " at "
-             << resolution << " grid resolution in " << jobBoxes.size()
-             << " boxes");
 
-    // Run jobs
-    lock();
-    double resolution = this->resolution;
-    RenderMode mode = this->mode;
-    unlock();
+  // Run jobs
+  SmartPointer<CompositeSurface> surface = new CompositeSurface;
+  typedef list<SmartPointer<RenderJob> > jobs_t;
+  jobs_t jobs;
+  while (!task->shouldQuit() && !(jobBoxes.empty() && jobs.empty())) {
 
-    SmartPointer<CompositeSurface> surface = new CompositeSurface;
-    typedef list<SmartPointer<RenderJob> > jobs_t;
-    jobs_t jobs;
-    while (!shouldShutdown() && !interrupt &&
-           !(jobBoxes.empty() && jobs.empty())) {
-      // Start new jobs
-      while (!jobBoxes.empty() && jobs.size() < threads) {
-        Rectangle3R jobBox = jobBoxes.back();
-        jobBoxes.pop_back();
+    // Start new jobs
+    while (!jobBoxes.empty() && jobs.size() < threads) {
+      Rectangle3R jobBox = jobBoxes.back();
+      jobBoxes.pop_back();
 
-        SmartPointer<RenderJob> job =
-          new RenderJob(cutWorkpiece, mode, resolution, jobBox);
-        job->start();
-        jobs.push_back(job);
-      }
-
-      // Reap completed jobs
-      for (jobs_t::iterator it = jobs.begin(); it != jobs.end();)
-        if ((*it)->getState() == Thread::THREAD_DONE) {
-          (*it)->join();
-          surface->add((*it)->getSurface());
-          it = jobs.erase(it);
-        } else it++;
-
-      // Update Progress
-      lock();
-      progress = 0;
-      // Running jobs
-      for (jobs_t::iterator it = jobs.begin(); it != jobs.end(); it++)
-        progress += (*it)->getProgress();
-      // Completed jobs
-      progress += totalJobCount - jobBoxes.size() - jobs.size();
-      progress /= totalJobCount;
-
-      double delta = (Timer::now() - start);
-      if (progress && 1 < delta) eta = delta / progress - delta;
-      else eta = 0;
-      unlock();
-
-      Timer::sleep(0.1);
+      SmartPointer<RenderJob> job =
+        new RenderJob(cutWorkpiece, mode, resolution, jobBox);
+      job->start();
+      jobs.push_back(job);
     }
 
-    // Clean up remaining jobs in case of an early exit
-    for (jobs_t::iterator it = jobs.begin(); it != jobs.end(); it++)
-      (*it)->join();
 
-    progress = 0;
-    eta = 0;
+    // Reap completed jobs
+    jobs_t::iterator it;
+    for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit();)
+      if ((*it)->getState() == Thread::THREAD_DONE) {
+        (*it)->join();
+        surface->add((*it)->getSurface());
+        it = jobs.erase(it);
+      } else it++;
 
-    if (shouldShutdown() || interrupt) continue;
 
-    if (smooth) {
-      LOG_INFO(1, "Smoothing");
-      surface->smooth();
-    }
+    // Update Progress
+    double progress = 0;
 
-    // Done
-    double delta = Timer::now() - start;
-    LOG_INFO(1, "Time: " << TimeInterval(delta)
-             << " Triangles: " << surface->getCount()
-             << " Triangles/sec: "
-             << String::printf("%0.2f", surface->getCount() / delta)
-             << " Resolution: " << resolution);
+    // Add running jobs
+    for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit(); it++)
+      progress += (*it)->getProgress();
 
-    lock();
-    nextSurface = surface;
-    unlock();
+    // Add completed jobs
+    progress += totalJobCount - jobBoxes.size() - jobs.size();
+    progress /= totalJobCount;
 
-    updated = true;
+    task->update(progress, "Rendering surface");
+
+
+    // Sleep
+    Timer::sleep(0.1);
   }
+
+
+  // Clean up remaining jobs in case of an early exit
+  for (jobs_t::iterator it = jobs.begin(); it != jobs.end(); it++)
+    (*it)->join();
+
+  if (shouldQuit()) {
+    task->end();
+    LOG_INFO(1, "Render aborted");
+    return 0;
+  }
+
+  // Done
+  double delta = task->end();
+  LOG_INFO(1, "Time: " << TimeInterval(delta)
+           << " Triangles: " << surface->getCount()
+           << " Triangles/sec: "
+           << String::printf("%0.2f", surface->getCount() / delta)
+           << " Resolution: " << resolution);
+
+
+  return surface;
 }

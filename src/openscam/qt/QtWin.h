@@ -24,6 +24,8 @@
 #include "ExportDialog.h"
 #include "AboutDialog.h"
 #include "DonateDialog.h"
+#include "ToolPathThread.h"
+#include "SurfaceThread.h"
 
 #include <openscam/Real.h>
 #include <openscam/view/GL.h>
@@ -53,13 +55,17 @@ class QMdiSubWindow;
 namespace OpenSCAM {
   class CutSim;
   class ConnectionManager;
-  class Renderer;
   class Viewer;
   class Project;
   class ProjectModel;
+  class ToolPath;
+  class CutWorkpiece;
 
   class QtWin : public QMainWindow {
     Q_OBJECT;
+
+    int toolPathCompleteEvent;
+    int surfaceCompleteEvent;
 
     cb::SmartPointer<Ui::OpenSCAMWindow> ui;
     ExportDialog exportDialog;
@@ -83,16 +89,23 @@ namespace OpenSCAM {
     cb::SmartPointer<CutSim> cutSim;
     cb::SmartPointer<Project> project;
     cb::SmartPointer<ConnectionManager> connectionManager;
-    cb::SmartPointer<Renderer> renderer;
     cb::SmartPointer<View> view;
     cb::SmartPointer<Viewer> viewer;
     cb::SmartPointer<ToolView> toolView;
+    cb::SmartPointer<ToolPath> toolPath;
+    cb::SmartPointer<Surface> surface;
+
+    cb::SmartPointer<ToolPathThread> toolPathThread;
+    cb::SmartPointer<SurfaceThread> surfaceThread;
 
     bool dirty;
     bool simDirty;
     unsigned inUIUpdate;
     double lastProgress;
+    std::string lastStatus;
+    bool lastStatusActive;
     cb::SmartPointer<Tool> currentTool;
+    bool smooth;
 
     typedef enum {
       NULL_VIEW,
@@ -107,7 +120,6 @@ namespace OpenSCAM {
 
     const cb::SmartPointer<ConnectionManager> &getConnectionManager() const
     {return connectionManager;}
-    const cb::SmartPointer<Renderer> &getRenderer() const {return renderer;}
     const cb::SmartPointer<View> &getView() const {return view;}
 
     void init();
@@ -119,6 +131,7 @@ namespace OpenSCAM {
     void restoreAllState();
     void saveDefaultLayout();
     void restoreDefaultLayout();
+    void minimalLayout();
 
     cb::SmartPointer<ViewPort> getCurrentViewPort() const;
     void snapView(char v);
@@ -135,6 +148,10 @@ namespace OpenSCAM {
     void message(const std::string &msg);
     void warning(const std::string &msg);
 
+    void toolPathComplete();
+    void surfaceComplete();
+
+    void stop();
     void reload(bool now = false);
     void redraw(bool now = false);
     void snapshot();
@@ -168,6 +185,8 @@ namespace OpenSCAM {
     void updateToolPathBounds();
     void updateWorkpieceBounds();
 
+    void setStatusActive(bool active);
+
     // Views
     void setUIView(ui_view_t uiView);
 
@@ -198,6 +217,7 @@ namespace OpenSCAM {
 
   protected:
     // From QMainWindow
+    bool event(QEvent *event);
     void closeEvent(QCloseEvent *event);
 
   protected slots:
@@ -209,6 +229,15 @@ namespace OpenSCAM {
     void on_resolutionDoubleSpinBox_valueChanged(double value);
     void on_unitsComboBox_currentIndexChanged(int value);
 
+    void on_smoothPushButton_clicked(bool active);
+    void on_stopPushButton_clicked();
+    void on_rerunPushButton_clicked();
+    void on_beginingPushButton_clicked();
+    void on_slowerPushButton_clicked();
+    void on_playPushButton_clicked();
+    void on_fasterPushButton_clicked();
+    void on_endPushButton_clicked();
+    void on_directionPushButton_clicked();
     void on_positionSlider_sliderMoved(int position);
 
     void on_projectTreeView_activated(const QModelIndex &index);
@@ -244,20 +273,10 @@ namespace OpenSCAM {
     void on_actionSnapshot_triggered();
 
     void on_actionResetLayout_triggered();
+    void on_actionMinimalLayout_triggered();
 
     void on_actionAbout_triggered();
     void on_actionDonate_triggered();
-
-    void on_actionSmooth_triggered(bool active);
-    void on_actionStop_triggered();
-    void on_actionRerun_triggered();
-
-    void on_actionBegining_triggered();
-    void on_actionSlower_triggered();
-    void on_actionPlay_triggered();
-    void on_actionFaster_triggered();
-    void on_actionEnd_triggered();
-    void on_actionDirection_triggered();
 
     void on_actionIsoView_triggered() {snapView('p');}
     void on_actionFrontView_triggered() {snapView('F');}

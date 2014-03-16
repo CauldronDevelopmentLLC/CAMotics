@@ -31,6 +31,8 @@
 #include "ast/Number.h"
 #include "ast/FunctionCall.h"
 
+#include <openscam/Task.h>
+
 #include <cbang/SmartPointer.h>
 #include <cbang/io/InputSource.h>
 
@@ -42,9 +44,15 @@ namespace OpenSCAM {
   class Tokenizer;
 
   class Parser {
+    cb::SmartPointer<Task> task;
+
   public:
+    Parser(const cb::SmartPointer<Task> &task = new Task) : task(task) {}
+
     void parse(Tokenizer &tokenizer, Processor &processor);
     void parse(const cb::InputSource &source, Processor &processor);
+
+    bool parseOne(Tokenizer &tokenizer, Processor &processor);
 
     cb::SmartPointer<Block> block(Tokenizer &tokenizer);
 

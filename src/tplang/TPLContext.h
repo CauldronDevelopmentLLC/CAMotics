@@ -38,10 +38,10 @@ namespace tplang {
 
   public:
     MachineInterface &machine;
-    OpenSCAM::ToolTable &tools;
+    cb::SmartPointer<OpenSCAM::ToolTable> tools;
 
     TPLContext(std::ostream &out, MachineInterface &machine,
-               OpenSCAM::ToolTable &tools);
+               const cb::SmartPointer<OpenSCAM::ToolTable> &tools);
 
     void pushPath(const std::string &path) {paths.push_back(path);}
     void popPath();

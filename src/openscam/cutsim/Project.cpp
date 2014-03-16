@@ -40,16 +40,13 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-Project::Project(Options &_options, const SmartPointer<ToolTable> &tools,
-                 const std::string &filename) :
-  options(_options), filename(filename), tools(tools),
+Project::Project(Options &_options, const std::string &filename) :
+  options(_options), filename(filename), tools(new ToolTable),
   resolution(1), workpieceMargin(5), watch(true), lastWatch(0), dirty(false) {
 
   options.setAllowReset(true);
 
   options.pushCategory("Project");
-  options.add("notes", "Add notes which will be displayed whenever the project "
-              "is opened.");
   options.add("units", "Units used in project measurement",
               new EnumConstraint<ToolUnits>)->setDefault("mm");
   options.popCategory();

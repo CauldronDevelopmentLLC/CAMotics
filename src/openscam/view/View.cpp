@@ -31,9 +31,8 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-View::View(ValueSet &valueSet, const SmartPointer<Renderer> &renderer) :
+View::View(ValueSet &valueSet) :
   values(valueSet), path(new ToolPathView(valueSet)), workpiece(new CuboidView),
-  renderer(renderer),
   flags(SHOW_PATH_FLAG | SHOW_TOOL_FLAG | SHOW_SURFACE_FLAG |
         SHOW_WORKPIECE_BOUNDS_FLAG),
   fps(0), speed(1), reverse(true), frames(0), frameTimes(0), lastTime(0)  {
@@ -69,6 +68,11 @@ void View::setToolPath(const SmartPointer<ToolPath> &toolPath) {
 
 void View::setWorkpiece(const Rectangle3R &bounds) {
   workpiece->setBounds(bounds);
+}
+
+
+void View::setSurface(const cb::SmartPointer<Surface> &surface) {
+  this->surface = surface;
 }
 
 
