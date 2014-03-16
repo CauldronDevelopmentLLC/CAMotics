@@ -134,7 +134,7 @@ libs.append(env.Library('clipper', glob.glob('src/clipper/*.cpp')))
 #area = env.Library('area', glob.glob('src/libarea/*.cpp'))
 #libs += [area, kurve, kbool]
 
-docs = ('README', 'LICENSE', 'COPYING', 'ChangeLog')
+docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
 progs = 'openscam gcodetool oscamprobe oscamopt tplang'
 execs = []
 for prog in progs.split():
@@ -177,13 +177,10 @@ examples = []
 if 'package' in COMMAND_LINE_TARGETS:
     import subprocess
 
-    cmd = 'svn ls -R examples'
+    cmd = 'git ls-files  examples/'
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     examples = p.communicate()[0]
-
-    examples = filter(lambda x: not x.endswith('/'), examples.split())
-    examples = map(lambda x: 'examples/' + x, examples)
-    examples = map(lambda x: [x, x], examples)
+    examples = map(lambda x: [x, x], examples.split())
 
 
 # Package
@@ -200,7 +197,7 @@ pkg = env.Packager(
     prefix = '/usr',
     icons = ('osx/openscam.icns', 'images/openscam.png'),
 
-    documents = ['README', 'ChangeLog'] + examples,
+    documents = ['README.md', 'CHANGELOG.md'] + examples,
     programs = map(lambda x: str(x[0]), execs),
     desktop_menu = ['OpenSCAM.desktop'],
     changelog = 'ChangeLog',
@@ -211,8 +208,7 @@ pkg = env.Packager(
     deb_section = 'miscellaneous',
     deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
         'libexpat1, libsqlite3-0, libqtcore4, libqtgui4, libqt4-opengl, ' +\
-        'libcairo2, libboost-regex-dev, libboost-filesystem-dev, ' +\
-        'libboost-system-dev, libboost-iostreams-dev',
+        'libcairo2',
     deb_priority = 'optional',
 
     rpm_license = 'GPLv2+',

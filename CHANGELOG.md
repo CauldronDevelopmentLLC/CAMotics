@@ -1,6 +1,14 @@
 # OpenSCAM Changelog
 
+## v0.2.1:
+
+ - Generate tool paths in background.
+ - Added icon to indicate run status.
+ - Moved simulation control buttons to bottom of sim view.
+
 ## v0.2.0:
+
+2014-03-10
 
  - Support for OSX.
  - New Qt GUI, with configurable layout.
