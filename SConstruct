@@ -222,7 +222,7 @@ pkg = env.Packager(
         'CFBundleIconFile': 'openscam.icns',
         },
     app_finish_cmd = 'macdeployqt',
-    pkg_scripts = 'osx',
+    pkg_scripts = 'osx/Scripts',
     pkg_resources = 'osx/Resources',
     pkg_distribution = 'osx/distribution.xml',
     pkg_plist = 'osx/pkg.plist',
