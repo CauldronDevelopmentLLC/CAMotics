@@ -213,9 +213,8 @@ pkg = env.Packager(
     rpm_group = 'Applications/Engineering',
     rpm_requires = 'expat, bzip2-libs',
 
-    app_id = 'org.openscam.pkg',
+    app_id = 'org.openscam',
     app_resources = [['osx/Resources', '.']],
-    pkg_resources = [['osx/Resources', '.']],
     app_copyright = 'Copyright 2011-2014, Cauldron Development LLC',
     app_signature = 'scam',
     app_other_info = {
@@ -223,6 +222,10 @@ pkg = env.Packager(
         'CFBundleIconFile': 'openscam.icns',
         },
     app_finish_cmd = 'macdeployqt',
+    pkg_scripts = 'osx',
+    pkg_resources = 'osx/Resources',
+    pkg_distribution = 'osx/distribution.xml',
+    pkg_plist = 'osx/pkg.plist',
     )
 
 AlwaysBuild(pkg)

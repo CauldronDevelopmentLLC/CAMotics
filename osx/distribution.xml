@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-  <pkg-ref id="org.openscam.pkg"/>
-  <title>Open-Source Simulation &amp; Computer Aided Machining</title>
+  <pkg-ref id="%(pkg_id)s"/>
+  <title>%(summary)s</title>
   <welcome file="Welcome.rtf"/>
   <license file="License.rtf"/>
   <conclusion file="Conclusion.rtf"/>
   <options customize="never" require-scripts="false"/>
   <choices-outline>
-    <line choice="default"><line choice="org.openscam.pkg"/></line>
+    <line choice="default"><line choice="%(pkg_id)s"/></line>
   </choices-outline>
   <choice id="default"/>
-  <choice id="org.openscam.pkg" visible="false">
-    <pkg-ref id="org.openscam.pkg"/>
+  <choice id="%(pkg_id)s" visible="false">
+    <pkg-ref id="%(pkg_id)s"/>
   </choice>
-  <pkg-ref id="org.openscam.pkg" version="0"
-           onConclusion="none">OpenSCAM.pkg</pkg-ref>
+  <pkg-ref id="$(pkg_id)s" version="0"
+           onConclusion="none">%(package_name)s</pkg-ref>
 </installer-gui-script>
