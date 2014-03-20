@@ -93,7 +93,7 @@
        </property>
        <property name="styleSheet">
         <string notr="true">QWidget {
-  background: url(:/images/paypal.gif) no-repeat;
+  background: url(:/images/paypal.png) no-repeat;
   border: 1px solid transparent;
 }
 
@@ -155,7 +155,7 @@ QWidget:hover {
        </property>
        <property name="styleSheet">
         <string notr="true">QWidget {
-	background: url(:/images/paypal_donate.gif) no-repeat;
+	background: url(:/images/paypal_donate.png) no-repeat;
     border: 1px solid transparent;
 }
 
@@ -309,7 +309,7 @@ QWidget:hover {
         <string>Learn about BitCoin QRCodes.</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">background: url(:/images/openscam-bitcoin-donations.gif) no-repeat;
+        <string notr="true">background: url(:/images/openscam-bitcoin-donations.png) no-repeat;
 </string>
        </property>
       </widget>
