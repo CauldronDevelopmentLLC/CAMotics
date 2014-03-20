@@ -41,10 +41,10 @@
         <file>icons/no-surface.png</file>
         <file>icons/revert.png</file>
         <file>icons/donate.png</file>
-        <file>images/bitcoin.svg</file>
-        <file>images/openscam-bitcoin-donations.gif</file>
-        <file>images/paypal_donate.gif</file>
-        <file>images/paypal.gif</file>
+        <file>images/bitcoin.png</file>
+        <file>images/openscam-bitcoin-donations.png</file>
+        <file>images/paypal_donate.png</file>
+        <file>images/paypal.png</file>
         <file>icons/cut_surface.png</file>
         <file>icons/running.gif</file>
         <file>icons/idle.png</file>

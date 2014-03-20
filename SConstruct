@@ -171,6 +171,7 @@ save you time and money and open up a world of creative possibilities by
 allowing you to rapidly visualize and improve upon designs with out wasting
 material or breaking tools.'''
 
+# Package checked in examples
 examples = []
 if 'package' in COMMAND_LINE_TARGETS:
     import subprocess
@@ -179,6 +180,15 @@ if 'package' in COMMAND_LINE_TARGETS:
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     examples = p.communicate()[0]
     examples = map(lambda x: [x, x], examples.split())
+
+
+# Get MSVC redist
+msvc_redist = 'vcredist_x86.exe'
+msvc_redist_url = 'http://download.microsoft.com/download/d/d/9/' + \
+    'dd9a82d0-52ef-40db-8dab-795376989c03/' + msvc_redist
+if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
+        not os.path.exists('build/' + msvc_redist):
+    redist = env.CBDownload('build/' + msvc_redist, url)
 
 
 # Package
@@ -201,6 +211,7 @@ pkg = env.Packager(
     changelog = 'CHANGELOG.md',
 
     nsi = 'openscam.nsi',
+    msvc_redist = msvc_redist,
 
     deb_directory = 'debian',
     deb_section = 'miscellaneous',

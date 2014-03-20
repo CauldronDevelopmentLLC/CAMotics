@@ -14,6 +14,7 @@
     "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_DIR_REGKEY \
     "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_NAME}"
+!define MSVCREDIST              "%(msvc_redist)s"
 
 !define MUI_ABORTWARNING
 !define MUI_ICON "images\${PRODUCT_ICON}"
@@ -62,11 +63,22 @@ Section -Install
   File ${PRODUCT_LICENSE}
   File "README.md"
   File "CHANGELOG.md"
+  File "build\${MSVCREDIST}"
 
   ; Qt DLLs
   File "$%%QT4DIR%%\bin\QtCore4.dll"
   File "$%%QT4DIR%%\bin\QtGui4.dll"
   File "$%%QT4DIR%%\bin\QtOpenGL4.dll"
+
+  ; Qt Plugins
+  SetOutPath "$INSTDIR\imageformats"
+  File "$%%QT4DIR%%\plugins\imageformats\qgif4.dll"
+  File "$%%QT4DIR%%\plugins\imageformats\qico4.dll"
+  File "$%%QT4DIR%%\plugins\imageformats\qjpeg4.dll"
+  File "$%%QT4DIR%%\plugins\imageformats\qmng4.dll"
+  File "$%%QT4DIR%%\plugins\imageformats\qsvg4.dll"
+  File "$%%QT4DIR%%\plugins\imageformats\qtga4.dll"
+  File "$%%QT4DIR%%\plugins\imageformats\qtiff4.dll"
 
   ; Examples
   SetOverwrite on
@@ -109,6 +121,9 @@ write_uninstaller:
     "Publisher" "${PRODUCT_VENDOR}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
     "DisplayVersion" "${PRODUCT_VERSION}"
+
+  # Install MSVC redist
+  ExecWait '"$INSTDIR\${MSVCREDIST}" /q:a /c:"VCREDI~1.EXE /q:a /c:""msiexec /i vcredist.msi /qb!"" "'
 
   Return
 

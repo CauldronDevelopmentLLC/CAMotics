@@ -224,7 +224,7 @@ QWidget:hover {
        </property>
        <property name="styleSheet">
         <string notr="true">QWidget {
-  background: url(:/images/bitcoin.svg) no-repeat;
+  background: url(:/images/bitcoin.png) no-repeat;
   border: 1px solid transparent;
 }
 
