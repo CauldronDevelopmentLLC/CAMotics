@@ -50,9 +50,9 @@ it is much easier to simply install prebuilt packages which can be found
 at http://openscam.org/downloads  There are also prebuilt Debian packages
 you can try.
 
-## Building cbang
+## Building C!
 
-Clone the C! git repository, build the software using scons and define the
+Clone the C! git repository, build the software using scons and set the
 environment variable CBANG_HOME so the OpenSCAM build system can find it
 later:
 
@@ -97,5 +97,10 @@ where you built OpenSCAM and run `./openscam`
 
 Try out some of the examples in OpenSCAM's File -> Examples menu.
 
+## No Icons in Menus in Linux
+If you don't see icons in OpenSCAM menus in linux try running the following
+command and restarting OpenSCAM:
+
+    gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
 
 [1]: https://raw.github.com/jcoffland/OpenSCAM/master/images/openscam-logo.png
