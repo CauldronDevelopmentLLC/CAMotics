@@ -76,7 +76,7 @@ In the OpenSCAM source code directory run:
     sudo dpkg -i openscam_*.deb
 
 ## Build Warnings/Errors
-If you get any build warnings, by default, the builds will stop.  If you have
+If you get any build warnings, by default, the build will stop.  If you have
 problems building, especially with warnings related to the boost library you
 can ignore these warnings by building cbang and/or OpenSCAM with
 `scons strict=0`.  This disables strict checking.  For example:
@@ -90,7 +90,7 @@ can ignore these warnings by building cbang and/or OpenSCAM with
 If you've installed the Debian package you should find OpenSCAM in your menu
 under Other.  Also you can simply run `openscam` on the command line.
 
-If you did not install the package, open a command line, got to the directory
+If you did not install the package, open a command line, go to the directory
 where you built OpenSCAM and run `./openscam`
 
 # Try the Examples
