@@ -74,7 +74,7 @@ namespace OpenSCAM {
     QFileDialog fileDialog;
     QTimer animationTimer;
     QGraphicsScene toolScene;
-    QByteArray defaultState;
+    QByteArray fullLayoutState;
     cb::SmartPointer<ProjectModel> projectModel;
 
     QIcon playIcon;
@@ -129,8 +129,10 @@ namespace OpenSCAM {
 
     void saveAllState();
     void restoreAllState();
-    void saveDefaultLayout();
-    void restoreDefaultLayout();
+    void setDefaultGeometry();
+    void saveFullLayout();
+    void fullLayout();
+    void defaultLayout();
     void minimalLayout();
 
     cb::SmartPointer<ViewPort> getCurrentViewPort() const;
@@ -272,7 +274,9 @@ namespace OpenSCAM {
     void on_actionExport_triggered();
     void on_actionSnapshot_triggered();
 
-    void on_actionResetLayout_triggered();
+    void on_actionFullscreen_triggered(bool checked);
+    void on_actionDefaultLayout_triggered();
+    void on_actionFullLayout_triggered();
     void on_actionMinimalLayout_triggered();
 
     void on_actionAbout_triggered();

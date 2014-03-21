@@ -27,41 +27,75 @@ improve upon designs with out wasting material or breaking tools.
 See http://openscam.org/
 
 # License
-GNU General Public License version 2.  See the file COPYING.
+GNU General Public License version 2+.  See the file COPYING.
 
 # Prerequisites
   - C!     - http://cbang.org/
-  - OpenGL - Open Graphics Library, accelerated 3D graphics
   - Qt4    - http://qt-project.org/
   - Cairo2 - http://cairographics.org/
   - SCons  - http://www.scons.org/
-
-Note, C! is provided in the 'cbang' sub-directory of OpenSCAM.  OpenGL
-is usually provided by your OS.
 
 On Debian based systems all the prerequisites, including thoese needed
 by C!, can be installed with the following command line:
 
     sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
-      libexpat1-dev libssl-dev libboost-dev libsqlite3-dev libgl1-mesa-dev \
-      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev
+      libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
+      libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
+      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
 
-# Building
-After installing the prerequisites.  Build C! with the following command:
+# Building from Source
+This section describes how to build OpenSCAM from source on Debian based
+systems such as Ubuntu and Mint Linux.  If you are running Windows or OSX
+it is much easier to simply install prebuilt packages which can be found
+at http://openscam.org/downloads  There are also prebuilt Debian packages
+you can try.
 
+## Building cbang
+
+Clone the C! git repository, build the software using scons and define the
+environment variable CBANG_HOME so the OpenSCAM build system can find it
+later:
+
+    git clone https://github.com/CauldronDevelopmentLLC/cbang.git
     scons -C cbang
+    export CBANG_HOME=$PWD/cbang
 
-Then build OpenSCAM with the following command:
+## Building OpenSCAM
 
+Clone the OpenSCAM git repository and build the software using scons:
+
+    git clone https://github.com/CauldronDevelopmentLLC/OpenSCAM.git
+    cd OpenSCAM
     scons
 
-# Using It
+## Building & Installing the Debian Package
 
-Run the GUI:
+In the OpenSCAM source code directory run:
 
-    ./openscam
+    scons package
+    sudo dpkg -i openscam_*.deb
 
-Try out some of the examples in the File menu.
+## Build Warnings/Errors
+If you get any build warnings, by default, the builds will stop.  If you have
+problems building, especially with warnings related to the boost library you
+can ignore these warnings by building cbang and/or OpenSCAM with
+`scons strict=0`.  This disables strict checking.  For example:
+
+    scons -C cbang strict=0
+    cd OpenSCAM
+    scons strict=0
+
+# Using OpenSCAM
+
+If you've installed the Debian package you should find OpenSCAM in your menu
+under Other.  Also you can simply run `openscam` on the command line.
+
+If you did not install the package, open a command line, got to the directory
+where you built OpenSCAM and run `./openscam`
+
+# Try the Examples
+
+Try out some of the examples in OpenSCAM's File -> Examples menu.
 
 
 [1]: https://raw.github.com/jcoffland/OpenSCAM/master/images/openscam-logo.png

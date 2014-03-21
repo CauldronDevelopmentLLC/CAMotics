@@ -590,13 +590,6 @@
     <addaction name="actionAbout"/>
     <addaction name="actionDonate"/>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>&amp;Layout</string>
-    </property>
-    <addaction name="actionResetLayout"/>
-    <addaction name="actionMinimalLayout"/>
-   </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
      <string>Project</string>
@@ -611,6 +604,14 @@
     <property name="title">
      <string>View</string>
     </property>
+    <addaction name="actionFullscreen"/>
+    <addaction name="separator"/>
+    <addaction name="actionDefaultLayout"/>
+    <addaction name="actionFullLayout"/>
+    <addaction name="actionMinimalLayout"/>
+    <addaction name="actionToolbars"/>
+    <addaction name="actionDocks"/>
+    <addaction name="separator"/>
     <addaction name="actionCutSurface"/>
     <addaction name="actionWireSurface"/>
     <addaction name="actionWorkpieceSurface"/>
@@ -620,11 +621,7 @@
     <addaction name="actionTool"/>
     <addaction name="actionWorkpieceBounds"/>
     <addaction name="actionAxes"/>
-   </widget>
-   <widget class="QMenu" name="menuPerspective">
-    <property name="title">
-     <string>Perspective</string>
-    </property>
+    <addaction name="separator"/>
     <addaction name="actionIsoView"/>
     <addaction name="actionFrontView"/>
     <addaction name="actionBackView"/>
@@ -636,8 +633,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuProject"/>
    <addaction name="menuView_2"/>
-   <addaction name="menuPerspective"/>
-   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="projectToolBar">
@@ -2817,6 +2812,9 @@
    <property name="text">
     <string>Show Wire Surface</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
   </action>
   <action name="actionWorkpieceBounds">
    <property name="checkable">
@@ -2835,6 +2833,9 @@
    <property name="toolTip">
     <string>Show workpiece bounds</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
+   </property>
   </action>
   <action name="actionTool">
    <property name="checkable">
@@ -2849,6 +2850,9 @@
    </property>
    <property name="text">
     <string>Show Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
    </property>
   </action>
   <action name="actionCutSurface">
@@ -2868,6 +2872,9 @@
    <property name="toolTip">
     <string>Show cut surface</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
   </action>
   <action name="actionAxes">
    <property name="checkable">
@@ -2882,6 +2889,9 @@
    </property>
    <property name="text">
     <string>Show Axes</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
    </property>
   </action>
   <action name="actionToolPath">
@@ -2898,6 +2908,9 @@
    <property name="text">
     <string>Show Tool Path</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
   </action>
   <action name="actionIsoView">
    <property name="icon">
@@ -2909,6 +2922,9 @@
    </property>
    <property name="toolTip">
     <string>Snap to isometric view</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+1</string>
    </property>
   </action>
   <action name="actionFrontView">
@@ -2922,6 +2938,9 @@
    <property name="toolTip">
     <string>Snap to front view</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+2</string>
+   </property>
   </action>
   <action name="actionBackView">
    <property name="icon">
@@ -2933,6 +2952,9 @@
    </property>
    <property name="toolTip">
     <string>Snap to back view</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+3</string>
    </property>
   </action>
   <action name="actionLeftView">
@@ -2946,6 +2968,9 @@
    <property name="toolTip">
     <string>Snap to left view</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+4</string>
+   </property>
   </action>
   <action name="actionRightView">
    <property name="icon">
@@ -2957,6 +2982,9 @@
    </property>
    <property name="toolTip">
     <string>Snap to right view</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+5</string>
    </property>
   </action>
   <action name="actionTopView">
@@ -2970,6 +2998,9 @@
    <property name="toolTip">
     <string>Snap to top view</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+6</string>
+   </property>
   </action>
   <action name="actionBottomView">
    <property name="icon">
@@ -2981,6 +3012,9 @@
    </property>
    <property name="toolTip">
     <string>Snap to bottom view</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+7</string>
    </property>
   </action>
   <action name="actionBegining">
@@ -3114,6 +3148,9 @@
    <property name="text">
     <string>Hide Surface</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
   </action>
   <action name="actionStop">
    <property name="icon">
@@ -3195,8 +3232,11 @@
    <property name="toolTip">
     <string>Show uncut workpiece</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
   </action>
-  <action name="actionResetLayout">
+  <action name="actionDefaultLayout">
    <property name="text">
     <string>Default Layout</string>
    </property>
@@ -3212,6 +3252,35 @@
   <action name="actionMinimalLayout">
    <property name="text">
     <string>Minimal Layout</string>
+   </property>
+  </action>
+  <action name="actionFullLayout">
+   <property name="text">
+    <string>Full Layout</string>
+   </property>
+   <property name="toolTip">
+    <string>Full Layout</string>
+   </property>
+  </action>
+  <action name="actionToolbars">
+   <property name="text">
+    <string>Toolbars</string>
+   </property>
+  </action>
+  <action name="actionDocks">
+   <property name="text">
+    <string>Docks</string>
+   </property>
+  </action>
+  <action name="actionFullscreen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Fullscreen</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
    </property>
   </action>
  </widget>

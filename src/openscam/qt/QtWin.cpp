@@ -50,6 +50,7 @@
 #include <QMessageBox>
 #include <QImageWriter>
 #include <QMovie>
+#include <QDesktopWidget>
 
 #include <vector>
 
@@ -93,17 +94,19 @@ QtWin::QtWin(Application &app) :
   loadExamples();
 
   // Add docks to View menu
-  ui->menuView->addSeparator();
+  QMenu *menu = new QMenu;
   QList<QDockWidget *> docks = findChildren<QDockWidget *>();
   for (int i = 0; i < docks.size(); i++)
     if (docks.at(i)->features() & QDockWidget::DockWidgetClosable)
-      ui->menuView->addAction(docks.at(i)->toggleViewAction());
+      menu->addAction(docks.at(i)->toggleViewAction());
+  ui->actionDocks->setMenu(menu);
 
   // Add toolbars to View menu
-  ui->menuView->addSeparator();
+  menu = new QMenu;
   QList<QToolBar *> toolBars = findChildren<QToolBar *>();
   for (int i = 0; i < toolBars.size(); i++)
-    ui->menuView->addAction(toolBars.at(i)->toggleViewAction());
+    menu->addAction(toolBars.at(i)->toggleViewAction());
+  ui->actionToolbars->setMenu(menu);
 
   // Start animation timer
   animationTimer.setSingleShot(false);
@@ -122,8 +125,14 @@ QtWin::~QtWin() {
 
 void QtWin::init() {
   setUIView(SIMULATION_VIEW);
-  saveDefaultLayout();
+  saveFullLayout();
+  defaultLayout();
+  setDefaultGeometry();
   restoreAllState();
+
+  // Update fullscreen menu item
+  if (windowState() & Qt::WindowFullScreen)
+    ui->actionFullscreen->setChecked(true);
 
   connectionManager->init();
 
@@ -250,22 +259,51 @@ void QtWin::restoreAllState() {
 }
 
 
-void QtWin::saveDefaultLayout() {
-  defaultState = saveState();
+void QtWin::setDefaultGeometry() {
+  int width = 1200;
+  int height = 800;
+
+  QDesktopWidget dw;
+  QRect screen = dw.availableGeometry(this);
+  QRect geom = geometry();
+  QRect frame = frameGeometry();
+
+  if (screen.width() < width) width = screen.width();
+  if (screen.height() < height) height = screen.height();
+
+  width -= frame.width() - geom.width();
+  height -= frame.height() - geom.height();
+
+  int x = (screen.width() - width) / 2;
+  int y = (screen.height() - height) / 2;
+
+  setGeometry(QRect(x, y, width, height));
 }
 
 
-void QtWin::restoreDefaultLayout() {
-  restoreState(defaultState);
+void QtWin::saveFullLayout() {
+  fullLayoutState = saveState();
 }
 
 
-void QtWin::minimalLayout() {
+void QtWin::fullLayout() {
+  restoreState(fullLayoutState);
+}
+
+
+void QtWin::defaultLayout() {
+  restoreState(fullLayoutState);
+
   // Hide all closable docks
   QList<QDockWidget *> docks = findChildren<QDockWidget *>();
   for (int i = 0; i < docks.size(); i++)
     if (docks.at(i)->features() & QDockWidget::DockWidgetClosable)
       docks.at(i)->setVisible(false);
+}
+
+
+void QtWin::minimalLayout() {
+  defaultLayout();
 
   // Hide all toolbars
   QList<QToolBar *> toolBars = findChildren<QToolBar *>();
@@ -1571,8 +1609,19 @@ void QtWin::on_actionSnapshot_triggered() {
 }
 
 
-void QtWin::on_actionResetLayout_triggered() {
-  restoreDefaultLayout();
+void QtWin::on_actionFullscreen_triggered(bool checked) {
+  if (checked) showFullScreen();
+  else showNormal();
+}
+
+
+void QtWin::on_actionDefaultLayout_triggered() {
+  defaultLayout();
+}
+
+
+void QtWin::on_actionFullLayout_triggered() {
+  fullLayout();
 }
 
 
