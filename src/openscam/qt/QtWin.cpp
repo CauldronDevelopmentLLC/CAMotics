@@ -819,8 +819,9 @@ void QtWin::addTool() {
 
   for (unsigned i = 1; i < 1000; i++)
     if (!tools.has(i)) {
-      tools.add(new Tool(i));
+      tools.add(new Tool(i, 0, project->getUnits()));
       loadTool(i);
+      setUIView(TOOL_VIEW);
       project->markDirty();
       projectModel->invalidate();
       return;

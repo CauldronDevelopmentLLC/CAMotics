@@ -50,11 +50,8 @@ namespace OpenSCAM {
     static const char *VARS;
     static cb::SmartPointer<Tool> null;
 
-    Tool(unsigned number = 0, unsigned pocket = 0) :
-      number(number), pocket(pocket), shape(ToolShape::TS_CYLINDRICAL)
-    {reset();}
-
-    void reset();
+    Tool(unsigned number = 0, unsigned pocket = 0,
+         ToolUnits units = ToolUnits::UNITS_MM);
 
     unsigned getNumber() const {return number;}
     void setNumber(unsigned number) {this->number = number;}

@@ -98,7 +98,7 @@ where you built OpenSCAM and run `./openscam`
 Try out some of the examples in OpenSCAM's File -> Examples menu.
 
 ## No Icons in Menus in Linux
-If you don't see icons in OpenSCAM menus in linux try running the following
+If you don't see icons in OpenSCAM menus in Linux try running the following
 command and restarting OpenSCAM:
 
     gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true

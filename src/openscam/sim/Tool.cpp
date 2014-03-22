@@ -42,14 +42,23 @@ using namespace OpenSCAM;
 const char *Tool::VARS = "XYZABCUVWRIJQ";
 SmartPointer<Tool> Tool::null = new Tool;
 
+Tool::Tool(unsigned number, unsigned pocket, ToolUnits units) :
+  number(number), pocket(pocket), units(units),
+  shape(ToolShape::TS_CYLINDRICAL) {
 
-void Tool::reset() {
   Axes::clear();
   memset(vars, 0, sizeof(vars));
-  setUnits(ToolUnits::UNITS_MM);
   setShape(ToolShape::TS_CYLINDRICAL);
-  setLength(10);
-  setRadius(1);
+
+  if (units == ToolUnits::UNITS_MM) {
+    setLength(10);
+    setRadius(1);
+
+  } else {
+    setLength(25.4);
+    setRadius(25.4 / 16);
+  }
+
   setSnubDiameter(0);
 }
 
