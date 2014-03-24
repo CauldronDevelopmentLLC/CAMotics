@@ -1,0 +1,51 @@
+include mixins
+
+header.navbar.navbar-inverse.navbar-fixed-top.docs-nav(role='banner')
+  a#ribbon(title='Click here to learn how you can support this project.',
+    href='./#donations')
+  a#ohloh(href='https://www.ohloh.net/p/openscam?ref=sample', target='_blank')
+
+  .container
+    .navbar-header
+      button.navbar-toggle(type='button', data-toggle='collapse',
+        data-target='.bs-navbar-collapse')
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+
+    nav.collapse.navbar-collapse.bs-navbar-collapse(role='navigation')
+      ul.nav.navbar-nav
+        li
+          a(href='.') About
+        li
+          a(href='download.html') Downloads
+        li
+          a(href='manual.html') Users Manual
+
+      ul.nav.navbar-nav.navbar-right
+        li.dropdown
+          a.dropdown-toggle(href='#', data-toggle='dropdown')
+            | GitHub
+            b.caret
+          ul.dropdown-menu
+            li
+              a(target='_blank', href=repoURL) Source Code
+            li
+              a(target='_blank',
+                href=repoURL + '/issues?state=open') Open Issues
+            li
+              a(target='_blank', href=repoURL + '/issues/new') New Issue
+
+#content.docs-header
+  .container
+    != pages[page].titleText
+    != pages[page].subtext
+
+.banner
+  .container
+    = 'OpenSCAM version ' + version + ' has been released -'
+    | &nbsp;
+    strong
+      a(href=repoURL + '/blob/master/CHANGELOG.md', target='_blank')
+        | See what's new.

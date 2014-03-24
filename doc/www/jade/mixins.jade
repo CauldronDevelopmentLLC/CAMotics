@@ -1,0 +1,18 @@
+mixin issue(n)
+  | &nbsp;
+  a(href=repoURL + '/issues/' + n)= '#' + n
+
+
+mixin do_release(r, release, mode)
+  - var url = 'http://openscam.org/releases/' + release + '/' + mode;
+  - url += '/openscam/' + r[2] + '/v0.2/' + r[3];
+  .release(title='Download OpenSCAM for ' + r[0])
+    each img in r[1]
+      img(src='images/' + img, alt=r[0])
+    h1= r[0]
+    a(title='Download OpenSCAM for ' + r[0], href=url)= r[3]
+
+
+mixin do_releases(rs, release, mode)
+  each r in rs
+    +do_release(r, release, mode)

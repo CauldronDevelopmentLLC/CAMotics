@@ -1,0 +1,34 @@
+.page-header
+  h1#source-code Source Code
+
+p You can build from source in Debian Linux with the following commands:
+pre
+  code.
+    # Install the prerequisites
+    sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
+      libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
+      libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
+      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
+
+    # Get the source
+    git clone https://github.com/CauldronDevelopmentLLC/cbang
+    git clone https://github.com/CauldronDevelopmentLLC/OpenSCAM
+
+    # Build C!
+    scons -C cbang
+    export CBANG_HOME=$PWD/cbang
+
+    # Build OpenSCAM
+    cd OpenSCAM
+    scons
+
+    # Build the package
+    scons package
+
+    # Install the package
+    sudo dpkg -i openscam_*.deb
+
+p
+  | Visit the&nbsp;
+  a(href=repoURL + '#readme') GitHub page
+  | &nbsp;for information on building the source code.

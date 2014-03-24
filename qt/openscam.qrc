@@ -48,5 +48,6 @@
         <file>icons/cut_surface.png</file>
         <file>icons/running.gif</file>
         <file>icons/idle.png</file>
+        <file>icons/help.png</file>
     </qresource>
 </RCC>

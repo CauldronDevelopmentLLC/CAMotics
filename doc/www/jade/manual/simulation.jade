@@ -1,0 +1,94 @@
+.page-header
+  h1#simulation Simulation
+p
+  | This section describes how to configure and control simulations.
+
+a(href='images/manual/view-simulation.png', rel='shadowbox')
+  img(src='images/manual/thumbs/view-simulation.png')
+
+h2#simulation-start-stop Starting, Stopping & Smoothing
+img(src='images/manual/simulation-control.png')
+p
+  | Simulations can be stopped, started or restarted via the buttons at the
+  | bottom right of the simulation view.   Any time you change the simulation's
+  | configuration you will need to rerun to view the changes.  You can stop
+  | or restart a simulation at anytime.  The status icon in the bottom left
+  | tells you if a simulation is active.
+p
+  | When you first open a project the simulation will run automatically.
+  | Simulations will also start automatically when one of the NC files changes
+  | on disk. You can abort a simulation by clicking the stop button.
+p
+  | If you enable smoothing (on by default), an extra smoothing operation
+  | will be performed at the end of the simulation.  Smoothing does not
+  | affect accuracy but can improve the visualization.
+
+h2#simulation-progress Progressbar
+img(src='images/manual/progressbar.png')
+p
+  | The progressbar can be found at the bottom of the Simulation View tab.
+  | It displays an estimate of the current simulation's progress.
+
+h2#simulation-resolution Adjusting the Resolution
+img(src='images/manual/resolution.png')
+p
+  | The simulator can run at different resolutions.  Higher resolutions
+  | improve accuracy but increase simulation time.  OpenSCAM automatically
+  | chooses a simulation resolution based on the workpiece volume.
+  | You can select a higher or lower resolution using the resolution
+  | combobox.
+p
+  | It is also possible to manually set the resolution by editing the
+  | resolution spinbox.  The resolution value specifies the size of the
+  | simulation grid in millimeters.  For example, if your workpiece is
+  | 100x100x10 mm and you select a resolution of 0.1 mm then OpenSCAM will
+  | probe 100,000,000 points in 3D space.  As the simulation value decreases,
+  | simulation complexity increases exponentially so don't choose resolution
+  | values which are too small.
+p
+  | Note, the resolution value is not affected by the project units setting.
+  | It is always in mm.
+
+h2#zoom-translate-rotate Zoom, Translate & Rotate
+p
+  | The simulation view can be changed by placing the mouse pointer in the
+  | <tt>Simulation View</tt> and performing the following actions.
+  ul
+    li Zoom in and out using the mouse wheel.
+    li Translate by holding down either the middle or right mouse button and
+      | dragging.
+    li Rotate by holding down the left mouse button and dragging.
+  | Also see <a href='#simulation-snapping'>Perspective Snapping</a>.
+
+h2#simulation-snapping Perspective Snapping
+img(src='images/manual/toolbar-perspective.png')
+p
+  | The simulation view can be rotated, translated or zoomed using the mouse.
+  | The <tt>perspective</tt> toolbar, or alternately the <tt>View</tt> menu
+  | can be used to snap to particular views.  The view defaults to the
+  | isometric perspective.  Other perspectives are front, back, left, right,
+  | top and bottom.
+
+h2#simulation-view Changing View Options
+img(src='images/manual/toolbar-view.png')
+p
+  | You can control what is visible in the simulation window either using
+  | the <tt>view</tt> toolbar or the <tt>View</tt> menu.
+p
+  | The first set of view options let you select which surface is viewed.
+  | You can view either then cut workpiece, if it's available, the wire
+  | view of the cut workpiece, the uncut workpiece or no surface.
+  | The remaining options allow you to turn off or on the tool path, tool
+  | workpiece bounds or axis indicator.
+
+h2#simulation-partial Partial Simulations
+img(src='images/manual/playback-position.png')
+p
+  | Although OpenSCAM is not yet able to show you the cutting process in
+  | real-time (
+  +issue(2)
+  | ), it is possible to view the cut workpiece at any point in time by
+  | setting the tool path position, using the slider bar, and then rerunning
+  | the simulation by click the rerun button.
+p
+  | Also see the section on <a href="#playback">Tool Path Playback</a>.

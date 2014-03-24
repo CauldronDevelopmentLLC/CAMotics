@@ -1,6 +1,13 @@
 # OpenSCAM Changelog
 
+## v0.2.2:
+ - Remove old cut surface after project change.
+ - Ask user to open .xml project file if it exists.
+ - Added link to online help.
+
 ## v0.2.1:
+
+2014-03-22
 
  - Generate tool paths in background.
  - Added icon to indicate run status.

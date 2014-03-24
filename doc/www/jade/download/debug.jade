@@ -1,0 +1,13 @@
+.page-header
+  h1#debug-release Debug Downloads
+
+h3= 'Version ' + version
+p
+  | The debug builds can be used to help diagnose problems but they
+  | are not optimized and <em>run substantially slower</em> than the regular
+  | releases.
+
+p Click on the boxes below to download OpenSCAM for your platform:
+
+p
+  +do_releases(releases, 'beta', 'debug')

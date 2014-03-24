@@ -1,0 +1,55 @@
+.page-header
+  h1#export Exports & Snapshots
+img(src='images/manual/toolbar-project.png')
+p
+  | It is possible to save a 3D model of the cut surface, the tool path,
+  | or a snapshot of the <tt>Simulation View</tt> or <tt>Tool View</tt> by
+  | selecting options either from the <tt>Project</tt> menu or <tt>Project</tt>
+  | toolbar.
+img(src='images/manual/dialog-export.png')
+
+h2#export-surface Surface
+p
+  | The cut surface can be exported to either an ASCII or binary format STL
+  | file.  STL files can be imported in to many other tools for further
+  | analysis such as <a href='http://meshlab.sourceforge.net/'>MeshLab</a>.
+p
+  | Select <tt>Project -> Export</tt> from the menu or click on the export
+  | button on the <tt>Project</tt> toolbar.  Then select <tt>Surface</tt>
+  | and the STL format of choice.  Finally click the <tt>Ok</tt> button,
+  | enter a file name and click the <tt>Save</tt> button.
+
+h2#export-tool-path Tool Path
+p
+  | A description of the tool path can be exported to a
+  | <a href='http://json.org/'>JSON</a> file by following the same procedure
+  | for exporting a surface, selecting <tt>Tool Path</tt> in the <tt>Export</tt>
+  | dialog.  <tt>Compact</tt> format creates smaller files but <tt>Pretty</tt>
+  | format is easier to read.
+p
+  | The JSON file format consists of a list of linear tool path moves.
+  | Non-linear moves, such as arcs, are broken in to several linear moves which
+  | approximate the non-linear move.  Each move can contain the following move
+  | entries:
+  ul
+    li <tt>X</tt>, <tt>Y</tt> & <tt>Z</tt> axes
+    li <tt>A</tt>, <tt>B</tt> & <tt>C</tt> axes (Currently unused by OpenSCAM)
+    li <tt>U</tt>, <tt>V</tt> & <tt>W</tt> axes (Currently unused by OpenSCAM)
+    li <tt>type</tt> either <tt>RAPID</tt>, <tt>CUTTING</tt>, <tt>PROBE</tt>,
+      | or <tt>DRILL</tt>
+    li <tt>line</tt> the active program line
+    li <tt>tool</tt> the active tool number
+    li <tt>feed</tt> the active feed rate
+    li <tt>speed</tt> the active spindle speed.  Negative for counterclockwise.
+  | Each move entry is only present if it's value has changed.
+
+h2#export-snapwhot Snapshot
+p
+  | Snapshots or screenshots of the <tt>Simulation View</tt> or
+  | <tt>Tool View</tt> can be saved in several different image formats by
+  | either selecting <tt>Project -> Snapshot</tt> from the menu or clicking the
+  | shapshot button from the <tt>Project</tt> toolbar.
+p
+  | The image format is set by the file extension.  The available formats
+  | can be seen in the file dialog's <tt>Image files</tt> filter.  .png is
+  | a good image format choice.

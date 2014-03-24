@@ -1,0 +1,24 @@
+.page-header
+  h1#previous-releases Previous Releases
+p
+  | You can browse previous releases here:
+  | <a href='//openscam.org/releases/'>/releases/</a>
+
+p
+  | The directory layout is as follows:
+  strong= '/releases/<status>/<mode>/<project>/<build>/<version>'
+
+table
+  tr
+    th status
+    td - alpha, beta or public
+  tr
+    th mode
+    td - release or debug
+  tr
+    th build
+    td -
+      strong= '<os>-<os version>-<bits>'
+  tr
+    th version
+    td - Major and minor version

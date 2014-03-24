@@ -1,0 +1,66 @@
+.page-header
+  h1#tools Tools
+img(src='images/manual/tooltable.png')
+p
+  | The tool table keeps track of the tools used to cut the workpiece.
+  | These tools are indexed by numbers starting from 1.  You can add remove
+  | and change the parameters of the tools in the tool table.  Rerun the
+  | simulation to see the effect of your changes.
+p
+  | Any tools referenced by the tool path which are not in the tool table
+  | will be automatically created by the simulator.  The default tool is
+  | probably not what you want so you should add the tools you need,
+  | edit their parameters and rerun the simulation.
+
+img(src='images/manual/tool-settings.png')
+
+h2#tools-add-remove Adding & Removing
+p
+  | New tools can be added either via the <tt>Project</tt> menu or by right
+  | clicking on the <tt>Project</tt> dock and select <tt>Add Tool</tt>.
+p
+  | To remove a tool right click on the tool and select <tt>Remove Tool</tt>.
+
+h2#tool-view Tool View
+a(title='Tool View' href='images/manual/view-tool.png')
+  img(src='images/manual/thumbs/view-tool.png')
+p
+  | The <tt>Tool View</tt> shows a diagram of the currently selected tool.
+  | It automatically updates as you change tool parameters.  Note, that the
+  | view automatically zooms to fit the tool so increasing tool length may
+  | appear to shrink the tool's diameter but it is only the relative
+  | diameter that is shrinking.
+
+h2#tools-order Changing Tool Order
+p
+  | Tools are always sorted in numerical order.  You can change a tool's order
+  | by changing it's number.  The user interface will not allow you to create
+  | two tools with the same number.  Make sure all of the tools referenced
+  | by your tool paths are defined in the tool table.
+
+h2#tools-description Description
+p
+  | OpenSCAM will give each tool a default description based on it's shape
+  | and diameter.  You can change this by editing the <tt>Description</tt>
+  | field.
+
+h2#tools-units Units
+p
+  | Tools can be specified in either millimeters or inches regardless of the
+  | <a href='#projects-units'>project units</a> setting.
+
+h2#tools-shape Shape
+p
+  | OpenSCAM support the following tool shapes:
+  ul
+    li Cylinderical
+    li Conical
+    li Ballnose
+    li Spheroid
+    li Snubnose
+
+h2#tools-dimensions Dimensions
+p
+  | Tool <tt>Length</tt> and <tt>Diameter</tt> can be set.  These specify the
+  | cutting area only and do not include the tool shaft.  Snubnose tools have an
+  | additional parameter <tt>Snub Diameter</tt>.

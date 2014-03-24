@@ -1,0 +1,31 @@
+.page-header
+  h1#playback Tool Path Playback
+p
+  | Although OpenSCAM is not yet able to show real-time simulations (
+  +issue(2)
+  | ) it is possible to playback the tool path moves and to do
+  | <a href='#simulation-partial'>Partial Simulations</a>.
+
+h2#playback-position Tool Path Position
+img(src='images/manual/playback-position.png')
+p
+  | The tool path position can be set manually using the position slider
+  | found at the bottom of the <tt>Simulation View</tt>.  The
+  | <a href='#docks-position'>Position</a> dock will tell you where the tool
+  | is in 3D space.  The <a href='#docks-estimates'>Estimates</a>
+  | dock will give the current distance traveled and estimates of the time.
+  | The <a href='#docks-status'>Machine Status</a> dock will tell you the
+  | current tool, feed, spindle speed and direction as well as the current
+  | line in the program.
+
+h2#playback-control Playback Control
+img(src='images/manual/playback-control.png')
+p
+  | The <tt>Playback</tt> buttons allow you to start and stop playback or
+  | jump to the end or begining of the simulation.
+p
+  | The <tt>Speed</tt> buttons can increase or decrease the playback speed.
+  | A value of <tt>1x</tt> is real-time.
+p
+  | The <tt>Direction</tt> button tells in which direction the simulation is
+  | running and allow you to change the direction.

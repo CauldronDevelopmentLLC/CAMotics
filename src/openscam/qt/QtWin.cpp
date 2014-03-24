@@ -634,6 +634,7 @@ void QtWin::loadProject() {
 void QtWin::resetProject() {
   view->setToolPath(0);
   view->setWorkpiece(Rectangle3R());
+  view->setSurface(0);
   currentTool.release();
   view->resetView();
 }
@@ -647,6 +648,25 @@ void QtWin::newProject() {
 
   reload();
   loadProject();
+}
+
+
+static bool is_xml(const std::string &filename) {
+  try {
+    if (!SystemUtilities::exists(filename)) return false;
+
+    SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::in);
+
+    while (true) {
+      int c = stream->peek();
+      if (c == '<') return true;
+      else if (isspace(c)) stream->get(); // Next
+      else return false; // Not XML
+    }
+
+  } CATCH_WARNING;
+
+  return false;
 }
 
 
@@ -665,13 +685,26 @@ void QtWin::openProject(const string &_filename) {
 
   try {
     // Check if the file appears to be XML
-    SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::in);
-    bool xml = false;
-    while (!xml) {
-      int c = stream->peek();
-      if (c == '<') xml = true;
-      else if (isspace(c)) stream->get(); // Next
-      else break; // Not XML
+    bool xml = is_xml(filename);
+
+    if (!xml) {
+      // Check if .xml file exists
+      string xmlPath = SystemUtilities::splitExt(filename)[0] + ".xml";
+      if (is_xml(xmlPath)) {
+        int response =
+          QMessageBox::question
+          (this, "Project File Exists", "An OpenSCAM project file for the "
+           "selected file exists.  It may contain important project settings.  "
+           "Would you like to open it instead?",
+           QMessageBox::Cancel  | QMessageBox::No | QMessageBox::Yes,
+           QMessageBox::Yes);
+
+        if (response == QMessageBox::Cancel) return;
+        if (response == QMessageBox::Yes) {
+          xml = true;
+          filename = xmlPath;
+        }
+      }
     }
 
     resetProject();
@@ -1638,6 +1671,17 @@ void QtWin::on_actionAbout_triggered() {
 
 void QtWin::on_actionDonate_triggered() {
   donateDialog.exec();
+}
+
+
+void QtWin::on_actionHelp_triggered() {
+  QMessageBox msg(this);
+  msg.setWindowTitle("OpenSCAM Help");
+  msg.setTextFormat(Qt::RichText);
+  msg.setText("Help can be find in the online User's Manual at "
+              "<a href='http://openscam.org/manual.html'"
+              ">http://openscam.org/manual.html</a>.");
+  msg.exec();
 }
 
 

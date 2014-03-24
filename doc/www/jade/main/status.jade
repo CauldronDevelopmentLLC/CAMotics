@@ -1,0 +1,117 @@
+.page-header
+  h1#status Status
+
+p
+  | Joseph Coffland of
+  | <a href='http://cauldrondevelopment.com/'>Cauldron Development LLC</a>,
+  | began development of OpenSCAM in
+  | early 2011.  An alpha release of the software was
+  | first made available to the public in April, 2012.
+  | OpenSCAM has an active community of users and active
+  | development continues in to 2014 (and hopefully
+  | beyond!).  Although there are plans to do much more,
+  | many of its users find OpenSCAM very useful in its
+  | current state.  True to the nature of Open-Source
+  | software, and unlike our commercial counterparts,
+  | version number increases and claims of software
+  | stability remain conservative.
+
+h2#features Features
+ul
+  li Fast 3-axis cut-workpiece simulation with 3D visualization.
+  li Simulates cylindrical, conical, ballnose, spheroid and snubnose tool
+    | shapes.
+  li Tool path 3D visualization. 
+  li Multi-threaded rendering can take advantage of multi-processor CPUs.
+  li GCode parsing, simulation, verification and annotation.
+  li Supports LinuxCNC (AKA EMC2) O-codes.
+  li Export cut workpiece to STL file.
+  li Tool table editing. 
+  li Add height probing to 2D GCode files.  Very useful for circuit board
+    | cutting and metal engraving.
+  li 2D GCode path optimization. (in progress
+    +issue(11)
+    | )
+  li Operates in Windows and Linux.
+  li
+    | Released under the
+    | <a href='http://www.gnu.org/licenses/gpl-2.0.html'>GPL v2+ license</a>.
+
+h2#limitations Limitations
+ul
+  li Simulates only snapshots of the cutting process. See issue
+    +issue(2)
+    | .
+  li No 5-axis simulation.  See issue
+    +issue(17)
+    | .
+  li No Lathe simulation.
+  li No CAM facilities yet, e.g. 3D model to tool path conversion.
+  li No CNC machine control, not a replacement for LinuxCNC or MACH3.
+  li Does not yet detect over/under cutting, collisions with
+    | the tool shaft or fixtures or rapid moves in the material.
+  li Not all of the LinuxCNC G-Code language is implemented, yet.  See below.
+
+h2#missing-linuxcnc-codes Missing G-Codes
+p
+  | This section lists features of the
+  | <a href="http://linuxcnc.org/docs/2.5/html/gcode/overview.html">LinuxCNC
+  | G-Code language</a> which are not yet implemented in OpenSCAM:
+
+ul
+  li More than 3-axis movements. Issue
+    +issue(17)
+    | .
+  li Tool offset compensation. Issue
+    +issue(15)
+    | .
+  li Incremental distance mode. G91. Issue
+    +issue(42)
+    | .
+  li Plane rotation. G10 L2 R#. Issue
+    +issue(41)
+    | .
+  li Canned cycles. G73, G76, G81-G89. Issue
+    +issue(39)
+    | .
+  li Feed modes: inverse time, units per revolution. G93 & G95. Issue
+    +issue(40)
+    | . (Only important for estimating run time)
+  li Quadratic B-spline. G5.1. (Experimental in LinuxCNC)
+  li NURBS. G5.2 & G5.3. (Experimental in LinuxCNC)
+  li Spindle Constant Surface Speed mode. G96. (Doesn't really apply)
+  li Spindle-synchronized motion. G33. (Lathe operations are not supported)
+  li Rigid Tapping. G33.1. (Lathe operations are not supported)
+
+p This list is probably incomplete.
+
+p
+  | See <a href='http://linuxcnc.org/docs/html/gcode/gcode.html'
+  | >http://linuxcnc.org/docs/html/gcode/gcode.html</a>
+
+h2#future-plans Future Plans
+p
+  | Many features are planed for the future of OpenSCAM.  Much
+  | of this depends on the availability of developer time and funding.
+p Here are some of the current ideas:
+  ul
+    li Real-time cutting simulation.
+    li Rotational axis simulation.
+    li 5-axis simulation.
+    li Lathe simulation.
+    li Tool collision detection.
+    li Fixture collision detection.
+    li Simulate cutting multiple sides of a workpiece.
+    li Feed and speed calculator.
+    li Simulation result caching.
+    li Machine description: speeds, dimensions, axes, etc.
+    li CNC remote control.
+    li In application G-Code view and edit.
+    li Workpiece view slicing.
+    li Multiple workpieces.
+    li Composite tools.
+    li Tool library.
+    li 3D printer simulation.
+    li CAM routines: pocketing, offsetting, arrays, etc.
+    li Font V-Carving.
+    li Tool path optimization.

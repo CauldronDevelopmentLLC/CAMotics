@@ -1,0 +1,77 @@
+.page-header
+  h1#docks Docks
+p
+  | Docks represent logic parts of the GUI.  All but the <tt>Project</tt>
+  | and <tt>Context</tt> docks can be moved around by left clicking on the
+  | dock title bar and dragging or closed by either clicking the dock's
+  | close button in the top left corner or via the <tt>View -> Docks</tt>
+  | menu.
+
+h2#docks-project Project
+img(src='images/manual/dock-project.png')
+p
+  | The project dock cannot be moved or closed.  It contains the tree view of
+  | the project's three main components:
+  ol
+    li <a href='#nc-files'>Tool paths</a> (created from NC files)
+    li <a href='#tools'>Tool table</a>
+    li <a href='#workpiece'>Workpiece</a>
+
+h2#docks-context Context
+p
+  | The context dock cannot be moved or closed.  It changes depending on
+  | whether the <tt>Simulation View</tt> or <tt>Tool View</tt> is selected.
+
+h3#docks-context-sim Simulation View
+img(src='images/manual/dock-context-sim.png')
+p
+  | When the <tt>Simulation View</tt> is selected the <tt>Context</tt> dock
+  | displays project and <a href='#workpiece'>workpiece settings</a>.
+
+h3#docks-context-sim Tool View
+img(src='images/manual/dock-context-tool.png')
+p
+  | When the <tt>Tool View</tt> is selected the <tt>Context</tt> dock
+  | displays <a href='#tools'>tool settings</a>.
+
+h2#docks-position Position
+img(src='images/manual/dock-position.png')
+p
+  | The <tt>Position</tt> dock shows the current tool position in the currently.
+  | selected <a href='#project-units'>project units</a>.  If you move the
+  | position slider at the bottom of
+  | the <tt>Simulation View</tt> or start tool path playback the tool position
+  | will likely change.
+
+h2#docks-estimates Estimates
+img(src='images/manual/dock-estimates.png')
+p
+  | The <tt>Estimates</tt> dock shows estimates of the current, remaining,
+  | total and percent cutting time and distance travelled by the tool in the
+  | currently selected <a href='#project-units'>project units</a>.
+
+h2#docks-status Machine Status
+img(src='images/manual/dock-status.png')
+p
+  | The <tt>Machine Status</tt> dock shows the selected tool,
+  | feed rate, spindle speed, spin direction and program line.  These values
+  | change as the <a href='#playback'>tool path position</a> changes.
+
+h2#docks-bounds Bounds
+p
+  | The bounds dialogs show the <tt>X</tt>, <tt>Y</tt> and <tt>Z</tt>
+  | boundaries and dimensions in the currently selected
+  | <a href='#project-units'>project units</a>.
+
+h3#docks-bounds-tool-path Tool Path
+img(src='images/manual/dock-tool-path-bounds.png')
+p
+  | The bounds of the tool path.
+
+h3#docks-bounds-workpiece Workpiece
+img(src='images/manual/dock-workpiece-bounds.png')
+p
+  | The bounds of the currently defined <a href='#workpiece'>workpiece</a>.
+  | This may not be the same as the bounds of the currently visible cut
+  | workpiece if the workpiece has been changed since the simulation was
+  | last run.

@@ -281,6 +281,7 @@ namespace OpenSCAM {
 
     void on_actionAbout_triggered();
     void on_actionDonate_triggered();
+    void on_actionHelp_triggered();
 
     void on_actionIsoView_triggered() {snapView('p');}
     void on_actionFrontView_triggered() {snapView('F');}

@@ -1,0 +1,51 @@
+.page-header
+  h1#projects Projects
+
+p
+  | OpenSCAM project files keep track of the three main parts of the simulation:
+ol
+  li <a href='#nc-files'>Tool Paths</a> (NC files).
+  li <a href='#tools'>Tool tables</a>.
+  li <a href='#workpiece'>Workpiece</a> descriptions.
+
+p
+  | Project files are stored as
+  | <a href='http://en.wikipedia.org/wiki/XML'>XML</a>.
+  | These files contain links to NC files, so they must be kept
+  | together.
+
+p
+  | If you open NC files directly in OpenSCAM, i.e. with out a project file,
+  | OpenSCAM will create a default workpiece and tool table automatically.
+  | If you make changes you will want to save the .xml project file and open it,
+  | instead of the NC file, in future runs.
+
+h2#projects-file-operations New, Open, Close, Save & Save As
+img(src='images/manual/toolbar-project.png')
+p
+  | The main operations on project files are new, open, close, save, and save
+  | as.  These operations can all be accessed through the File menu.
+img(src='images/manual/menu-file.png')
+
+h2#projects-detecting-modifications Detecting Modifications
+img(src='images/manual/modified.png')
+p
+  | OpenSCAM will automatically detect any changes to the project.
+  | When it does this a '*' will appear in the window's title bar.
+  | Any attempt to close the current project, either by exiting the program,
+  | or creating or opening a new project will bring up a dialog which
+  | will ask you to either save the current project, discard the changes
+  | and proceed with the requested operation or cancel.
+
+h2#projects-viewing-examples Viewing the Examples
+p
+  | The File menu contains a submenu of example projects which you can try
+  | out to get a better feel for what OpenSCAM can do.
+
+img(src='images/manual/menu-examples.png')
+
+h2#projects-units Units
+img(src='images/manual/project-units.png')
+p
+  | Projects may use imperial or metric units.  <a href='#tools-units'>Tools
+  | units</a> may be configured independently.

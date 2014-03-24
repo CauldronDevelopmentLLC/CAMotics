@@ -1,0 +1,40 @@
+.page-header
+  h1#workpiece Workpiece
+p
+  | The workpiece defines the original uncut material.  Currently OpenSCAM
+  | only supports cuboid workpieces.  The workpiece may be defined either
+  | manually or automatically.
+img(src='images/manual/workpiece.png')
+
+h2#workpiece-automatic Automatic
+img(src='images/manual/workpiece-automatic.png')
+p
+  | By default OpenSCAM will automatically create a workpiece for you based
+  | on the tool path and a percent margin.  The <tt>Margin</tt> extends in
+  | all directions except the positive Z axis direction.  There is no margin
+  | in the positive Z direction because it is assumed this is the zero point
+  | for your cutting operation.
+
+h2#workpiece-manual Manual
+img(src='images/manual/workpiece-manual.png')
+p
+  | Often the automatic workpiece is close but not perfect.  You can fine
+  | tune the workpiece dimensions by switching to <tt>Manual</tt> mode.
+p
+  | The <tt>X</tt>, <tt>Y</tt> and <tt>Z</tt> <tt>Dimensions</tt> specify
+  | the length, width and height of the workpiece.  <tt>Offset</tt>
+  | specifies it's offset from the origin (0, 0, 0).
+
+h2#workpiece-view View
+img(src='images/manual/workpiece-view.png')
+p
+  | You can view the workpiece by selecting the workpiece view from the
+  | <tt>View</tt> toolbar or <tt>View</tt> menu.
+p
+  | When the workpiece view is selected you can see changes to the workpiece
+  | dimensions immediately but you must rerun the simulation to see the effect
+  | on the final cut workpiece.  Be sure to select the cut workpiece view when
+  | your done.
+p
+  | You can also more details about the workpiece and tool path dimensions in
+  | the <a href='#docks-bounds'>Bounds Docks</a>.

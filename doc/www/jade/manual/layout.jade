@@ -1,0 +1,30 @@
+.page-header
+  h1#layout Layout
+p
+  | OpenSCAM's layout can be easily configured in several ways.  You can
+  | enable or disable any of the toolbars or informational docks from the
+  | <tt>View -> Toolbars</tt> or <tt>View -> Docks</tt> menus.
+p
+  | In addition, there are several built-in layouts which can be selected
+  | from the View menu.
+.gallery
+  each img in ['default', 'minimal', 'full']
+    a(href='images/manual/layout-' + img + '.png', rel='shadowbox[Layouts]', \
+      title=img + ' layout')
+      img(src='images/manual/thumbs/layout-' + img + '.png')
+
+h2#layout-moving Moving Docks & Toolbars
+p
+  | Docks and toolbars can be dragged to different locations by holding down
+  | the left mouse button on either the toolbar handle on the left or the
+  | dock titlebar on the top of the dock.
+
+h2#layout-fullscreen Fullscreen
+p
+  | It's possible to switch to a fullscreen view either by pressing F11 or
+  | from the <tt>View</tt> menu.
+
+h2#layout-saving Saving the Layout
+p
+  | The layout is automatically saved when you exit the program and restored
+  | on the next run.

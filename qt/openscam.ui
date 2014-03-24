@@ -589,6 +589,7 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionDonate"/>
+    <addaction name="actionHelp"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -3281,6 +3282,15 @@
    </property>
    <property name="shortcut">
     <string>F11</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Help</string>
    </property>
   </action>
  </widget>
