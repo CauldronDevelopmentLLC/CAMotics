@@ -73,6 +73,9 @@ Section -Install
   File "$%%GTK_HOME%%\bin\LIBPNG14-14.DLL"
   File "$%%GTK_HOME%%\bin\ZLIB1.DLL"
 
+  ; Expat DLL
+  File "c:\strawberry\c\bin\LIBEXPAT.DLL"
+
   ; Qt DLLs
   File "$%%QT4DIR%%\bin\QtCore4.dll"
   File "$%%QT4DIR%%\bin\QtGui4.dll"
