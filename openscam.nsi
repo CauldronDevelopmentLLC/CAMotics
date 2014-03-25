@@ -65,6 +65,14 @@ Section -Install
   File "CHANGELOG.md"
   File "build\${MSVCREDIST}"
 
+  ; Cairo DLLs
+  File "$%%GTK_HOME%%\bin\FREETYPE6.DLL"
+  File "$%%GTK_HOME%%\bin\LIBCAIRO-2.DLL"
+  File "$%%GTK_HOME%%\bin\LIBEXPAT-1.DLL"
+  File "$%%GTK_HOME%%\bin\LIBFONTCONFIG-1.DLL"
+  File "$%%GTK_HOME%%\bin\LIBPNG14-14.DLL"
+  File "$%%GTK_HOME%%\bin\ZLIB1.DLL"
+
   ; Qt DLLs
   File "$%%QT4DIR%%\bin\QtCore4.dll"
   File "$%%QT4DIR%%\bin\QtGui4.dll"

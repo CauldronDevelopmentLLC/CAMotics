@@ -63,8 +63,9 @@ using namespace OpenSCAM;
 
 
 QtWin::QtWin(Application &app) :
-  QMainWindow(0), ui(new Ui::OpenSCAMWindow), fileDialog(this),
-  app(app), options(app.getOptions()), cutSim(new CutSim(options)),
+  QMainWindow(0), toolPathCompleteEvent(0), surfaceCompleteEvent(0),
+  ui(new Ui::OpenSCAMWindow), fileDialog(this), app(app),
+  options(app.getOptions()), cutSim(new CutSim(options)),
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
@@ -1176,9 +1177,14 @@ void QtWin::updateProgramLine(const string &name, unsigned value) {
 
 
 bool QtWin::event(QEvent *event) {
-  if (event->type() == toolPathCompleteEvent) toolPathComplete();
-  else if (event->type() == surfaceCompleteEvent) surfaceComplete();
+  if (toolPathCompleteEvent && event->type() == toolPathCompleteEvent)
+    toolPathComplete();
+
+  else if (surfaceCompleteEvent && event->type() == surfaceCompleteEvent)
+    surfaceComplete();
+
   else return QMainWindow::event(event);
+
   return true;
 }
 

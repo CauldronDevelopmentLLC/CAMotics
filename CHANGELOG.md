@@ -1,5 +1,9 @@
 # OpenSCAM Changelog
 
+## v0.2.3:
+ - Fixed valgrind uninitialized var warning.
+ - Added missing DLLs to Windows installer.
+
 ## v0.2.2:
  - Remove old cut surface after project change.
  - Ask user to open .xml project file if it exists.

@@ -4,7 +4,7 @@ declare -A PAGES
 
 PAGES[main]="about quick-start mission screenshots status donate community "
 PAGES[main]+="legal contact"
-PAGES[download]="current install run source debug previous"
+PAGES[download]="current install run source previous"
 PAGES[manual]="overview projects simulation layout playback nc-files tools "
 PAGES[manual]+="workpiece export docks toolbars"
 
