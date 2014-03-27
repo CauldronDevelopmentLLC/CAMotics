@@ -81,6 +81,7 @@ for subdir in [
 for subdir in ['']:
     src += Glob('src/tplang/%s/*.cpp' % subdir)
 
+src += Glob('src/jsedit/*.cpp')
 
 # Build in 'build'
 import re

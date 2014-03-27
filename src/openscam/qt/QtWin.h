@@ -111,6 +111,7 @@ namespace OpenSCAM {
       NULL_VIEW,
       SIMULATION_VIEW,
       TOOL_VIEW,
+      FILE_VIEW,
     } ui_view_t;
     ui_view_t currentUIView;
 
@@ -172,6 +173,12 @@ namespace OpenSCAM {
     void removeFile();
     bool checkSave(bool canCancel = true);
 
+    void editFile(unsigned num);
+    void saveFileTab(int tab);
+    void revertFileTab(int tab);
+    bool checkSaveFileTab(int tab);
+    void closeFileTab(int tab, bool canSave = true);
+
     void updateUnits();
 
     void loadTool(unsigned number);
@@ -225,7 +232,10 @@ namespace OpenSCAM {
   protected slots:
     void animate();
 
+    void fileTabModified(bool changed);
+
     void on_tabWidget_currentChanged(int index);
+    void on_tabWidget_tabCloseRequested(int index);
 
     void on_resolutionComboBox_currentIndexChanged(int index);
     void on_resolutionDoubleSpinBox_valueChanged(double value);
