@@ -46,6 +46,16 @@ void ProjectModel::setProject(const SmartPointer<Project> &project) {
 }
 
 
+string ProjectModel::getFile(unsigned i) const {
+  return project->getRelativeFiles().at(i);
+}
+
+
+string ProjectModel::getFile(const QModelIndex &index) const {
+  return getFile(getOffset(index));
+}
+
+
 Tool &ProjectModel::getTool(unsigned i) const {
   ToolTable &tools = *project->getToolTable();
 
@@ -56,6 +66,11 @@ Tool &ProjectModel::getTool(unsigned i) const {
   if (it == tools.end()) THROW("Invalid tool index");
 
   return *it->second;
+}
+
+
+Tool &ProjectModel::getTool(const QModelIndex &index) const {
+  return getTool(getOffset(index));
 }
 
 

@@ -41,6 +41,8 @@
 #include <cbang/util/DefaultCatch.h>
 #include <cbang/time/TimeInterval.h>
 
+#include <jsedit/jsedit.h>
+
 #include <QSettings>
 #include <QMouseEvent>
 #include <QWheelEvent>
@@ -125,6 +127,14 @@ QtWin::~QtWin() {
 
 
 void QtWin::init() {
+  // Simulation and Tool View tabs are not closeable
+  ui->tabWidget->setTabsClosable(true);
+  QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
+  for (int i = 0; i < tabBar->count(); i++) {
+    tabBar->setTabButton(i, QTabBar::RightSide, 0);
+    tabBar->setTabButton(i, QTabBar::LeftSide, 0);
+  }
+
   setUIView(SIMULATION_VIEW);
   saveFullLayout();
   defaultLayout();
@@ -638,6 +648,11 @@ void QtWin::resetProject() {
   view->setSurface(0);
   currentTool.release();
   view->resetView();
+
+  // Close editor tabs
+  while (2 < ui->tabWidget->count())
+    closeFileTab(ui->tabWidget->count() - 1, false);
+  ui->tabWidget->setCurrentIndex(0);
 }
 
 
@@ -736,6 +751,10 @@ bool QtWin::saveProject(bool saveAs) {
 
   try {
     project->save(filename);
+
+    // Save open files
+    for (int tab = 2; tab < ui->tabWidget->count(); tab++) saveFileTab(tab);
+
     showMessage("Saved " + filename);
     return true;
   } CATCH_ERROR;
@@ -752,6 +771,12 @@ void QtWin::revertProject() {
   if (filename.empty()) {
     warning("Cannot revert project.");
     return;
+  }
+
+  // Mark open files clean
+  for (int tab = 2; tab < ui->tabWidget->count(); tab++) {
+    JSEdit *editor = (JSEdit *)ui->tabWidget->widget(tab);
+    editor->document()->setModified(false);
   }
 
   project->markClean();
@@ -782,6 +807,9 @@ void QtWin::removeFile() {
 
 
 bool QtWin::checkSave(bool canCancel) {
+  for (int tab = 2; tab < ui->tabWidget->count(); tab++)
+    if (!checkSaveFileTab(tab)) return false;
+
   if (project.isNull() || !project->isDirty()) return true;
 
   int response =
@@ -794,6 +822,117 @@ bool QtWin::checkSave(bool canCancel) {
   if (response == QMessageBox::Yes) return saveProject();
   else if (response != QMessageBox::No) return false;
   return true;
+}
+
+
+void QtWin::editFile(unsigned num) {
+  string relPath = project->getRelativeFiles().at(num);
+
+  // Find existing tab
+  int tab = -1;
+  for (int i = 2; i < ui->tabWidget->count(); i++)
+    if (relPath == ui->tabWidget->tabText(i).toAscii().data()) {
+      tab = i;
+      break;
+    }
+
+  // Create new tab
+  if (tab == -1) {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    JSEdit *editor = new JSEdit(this);
+
+    string absPath = project->getAbsoluteFiles().at(num);
+    QFile file(absPath.c_str());
+    file.open(QFile::ReadOnly);
+    QString contents = file.readAll();
+    file.close();
+    contents.replace('\t', " ");
+
+    editor->setWordWrapMode(QTextOption::NoWrap);
+    editor->setTabStopWidth(2);
+    editor->setPlainText(contents);
+
+    connect(editor, SIGNAL(modificationChanged(bool)),
+            SLOT(fileTabModified(bool)));
+
+    tab = ui->tabWidget->addTab(editor, relPath.c_str());
+    QApplication::restoreOverrideCursor();
+  }
+
+  // Switch to tab
+  ui->tabWidget->setCurrentIndex(tab);
+}
+
+
+void QtWin::saveFileTab(int tab) {
+  // Check if modified
+  QString title = ui->tabWidget->tabText(tab);
+  if (!title.endsWith(" *")) return;
+
+  // Get absolute path
+  title = title.left(title.length() - 2); // Remove *
+  string absPath = project->makeAbsolute(title.toUtf8().data());
+
+  // Save data
+  JSEdit *editor = (JSEdit *)ui->tabWidget->widget(tab);
+  QString content = editor->toPlainText();
+  QFile file(absPath.c_str());
+  file.open(QFile::WriteOnly | QIODevice::Truncate);
+  file.write(content.toUtf8());
+  file.close();
+
+  // Set unmodified
+  editor->document()->setModified(false);
+
+  // Notify
+  showMessage("Saved " + string(title.toUtf8().data()));
+}
+
+
+void QtWin::revertFileTab(int tab) {
+  // Check if modified
+  QString title = ui->tabWidget->tabText(tab);
+  if (!title.endsWith(" *")) return;
+
+  // Get absolute path
+  title = title.left(title.length() - 2); // Remove *
+  string absPath = project->makeAbsolute(title.toUtf8().data());
+
+  // Read data
+  QFile file(absPath.c_str());
+  file.open(QFile::ReadOnly);
+  QString contents = file.readAll();
+  file.close();
+  contents.replace('\t', " ");
+
+  // Revert
+  JSEdit *editor = (JSEdit *)ui->tabWidget->widget(tab);
+  editor->setPlainText(contents);
+
+  // Set unmodified
+  editor->document()->setModified(false);
+}
+
+
+bool QtWin::checkSaveFileTab(int tab) {
+  if (!ui->tabWidget->tabText(tab).endsWith(" *")) return true;
+
+  int response =
+    QMessageBox::question(this, "File Modified", "The current file has "
+                          "been modifed.  Would you like to save it?",
+                          QMessageBox::Cancel | QMessageBox::No |
+                          QMessageBox::Yes, QMessageBox::Yes);
+
+  if (response == QMessageBox::Yes) saveFileTab(tab);
+  else if (response == QMessageBox::Cancel) return false;
+  return true;
+}
+
+
+void QtWin::closeFileTab(int tab, bool canSave) {
+  if (canSave && !checkSaveFileTab(tab)) return;
+  delete (JSEdit *)ui->tabWidget->widget(tab);
+  ui->tabWidget->removeTab(tab);
 }
 
 
@@ -1237,9 +1376,32 @@ void QtWin::animate() {
 }
 
 
+void QtWin::fileTabModified(bool changed) {
+  int index = ui->tabWidget->currentIndex();
+
+  if (changed)
+    ui->tabWidget->setTabText(index, ui->tabWidget->tabText(index) + tr(" *"));
+
+  else {
+    QString title = ui->tabWidget->tabText(index);
+
+    if (title.endsWith(" *"))
+      ui->tabWidget->setTabText(index, title.left(title.size() - 2));
+  }
+}
+
+
 void QtWin::on_tabWidget_currentChanged(int index) {
-  if (index == 0) setUIView(SIMULATION_VIEW);
-  else setUIView(TOOL_VIEW);
+  switch (index) {
+  case 0: setUIView(SIMULATION_VIEW); break;
+  case 1: setUIView(TOOL_VIEW); break;
+  default: setUIView(FILE_VIEW); break;
+  }
+}
+
+
+void QtWin::on_tabWidget_tabCloseRequested(int index) {
+  closeFileTab(index);
 }
 
 
@@ -1326,6 +1488,9 @@ void QtWin::on_positionSlider_sliderMoved(int position) {
 void QtWin::on_projectTreeView_activated(const QModelIndex &index) {
   switch (projectModel->getType(index)) {
   case ProjectModel::FILE_ITEM:
+    editFile(projectModel->getOffset(index));
+    break;
+
   case ProjectModel::PATHS_ITEM:
   case ProjectModel::PROJECT_ITEM:
   case ProjectModel::WORKPIECE_ITEM:
@@ -1334,7 +1499,7 @@ void QtWin::on_projectTreeView_activated(const QModelIndex &index) {
 
   case ProjectModel::TOOL_ITEM: {
     setUIView(TOOL_VIEW);
-    Tool &tool = projectModel->getTool(projectModel->getOffset(index));
+    Tool &tool = projectModel->getTool(index);
     loadTool(tool.getNumber());
     break;
   }

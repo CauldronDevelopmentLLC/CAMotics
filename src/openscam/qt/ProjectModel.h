@@ -54,7 +54,11 @@ namespace OpenSCAM {
 
     void setProject(const cb::SmartPointer<Project> &project);
 
+    std::string getFile(unsigned i) const;
+    std::string getFile(const QModelIndex &index) const;
+
     Tool &getTool(unsigned i) const;
+    Tool &getTool(const QModelIndex &index) const;
     std::string getToolString(unsigned i) const;
     QModelIndex getToolIndex(unsigned number) const;
 
