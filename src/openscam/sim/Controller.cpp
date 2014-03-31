@@ -333,7 +333,7 @@ void Controller::reset() {
   naiveCamTolerance = 0;
   modalMotion = false;
   incrementalDistanceMode = false;
-  arcIncrementalDistanceMode = false;
+  arcIncrementalDistanceMode = true;
   moveInAbsoluteCoords = false;
 
   machine.setMetric();
@@ -471,9 +471,9 @@ void Controller::execute(const Code &code, int vars) {
     case 890: drill(vars, true, true, false); // Dwell, Feed Out
 
     case 900: incrementalDistanceMode = false; break;
-    case 901: arcIncrementalDistanceMode = false; break;
+    case 901: arcIncrementalDistanceMode = false; implemented = false; break;
     case 910: incrementalDistanceMode = true; implemented = false; break;
-    case 911: arcIncrementalDistanceMode = true; implemented = false; break;
+    case 911: arcIncrementalDistanceMode = true; break;
 
     case 920: setGlobalOffsets(vars); break;
     case 921: resetGlobalOffsets(true); break;
@@ -540,7 +540,7 @@ void Controller::moveAxis(char axis, double value, bool rapid) {
 
 
 void Controller::arc(int vars, bool clockwise) {
-  // TODO Handle Arc Incremental Distance Mode
+  // TODO Handle Arc Absolute Mode
   // TODO Affected by cutter radius compensation
 
   const char *axes = getPlaneAxes(getPlane());

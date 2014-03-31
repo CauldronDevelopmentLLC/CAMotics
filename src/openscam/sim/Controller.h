@@ -45,7 +45,6 @@ namespace OpenSCAM {
 
   struct EndProgram {}; // Exception
 
-  // TODO Rename this to Controller
   class Controller : public VarTypes, public ModalGroup {
   public:
     typedef enum {

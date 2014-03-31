@@ -23,6 +23,7 @@
 #include "ui_openscam.h"
 
 #include "ProjectModel.h"
+#include "NCEdit.h"
 
 #include <openscam/Geom.h>
 #include <openscam/view/Viewer.h>
@@ -40,8 +41,6 @@
 #include <cbang/util/SmartInc.h>
 #include <cbang/util/DefaultCatch.h>
 #include <cbang/time/TimeInterval.h>
-
-#include <jsedit/jsedit.h>
 
 #include <QSettings>
 #include <QMouseEvent>
@@ -259,7 +258,6 @@ void QtWin::saveAllState() {
   QSettings settings;
   settings.setValue("MainWindow/State", saveState());
   settings.setValue("MainWindow/Geometry", saveGeometry());
-  // TODO save Mdi window states
 }
 
 
@@ -775,7 +773,7 @@ void QtWin::revertProject() {
 
   // Mark open files clean
   for (int tab = 2; tab < ui->tabWidget->count(); tab++) {
-    JSEdit *editor = (JSEdit *)ui->tabWidget->widget(tab);
+    NCEdit *editor = (NCEdit *)ui->tabWidget->widget(tab);
     editor->document()->setModified(false);
   }
 
@@ -839,7 +837,7 @@ void QtWin::editFile(unsigned num) {
   // Create new tab
   if (tab == -1) {
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    JSEdit *editor = new JSEdit(this);
+    NCEdit *editor = new NCEdit(this);
 
     string absPath = project->getAbsoluteFiles().at(num);
     QFile file(absPath.c_str());
@@ -874,7 +872,7 @@ void QtWin::saveFileTab(int tab) {
   string absPath = project->makeAbsolute(title.toUtf8().data());
 
   // Save data
-  JSEdit *editor = (JSEdit *)ui->tabWidget->widget(tab);
+  NCEdit *editor = (NCEdit *)ui->tabWidget->widget(tab);
   QString content = editor->toPlainText();
   QFile file(absPath.c_str());
   file.open(QFile::WriteOnly | QIODevice::Truncate);
@@ -906,7 +904,7 @@ void QtWin::revertFileTab(int tab) {
   contents.replace('\t', " ");
 
   // Revert
-  JSEdit *editor = (JSEdit *)ui->tabWidget->widget(tab);
+  NCEdit *editor = (NCEdit *)ui->tabWidget->widget(tab);
   editor->setPlainText(contents);
 
   // Set unmodified
@@ -931,7 +929,7 @@ bool QtWin::checkSaveFileTab(int tab) {
 
 void QtWin::closeFileTab(int tab, bool canSave) {
   if (canSave && !checkSaveFileTab(tab)) return;
-  delete (JSEdit *)ui->tabWidget->widget(tab);
+  delete (NCEdit *)ui->tabWidget->widget(tab);
   ui->tabWidget->removeTab(tab);
 }
 
