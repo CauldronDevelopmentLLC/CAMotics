@@ -119,6 +119,17 @@ QtWin::QtWin(Application &app) :
 
   // Select workpiece radio
   ui->automaticCuboidRadioButton->setChecked(true);
+
+  // Add status label to status bar
+  statusLabel = new QLabel;
+  statusBar()->addPermanentWidget(statusLabel);
+
+  // Setup console color
+  ui->console->setTextColor(QColor("#d9d9d9"));
+
+  // Setup console stream
+  consoleStream = new LineBufferStream<LineBuffer>(lineBuffer);
+  Logger::instance().setScreenStream(*consoleStream);
 }
 
 
@@ -135,6 +146,9 @@ void QtWin::init() {
     tabBar->setTabButton(i, QTabBar::RightSide, 0);
     tabBar->setTabButton(i, QTabBar::LeftSide, 0);
   }
+
+  // Hide console by default
+  hideConsole();
 
   setUIView(SIMULATION_VIEW);
   saveFullLayout();
@@ -260,6 +274,7 @@ void QtWin::saveAllState() {
   QSettings settings;
   settings.setValue("MainWindow/State", saveState());
   settings.setValue("MainWindow/Geometry", saveGeometry());
+  settings.setValue("Console/Splitter", ui->splitter->saveState());
 }
 
 
@@ -267,6 +282,7 @@ void QtWin::restoreAllState() {
   QSettings settings;
   restoreState(settings.value("MainWindow/State").toByteArray());
   restoreGeometry(settings.value("MainWindow/Geometry").toByteArray());
+  ui->splitter->restoreState(settings.value("Console/Splitter").toByteArray());
 }
 
 
@@ -299,6 +315,7 @@ void QtWin::saveFullLayout() {
 
 void QtWin::fullLayout() {
   restoreState(fullLayoutState);
+  showConsole();
 }
 
 
@@ -310,6 +327,8 @@ void QtWin::defaultLayout() {
   for (int i = 0; i < docks.size(); i++)
     if (docks.at(i)->features() & QDockWidget::DockWidgetClosable)
       docks.at(i)->setVisible(false);
+
+  hideConsole();
 }
 
 
@@ -320,6 +339,8 @@ void QtWin::minimalLayout() {
   QList<QToolBar *> toolBars = findChildren<QToolBar *>();
   for (int i = 0; i < toolBars.size(); i++)
     toolBars.at(i)->setVisible(false);
+
+  hideConsole();
 }
 
 
@@ -1166,25 +1187,77 @@ void QtWin::setStatusActive(bool active) {
   lastStatusActive = active;
 
   if (active) {
-    ui->statusLabel->clear();
+    statusLabel->clear();
     QMovie *movie = new QMovie(":/icons/running.gif");
-    ui->statusLabel->setMovie(movie);
+    statusLabel->setMovie(movie);
     movie->start();
 
-    ui->statusLabel->setToolTip("Simulation is running");
-    ui->stopPushButton->setEnabled(true);
+    statusLabel->setToolTip("Simulation is running");
+    ui->actionStop->setEnabled(true);
 
   } else {
-    QMovie *movie = ui->statusLabel->movie();
+    QMovie *movie = statusLabel->movie();
     if (movie) {
-      ui->statusLabel->clear();
+      statusLabel->clear();
       delete movie;
     }
 
-    ui->statusLabel->setPixmap(QPixmap(":/icons/idle.png"));
-    ui->statusLabel->setToolTip("Simulation has ended");
-    ui->stopPushButton->setEnabled(false);
+    statusLabel->setPixmap(QPixmap(":/icons/idle.png"));
+    statusLabel->setToolTip("Simulation has ended");
+    ui->actionStop->setEnabled(false);
   }
+}
+
+
+void QtWin::showConsole() {
+  ui->splitter->setSizes(QList<int>() << 5 << 1);
+}
+
+
+void QtWin::hideConsole() {
+  ui->splitter->setSizes(QList<int>() << 1 << 0);
+}
+
+
+void QtWin::appendConsole(const string &_line) {
+  string line = _line;
+  QColor saveColor = ui->console->textColor();
+
+  if (4 < line.size() && line[0] == 27 && line[1] == '[' &&
+      line[4] == 'm') {
+
+    int code = String::parseU8(line.substr(2, 2));
+    QColor color;
+
+    switch (code) {
+    case 30: color = QColor("#000000"); break;
+    case 31: color = QColor("#ff0000"); break;
+    case 32: color = QColor("#00ff00"); break;
+    case 33: color = QColor("#ffff00"); break;
+    case 34: color = QColor("#0000ff"); break;
+    case 35: color = QColor("#ff00ff"); break;
+    case 36: color = QColor("#00ffff"); break;
+    case 37: color = QColor("#ffffff"); break;
+
+    case 90: color = QColor("#555555"); break;
+    case 91: color = QColor("#ff5555"); break;
+    case 92: color = QColor("#55ff55"); break;
+    case 93: color = QColor("#ffff55"); break;
+    case 94: color = QColor("#5555ff"); break;
+    case 95: color = QColor("#ff55ff"); break;
+    case 96: color = QColor("#55ffff"); break;
+    case 97: color = QColor("#ffffff"); break;
+    }
+
+    line = line.substr(5);
+    ui->console->setTextColor(color);
+  }
+
+  if (String::endsWith(line, "\033[0m"))
+    line = line.substr(0, line.size() - 4);
+
+  ui->console->append(QByteArray(line.c_str()));
+  ui->console->setTextColor(saveColor);
 }
 
 
@@ -1196,13 +1269,13 @@ void QtWin::setUIView(ui_view_t uiView) {
   switch (uiView) {
   case SIMULATION_VIEW:
     ui->tabWidget->setCurrentIndex(0);
-    ui->contextStack->setCurrentWidget(ui->simulationProperties);
+    ui->settingsStack->setCurrentWidget(ui->simulationProperties);
     break;
 
   case TOOL_VIEW:
     if (currentTool.isNull()) loadTool(0);
     ui->tabWidget->setCurrentIndex(1);
-    ui->contextStack->setCurrentWidget(ui->toolProperties);
+    ui->settingsStack->setCurrentWidget(ui->toolProperties);
     break;
 
   default: break;
@@ -1213,19 +1286,19 @@ void QtWin::setUIView(ui_view_t uiView) {
 
 
 void QtWin::updatePlaySpeed(const string &name, unsigned value) {
-  ui->playbackSpeedLabel->setText(QString().sprintf("%dx", view->speed));
+  // TODO
+  //ui->playbackSpeedLabel->setText(QString().sprintf("%dx", view->speed));
 }
 
 
 void QtWin::updateViewFlags(const std::string &name, unsigned flags) {
   ui->actionPlay->setIcon(flags & View::PLAY_FLAG ? pauseIcon : playIcon);
-  ui->playPushButton->setIcon(flags & View::PLAY_FLAG ? pauseIcon : playIcon);
+  ui->actionPlay->setText(flags & View::PLAY_FLAG ? "Pause" : "Play");
 }
 
 
 void QtWin::updatePlayDirection(const string &name, bool reverse) {
   ui->actionDirection->setIcon(reverse ? backwardIcon : forwardIcon);
-  ui->directionPushButton->setIcon(reverse ? backwardIcon : forwardIcon);
 }
 
 
@@ -1370,6 +1443,10 @@ void QtWin::animate() {
         ui->progressBar->setFormat(status.c_str());
       }
     }
+
+    // Copy log
+    while (lineBuffer.hasLine()) appendConsole(lineBuffer.getLine());
+
   } CBANG_CATCH_ERROR;
 
   bool modified = !project.isNull() && project->isDirty();
@@ -1437,52 +1514,6 @@ void QtWin::on_unitsComboBox_currentIndexChanged(int value) {
 
 void QtWin::on_smoothPushButton_clicked(bool active) {
   smooth = active;
-}
-
-
-void QtWin::on_stopPushButton_clicked() {
-  stop();
-}
-
-
-void QtWin::on_rerunPushButton_clicked() {
-  reload(true);
-}
-
-
-void QtWin::on_beginingPushButton_clicked() {
-  view->path->setByRatio(0);
-  view->clearFlag(View::PLAY_FLAG);
-  view->reverse = false;
-  redraw();
-}
-
-
-void QtWin::on_slowerPushButton_clicked() {
-  view->decSpeed();
-}
-
-
-void QtWin::on_playPushButton_clicked() {
-  view->toggleFlag(View::PLAY_FLAG);
-}
-
-
-void QtWin::on_fasterPushButton_clicked() {
-  view->incSpeed();
-}
-
-
-void QtWin::on_endPushButton_clicked() {
-  view->path->setByRatio(1);
-  view->clearFlag(View::PLAY_FLAG);
-  view->reverse = true;
-  redraw();
-}
-
-
-void QtWin::on_directionPushButton_clicked() {
-  view->changeDirection();
 }
 
 
@@ -1786,6 +1817,52 @@ void QtWin::on_actionNew_triggered() {
 
 void QtWin::on_actionOpen_triggered() {
   openProject();
+}
+
+
+void QtWin::on_actionStop_triggered() {
+  stop();
+}
+
+
+void QtWin::on_actionRun_triggered() {
+  reload(true);
+}
+
+
+void QtWin::on_actionBegining_triggered() {
+  view->path->setByRatio(0);
+  view->clearFlag(View::PLAY_FLAG);
+  view->reverse = false;
+  redraw();
+}
+
+
+void QtWin::on_actionSlower_triggered() {
+  view->decSpeed();
+}
+
+
+void QtWin::on_actionPlay_triggered() {
+  view->toggleFlag(View::PLAY_FLAG);
+}
+
+
+void QtWin::on_actionFaster_triggered() {
+  view->incSpeed();
+}
+
+
+void QtWin::on_actionEnd_triggered() {
+  view->path->setByRatio(1);
+  view->clearFlag(View::PLAY_FLAG);
+  view->reverse = true;
+  redraw();
+}
+
+
+void QtWin::on_actionDirection_triggered() {
+  view->changeDirection();
 }
 
 

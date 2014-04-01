@@ -10,8 +10,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1015</width>
-    <height>837</height>
+    <width>1004</width>
+    <height>797</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_7">
+   <layout class="QVBoxLayout" name="verticalLayout_25">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -38,153 +38,167 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>0</number>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QWidget" name="simulationTab">
-       <property name="styleSheet">
-        <string notr="true">QPushButton:hover {
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="simulationTab">
+           <property name="styleSheet">
+            <string notr="true">QPushButton:hover {
   border: 1px outset #71869c;
   border-radius: 2px;
   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0 #c5d3df, stop: 1 #b2c1d1);
 } </string>
-       </property>
-       <attribute name="title">
-        <string>Simulation View</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_9">
+           </property>
+           <attribute name="title">
+            <string>Simulation View</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="OpenSCAM::GLView" name="simulationView" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>1</horstretch>
+                <verstretch>1</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>200</height>
+               </size>
+              </property>
+              <property name="contextMenuPolicy">
+               <enum>Qt::CustomContextMenu</enum>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_9">
+              <property name="horizontalSpacing">
+               <number>6</number>
+              </property>
+              <item row="0" column="1">
+               <widget class="QSlider" name="positionSlider">
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Set tool path position</string>
+                </property>
+                <property name="maximum">
+                 <number>10000</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="pageStep">
+                 <number>100</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_28">
+                <property name="minimumSize">
+                 <size>
+                  <width>70</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <underline>true</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Position</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="toolTab">
+           <attribute name="title">
+            <string>Tool View</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QGraphicsView" name="toolView">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="verticalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <layout class="QVBoxLayout" name="verticalLayout_16">
         <property name="spacing">
-         <number>1</number>
-        </property>
-        <property name="margin">
          <number>0</number>
         </property>
         <item>
-         <widget class="OpenSCAM::GLView" name="simulationView" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>1</horstretch>
-            <verstretch>1</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>200</width>
-            <height>200</height>
-           </size>
-          </property>
-          <property name="contextMenuPolicy">
-           <enum>Qt::CustomContextMenu</enum>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLabel" name="statusLabel">
+           <widget class="QCheckBox" name="errorsCheckBox">
             <property name="text">
-             <string>Status</string>
+             <string>Errors</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="stopPushButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Stop the simulation</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="rerunPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Rerun the simulation</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="smoothPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Smooth the resulting surface for better visualization</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
+           <widget class="QCheckBox" name="warningsCheckBox">
+            <property name="text">
+             <string>Warnings</string>
             </property>
            </widget>
           </item>
@@ -195,369 +209,101 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>13</width>
-              <height>14</height>
+              <width>40</width>
+              <height>20</height>
              </size>
             </property>
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label_29">
-            <property name="text">
-             <string>Playback:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="beginingPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
+           <widget class="QPushButton" name="clearConsolePushButton">
             <property name="toolTip">
-             <string>Jump to start of tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="playPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Start or stop tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="endPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Jump to end of tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/end.png</normaloff>:/icons/end.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>13</width>
-              <height>17</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_36">
-            <property name="text">
-             <string>Speed:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="slowerPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Slow down tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/slower.png</normaloff>:/icons/slower.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="fasterPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Speed up tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset resource="openscam.qrc">
-              <normaloff>:/icons/faster.png</normaloff>:/icons/faster.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="playbackSpeedLabel">
-            <property name="minimumSize">
-             <size>
-              <width>72</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>72</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Tool path playback speed.</string>
+             <string>Clear console.</string>
             </property>
             <property name="text">
-             <string>1x</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>13</width>
-              <height>14</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_35">
-            <property name="text">
-             <string>Direction:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="directionPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Change tool path animation direction</string>
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="openscam.qrc">
-              <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
+              <normaloff>:/icons/clear.png</normaloff>:/icons/clear.png</iconset>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout_9">
-          <property name="spacing">
-           <number>0</number>
+         <widget class="QTextEdit" name="console">
+          <property name="styleSheet">
+           <string notr="true">QTextEdit {
+  background-color: #343434;
+}</string>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_28">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Position</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSlider" name="positionSlider">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Set tool path position</string>
-            </property>
-            <property name="maximum">
-             <number>10000</number>
-            </property>
-            <property name="singleStep">
-             <number>10</number>
-            </property>
-            <property name="pageStep">
-             <number>100</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_27">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Progress</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string>Progressbar</string>
-            </property>
-            <property name="maximum">
-             <number>10000</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="toolTab">
-       <attribute name="title">
-        <string>Tool View</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <property name="margin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QGraphicsView" name="toolView">
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+          <property name="lineWrapMode">
+           <enum>QTextEdit::NoWrap</enum>
           </property>
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
      </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_27">
+        <property name="minimumSize">
+         <size>
+          <width>70</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>70</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <underline>true</underline>
+         </font>
+        </property>
+        <property name="text">
+         <string>Progress</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Progressbar</string>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -566,7 +312,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1015</width>
+     <width>1004</width>
      <height>29</height>
     </rect>
    </property>
@@ -631,8 +377,23 @@
     <addaction name="actionTopView"/>
     <addaction name="actionBottomView"/>
    </widget>
+   <widget class="QMenu" name="menuSimulate">
+    <property name="title">
+     <string>Simulate</string>
+    </property>
+    <addaction name="actionStop"/>
+    <addaction name="actionRun"/>
+    <addaction name="separator"/>
+    <addaction name="actionPlay"/>
+    <addaction name="actionBegining"/>
+    <addaction name="actionEnd"/>
+    <addaction name="actionSlower"/>
+    <addaction name="actionFaster"/>
+    <addaction name="actionDirection"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuProject"/>
+   <addaction name="menuSimulate"/>
    <addaction name="menuView_2"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -672,6 +433,26 @@
    <addaction name="actionTool"/>
    <addaction name="actionWorkpieceBounds"/>
    <addaction name="actionAxes"/>
+  </widget>
+  <widget class="QToolBar" name="simulateToolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionStop"/>
+   <addaction name="actionRun"/>
+   <addaction name="separator"/>
+   <addaction name="actionPlay"/>
+   <addaction name="actionBegining"/>
+   <addaction name="actionEnd"/>
+   <addaction name="actionSlower"/>
+   <addaction name="actionFaster"/>
+   <addaction name="actionDirection"/>
   </widget>
   <widget class="QToolBar" name="perspectiveToolBar">
    <property name="windowTitle">
@@ -1411,7 +1192,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="contextDockWidget">
+  <widget class="QDockWidget" name="settingsDockWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
      <horstretch>0</horstretch>
@@ -1422,7 +1203,7 @@
     <set>QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Context</string>
+    <string>Settings</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -1445,7 +1226,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QStackedWidget" name="contextStack">
+      <widget class="QStackedWidget" name="settingsStack">
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -1465,7 +1246,7 @@
             </font>
            </property>
            <property name="title">
-            <string>Project Settings</string>
+            <string>Project</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_15">
             <property name="spacing">
@@ -1485,6 +1266,41 @@
             </property>
             <item>
              <layout class="QGridLayout" name="gridLayout_8">
+              <item row="0" column="2">
+               <widget class="QDoubleSpinBox" name="resolutionDoubleSpinBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Renderer resolution</string>
+                </property>
+                <property name="decimals">
+                 <number>6</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>13</width>
+                  <height>17</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_25">
                 <property name="font">
@@ -1535,41 +1351,6 @@
                 </item>
                </widget>
               </item>
-              <item row="0" column="2">
-               <widget class="QDoubleSpinBox" name="resolutionDoubleSpinBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>100</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Renderer resolution</string>
-                </property>
-                <property name="decimals">
-                 <number>6</number>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="3">
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>13</width>
-                  <height>17</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_26">
                 <property name="font">
@@ -1596,6 +1377,53 @@
                 </item>
                </widget>
               </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_37">
+                <property name="font">
+                 <font>
+                  <underline>true</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Smooth</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QPushButton" name="smoothPushButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>32</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Smooth the resulting surface for better visualization</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="openscam.qrc">
+                  <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
@@ -1609,7 +1437,7 @@
             </font>
            </property>
            <property name="title">
-            <string>Workpiece Settings</string>
+            <string>Workpiece</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <property name="spacing">
@@ -2020,7 +1848,7 @@
             </font>
            </property>
            <property name="title">
-            <string>Tool Settings</string>
+            <string>Tool</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <property name="spacing">
@@ -3164,17 +2992,23 @@
    <property name="toolTip">
     <string>Stop the simulation</string>
    </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
   </action>
-  <action name="actionRerun">
+  <action name="actionRun">
    <property name="icon">
     <iconset resource="openscam.qrc">
      <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
    </property>
    <property name="text">
-    <string>Rerun</string>
+    <string>Run</string>
    </property>
    <property name="toolTip">
-    <string>Rerun the simulation</string>
+    <string>Run or restart the simulation</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
   <action name="actionSmooth">
