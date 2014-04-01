@@ -36,6 +36,11 @@ using namespace OpenSCAM;
 QtApp::QtApp(QWidget *parent) : OpenSCAM::Application("OpenSCAM") {
   options.add("qt-style", "Set Qt style");
 
+  // Configure Logger
+  Logger &logger = Logger::instance();
+  logger.setLogTime(false);
+  logger.setLogNoInfoHeader(true);
+
   // Configure command line
   cmdLine.setAllowConfigAsFirstArg(false);
   cmdLine.setAllowPositionalArgs(true);

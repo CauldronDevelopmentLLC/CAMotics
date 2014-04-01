@@ -26,6 +26,7 @@
 #include "DonateDialog.h"
 #include "ToolPathThread.h"
 #include "SurfaceThread.h"
+#include "LineBuffer.h"
 
 #include <openscam/Real.h>
 #include <openscam/view/GL.h>
@@ -35,16 +36,9 @@
 
 #include <cbang/SmartPointer.h>
 #include <cbang/Application.h>
+#include <cbang/iostream/LineBufferDevice.h>
 
-#include <QMainWindow>
-#include <QFileDialog>
-#include <QTreeView>
-#include <QIcon>
-#include <QTimer>
-#include <QGraphicsScene>
-#include <QPoint>
-#include <QLabel>
-#include <QByteArray>
+#include <QtGui>
 
 
 namespace cb {class Application;}
@@ -77,10 +71,15 @@ namespace OpenSCAM {
     QByteArray fullLayoutState;
     cb::SmartPointer<ProjectModel> projectModel;
 
+    LineBuffer lineBuffer;
+    cb::SmartPointer<cb::LineBufferStream<LineBuffer> > consoleStream;
+
     QIcon playIcon;
     QIcon pauseIcon;
     QIcon forwardIcon;
     QIcon backwardIcon;
+
+    QLabel *statusLabel;
 
     cb::Application &app;
     cb::Options &options;
@@ -196,6 +195,10 @@ namespace OpenSCAM {
 
     void setStatusActive(bool active);
 
+    void showConsole();
+    void hideConsole();
+    void appendConsole(const std::string &line);
+
     // Views
     void setUIView(ui_view_t uiView);
 
@@ -242,14 +245,6 @@ namespace OpenSCAM {
     void on_unitsComboBox_currentIndexChanged(int value);
 
     void on_smoothPushButton_clicked(bool active);
-    void on_stopPushButton_clicked();
-    void on_rerunPushButton_clicked();
-    void on_beginingPushButton_clicked();
-    void on_slowerPushButton_clicked();
-    void on_playPushButton_clicked();
-    void on_fasterPushButton_clicked();
-    void on_endPushButton_clicked();
-    void on_directionPushButton_clicked();
     void on_positionSlider_sliderMoved(int position);
 
     void on_projectTreeView_activated(const QModelIndex &index);
@@ -280,6 +275,15 @@ namespace OpenSCAM {
     void on_actionSave_triggered();
     void on_actionSaveAs_triggered();
     void on_actionRevert_triggered();
+
+    void on_actionStop_triggered();
+    void on_actionRun_triggered();
+    void on_actionBegining_triggered();
+    void on_actionSlower_triggered();
+    void on_actionPlay_triggered();
+    void on_actionFaster_triggered();
+    void on_actionEnd_triggered();
+    void on_actionDirection_triggered();
 
     void on_actionExport_triggered();
     void on_actionSnapshot_triggered();

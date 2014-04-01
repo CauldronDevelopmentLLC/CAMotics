@@ -49,5 +49,6 @@
         <file>icons/running.gif</file>
         <file>icons/idle.png</file>
         <file>icons/help.png</file>
+        <file>icons/clear.png</file>
     </qresource>
 </RCC>
