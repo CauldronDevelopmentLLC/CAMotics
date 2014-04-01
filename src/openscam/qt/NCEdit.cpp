@@ -49,9 +49,13 @@
 */
 
 #include "NCEdit.h"
+
 #include "TPLHighlighter.h"
 #include "SidebarWidget.h"
 
+#include <cbang/SmartPointer.h>
+
+using namespace cb;
 using namespace OpenSCAM;
 
 
@@ -88,7 +92,8 @@ static int findClosingMatch(const QTextDocument *doc, int cursorPosition) {
 
 static int findOpeningMatch(const QTextDocument *doc, int cursorPosition) {
   QTextBlock block = doc->findBlock(cursorPosition);
-  TextBlockData *blockData = reinterpret_cast<TextBlockData *>(block.userData());
+  TextBlockData *blockData =
+    reinterpret_cast<TextBlockData *>(block.userData());
 
   if (!blockData->bracketPositions.isEmpty()) {
     int depth = 1;
@@ -121,49 +126,25 @@ namespace OpenSCAM {
   };
 
 
-  NCDocLayout::NCDocLayout(QTextDocument *doc) : QPlainTextDocumentLayout(doc) {
-  }
+  NCDocLayout::NCDocLayout(QTextDocument *doc) :
+    QPlainTextDocumentLayout(doc) {}
 
 
   void NCDocLayout::forceUpdate() {
     emit documentSizeChanged(documentSize());
   }
-
-
-  class NCEditPrivate {
-  public:
-    NCEdit *editor;
-    NCDocLayout *layout;
-    Highlighter *highlighter;
-    SidebarWidget *sidebar;
-    bool showLineNumbers;
-    bool textWrap;
-    QColor cursorColor;
-    bool bracketsMatching;
-    QList<int> matchPositions;
-    QColor bracketMatchColor;
-    QList<int> errorPositions;
-    QColor bracketErrorColor;
-    bool codeFolding : 1;
-  };
 }
 
 
-NCEdit::NCEdit(QWidget *parent) :
-  QPlainTextEdit(parent) , d_ptr(new NCEditPrivate) {
-  d_ptr->editor = this;
-  d_ptr->layout = new NCDocLayout(document());
-  d_ptr->highlighter = new TPLHighlighter(document());
-  d_ptr->sidebar = new SidebarWidget(this);
-  d_ptr->showLineNumbers = true;
-  d_ptr->textWrap = true;
-  d_ptr->bracketsMatching = true;
-  d_ptr->cursorColor = QColor(255, 255, 192);
-  d_ptr->bracketMatchColor = QColor(180, 238, 180);
-  d_ptr->bracketErrorColor = QColor(224, 128, 128);
-  d_ptr->codeFolding = true;
+NCEdit::NCEdit(const SmartPointer<Highlighter> &highlighter, QWidget *parent) :
+  QPlainTextEdit(parent), layout(new NCDocLayout(document())),
+  highlighter(highlighter), sidebar(new SidebarWidget(this)),
+  showLineNumbers(true), textWrap(true), bracketsMatching(true),
+  cursorColor(QColor(255, 255, 192)), bracketMatchColor(QColor(180, 238, 180)),
+  bracketErrorColor(QColor(224, 128, 128)), codeFolding(true) {
 
-  document()->setDocumentLayout(d_ptr->layout);
+  highlighter->setDocument(document());
+  document()->setDocumentLayout(layout.get());
 
   connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(updateCursor()));
   connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateSidebar()));
@@ -175,28 +156,56 @@ NCEdit::NCEdit(QWidget *parent) :
   textFont.setPointSize(12);
   textFont.setFamily("Monaco");
   setFont(textFont);
+
 #elif defined(Q_OS_UNIX)
   QFont textFont = font();
   textFont.setFamily("Monospace");
   setFont(textFont);
 #endif
+
+  loadDarkScheme();
 }
 
 
-NCEdit::~NCEdit() {
-  delete d_ptr->layout;
+NCEdit::~NCEdit() {}
+
+
+void NCEdit::loadLightScheme() {
+  setColor(ColorComponent::Normal, QColor("#000000"));
+  setColor(ColorComponent::Comment, QColor("#808080"));
+  setColor(ColorComponent::Number, QColor("#008000"));
+  setColor(ColorComponent::String, QColor("#800000"));
+  setColor(ColorComponent::Operator, QColor("#808000"));
+  setColor(ColorComponent::Identifier, QColor("#000020"));
+  setColor(ColorComponent::Keyword, QColor("#000080"));
+  setColor(ColorComponent::BuiltIn, QColor("#008080"));
+  setColor(ColorComponent::Marker, QColor("#ffff00"));
+}
+
+
+void NCEdit::loadDarkScheme() {
+  setColor(ColorComponent::Background, QColor("#343434"));
+  setColor(ColorComponent::Normal, QColor("#d9d9d9"));
+  setColor(ColorComponent::Comment, QColor("#ff7f24"));
+  setColor(ColorComponent::Number, QColor("#eedd82"));
+  setColor(ColorComponent::String, QColor("#ffa07a"));
+  setColor(ColorComponent::Operator, QColor("#ce6926"));
+  setColor(ColorComponent::Identifier, QColor("#d9d9d9"));
+  setColor(ColorComponent::Keyword, QColor("#00ffff"));
+  setColor(ColorComponent::BuiltIn, QColor("#98fb98"));
+  setColor(ColorComponent::Cursor, QColor("#222222"));
+  setColor(ColorComponent::Marker, QColor("#d9d9d9"));
+  setColor(ColorComponent::BracketMatch, QColor("#cd0000"));
 }
 
 
 void NCEdit::setColor(ColorComponent component, const QColor &color) {
-  Q_D(NCEdit);
-
   switch (component) {
   case ColorComponent::Background: {
     QPalette pal = palette();
     pal.setColor(QPalette::Base, color);
     setPalette(pal);
-    d->sidebar->indicatorColor = color;
+    sidebar->indicatorColor = color;
     updateSidebar();
     break;
   }
@@ -209,92 +218,92 @@ void NCEdit::setColor(ColorComponent component, const QColor &color) {
   }
 
   case ColorComponent::Sidebar:
-    d->sidebar->backgroundColor = color;
+    sidebar->backgroundColor = color;
     updateSidebar();
     break;
 
   case ColorComponent::LineNumber:
-    d->sidebar->lineNumberColor = color;
+    sidebar->lineNumberColor = color;
     updateSidebar();
     break;
 
   case ColorComponent::Cursor:
-    d->cursorColor = color;
+    cursorColor = color;
     updateCursor();
     break;
 
   case ColorComponent::BracketMatch:
-    d->bracketMatchColor = color;
+    bracketMatchColor = color;
     updateCursor();
     break;
 
   case ColorComponent::BracketError:
-    d->bracketErrorColor = color;
+    bracketErrorColor = color;
     updateCursor();
     break;
 
   case ColorComponent::FoldIndicator:
-    d->sidebar->foldIndicatorColor = color;
+    sidebar->foldIndicatorColor = color;
     updateSidebar();
     break;
 
   default:
-    d->highlighter->setColor(component, color);
+    highlighter->setColor(component, color);
     updateCursor();
   }
 }
 
 
 QStringList NCEdit::keywords() const {
-  return d_ptr->highlighter->keywords();
+  return highlighter->getKeywords();
 }
 
 
 void NCEdit::setKeywords(const QStringList &keywords) {
-  d_ptr->highlighter->setKeywords(keywords);
+  highlighter->setKeywords(keywords);
 }
 
 
 bool NCEdit::isLineNumbersVisible() const {
-  return d_ptr->showLineNumbers;
+  return showLineNumbers;
 }
 
 
 void NCEdit::setLineNumbersVisible(bool visible) {
-  d_ptr->showLineNumbers = visible;
+  showLineNumbers = visible;
   updateSidebar();
 }
 
 
 bool NCEdit::isTextWrapEnabled() const {
-  return d_ptr->textWrap;
+  return textWrap;
 }
 
 
 void NCEdit::setTextWrapEnabled(bool enable) {
-  d_ptr->textWrap = enable;
+  textWrap = enable;
   setLineWrapMode(enable ? WidgetWidth : NoWrap);
 }
 
 
 bool NCEdit::isBracketsMatchingEnabled() const {
-  return d_ptr->bracketsMatching;
+  return bracketsMatching;
 }
 
 
 void NCEdit::setBracketsMatchingEnabled(bool enable) {
-  d_ptr->bracketsMatching = enable;
+  bracketsMatching = enable;
   updateCursor();
 }
 
 
 bool NCEdit::isCodeFoldingEnabled() const {
-  return d_ptr->codeFolding;
+  return codeFolding;
 }
 
 
 void NCEdit::setCodeFoldingEnabled(bool enable) {
-  d_ptr->codeFolding = enable;
+  codeFolding = enable;
   updateSidebar();
 }
 
@@ -421,39 +430,39 @@ void NCEdit::wheelEvent(QWheelEvent *e) {
 
 
 void NCEdit::updateCursor() {
-  Q_D(NCEdit);
-
   if (isReadOnly()) setExtraSelections(QList<QTextEdit::ExtraSelection>());
 
   else {
-    d->matchPositions.clear();
-    d->errorPositions.clear();
+    matchPositions.clear();
+    errorPositions.clear();
 
-    if (d->bracketsMatching && textCursor().block().userData()) {
+    if (bracketsMatching && textCursor().block().userData()) {
       QTextCursor cursor = textCursor();
       int cursorPosition = cursor.position();
 
       if (document()->characterAt(cursorPosition) == '{') {
         int matchPos = findClosingMatch(document(), cursorPosition);
-        if (matchPos < 0) d->errorPositions += cursorPosition;
+
+        if (matchPos < 0) errorPositions += cursorPosition;
         else {
-          d->matchPositions += cursorPosition;
-          d->matchPositions += matchPos;
+          matchPositions += cursorPosition;
+          matchPositions += matchPos;
         }
       }
 
       if (document()->characterAt(cursorPosition - 1) == '}') {
         int matchPos = findOpeningMatch(document(), cursorPosition);
-        if (matchPos < 0) d->errorPositions += cursorPosition - 1;
+
+        if (matchPos < 0) errorPositions += cursorPosition - 1;
         else {
-          d->matchPositions += cursorPosition - 1;
-          d->matchPositions += matchPos;
+          matchPositions += cursorPosition - 1;
+          matchPositions += matchPos;
         }
       }
     }
 
     QTextEdit::ExtraSelection highlight;
-    highlight.format.setBackground(d->cursorColor);
+    highlight.format.setBackground(cursorColor);
     highlight.format.setProperty(QTextFormat::FullWidthSelection, true);
     highlight.cursor = textCursor();
     highlight.cursor.clearSelection();
@@ -461,20 +470,20 @@ void NCEdit::updateCursor() {
     QList<QTextEdit::ExtraSelection> extraSelections;
     extraSelections.append(highlight);
 
-    for (int i = 0; i < d->matchPositions.count(); ++i) {
-      int pos = d->matchPositions.at(i);
+    for (int i = 0; i < matchPositions.count(); ++i) {
+      int pos = matchPositions.at(i);
       QTextEdit::ExtraSelection matchHighlight;
-      matchHighlight.format.setBackground(d->bracketMatchColor);
+      matchHighlight.format.setBackground(bracketMatchColor);
       matchHighlight.cursor = textCursor();
       matchHighlight.cursor.setPosition(pos);
       matchHighlight.cursor.setPosition(pos + 1, QTextCursor::KeepAnchor);
       extraSelections.append(matchHighlight);
     }
 
-    for (int i = 0; i < d->errorPositions.count(); ++i) {
-      int pos = d->errorPositions.at(i);
+    for (int i = 0; i < errorPositions.count(); ++i) {
+      int pos = errorPositions.at(i);
       QTextEdit::ExtraSelection errorHighlight;
-      errorHighlight.format.setBackground(d->bracketErrorColor);
+      errorHighlight.format.setBackground(bracketErrorColor);
       errorHighlight.cursor = textCursor();
       errorHighlight.cursor.setPosition(pos);
       errorHighlight.cursor.setPosition(pos + 1, QTextCursor::KeepAnchor);
@@ -493,21 +502,19 @@ void NCEdit::updateSidebar(const QRect &rect, int d) {
 
 
 void NCEdit::updateSidebar() {
-  Q_D(NCEdit);
-
-  if (!d->showLineNumbers && !d->codeFolding) {
-    d->sidebar->hide();
+  if (!showLineNumbers && !codeFolding) {
+    sidebar->hide();
     setViewportMargins(0, 0, 0, 0);
-    d->sidebar->setGeometry(3, 0, 0, height());
+    sidebar->setGeometry(3, 0, 0, height());
     return;
   }
 
-  d->sidebar->foldIndicatorWidth = 0;
-  d->sidebar->font = this->font();
-  d->sidebar->show();
+  sidebar->foldIndicatorWidth = 0;
+  sidebar->font = this->font();
+  sidebar->show();
 
   int sw = 0;
-  if (d->showLineNumbers) {
+  if (showLineNumbers) {
     int digits = 2;
     int maxLines = blockCount();
     for (int number = 10; number < maxLines; number *= 10)
@@ -515,15 +522,15 @@ void NCEdit::updateSidebar() {
     sw += fontMetrics().width('w') * digits;
   }
 
-  if (d->codeFolding) {
+  if (codeFolding) {
     int fh = fontMetrics().lineSpacing();
     int fw = fontMetrics().width('w');
-    d->sidebar->foldIndicatorWidth = qMax(fw, fh);
-    sw += d->sidebar->foldIndicatorWidth;
+    sidebar->foldIndicatorWidth = qMax(fw, fh);
+    sw += sidebar->foldIndicatorWidth;
   }
   setViewportMargins(sw, 0, 0, 0);
 
-  d->sidebar->setGeometry(0, 0, sw, height());
+  sidebar->setGeometry(0, 0, sw, height());
   QRectF sidebarRect(0, 0, sw, height());
 
   QTextBlock block = firstVisibleBlock();
@@ -532,15 +539,17 @@ void NCEdit::updateSidebar() {
     if (block.isVisible()) {
       QRectF rect = blockBoundingGeometry(block).translated(contentOffset());
       if (sidebarRect.intersects(rect)) {
-        if (d->sidebar->lineNumbers.count() >= index)
-          d->sidebar->lineNumbers.resize(index + 1);
-        d->sidebar->lineNumbers[index].position = rect.top();
-        d->sidebar->lineNumbers[index].number = block.blockNumber() + 1;
-        d->sidebar->lineNumbers[index].foldable =
-          d->codeFolding ? isFoldable(block.blockNumber() + 1) : false;
-        d->sidebar->lineNumbers[index].folded =
-          d->codeFolding ? isFolded(block.blockNumber() + 1) : false;
-        ++index;
+        if (sidebar->lineNumbers.count() >= index)
+          sidebar->lineNumbers.resize(index + 1);
+
+        sidebar->lineNumbers[index].position = rect.top();
+        sidebar->lineNumbers[index].number = block.blockNumber() + 1;
+        sidebar->lineNumbers[index].foldable =
+          codeFolding ? isFoldable(block.blockNumber() + 1) : false;
+        sidebar->lineNumbers[index].folded =
+          codeFolding ? isFolded(block.blockNumber() + 1) : false;
+
+        index++;
       }
 
       if (rect.top() > sidebarRect.bottom()) break;
@@ -549,11 +558,11 @@ void NCEdit::updateSidebar() {
     block = block.next();
   }
 
-  d->sidebar->lineNumbers.resize(index);
-  d->sidebar->update();
+  sidebar->lineNumbers.resize(index);
+  sidebar->update();
 }
 
 
 void NCEdit::mark(const QString &str, Qt::CaseSensitivity sens) {
-  d_ptr->highlighter->mark(str, sens);
+  highlighter->mark(str, sens);
 }

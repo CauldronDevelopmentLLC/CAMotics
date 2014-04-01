@@ -54,41 +54,50 @@ using namespace OpenSCAM;
 
 
 Highlighter::Highlighter(QTextDocument *parent)
-  : QSyntaxHighlighter(parent), m_markCaseSensitivity(Qt::CaseInsensitive) {
-
-  // Default color scheme
-  m_colors[ColorComponent::Normal]     = QColor("#000000");
-  m_colors[ColorComponent::Comment]    = QColor("#808080");
-  m_colors[ColorComponent::Number]     = QColor("#008000");
-  m_colors[ColorComponent::String]     = QColor("#800000");
-  m_colors[ColorComponent::Operator]   = QColor("#808000");
-  m_colors[ColorComponent::Identifier] = QColor("#000020");
-  m_colors[ColorComponent::Keyword]    = QColor("#000080");
-  m_colors[ColorComponent::BuiltIn]    = QColor("#008080");
-  m_colors[ColorComponent::Marker]     = QColor("#ffff00");
+  : QSyntaxHighlighter(parent), markCaseSensitivity(Qt::CaseInsensitive) {
 }
 
 
 void Highlighter::setColor(ColorComponent component, const QColor &color) {
-  m_colors[component] = color;
+  colors[component] = color;
   rehighlight();
 }
 
 
 void Highlighter::mark(const QString &str,
                        Qt::CaseSensitivity caseSensitivity) {
-  m_markString = str;
-  m_markCaseSensitivity = caseSensitivity;
+  markString = str;
+  markCaseSensitivity = caseSensitivity;
   rehighlight();
 }
 
 
-QStringList Highlighter::keywords() const {
-  return m_keywords.toList();
+QStringList Highlighter::getKeywords() const {
+  return keywords.toList();
 }
 
 
 void Highlighter::setKeywords(const QStringList &keywords) {
-  m_keywords = QSet<QString>::fromList(keywords);
+  this->keywords = QSet<QString>::fromList(keywords);
   rehighlight();
+}
+
+
+void Highlighter::highlightBlock(const QString &text) {
+  // Mark
+  if (!markString.isEmpty()) {
+    int pos = 0;
+    int len = markString.length();
+
+    QTextCharFormat markerFormat;
+    markerFormat.setBackground(colors[ColorComponent::Marker]);
+    markerFormat.setForeground(colors[ColorComponent::Normal]);
+
+    while (true) {
+      pos = text.indexOf(markString, pos, markCaseSensitivity);
+      if (pos < 0) break;
+      setFormat(pos, len, markerFormat);
+      pos++;
+    }
+  }
 }

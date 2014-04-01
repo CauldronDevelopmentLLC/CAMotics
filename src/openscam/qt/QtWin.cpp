@@ -24,6 +24,8 @@
 
 #include "ProjectModel.h"
 #include "NCEdit.h"
+#include "TPLHighlighter.h"
+#include "GCodeHighlighter.h"
 
 #include <openscam/Geom.h>
 #include <openscam/view/Viewer.h>
@@ -836,16 +838,23 @@ void QtWin::editFile(unsigned num) {
 
   // Create new tab
   if (tab == -1) {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    NCEdit *editor = new NCEdit(this);
-
     string absPath = project->getAbsoluteFiles().at(num);
+
+    bool isTPL = String::endsWith(absPath, ".tpl");
+    SmartPointer<Highlighter> highlighter;
+    if (isTPL) highlighter = new TPLHighlighter;
+    else highlighter = new GCodeHighlighter;
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    NCEdit *editor = new NCEdit(highlighter, this);
+
     QFile file(absPath.c_str());
     file.open(QFile::ReadOnly);
     QString contents = file.readAll();
     file.close();
     contents.replace('\t', " ");
 
+    editor->loadDarkScheme();
     editor->setWordWrapMode(QTextOption::NoWrap);
     editor->setTabStopWidth(2);
     editor->setPlainText(contents);

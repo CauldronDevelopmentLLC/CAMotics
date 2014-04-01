@@ -34,11 +34,11 @@ namespace OpenSCAM {
 
   class Highlighter : public QSyntaxHighlighter {
   protected:
-    QSet<QString> m_keywords;
-    QSet<QString> m_knownIds;
-    QHash<ColorComponent::enum_t, QColor> m_colors;
-    QString m_markString;
-    Qt::CaseSensitivity m_markCaseSensitivity;
+    QSet<QString> keywords;
+    QSet<QString> builtins;
+    QHash<ColorComponent::enum_t, QColor> colors;
+    QString markString;
+    Qt::CaseSensitivity markCaseSensitivity;
 
   public:
     Highlighter(QTextDocument *parent = 0);
@@ -46,8 +46,12 @@ namespace OpenSCAM {
     void setColor(ColorComponent component, const QColor &color);
     void mark(const QString &str, Qt::CaseSensitivity caseSensitivity);
 
-    QStringList keywords() const;
+    QStringList getKeywords() const;
     void setKeywords(const QStringList &keywords);
+
+  protected:
+    // From QSyntaxHighlighter
+    void highlightBlock(const QString &text);
   };
 }
 

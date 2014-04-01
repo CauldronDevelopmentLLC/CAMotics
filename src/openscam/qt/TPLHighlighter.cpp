@@ -55,348 +55,260 @@ using namespace OpenSCAM;
 
 TPLHighlighter::TPLHighlighter(QTextDocument *parent) : Highlighter(parent) {
   // https://developer.mozilla.org/en/JavaScript/Reference/Reserved_Words
-  m_keywords << "break";
-  m_keywords << "case";
-  m_keywords << "catch";
-  m_keywords << "continue";
-  m_keywords << "default";
-  m_keywords << "delete";
-  m_keywords << "do";
-  m_keywords << "else";
-  m_keywords << "finally";
-  m_keywords << "for";
-  m_keywords << "function";
-  m_keywords << "if";
-  m_keywords << "in";
-  m_keywords << "instanceof";
-  m_keywords << "new";
-  m_keywords << "return";
-  m_keywords << "switch";
-  m_keywords << "this";
-  m_keywords << "throw";
-  m_keywords << "try";
-  m_keywords << "typeof";
-  m_keywords << "var";
-  m_keywords << "void";
-  m_keywords << "while";
-  m_keywords << "with";
+  // Current
+  keywords << "break";
+  keywords << "case";
+  keywords << "catch";
+  keywords << "continue";
+  keywords << "default";
+  keywords << "delete";
+  keywords << "do";
+  keywords << "else";
+  keywords << "finally";
+  keywords << "for";
+  keywords << "function";
+  keywords << "if";
+  keywords << "in";
+  keywords << "instanceof";
+  keywords << "new";
+  keywords << "return";
+  keywords << "switch";
+  keywords << "this";
+  keywords << "throw";
+  keywords << "try";
+  keywords << "typeof";
+  keywords << "var";
+  keywords << "void";
+  keywords << "while";
+  keywords << "with";
 
-  m_keywords << "true";
-  m_keywords << "false";
-  m_keywords << "null";
+  // Future
+  keywords << "abstract";
+  keywords << "boolean";
+  keywords << "byte";
+  keywords << "char";
+  keywords << "class";
+  keywords << "const";
+  keywords << "debugger";
+  keywords << "double";
+  keywords << "enum";
+  keywords << "export";
+  keywords << "extends";
+  keywords << "final";
+  keywords << "float";
+  keywords << "goto";
+  keywords << "implements";
+  keywords << "import";
+  keywords << "int";
+  keywords << "interface";
+  keywords << "long";
+  keywords << "native";
+  keywords << "package";
+  keywords << "private";
+  keywords << "protected";
+  keywords << "public";
+  keywords << "short";
+  keywords << "static";
+  keywords << "super";
+  keywords << "synchronized";
+  keywords << "throws";
+  keywords << "transient";
+  keywords << "volatile";
 
-  // built-in and other popular objects + properties
-  m_knownIds << "Object";
-  m_knownIds << "prototype";
-  m_knownIds << "create";
-  m_knownIds << "defineProperty";
-  m_knownIds << "defineProperties";
-  m_knownIds << "getOwnPropertyDescriptor";
-  m_knownIds << "keys";
-  m_knownIds << "getOwnPropertyNames";
-  m_knownIds << "constructor";
-  m_knownIds << "__parent__";
-  m_knownIds << "__proto__";
-  m_knownIds << "__defineGetter__";
-  m_knownIds << "__defineSetter__";
-  m_knownIds << "eval";
-  m_knownIds << "hasOwnProperty";
-  m_knownIds << "isPrototypeOf";
-  m_knownIds << "__lookupGetter__";
-  m_knownIds << "__lookupSetter__";
-  m_knownIds << "__noSuchMethod__";
-  m_knownIds << "propertyIsEnumerable";
-  m_knownIds << "toSource";
-  m_knownIds << "toLocaleString";
-  m_knownIds << "toString";
-  m_knownIds << "unwatch";
-  m_knownIds << "valueOf";
-  m_knownIds << "watch";
-
-  m_knownIds << "Function";
-  m_knownIds << "arguments";
-  m_knownIds << "arity";
-  m_knownIds << "caller";
-  m_knownIds << "constructor";
-  m_knownIds << "length";
-  m_knownIds << "name";
-  m_knownIds << "apply";
-  m_knownIds << "bind";
-  m_knownIds << "call";
-
-  m_knownIds << "String";
-  m_knownIds << "fromCharCode";
-  m_knownIds << "length";
-  m_knownIds << "charAt";
-  m_knownIds << "charCodeAt";
-  m_knownIds << "concat";
-  m_knownIds << "indexOf";
-  m_knownIds << "lastIndexOf";
-  m_knownIds << "localCompare";
-  m_knownIds << "match";
-  m_knownIds << "quote";
-  m_knownIds << "replace";
-  m_knownIds << "search";
-  m_knownIds << "slice";
-  m_knownIds << "split";
-  m_knownIds << "substr";
-  m_knownIds << "substring";
-  m_knownIds << "toLocaleLowerCase";
-  m_knownIds << "toLocaleUpperCase";
-  m_knownIds << "toLowerCase";
-  m_knownIds << "toUpperCase";
-  m_knownIds << "trim";
-  m_knownIds << "trimLeft";
-  m_knownIds << "trimRight";
-
-  m_knownIds << "Array";
-  m_knownIds << "isArray";
-  m_knownIds << "index";
-  m_knownIds << "input";
-  m_knownIds << "pop";
-  m_knownIds << "push";
-  m_knownIds << "reverse";
-  m_knownIds << "shift";
-  m_knownIds << "sort";
-  m_knownIds << "splice";
-  m_knownIds << "unshift";
-  m_knownIds << "concat";
-  m_knownIds << "join";
-  m_knownIds << "filter";
-  m_knownIds << "forEach";
-  m_knownIds << "every";
-  m_knownIds << "map";
-  m_knownIds << "some";
-  m_knownIds << "reduce";
-  m_knownIds << "reduceRight";
-
-  m_knownIds << "RegExp";
-  m_knownIds << "global";
-  m_knownIds << "ignoreCase";
-  m_knownIds << "lastIndex";
-  m_knownIds << "multiline";
-  m_knownIds << "source";
-  m_knownIds << "exec";
-  m_knownIds << "test";
-
-  m_knownIds << "JSON";
-  m_knownIds << "parse";
-  m_knownIds << "stringify";
-
-  m_knownIds << "decodeURI";
-  m_knownIds << "decodeURIComponent";
-  m_knownIds << "encodeURI";
-  m_knownIds << "encodeURIComponent";
-  m_knownIds << "eval";
-  m_knownIds << "isFinite";
-  m_knownIds << "isNaN";
-  m_knownIds << "parseFloat";
-  m_knownIds << "parseInt";
-  m_knownIds << "Infinity";
-  m_knownIds << "NaN";
-  m_knownIds << "undefined";
-
-  m_knownIds << "Math";
-  m_knownIds << "E";
-  m_knownIds << "LN2";
-  m_knownIds << "LN10";
-  m_knownIds << "LOG2E";
-  m_knownIds << "LOG10E";
-  m_knownIds << "PI";
-  m_knownIds << "SQRT1_2";
-  m_knownIds << "SQRT2";
-  m_knownIds << "abs";
-  m_knownIds << "acos";
-  m_knownIds << "asin";
-  m_knownIds << "atan";
-  m_knownIds << "atan2";
-  m_knownIds << "ceil";
-  m_knownIds << "cos";
-  m_knownIds << "exp";
-  m_knownIds << "floor";
-  m_knownIds << "log";
-  m_knownIds << "max";
-  m_knownIds << "min";
-  m_knownIds << "pow";
-  m_knownIds << "random";
-  m_knownIds << "round";
-  m_knownIds << "sin";
-  m_knownIds << "sqrt";
-  m_knownIds << "tan";
-
-  m_knownIds << "document";
-  m_knownIds << "window";
-  m_knownIds << "navigator";
-  m_knownIds << "userAgent";
+  // Constants
+  keywords << "true";
+  keywords << "false";
+  keywords << "null";
 }
 
 
 void TPLHighlighter::highlightBlock(const QString &text) {
-  // parsing state
+  // Parsing state
   enum {
-    Start = 0,
-    Number = 1,
-    Identifier = 2,
-    String = 3,
-    Comment = 4,
-    Regex = 5
+    Start,
+    Number,
+    Identifier,
+    String,
+    Comment,
+    Regex,
   };
 
   QList<int> bracketPositions;
 
   int blockState = previousBlockState();
-  int bracketLevel = blockState >> 4;
-  int state = blockState & 15;
+  int bracketLevel = blockState >> 8;
+  int state = blockState & 0xf;
+  int precedingState = (blockState >> 4) & 0xf;
+
   if (blockState < 0) {
     bracketLevel = 0;
-    state = Start;
+    precedingState = state = Start;
   }
 
   int start = 0;
   int i = 0;
+  int nextState = Start;
+  QChar lastCh = QChar();
+
   while (i <= text.length()) {
     QChar ch = (i < text.length()) ? text.at(i) : QChar();
     QChar next = (i < text.length() - 1) ? text.at(i + 1) : QChar();
 
     switch (state) {
-
     case Start:
       start = i;
-      if (ch.isSpace()) {
-        ++i;
-      } else if (ch.isDigit()) {
-        ++i;
-        state = Number;
+
+      if (ch.isSpace()) i++;
+
+      else if (ch.isDigit()) {
+        i++;
+        nextState = Number;
+
       } else if (ch.isLetter() || ch == '_') {
-        ++i;
-        state = Identifier;
+        i++;
+        nextState = Identifier;
+
       } else if (ch == '\'' || ch == '\"') {
-        ++i;
-        state = String;
+        i++;
+        nextState = String;
+
       } else if (ch == '/' && next == '*') {
-        ++i;
-        ++i;
-        state = Comment;
+        i++;
+        i++;
+        nextState = Comment;
+
       } else if (ch == '/' && next == '/') {
         i = text.length();
-        setFormat(start, text.length(), m_colors[ColorComponent::Comment]);
+        setFormat(start, text.length(), colors[ColorComponent::Comment]);
+
       } else if (ch == '/' && next != '*') {
-        ++i;
-        state = Regex;
+        i++;
+        nextState = Regex;
+
+        switch (precedingState) {
+        case Number:
+        case Identifier:
+        case String:
+          setFormat(start, 1, colors[ColorComponent::Operator]);
+          nextState = Start;
+          break;
+
+        default:
+          if (QString(")]}").contains(lastCh)) {
+            setFormat(start, 1, colors[ColorComponent::Operator]);
+            nextState = Start;
+          }
+          break;
+        }
+
       } else {
-        if (!QString("(){}[]").contains(ch))
-          setFormat(start, 1, m_colors[ColorComponent::Operator]);
+        if (!QString("()[]{}").contains(ch))
+          setFormat(start, 1, colors[ColorComponent::Operator]);
+
         if (ch =='{' || ch == '}') {
           bracketPositions += i;
-          if (ch == '{')
-            bracketLevel++;
-          else
-            bracketLevel--;
+          if (ch == '{') bracketLevel++;
+          else bracketLevel--;
         }
-        ++i;
-        state = Start;
+
+        i++;
+        nextState = Start;
       }
       break;
 
     case Number:
       if (ch.isSpace() || !ch.isDigit()) {
-        setFormat(start, i - start, m_colors[ColorComponent::Number]);
-        state = Start;
-      } else {
-        ++i;
-      }
+        setFormat(start, i - start, colors[ColorComponent::Number]);
+        nextState = Start;
+
+      } else i++;
       break;
 
     case Identifier:
       if (ch.isSpace() || !(ch.isDigit() || ch.isLetter() || ch == '_')) {
         QString token = text.mid(start, i - start).trimmed();
-        if (m_keywords.contains(token))
-          setFormat(start, i - start, m_colors[ColorComponent::Keyword]);
-        else if (m_knownIds.contains(token))
-          setFormat(start, i - start, m_colors[ColorComponent::BuiltIn]);
-        state = Start;
-      } else {
-        ++i;
-      }
+
+        if (keywords.contains(token))
+          setFormat(start, i - start, colors[ColorComponent::Keyword]);
+
+        else if (builtins.contains(token))
+          setFormat(start, i - start, colors[ColorComponent::BuiltIn]);
+
+        nextState = Start;
+
+      } else i++;
       break;
 
     case String:
       if (ch == text.at(start)) {
         QChar prev = (i > 0) ? text.at(i - 1) : QChar();
         if (prev != '\\') {
-          ++i;
-          setFormat(start, i - start, m_colors[ColorComponent::String]);
-          state = Start;
-        } else {
-          ++i;
-        }
-      } else {
-        ++i;
-      }
+          i++;
+          setFormat(start, i - start, colors[ColorComponent::String]);
+          nextState = Start;
+
+        } else i++;
+
+      } else i++;
       break;
 
     case Comment:
       if (ch == '*' && next == '/') {
-        ++i;
-        ++i;
-        setFormat(start, i - start, m_colors[ColorComponent::Comment]);
-        state = Start;
-      } else {
-        ++i;
-      }
+        i++;
+        i++;
+        setFormat(start, i - start, colors[ColorComponent::Comment]);
+        nextState = Start;
+
+      } else i++;
       break;
 
     case Regex:
       if (ch == '/') {
         QChar prev = (i > 0) ? text.at(i - 1) : QChar();
         if (prev != '\\') {
-          ++i;
-          setFormat(start, i - start, m_colors[ColorComponent::String]);
-          state = Start;
-        } else {
-          ++i;
-        }
-      } else {
-        ++i;
-      }
+          i++;
+          setFormat(start, i - start, colors[ColorComponent::String]);
+          nextState = Start;
+
+        } else i++;
+
+      } else i++;
       break;
 
     default:
-      state = Start;
+      nextState = Start;
       break;
     }
+
+    precedingState = state;
+    state = nextState;
+
+    if (!ch.isSpace() && state != Comment) lastCh = ch;
   }
 
+  // EOL state
   if (state == Comment)
-    setFormat(start, text.length(), m_colors[ColorComponent::Comment]);
-  else
-    state = Start;
+    setFormat(start, text.length(), colors[ColorComponent::Comment]);
+  else state = Start;
 
-  if (!m_markString.isEmpty()) {
-    int pos = 0;
-    int len = m_markString.length();
-    QTextCharFormat markerFormat;
-    markerFormat.setBackground(m_colors[ColorComponent::Marker]);
-    markerFormat.setForeground(m_colors[ColorComponent::Normal]);
-    for (;;) {
-      pos = text.indexOf(m_markString, pos, m_markCaseSensitivity);
-      if (pos < 0)
-        break;
-      setFormat(pos, len, markerFormat);
-      ++pos;
-    }
-  }
-
+  // Record bracket positions
   if (!bracketPositions.isEmpty()) {
     TextBlockData *blockData =
       reinterpret_cast<TextBlockData*>(currentBlock().userData());
+
     if (!blockData) {
       blockData = new TextBlockData;
       currentBlock().setUserData(blockData);
     }
+
     blockData->bracketPositions = bracketPositions;
   }
 
-  blockState = (state & 15) | (bracketLevel << 4);
+  // Save state
+  blockState =
+    (state & 0xf) | ((precedingState << 4) & 0xf) | (bracketLevel << 8);
   setCurrentBlockState(blockState);
+
+  // Call base class
+  Highlighter::highlightBlock(text);
 }

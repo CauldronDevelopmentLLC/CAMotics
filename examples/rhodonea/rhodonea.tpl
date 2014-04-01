@@ -1,21 +1,21 @@
 // See: http://en.wikipedia.org/wiki/Rose_%28mathematics%29
 
 var drawRhodonea = function (n, d, depth, scale) {
-	var left_limit  = 0;
-	var right_limit = 4 * Math.PI;
+ var left_limit  = 0;
+ var right_limit = 4 * Math.PI;
 
-	for (var theta = left_limit; theta <= right_limit; theta += 0.02) {
-		r = Math.cos(n / d * theta);
-		x = r * Math.cos(theta) * scale;
-		y = r * Math.sin(theta) * scale;
+ for (var theta = left_limit; theta <= right_limit; theta += 0.02) {
+  r = Math.cos(n / d * theta);
+  x = r * Math.cos(theta) * scale;
+  y = r * Math.sin(theta) * scale;
 
-        if (getZ() != depth) {
-            rapid(x, y);
-            cut({z: depth});
-        }
+  if (getZ() != depth) {
+    rapid(x, y);
+    cut({z: depth});
+  }
 
-		cut(x, y);
-	}
+  cut(x, y);
+ }
 }
 
 tool_set({number: 1, units: IMPERIAL, length: 1/4, diameter: 1/2,
