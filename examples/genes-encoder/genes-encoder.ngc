@@ -31,27 +31,27 @@ o100 endsub
 
 (======================================================================)
 (=================== Define Constants/Variables =======================)
-#<_endmill_dia> = 0.0625 			  	  ( 1/16" endmill diameter )
+#<_endmill_dia> = 0.0625         ( 1/16" endmill diameter )
 
-#<_safe_Z> = 0.100		                  ( safe Z height )
-#<_zstart> = 0.0025	(run down to there fast, then ramp into slot)
+#<_safe_Z> = 0.100                    ( safe Z height )
+#<_zstart> = 0.0025 (run down to there fast, then ramp into slot)
 ( This Zcut is not through but safe for bits )
 ( Increase and rerun to get full depth & part cut out )
 #<_Zcut> = -0.020                 ( Z depth to cut encoder elements NOT USED! )
-#<_feedrate> = 5.5			              ( cutting feedrate )
+#<_feedrate> = 5.5                 ( cutting feedrate )
 S1000 (spindle speed?)
 ( define characteristics of encoder and index tracks )
-#<_main_track_dia> = 2.2350		          ( diameter of main signal track )
+#<_main_track_dia> = 2.2350            ( diameter of main signal track )
 #<_index_track_dia> = [#<_main_track_dia> - 0.130] ( diameter of index track )
 #<_inside_cutout> = 1.0510                ( diameter of interior cutout == inside of pulley)
-#<_outside_cutout> = 2.410	  ( diameter of exterior cutout ~= enough space for tracks)
-#<_encoder_cycles> = 45	  	  ( number of slots to cut * 4 == 180 edges or about 2 degree resolution)
+#<_outside_cutout> = 2.410   ( diameter of exterior cutout ~= enough space for tracks)
+#<_encoder_cycles> = 45      ( number of slots to cut * 4 == 180 edges or about 2 degree resolution)
 #<_slotlen> = 0.155               ( finished slot length for 1 encoder element ~= sensor aperture + runout )
 
 ( define 3 params for the mounting arrangement )
-#<_mount_circle> = 1.600				  ( mounting bolt circle diameter )
-#<_mount_holes> = 6					  ( number of holes to mill for mounting bolts )
-#<_mount_hdia> = 0.130					  ( sloppy #6 or a #8 bolt )
+#<_mount_circle> = 1.600      ( mounting bolt circle diameter )
+#<_mount_holes> = 6       ( number of holes to mill for mounting bolts )
+#<_mount_hdia> = 0.130       ( sloppy #6 or a #8 bolt )
 
 #<_PI> = 3.14159265359 (more decimal places can't hurt GH)
 #<_endmill_rad> = [#<_endmill_dia>/2.0]   ( endmill radius )
@@ -112,7 +112,7 @@ o300 while [#<_ztmp> gt #<_zend>]
 #<slots> = #<_encoder_cycles>
 ( main loop to cut encoder slots around disk )
 o10 do
-  #<centerx> = [#<_main_track_dia>/2.0 * cos[#<angle>]]	 ( x center of slot )
+  #<centerx> = [#<_main_track_dia>/2.0 * cos[#<angle>]]  ( x center of slot )
   #<centery> = [#<_main_track_dia>/2.0 * sin[#<angle>]]  ( y center of slot )
 (debug, centery = #<centery>)
   g0 z#<_safe_Z>
@@ -161,7 +161,7 @@ o10 while [#<slots> GT 0]
 #<slot_deg> = [#<_encoder_theta>/2.0 ]
 #<angle> = 360                    ( starting angle to cut )
 
-#<centerx> = [#<_index_track_dia>/2.0 * cos[#<angle>]]	 ( x center of slot )
+#<centerx> = [#<_index_track_dia>/2.0 * cos[#<angle>]]  ( x center of slot )
 #<centery> = [#<_index_track_dia>/2.0 * sin[#<angle>]]  ( y center of slot )
 g0 z#<_safe_Z>
 g0 x[#<centerx>] y[#<centery>] 

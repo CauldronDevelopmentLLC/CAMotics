@@ -1,4 +1,5 @@
 <openscam>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
   <!-- NC Files -->
   <nc-files>
     compass.tpl

@@ -54,13 +54,15 @@
 
 #include "ColorComponent.h"
 
-#include <QColor>
-#include <QPlainTextEdit>
-#include <QScopedPointer>
+#include <cbang/SmartPointer.h>
+
+#include <QtGui>
 
 
 namespace OpenSCAM {
-  class NCEditPrivate;
+  class NCDocLayout;
+  class Highlighter;
+  class SidebarWidget;
 
   class NCEdit: public QPlainTextEdit {
     Q_OBJECT;
@@ -73,13 +75,29 @@ namespace OpenSCAM {
     Q_PROPERTY(bool textWrapEnabled READ isTextWrapEnabled
                WRITE setTextWrapEnabled);
 
-    QScopedPointer<NCEditPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(NCEdit);
+    cb::SmartPointer<NCDocLayout> layout;
+    cb::SmartPointer<Highlighter> highlighter;
+    cb::SmartPointer<SidebarWidget> sidebar;
+
+    bool showLineNumbers;
+    bool textWrap;
+    bool bracketsMatching;
+    QColor cursorColor;
+    QList<int> matchPositions;
+    QColor bracketMatchColor;
+    QList<int> errorPositions;
+    QColor bracketErrorColor;
+    bool codeFolding;
+
     Q_DISABLE_COPY(NCEdit);
 
   public:
-    NCEdit(QWidget *parent = 0);
+    NCEdit(const cb::SmartPointer<Highlighter> &highlighter,
+           QWidget *parent = 0);
     ~NCEdit();
+
+    void loadLightScheme();
+    void loadDarkScheme();
 
     void setColor(ColorComponent component, const QColor &color);
 

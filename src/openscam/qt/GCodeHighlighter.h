@@ -48,42 +48,51 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef OPENSCAM_COLOR_COMPONENT_H
-#define OPENSCAM_COLOR_COMPONENT_H
+#ifndef OPENSCAM_GCODEHIGHLIGHTER_H
+#define OPENSCAM_GCODEHIGHLIGHTER_H
+
+#include "Highlighter.h"
+
+#include <openscam/gcode/Tokenizer.h>
+
 
 namespace OpenSCAM {
-  class ColorComponent {
+  class Tokenizer;
+
+  class GCodeHighlighter : public Highlighter {
+    QSet<QString> ops;
+    QSet<QString> functions;
+    QSet<QString> ocodes;
+
   public:
-    typedef enum {
-      Background,
-      Normal,
-      Comment,
-      Number,
-      String,
-      Operator,
-      Identifier,
-      Keyword,
-      BuiltIn,
-      Sidebar,
-      LineNumber,
-      Cursor,
-      Marker,
-      BracketMatch,
-      BracketError,
-      FoldIndicator,
+    GCodeHighlighter(QTextDocument *parent = 0);
 
-      GCodeLineNumber,
-      Reference,
-      Function,
-    } enum_t;
+    typedef Tokenizer::Token_T Token;
+    using Highlighter::setFormat;
+    void setFormat(const Token &start, const Token &end, ColorComponent cc);
+    void setFormat(const Token &token, ColorComponent cc);
 
-    enum_t cc;
+  protected:
+    // From QSyntaxHighlighter
+    void highlightBlock(const QString &text);
 
-    ColorComponent(enum_t cc) : cc(cc) {}
+    void comment(Tokenizer &tokenizer);
+    void word(Tokenizer &tokenizer);
+    void assign(Tokenizer &tokenizer);
+    void ocode(Tokenizer &tokenizer);
 
-    operator enum_t() const {return cc;}
+    void numberRefOrExpr(Tokenizer &tokenizer);
+    void expression(Tokenizer &tokenizer);
+    void unaryOp(Tokenizer &tokenizer);
+
+    void primary(Tokenizer &tokenizer);
+
+    void quotedExpr(Tokenizer &tokenizer);
+    void functionCall(Tokenizer &tokenizer);
+    void number(Tokenizer &tokenizer);
+    void reference(Tokenizer &tokenizer);
   };
 }
 
-#endif // OPENSCAM_COLOR_COMPONENT_H
+#endif // OPENSCAM_GCODEHIGHLIGHTER_H
 

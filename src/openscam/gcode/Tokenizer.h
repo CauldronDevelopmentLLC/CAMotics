@@ -29,6 +29,8 @@
 namespace OpenSCAM {
   class Tokenizer : public cb::Tokenizer<TokenType> {
   public:
+    using cb::Tokenizer<TokenType>::Token_T;
+
     Tokenizer(cb::Scanner &scanner) : cb::Tokenizer<TokenType>(scanner)
     {advance();}
 
