@@ -570,12 +570,12 @@ void Controller::arc(int vars, bool clockwise) {
     Vector2D n =
       Vector2D(start.y() - finish.y(), finish.x() - start.x()).normalize();
     double d = (finish - start).length();
-    double t = sqrt(radius * radius - d * d);
+    double t = sqrt(radius * radius - d * d / 4);
 
     if (!clockwise) t = -t;
     if (0 < radius) t = -t;
 
-    center = start + n * t;
+    center = (start + (finish - start) / 2) + n * t;
 
     static bool warned = false;
     if (!warned) LOG_WARNING("Radius format arcs are discouraged");
