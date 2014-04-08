@@ -76,8 +76,6 @@ string Tool::getText() const {
 
 
 SmartPointer<Sweep> Tool::getSweep() const {
-  // TODO Consider moving this to cutsim
-
   switch (getShape()) {
   case ToolShape::TS_CYLINDRICAL:
     return new ConicSweep(getLength(), getRadius(), getRadius());
