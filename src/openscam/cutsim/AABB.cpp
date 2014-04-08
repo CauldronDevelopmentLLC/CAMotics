@@ -32,12 +32,17 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
+/// NOTE: Expects @nodes to be a link list along the left child
 AABB::AABB(AABB *nodes) : left(0), right(0), move(0) {
   if (!nodes) return;
 
   // Compute bounds
   unsigned count = 0;
-  for (AABB *it = nodes; it; it = it->left) {add(*it); count++;}
+  for (AABB *it = nodes; it; it = it->left) {
+    if (it->right) THROW("Unexpected right-hand AABB node");
+    add(*it);
+    count++;
+  }
 
   // Degenerate cases
   if (count < 3) {
