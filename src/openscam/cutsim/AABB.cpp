@@ -32,7 +32,7 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-/// NOTE: Expects @nodes to be a link list along the left child
+/// NOTE: Expects @param nodes to be a link list along the left child
 AABB::AABB(AABB *nodes) : left(0), right(0), move(0) {
   if (!nodes) return;
 
@@ -51,36 +51,24 @@ AABB::AABB(AABB *nodes) : left(0), right(0), move(0) {
     return;
   }
 
-  // Decide split axis
+  // Decide split
   unsigned axis = getDimensions().findLargest();
-
-  // Compute cut
-  real cut = (getMax()[axis] + getMin()[axis]) / 2.0;
+  real cut = getMax()[axis] + getMin()[axis];
 
   // Partition nodes
   AABB *lessThan = 0;
   AABB *greaterThan = 0;
   unsigned lessCount = 0;
   unsigned greaterCount = 0;
-  for (int i = 0; i < 3; i++) {
-    for (AABB *it = nodes; it;) {
-      AABB *next = it->left;
-      bool less = ((it->getMax()[axis] + it->getMin()[axis]) / 2.0) < cut;
 
-      if (less) {lessThan = it->prepend(lessThan); lessCount++;}
-      else {greaterThan = it->prepend(greaterThan); greaterCount++;}
+  for (AABB *it = nodes; it;) {
+    AABB *next = it->left;
+    bool less = it->getMax()[axis] + it->getMin()[axis] < cut;
 
-      it = next;
-    }
+    if (less) {lessThan = it->prepend(lessThan); lessCount++;}
+    else {greaterThan = it->prepend(greaterThan); greaterCount++;}
 
-    if (lessThan && greaterThan) break;
-    if (i == 2) break;
-
-    // Try another partition axis
-    axis = (axis + 1) % 3;
-    nodes = lessThan ? lessThan : greaterThan;
-    lessThan = greaterThan = 0;
-    lessCount = greaterCount = 0;
+    it = next;
   }
 
   // Check for bad partition

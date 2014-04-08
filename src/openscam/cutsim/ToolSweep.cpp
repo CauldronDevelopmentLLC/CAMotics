@@ -69,11 +69,7 @@ bool ToolSweep::contains(const Vector3R &p) {
   for (unsigned i = 0; i < moves.size(); i++) {
     const Move &move = *moves[i];
     if (time < move.getStartTime()) continue;
-
-    const Sweep &sweep = *sweeps[move.getTool()];
-    if (sweep.contains(move.getStartPt(), time < move.getEndTime() ?
-                       move.getEndPtAtTime(time) : move.getEndPt(), p))
-      return true;
+    if (sweeps[move.getTool()]->contains(move, p, time)) return true;
   }
 
   return false;

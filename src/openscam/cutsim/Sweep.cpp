@@ -20,6 +20,8 @@
 
 #include "Sweep.h"
 
+#include "Move.h"
+
 using namespace std;
 using namespace cb;
 using namespace OpenSCAM;
@@ -51,4 +53,10 @@ void Sweep::getBBoxes(const Vector3R &start, const Vector3R &end,
 
     p1 = p2;
   }
+}
+
+
+bool Sweep::contains(const Move &move, const Vector3R &p, double time) const {
+  return contains(move.getStartPt(), time < move.getEndTime() ?
+                  move.getEndPtAtTime(time) : move.getEndPt(), p);
 }
