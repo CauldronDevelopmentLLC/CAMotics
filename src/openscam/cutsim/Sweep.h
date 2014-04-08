@@ -27,6 +27,8 @@
 
 
 namespace OpenSCAM {
+  class Move;
+
   class Sweep {
   public:
     virtual ~Sweep() {} // Compiler needs this
@@ -38,8 +40,12 @@ namespace OpenSCAM {
     virtual void getBBoxes(const Vector3R &start, const Vector3R &end,
                            std::vector<Rectangle3R> &bboxes,
                            real tolerance = 0.01) const = 0;
+    virtual bool intersects(const Move &move, const Rectangle3R &box) const
+    {return false;}
     virtual bool contains(const Vector3R &start, const Vector3R &end,
                           const Vector3R &p) const = 0;
+    virtual bool contains(const Move &move, const Vector3R &p,
+                          double time) const;
   };
 }
 
