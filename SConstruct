@@ -71,14 +71,6 @@ if not env.GetOption('clean'):
         conf.CBCheckLib('selinux')
         env.ParseConfig('pkg-config --libs --static cairo')
 
-    # Mostly static libraries
-    if env.get('mostly_static', False):
-        if env['PLATFORM'] == 'posix':
-            ignores = ['pthread', 'dl']
-        else: ignores = None
-
-        config.compiler.mostly_static_libs(env, ignores)
-
 conf.Finish()
 
 # Source
