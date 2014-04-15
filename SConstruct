@@ -57,9 +57,6 @@ if not env.GetOption('clean'):
     conf.CBConfig('opengl')
     conf.CBConfig('v8', True)
 
-    # To compile in non-debug mode against debug cbang
-    conf.CBCheckLib('bfd')
-
     # Cairo
     conf.CBRequireLib('cairo');
 
