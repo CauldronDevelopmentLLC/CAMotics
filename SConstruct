@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '0.2.3'
+version = '0.2.4'
 major, minor, revision = version.split('.')
 
 # Setup
@@ -56,9 +56,6 @@ if not env.GetOption('clean'):
     conf.CBConfig('freetype2')
     conf.CBConfig('opengl')
     conf.CBConfig('v8', True)
-
-    # To compile in non-debug mode against debug cbang
-    conf.CBCheckLib('bfd')
 
     # Cairo
     conf.CBRequireLib('cairo');

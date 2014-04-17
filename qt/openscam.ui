@@ -10,7 +10,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1015</width>
+    <width>1226</width>
     <height>837</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
    <string>OpenSCAM[*]</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="openscam.qrc">
+   <iconset>
     <normaloff>:/icons/openscam.png</normaloff>:/icons/openscam.png</iconset>
   </property>
   <property name="styleSheet">
@@ -116,7 +116,7 @@
              <string>Stop the simulation</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
             </property>
             <property name="flat">
@@ -145,7 +145,7 @@
              <string>Rerun the simulation</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
             </property>
             <property name="flat">
@@ -174,7 +174,7 @@
              <string>Smooth the resulting surface for better visualization</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
             </property>
             <property name="checkable">
@@ -229,7 +229,7 @@
              <string>Jump to start of tool path animation</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
             </property>
             <property name="flat">
@@ -258,7 +258,7 @@
              <string>Start or stop tool path animation</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
             </property>
             <property name="flat">
@@ -287,7 +287,7 @@
              <string>Jump to end of tool path animation</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/end.png</normaloff>:/icons/end.png</iconset>
             </property>
             <property name="flat">
@@ -336,7 +336,7 @@
              <string>Slow down tool path animation</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/slower.png</normaloff>:/icons/slower.png</iconset>
             </property>
             <property name="flat">
@@ -365,7 +365,7 @@
              <string>Speed up tool path animation</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/faster.png</normaloff>:/icons/faster.png</iconset>
             </property>
             <property name="flat">
@@ -436,7 +436,7 @@
              <string>Change tool path animation direction</string>
             </property>
             <property name="icon">
-             <iconset resource="openscam.qrc">
+             <iconset>
               <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
             </property>
             <property name="flat">
@@ -566,7 +566,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1015</width>
+     <width>1226</width>
      <height>29</height>
     </rect>
    </property>
@@ -1845,6 +1845,9 @@
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
+                      <property name="decimals">
+                       <number>4</number>
+                      </property>
                       <property name="minimum">
                        <double>-1000000.000000000000000</double>
                       </property>
@@ -1914,6 +1917,9 @@
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
+                      <property name="decimals">
+                       <number>4</number>
+                      </property>
                       <property name="minimum">
                        <double>-1000000.000000000000000</double>
                       </property>
@@ -1969,6 +1975,9 @@
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
+                      </property>
+                      <property name="decimals">
+                       <number>4</number>
                       </property>
                       <property name="minimum">
                        <double>-1000000.000000000000000</double>
@@ -2716,7 +2725,7 @@
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
    </property>
    <property name="text">
@@ -2741,7 +2750,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
@@ -2753,7 +2762,7 @@
   </action>
   <action name="actionSaveAs">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/save_as.png</normaloff>:/icons/save_as.png</iconset>
    </property>
    <property name="text">
@@ -2762,7 +2771,7 @@
   </action>
   <action name="actionExport">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
    </property>
    <property name="text">
@@ -2774,7 +2783,7 @@
   </action>
   <action name="actionSnapshot">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/snapshot.png</normaloff>:/icons/snapshot.png</iconset>
    </property>
    <property name="text">
@@ -2786,7 +2795,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/quit.png</normaloff>:/icons/quit.png</iconset>
    </property>
    <property name="text">
@@ -2795,7 +2804,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
    </property>
    <property name="text">
@@ -2807,7 +2816,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/wire.png</normaloff>:/icons/wire.png</iconset>
    </property>
    <property name="text">
@@ -2825,7 +2834,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/bbox.png</normaloff>:/icons/bbox.png</iconset>
    </property>
    <property name="text">
@@ -2846,7 +2855,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/tool.png</normaloff>:/icons/tool.png</iconset>
    </property>
    <property name="text">
@@ -2864,7 +2873,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/cut_surface.png</normaloff>:/icons/cut_surface.png</iconset>
    </property>
    <property name="text">
@@ -2885,7 +2894,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/axes.png</normaloff>:/icons/axes.png</iconset>
    </property>
    <property name="text">
@@ -2903,7 +2912,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/path.png</normaloff>:/icons/path.png</iconset>
    </property>
    <property name="text">
@@ -2915,7 +2924,7 @@
   </action>
   <action name="actionIsoView">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/isometric.png</normaloff>:/icons/isometric.png</iconset>
    </property>
    <property name="text">
@@ -2930,7 +2939,7 @@
   </action>
   <action name="actionFrontView">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/front.png</normaloff>:/icons/front.png</iconset>
    </property>
    <property name="text">
@@ -2945,7 +2954,7 @@
   </action>
   <action name="actionBackView">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/back.png</normaloff>:/icons/back.png</iconset>
    </property>
    <property name="text">
@@ -2960,7 +2969,7 @@
   </action>
   <action name="actionLeftView">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/left.png</normaloff>:/icons/left.png</iconset>
    </property>
    <property name="text">
@@ -2975,7 +2984,7 @@
   </action>
   <action name="actionRightView">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/right.png</normaloff>:/icons/right.png</iconset>
    </property>
    <property name="text">
@@ -2990,7 +2999,7 @@
   </action>
   <action name="actionTopView">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/top.png</normaloff>:/icons/top.png</iconset>
    </property>
    <property name="text">
@@ -3005,7 +3014,7 @@
   </action>
   <action name="actionBottomView">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/bottom.png</normaloff>:/icons/bottom.png</iconset>
    </property>
    <property name="text">
@@ -3020,7 +3029,7 @@
   </action>
   <action name="actionBegining">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
    </property>
    <property name="text">
@@ -3032,7 +3041,7 @@
   </action>
   <action name="actionSlower">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/slower.png</normaloff>:/icons/slower.png</iconset>
    </property>
    <property name="text">
@@ -3044,7 +3053,7 @@
   </action>
   <action name="actionPlay">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
    </property>
    <property name="text">
@@ -3056,7 +3065,7 @@
   </action>
   <action name="actionFaster">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/faster.png</normaloff>:/icons/faster.png</iconset>
    </property>
    <property name="text">
@@ -3068,7 +3077,7 @@
   </action>
   <action name="actionEnd">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/end.png</normaloff>:/icons/end.png</iconset>
    </property>
    <property name="text">
@@ -3080,7 +3089,7 @@
   </action>
   <action name="actionDirection">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -3092,7 +3101,7 @@
   </action>
   <action name="actionAddTool">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
    </property>
    <property name="text">
@@ -3104,7 +3113,7 @@
   </action>
   <action name="actionRemoveTool">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -3116,7 +3125,7 @@
   </action>
   <action name="actionAddFile">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
    </property>
    <property name="text">
@@ -3128,7 +3137,7 @@
   </action>
   <action name="actionRemoveFile">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -3143,7 +3152,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/no-surface.png</normaloff>:/icons/no-surface.png</iconset>
    </property>
    <property name="text">
@@ -3155,7 +3164,7 @@
   </action>
   <action name="actionStop">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
    </property>
    <property name="text">
@@ -3167,7 +3176,7 @@
   </action>
   <action name="actionRerun">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
    </property>
    <property name="text">
@@ -3185,7 +3194,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
    </property>
    <property name="text">
@@ -3197,7 +3206,7 @@
   </action>
   <action name="actionRevert">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/revert.png</normaloff>:/icons/revert.png</iconset>
    </property>
    <property name="text">
@@ -3209,7 +3218,7 @@
   </action>
   <action name="actionDonate">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/donate.png</normaloff>:/icons/donate.png</iconset>
    </property>
    <property name="text">
@@ -3224,7 +3233,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/surface.png</normaloff>:/icons/surface.png</iconset>
    </property>
    <property name="text">
@@ -3286,7 +3295,7 @@
   </action>
   <action name="actionHelp">
    <property name="icon">
-    <iconset resource="openscam.qrc">
+    <iconset>
      <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
    </property>
    <property name="text">
