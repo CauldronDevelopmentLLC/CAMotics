@@ -1,5 +1,9 @@
 # OpenSCAM Changelog
 
+## v0.2.4:
+ - Fixed arcs.  #78, #85
+ - Removed dependency on libbfd.  #84
+
 ## v0.2.3:
  - Fixed valgrind uninitialized var warning.
  - Added missing DLLs to Windows installer.

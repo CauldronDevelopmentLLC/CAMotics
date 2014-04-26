@@ -11,23 +11,23 @@
         },
         manual: {
             titleText: "<h1>User's Manual</h1>",
-            subtext: 'A guide to using OpenSCAM v0.2.3 or newer.',
+            subtext: 'A guide to using OpenSCAM v0.2.4 or newer.',
         }
     },
-    version: '0.2.3 beta',
+    version: '0.2.4 beta',
     repoURL: 'https://github.com/CauldronDevelopmentLLC/OpenSCAM',
     releases: [
         ['Windows', ['windows-128.png'],
-         'windows-xp-32bit', 'openscam_0.2.3_x86.exe'],
+         'windows-xp-32bit', 'openscam_0.2.4_x86.exe'],
         ['Mac OS-X', ['osx-128.png'],
-         'osx-10.6.4-64bit', 'openscam_0.2.3_x86_64.pkg'],
+         'osx-10.6.4-64bit', 'openscam_0.2.4_x86_64.pkg'],
         ['Debian Linux 64-bit', ['debian-128.png', 'mint-128.png'],
-         'debian-testing-64bit', 'openscam_0.2.3_amd64.deb'],
+         'debian-testing-64bit', 'openscam_0.2.4_amd64.deb'],
         ['Debian Linux 32-bit', ['debian-128.png', 'mint-128.png'],
-         'debian-testing-32bit', 'openscam_0.2.3_i386.deb'],
+         'debian-testing-32bit', 'openscam_0.2.4_i386.deb'],
         ['Ubuntu Precise Penguin 64-bit', ['ubuntu-128.png'],
-         'ubuntu-precise-64bit', 'openscam_0.2.3_amd64.deb'],
+         'ubuntu-precise-64bit', 'openscam_0.2.4_amd64.deb'],
         ['LinuxCNC 10.04', ['ubuntu-128.png'],
-         'linuxcnc-10.04-32bit', 'openscam_0.2.3_i386.deb']
+         'linuxcnc-10.04-32bit', 'openscam_0.2.4_i386.deb']
     ]
 }
