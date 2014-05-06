@@ -18,7 +18,7 @@
    <string>OpenSCAM[*]</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="openscam.qrc">
     <normaloff>:/icons/openscam.png</normaloff>:/icons/openscam.png</iconset>
   </property>
   <property name="styleSheet">
@@ -196,104 +196,9 @@
            </widget>
           </item>
           <item>
-<<<<<<< HEAD
-           <widget class="QPushButton" name="stopPushButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Stop the simulation</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="rerunPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Rerun the simulation</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="smoothPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Smooth the resulting surface for better visualization</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-=======
            <widget class="QCheckBox" name="warningsCheckBox">
             <property name="text">
              <string>Warnings</string>
->>>>>>> Added console
             </property>
            </widget>
           </item>
@@ -313,209 +218,14 @@
           <item>
            <widget class="QPushButton" name="clearConsolePushButton">
             <property name="toolTip">
-<<<<<<< HEAD
-             <string>Jump to start of tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="playPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Start or stop tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="endPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Jump to end of tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/end.png</normaloff>:/icons/end.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>13</width>
-              <height>17</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_36">
-=======
              <string>Clear console.</string>
             </property>
->>>>>>> Added console
             <property name="text">
              <string/>
             </property>
             <property name="icon">
-<<<<<<< HEAD
-             <iconset>
-              <normaloff>:/icons/slower.png</normaloff>:/icons/slower.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="fasterPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Speed up tool path animation</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/faster.png</normaloff>:/icons/faster.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="playbackSpeedLabel">
-            <property name="minimumSize">
-             <size>
-              <width>72</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>72</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Tool path playback speed.</string>
-            </property>
-            <property name="text">
-             <string>1x</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>13</width>
-              <height>14</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_35">
-            <property name="text">
-             <string>Direction:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="directionPushButton">
-            <property name="minimumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>32</width>
-              <height>32</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Change tool path animation direction</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-=======
              <iconset resource="openscam.qrc">
               <normaloff>:/icons/clear.png</normaloff>:/icons/clear.png</iconset>
->>>>>>> Added console
             </property>
            </widget>
           </item>
@@ -602,11 +312,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-<<<<<<< HEAD
-     <width>1226</width>
-=======
      <width>1004</width>
->>>>>>> Added console
      <height>29</height>
     </rect>
    </property>
@@ -1967,9 +1673,6 @@
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
-                      <property name="decimals">
-                       <number>4</number>
-                      </property>
                       <property name="minimum">
                        <double>-1000000.000000000000000</double>
                       </property>
@@ -2039,9 +1742,6 @@
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
-                      <property name="decimals">
-                       <number>4</number>
-                      </property>
                       <property name="minimum">
                        <double>-1000000.000000000000000</double>
                       </property>
@@ -2097,9 +1797,6 @@
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
-                      </property>
-                      <property name="decimals">
-                       <number>4</number>
                       </property>
                       <property name="minimum">
                        <double>-1000000.000000000000000</double>
@@ -2847,7 +2544,7 @@
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
    </property>
    <property name="text">
@@ -2872,7 +2569,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
@@ -2884,7 +2581,7 @@
   </action>
   <action name="actionSaveAs">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/save_as.png</normaloff>:/icons/save_as.png</iconset>
    </property>
    <property name="text">
@@ -2893,7 +2590,7 @@
   </action>
   <action name="actionExport">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
    </property>
    <property name="text">
@@ -2905,7 +2602,7 @@
   </action>
   <action name="actionSnapshot">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/snapshot.png</normaloff>:/icons/snapshot.png</iconset>
    </property>
    <property name="text">
@@ -2917,7 +2614,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/quit.png</normaloff>:/icons/quit.png</iconset>
    </property>
    <property name="text">
@@ -2926,7 +2623,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/about.png</normaloff>:/icons/about.png</iconset>
    </property>
    <property name="text">
@@ -2938,7 +2635,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/wire.png</normaloff>:/icons/wire.png</iconset>
    </property>
    <property name="text">
@@ -2956,7 +2653,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/bbox.png</normaloff>:/icons/bbox.png</iconset>
    </property>
    <property name="text">
@@ -2977,7 +2674,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/tool.png</normaloff>:/icons/tool.png</iconset>
    </property>
    <property name="text">
@@ -2995,7 +2692,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/cut_surface.png</normaloff>:/icons/cut_surface.png</iconset>
    </property>
    <property name="text">
@@ -3016,7 +2713,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/axes.png</normaloff>:/icons/axes.png</iconset>
    </property>
    <property name="text">
@@ -3034,7 +2731,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/path.png</normaloff>:/icons/path.png</iconset>
    </property>
    <property name="text">
@@ -3046,7 +2743,7 @@
   </action>
   <action name="actionIsoView">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/isometric.png</normaloff>:/icons/isometric.png</iconset>
    </property>
    <property name="text">
@@ -3061,7 +2758,7 @@
   </action>
   <action name="actionFrontView">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/front.png</normaloff>:/icons/front.png</iconset>
    </property>
    <property name="text">
@@ -3076,7 +2773,7 @@
   </action>
   <action name="actionBackView">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/back.png</normaloff>:/icons/back.png</iconset>
    </property>
    <property name="text">
@@ -3091,7 +2788,7 @@
   </action>
   <action name="actionLeftView">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/left.png</normaloff>:/icons/left.png</iconset>
    </property>
    <property name="text">
@@ -3106,7 +2803,7 @@
   </action>
   <action name="actionRightView">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/right.png</normaloff>:/icons/right.png</iconset>
    </property>
    <property name="text">
@@ -3121,7 +2818,7 @@
   </action>
   <action name="actionTopView">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/top.png</normaloff>:/icons/top.png</iconset>
    </property>
    <property name="text">
@@ -3136,7 +2833,7 @@
   </action>
   <action name="actionBottomView">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/bottom.png</normaloff>:/icons/bottom.png</iconset>
    </property>
    <property name="text">
@@ -3151,7 +2848,7 @@
   </action>
   <action name="actionBegining">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
    </property>
    <property name="text">
@@ -3163,7 +2860,7 @@
   </action>
   <action name="actionSlower">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/slower.png</normaloff>:/icons/slower.png</iconset>
    </property>
    <property name="text">
@@ -3175,7 +2872,7 @@
   </action>
   <action name="actionPlay">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
    </property>
    <property name="text">
@@ -3187,7 +2884,7 @@
   </action>
   <action name="actionFaster">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/faster.png</normaloff>:/icons/faster.png</iconset>
    </property>
    <property name="text">
@@ -3199,7 +2896,7 @@
   </action>
   <action name="actionEnd">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/end.png</normaloff>:/icons/end.png</iconset>
    </property>
    <property name="text">
@@ -3211,7 +2908,7 @@
   </action>
   <action name="actionDirection">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
@@ -3223,7 +2920,7 @@
   </action>
   <action name="actionAddTool">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
    </property>
    <property name="text">
@@ -3235,7 +2932,7 @@
   </action>
   <action name="actionRemoveTool">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -3247,7 +2944,7 @@
   </action>
   <action name="actionAddFile">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
    </property>
    <property name="text">
@@ -3259,7 +2956,7 @@
   </action>
   <action name="actionRemoveFile">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/remove.png</normaloff>:/icons/remove.png</iconset>
    </property>
    <property name="text">
@@ -3274,7 +2971,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/no-surface.png</normaloff>:/icons/no-surface.png</iconset>
    </property>
    <property name="text">
@@ -3286,7 +2983,7 @@
   </action>
   <action name="actionStop">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
    </property>
    <property name="text">
@@ -3301,7 +2998,7 @@
   </action>
   <action name="actionRun">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
    </property>
    <property name="text">
@@ -3322,7 +3019,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
    </property>
    <property name="text">
@@ -3334,7 +3031,7 @@
   </action>
   <action name="actionRevert">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/revert.png</normaloff>:/icons/revert.png</iconset>
    </property>
    <property name="text">
@@ -3346,7 +3043,7 @@
   </action>
   <action name="actionDonate">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/donate.png</normaloff>:/icons/donate.png</iconset>
    </property>
    <property name="text">
@@ -3361,7 +3058,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/surface.png</normaloff>:/icons/surface.png</iconset>
    </property>
    <property name="text">
@@ -3423,7 +3120,7 @@
   </action>
   <action name="actionHelp">
    <property name="icon">
-    <iconset>
+    <iconset resource="openscam.qrc">
      <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
    </property>
    <property name="text">
