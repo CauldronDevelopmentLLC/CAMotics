@@ -560,22 +560,22 @@ void Controller::arc(int vars, bool clockwise) {
     // If radius is less than half the distance then the arc is impossible
     double a = start.distance(finish) / 2;
     if (fabs(radius) < a - 0.00001) {
-      LOG_WARNING("Invalid radius format arc, replacing with line segment, "
+      LOG_WARNING("Impossible radius format arc, replacing with line segment, "
                   "radius=" << fabs(radius) << " distance/2=" << a);
       doMove(target, false);
       return;
     }
 
     // Compute arc center
-    Vector2D n =
-      Vector2D(start.y() - finish.y(), finish.x() - start.x()).normalize();
-    double d = (finish - start).length();
-    double t = sqrt(radius * radius - d * d);
+    Vector2D m = (start + finish) / 2;
+    Vector2D E = Vector2D(start.y() - finish.y(), finish.x() - start.x());
+    double d = (finish - start).length() / 2;
+    double l = sqrt(radius * radius - d * d);
 
-    if (!clockwise) t = -t;
-    if (0 < radius) t = -t;
+    if (!clockwise) l = -l;
+    if (0 < radius) l = -l;
 
-    center = start + n * t;
+    center = m + E.normalize() * l;
 
     static bool warned = false;
     if (!warned) LOG_WARNING("Radius format arcs are discouraged");

@@ -1,7 +1,9 @@
 # OpenSCAM Changelog
 
-## v0.2.4:
+## v0.2.5:
  - Fixed arcs.  #78, #85
+
+## v0.2.4:
  - Removed dependency on libbfd.  #84
 
 ## v0.2.3:
