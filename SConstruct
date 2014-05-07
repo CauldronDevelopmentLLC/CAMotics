@@ -98,7 +98,9 @@ qrc = env.Qrc4('build/qrc_openscam.cpp', 'qt/openscam.qrc')
 src += qrc
 
 # Build Info
-src += env.BuildInfo('build/build_info.cpp', [])
+info = env.BuildInfo('build/build_info.cpp', [])
+AlwaysBuild(info)
+src += info
 
 
 # Build
