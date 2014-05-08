@@ -25,8 +25,6 @@
          'debian-testing-64bit', 'openscam_0.2.5_amd64.deb'],
         ['Debian Linux 32-bit', ['debian-128.png', 'mint-128.png'],
          'debian-testing-32bit', 'openscam_0.2.5_i386.deb'],
-        ['Ubuntu Precise Penguin 64-bit', ['ubuntu-128.png'],
-         'ubuntu-precise-64bit', 'openscam_0.2.5_amd64.deb'],
         ['LinuxCNC 10.04', ['ubuntu-128.png'],
          'linuxcnc-10.04-32bit', 'openscam_0.2.5_i386.deb']
     ]
