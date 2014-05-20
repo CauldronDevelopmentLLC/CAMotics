@@ -445,6 +445,7 @@ void QtWin::toolPathComplete() {
   redraw();
 
   // Start surface thread
+  if (!surfaceThread.isNull()) surfaceThread->join();
   surfaceThread = new SurfaceThread(surfaceCompleteEvent, this, cutSim,
                                     toolPath, project->getWorkpieceBounds(),
                                     project->getResolution(), view->getTime(),
@@ -482,6 +483,7 @@ void QtWin::reload(bool now) {
     stop();
 
     // Start tool path thread
+    if (!toolPathThread.isNull()) toolPathThread->join();
     toolPathThread = new ToolPathThread(toolPathCompleteEvent, this, cutSim,
                                         project->getToolTable(),
                                         project->getAbsoluteFiles());
