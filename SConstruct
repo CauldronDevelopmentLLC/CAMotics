@@ -91,9 +91,10 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 
 # Qt
-uic = []
-for name in ('openscam', 'export_dialog', 'about_dialog', 'donate_dialog'):
-    uic.append(env.Uic4('build/ui_%s.h' % name, 'qt/%s.ui' % name))
+uic = [env.Uic4('build/ui_openscam.h', 'qt/openscam.ui')]
+for dialog in 'export about donate new'.split():
+    uic.append(env.Uic4('build/ui_%s_dialog.h' % dialog,
+                        'qt/%s_dialog.ui' % dialog))
 
 qrc = env.Qrc4('build/qrc_openscam.cpp', 'qt/openscam.qrc')
 src += qrc

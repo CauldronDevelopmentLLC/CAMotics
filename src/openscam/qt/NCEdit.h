@@ -96,6 +96,8 @@ namespace OpenSCAM {
            QWidget *parent = 0);
     ~NCEdit();
 
+    bool isTPL() const;
+
     void loadLightScheme();
     void loadDarkScheme();
 

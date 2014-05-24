@@ -35,6 +35,7 @@
 
 #include <cbang/js/Javascript.h>
 #include <cbang/os/SystemInfo.h>
+#include <cbang/os/SystemUtilities.h>
 #include <cbang/util/DefaultCatch.h>
 
 #include <limits>
@@ -68,6 +69,8 @@ CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
   // Interpret code
   try {
     for (unsigned i = 0; i < files.size() && !task->shouldQuit(); i++) {
+      if (!SystemUtilities::exists(files[i])) continue;
+
       task->update(0, "Running " + files[i]);
 
       if (String::endsWith(files[i], ".tpl")) {

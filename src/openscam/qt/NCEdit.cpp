@@ -170,6 +170,11 @@ NCEdit::NCEdit(const SmartPointer<Highlighter> &highlighter, QWidget *parent) :
 NCEdit::~NCEdit() {}
 
 
+bool NCEdit::isTPL() const {
+  return highlighter.isInstance<TPLHighlighter>();
+}
+
+
 void NCEdit::loadLightScheme() {
   setColor(ColorComponent::Normal, QColor("#000000"));
   setColor(ColorComponent::Comment, QColor("#808080"));

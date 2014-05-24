@@ -21,6 +21,7 @@
 #ifndef OPENSCAM_QT_WIN_H
 #define OPENSCAM_QT_WIN_H
 
+#include "NewDialog.h"
 #include "ExportDialog.h"
 #include "AboutDialog.h"
 #include "DonateDialog.h"
@@ -62,6 +63,7 @@ namespace OpenSCAM {
     int surfaceCompleteEvent;
 
     cb::SmartPointer<Ui::OpenSCAMWindow> ui;
+    NewDialog newDialog;
     ExportDialog exportDialog;
     AboutDialog aboutDialog;
     DonateDialog donateDialog;
@@ -172,11 +174,15 @@ namespace OpenSCAM {
     void removeFile();
     bool checkSave(bool canCancel = true);
 
+    void newFile(bool tpl);
     void editFile(unsigned num);
-    void saveFileTab(int tab);
+    std::string getFileTabPath(int tab) const;
+    bool isFileTabModified(int tab) const;
+    void saveFileTab(int tab, bool saveAs = false);
     void revertFileTab(int tab);
     bool checkSaveFileTab(int tab);
-    void closeFileTab(int tab, bool canSave = true);
+    void closeFileTab(int tab, bool canSave = true, bool removeTab = true);
+    void updateFileSave();
 
     void updateUnits();
 
@@ -274,7 +280,9 @@ namespace OpenSCAM {
     void on_actionExamples_triggered();
     void on_actionSave_triggered();
     void on_actionSaveAs_triggered();
-    void on_actionRevert_triggered();
+    void on_actionSaveFile_triggered();
+    void on_actionSaveFileAs_triggered();
+    void on_actionRevertFile_triggered();
 
     void on_actionStop_triggered();
     void on_actionRun_triggered();

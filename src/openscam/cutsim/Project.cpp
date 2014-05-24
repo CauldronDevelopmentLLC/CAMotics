@@ -40,6 +40,14 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
+namespace {
+  uint64_t getFileTime(const std::string &path) {
+    return SystemUtilities::exists(path) ?
+      SystemUtilities::getModificationTime(path) : 0;
+  }
+}
+
+
 Project::Project(Options &_options, const std::string &filename) :
   options(_options), filename(filename), tools(new ToolTable),
   resolution(1), workpieceMargin(5), watch(true), lastWatch(0), dirty(false) {
@@ -210,7 +218,7 @@ void Project::save(const string &_filename) {
 void Project::addFile(const string &path) {
   string abs = makeAbsolute(path);
   if (files.has(abs)) return; // Duplicate
-  files[abs] = SystemUtilities::getModificationTime(abs);
+  files[abs] = getFileTime(abs);
   options["nc-files"].append(encodeFilename(makeRelative(abs)));
   markDirty();
 }
@@ -341,7 +349,7 @@ Rectangle3R Project::getWorkpieceBounds() const {
 bool Project::checkFiles() {
   if (watch && lastWatch < Time::now()) {
     for (unsigned i = 0; i < files.size(); i++) {
-      uint64_t fileTime = SystemUtilities::getModificationTime(files.keyAt(i));
+      uint64_t fileTime = getFileTime(files.keyAt(i));
       if (files[i] < fileTime) {
         files[i] = fileTime;
         LOG_INFO(1, "File changed: " << files.keyAt(i));

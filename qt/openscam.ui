@@ -181,7 +181,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout_16">
         <property name="spacing">
          <number>0</number>
@@ -322,9 +322,13 @@
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
+    <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSaveAs"/>
-    <addaction name="actionRevert"/>
+    <addaction name="actionSaveFile"/>
+    <addaction name="actionSaveFileAs"/>
+    <addaction name="actionRevertFile"/>
+    <addaction name="separator"/>
     <addaction name="actionExamples"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -2548,10 +2552,10 @@
      <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;New</string>
+    <string>&amp;New Project or File</string>
    </property>
    <property name="toolTip">
-    <string>Start a new project</string>
+    <string>Create a new project or NC file.</string>
    </property>
   </action>
   <action name="actionOpen">
@@ -2561,10 +2565,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>&amp;Open</string>
+    <string>&amp;Open Project or File</string>
    </property>
    <property name="toolTip">
-    <string>Open an existing project</string>
+    <string>Open an existing project or NC file.</string>
    </property>
   </action>
   <action name="actionSave">
@@ -2573,7 +2577,7 @@
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Save</string>
+    <string>&amp;Save All</string>
    </property>
    <property name="toolTip">
     <string>Save the current project</string>
@@ -2585,7 +2589,7 @@
      <normaloff>:/icons/save_as.png</normaloff>:/icons/save_as.png</iconset>
    </property>
    <property name="text">
-    <string>Save &amp;As</string>
+    <string>Save Project &amp;As</string>
    </property>
   </action>
   <action name="actionExport">
@@ -3029,18 +3033,6 @@
     <string>Smooth the resulting surface for better visualization</string>
    </property>
   </action>
-  <action name="actionRevert">
-   <property name="icon">
-    <iconset resource="openscam.qrc">
-     <normaloff>:/icons/revert.png</normaloff>:/icons/revert.png</iconset>
-   </property>
-   <property name="text">
-    <string>Revert</string>
-   </property>
-   <property name="toolTip">
-    <string>Rervert all changes</string>
-   </property>
-  </action>
   <action name="actionDonate">
    <property name="icon">
     <iconset resource="openscam.qrc">
@@ -3125,6 +3117,51 @@
    </property>
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionRevertFile">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/revert.png</normaloff>:/icons/revert.png</iconset>
+   </property>
+   <property name="text">
+    <string>Revert File</string>
+   </property>
+   <property name="toolTip">
+    <string>Revert changes to NC file.</string>
+   </property>
+  </action>
+  <action name="actionSaveFileAs">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/save_as.png</normaloff>:/icons/save_as.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save File As</string>
+   </property>
+   <property name="toolTip">
+    <string>Save NC file to a specified location.</string>
+   </property>
+  </action>
+  <action name="actionSaveFile">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save File</string>
+   </property>
+   <property name="toolTip">
+    <string>Save file.</string>
    </property>
   </action>
  </widget>

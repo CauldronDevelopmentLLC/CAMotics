@@ -1,3 +1,4 @@
+units(METRIC);
 size = 1;
 
 wiggle = 0.075;

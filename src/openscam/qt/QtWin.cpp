@@ -764,10 +764,15 @@ bool QtWin::saveProject(bool saveAs) {
   string filename = project->getFilename();
 
   if (saveAs || filename.empty()) {
-    filename = openFile("Save Project",
-                        "Projects (*.xml);;NC files (*.nc *.ngc "
-                        "*.gcode;;TPL files (*.tpl)", filename, true);
+    filename = openFile("Save Project", "Projects (*.xml)", filename, true);
     if (filename.empty()) return false;
+
+    string ext = SystemUtilities::extension(filename);
+    if (ext.empty()) filename += ".xml";
+    else if (ext != "xml") {
+      warning("Project file must have .xml extension, not saved!");
+      return false;
+    }
   }
 
   try {
@@ -806,7 +811,7 @@ void QtWin::revertProject() {
 
 
 void QtWin::addFile() {
-  string filename = openFile("Add Path File", "Supported Files (*.nc *.ngc "
+  string filename = openFile("Add file", "Supported Files (*.nc *.ngc "
                              "*.gcode *.tpl);;All Files (*.*)", "", false);
   if (filename.empty()) return;
 
@@ -843,6 +848,31 @@ bool QtWin::checkSave(bool canCancel) {
   if (response == QMessageBox::Yes) return saveProject();
   else if (response != QMessageBox::No) return false;
   return true;
+}
+
+
+void QtWin::newFile(bool tpl) {
+  string filename =
+    openFile(tpl ? "New TPL file" : "New GCode file",
+             tpl ? "TPL (*.tpl);;All files (*.*)" :
+             "GCode (*.nc *.ngc *.gcode);;All files", "", false);
+  if (filename.empty()) return;
+
+  string ext = SystemUtilities::extension(filename);
+  if (ext.empty()) filename += tpl ? ".tpl" : ".gcode";
+
+  else if (tpl && ext != "tpl") {
+    warning("TPL file must have .tpl extension");
+    return;
+
+  } else if (!tpl && (ext == "xml" || ext == "tpl")) {
+    warning("GCode file cannot have .tpl or .xml extension");
+    return;
+  }
+
+  project->addFile(filename);
+  projectModel->invalidate();
+  reload();
 }
 
 
@@ -892,19 +922,50 @@ void QtWin::editFile(unsigned num) {
 }
 
 
-void QtWin::saveFileTab(int tab) {
-  // Check if modified
+bool QtWin::isFileTabModified(int tab) const {
+  return ui->tabWidget->tabText(tab).endsWith(" *");
+}
+
+
+string QtWin::getFileTabPath(int tab) const {
   QString title = ui->tabWidget->tabText(tab);
-  if (!title.endsWith(" *")) return;
+  if (title.endsWith(" *")) title = title.left(title.length() - 2);
+  return project->makeAbsolute(title.toUtf8().data());
+}
+
+
+void QtWin::saveFileTab(int tab, bool saveAs) {
+  if (tab < 2) THROWS("Invalid file tab index " << tab);
+  if (!isFileTabModified(tab)) return;
 
   // Get absolute path
-  title = title.left(title.length() - 2); // Remove *
-  string absPath = project->makeAbsolute(title.toUtf8().data());
+  string filename = getFileTabPath(tab);
+
+  // Get type
+  NCEdit *editor = (NCEdit *)ui->tabWidget->widget(tab);
+  bool tpl = editor->isTPL();
+
+  if (saveAs) {
+    filename = openFile("Save file", tpl ? "TPL (*.tpl)" :
+                        "GCode (*.nc *.ngc *.gcode)", filename, true);
+    if (filename.empty()) return;
+
+    string ext = SystemUtilities::extension(filename);
+    if (ext.empty()) filename += tpl ? ".tpl" : ".gcode";
+
+    else if (tpl && ext != "tpl") {
+      warning("TPL file must have .tpl extension");
+      return;
+
+    } else if (!tpl && (ext == "xml" || ext == "tpl")) {
+      warning("GCode file cannot have .tpl or .xml extension");
+      return;
+    }
+  }
 
   // Save data
-  NCEdit *editor = (NCEdit *)ui->tabWidget->widget(tab);
   QString content = editor->toPlainText();
-  QFile file(absPath.c_str());
+  QFile file(filename.c_str());
   file.open(QFile::WriteOnly | QIODevice::Truncate);
   file.write(content.toUtf8());
   file.close();
@@ -913,21 +974,19 @@ void QtWin::saveFileTab(int tab) {
   editor->document()->setModified(false);
 
   // Notify
-  showMessage("Saved " + string(title.toUtf8().data()));
+  showMessage("Saved " + SystemUtilities::basename(filename));
 }
 
 
 void QtWin::revertFileTab(int tab) {
   // Check if modified
-  QString title = ui->tabWidget->tabText(tab);
-  if (!title.endsWith(" *")) return;
+  if (!isFileTabModified(tab)) return;
 
   // Get absolute path
-  title = title.left(title.length() - 2); // Remove *
-  string absPath = project->makeAbsolute(title.toUtf8().data());
+  string filename = getFileTabPath(tab);
 
   // Read data
-  QFile file(absPath.c_str());
+  QFile file(filename.c_str());
   file.open(QFile::ReadOnly);
   QString contents = file.readAll();
   file.close();
@@ -939,11 +998,14 @@ void QtWin::revertFileTab(int tab) {
 
   // Set unmodified
   editor->document()->setModified(false);
+
+  // Notify
+  showMessage("Reverted " + SystemUtilities::basename(filename));
 }
 
 
 bool QtWin::checkSaveFileTab(int tab) {
-  if (!ui->tabWidget->tabText(tab).endsWith(" *")) return true;
+  if (!isFileTabModified(tab)) return true;
 
   int response =
     QMessageBox::question(this, "File Modified", "The current file has "
@@ -957,10 +1019,43 @@ bool QtWin::checkSaveFileTab(int tab) {
 }
 
 
-void QtWin::closeFileTab(int tab, bool canSave) {
+void QtWin::closeFileTab(int tab, bool canSave, bool removeTab) {
   if (canSave && !checkSaveFileTab(tab)) return;
   delete (NCEdit *)ui->tabWidget->widget(tab);
-  ui->tabWidget->removeTab(tab);
+  if (removeTab) ui->tabWidget->removeTab(tab);
+}
+
+
+void QtWin::updateFileSave() {
+  unsigned index = ui->tabWidget->currentIndex();
+
+  if (index < 2) {
+    ui->actionSaveFile->setEnabled(false);
+    ui->actionSaveFileAs->setEnabled(false);
+    ui->actionRevertFile->setEnabled(false);
+
+    ui->actionSaveFile->setText("Save File");
+    ui->actionSaveFileAs->setText("Save File As");
+    ui->actionRevertFile->setText("Revert File");
+
+  } else {
+    QString title = QString(getFileTabPath(index).c_str());
+
+    if (isFileTabModified(index)) {
+      ui->actionSaveFile->setEnabled(true);
+      ui->actionRevertFile->setEnabled(true);
+
+    } else {
+      ui->actionSaveFile->setEnabled(false);
+      ui->actionRevertFile->setEnabled(false);
+    }
+
+    ui->actionSaveFileAs->setEnabled(true);
+
+    ui->actionSaveFile->setText(QString("Save \"%1\"").arg(title));
+    ui->actionSaveFileAs->setText(QString("Save \"%1\" As").arg(title));
+    ui->actionRevertFile->setText(QString("Revert \"%1\"").arg(title));
+  }
 }
 
 
@@ -1281,6 +1376,8 @@ void QtWin::setUIView(ui_view_t uiView) {
   default: break;
   }
 
+  updateFileSave();
+
   redraw(true);
 }
 
@@ -1462,16 +1559,15 @@ void QtWin::animate() {
 
 void QtWin::fileTabModified(bool changed) {
   int index = ui->tabWidget->currentIndex();
+  QString title = ui->tabWidget->tabText(index);
 
-  if (changed)
-    ui->tabWidget->setTabText(index, ui->tabWidget->tabText(index) + tr(" *"));
+  if (changed && !title.endsWith(" *"))
+    ui->tabWidget->setTabText(index, title + tr(" *"));
 
-  else {
-    QString title = ui->tabWidget->tabText(index);
+  if (!changed && title.endsWith(" *"))
+    ui->tabWidget->setTabText(index, title.left(title.size() - 2));
 
-    if (title.endsWith(" *"))
-      ui->tabWidget->setTabText(index, title.left(title.size() - 2));
-  }
+  updateFileSave();
 }
 
 
@@ -1485,7 +1581,7 @@ void QtWin::on_tabWidget_currentChanged(int index) {
 
 
 void QtWin::on_tabWidget_tabCloseRequested(int index) {
-  closeFileTab(index);
+  closeFileTab(index, true, false);
 }
 
 
@@ -1811,7 +1907,10 @@ void QtWin::on_actionQuit_triggered() {
 
 
 void QtWin::on_actionNew_triggered() {
-  newProject();
+  if (newDialog.exec() != QDialog::Accepted) return;
+
+  if (newDialog.projectSelected()) newProject();
+  else newFile(newDialog.tplSelected());
 }
 
 
@@ -1883,8 +1982,18 @@ void QtWin::on_actionSaveAs_triggered() {
 }
 
 
-void QtWin::on_actionRevert_triggered() {
-  revertProject();
+void QtWin::on_actionSaveFile_triggered() {
+  saveFileTab(ui->tabWidget->currentIndex());
+}
+
+
+void QtWin::on_actionSaveFileAs_triggered() {
+  saveFileTab(ui->tabWidget->currentIndex(), true);
+}
+
+
+void QtWin::on_actionRevertFile_triggered() {
+  revertFileTab(ui->tabWidget->currentIndex());
 }
 
 
