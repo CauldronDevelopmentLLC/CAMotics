@@ -22,6 +22,7 @@
 #define OPENSCAM_PROJECT_H
 
 #include "ResolutionMode.h"
+#include "NCFile.h"
 
 #include <openscam/sim/ToolUnits.h>
 
@@ -30,12 +31,15 @@
 
 #include <openscam/Geom.h>
 
+#include <list>
+
 
 namespace OpenSCAM {
   class ToolPath;
   class CutWorkpiece;
   class ToolTable;
   class ToolPath;
+
 
   class Project {
     cb::OptionProxy options;
@@ -49,7 +53,7 @@ namespace OpenSCAM {
     std::string workpieceMin;
     std::string workpieceMax;
 
-    typedef cb::OrderedDict<uint64_t> files_t;
+    typedef std::list<cb::SmartPointer<NCFile> > files_t;
     files_t files;
     bool watch;
     uint64_t lastWatch;
@@ -66,9 +70,7 @@ namespace OpenSCAM {
 
     const std::string &getFilename() const {return filename;}
     void setFilename(const std::string &filename);
-
-    std::string makeRelative(const std::string &path) const;
-    std::string makeAbsolute(const std::string &path) const;
+    std::string getDirectory() const;
 
     const cb::SmartPointer<ToolTable> &getToolTable() const {return tools;}
 
@@ -84,11 +86,15 @@ namespace OpenSCAM {
     void load(const std::string &filename);
     void save(const std::string &filename = std::string());
 
+    unsigned getFileCount() const {return files.size();}
+    typedef files_t::const_iterator iterator;
+    iterator begin() const {return files.begin();}
+    iterator end() const {return files.end();}
+    const cb::SmartPointer<NCFile> &getFile(unsigned index) const;
+    cb::SmartPointer<NCFile> findFile(const std::string &filename) const;
     void addFile(const std::string &filename);
     void removeFile(unsigned i);
-    std::vector<std::string> getRelativeFiles() const;
-    std::vector<std::string> getAbsoluteFiles() const;
-    void setFiles(std::vector<std::string> &files);
+    bool checkFiles();
 
     void updateAutomaticWorkpiece(ToolPath &path);
     bool getAutomaticWorkpiece() const;
@@ -99,8 +105,6 @@ namespace OpenSCAM {
 
     void setWorkpieceBounds(const Rectangle3R &bounds);
     Rectangle3R getWorkpieceBounds() const;
-
-    bool checkFiles();
 
     static std::string encodeFilename(const std::string &filename);
     static std::string decodeFilename(const std::string &filename);

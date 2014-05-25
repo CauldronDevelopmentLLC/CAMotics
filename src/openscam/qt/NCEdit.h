@@ -60,6 +60,7 @@
 
 
 namespace OpenSCAM {
+  class NCFile;
   class NCDocLayout;
   class Highlighter;
   class SidebarWidget;
@@ -75,6 +76,7 @@ namespace OpenSCAM {
     Q_PROPERTY(bool textWrapEnabled READ isTextWrapEnabled
                WRITE setTextWrapEnabled);
 
+    cb::SmartPointer<NCFile> file;
     cb::SmartPointer<NCDocLayout> layout;
     cb::SmartPointer<Highlighter> highlighter;
     cb::SmartPointer<SidebarWidget> sidebar;
@@ -92,10 +94,12 @@ namespace OpenSCAM {
     Q_DISABLE_COPY(NCEdit);
 
   public:
-    NCEdit(const cb::SmartPointer<Highlighter> &highlighter,
+    NCEdit(const cb::SmartPointer<NCFile> &file,
+           const cb::SmartPointer<Highlighter> &highlighter,
            QWidget *parent = 0);
     ~NCEdit();
 
+    const cb::SmartPointer<NCFile> &getFile() const {return file;}
     bool isTPL() const;
 
     void loadLightScheme();
@@ -128,6 +132,8 @@ namespace OpenSCAM {
     void toggleFold(int line);
 
   protected:
+    void keyPressEvent(QKeyEvent *e);
+    void keyReleaseEvent(QKeyEvent *e);
     void resizeEvent(QResizeEvent *e);
     void wheelEvent(QWheelEvent *e);
 

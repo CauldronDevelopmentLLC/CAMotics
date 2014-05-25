@@ -54,6 +54,7 @@
 #include "SidebarWidget.h"
 
 #include <cbang/SmartPointer.h>
+#include <cbang/log/Logger.h>
 
 using namespace cb;
 using namespace OpenSCAM;
@@ -136,8 +137,9 @@ namespace OpenSCAM {
 }
 
 
-NCEdit::NCEdit(const SmartPointer<Highlighter> &highlighter, QWidget *parent) :
-  QPlainTextEdit(parent), layout(new NCDocLayout(document())),
+NCEdit::NCEdit(const SmartPointer<NCFile> &file,
+               const SmartPointer<Highlighter> &highlighter, QWidget *parent) :
+  QPlainTextEdit(parent), file(file), layout(new NCDocLayout(document())),
   highlighter(highlighter), sidebar(new SidebarWidget(this)),
   showLineNumbers(true), textWrap(true), bracketsMatching(true),
   cursorColor(QColor(255, 255, 192)), bracketMatchColor(QColor(180, 238, 180)),
@@ -357,6 +359,73 @@ bool NCEdit::isFolded(int line) const {
 }
 
 
+void NCEdit::updateSidebar() {
+  if (!showLineNumbers && !codeFolding) {
+    sidebar->hide();
+    setViewportMargins(0, 0, 0, 0);
+    sidebar->setGeometry(3, 0, 0, height());
+    return;
+  }
+
+  sidebar->foldIndicatorWidth = 0;
+  sidebar->font = this->font();
+  sidebar->show();
+
+  int sw = 0;
+  if (showLineNumbers) {
+    int digits = 2;
+    int maxLines = blockCount();
+    for (int number = 10; number < maxLines; number *= 10)
+      ++digits;
+    sw += fontMetrics().width('w') * digits;
+  }
+
+  if (codeFolding) {
+    int fh = fontMetrics().lineSpacing();
+    int fw = fontMetrics().width('w');
+    sidebar->foldIndicatorWidth = qMax(fw, fh);
+    sw += sidebar->foldIndicatorWidth;
+  }
+  setViewportMargins(sw, 0, 0, 0);
+
+  sidebar->setGeometry(0, 0, sw, height());
+  QRectF sidebarRect(0, 0, sw, height());
+
+  QTextBlock block = firstVisibleBlock();
+  int index = 0;
+  while (block.isValid()) {
+    if (block.isVisible()) {
+      QRectF rect = blockBoundingGeometry(block).translated(contentOffset());
+      if (sidebarRect.intersects(rect)) {
+        if (sidebar->lineNumbers.count() >= index)
+          sidebar->lineNumbers.resize(index + 1);
+
+        sidebar->lineNumbers[index].position = rect.top();
+        sidebar->lineNumbers[index].number = block.blockNumber() + 1;
+        sidebar->lineNumbers[index].foldable =
+          codeFolding ? isFoldable(block.blockNumber() + 1) : false;
+        sidebar->lineNumbers[index].folded =
+          codeFolding ? isFolded(block.blockNumber() + 1) : false;
+
+        index++;
+      }
+
+      if (rect.top() > sidebarRect.bottom()) break;
+    }
+
+    block = block.next();
+  }
+
+  sidebar->lineNumbers.resize(index);
+  sidebar->update();
+}
+
+
+void NCEdit::mark(const QString &str, Qt::CaseSensitivity sens) {
+  highlighter->mark(str, sens);
+}
+
+
 void NCEdit::fold(int line) {
   QTextBlock startBlock = document()->findBlockByNumber(line - 1);
   int endPos = findClosingConstruct(startBlock);
@@ -407,6 +476,17 @@ void NCEdit::unfold(int line) {
 void NCEdit::toggleFold(int line) {
   if (isFolded(line)) unfold(line);
   else fold(line);
+}
+
+
+void NCEdit::keyPressEvent(QKeyEvent *e) {
+  if (e->key() == Qt::Key_Tab) insertPlainText("  ");
+  else QPlainTextEdit::keyPressEvent(e);
+}
+
+
+void NCEdit::keyReleaseEvent(QKeyEvent *e) {
+  if (e->key() != Qt::Key_Tab) QPlainTextEdit::keyReleaseEvent(e);
 }
 
 
@@ -503,71 +583,4 @@ void NCEdit::updateCursor() {
 void NCEdit::updateSidebar(const QRect &rect, int d) {
   Q_UNUSED(rect);
   if (d != 0) updateSidebar();
-}
-
-
-void NCEdit::updateSidebar() {
-  if (!showLineNumbers && !codeFolding) {
-    sidebar->hide();
-    setViewportMargins(0, 0, 0, 0);
-    sidebar->setGeometry(3, 0, 0, height());
-    return;
-  }
-
-  sidebar->foldIndicatorWidth = 0;
-  sidebar->font = this->font();
-  sidebar->show();
-
-  int sw = 0;
-  if (showLineNumbers) {
-    int digits = 2;
-    int maxLines = blockCount();
-    for (int number = 10; number < maxLines; number *= 10)
-      ++digits;
-    sw += fontMetrics().width('w') * digits;
-  }
-
-  if (codeFolding) {
-    int fh = fontMetrics().lineSpacing();
-    int fw = fontMetrics().width('w');
-    sidebar->foldIndicatorWidth = qMax(fw, fh);
-    sw += sidebar->foldIndicatorWidth;
-  }
-  setViewportMargins(sw, 0, 0, 0);
-
-  sidebar->setGeometry(0, 0, sw, height());
-  QRectF sidebarRect(0, 0, sw, height());
-
-  QTextBlock block = firstVisibleBlock();
-  int index = 0;
-  while (block.isValid()) {
-    if (block.isVisible()) {
-      QRectF rect = blockBoundingGeometry(block).translated(contentOffset());
-      if (sidebarRect.intersects(rect)) {
-        if (sidebar->lineNumbers.count() >= index)
-          sidebar->lineNumbers.resize(index + 1);
-
-        sidebar->lineNumbers[index].position = rect.top();
-        sidebar->lineNumbers[index].number = block.blockNumber() + 1;
-        sidebar->lineNumbers[index].foldable =
-          codeFolding ? isFoldable(block.blockNumber() + 1) : false;
-        sidebar->lineNumbers[index].folded =
-          codeFolding ? isFolded(block.blockNumber() + 1) : false;
-
-        index++;
-      }
-
-      if (rect.top() > sidebarRect.bottom()) break;
-    }
-
-    block = block.next();
-  }
-
-  sidebar->lineNumbers.resize(index);
-  sidebar->update();
-}
-
-
-void NCEdit::mark(const QString &str, Qt::CaseSensitivity sens) {
-  highlighter->mark(str, sens);
 }

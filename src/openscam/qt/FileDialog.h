@@ -18,39 +18,27 @@
 
 \******************************************************************************/
 
-#ifndef OPENSCAM_TOOL_PATH_THREAD_H
-#define OPENSCAM_TOOL_PATH_THREAD_H
+#ifndef OPENSCAM_FILE_DIALOG_H
+#define OPENSCAM_FILE_DIALOG_H
 
-#include "CutSimThread.h"
-
-#include <openscam/cutsim/ToolPath.h>
-#include <openscam/sim/ToolTable.h>
+#include <QFileDialog>
 
 #include <string>
-#include <vector>
 
 
 namespace OpenSCAM {
-  class ToolTable;
-  class ToolPath;
-  class Project;
+  class QtWin;
 
-  class ToolPathThread : public CutSimThread {
-    cb::SmartPointer<ToolTable> tools;
-    std::vector<std::string> files;
-    cb::SmartPointer<ToolPath> path;
+  class FileDialog : public QFileDialog {
+    QtWin &win;
 
-    public:
-    ToolPathThread(int event, QWidget *parent,
-                   const cb::SmartPointer<CutSim> &cutSim,
-                   const cb::SmartPointer<Project> &project);
+  public:
+    FileDialog(QtWin &win);
 
-    const cb::SmartPointer<ToolPath> &getPath() const {return path;}
-
-    // From cb::Thread
-    void run();
+    std::string open(const std::string &title, const std::string &filters,
+                     const std::string &filename, bool save);
   };
 }
 
-#endif // OPENSCAM_TOOL_PATH_THREAD_H
+#endif // OPENSCAM_FILE_DIALOG_H
 

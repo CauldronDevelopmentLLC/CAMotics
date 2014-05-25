@@ -18,39 +18,44 @@
 
 \******************************************************************************/
 
-#ifndef OPENSCAM_TOOL_PATH_THREAD_H
-#define OPENSCAM_TOOL_PATH_THREAD_H
+#include "NCFile.h"
 
-#include "CutSimThread.h"
+#include "Project.h"
 
-#include <openscam/cutsim/ToolPath.h>
-#include <openscam/sim/ToolTable.h>
+#include <cbang/os/SystemUtilities.h>
 
-#include <string>
-#include <vector>
+using namespace OpenSCAM;
+using namespace cb;
+using namespace std;
 
 
-namespace OpenSCAM {
-  class ToolTable;
-  class ToolPath;
-  class Project;
+NCFile::NCFile(Project &project, const string &filename) :
+  project(project),
+  absPath(SystemUtilities::absolute(project.getDirectory(), filename)),
+  modTime(getTime()) {}
 
-  class ToolPathThread : public CutSimThread {
-    cb::SmartPointer<ToolTable> tools;
-    std::vector<std::string> files;
-    cb::SmartPointer<ToolPath> path;
 
-    public:
-    ToolPathThread(int event, QWidget *parent,
-                   const cb::SmartPointer<CutSim> &cutSim,
-                   const cb::SmartPointer<Project> &project);
-
-    const cb::SmartPointer<ToolPath> &getPath() const {return path;}
-
-    // From cb::Thread
-    void run();
-  };
+bool NCFile::isTPL() const {
+  return String::endsWith(absPath, ".tpl");
 }
 
-#endif // OPENSCAM_TOOL_PATH_THREAD_H
 
+void NCFile::setFilename(const string &filename) {
+  absPath = SystemUtilities::absolute(filename);
+}
+
+
+string NCFile::getRelativePath() const {
+  return SystemUtilities::relative(project.getDirectory(), absPath, 4);
+}
+
+
+bool NCFile::exists() const {
+  return SystemUtilities::exists(absPath);
+}
+
+
+uint64_t NCFile::getTime() const {
+  return SystemUtilities::exists(absPath) ?
+    SystemUtilities::getModificationTime(absPath) : 0;
+}

@@ -25,6 +25,7 @@
 #include "ExportDialog.h"
 #include "AboutDialog.h"
 #include "DonateDialog.h"
+#include "FileDialog.h"
 #include "ToolPathThread.h"
 #include "SurfaceThread.h"
 #include "LineBuffer.h"
@@ -55,6 +56,7 @@ namespace OpenSCAM {
   class ProjectModel;
   class ToolPath;
   class CutWorkpiece;
+  class FileTabManager;
 
   class QtWin : public QMainWindow {
     Q_OBJECT;
@@ -67,11 +69,12 @@ namespace OpenSCAM {
     ExportDialog exportDialog;
     AboutDialog aboutDialog;
     DonateDialog donateDialog;
-    QFileDialog fileDialog;
+    FileDialog fileDialog;
     QTimer animationTimer;
     QGraphicsScene toolScene;
     QByteArray fullLayoutState;
     cb::SmartPointer<ProjectModel> projectModel;
+    cb::SmartPointer<FileTabManager> fileTabManager;
 
     LineBuffer lineBuffer;
     cb::SmartPointer<cb::LineBufferStream<LineBuffer> > consoleStream;
@@ -164,26 +167,19 @@ namespace OpenSCAM {
     std::string openFile(const std::string &title,
                          const std::string &filters,
                          const std::string &filename, bool save);
+    const cb::SmartPointer<Project> &getProject() const {return project;}
     void loadProject();
     void resetProject();
     void newProject();
     void openProject(const std::string &filename = std::string());
     bool saveProject(bool saveas = false);
     void revertProject();
+    void newFile(bool tpl);
     void addFile();
     void removeFile();
     bool checkSave(bool canCancel = true);
 
-    void newFile(bool tpl);
-    void editFile(unsigned num);
-    std::string getFileTabPath(int tab) const;
-    bool isFileTabModified(int tab) const;
-    void saveFileTab(int tab, bool saveAs = false);
-    void revertFileTab(int tab);
-    bool checkSaveFileTab(int tab);
-    void closeFileTab(int tab, bool canSave = true, bool removeTab = true);
-    void updateFileSave();
-
+    void updateActions();
     void updateUnits();
 
     void loadTool(unsigned number);
@@ -240,8 +236,6 @@ namespace OpenSCAM {
 
   protected slots:
     void animate();
-
-    void fileTabModified(bool changed);
 
     void on_tabWidget_currentChanged(int index);
     void on_tabWidget_tabCloseRequested(int index);

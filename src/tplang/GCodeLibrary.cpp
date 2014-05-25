@@ -91,7 +91,7 @@ void GCodeLibrary::add(js::ObjectTemplate &tmpl) {
 
 js::Value GCodeLibrary::gcodeCB(const js::Arguments &args) {
   string path =
-    SystemUtilities::makeRelative(ctx.currentPath(), args.getString("path"));
+    SystemUtilities::absolute(ctx.currentPath(), args.getString("path"));
 
   ctx.pushPath(path);
   SmartFunctor<TPLContext> popPath(&ctx, &TPLContext::popPath);

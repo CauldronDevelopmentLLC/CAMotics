@@ -50,5 +50,12 @@
         <file>icons/idle.png</file>
         <file>icons/help.png</file>
         <file>icons/clear.png</file>
+        <file>icons/undo.png</file>
+        <file>icons/redo.png</file>
+        <file>icons/cut.png</file>
+        <file>icons/copy.png</file>
+        <file>icons/paste.png</file>
+        <file>icons/select-all.png</file>
+        <file>icons/delete.png</file>
     </qresource>
 </RCC>

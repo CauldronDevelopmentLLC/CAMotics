@@ -18,39 +18,36 @@
 
 \******************************************************************************/
 
-#ifndef OPENSCAM_TOOL_PATH_THREAD_H
-#define OPENSCAM_TOOL_PATH_THREAD_H
+#ifndef OPENSCAM_NCFILE_H
+#define OPENSCAM_NCFILE_H
 
-#include "CutSimThread.h"
-
-#include <openscam/cutsim/ToolPath.h>
-#include <openscam/sim/ToolTable.h>
+#include <cbang/StdTypes.h>
+#include <cbang/SmartPointer.h>
 
 #include <string>
-#include <vector>
 
 
 namespace OpenSCAM {
-  class ToolTable;
-  class ToolPath;
   class Project;
 
-  class ToolPathThread : public CutSimThread {
-    cb::SmartPointer<ToolTable> tools;
-    std::vector<std::string> files;
-    cb::SmartPointer<ToolPath> path;
+  class NCFile {
+    Project &project;
+    std::string absPath;
+    uint64_t modTime;
 
-    public:
-    ToolPathThread(int event, QWidget *parent,
-                   const cb::SmartPointer<CutSim> &cutSim,
-                   const cb::SmartPointer<Project> &project);
+  public:
+    NCFile(Project &project, const std::string &filename);
 
-    const cb::SmartPointer<ToolPath> &getPath() const {return path;}
-
-    // From cb::Thread
-    void run();
+    bool isTPL() const;
+    void setFilename(const std::string &filename);
+    const std::string &getAbsolutePath() const {return absPath;}
+    std::string getRelativePath() const;
+    bool exists() const;
+    uint64_t getTime() const;
+    bool changed() const {return modTime < getTime();}
+    void update() {modTime = getTime();}
   };
 }
 
-#endif // OPENSCAM_TOOL_PATH_THREAD_H
+#endif // OPENSCAM_NCFILE_H
 

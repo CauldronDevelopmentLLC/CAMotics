@@ -50,6 +50,8 @@
 
 #include "TPLHighlighter.h"
 
+#include <cbang/log/Logger.h>
+
 using namespace OpenSCAM;
 
 
@@ -153,6 +155,7 @@ void TPLHighlighter::highlightBlock(const QString &text) {
   while (i <= text.length()) {
     QChar ch = (i < text.length()) ? text.at(i) : QChar();
     QChar next = (i < text.length() - 1) ? text.at(i + 1) : QChar();
+    nextState = state;
 
     switch (state) {
     case Start:
@@ -308,7 +311,4 @@ void TPLHighlighter::highlightBlock(const QString &text) {
   blockState =
     (state & 0xf) | ((precedingState << 4) & 0xf) | (bracketLevel << 8);
   setCurrentBlockState(blockState);
-
-  // Call base class
-  Highlighter::highlightBlock(text);
 }

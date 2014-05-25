@@ -331,6 +331,9 @@
     <addaction name="separator"/>
     <addaction name="actionExamples"/>
     <addaction name="separator"/>
+    <addaction name="actionExport"/>
+    <addaction name="actionSnapshot"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -341,15 +344,19 @@
     <addaction name="actionDonate"/>
     <addaction name="actionHelp"/>
    </widget>
-   <widget class="QMenu" name="menuProject">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Project</string>
+     <string>Edit</string>
     </property>
-    <addaction name="actionAddFile"/>
-    <addaction name="actionAddTool"/>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
     <addaction name="separator"/>
-    <addaction name="actionExport"/>
-    <addaction name="actionSnapshot"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelectAll"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuView_2">
     <property name="title">
@@ -396,7 +403,7 @@
     <addaction name="actionDirection"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuProject"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuSimulate"/>
    <addaction name="menuView_2"/>
    <addaction name="menuHelp"/>
@@ -3162,6 +3169,96 @@
    </property>
    <property name="toolTip">
     <string>Save file.</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/undo.png</normaloff>:/icons/undo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo most recent edit.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/redo.png</normaloff>:/icons/redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="toolTip">
+    <string>Redo recent edit.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/cut.png</normaloff>:/icons/cut.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="toolTip">
+    <string>Cut selected text to clipboard.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/copy.png</normaloff>:/icons/copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy selected text to clipboard.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/paste.png</normaloff>:/icons/paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste clipboard contents to editor.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="icon">
+    <iconset resource="openscam.qrc">
+     <normaloff>:/icons/select-all.png</normaloff>:/icons/select-all.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="toolTip">
+    <string>Select all text in editor.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

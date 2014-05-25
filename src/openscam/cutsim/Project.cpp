@@ -100,27 +100,17 @@ void Project::setFilename(const string &_filename) {
   if (_filename.empty() || filename == _filename) return;
   filename = _filename;
 
-  vector<string> absFiles = getAbsoluteFiles();
-
   Option &option = options["nc-files"];
   option.reset();
 
-  for (unsigned i = 0; i < absFiles.size(); i++)
-    option.append(encodeFilename(makeRelative(absFiles[i])));
+  for (iterator it = begin(); it != end(); it++)
+    option.append(encodeFilename((*it)->getRelativePath()));
 }
 
 
-string Project::makeRelative(const string &path) const {
-  string dir = filename.empty() ?
-    SystemUtilities::getcwd() : SystemUtilities::dirname(filename);
-  return SystemUtilities::relative(dir, path, 4);
-}
-
-
-string Project::makeAbsolute(const string &path) const {
-  string dir = filename.empty() ?
-    SystemUtilities::getcwd() : SystemUtilities::dirname(filename);
-  return SystemUtilities::makeRelative(dir, path);
+string Project::getDirectory() const {
+  return filename.empty() ? SystemUtilities::getcwd() :
+    SystemUtilities::dirname(filename);
 }
 
 
@@ -180,20 +170,22 @@ void Project::updateResolution() {
 void Project::load(const string &_filename) {
   setFilename(_filename);
 
-  XMLReader reader;
-  reader.addFactory("tool_table", tools.get());
-  reader.read(filename, &options);
+  if (SystemUtilities::exists(_filename)) {
+    XMLReader reader;
+    reader.addFactory("tool_table", tools.get());
+    reader.read(filename, &options);
 
-  // Default workpiece
-  if (!options["automatic-workpiece"].hasValue())
-    options["automatic-workpiece"].
-      setDefault(workpieceMin.empty() && workpieceMax.empty());
+    // Default workpiece
+    if (!options["automatic-workpiece"].hasValue())
+      options["automatic-workpiece"].
+        setDefault(workpieceMin.empty() && workpieceMax.empty());
 
-  // Load NC files
-  Option::strings_t ncFiles = options["nc-files"].toStrings();
-  options["nc-files"].reset();
-  for (unsigned i = 0; i < ncFiles.size(); i++)
-    addFile(decodeFilename(ncFiles[i]));
+    // Load NC files
+    Option::strings_t ncFiles = options["nc-files"].toStrings();
+    options["nc-files"].reset();
+    for (unsigned i = 0; i < ncFiles.size(); i++)
+      addFile(decodeFilename(ncFiles[i]));
+  }
 
   markClean();
 }
@@ -215,52 +207,60 @@ void Project::save(const string &_filename) {
 }
 
 
-void Project::addFile(const string &path) {
-  string abs = makeAbsolute(path);
-  if (files.has(abs)) return; // Duplicate
-  files[abs] = getFileTime(abs);
-  options["nc-files"].append(encodeFilename(makeRelative(abs)));
+const SmartPointer<NCFile> &Project::getFile(unsigned index) const {
+  unsigned count = 0;
+
+  for (iterator it = begin(); it != end(); it++)
+    if (count++ == index) return *it;
+
+  THROWS("Invalid file index " << index);
+}
+
+
+SmartPointer<NCFile> Project::findFile(const string &filename) const {
+  string abs = SystemUtilities::absolute(filename);
+  for (iterator it = begin(); it != end(); it++)
+    if ((*it)->getAbsolutePath() == abs) return *it;
+  return 0;
+}
+
+
+void Project::addFile(const string &filename) {
+  string abs = SystemUtilities::absolute(filename);
+  if (!findFile(abs).isNull()) return; // Duplicate
+
+  SmartPointer<NCFile> file = new NCFile(*this, abs);
+  files.push_back(file);
+  options["nc-files"].append(encodeFilename(file->getRelativePath()));
   markDirty();
 }
 
 
-void Project::removeFile(unsigned i) {
-  vector<string> files = getRelativeFiles();
-  for (vector<string>::iterator it = files.begin(); it != files.end(); it++)
-    if (!i--) {
+void Project::removeFile(unsigned index) {
+  unsigned count = 0;
+  for (files_t::iterator it = files.begin(); it != files.end(); it++)
+    if (count++ == index) {
       files.erase(it);
-      setFiles(files);
+      markDirty();
       break;
     }
-  markDirty();
 }
 
 
-vector<string> Project::getRelativeFiles() const {
-  vector<string> files = options["nc-files"].toStrings();
-  vector<string> result;
+bool Project::checkFiles() {
+  bool changed = false;
 
-  for (unsigned i = 0; i < files.size(); i++)
-    result.push_back(decodeFilename(files[i]));
+  if (watch && lastWatch < Time::now()) {
+    for (iterator it = begin(); it != end(); it++)
+      if ((*it)->changed()) {
+        LOG_INFO(1, "File changed: " << (*it)->getRelativePath());
+        changed = true;
+      }
 
-  return result;
-}
+    lastWatch = Time::now();
+  }
 
-
-vector<string> Project::getAbsoluteFiles() const {
-  vector<string> absFiles;
-
-  for (unsigned i = 0; i < files.size(); i++)
-    absFiles.push_back(files.keyAt(i));
-
-  return absFiles;
-}
-
-
-void Project::setFiles(vector<string> &files) {
-  options["nc-files"].reset();
-  this->files.clear();
-  for (unsigned i = 0; i < files.size(); i++) addFile(files[i]);
+  return changed;
 }
 
 
@@ -343,24 +343,6 @@ Rectangle3R Project::getWorkpieceBounds() const {
   Vector3R wpMin = workpieceMin.empty() ? Vector3R() : Vector3R(workpieceMin);
   Vector3R wpMax = workpieceMax.empty() ? Vector3R() : Vector3R(workpieceMax);
   return Rectangle3R(wpMin, wpMax);
-}
-
-
-bool Project::checkFiles() {
-  if (watch && lastWatch < Time::now()) {
-    for (unsigned i = 0; i < files.size(); i++) {
-      uint64_t fileTime = getFileTime(files.keyAt(i));
-      if (files[i] < fileTime) {
-        files[i] = fileTime;
-        LOG_INFO(1, "File changed: " << files.keyAt(i));
-        return true;
-      }
-    }
-
-    lastWatch = Time::now();
-  }
-
-  return false;
 }
 
 

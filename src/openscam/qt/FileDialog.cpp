@@ -18,32 +18,46 @@
 
 \******************************************************************************/
 
-#include "ToolPathThread.h"
+#include "FileDialog.h"
 
-#include <openscam/cutsim/Project.h>
+#include "QtWin.h"
 
-#include <cbang/js/Javascript.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/os/SystemUtilities.h>
+
+#include <QString>
 
 using namespace OpenSCAM;
 using namespace cb;
+using namespace std;
 
 
-ToolPathThread::ToolPathThread(int event, QWidget *parent,
-                               const SmartPointer<CutSim> &cutSim,
-                               const SmartPointer<Project> &project) :
-  CutSimThread(event, parent, cutSim),
-  tools(new ToolTable(*project->getToolTable())) {
-
-  for (Project::iterator it = project->begin(); it != project->end(); it++)
-    files.push_back((*it)->getAbsolutePath());
+FileDialog::FileDialog(QtWin &win) : QFileDialog(&win), win(win) {
+  setResolveSymlinks(false);
 }
 
 
-void ToolPathThread::run() {
-  v8::Locker locker;
-  try {
-    path = cutSim->computeToolPath(tools, files);
-  } CATCH_ERROR;
-  done();
+string FileDialog::open(const string &title, const string &filters,
+                        const string &filename, bool save) {
+  setWindowTitle(QString::fromAscii(title.c_str()));
+  setNameFilter(QString::fromAscii(filters.c_str()));
+  setAcceptMode(save ? AcceptSave : AcceptOpen);
+  setConfirmOverwrite(save);
+
+  if (!filename.empty()) {
+    selectFile(QString());
+    setDirectory(QString::fromAscii(filename.c_str()));
+  }
+
+  if (exec() != Accepted) return "";
+
+  QStringList names = selectedFiles();
+  if (!names.size()) return "";
+  string path = names.at(0).toAscii().data();
+
+  if (SystemUtilities::isDirectory(path)) {
+    win.warning("Cannot open directory");
+    return "";
+  }
+
+  return path;
 }

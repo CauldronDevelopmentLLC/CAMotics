@@ -47,7 +47,7 @@ void ProjectModel::setProject(const SmartPointer<Project> &project) {
 
 
 string ProjectModel::getFile(unsigned i) const {
-  return project->getRelativeFiles().at(i);
+  return project->getFile(i)->getRelativePath();
 }
 
 
@@ -119,8 +119,7 @@ QVariant ProjectModel::data(const QModelIndex &index, int role) const {
   switch (getType(index)) {
   case PROJECT_ITEM: return QString("Project");
   case PATHS_ITEM: return QString("Paths");
-  case FILE_ITEM:
-    return QString::fromAscii(project->getRelativeFiles().at(offset).c_str());
+  case FILE_ITEM: return QString::fromAscii(getFile(offset).c_str());
   case TOOLS_ITEM: return QString("Tools");
   case TOOL_ITEM: return QString::fromAscii(getToolString(offset).c_str());
   case WORKPIECE_ITEM: return QString("Workpiece");
@@ -167,7 +166,7 @@ int ProjectModel::rowCount(const QModelIndex &parent) const {
   switch (getType(parent)) {
   case NULL_ITEM:
   case PROJECT_ITEM: return 3;
-  case PATHS_ITEM: return project->getRelativeFiles().size();
+  case PATHS_ITEM: return project->getFileCount();
   case TOOLS_ITEM: return project->getToolTable()->size() - 1;
   default: return 0;
   }
