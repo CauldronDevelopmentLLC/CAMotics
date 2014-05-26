@@ -11,19 +11,25 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Create new project or NC file.</string>
+   <string>Create new project or add NC files.</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="toolTip">
+      <string>Creates a new empty project and closes the current one.</string>
+     </property>
      <property name="title">
-      <string>Create new:</string>
+      <string>Create new or add existing:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QRadioButton" name="newProjectRadioButton">
+       <widget class="QRadioButton" name="newTPLRadioButton">
+        <property name="toolTip">
+         <string>Create a new TPL file by selecting a non-existing filename or select an exsiting TPL file and add it to the current project.</string>
+        </property>
         <property name="text">
-         <string>Project</string>
+         <string>TPL File (Tool Path Lanague)</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -31,14 +37,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="newTPLRadioButton">
-        <property name="text">
-         <string>TPL File (Tool Path Language)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QRadioButton" name="newGCodeRadioButton">
+        <property name="toolTip">
+         <string>Create a new GCode file by selecting a non-existing filename or select an exsiting GCode file and add it to the current project.</string>
+        </property>
         <property name="text">
          <string>G-Code File</string>
         </property>
@@ -52,7 +54,7 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>120</height>
+          <height>150</height>
          </size>
         </property>
        </spacer>

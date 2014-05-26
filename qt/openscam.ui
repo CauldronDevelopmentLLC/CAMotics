@@ -322,6 +322,7 @@
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
+    <addaction name="actionAddFile"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSaveAs"/>
@@ -2559,7 +2560,7 @@
      <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;New Project or File</string>
+    <string>&amp;New Project</string>
    </property>
    <property name="toolTip">
     <string>Create a new project or NC file.</string>
@@ -2572,7 +2573,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>&amp;Open Project or File</string>
+    <string>&amp;Open Project</string>
    </property>
    <property name="toolTip">
     <string>Open an existing project or NC file.</string>

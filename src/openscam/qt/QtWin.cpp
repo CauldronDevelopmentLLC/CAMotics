@@ -1745,10 +1745,7 @@ void QtWin::on_actionQuit_triggered() {
 
 
 void QtWin::on_actionNew_triggered() {
-  if (newDialog.exec() != QDialog::Accepted) return;
-
-  if (newDialog.projectSelected()) newProject();
-  else newFile(newDialog.tplSelected());
+  newProject();
 }
 
 
@@ -1976,7 +1973,8 @@ void QtWin::on_actionToolPath_triggered(bool checked) {
 
 
 void QtWin::on_actionAddFile_triggered() {
-  addFile();
+  if (newDialog.exec() != QDialog::Accepted) return;
+  newFile(newDialog.tplSelected());
 }
 
 

@@ -36,7 +36,6 @@ namespace OpenSCAM {
   public:
     NewDialog();
 
-    bool projectSelected() const;
     bool tplSelected() const;
     bool gcodeSelected() const;
   };

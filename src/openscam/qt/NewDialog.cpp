@@ -30,11 +30,6 @@ NewDialog::NewDialog() : ui(new Ui::NewDialog) {
 }
 
 
-bool NewDialog::projectSelected() const {
-  return ui->newProjectRadioButton->isChecked();
-}
-
-
 bool NewDialog::tplSelected() const {
   return ui->newTPLRadioButton->isChecked();
 }
