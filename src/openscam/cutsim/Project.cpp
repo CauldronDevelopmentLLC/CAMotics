@@ -99,12 +99,7 @@ void Project::markDirty() {
 void Project::setFilename(const string &_filename) {
   if (_filename.empty() || filename == _filename) return;
   filename = _filename;
-
-  Option &option = options["nc-files"];
-  option.reset();
-
-  for (iterator it = begin(); it != end(); it++)
-    option.append(encodeFilename((*it)->getRelativePath()));
+  markDirty();
 }
 
 
@@ -181,8 +176,8 @@ void Project::load(const string &_filename) {
         setDefault(workpieceMin.empty() && workpieceMax.empty());
 
     // Load NC files
+    files.clear();
     Option::strings_t ncFiles = options["nc-files"].toStrings();
-    options["nc-files"].reset();
     for (unsigned i = 0; i < ncFiles.size(); i++)
       addFile(decodeFilename(ncFiles[i]));
   }
@@ -193,6 +188,11 @@ void Project::load(const string &_filename) {
 
 void Project::save(const string &_filename) {
   setFilename(_filename);
+
+  // Set nc-files option
+  options["nc-files"].reset();
+  for (files_t::iterator it = files.begin(); it != files.end(); it++)
+    options["nc-files"].append((*it)->getRelativePath());
 
   SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::out);
   XMLWriter writer(*stream, true);
@@ -229,9 +229,7 @@ void Project::addFile(const string &filename) {
   string abs = SystemUtilities::absolute(filename);
   if (!findFile(abs).isNull()) return; // Duplicate
 
-  SmartPointer<NCFile> file = new NCFile(*this, abs);
-  files.push_back(file);
-  options["nc-files"].append(encodeFilename(file->getRelativePath()));
+  files.push_back(new NCFile(*this, abs));
   markDirty();
 }
 
