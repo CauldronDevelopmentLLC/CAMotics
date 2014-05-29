@@ -178,8 +178,10 @@ void Project::load(const string &_filename) {
     // Load NC files
     files.clear();
     Option::strings_t ncFiles = options["nc-files"].toStrings();
-    for (unsigned i = 0; i < ncFiles.size(); i++)
-      addFile(decodeFilename(ncFiles[i]));
+    for (unsigned i = 0; i < ncFiles.size(); i++) {
+      string relPath = decodeFilename(ncFiles[i]);
+      addFile(SystemUtilities::absolute(getDirectory(), relPath));
+    }
   }
 
   markClean();

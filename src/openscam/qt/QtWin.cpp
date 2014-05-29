@@ -1167,6 +1167,8 @@ void QtWin::hideConsole() {
 
 
 void QtWin::appendConsole(const string &_line) {
+  cout << _line << endl;
+
   string line = _line;
   QColor saveColor = ui->console->textColor();
 
