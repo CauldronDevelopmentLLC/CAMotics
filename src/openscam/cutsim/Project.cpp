@@ -112,7 +112,7 @@ string Project::makeRelative(const string &path) const {
 string Project::makeAbsolute(const string &path) const {
   string dir = filename.empty() ?
     SystemUtilities::getcwd() : SystemUtilities::dirname(filename);
-  return SystemUtilities::makeRelative(dir, path);
+  return SystemUtilities::absolute(dir, path);
 }
 
 
