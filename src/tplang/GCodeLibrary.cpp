@@ -123,6 +123,8 @@ js::Value GCodeLibrary::cutCB(const js::Arguments &args) {
 
 
 js::Value GCodeLibrary::arcCB(const js::Arguments &args) {
+  // TODO Handle 'incremental=false'
+
   Vector3D
     offset(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
   double angle = args.getNumber("angle");

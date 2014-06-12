@@ -723,7 +723,7 @@ void QtWin::openProject(const string &_filename) {
     if (!xml) {
       // Check if .xml file exists
       string xmlPath = SystemUtilities::splitExt(filename)[0] + ".xml";
-      if (is_xml(xmlPath)) {
+      if (SystemUtilities::exists(xmlPath) && is_xml(xmlPath)) {
         int response =
           QMessageBox::question
           (this, "Project File Exists", "An OpenSCAM project file for the "

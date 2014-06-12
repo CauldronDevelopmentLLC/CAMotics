@@ -2563,7 +2563,7 @@
     <string>&amp;New Project</string>
    </property>
    <property name="toolTip">
-    <string>Create a new project or NC file.</string>
+    <string>Create a new project.</string>
    </property>
   </action>
   <action name="actionOpen">

@@ -42,16 +42,7 @@ Interpreter::Interpreter(TPLContext &ctx) :
 void Interpreter::read(const InputSource &source) {
   js::Context context(*this);
 
-  string s;
-  istream &stream = source.getStream();
-
-  while (stream) {
-    char buffer[4096];
-    stream.read(buffer, 4096);
-    s.append(buffer, stream.gcount());
-  }
-
   ctx.machine.start();
-  js::Script(context, s, source.getName()).eval();
+  js::Script(context, source).eval();
   ctx.machine.end();
 }

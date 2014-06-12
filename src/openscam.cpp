@@ -23,8 +23,6 @@
 #include <cbang/ApplicationMain.h>
 #include <cbang/js/Javascript.h>
 
-#include <QApplication>
-
 // This causes Windows to not automatically create a console
 #if defined(_WIN32) && !defined(DEBUG)
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
