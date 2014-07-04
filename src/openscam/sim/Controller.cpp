@@ -542,15 +542,16 @@ void Controller::moveAxis(char axis, double value, bool rapid) {
 void Controller::arc(int vars, bool clockwise) {
   // TODO Handle Arc Absolute Mode
   // TODO Affected by cutter radius compensation
+  // TODO Make sure this is correct for planes XZ and YZ
 
   const char *axes = getPlaneAxes(getPlane());
+  if (getPlane() == MachineInterface::XZ) clockwise = !clockwise;
 
   // Compute start and end points
   Axes current = getPosition(true);
   Axes target = getNextPosition(vars);
   Vector2D start = Vector2D(current.get(axes[0]), current.get(axes[1]));
   Vector2D finish = Vector2D(target.get(axes[0]), target.get(axes[1]));
-
   Vector2D center;
   double radius;
 

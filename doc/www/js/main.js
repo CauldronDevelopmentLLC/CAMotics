@@ -44,7 +44,20 @@ $(function() {
 
     // Make releases clickable
     $('.release').click(function (e) {
-        window.location = $(this).find('a').attr('href');
+        var origin = window.location;
+        var target = $(this).find('a').attr('href');
+        window.location = target;
+
+        $.get('http://c.statcounter.com/click.gif', {
+            sc_project: sc_project,
+            security: sc_security,
+            c: '' + target,
+            m: 2,
+            u: '' + origin,
+            t: document.title,
+            rand: Math.random()
+        });
+
         e.preventDefault();
     });
 
