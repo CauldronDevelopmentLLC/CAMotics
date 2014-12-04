@@ -491,8 +491,8 @@ void Controller::execute(const Code &code, int vars) {
       break;
     case 970: spinMode = MachineInterface::REVOLUTIONS_PER_MINUTE; break;
 
-    case 980: returnMode = RETURN_TO_R; break;
-    case 990: returnMode = RETURN_TO_OLD_Z; break;
+    case 980: returnMode = RETURN_TO_OLD_Z; break;
+    case 990: returnMode = RETURN_TO_R; break;
 
     default: implemented = false;
     }
