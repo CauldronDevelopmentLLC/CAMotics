@@ -25,7 +25,7 @@ G0 X0
 G0 Y0
 %      (end of program)
 ```
-[Figure 1](figures/figure1.png)
+![Figure 1](figures/figure1.png)
 
 Note, that a starting position of (0, 0) is assumed and GCode only requires
 writing the axes which have changed.
