@@ -15,7 +15,7 @@ rapid(0, 1);
 rapid(0, 0);
 ```
 
-This will produce the following GCode
+This will produce the following GCode:
 
 ```
 G21    (mm mode)
