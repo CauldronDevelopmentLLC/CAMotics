@@ -56,7 +56,7 @@ G0 X1
 G0 Y1
 %
 ```
-[Figure 3](figures/figure2.png)
+![Figure 2](figures/figure2.png)
 
 
 # Combining Matrix Operations
@@ -86,7 +86,7 @@ G0 X-1.12132 Y3.12132
 G0 X1 Y1
 %
 ```
-[Figure 3](figures/figure3.png)
+![Figure 3](figures/figure3.png)
 
 Matrix operations accumulate via matrix multiplication.  The default matrix is
 the identity matrix which does not change the tool path output at all.  To get
@@ -123,7 +123,7 @@ translate(0.5, 0.5);
 square(-1, 2);
 ```
 
-[Figure 4](figures/figure4.png)
+![Figure 4](figures/figure4.png)
 
 
 # Order of Matrix Operations
@@ -147,7 +147,7 @@ square(zcut, zsafe);
 
 ```
 
-[Figure 5](figures/figure5.png)
+![Figure 5](figures/figure5.png)
 
 Note that for the second square the starting position of the square (1, 1)
 is scaled up to (2, 2) because the translation is applied before the scale
@@ -172,4 +172,4 @@ square(zcut, zsafe);
 
 ```
 
-[Figure 6](figures/figure6.png)
+![Figure 6](figures/figure6.png)
