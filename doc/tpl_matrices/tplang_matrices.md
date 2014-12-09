@@ -134,8 +134,6 @@ translating is not the same as applying the same operations in the reverse
 order.
 
 ```javascript
-...
-
 scale(2, 2);
 translate(1, 1);
 square(zcut, zsafe);
@@ -159,8 +157,6 @@ and pop the current matrix to and from the matrix stack.  This can be useful
 for applying temporary changes to the matrix.
 
 ```javascript
-...
-
 translate(1, 1);
 
 pushMatrix();
