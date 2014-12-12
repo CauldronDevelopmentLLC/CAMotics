@@ -1,4 +1,5 @@
 - var ggroup = 'http://groups.google.com/group/openscam';
+- var scheme = 'http:';
 
 footer.bs-footer(role='contentinfo')
   .container
@@ -38,13 +39,22 @@ footer.bs-footer(role='contentinfo')
 
 
 // Placed at the end of the document so the pages load faster
-script(src='//code.jquery.com/jquery-1.10.2.min.js')
-script(src='//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js')
+script(src=scheme + '//code.jquery.com/jquery-1.10.2.min.js')
+script(src=scheme +
+  '//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js')
       
-script(src='//cdnjs.cloudflare.com/ajax/libs/holder/2.2.0/holder.min.js')
+script(src=scheme +
+  '//cdnjs.cloudflare.com/ajax/libs/holder/2.2.0/holder.min.js')
       
 script(src='js/shadowbox.js')
 script(src='js/main.js')
+
+// Google Analytics
+script
+  | var id='UA-57023811-1';
+  | GoogleAnalyticsObject='ga';
+  | ga={'q':[['create',,'auto'],['send', 'pageview']],'l':1*new Date()};
+script(src='//www.google-analytics.com/analytics.js' async=1)
 
 // StatCounter
 script(type='text/javascript')
@@ -52,7 +62,7 @@ script(type='text/javascript')
   | var sc_invisible = 1;
   | var sc_security = 'b96519b2';
   | var sc_download_type = 'exe|pkg|deb';
-script(src='//www.statcounter.com/counter/counter.js')
+script(src=scheme + '//www.statcounter.com/counter/counter.js')
 noscript
   div.statcounter
     a.statcounter(title='web analytics', href='http://statcounter.com/',

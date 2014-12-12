@@ -84,4 +84,26 @@ $(function() {
                width: 100, height: 20})
         .addClass('github-btn')
         .appendTo('.github-fork');
+
+    // Banner
+    var banner = $('.banner');
+    var bannerID = banner.attr('id');
+
+    if (document.cookie.indexOf('banner-close=' + bannerID) == -1)
+        banner.slideDown('fast');
+
+    $('.banner-close').click(function () {
+        banner.slideUp('fast');
+        document.cookie = 'banner-close=' + bannerID + '; path=/';
+    });
+
+    // Google Analytics
+    GoogleAnalyticsObject = 'ga';
+    ga = {
+        'q': [['create', 'UA-57023811-1', 'auto'], ['send', 'pageview']],
+        'l': 1 * new Date()
+    };
+    $('<script>')
+        .attr({'src': '//www.google-analytics.com/analytics.js', 'async': 1})
+        .appendTo('head');
 });

@@ -42,10 +42,14 @@ header.navbar.navbar-inverse.navbar-fixed-top.docs-nav(role='banner')
     != pages[page].titleText
     != pages[page].subtext
 
-.banner
+.banner#survey20141120
+  img.banner-close(src='images/banner-close.png')
   .container
-    = 'OpenSCAM version ' + version + ' has been released -'
-    | &nbsp;
-    strong
-      a(href=repoURL + '/blob/master/CHANGELOG.md', target='_blank')
-        | See what's new.
+    | Help us decide what to focus on next by completing&nbsp;
+    a(href='https://www.surveymonkey.com/s/SKS79FQ') our user survey
+    | .
+    //= 'OpenSCAM version ' + version + ' has been released -'
+    //| &nbsp;
+    //strong
+    //  a(href=repoURL + '/blob/master/CHANGELOG.md', target='_blank')
+    //    | See what's new.
