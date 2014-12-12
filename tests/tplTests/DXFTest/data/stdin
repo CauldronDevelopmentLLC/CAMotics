@@ -4,7 +4,7 @@ feed(50);
 
 
 function samePos(x, y) {
-  small = 0.0001;
+  var small = 0.0001;
   return getX() - small < x && x < getX() + small &&
     getY() - small < y && y < getY() + small;
 }
@@ -19,17 +19,17 @@ function cut_layer(layer) {
 
     case LINE:
       print('(line)\n');
-      if (samePos(entity.x2, entity.y2))
-        cut(entity.x1, entity.y1);
+      if (samePos(entity.end.x, entity.end.y))
+        cut(entity.start.x, entity.start.y);
 
       else {
-        if (!samePos(entity.x1, entity.y1)) {
+        if (!samePos(entity.start.x, entity.start.y)) {
           rapid({z: zSafe});
-          rapid(entity.x1, entity.y1);
+          rapid(entity.start.x, entity.start.y);
           cut({z: zCut});
         }
 
-        cut(entity.x2, entity.y2);
+        cut(entity.end.x, entity.end.y);
       }
       break;
 
