@@ -210,7 +210,7 @@ pkg = env.Packager(
     deb_section = 'miscellaneous',
     deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
         'libexpat1, libsqlite3-0, libqtcore4, libqtgui4, libqt4-opengl, ' +\
-        'libcairo2',
+        'libcairo2, libv8-dev',
     deb_priority = 'optional',
 
     rpm_license = 'GPLv2+',
