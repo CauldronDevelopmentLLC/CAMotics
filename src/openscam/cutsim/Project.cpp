@@ -40,14 +40,6 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-namespace {
-  uint64_t getFileTime(const std::string &path) {
-    return SystemUtilities::exists(path) ?
-      SystemUtilities::getModificationTime(path) : 0;
-  }
-}
-
-
 Project::Project(Options &_options, const std::string &filename) :
   options(_options), filename(filename), tools(new ToolTable),
   resolution(1), workpieceMargin(5), watch(true), lastWatch(0), dirty(false) {
