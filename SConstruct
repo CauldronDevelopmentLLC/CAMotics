@@ -183,52 +183,53 @@ if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
 
 
 # Package
-pkg = env.Packager(
-    'OpenSCAM',
-    version = version,
-    maintainer = 'Joseph Coffland <joseph@cauldrondevelopment.com>',
-    vendor = 'Cauldron Development LLC',
-    url = 'http://openscam.com/',
-    license = 'COPYING',
-    bug_url = 'http://openscam.com/',
-    summary = 'Open-Source Simulation & Computer Aided Machining',
-    description = description,
-    prefix = '/usr',
-    icons = ('osx/openscam.icns', 'images/openscam.png'),
+if 'package' in COMMAND_LINE_TARGETS:
+    pkg = env.Packager(
+        'OpenSCAM',
+        version = version,
+        maintainer = 'Joseph Coffland <joseph@cauldrondevelopment.com>',
+        vendor = 'Cauldron Development LLC',
+        url = 'http://openscam.com/',
+        license = 'COPYING',
+        bug_url = 'http://openscam.com/',
+        summary = 'Open-Source Simulation & Computer Aided Machining',
+        description = description,
+        prefix = '/usr',
+        icons = ('osx/openscam.icns', 'images/openscam.png'),
 
-    documents = ['README.md', 'CHANGELOG.md'] + examples,
-    programs = map(lambda x: str(x[0]), execs),
-    desktop_menu = ['OpenSCAM.desktop'],
-    changelog = 'CHANGELOG.md',
+        documents = ['README.md', 'CHANGELOG.md'] + examples,
+        programs = map(lambda x: str(x[0]), execs),
+        desktop_menu = ['OpenSCAM.desktop'],
+        changelog = 'CHANGELOG.md',
 
-    nsi = 'openscam.nsi',
-    msvc_redist = msvc_redist,
+        nsi = 'openscam.nsi',
+        msvc_redist = msvc_redist,
 
-    deb_directory = 'debian',
-    deb_section = 'miscellaneous',
-    deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
-        'libexpat1, libsqlite3-0, libqtcore4, libqtgui4, libqt4-opengl, ' +\
-        'libcairo2',
-    deb_priority = 'optional',
+        deb_directory = 'debian',
+        deb_section = 'miscellaneous',
+        deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
+            'libexpat1, libsqlite3-0, libqtcore4, libqtgui4, libqt4-opengl, ' +\
+            'libcairo2',
+        deb_priority = 'optional',
 
-    rpm_license = 'GPLv2+',
-    rpm_group = 'Applications/Engineering',
-    rpm_requires = 'expat, bzip2-libs',
+        rpm_license = 'GPLv2+',
+        rpm_group = 'Applications/Engineering',
+        rpm_requires = 'expat, bzip2-libs',
 
-    app_id = 'org.openscam',
-    app_resources = [['osx/Resources', '.']],
-    app_copyright = 'Copyright 2011-2014, Cauldron Development LLC',
-    app_signature = 'scam',
-    app_other_info = {
-        'CFBundleExecutable': 'openscam', # Overrides 'programs'
-        'CFBundleIconFile': 'openscam.icns',
-        },
-    app_finish_cmd = 'macdeployqt',
-    pkg_scripts = 'osx/Scripts',
-    pkg_resources = 'osx/Resources',
-    pkg_distribution = 'osx/distribution.xml',
-    pkg_plist = 'osx/pkg.plist',
-    )
+        app_id = 'org.openscam',
+        app_resources = [['osx/Resources', '.']],
+        app_copyright = 'Copyright 2011-2014, Cauldron Development LLC',
+        app_signature = 'scam',
+        app_other_info = {
+            'CFBundleExecutable': 'openscam', # Overrides 'programs'
+            'CFBundleIconFile': 'openscam.icns',
+            },
+        app_finish_cmd = 'macdeployqt',
+        pkg_scripts = 'osx/Scripts',
+        pkg_resources = 'osx/Resources',
+        pkg_distribution = 'osx/distribution.xml',
+        pkg_plist = 'osx/pkg.plist',
+        )
 
-AlwaysBuild(pkg)
-env.Alias('package', pkg)
+    AlwaysBuild(pkg)
+    env.Alias('package', pkg)
