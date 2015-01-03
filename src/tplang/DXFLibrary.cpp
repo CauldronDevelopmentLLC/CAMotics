@@ -53,7 +53,7 @@ void DXFLibrary::add(js::ObjectTemplate &tmpl) {
 
 js::Value DXFLibrary::openCB(const js::Arguments &args) {
   string path =
-    SystemUtilities::absolute(ctx.currentPath(), args.getString("path"));
+    SystemUtilities::absolute(ctx.getCurrentPath(), args.getString("path"));
 
   DXFReader reader;
   reader.read(path);

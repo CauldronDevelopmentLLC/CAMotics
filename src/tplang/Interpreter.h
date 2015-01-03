@@ -30,14 +30,13 @@
 #include <cbang/io/Reader.h>
 #include <cbang/io/OutputSink.h>
 
-#include <cbang/js/ObjectTemplate.h>
 #include <cbang/js/StdLibrary.h>
 
 #include <ostream>
 
 
 namespace tplang {
-  class Interpreter : public cb::Reader, public cb::js::ObjectTemplate {
+  class Interpreter : public cb::Reader {
     TPLContext &ctx;
     cb::js::StdLibrary stdLib;
     GCodeLibrary gcodeLib;

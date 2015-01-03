@@ -69,13 +69,7 @@ namespace OpenSCAM {
     // From cb::Reader
     void read(const cb::InputSource &source) {
       tplang::TPLContext ctx(cout, pipeline, tools);
-
-      if (!source.getName().empty() && source.getName()[0] != '<')
-        ctx.pushPath(source.getName());
-
-      tplang::Interpreter interp(ctx);
-
-      interp.read(source);
+      tplang::Interpreter(ctx).read(source);
       cout.flush();
     }
   };

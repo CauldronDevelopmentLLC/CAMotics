@@ -28,24 +28,14 @@
 #include <cbang/js/LibraryContext.h>
 #include <cbang/config/Options.h>
 
-#include <vector>
-#include <string>
-
-
 namespace tplang {
   class TPLContext : public cb::js::LibraryContext {
-    std::vector<std::string> paths;
-
   public:
     MachineInterface &machine;
     cb::SmartPointer<OpenSCAM::ToolTable> tools;
 
     TPLContext(std::ostream &out, MachineInterface &machine,
                const cb::SmartPointer<OpenSCAM::ToolTable> &tools);
-
-    void pushPath(const std::string &path) {paths.push_back(path);}
-    void popPath();
-    const std::string &currentPath() const;
 
     template <typename T>
     T &find() {

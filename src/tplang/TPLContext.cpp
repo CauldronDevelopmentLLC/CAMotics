@@ -21,6 +21,7 @@
 #include "TPLContext.h"
 
 #include <cbang/Exception.h>
+#include <cbang/os/SystemUtilities.h>
 
 using namespace std;
 using namespace cb;
@@ -30,16 +31,12 @@ using namespace tplang;
 TPLContext::TPLContext(ostream &out, MachineInterface &machine,
                        const SmartPointer<OpenSCAM::ToolTable> &tools) :
   js::LibraryContext(out), machine(machine), tools(tools) {
-  pushPath(".");
-}
 
+  // Add search paths
+  const char *paths = SystemUtilities::getenv("TPL_PATH");
+  if (paths) addSearchPaths(paths);
 
-void TPLContext::popPath() {
-  if (paths.size() == 1) THROW("No path top pop");
-  paths.pop_back();
-}
-
-
-const string &TPLContext::currentPath() const {
-  return paths.back();
+  // Search for .tpl before .js
+  clearSearchExtensions();
+  addSearchExtensions("tpl js");
 }

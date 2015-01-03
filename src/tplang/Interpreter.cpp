@@ -31,18 +31,16 @@ using namespace std;
 Interpreter::Interpreter(TPLContext &ctx) :
   ctx(ctx), stdLib(ctx), gcodeLib(ctx), matrixLib(ctx), dxfLib(ctx),
   clipperLib(ctx) {
-  stdLib.add(*this);
-  gcodeLib.add(*this);
-  matrixLib.add(*this);
-  dxfLib.add(*this);
-  clipperLib.add(*this);
+  stdLib.add(ctx);
+  gcodeLib.add(ctx);
+  matrixLib.add(ctx);
+  dxfLib.add(ctx);
+  clipperLib.add(ctx);
 }
 
 
 void Interpreter::read(const InputSource &source) {
-  js::Context context(*this);
-
   ctx.machine.start();
-  js::Script(context, source).eval();
+  ctx.eval(source);
   ctx.machine.end();
 }

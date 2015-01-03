@@ -37,6 +37,7 @@ namespace OpenSCAM {
 bool Application::_hasFeature(int feature) {
   switch (feature) {
   case FEATURE_INFO: return true;
+  case FEATURE_PRINT_INFO: return false;
   default: return cb::Application::_hasFeature(feature);
   }
 }

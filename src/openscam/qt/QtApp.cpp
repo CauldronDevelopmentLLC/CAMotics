@@ -58,6 +58,8 @@ int QtApp::init(int argc, char *argv[]) {
   int ret = cb::Application::init(argc, argv);
   if (ret < 0) return ret;
 
+  printInfo();
+
   // Get project file
   const vector<string> &args = cmdLine.getPositionalArgs();
   if (1 <= args.size()) {
