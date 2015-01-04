@@ -1,0 +1,105 @@
+html *
+  padding: 0
+  margin: 0
+
+body
+  background: url(background.png)
+
+#sidebar
+  overflow-x: hidden
+  overflow-y: auto
+  width: 15em
+  position: fixed
+  left: 0
+  top: 0
+  bottom: 0
+  border-right: 1px solid #aaa
+  box-shadow: 0 0 20px #ddd
+  background: url(background.png) fixed
+  white-space: nowrap
+
+  a
+    text-decoration: none
+    color: inherit
+
+    &:hover
+      text-decoration: underline
+
+  ul
+    margin-top: 0.33em
+
+  li
+    list-style: none
+    margin-bottom: 0.33em
+
+  > ul > li
+    font-size: 110%
+    margin-left: 0.75em
+    margin-top: 0.5em
+
+    > ul > li
+      font-size: 90%
+
+      &:before
+        content: '\b7\a0'
+
+      > ul > li
+        margin-left: 1em
+        font-weight: bold
+
+#content
+  margin-left: 235px
+  padding-bottom: 20em
+  padding-left: 2em
+  width: 40em
+
+  .func
+    margin: 1em 0 5em 0
+
+    .decl
+      font-size: 120%
+      font-weight: bold
+      border-bottom: 2px solid #bbb
+      display: block
+      padding-left: 2em
+      text-indent: -2em
+
+    .func-name
+      margin-right: 1em
+      font-weight: bold
+      font-size: 110%
+
+  code.example
+    margin-bottom: 0.75em
+    padding: 0.5em 1em
+    border-left: 5px solid #bbb
+    font-size: 110%
+    background-color: rgba(200, 200, 200, 0.2);
+    border-radius: 3px
+
+  pre code
+    display: block
+
+  h1, h2, h3
+    margin: 2em 0 0.5em 0
+
+  h1:first-of-type
+    margin-top: 0
+
+  ul
+    margin-bottom: 0.75em
+
+  li
+    margin-left: 2em
+
+  p
+    margin: 1em 0
+
+
+.sim-image
+  margin: 1px
+
+  &:hover
+    border: 1px dashed black
+    margin: 0
+
