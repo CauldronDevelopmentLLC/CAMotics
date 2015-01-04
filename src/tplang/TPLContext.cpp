@@ -36,7 +36,7 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
   const char *paths = SystemUtilities::getenv("TPL_PATH");
   if (paths) addSearchPaths(paths);
 
-  // Search for .tpl before .js
+  // Add .tpl to search extensions
   clearSearchExtensions();
-  addSearchExtensions("tpl js");
+  addSearchExtensions("/package.json .tpl .js .json");
 }
