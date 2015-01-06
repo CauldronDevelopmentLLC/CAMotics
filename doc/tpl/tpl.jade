@@ -9,29 +9,32 @@ html
     link(rel="stylesheet", href="tpl.css")
 
   body
+    #header
+      h1 Tool Path Language
+
     #sidebar
       ul
 
     #content
-      h1#about Tool Path Language
+      h1#about About
       p
-        | TPLang or Tool Path Language is a programming language for creating
+        | TPL or Tool Path Language is a programming language for creating
         | machine tool paths for
         | <a href="http://en.wikipedia.org/wiki/CNC">CNCs</a>.  It is based on
         | <a href="http://en.wikipedia.org/wiki/JavaScript">JavaScript</a>
         | and is a powerful replacement for the venerable but horribly outdated
         | <a href="http://en.wikipedia.org/wiki/G-code">G-code</a> language.
-        | However, TPLang can output G-code so it remains compatible with
+        | However, TPL can output G-code so it remains compatible with
         | existing machine control software like
         | <a href="http://www.linuxcnc.org/">LinuxCNC</a>.
       p
-        | TPLang is part of the
+        | TPL is part of the
         | <a href="http://openscam.org/">OpenSCAM project</a>
         | and can be used in conjunction with the OpenSCAM CNC simulator.
 
       h1#downloads Downloads
       p
-        | TPLang is part of the OpenSCAM project. See
+        | TPL is part of the OpenSCAM project. See
         | <a href="http://openscam.org/">openscam.org</a>
         | for information on downloading and installing the software.
 
@@ -43,21 +46,21 @@ html
         | TPL code is JavaScript with a library of built-in functions which
         | allow you to generate tool paths.  It looks like this:
       pre: code.example
-        | feed(400); // Set the feed rate to 400 millimeters per minute
-        | tool(1); // Select tool 1
+        | feed(400);     // Set the feed rate to 400 millimeters per minute
+        | tool(1);       // Select tool 1
         != '\n\n'
         | rapid({z: 5}); // Move to a safe height of 5mm
         | rapid({x: 1, y: 1});  // Go to start position
-        | speed(2000); // Spin at 2000 RPM in the clockwise direction
+        | speed(2000);   // Spin at 2000 RPM in the clockwise direction
         != '\n\n'
-        | cut({z: -3}); // Cut down to depth
-        | cut({x: 11}); // Cut to second corner
-        | cut({y: 11}); // Cut to third corner
-        | cut({x: 1}); // Cut to forth corner
-        | cut({y: 1}); // Cut back to begining
+        | cut({z: -3});  // Cut down to depth
+        | cut({x: 11});  // Cut to second corner
+        | cut({y: 11});  // Cut to third corner
+        | cut({x: 1});   // Cut to forth corner
+        | cut({y: 1});   // Cut back to begining
         != '\n\n'
         | rapid({z: 5}); // Move back to safe position
-        | speed(0); // Stop spinning
+        | speed(0);      // Stop spinning
 
       p The OpenSCAM simulator shows the result:
 
@@ -69,9 +72,9 @@ html
         | before making a cut.  It's also a good idea to select a tool and
         | set the spindle speed.  Also note thate, TPL uses metric units by
         | default but you can switch to imperial units by calling
-        | <b>units(IMPERIAL)</b>.
+        | <code>units(IMPERIAL)</code>.
       p
-        | Note, the bracket notation <b>{}</b> used above lets you specify
+        | Note, the bracket notation <code>{}</code> used above lets you specify
         | specific arguments and leave others to their default values.  The
         | following function calls are all equivalent:
 
@@ -88,38 +91,38 @@ html
 
       pre: code.example
         | function square(size, depth, safe) {
-        |   cut({z: depth}); // Cut down to depth
-        |   icut({x: size}); // Cut to second corner
-        |   icut({y: size}); // Cut to third corner
+        |   cut({z: depth});  // Cut down to depth
+        |   icut({x: size});  // Cut to second corner
+        |   icut({y: size});  // Cut to third corner
         |   icut({x: -size}); // Cut to forth corner
         |   icut({y: -size}); // Cut back to begining
         |   rapid({z: safe}); // Move back to safe position
         | }
         != '\n\n'
-        | feed(400); // Set the feed rate to 400 millimeters per minute
-        | tool(1); // Select tool 1
+        | feed(400);          // Set the feed rate to 400 millimeters per minute
+        | tool(1);            // Select tool 1
         != '\n\n'
-        | rapid({z: 5}); // Move to a safe height of 5mm
+        | rapid({z: 5});      // Move to a safe height of 5mm
         | rapid({x: 1, y: 1});  // Go to start position
-        | speed(2000); // Spin at 2000 RPM in the clockwise direction
+        | speed(2000);        // Spin at 2000 RPM in the clockwise direction
         != '\n\n'
         | square(10, -3, 5);
         != '\n\n'
-        | speed(0); // Stop spinning
+        | speed(0);           // Stop spinning
 
       p
-        | Note the <b>square()</b> function uses <b>icut()</b>
-        | the incremental version of <b>cut()</b>.
+        | Note the <code>square()</code> function uses <code>icut()</code>
+        | the incremental version of <code>cut()</code>.
       p
-        | Given the <b>square()</b> function you can now cut repeated squares
-        | like this:
+        | Given the <code>square()</code> function you can now cut repeated
+        | squares like this:
 
       pre: code.example
         | for (i = 1; i <= 10; i++) square(i * 5, -3, 5);
 
       p
-        | Here is the result of running the <b>squares</b> function as in the
-        | for loop above.
+        | Here is the result of running the <code>squares</code> function as in
+        | the for loop above.
 
       img.sim-image(src="images/squares.png")
 
@@ -130,9 +133,9 @@ html
 
       pre: code.example
         | function square(size, depth, safe) {
-        |   cut({z: depth}); // Cut down to depth
-        |   icut({x: size}); // Cut to second corner
-        |   icut({y: size}); // Cut to third corner
+        |   cut({z: depth});  // Cut down to depth
+        |   icut({x: size});  // Cut to second corner
+        |   icut({y: size});  // Cut to third corner
         |   icut({x: -size}); // Cut to forth corner
         |   icut({y: -size}); // Cut back to begining
         |   rapid({z: safe}); // Move back to safe position
@@ -145,16 +148,16 @@ html
         |   }
         | }
         != '\n\n'
-        | feed(400); // Set the feed rate to 40 millimeters per second
-        | tool(1); // Select tool 1
+        | feed(400);           // Set the feed rate to 40 millimeters per second
+        | tool(1);             // Select tool 1
         != '\n\n'
-        | rapid({z: 5}); // Move to a safe height of 5mm
-        | rapid({x: 0, y: 0});  // Go to center position
-        | speed(2000); // Spin at 2000 RPM in the clockwise direction
+        | rapid({z: 5});       // Move to a safe height of 5mm
+        | rapid({x: 0, y: 0}); // Go to center position
+        | speed(2000);         // Spin at 2000 RPM in the clockwise direction
         != '\n\n'
         | for (var i = 0; i < 4; i++) {
         |   squares(10, 5, -3, 5);
-        |   rotate(PI / 8); // Rotate clockwise 15 degrees
+        |   rotate(Math.PI / 8); // Rotate clockwise 15 degrees
         | }
         != '\n\n'
         | speed(0); // Stop spinning
@@ -162,26 +165,24 @@ html
       p The simulator shows the final result:
       img.sim-image(src="images/star.png")
 
-      h1#usage Using TPLang
+      h1#usage Using TPL
       p
         | After downloading and installing the latest OpenSCAM you can write
-        | a TPLang program, or try out one of the examples.  TPLang programs
-        | usually have the file extension <b>.tpl</b>.  You can execute a TPLang
-        | program like this:
-      pre: code.example
-        | tplang input.tpl
+        | a TPL program, or try out one of the examples.  TPL programs
+        | usually have the file extension <code>.tpl</code>.  You can execute a
+        | TPL program like this:
+
+      pre: code.example tplang input.tpl
 
       p
         | This will print the resulting G-code to the screen.  You can also
         | save the output to a file like this:
 
-      pre: code.example
-        | tplang input.tpl > output.gc
+      pre: code.example tplang input.tpl > output.gc
 
       p You can then view the results in the OpenSCAM simulator like this:
 
-      pre: code.example
-        | openscam output.gc
+      pre: code.example openscam output.gc
 
       p
         | You will also probably have to configure a tool table and
@@ -192,11 +193,11 @@ html
 
       h1#api API
       p
-        | The TPLang Application Programming Interface allows you to duplicate
+        | The TPL Application Programming Interface allows you to duplicate
         | any G-code program easily in a much more readable way but you also
         | have the full power of the JavaScript language at your finger tips so
         | much more is possible.  In fact you don't even need CAM software
-        | you can model the shapes you want to cut directly in TPLang.
+        | you can model the shapes you want to cut directly in TPL.
 
       // Machine Motion Functions
       h2#motion Tool Movement
@@ -214,20 +215,24 @@ html
       #irapid.func
         code.decl irapid(x, y, z, a, b, c, u, v, w, incremental=true)
 
-        p The same as <b>rapid()</b> but <b>incremental</b> defaults to true.
+        p
+          | The same as <code>rapid()</code> but <code>incremental</code>
+          | defaults to true.
 
       #cut.func
         code.decl cut(x, y, z, a, b, c, u, v, w, incremental=false)
 
         p
-          | The same as <b>rapid()</b> except moves are at the current feed
-          | rate set by a call to <b>feed()</b>.
+          | The same as <code>rapid()</code> except moves are at the current
+          | feed rate set by a call to <code>feed()</code>.
 
       #icut.func
         code.decl
           | icut(x, y, z, a, b, c, u, v, w, incremental=true)
 
-        p The same as <b>cut()</b> but <b>incremental</b> defaults to true.
+        p
+          | The same as <code>cut()</code> but <code>incremental</code> defaults
+          | to true.
 
       #arc.func
         code.decl arc(x, y, z, angle, plane, incremental=true)
@@ -238,14 +243,14 @@ html
           | error=true, index=0, port=-1, invert=false)
         p
           | Make a linear move in the direction indicated until the probe
-          | state changes to the target state.  If <b>toward</b> is true the
-          | probe motion will stop on contact.  Otherwise it will stop on loss
-          | of contact.
+          | state changes to the target state.  If <code>toward</code> is true
+          | the probe motion will stop on contact.  Otherwise it will stop on
+          | loss of contact.
         p
-          | <b>probe()</b> will return the coordinates of the position at the
-          | time the probe changed state.  If the programmed point was reached
-          | before the state changed then the programmed point will be returend
-          | instead.
+          | <code>probe()</code> will return the coordinates of the position at
+          | the time the probe changed state.  If the programmed point was
+          | reached before the state changed then the programmed point will be
+          | returend instead.
 
         pre: code.example
           | probe(z = -10);  // Probe towards z=-10
@@ -260,7 +265,7 @@ html
       #dwell.func
         code.decl dwell(seconds)
         p
-          | <b>seconds</b> indicate the time in seconds that all axes will
+          | <code>seconds</code> indicate the time in seconds that all axes will
           | remain unmoving.  Fractions of a second may be used.
 
         pre: code.example
@@ -271,25 +276,25 @@ html
       #feed.func
         code.decl feed(rate, mode = FEED_UNITS_PER_MIN)
         p
-          | <b>rate</b> indicates the units per minute in the XYZ cartesian
-          | system of all subsequent non-rapid moves until the feed rate is
-          | changed.
+          | <code>rate</code> indicates the units per minute in the XYZ
+          | cartesian system of all subsequent non-rapid moves until the feed
+          | rate is changed.
 
-        p <b>mode</b> may be one of the following:
+        p <code>mode</code> may be one of the following:
           ul
             li
-              | <i>FEED_UNITS_PER_MIN</i> - The feed rate is in units per
+              | <code>FEED_UNITS_PER_MIN</code> - The feed rate is in units per
               | minute.  The unit may be inches, millimeters or degrees
               | depending on the current unit of length and which axes are
               | moving.
             li
-              | <i>FEED_INVERSE_TIME</i> - Indicates that moves should be
-              | completed in one divided by <b>rate</b> minutes.  For example,
-              | if <b>rate</b> is 2.0, moves should be completed in half a
-              | minute.
+              | <code>FEED_INVERSE_TIME</code> - Indicates that moves should be
+              | completed in one divided by <code>rate</code> minutes.  For
+              | example, if <code>rate</code> is 2.0, moves should be completed
+              | in half a minute.
             li
-              | <i>FEED_UNITS_PER_REV</i> - Means that the controlled point
-              | should move a certain number of units per revolution.
+              | <code>FEED_UNITS_PER_REV</code> - Means that the controlled
+              | point should move a certain number of units per revolution.
 
           | Note, these names are case sensitive.
         p
@@ -301,18 +306,18 @@ html
 
       #speed.func
         code.decl speed(rate, surface, max)
-        p <b>rate</b> indicates the revolutions per minute of the spindle.
+        p <code>rate</code> indicates the revolutions per minute of the spindle.
         p
-          | If <b>rate</b> is positive the spindle will turn in the
+          | If <code>rate</code> is positive the spindle will turn in the
           | clockwise direction.  If negative in the counterclockwise direction.
 
-        p A <b>rate</b> of zero turns the spindle off.
+        p A <code>rate</code> of zero turns the spindle off.
         p
-          | If <b>surface</b> is specified it selects a constant surface speed
-          | of <b>surface</b> feet per minute if <i>IMPERIAL</i>
-          | units are selected or meters per minute if <i>METRIC</i>
-          | units are selected. If <b>max</b> is also specified it indicates
-          | the maximum spindle RPM.
+          | If <code>surface</code> is specified it selects a constant surface
+          | speed of <code>surface</code> feet per minute if
+          | <code>IMPERIAL</code> units are selected or meters per minute if
+          | <code>METRIC</code> units are selected. If <code>max</code> is also
+          | specified it indicates the maximum spindle RPM.
         p
           | If no arguments are given, returns the current spindle speed,
           | surface speed and maximum RPM.
@@ -323,24 +328,26 @@ html
 
       #tool.func
         code.decl tool(number)
-        p Make tool <b>number</b> the current tool.
+        p Make tool <code>number</code> the current tool.
         p If no arguments are given the current tool number is returned.
         pre: code.example tool(1);  // Select tool 1
 
       #units.func
         code.decl units(type)
         p
-          | <b>type</b> may be either <i>METRIC</i> which selects millimeters
-          | as the unit of measure or <i>IMPERIAL</i>
+          | <code>type</code> may be either <code>METRIC</code> which selects
+          | millimeters as the unit of measure or <code>IMPERIAL</code>
           | which selects inches.
-        p If no arguments are given the current <b>type</b> is returned.
+
+        p If no arguments are given the current <code>type</code> is returned.
+
         pre: code.example units(METRIC);  // Select millimeters
 
       #pause.func
         code.decl pause(optional=false)
         p
-          | Pause the program until the user resumes.  If <b>optional</b> is
-          | true then only pause if the stop switch is activated.
+          | Pause the program until the user resumes.  If <code>optional</code>
+          | is true then only pause if the stop switch is activated.
         pre: code.example pause(true);
 
       //
@@ -419,6 +426,8 @@ html
         code.decl console.error(...)
 
       h2#module Module
+      p Load code modules.
+
       #require.func
         code.decl require(path)
 
