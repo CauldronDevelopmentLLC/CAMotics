@@ -1,3 +1,6 @@
+header_height = 60px
+sidebar_width = 12em
+
 html *
   padding: 0
   margin: 0
@@ -6,26 +9,30 @@ body
   background: url(background.png)
 
 #header
-  height: 60px
-  background: rgba(181, 202, 219, 0.4)
+  height: header_height - 1
+  background: #dde6ec
   border-bottom: 1px solid #888
   margin-bottom: 1em
   position: fixed
   top: 0
   width: 100%
   z-index: 10
+  white-space: nowrap
 
   h1
     margin: 10px
 
+#page
+  margin-top: -75px
+
 #sidebar
-  overflow-x: hidden
-  overflow-y: auto
-  width: 15em
-  position: absolute
-  top: 61px
+  width: sidebar_width
+  position: fixed
+  top: header_height
   bottom: 0
   left: 0
+  overflow-x: hidden
+  overflow-y: auto
   border-right: 1px solid #aaa
   box-shadow: 0 0 20px #ddd
   background: url(background.png) fixed
@@ -61,13 +68,12 @@ body
         font-weight: bold
 
 #content
-  position: absolute
-  top: 61px
-  left: 15em
+  margin-left: sidebar_width
   bottom: 0
   overflow-y: auto
-  padding: 1em 2em 20em 2em
-  width: 40em
+  padding: 0 2em 20em 2em
+  max-width: 40em
+  min-width: 10em
 
   h1, h2, h3, .func
     margin: 2em 0 0.5em 0
@@ -75,8 +81,8 @@ body
     &:before
       display: block
       content: ' '
-      margin-top: -0.5em
-      height: 0.5em
+      margin-top: 75px
+      height: 75px
       visibility: hidden
 
   .func
@@ -102,6 +108,7 @@ body
     font-size: 110%
     padding: 2px
     border-radius: 3px
+    overflow-x: auto
 
   code.example
     margin-bottom: 0.75em
