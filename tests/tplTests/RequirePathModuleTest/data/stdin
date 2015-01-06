@@ -1,0 +1,3 @@
+var hello = require('hello');
+
+print(hello.msg);
