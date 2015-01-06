@@ -44,7 +44,7 @@ namespace OpenSCAM {
       event(event), parent(parent), cutSim(cutSim) {}
     ~CutSimThread() {join();}
 
-    void done();
+    void completed();
 
     // From cb::Thread
     void stop();

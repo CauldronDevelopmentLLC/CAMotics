@@ -31,6 +31,9 @@ using namespace tplang;
 using namespace OpenSCAM;
 
 
+ToolPath::~ToolPath() {}
+
+
 void ToolPath::add(const Move &move) {
   push_back(move);
 

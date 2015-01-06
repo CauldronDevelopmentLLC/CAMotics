@@ -26,7 +26,7 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-void CutSimThread::done() {
+void CutSimThread::completed() {
   if (!cutSim->shouldQuit())
     QCoreApplication::postEvent(parent, new QEvent((QEvent::Type)event));
 }

@@ -40,6 +40,7 @@ namespace OpenSCAM {
 
   public:
     ToolPath(const cb::SmartPointer<ToolTable> &tools) : tools(tools) {}
+    ~ToolPath();
 
     const Rectangle3R &getBounds() const {return *this;}
     const cb::SmartPointer<ToolTable> &getTools() const {return tools;}

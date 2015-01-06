@@ -29,5 +29,5 @@ void SurfaceThread::run() {
   try {
     surface = cutSim->computeSurface(path, bounds, resolution, time, smooth);
   } CATCH_ERROR;
-  done();
+  completed();
 }

@@ -45,5 +45,5 @@ void ToolPathThread::run() {
   try {
     path = cutSim->computeToolPath(tools, files);
   } CATCH_ERROR;
-  done();
+  completed();
 }
