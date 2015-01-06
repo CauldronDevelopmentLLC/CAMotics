@@ -1,5 +1,6 @@
 header_height = 60px
 sidebar_width = 12em
+anchor_offset = header_height + 15px
 
 html *
   padding: 0
@@ -23,7 +24,7 @@ body
     margin: 10px
 
 #page
-  margin-top: -75px
+  margin-top: -(anchor_offset)
 
 #sidebar
   width: sidebar_width
@@ -81,8 +82,8 @@ body
     &:before
       display: block
       content: ' '
-      margin-top: header_height + 15px
-      height: header_height + 15px
+      margin-top: anchor_offset
+      height: anchor_offset
       visibility: hidden
 
   .func
