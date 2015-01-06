@@ -287,9 +287,9 @@ void Project::updateAutomaticWorkpiece(ToolPath &path) {
   Vector3R bMax = wpBounds.getMax();
   wpBounds = Rectangle3R(bMin, Vector3R(bMax.x(), bMax.y(), 0));
 
-  // At least a height of 2
+  // At least 2mm thick
   if (wpBounds.getHeight() < 2)
-    wpBounds = Rectangle3R(Vector3R(bMin.x(), bMin.y(), bMax.z() - 2), bMax);
+    wpBounds.add(Vector3R(bMin.x(), bMin.y(), bMin.z() - 2));
 
   if (wpBounds.isReal()) {
     // Margin
