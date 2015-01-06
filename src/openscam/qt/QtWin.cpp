@@ -126,11 +126,6 @@ QtWin::QtWin(Application &app) :
     menu->addAction(toolBars.at(i)->toggleViewAction());
   ui->actionToolbars->setMenu(menu);
 
-  // Start animation timer
-  animationTimer.setSingleShot(false);
-  connect(&animationTimer, SIGNAL(timeout()), this, SLOT(animate()));
-  animationTimer.start(100);
-
   // Select workpiece radio
   ui->automaticCuboidRadioButton->setChecked(true);
 
@@ -153,6 +148,11 @@ QtWin::~QtWin() {
 
 
 void QtWin::init() {
+  // Start animation timer
+  animationTimer.setSingleShot(false);
+  connect(&animationTimer, SIGNAL(timeout()), this, SLOT(animate()));
+  animationTimer.start(100);
+
   // Simulation and Tool View tabs are not closeable
   ui->tabWidget->setTabsClosable(true);
   QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
