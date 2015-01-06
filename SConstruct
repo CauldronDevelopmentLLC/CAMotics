@@ -74,7 +74,7 @@ conf.Finish()
 src = ['src/glew/glew.c']
 for subdir in [
     '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'pcb', 'stl',
-    'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'colide', 'dxf',
+    'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'dxf',
     'dxf/dxflib']:
     src += Glob('src/openscam/%s/*.cpp' % subdir)
 

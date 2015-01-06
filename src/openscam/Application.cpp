@@ -22,6 +22,7 @@
 
 #include <cbang/Info.h>
 #include <cbang/log/Logger.h>
+#include <cbang/os/SystemUtilities.h>
 
 using namespace std;
 using namespace OpenSCAM;
@@ -45,6 +46,11 @@ bool Application::_hasFeature(int feature) {
 
 Application::Application(const string &name) :
   cb::Application(name, _hasFeature) {
+
+  // Default to 'C' locale, otherwise double parsing is messed up.
+  if (!cb::SystemUtilities::getenv("LC_NUMERIC"))
+    cb::SystemUtilities::setenv("LC_NUMERIC", "C");
+
   cb::Logger::instance().setScreenStream(cerr);
   cb::Logger::instance().setLogThreadPrefix(true);
 
