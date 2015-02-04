@@ -53,8 +53,8 @@ namespace tplang {
     cb::js::Value toolCB(const cb::js::Arguments &args);
     cb::js::Value unitsCB(const cb::js::Arguments &args);
     cb::js::Value pauseCB(const cb::js::Arguments &args);
-
     cb::js::Value toolSetCB(const cb::js::Arguments &args);
+    cb::js::Value positionCB(const cb::js::Arguments &args);
 
   protected:
     void parseAxes(const cb::js::Arguments &args, Axes &axes,

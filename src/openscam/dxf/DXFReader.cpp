@@ -66,13 +66,13 @@ void DXFReader::addLine(const DL_LineData &line) {
 
 void DXFReader::addArc(const DL_ArcData &arc) {
   addEntity(new DXFArc(Vector3D(arc.cx, arc.cy, arc.cz), arc.radius, arc.angle1,
-                       arc.angle2));
+                       arc.angle2, arc.clockwise));
 }
 
 
 void DXFReader::addCircle(const DL_CircleData &circle) {
   addEntity(new DXFArc(Vector3D(circle.cx, circle.cy, circle.cz), circle.radius,
-                       0, 2 * M_PI));
+                       0, 360, true));
 }
 
 

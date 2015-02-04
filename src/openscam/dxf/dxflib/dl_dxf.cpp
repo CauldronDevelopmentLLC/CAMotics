@@ -970,7 +970,8 @@ void DL_Dxf::addArc(DL_CreationInterface* creationInterface) {
                  toReal(values[30]),
                  toReal(values[40]),
                  toReal(values[50]),
-                 toReal(values[51]));
+                 toReal(values[51]),
+                 0 < toReal(values[230], 1));
 
     creationInterface->addArc(d);
 }

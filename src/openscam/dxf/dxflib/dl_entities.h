@@ -209,7 +209,8 @@ struct DL_ArcData {
      */
     DL_ArcData(double acx, double acy, double acz,
                double aRadius,
-               double aAngle1, double aAngle2) {
+               double aAngle1, double aAngle2,
+               bool aClockwise) {
 
         cx = acx;
         cy = acy;
@@ -217,6 +218,7 @@ struct DL_ArcData {
         radius = aRadius;
         angle1 = aAngle1;
         angle2 = aAngle2;
+        clockwise = aClockwise;
     }
 
     /*! X Coordinate of center point. */
@@ -232,6 +234,8 @@ struct DL_ArcData {
     double angle1;
     /*! Endangle of arc in degrees. */
     double angle2;
+
+    bool clockwise;
 };
 
 

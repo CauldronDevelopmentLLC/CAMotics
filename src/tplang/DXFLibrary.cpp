@@ -109,6 +109,7 @@ js::Value DXFLibrary::openCB(const js::Arguments &args) {
         obj.set("radius", arc.getRadius());
         obj.set("startAngle", arc.getStartAngle());
         obj.set("endAngle", arc.getEndAngle());
+        obj.set("clockwise", arc.getClockwise());
         break;
       }
 

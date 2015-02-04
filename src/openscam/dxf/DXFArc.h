@@ -30,16 +30,19 @@ namespace OpenSCAM {
     double radius;
     double startAngle;
     double endAngle;
+    bool clockwise;
 
   public:
     DXFArc(const cb::Vector3D &center, double radius, double startAngle,
-           double endAngle) : center(center), radius(radius),
-                              startAngle(startAngle), endAngle(endAngle) {}
+           double endAngle, bool clockwise) :
+      center(center), radius(radius), startAngle(startAngle),
+      endAngle(endAngle), clockwise(clockwise) {}
 
     const cb::Vector3D &getCenter() const {return center;}
     double getRadius() const {return radius;}
     double getStartAngle() const {return startAngle;}
     double getEndAngle() const {return endAngle;}
+    bool getClockwise() const {return clockwise;}
 
     // From DXFEntity
     type_t getType() const {return DXF_ARC;}

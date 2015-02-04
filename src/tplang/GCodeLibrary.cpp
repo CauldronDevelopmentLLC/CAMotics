@@ -56,10 +56,10 @@ void GCodeLibrary::add(js::ObjectTemplate &tmpl) {
   tmpl.set("tool(number)", this, &GCodeLibrary::toolCB);
   tmpl.set("units(type)", this, &GCodeLibrary::unitsCB);
   tmpl.set("pause(optional=false)", this, &GCodeLibrary::pauseCB);
-
   tmpl.set("tool_set(number, length, diameter, units, shape, snub=0, "
            "front_angle=0, back_angle=0, orientation=0)", this,
            &GCodeLibrary::toolSetCB);
+  tmpl.set("position()", this, &GCodeLibrary::positionCB);
 
   tmpl.set("FEED_INVERSE_TIME", INVERSE_TIME);
   tmpl.set("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
@@ -282,6 +282,19 @@ js::Value GCodeLibrary::toolSetCB(const js::Arguments &args) {
   tool->setOrientation(args.getNumber("orientation"));
 
   return js::Value();
+}
+
+
+js::Value GCodeLibrary::positionCB(const js::Arguments &args) {
+  Axes axes = ctx.machine.getPosition();
+
+  cb::js::ObjectTemplate tmpl;
+  js::Value obj = tmpl.create();
+
+  for (unsigned i = 0; Axes::AXES[i]; i++)
+    obj.set(string(1, tolower(Axes::AXES[i])), axes.getIndex(i));
+
+  return obj;
 }
 
 
