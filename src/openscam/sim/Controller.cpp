@@ -333,7 +333,7 @@ void Controller::reset() {
   naiveCamTolerance = 0;
   modalMotion = false;
   incrementalDistanceMode = false;
-  arcIncrementalDistanceMode = false;
+  arcIncrementalDistanceMode = true;
   moveInAbsoluteCoords = false;
 
   machine.setMetric();
@@ -471,9 +471,9 @@ void Controller::execute(const Code &code, int vars) {
     case 890: drill(vars, true, true, false); // Dwell, Feed Out
 
     case 900: incrementalDistanceMode = false; break;
-    case 901: arcIncrementalDistanceMode = false; break;
+    case 901: arcIncrementalDistanceMode = false; implemented = false; break;
     case 910: incrementalDistanceMode = true; implemented = false; break;
-    case 911: arcIncrementalDistanceMode = true; implemented = false; break;
+    case 911: arcIncrementalDistanceMode = true; break;
 
     case 920: setGlobalOffsets(vars); break;
     case 921: resetGlobalOffsets(true); break;
@@ -491,8 +491,8 @@ void Controller::execute(const Code &code, int vars) {
       break;
     case 970: spinMode = MachineInterface::REVOLUTIONS_PER_MINUTE; break;
 
-    case 980: returnMode = RETURN_TO_OLD_Z; break;
-    case 990: returnMode = RETURN_TO_R; break;
+    case 980: returnMode = RETURN_TO_R; break;
+    case 990: returnMode = RETURN_TO_OLD_Z; break;
 
     default: implemented = false;
     }
@@ -540,17 +540,18 @@ void Controller::moveAxis(char axis, double value, bool rapid) {
 
 
 void Controller::arc(int vars, bool clockwise) {
-  // TODO Handle Arc Incremental Distance Mode
+  // TODO Handle Arc Absolute Mode
   // TODO Affected by cutter radius compensation
+  // TODO Make sure this is correct for planes XZ and YZ
 
   const char *axes = getPlaneAxes(getPlane());
+  if (getPlane() == MachineInterface::XZ) clockwise = !clockwise;
 
   // Compute start and end points
   Axes current = getPosition(true);
   Axes target = getNextPosition(vars);
   Vector2D start = Vector2D(current.get(axes[0]), current.get(axes[1]));
   Vector2D finish = Vector2D(target.get(axes[0]), target.get(axes[1]));
-
   Vector2D center;
   double radius;
 
@@ -609,7 +610,7 @@ void Controller::arc(int vars, bool clockwise) {
   if (!angle) angle = 2 * M_PI;
 
   if ((VT_P & vars) && 1 < getVar('P'))
-      angle = angle + angle * (getVar('P') - 1);
+    angle = angle + M_PI * 2 * (getVar('P') - 1) * (angle < 0 ? -1 : 1);
 
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
