@@ -610,7 +610,7 @@ void Controller::arc(int vars, bool clockwise) {
   if (!angle) angle = 2 * M_PI;
 
   if ((VT_P & vars) && 1 < getVar('P'))
-      angle = angle + angle * (getVar('P') - 1);
+    angle = angle + M_PI * 2 * (getVar('P') - 1) * (angle < 0 ? -1 : 1);
 
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
