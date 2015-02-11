@@ -84,7 +84,7 @@ void DXFReader::addPolyline(const DL_PolylineData &polyline) {
 
 void DXFReader::addVertex(const DL_VertexData &vertex) {
   if (vertex.bulge) LOG_WARNING("Cannot handle vertex with bulge");
-  entity->addVertex(Vector3D(vertex.z, vertex.y, vertex.z));
+  entity->addVertex(Vector3D(vertex.x, vertex.y, vertex.z));
 }
 
 
