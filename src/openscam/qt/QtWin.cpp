@@ -69,7 +69,8 @@ QtWin::QtWin(Application &app) :
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), smooth(true), currentUIView(NULL_VIEW) {
+  lastStatusActive(false), smooth(true), autoPlay(false), autoClose(false),
+  currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
   ui->simulationView->init(SIMULATION_VIEW, this);
@@ -451,6 +452,14 @@ void QtWin::toolPathComplete() {
                                     project->getResolution(), view->getTime(),
                                     smooth);
   surfaceThread->start();
+
+  // Auto play
+  if (autoPlay) {
+    autoPlay = false;
+    view->path->setByRatio(0);
+    view->setFlag(View::PLAY_FLAG);
+    view->reverse = false;
+  }
 }
 
 
@@ -1201,6 +1210,10 @@ void QtWin::animate() {
   try {
     dirty = connectionManager->update() || dirty;
     dirty = view->update() || dirty;
+
+    // Auto close after auto play
+    if (!autoPlay &&autoClose &&
+        !view->isFlagSet(View::PLAY_FLAG)) app.requestExit();
 
     if (dirty) redraw(true);
     if (simDirty) reload(true);
