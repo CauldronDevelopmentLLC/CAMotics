@@ -70,7 +70,8 @@ QtWin::QtWin(Application &app) :
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), smooth(true), currentUIView(NULL_VIEW) {
+  lastStatusActive(false), smooth(true), autoPlay(false),
+  currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
   ui->simulationView->init(SIMULATION_VIEW, this);
@@ -499,6 +500,14 @@ void QtWin::toolPathComplete() {
                                     project->getResolution(), view->getTime(),
                                     smooth);
   surfaceThread->start();
+
+  // Auto play
+  if (autoPlay) {
+    autoPlay = false;
+    view->path->setByRatio(0);
+    view->setFlag(View::PLAY_FLAG);
+    view->reverse = false;
+  }
 }
 
 

@@ -22,11 +22,15 @@
 
 #include <cbang/util/DefaultCatch.h>
 
+#include <limits>
+
+using namespace std;
 using namespace OpenSCAM;
 
 
 void SurfaceThread::run() {
   try {
+    if (!time) time = numeric_limits<double>::max();
     surface = cutSim->computeSurface(path, bounds, resolution, time, smooth);
   } CATCH_ERROR;
   completed();

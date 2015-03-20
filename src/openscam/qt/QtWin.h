@@ -110,6 +110,7 @@ namespace OpenSCAM {
     bool lastStatusActive;
     cb::SmartPointer<Tool> currentTool;
     bool smooth;
+    bool autoPlay;
 
     typedef enum {
       NULL_VIEW,
@@ -126,6 +127,8 @@ namespace OpenSCAM {
     const cb::SmartPointer<ConnectionManager> &getConnectionManager() const
     {return connectionManager;}
     const cb::SmartPointer<View> &getView() const {return view;}
+
+    void setAutoPlay(bool x = true) {autoPlay = x;}
 
     void init();
     void setUnitLabel(QLabel *label, real value, int precision = 2);
