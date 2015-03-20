@@ -77,6 +77,7 @@ namespace OpenSCAM {
     void clearFlag(unsigned flag) {flags &= ~flag; values.updated();}
     void toggleFlag(unsigned flag) {flags ^= flag; values.updated();}
 
+    void setSpeed(unsigned speed) {this->speed = speed;}
     void incSpeed();
     void decSpeed();
     void changeDirection() {reverse = !reverse; values.updated();}
