@@ -35,6 +35,7 @@ using namespace OpenSCAM;
 
 QtApp::QtApp(QWidget *parent) : OpenSCAM::Application("OpenSCAM") {
   options.add("qt-style", "Set Qt style");
+  options.add("fullscreen", "Start in fullscreen mode")->setDefault(false);
 
   // Configure Logger
   Logger &logger = Logger::instance();
@@ -88,6 +89,9 @@ void QtApp::run() {
 
   QtWin qtWin(*this);
   qtWin.init();
+
+  if (options["fullscreen"].toBoolean())
+    qtWin.setWindowState(qtWin.windowState() | Qt::WindowFullScreen);
 
   if (projectFile.empty()) qtWin.newProject();
   else qtWin.openProject(projectFile);
