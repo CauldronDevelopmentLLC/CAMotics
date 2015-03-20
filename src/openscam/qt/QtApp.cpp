@@ -35,7 +35,9 @@ using namespace OpenSCAM;
 
 QtApp::QtApp(QWidget *parent) : OpenSCAM::Application("OpenSCAM") {
   options.add("qt-style", "Set Qt style");
-  options.add("fullscreen", "Start in fullscreen mode")->setDefault(false);
+  options.add("fullscreen", "Start in fullscreen mode.")->setDefault(false);
+  options.add("auto-play", "Automatically start tool path playback.")
+    ->setDefault(false);
 
   // Configure command line
   cmdLine.setAllowConfigAsFirstArg(false);
@@ -88,6 +90,8 @@ void QtApp::run() {
 
   if (projectFile.empty()) qtWin.newProject();
   else qtWin.openProject(projectFile);
+
+  if (options["auto-play"].toBoolean()) qtWin.setAutoPlay();
 
   qtWin.show();
   qtApp.exec();
