@@ -69,7 +69,7 @@ QtWin::QtWin(Application &app) :
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), smooth(true), autoPlay(false),
+  lastStatusActive(false), smooth(true), autoPlay(false), autoClose(false),
   currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
@@ -1210,6 +1210,10 @@ void QtWin::animate() {
   try {
     dirty = connectionManager->update() || dirty;
     dirty = view->update() || dirty;
+
+    // Auto close after auto play
+    if (!autoPlay &&autoClose &&
+        !view->isFlagSet(View::PLAY_FLAG)) app.requestExit();
 
     if (dirty) redraw(true);
     if (simDirty) reload(true);
