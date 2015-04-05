@@ -73,7 +73,7 @@ Clone the OpenSCAM git repository and build the software using scons:
 In the OpenSCAM source code directory run:
 
     scons package
-    sudo dpkg -i openscam_*.deb
+    sudo dpkg -i $(cat package.txt)
 
 ## Build Warnings/Errors
 If you get any build warnings, by default, the build will stop.  If you have
