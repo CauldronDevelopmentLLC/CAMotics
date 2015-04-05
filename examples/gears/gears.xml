@@ -6,7 +6,8 @@
   </nc-files>
 
   <!-- Renderer -->
-  <resolution v='0.639361'/>
+  <resolution v='0.235543'/>
+  <resolution-mode v='HIGH'/>
 
   <!-- Workpiece -->
   <automatic-workpiece v='false'/>
