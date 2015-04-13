@@ -43,7 +43,7 @@ by C!, can be installed with the following command line:
       libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
       qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
 
-# Building from Source
+# Building from Source on Debian
 This section describes how to build OpenSCAM from source on Debian based
 systems such as Ubuntu and Mint Linux.  If you are running Windows or OSX
 it is much easier to simply install prebuilt packages which can be found
@@ -75,7 +75,10 @@ In the OpenSCAM source code directory run:
     scons package
     sudo dpkg -i $(cat package.txt)
 
-## Build Warnings/Errors
+# Building from Source on Windows
+See [Building in Windows](Building_In_Windows.md).
+
+# Build Warnings/Errors
 If you get any build warnings, by default, the build will stop.  If you have
 problems building, especially with warnings related to the boost library you
 can ignore these warnings by building cbang and/or OpenSCAM with
