@@ -53,7 +53,7 @@ Note, that the above is for a 32-bit release mode build.  The possible configura
  * ```VC-WIN64A```
  * ```debug-VC-WIN64A```
 
-Additional instructions:
+Alternative instructions can be found here:
 
  * http://developer.covenanteyes.com/building-openssl-for-visual-studio/
  * http://p-nand-q.com/programming/windows/building_openssl_with_visual_studio_2013.html
