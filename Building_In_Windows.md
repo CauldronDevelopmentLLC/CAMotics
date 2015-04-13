@@ -1,6 +1,6 @@
 Building from source in Windows is much more difficult because satisfying the dependecies with out the help of a package system is more of a challenge.  You can build everything from source or you can find prebuilt libraries for some of the dependencies.
 
-These instructions assume you are using MSVC 2008 or better on Windows XP or newer.  Building with Cygwin or MinGW is not supported or recommended.
+These instructions assume you are using MSVC 2008 or better on Windows XP or newer.  Building with Cygwin or MinGW is not supported or recommended.  We will build everything from the command line.
 
 # Prerequisites
 Build or download binaries of the following, in this order:
@@ -48,10 +48,10 @@ Alternatively you can build from source but this also requires that you install 
 
 Note, that the above is for a 32-bit release mode build.  The possible configuration targets are:
 
- * VC-WIN32
- * debug-VC-WIN32
- * VC-WIN64A
- * debug-VC-WIN64A
+ * ```VC-WIN32```
+ * ```debug-VC-WIN32```
+ * ```VC-WIN64A```
+ * ```debug-VC-WIN64A```
 
 Additional instructions:
 
