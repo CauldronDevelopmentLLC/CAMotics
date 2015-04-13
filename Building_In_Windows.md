@@ -5,6 +5,7 @@ These instructions assume you are using MSVC 2008 or better on Windows XP or new
 # Prerequisites
 Build or download binaries of the following, in this order:
 
+  * MSVS 2008 or better https://www.visualstudio.com/
   * SCons http://www.scons.org/
   * Perl https://www.perl.org/
   * OpenSSL http://www.openssl.org/
@@ -12,22 +13,27 @@ Build or download binaries of the following, in this order:
   * Git http://git-scm.com/
   * V8 http://code.google.com/p/v8/ 
   * C! http://cbang.org/
+  * Qt4  http://qt-project.org/
+  * Cairo2 http://cairographics.org/
 
 # Preparation
 ## Create a build directory
 You will need to build or install several different packages.  It is recommend that you create a ```build``` diretory somewhere on your system and build or install all the packages under this directory.
 
-## Determining the Build Type
-You should determine your system's bit width, either 32 or 64 as this will be an important distinction for several of the packages.  You also need to decide to either build or download only *debug* or *release* mode packages.  Windows cannot mix packages build in different release modes.
+## Determin the Build Type
+You should determine your system's bit width, either 32 or 64.  This will be an important distinction for several of the packages.  You also need to decide to either build or download only *debug* or *release* mode packages.  Windows cannot mix packages build in different release modes.
 
 ## Maintaining the Environment
 There are several environment variables that you will need to set in order for the build scripts to be able to find the other packages.  You can enter these on the command line but it is far easier to maintain a ```env.bat``` file which you can run at any time to get your configuration back.
 
-In order for the build scripts to find MSVC, you need to call the appropriate ```vcvars.bat```.  This script configures your environmen to use the correct MSVC compiler.  You can also add this to your ```env.bat``` for example you might have line like this:
+In order for the build scripts to find MSVC, you need to call the appropriate ```vcvars.bat```.  This script configures your environment to use the correct MSVC compiler.  You can also add this to your ```env.bat``` for example you might have line like this:
 
     call "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\bin\vcvars32.bat"
 
 Note that there are 32-bit and 64-bit versions of this batch file.
+
+# MSVS
+You can get a free version of Visual Studio here: https://www.visualstudio.com/.  You do not need any of the optional features.
 
 # SCons
 Download and install the lastest SCons from here: http://www.scons.org/download.php.  It is not recommend that you build SCons from source.
@@ -102,7 +108,21 @@ Or to build in debug mode change the last line to:
 
 Then set ```CBANG_HOME```.
 
+# Qt
+You can download Windows binaries for Qt4 here: https://www.qt.io/download-open-source/  Instructions for building from source can be found here: http://doc.qt.io/qt-4.8/install-win.html
+
+# Cairo
+You can find prebuilt Windows binaries for cairo here: http://www.gtk.org/download/.  Or build instructions here: http://cairographics.org/end_to_end_build_for_win32/
+
 # OpenSCAM
+Make sure you have all of the following envrionement variables set correctly:
+
+ * ```OPENSSL_HOME```
+ * ```BOOST_SOURCE```
+ * ```V8_HOME```
+ * ```QT_HOME```
+ * ```CAIRO_HOME```
+
 Now you can check out and build OpenSCAM like this:
 
     git clone https://github.com/CauldronDevelopmentLLC/OpenSCAM.git
