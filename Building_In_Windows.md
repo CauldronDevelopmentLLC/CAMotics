@@ -109,7 +109,7 @@ Or to build in debug mode change the last line to:
 Then set ```CBANG_HOME```.
 
 # Qt
-You can download Windows binaries for Qt4 here: https://www.qt.io/download-open-source/  Instructions for building from source can be found here: http://doc.qt.io/qt-4.8/install-win.html
+You can download Windows binaries for Qt4 here: https://www.qt.io/download-open-source/  Instructions for building from source can be found here: http://doc.qt.io/qt-4.8/install-win.html.  Make sure you install or build Qt with OpenGL support.
 
 # Cairo
 You can find prebuilt Windows binaries for cairo here: http://www.gtk.org/download/.  Or build instructions here: http://cairographics.org/end_to_end_build_for_win32/
