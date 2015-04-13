@@ -59,7 +59,7 @@ Alternative instructions can be found here:
  * http://p-nand-q.com/programming/windows/building_openssl_with_visual_studio_2013.html
 
 # Boost
-It is not actually necessary to build Boost yourself.  If you download, unpack and set the environment vairable ```BOOST_SOURCE``` C! will build the parts of boost that it needs automatically.  You can find the latest version here: http://www.boost.org/users/download/#live
+It is not actually necessary to build Boost yourself.  If you download, unpack and set the environment variable ```BOOST_SOURCE``` C! will build the parts of boost that it needs automatically.  You can find the latest version here: http://www.boost.org/users/download/#live
 
 # V8
 To get V8 you first need to install Git.  You can find Windows binaries here: http://git-scm.com/download/win.
