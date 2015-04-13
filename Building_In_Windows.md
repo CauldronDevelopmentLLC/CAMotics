@@ -20,8 +20,8 @@ Build or download binaries of the following, in this order:
 ## Create a build directory
 You will need to build or install several different packages.  It is recommend that you create a ```build``` diretory somewhere on your system and build or install all the packages under this directory.
 
-## Determin the Build Type
-You should determine your system's bit width, either 32 or 64.  This will be an important distinction for several of the packages.  You also need to decide to either build or download only *debug* or *release* mode packages.  Windows cannot mix packages build in different release modes.
+## Determine the Build Type
+You should determine your system's bit width, either *32-bit* or *64-bit*.  32-bit mode is also refered to as *x32* or *x86* mode and 64-bit mode may be refered to as *x64* or *amd64* mode.  This will be an important distinction for several of the packages.  You also need to decide to either build or download only *debug* or *release* mode packages.  Windows cannot mix packages build in different release modes.
 
 ## Maintaining the Environment
 There are several environment variables that you will need to set in order for the build scripts to be able to find the other packages.  You can enter these on the command line but it is far easier to maintain a ```env.bat``` file which you can run at any time to get your configuration back.
