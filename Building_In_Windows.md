@@ -63,6 +63,7 @@ Alternatively you can build from source but this also requires that you install 
  2. Unpack the source.
  3. Move in to the source directory on the command line.
  4. Build the package like this:
+ 
         perl Configure VC-WIN32
         ms\do_ms
         nmake -f ms\nt.mak 
