@@ -6,6 +6,7 @@ These instructions assume you are using MSVC 2008 or better on Windows XP or new
 Build or download binaries of the following, in this order:
 
   * MSVS 2008 or better https://www.visualstudio.com/
+  * Pytho https://www.python.org/
   * SCons http://www.scons.org/
   * Perl https://www.perl.org/
   * OpenSSL http://www.openssl.org/
@@ -52,6 +53,9 @@ set CAIRO_HOME=%BUILD_ROOT%\ciaro-1.14.2
 
 # MSVS
 You can get a free version of Visual Studio here: https://www.visualstudio.com/.  You do not need any of the optional features.
+
+# Python
+Python is needed to run SCons.  You can find binaries here: https://www.python.org/downloads/windows/  You should download and install the latest Python 2.
 
 # SCons
 Download and install the lastest SCons from here: http://www.scons.org/download.php.  It is not recommend that you build SCons from source.
