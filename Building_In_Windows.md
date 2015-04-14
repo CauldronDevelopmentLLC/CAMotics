@@ -79,7 +79,7 @@ Alternatively you can build from source but this also requires that you install 
  1. Download the latest source package from https://www.openssl.org/source/
  2. Unpack the source.  You will need ```tar``` which is supplied with Git's Unix tools.
 
-     tar xvf  %HOMEPATH%\Downloads\openssl-1.0.2a.tar.gz
+         tar xvf  %HOMEPATH%\Downloads\openssl-1.0.2a.tar.gz
 
  3. Move in to the source directory on the command line.
  4. Build the package like this:
