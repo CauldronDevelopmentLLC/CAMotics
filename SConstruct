@@ -58,7 +58,8 @@ if not env.GetOption('clean'):
     conf.CBConfig('v8', True)
 
     # Cairo
-    conf.CBRequireLib('cairo');
+    conf.CBCheckHome('cairo')
+    conf.CBRequireLib('cairo')
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
