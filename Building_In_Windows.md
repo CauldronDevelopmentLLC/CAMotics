@@ -35,7 +35,7 @@ There are several environment variables that you will need to set in order for t
 
 In order for the build scripts to find MSVC, you need to call the appropriate ```vcvars.bat```.  This script configures your environment to use the correct MSVC compiler.  You can also add this to your ```env.bat``` for example you might have line like this:
 
-    call "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\bin\vcvars32.bat"
+    call "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\vcvarsall.bat" x86
 
 Note that there are 32-bit and 64-bit versions of this batch file.
 
@@ -44,7 +44,7 @@ Your ```env.bat``` might look something like this:
 ```
 set BUILD_ROOT=C:\build
 
-call "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\bin\vcvars32.bat"
+call "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\vcvarsall.bat" x86
 
 set BOOST_SOURCE=%BUILD_ROOT%\boost_1_57_0
 set V8_HOME=%BUILD_ROOT%\v8
