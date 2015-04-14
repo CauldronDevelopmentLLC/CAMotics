@@ -91,7 +91,6 @@ If you are creating a 64-bit build then add ```-Dtarget_arch=x64``` to the end o
 # C!
 First make sure you have all all of the following environment variables pointing to the root directories of the packages built above:
 
- * ```OPENSSL_HOME```
  * ```BOOST_SOURCE```
  * ```V8_HOME```
 
@@ -119,7 +118,6 @@ You can find prebuilt Windows binaries for cairo here: http://www.gtk.org/downlo
 # OpenSCAM
 Make sure you have all of the following envrionement variables set correctly:
 
- * ```OPENSSL_HOME```
  * ```BOOST_SOURCE```
  * ```V8_HOME```
  * ```QT_HOME```
