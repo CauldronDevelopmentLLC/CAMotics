@@ -41,20 +41,20 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-void Parser::parse(Tokenizer &tokenizer, Processor &processor) {
+void Parser::parse(OpenSCAM::Tokenizer &tokenizer, Processor &processor) {
   while (!task->shouldQuit() && parseOne(tokenizer, processor)) continue;
 }
 
 
 void Parser::parse(const InputSource &source, Processor &processor) {
   Scanner scanner(source);
-  Tokenizer tokenizer(scanner);
+  OpenSCAM::Tokenizer tokenizer(scanner);
 
   parse(tokenizer, processor);
 }
 
 
-bool Parser::parseOne(Tokenizer &tokenizer, Processor &processor) {
+bool Parser::parseOne(OpenSCAM::Tokenizer &tokenizer, Processor &processor) {
   try {
     if (!tokenizer.hasMore()) return false;
     processor(block(tokenizer));
@@ -65,7 +65,7 @@ bool Parser::parseOne(Tokenizer &tokenizer, Processor &processor) {
 }
 
 
-SmartPointer<Block> Parser::block(Tokenizer &tokenizer) {
+SmartPointer<Block> Parser::block(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
 
   // Deleted
@@ -117,7 +117,7 @@ SmartPointer<Block> Parser::block(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Comment> Parser::comment(Tokenizer &tokenizer) {
+SmartPointer<Comment> Parser::comment(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
 
   Token token;
@@ -130,7 +130,7 @@ SmartPointer<Comment> Parser::comment(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Word> Parser::word(Tokenizer &tokenizer) {
+SmartPointer<Word> Parser::word(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
 
   string name = tokenizer.match(TokenType::ID_TOKEN).getValue();
@@ -140,7 +140,7 @@ SmartPointer<Word> Parser::word(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Assign> Parser::assign(Tokenizer &tokenizer) {
+SmartPointer<Assign> Parser::assign(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
 
   SmartPointer<Entity> ref = reference(tokenizer);
@@ -150,7 +150,7 @@ SmartPointer<Assign> Parser::assign(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<OCode> Parser::ocode(Tokenizer &tokenizer) {
+SmartPointer<OCode> Parser::ocode(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
 
   tokenizer.match(TokenType::ID_TOKEN); // The 'O'
@@ -180,7 +180,7 @@ SmartPointer<OCode> Parser::ocode(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::numberRefOrExpr(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::numberRefOrExpr(OpenSCAM::Tokenizer &tokenizer) {
   switch (tokenizer.getType()) {
   case TokenType::POUND_TOKEN: return reference(tokenizer);
   case TokenType::OBRACKET_TOKEN: return quotedExpr(tokenizer);
@@ -192,12 +192,12 @@ SmartPointer<Entity> Parser::numberRefOrExpr(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::expression(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::expression(OpenSCAM::Tokenizer &tokenizer) {
   return boolOp(tokenizer);
 }
 
 
-SmartPointer<Entity> Parser::boolOp(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::boolOp(OpenSCAM::Tokenizer &tokenizer) {
   SmartPointer<Entity> entity = compareOp(tokenizer);
 
   while (true) {
@@ -221,7 +221,7 @@ SmartPointer<Entity> Parser::boolOp(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::compareOp(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::compareOp(OpenSCAM::Tokenizer &tokenizer) {
   SmartPointer<Entity> entity = addOp(tokenizer);
 
   while (true) {
@@ -249,7 +249,7 @@ SmartPointer<Entity> Parser::compareOp(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::addOp(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::addOp(OpenSCAM::Tokenizer &tokenizer) {
   SmartPointer<Entity> entity = mulOp(tokenizer);
 
   while (true) {
@@ -271,7 +271,7 @@ SmartPointer<Entity> Parser::addOp(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::mulOp(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::mulOp(OpenSCAM::Tokenizer &tokenizer) {
   SmartPointer<Entity> entity = expOp(tokenizer);
 
   while (true) {
@@ -297,7 +297,7 @@ SmartPointer<Entity> Parser::mulOp(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::expOp(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::expOp(OpenSCAM::Tokenizer &tokenizer) {
   SmartPointer<Entity> entity = primary(tokenizer);
 
   while (true) {
@@ -310,7 +310,7 @@ SmartPointer<Entity> Parser::expOp(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::unaryOp(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::unaryOp(OpenSCAM::Tokenizer &tokenizer) {
   Operator op;
   switch(tokenizer.getType()) {
   case TokenType::ADD_TOKEN: op = Operator::ADD_OP; break;
@@ -325,7 +325,7 @@ SmartPointer<Entity> Parser::unaryOp(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::primary(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::primary(OpenSCAM::Tokenizer &tokenizer) {
   switch (tokenizer.getType()) {
   case TokenType::ID_TOKEN: return functionCall(tokenizer);
   default: return numberRefOrExpr(tokenizer);
@@ -333,7 +333,7 @@ SmartPointer<Entity> Parser::primary(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::quotedExpr(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::quotedExpr(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
 
   tokenizer.match(TokenType::OBRACKET_TOKEN);
@@ -344,7 +344,8 @@ SmartPointer<Entity> Parser::quotedExpr(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<FunctionCall> Parser::functionCall(Tokenizer &tokenizer) {
+SmartPointer<FunctionCall>
+Parser::functionCall(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
   string name = tokenizer.match(TokenType::ID_TOKEN).getValue();
   SmartPointer<Entity> arg1 = quotedExpr(tokenizer);
@@ -359,7 +360,7 @@ SmartPointer<FunctionCall> Parser::functionCall(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Number> Parser::number(Tokenizer &tokenizer) {
+SmartPointer<Number> Parser::number(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
   double value =
     String::parseDouble(tokenizer.match(TokenType::NUMBER_TOKEN).getValue());
@@ -368,7 +369,7 @@ SmartPointer<Number> Parser::number(Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::reference(Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::reference(OpenSCAM::Tokenizer &tokenizer) {
   ParseScope scope(tokenizer.getScanner());
 
   tokenizer.match(TokenType::POUND_TOKEN);
