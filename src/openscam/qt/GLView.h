@@ -21,6 +21,10 @@
 #ifndef OPENSCAM_GLVIEW_H
 #define OPENSCAM_GLVIEW_H
 
+#ifdef _WIN32
+#include <winsock2.h> // Must come before below
+#endif
+
 #include <openscam/view/GL.h>
 
 #include <QGLWidget>

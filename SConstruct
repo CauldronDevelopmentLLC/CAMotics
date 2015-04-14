@@ -9,10 +9,11 @@ version = '0.3.0'
 major, minor, revision = version.split('.')
 
 # Setup
-env = Environment(ENV = os.environ)
+env = Environment(ENV = os.environ,
+                  TARGET_ARCH = os.environ.get('TARGET_ARCH', 'x86'))
 env.Tool('config', toolpath = [cbang])
 env.CBAddVariables(
-    ('install_prefix', 'Instalation directory prefix', '/usr/local/'))
+    ('install_prefix', 'Installation directory prefix', '/usr/local/'))
 env.CBLoadTools(
     'compiler cbang dist freetype2 opengl resources build_info packager')
 conf = env.CBConfigure()
