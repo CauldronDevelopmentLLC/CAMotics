@@ -13,12 +13,13 @@ Build or download binaries of the following, in this order:
   * Git http://git-scm.com/
   * V8 http://code.google.com/p/v8/ 
   * C! http://cbang.org/
+  * FreeType http://www.freetype.org/
   * Qt4  http://qt-project.org/
-  * Cairo2 http://cairographics.org/
+  * Cairo http://cairographics.org/
 
 # Preparation
 ## Create a build directory
-You will need to build or install several different packages.  It is recommend that you create a ```build``` diretory somewhere on your system and build or install all the packages under this directory.
+You will need to build or install several different packages.  It is recommend that you create a ```build``` directory somewhere on your system and build or install all the packages under this directory.
 
 ## Determine the Build Type
 You should determine your system's bit width, either *32-bit* or *64-bit*.  32-bit mode is also refered to as *x32* or *x86* mode and 64-bit mode may be refered to as *x64* or *amd64* mode.  This will be an important distinction for several of the packages.  You also need to decide to either build or download only *debug* or *release* mode packages.  Windows cannot mix packages built with different release modes.
@@ -124,8 +125,11 @@ Or to build in debug mode change the last line to:
 
 Then set ```CBANG_HOME```.
 
+# FreeType
+You can download Windows binaries for FreeType here: http://gnuwin32.sourceforge.net/packages/freetype.htm
+
 # Qt
-You can download Windows binaries for Qt4 here: https://www.qt.io/download-open-source/  Instructions for building from source can be found here: http://doc.qt.io/qt-4.8/install-win.html.  Make sure you install or build Qt with OpenGL support.
+You can download Windows binaries for Qt4 here: https://www.qt.io/download-open-source/.  Instructions for building from source can be found here: http://doc.qt.io/qt-4.8/install-win.html.  Make sure you install or build Qt with OpenGL support.
 
 # Cairo
 You can find prebuilt Windows binaries for cairo here: http://www.gtk.org/download/.  Or build instructions here: http://cairographics.org/end_to_end_build_for_win32/
