@@ -10,6 +10,7 @@ You will need to isntall the following bulid tools:
   * Git http://git-scm.com/
   * Python https://www.python.org/
   * SCons http://www.scons.org/
+  * NSIS http://nsis.sourceforge.net/Download (Installer build only)
 
 ## Libraries
 Build or download binaries of the following, in this order:
@@ -137,9 +138,29 @@ Now you can check out and build OpenSCAM like this:
 
     git clone https://github.com/CauldronDevelopmentLLC/OpenSCAM.git
     cd OpenSCAM
+    git checkout dev
     scons
 
 or in debug mode:
 
     scons debug=1
 
+# Building the Installer
+You can build the installer with scons like this:
+
+    scons package
+
+However, the build scripts currently expect a number of DLLs to be in particular locations, relative to the environment variables set above.  This may not match your build.  You can edit ```openscam.nsi``` to reflect the DLLs your build needs and their locations.  You should only need to change the ```File``` lines at the top of ```Section -Install```.  After making any changes simply rerun ```scons package```.  For example, here is a possible set of DLLs required to run a build of OpenSCAM:
+
+ * freetype6.dll
+ * libcairo-2.dll
+ * libfontconfig-1.dll
+ * libfreetype-6.dll
+ * liblzma-5.dll
+ * libpixman-1-0.dll
+ * libpng15-15.dll
+ * libxml2-2.dll
+ * QtCore4.dll
+ * QtGui4.dll
+ * QtOpenGL4.dll
+ * zlib1.dll
