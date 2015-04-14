@@ -26,7 +26,7 @@ Build or download binaries of the following, in this order:
 You will need to build or install several different packages.  It is recommend that you create a ```build``` directory somewhere on your system and build or install all the packages under this directory.
 
 ## Determine the Build Type
-You should determine your system's bit width, either *32-bit* or *64-bit*.  32-bit mode is also refered to as *x32* or *x86* mode and 64-bit mode may be refered to as *x64* or *amd64* mode.  This will be an important distinction for several of the packages.  Note, that it is perfectly reasonable and will not adversely affect performance if you build in 32-bit mode on a 64-bit system.  In fact it is much easier to find 32-bit binaries of the library dependencies.
+You should determine your system's bit width, either *32-bit* or *64-bit*.  32-bit mode is also refered to as *x32* or *x86* mode and 64-bit mode may be refered to as *x64* or *amd64* mode.  This will be an important distinction for several of the packages.  Note, that it is perfectly reasonable and will not adversely affect performance if you build in 32-bit mode on a 64-bit system.  In fact, it is much easier to find 32-bit binaries of the library dependencies.  You should set the environment vairable ```TARGET_ARCH``` to either ```x86``` or ```amd64```.
 
 You also need to decide to either build or download only *debug* or *release* mode packages.  Windows cannot mix packages built with different release modes.
 
@@ -45,6 +45,8 @@ Your ```env.bat``` might look something like this:
 @echo off
 
 set BUILD_ROOT=C:\build
+
+set TARGET_ARCH=x86
 
 call "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
 
