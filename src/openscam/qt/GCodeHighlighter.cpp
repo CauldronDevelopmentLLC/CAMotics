@@ -123,7 +123,7 @@ void GCodeHighlighter::highlightBlock(const QString &text) {
   try {
     QByteArray array = text.toUtf8();
     Scanner scanner(InputSource(array.data(), array.length()));
-    Tokenizer tokenizer(scanner);
+    OpenSCAM::Tokenizer tokenizer(scanner);
 
     // Deleted
     if (tokenizer.consume(TokenType::DIV_TOKEN))
@@ -173,25 +173,25 @@ void GCodeHighlighter::highlightBlock(const QString &text) {
   }
 }
 
-void GCodeHighlighter::comment(Tokenizer &tokenizer) {
+void GCodeHighlighter::comment(OpenSCAM::Tokenizer &tokenizer) {
   setFormat(tokenizer.advance(), ColorComponent::Comment);
 }
 
 
-void GCodeHighlighter::word(Tokenizer &tokenizer) {
+void GCodeHighlighter::word(OpenSCAM::Tokenizer &tokenizer) {
   tokenizer.advance();
   numberRefOrExpr(tokenizer);
 }
 
 
-void GCodeHighlighter::assign(Tokenizer &tokenizer) {
+void GCodeHighlighter::assign(OpenSCAM::Tokenizer &tokenizer) {
   reference(tokenizer);
   tokenizer.consume(TokenType::ASSIGN_TOKEN);
   expression(tokenizer);
 }
 
 
-void GCodeHighlighter::ocode(Tokenizer &tokenizer) {
+void GCodeHighlighter::ocode(OpenSCAM::Tokenizer &tokenizer) {
   Token start = tokenizer.peek();
   tokenizer.advance();
 
@@ -215,7 +215,7 @@ void GCodeHighlighter::ocode(Tokenizer &tokenizer) {
 }
 
 
-void GCodeHighlighter::numberRefOrExpr(Tokenizer &tokenizer) {
+void GCodeHighlighter::numberRefOrExpr(OpenSCAM::Tokenizer &tokenizer) {
   switch (tokenizer.getType()) {
   case TokenType::POUND_TOKEN: return reference(tokenizer);
   case TokenType::OBRACKET_TOKEN: return quotedExpr(tokenizer);
@@ -227,7 +227,7 @@ void GCodeHighlighter::numberRefOrExpr(Tokenizer &tokenizer) {
 }
 
 
-void GCodeHighlighter::expression(Tokenizer &tokenizer) {
+void GCodeHighlighter::expression(OpenSCAM::Tokenizer &tokenizer) {
   primary(tokenizer);
 
   switch (tokenizer.getType()) {
@@ -250,13 +250,13 @@ void GCodeHighlighter::expression(Tokenizer &tokenizer) {
 }
 
 
-void GCodeHighlighter::unaryOp(Tokenizer &tokenizer) {
+void GCodeHighlighter::unaryOp(OpenSCAM::Tokenizer &tokenizer) {
   tokenizer.advance();
   numberRefOrExpr(tokenizer);
 }
 
 
-void GCodeHighlighter::primary(Tokenizer &tokenizer) {
+void GCodeHighlighter::primary(OpenSCAM::Tokenizer &tokenizer) {
   switch (tokenizer.getType()) {
   case TokenType::ID_TOKEN: return functionCall(tokenizer);
   default: return numberRefOrExpr(tokenizer);
@@ -264,14 +264,14 @@ void GCodeHighlighter::primary(Tokenizer &tokenizer) {
 }
 
 
-void GCodeHighlighter::quotedExpr(Tokenizer &tokenizer) {
+void GCodeHighlighter::quotedExpr(OpenSCAM::Tokenizer &tokenizer) {
   tokenizer.advance();
   expression(tokenizer);
   tokenizer.consume(TokenType::CBRACKET_TOKEN);
 }
 
 
-void GCodeHighlighter::functionCall(Tokenizer &tokenizer) {
+void GCodeHighlighter::functionCall(OpenSCAM::Tokenizer &tokenizer) {
   Token func = tokenizer.advance();
   string name = String::toUpper(func.getValue());
   if (functions.contains(name.c_str()))
@@ -285,12 +285,12 @@ void GCodeHighlighter::functionCall(Tokenizer &tokenizer) {
 }
 
 
-void GCodeHighlighter::number(Tokenizer &tokenizer) {
+void GCodeHighlighter::number(OpenSCAM::Tokenizer &tokenizer) {
   setFormat(tokenizer.advance(), ColorComponent::Number);
 }
 
 
-void GCodeHighlighter::reference(Tokenizer &tokenizer) {
+void GCodeHighlighter::reference(OpenSCAM::Tokenizer &tokenizer) {
   Token pound = tokenizer.advance();
 
   if (tokenizer.consume(TokenType::OANGLE_TOKEN)) {
