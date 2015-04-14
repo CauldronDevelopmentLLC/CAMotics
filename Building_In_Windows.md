@@ -3,15 +3,20 @@ Building from source in Windows is much more difficult because satisfying the de
 These instructions assume you are using MSVC 2008 or better on Windows XP or newer.  Building with Cygwin or MinGW is not supported or recommended.  We will build everything from the command line.
 
 # Prerequisites
-Build or download binaries of the following, in this order:
+## Tools
+You will need to isntall the following bulid tools:
 
   * MSVS 2008 or better https://www.visualstudio.com/
-  * Pytho https://www.python.org/
+  * Git http://git-scm.com/
+  * Python https://www.python.org/
   * SCons http://www.scons.org/
   * Perl https://www.perl.org/
+
+## Libraries
+Build or download binaries of the following, in this order:
+
   * OpenSSL http://www.openssl.org/
   * Boost http://www.boost.org/
-  * Git http://git-scm.com/
   * V8 http://code.google.com/p/v8/ 
   * C! http://cbang.org/
   * FreeType http://www.freetype.org/
@@ -54,19 +59,24 @@ set CAIRO_HOME=%BUILD_ROOT%\ciaro-1.14.2
 # MSVS
 You can get a free version of Visual Studio here: https://www.visualstudio.com/.  You do not need any of the optional features.
 
+# Git
+You can find Windows binaries here: http://git-scm.com/download/win.  It is recommended that you select the options that installs the extra *Unix tools* and make ```git``` available on the Windows command line.
+
 # Python
 Python is needed to run SCons.  You can find binaries here: https://www.python.org/downloads/windows/  You should download and install the latest Python 2.
 
 # SCons
 Download and install the lastest SCons from here: http://www.scons.org/download.php.  It is not recommend that you build SCons from source.
 
+# Perl
+Installing Perl is only necessary if you plan to build OpenSSL from source.  You can find Perl binaries here: [Active Perl](http://www.activestate.com/activeperl/downloads)
+
 # OpenSSL
 You can find Windows binaries of OpenSSL here: https://www.openssl.org/related/binaries.html
 
 Alternatively you can build from source but this also requires that you install Perl.
 
- 1. Install either [Active Perl](http://www.activestate.com/activeperl/downloads) or [Strawberry Perl](http://strawberryperl.com/).
- 2. Download the latest source package from https://www.openssl.org/source/
+ 1. Download the latest source package from https://www.openssl.org/source/
  2. Unpack the source.
  3. Move in to the source directory on the command line.
  4. Build the package like this:
@@ -91,9 +101,7 @@ Alternative instructions can be found here:
 It is not actually necessary to build Boost yourself.  If you download, unpack and set the environment variable ```BOOST_SOURCE``` C! will build the parts of boost that it needs automatically.  You can find the latest version here: http://www.boost.org/users/download/#live
 
 # V8
-To get V8 you first need to install Git.  You can find Windows binaries here: http://git-scm.com/download/win.
-
-Next you need to install Google's depot tools.
+First you need to install Google's depot tools.
 
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 
