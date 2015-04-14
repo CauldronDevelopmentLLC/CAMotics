@@ -10,12 +10,10 @@ You will need to isntall the following bulid tools:
   * Git http://git-scm.com/
   * Python https://www.python.org/
   * SCons http://www.scons.org/
-  * Perl https://www.perl.org/
 
 ## Libraries
 Build or download binaries of the following, in this order:
 
-  * OpenSSL http://www.openssl.org/
   * Boost http://www.boost.org/
   * V8 http://code.google.com/p/v8/ 
   * C! http://cbang.org/
@@ -48,7 +46,6 @@ set BUILD_ROOT=C:\build
 
 call "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\bin\vcvars32.bat"
 
-set OPENSSL_HOME=%BUILD_ROOT%\openssl-1.0.2a
 set BOOST_SOURCE=%BUILD_ROOT%\boost_1_57_0
 set V8_HOME=%BUILD_ROOT%\v8
 set CBANG_HOME=%BUILD_ROOT%\cbang
@@ -67,38 +64,6 @@ Python is needed to run SCons.  You can find binaries here: https://www.python.o
 
 # SCons
 Download and install the lastest SCons from here: http://www.scons.org/download.php.  It is not recommend that you build SCons from source.
-
-# Perl
-Installing Perl is only necessary if you plan to build OpenSSL from source.  You can find Perl binaries here: [Active Perl](http://www.activestate.com/activeperl/downloads)
-
-# OpenSSL
-You can find Windows binaries of OpenSSL here: https://www.openssl.org/related/binaries.html
-
-Alternatively you can build from source but this also requires that you install Perl.
-
- 1. Download the latest source package from https://www.openssl.org/source/
- 2. Unpack the source.  You will need ```tar``` which is supplied with Git's Unix tools.
-
-         tar xvf  %HOMEPATH%\Downloads\openssl-1.0.2a.tar.gz
-
- 3. Move in to the source directory on the command line.
- 4. Build the package like this:
- 
-        perl Configure VC-WIN32
-        ms\do_ms
-        nmake -f ms\nt.mak 
-
-Note, that the above is for a 32-bit release mode build.  The possible configuration targets are:
-
- * ```VC-WIN32```
- * ```debug-VC-WIN32```
- * ```VC-WIN64A```
- * ```debug-VC-WIN64A```
-
-Alternative instructions can be found here:
-
- * http://developer.covenanteyes.com/building-openssl-for-visual-studio/
- * http://p-nand-q.com/programming/windows/building_openssl_with_visual_studio_2013.html
 
 # Boost
 It is not actually necessary to build Boost yourself.  If you download, unpack and set the environment variable ```BOOST_SOURCE``` C! will build the parts of boost that it needs automatically.  You can find the latest version here: http://www.boost.org/users/download/#live
