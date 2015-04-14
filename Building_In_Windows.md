@@ -42,15 +42,20 @@ Note that there are 32-bit and 64-bit versions of this batch file.
 Your ```env.bat``` might look something like this:
 
 ```
+@echo off
+
 set BUILD_ROOT=C:\build
 
-call "%ProgramFiles%\Microsoft Visual Studio 9.0\vc\vcvarsall.bat" x86
+call "%ProgramFiles(x86)%\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+
+set PATH=%PATH%;%BUILD_ROOT%\depot_tools;C:\Python27\Scripts;%ProgramFiles(x86)%\NSIS
 
 set BOOST_SOURCE=%BUILD_ROOT%\boost_1_57_0
 set V8_HOME=%BUILD_ROOT%\v8
 set CBANG_HOME=%BUILD_ROOT%\cbang
-set QT_HOME=%BUILD_ROOT%\qt-4.8.6
-set CAIRO_HOME=%BUILD_ROOT%\ciaro-1.14.2
+set QTDIR=%BUILD_ROOT%\Qt\4.8.6
+set CAIRO_HOME=%BUILD_ROOT%\gtk
+set FREETYPE2_HOME=%BUILD_ROOT%\freetype-2.3.5-1
 ```
 
 # MSVS
@@ -63,7 +68,9 @@ You can find Windows binaries here: http://git-scm.com/download/win.  It is reco
 Python is needed to run SCons.  You can find binaries here: https://www.python.org/downloads/windows/  You should download and install the latest Python 2.
 
 # SCons
-Download and install the lastest SCons from here: http://www.scons.org/download.php.  It is not recommend that you build SCons from source.
+Download and install the lastest SCons from here: http://www.scons.org/download.php.  It is not recommend that you build SCons from source.  After installing add SCons to the PATH.  SCons installs to the Python ```Scripts``` directory.
+
+    set PATH=%PATH%;C:\Python27\Scripts
 
 # Boost
 It is not actually necessary to build Boost yourself.  If you download, unpack and set the environment variable ```BOOST_SOURCE``` C! will build the parts of boost that it needs automatically.  You can find the latest version here: http://www.boost.org/users/download/#live
@@ -113,15 +120,16 @@ You can download Windows binaries for FreeType here: http://gnuwin32.sourceforge
 You can download Windows binaries for Qt4 here: https://www.qt.io/download-open-source/.  Instructions for building from source can be found here: http://doc.qt.io/qt-4.8/install-win.html.  Make sure you install or build Qt with OpenGL support.
 
 # Cairo
-You can find prebuilt Windows binaries for cairo here: http://www.gtk.org/download/.  Or build instructions here: http://cairographics.org/end_to_end_build_for_win32/
+You can find prebuilt Windows binaries for cairo here: http://www.gtk.org/download/.  It's easiest to just install [the whole Gtk package](http://win32builder.gnome.org/gtk+-bundle_3.6.4-20130921_win32.zip) because you will need several of the included DLLs later.  Or build instructions here: http://cairographics.org/end_to_end_build_for_win32/
 
 # OpenSCAM
 Make sure you have all of the following envrionement variables set correctly:
 
  * ```BOOST_SOURCE```
  * ```V8_HOME```
- * ```QT_HOME```
+ * ```QTDIR```
  * ```CAIRO_HOME```
+ * ```FREETYPE2_HOME```
 
 Now you can check out and build OpenSCAM like this:
 
