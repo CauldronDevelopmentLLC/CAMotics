@@ -41,7 +41,7 @@ On Debian based systems all the prerequisites, including thoese needed
 by C!, can be installed with the following command line:
 
     sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
-      libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
+      libexpat1-dev libboost-iostreams-dev libboost-system-dev \
       libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
       qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev \
       libfreetype6-dev git
