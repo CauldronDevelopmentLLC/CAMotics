@@ -126,6 +126,7 @@ Make sure you have all of the following envrionement variables set correctly:
 Now you can check out and build OpenSCAM like this:
 
     git clone https://github.com/CauldronDevelopmentLLC/OpenSCAM.git
+    cd OpenSCAM
     scons
 
 or in debug mode:
