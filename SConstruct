@@ -15,12 +15,11 @@ env.Tool('config', toolpath = [cbang])
 env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'))
 env.CBLoadTools(
-    'compiler cbang dist freetype2 opengl resources build_info packager')
+    'compiler cbang dist freetype2 opengl build_info packager')
 conf = env.CBConfigure()
 
 # Config vars
 env.Replace(PACKAGE_VERSION = version)
-env.Replace(RESOURCES_NS = 'OpenSCAM')
 env.Replace(BUILD_INFO_NS = 'OpenSCAM::BuildInfo')
 
 # Qt4 tool
@@ -111,19 +110,9 @@ libs = [lib]
 Depends(lib, uic)
 
 
-# Resources
-res = env.Resources('build/resources.cpp', ['#/src/resources'])
-Precious(res)
-resLib = env.Library('libResources', res)
-Precious(resLib)
-libs += [resLib]
-
 # 3rd-party libs
 libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
-#kbool = env.Library('kbool', Glob('src/kbool/src/*.cpp'))
-#kurve = env.Library('kurve', Glob('src/kurve/*.cpp'))
-#area = env.Library('area', Glob('src/libarea/*.cpp'))
-#libs += [area, kurve, kbool]
+
 
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
 progs = 'openscam gcodetool oscamprobe oscamopt oscameval tplang oscamsim'
