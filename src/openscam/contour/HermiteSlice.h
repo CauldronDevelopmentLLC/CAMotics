@@ -1,7 +1,7 @@
 /******************************************************************************\
 
     OpenSCAM is an Open-Source CAM software.
-    Copyright (C) 2011-2014 Joseph Coffland <joseph@cauldrondevelopment.com>
+    Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

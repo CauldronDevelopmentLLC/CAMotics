@@ -1,7 +1,7 @@
 /******************************************************************************\
 
     OpenSCAM is an Open-Source CAM software.
-    Copyright (C) 2011-2014 Joseph Coffland <joseph@cauldrondevelopment.com>
+    Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ Application::Application(const string &name) :
     // TODO move this stuff out to the build system
     cb::Info &info = cb::Info::instance();
     info.add(name, "Website", "http://openscam.org/", true);
-    info.add(name, "Copyright", "(c) 2011-2014");
+    info.add(name, "Copyright", "(c) 2011-2015");
     info.add(name, "Author", "Joseph Coffland <joseph@openscam.org>");
     info.add(name, "Organization", "Cauldron Development LLC");
   }
