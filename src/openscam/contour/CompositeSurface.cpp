@@ -60,17 +60,12 @@ void CompositeSurface::draw() {
 }
 
 
-void CompositeSurface::drawNormals() {
-  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->drawNormals();
-}
-
-
 void CompositeSurface::exportSTL(STL &stl) {
   for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->exportSTL(stl);
 }
 
 
-void CompositeSurface::smooth() {
+void CompositeSurface::simplify() {
   if (1 < surfaces.size()) collect();
-  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->smooth();
+  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->simplify();
 }

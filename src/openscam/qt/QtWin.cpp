@@ -69,7 +69,7 @@ QtWin::QtWin(Application &app) :
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), smooth(true), autoPlay(false), autoClose(false),
+  lastStatusActive(false), simplify(true), autoPlay(false), autoClose(false),
   currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
@@ -497,7 +497,7 @@ void QtWin::toolPathComplete() {
   surfaceThread = new SurfaceThread(surfaceCompleteEvent, this, cutSim,
                                     toolPath, project->getWorkpieceBounds(),
                                     project->getResolution(), view->getTime(),
-                                    smooth);
+                                    simplify);
   surfaceThread->start();
 
   // Auto play
@@ -1460,8 +1460,8 @@ void QtWin::on_unitsComboBox_currentIndexChanged(int value) {
 }
 
 
-void QtWin::on_smoothPushButton_clicked(bool active) {
-  smooth = active;
+void QtWin::on_simplifyPushButton_clicked(bool active) {
+  simplify = active;
 }
 
 

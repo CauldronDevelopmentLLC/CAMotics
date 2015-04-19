@@ -53,7 +53,7 @@ namespace OpenSCAM {
     Rectangle3R getBounds() const {return bounds;}
     void draw();
     void exportSTL(STL &stl);
-    void smooth();
+    void simplify();
   };
 }
 

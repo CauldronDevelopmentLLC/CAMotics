@@ -1397,12 +1397,12 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Smooth</string>
+                 <string>Simplify</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QPushButton" name="smoothPushButton">
+               <widget class="QPushButton" name="simplifyPushButton">
                 <property name="minimumSize">
                  <size>
                   <width>32</width>
@@ -1419,11 +1419,11 @@
                  <enum>Qt::NoFocus</enum>
                 </property>
                 <property name="toolTip">
-                 <string>Smooth the resulting surface for better visualization</string>
+                 <string>Simplify the resulting surface for better visualization</string>
                 </property>
                 <property name="icon">
                  <iconset resource="openscam.qrc">
-                  <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
+                  <normaloff>:/icons/simplify.png</normaloff>:/icons/simplify.png</iconset>
                 </property>
                 <property name="checkable">
                  <bool>true</bool>
@@ -3023,7 +3023,7 @@
     <string>F5</string>
    </property>
   </action>
-  <action name="actionSmooth">
+  <action name="actionSimplify">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -3032,13 +3032,13 @@
    </property>
    <property name="icon">
     <iconset resource="openscam.qrc">
-     <normaloff>:/icons/smooth.png</normaloff>:/icons/smooth.png</iconset>
+     <normaloff>:/icons/simplify.png</normaloff>:/icons/simplify.png</iconset>
    </property>
    <property name="text">
-    <string>Smooth</string>
+    <string>Simplify</string>
    </property>
    <property name="toolTip">
-    <string>Smooth the resulting surface for better visualization</string>
+    <string>Simplify the resulting surface for better visualization</string>
    </property>
   </action>
   <action name="actionDonate">

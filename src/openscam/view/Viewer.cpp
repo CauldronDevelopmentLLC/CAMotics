@@ -111,11 +111,6 @@ void Viewer::draw(const View &view) {
     glEnable(GL_COLOR_MATERIAL);
 
     view.setWire(false);
-
-    if (view.isFlagSet(View::SHOW_NORMALS_FLAG)) {
-      glColor4f(1.0, 1.0, 0, 0.6);
-      surface->drawNormals();
-    }
   }
 
   // Bounding box tree

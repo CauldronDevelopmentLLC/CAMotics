@@ -45,9 +45,8 @@ namespace OpenSCAM {
     uint64_t getCount() const;
     Rectangle3R getBounds() const;
     void draw();
-    void drawNormals();
     void exportSTL(STL &stl);
-    void smooth();
+    void simplify();
   };
 }
 

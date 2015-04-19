@@ -56,7 +56,7 @@ namespace OpenSCAM {
     cb::SmartPointer<Surface>
     computeSurface(const cb::SmartPointer<ToolPath> &path,
                    const Rectangle3R &bounds, double resolution,
-                   double time, bool smooth);
+                   double time, bool simplify);
 
     // From Task
     void interrupt();

@@ -27,6 +27,8 @@
 #include <openscam/stl/STL.h>
 
 #include <map>
+#include <limits>
+#include <algorithm>
 
 using namespace std;
 using namespace cb;
@@ -108,8 +110,6 @@ void ElementSurface::addElement(const Vector3R *vertices) {
       this->vertices.push_back(vertices[i][j]);
       normals.push_back(normal[j]);
     }
-
-    addNormalLine(vertices[i], normal);
   }
 }
 
@@ -177,45 +177,299 @@ void ElementSurface::exportSTL(STL &stl) {
 
 
 namespace {
-  struct normals_t {
-    Vector3D normal;
-    unsigned count;
-    normals_t() : count(0) {}
+  struct AxisSort {
+    const vector<float> &vertices;
+    int axis;
+
+    AxisSort(const vector<float> &vertices, int axis) :
+      vertices(vertices), axis(axis) {}
+
+    bool operator() (unsigned i, unsigned j) {
+      return vertices[i * 3 + axis] < vertices[j * 3 + axis];
+    }
   };
+
+
+  struct Triangle;
+  struct Vertex;
+  struct VertexSort;
+  typedef set<Vertex *, VertexSort> VertexSet;
+
+
+  struct Vertex {
+    Vector3R v;
+    vector<Triangle *> triangles;
+    bool deleted;
+
+    Vertex(const Vector3R &v) : v(v), deleted(false) {}
+
+    void findNeighbors(VertexSet &neighbors) const;
+    bool coplaner(const Vector3R &normal, double tolerance = 0.0001) const;
+    bool wouldFlip(Vertex &o);
+    double weight(Vertex &o);
+  };
+
+
+  struct VertexSort {
+    bool operator() (const Vertex *a, const Vertex *b) {return a->v < b->v;}
+  };
+
+
+  struct Triangle {
+    Vertex *vertices[3];
+    Vector3R normal;
+    bool deleted;
+
+    Triangle() : deleted(false) {vertices[0] = vertices[1] = vertices[2] = 0;}
+
+
+    double areaSquared() const {
+      double a = vertices[0]->v.length();
+      double b = vertices[1]->v.length();
+      double c = vertices[2]->v.length();
+      double s = (a + b + c) / 2;
+
+      return s * (s - a) * (s - b) * (s - c);
+    }
+
+
+    double weight() const {
+      double a = vertices[0]->v.length();
+      double b = vertices[1]->v.length();
+      double c = vertices[2]->v.length();
+
+      return (a + b + c) / min(a, min(b, c));
+    }
+
+
+    void computeNormal() {
+      if (!(vertices[0] && vertices[1] && vertices[2]))
+        THROW("Triangle has null vertex");
+
+      Vector3R u = vertices[0]->v - vertices[1]->v;
+      Vector3R v = vertices[1]->v - vertices[2]->v;
+
+      normal = u.cross(v).normalize();
+    }
+
+
+    bool wouldFlip(Vertex &a, Vertex &b) const {
+      Triangle t;
+      Vertex mid((a.v + b.v) / 2.0);
+
+      for (unsigned i = 0; i < 3; i++)
+        t.vertices[i] =
+          (vertices[i]->v == a.v || vertices[i]->v == b.v) ? &mid : vertices[i];
+
+      t.computeNormal();
+
+      return normal.dot(t.normal) < 0;
+    }
+  };
+
+
+  void Vertex::findNeighbors(VertexSet &neighbors) const {
+    for (unsigned i = 0; i < triangles.size(); i++) {
+      Triangle &t = *triangles[i];
+
+      if (t.deleted) continue;
+
+      for (unsigned j = 0; j < 3; j++)
+        if (t.vertices[j] != this) neighbors.insert(t.vertices[j]);
+    }
+  }
+
+
+  bool Vertex::coplaner(const Vector3R &normal, double tolerance) const {
+    for (unsigned i = 0; i < triangles.size() - 1; i++) {
+      if (triangles[i]->deleted) continue;
+
+      const Vector3R &na = triangles[i]->normal;
+      const Vector3R &nb = triangles[i + 1]->normal;
+
+      double cosAngle = na.dot(nb);
+      if (cosAngle < 1 - tolerance) {
+        cosAngle = na.cross(nb).normalize().dot(normal);
+        if (cosAngle < 1 - tolerance) return false;
+      }
+    }
+
+    return true;
+  }
+
+
+  bool Vertex::wouldFlip(Vertex &o) {
+    for (unsigned i = 0; i < triangles.size(); i++)
+      if (!triangles[i]->deleted && triangles[i]->wouldFlip(*this, o))
+        return true;
+
+    return false;
+  }
+
+
+  double Vertex::weight(Vertex &o) {
+    return 0;
+  }
+
+
+  bool moreThan2InCommon(VertexSet &vs1, VertexSet &vs2) {
+    unsigned count = 0;
+    VertexSet::iterator it1 = vs1.begin();
+    VertexSet::iterator it2 = vs2.end();
+
+    while (it1 != vs1.end() && it2 != vs2.end()) {
+      if ((*it1)->v == (*it2)->v) {
+        if (++count == 3) return true;
+        it1++;
+        it2++;
+
+      } else if ((*it1)->v < (*it2)->v) it1++;
+      else it2++;
+    }
+
+    return false;
+  }
 }
 
 
-void ElementSurface::smooth() {
-  // NOTE Many incident vertices are missed due to small floating point
-  // differences
-  typedef map<Vector3R, normals_t> vertNorms_t;
-  vertNorms_t vertNorms;
-  vertNorms_t::iterator it;
-
-  // Gather adjacent normals
-  for (unsigned i = 0; i < count * dim; i++) {
-    unsigned offset = i * 3;
-    Vector3D v(vertices[offset], vertices[offset + 1], vertices[offset + 2]);
-    Vector3D n(normals[offset], normals[offset + 1], normals[offset + 2]);
-
-    it = vertNorms.insert(vertNorms_t::value_type(v, normals_t())).first;
-    it->second.normal += n;
-    it->second.count++;
+void ElementSurface::simplify() {
+  if (dim != 3) {
+    LOG_WARNING(__func__ << "() only implemented for triangles");
+    return;
   }
 
-  // Average adjacent normals
-  for (it = vertNorms.begin(); it != vertNorms.end(); it++)
-    it->second.normal = (it->second.normal / it->second.count).normalize();
+  // Weld vertices
+  float delta = numeric_limits<float>::epsilon() * 10;
+  vector<unsigned> vertexIndex(count * dim);
+  for (unsigned i = 0; i < count * dim; i++) vertexIndex[i] = i;
 
-  // Apply averaged normals
-  for (unsigned i = 0; i < count * dim; i++) {
-    unsigned offset = i * 3;
-    Vector3D v(vertices[offset], vertices[offset + 1], vertices[offset + 2]);
+  for (unsigned axis = 0; axis < 3; axis++) {
+    sort(vertexIndex.begin(), vertexIndex.end(), AxisSort(vertices, axis));
 
-    it = vertNorms.find(v);
-    if (it == vertNorms.end()) THROWS("Couldn't find vertex");
-    normals[offset + 0] = it->second.normal.x();
-    normals[offset + 1] = it->second.normal.y();
-    normals[offset + 2] = it->second.normal.z();
+    for (unsigned i = 0; i < count * 3 - 1; i++) {
+      unsigned a = vertexIndex[i] * 3 + axis;
+      unsigned b = vertexIndex[i + 1] * 3 + axis;
+
+      if (vertices[b] < vertices[a] + delta) vertices[b] = vertices[a];
+    }
+  }
+
+  // Build triangles and find unique vertices
+  vector<SmartPointer<Vertex> > vertices;
+  vector<Triangle> triangles(count);
+
+  typedef map<Vector3R, unsigned> unique_vertices_t;
+  unique_vertices_t uniqueVertices;
+  Vector3R v;
+  unsigned index = 0;
+
+  for (unsigned i = 0; i < count; i++) {
+    Triangle &t = triangles[i];
+
+    for (unsigned j = 0; j < dim; j++) {
+      for (unsigned k = 0; k < 3; k++) v[k] = this->vertices[index++];
+
+      unsigned pos = uniqueVertices.insert
+        (unique_vertices_t::value_type(v, vertices.size())).first->second;
+
+      if (pos == vertices.size()) vertices.push_back(new Vertex(v));
+
+      t.vertices[j] = vertices[pos].get();
+      vertices[pos]->triangles.push_back(&t);
+    }
+
+    t.computeNormal();
+  }
+
+  // Collapse edges
+  for (unsigned i = 0; i < vertices.size(); i++) {
+    Vertex &v = *vertices[i];
+
+    // Find neighbors
+    VertexSet neighbors;
+    v.findNeighbors(neighbors);
+
+    // Choose vertex to merge with
+    unsigned minNeighbors = numeric_limits<unsigned>::max();
+    Vertex *merge = 0;
+
+    VertexSet::iterator it;
+    for (it = neighbors.begin(); it != neighbors.end(); it++) {
+      Vertex &neighbor = **it;
+
+      // Check if adjacent triangles are coplaner
+      Vector3R n = (v.v - neighbor.v).normalize();
+      if (!v.coplaner(n)) continue;
+      if (!neighbor.coplaner(n)) continue;
+
+      // Make sure the neighbor does not have more then two neighbors in common
+      VertexSet neighborNeighbors;
+      neighbor.findNeighbors(neighborNeighbors);
+      if (moreThan2InCommon(neighbors, neighborNeighbors)) continue;
+
+      // Check for flips
+      if (v.wouldFlip(neighbor) || neighbor.wouldFlip(v)) continue;
+
+      unsigned numNeighbors = neighborNeighbors.size();
+      if (numNeighbors < minNeighbors) {
+        merge = &neighbor;
+        minNeighbors = numNeighbors;
+      }
+    }
+
+    if (!merge) continue;
+
+    // Delete this vertex
+    v.deleted = true;
+
+    // Update triangles
+    merge->v = (v.v + merge->v) / 2.0;
+
+    for (unsigned j = 0; j < v.triangles.size(); j++) {
+      Triangle &t = *v.triangles[j];
+      if (t.deleted) continue;
+
+      // Delete triangle
+      for (unsigned k = 0; k < 3; k++)
+        if (t.vertices[k] == merge) t.deleted = true;
+
+      if (t.deleted) continue;
+
+      // Merge triangle
+      for (unsigned k = 0; k < 3; k++)
+        if (t.vertices[k] == &v) t.vertices[k] = merge;
+
+      // Add triangle
+      bool added = false;
+      for (unsigned k = 0; k < merge->triangles.size(); k++)
+        if (merge->triangles[k]->deleted) {
+          merge->triangles[k] = &t;
+          added = true;
+          break;
+        }
+
+      if (!added) merge->triangles.push_back(&t);
+    }
+  }
+
+  // Reconstruct
+  this->vertices.clear();
+  normals.clear();
+  count = 0;
+
+  for (unsigned i = 0; i < triangles.size(); i++) {
+    Triangle &t = triangles[i];
+    if (t.deleted) continue;
+
+    count++;
+
+    for (unsigned j = 0; j < dim; j++) {
+      Vertex &v = *t.vertices[j];
+
+      for (unsigned k = 0; k < 3; k++) {
+        this->vertices.push_back(v.v[k]);
+        this->normals.push_back(t.normal[k]);
+      }
+    }
   }
 }

@@ -111,7 +111,7 @@ namespace OpenSCAM {
     std::string lastStatus;
     bool lastStatusActive;
     cb::SmartPointer<Tool> currentTool;
-    bool smooth;
+    bool simplify;
     bool autoPlay;
     bool autoClose;
 
@@ -251,7 +251,7 @@ namespace OpenSCAM {
     void on_resolutionDoubleSpinBox_valueChanged(double value);
     void on_unitsComboBox_currentIndexChanged(int value);
 
-    void on_smoothPushButton_clicked(bool active);
+    void on_simplifyPushButton_clicked(bool active);
     void on_positionSlider_sliderMoved(int position);
 
     void on_projectTreeView_activated(const QModelIndex &index);

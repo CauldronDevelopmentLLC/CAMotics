@@ -51,9 +51,8 @@ namespace OpenSCAM {
       SHOW_TOOL_FLAG             = 1 << 5,
       SHOW_SURFACE_FLAG          = 1 << 6,
       SHOW_BBTREE_FLAG           = 1 << 7,
-      SHOW_NORMALS_FLAG          = 1 << 8,
-      PLAY_FLAG                  = 1 << 9,
-      LOOP_FLAG                  = 1 << 10,
+      PLAY_FLAG                  = 1 << 8,
+      LOOP_FLAG                  = 1 << 9,
     };
 
     unsigned flags;

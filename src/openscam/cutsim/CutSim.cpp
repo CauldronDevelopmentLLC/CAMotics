@@ -103,7 +103,7 @@ SmartPointer<ToolPath> CutSim::computeToolPath(const Project &project) {
 cb::SmartPointer<Surface>
 CutSim::computeSurface(const SmartPointer<ToolPath> &path,
                        const Rectangle3R &bounds, double resolution,
-                       double time, bool smooth) {
+                       double time, bool simplify) {
   // Setup cut simulation
   CutWorkpiece cutWP(new ToolSweep(path, time), new Workpiece(bounds));
 
@@ -111,13 +111,21 @@ CutSim::computeSurface(const SmartPointer<ToolPath> &path,
   Renderer renderer(SmartPointer<Task>::Null(this));
   SmartPointer<Surface> surface = renderer.render(cutWP, threads, resolution);
 
-  // Smooth
-  if (smooth && !task->shouldQuit()) {
-    LOG_INFO(1, "Smoothing");
+  // Simplify
+  if (simplify && !task->shouldQuit()) {
+    LOG_INFO(1, "Simplifying");
+
+    double startCount = surface->getCount();
 
     task->begin();
-    task->update(0, "Smoothing...");
-    surface->smooth();
+    task->update(0, "Simplifying...");
+
+    for (unsigned i = 0; i < 5; i++) surface->simplify();
+
+    unsigned count = surface->getCount();
+    double r = (double)(startCount - count) / startCount * 100;
+    LOG_INFO(1, String::printf("Triangles %u, %0.2f%% reduction", count, r));
+
     task->end();
   }
 

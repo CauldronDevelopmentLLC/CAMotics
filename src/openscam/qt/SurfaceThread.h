@@ -34,7 +34,7 @@ namespace OpenSCAM {
     Rectangle3R bounds;
     double resolution;
     double time;
-    bool smooth;
+    bool simplify;
     cb::SmartPointer<Surface> surface;
 
   public:
@@ -42,9 +42,9 @@ namespace OpenSCAM {
                   const cb::SmartPointer<CutSim> &cutSim,
                   const cb::SmartPointer<ToolPath> &path,
                   const Rectangle3R &bounds, double resolution, double time,
-                  bool smooth) :
+                  bool simplify) :
       CutSimThread(event, parent, cutSim), path(path), bounds(bounds),
-      resolution(resolution), time(time), smooth(smooth) {}
+      resolution(resolution), time(time), simplify(simplify) {}
 
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
 
