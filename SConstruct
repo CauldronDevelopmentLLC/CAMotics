@@ -80,7 +80,6 @@ for subdir in [
 for subdir in ['']:
     src += Glob('src/tplang/%s/*.cpp' % subdir)
 
-
 # Build in 'build'
 import re
 VariantDir('build', 'src')
