@@ -22,7 +22,6 @@
 
 #include "View.h"
 #include "GL.h"
-#include "GLFreeType.h"
 #include "BoundsView.h"
 
 #include <openscam/sim/ToolTable.h>
@@ -58,11 +57,6 @@ static void drawCylinder(GLUquadric *quad, double radiusA, double radiusB,
 
 
 void Viewer::init() {
-  if (!font)
-    try {
-      font = new GLFreeType("Courier_New.ttf", 12);
-    } CBANG_CATCH_ERROR;
-
   if (!toolQuad) {
     toolQuad = gluNewQuadric();
     if (!toolQuad) THROW("Failed to allocate tool quad");

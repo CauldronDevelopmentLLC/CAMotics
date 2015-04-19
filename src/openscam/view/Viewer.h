@@ -23,15 +23,12 @@
 
 namespace OpenSCAM {
   class View;
-  class Machine;
-  class GLFreeType;
 
   class Viewer {
-    GLFreeType *font;
     void *toolQuad;
 
   public:
-    Viewer() : font(0), toolQuad(0) {}
+    Viewer() : toolQuad(0) {}
 
     void init();
     void draw(const View &view);
