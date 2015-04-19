@@ -83,11 +83,11 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
            << resolution << " grid resolution in " << jobBoxes.size()
            << " boxes");
 
-
   // Run jobs
   SmartPointer<CompositeSurface> surface = new CompositeSurface;
   typedef list<SmartPointer<RenderJob> > jobs_t;
   jobs_t jobs;
+  double lastUpdate = 0;
   while (!task->shouldQuit() && !(jobBoxes.empty() && jobs.empty())) {
 
     // Start new jobs
@@ -125,6 +125,14 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
 
     task->update(progress, "Rendering surface");
 
+    // Log progress
+    double now = Timer::now();
+    if (lastUpdate + 1 < now) {
+      lastUpdate = now;
+      LOG_INFO(2, String::printf("Progress: %0.2f%%", progress * 100)
+               << " Time: " << TimeInterval(task->getTime())
+               << " ETA: " << TimeInterval(task->getETA()));
+    }
 
     // Sleep
     Timer::sleep(0.1);

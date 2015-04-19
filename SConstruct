@@ -128,7 +128,7 @@ libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
 #libs += [area, kurve, kbool]
 
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
-progs = 'openscam gcodetool oscamprobe oscamopt oscameval tplang'
+progs = 'openscam gcodetool oscamprobe oscamopt oscameval tplang oscamsim'
 execs = []
 for prog in progs.split():
     p = env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])

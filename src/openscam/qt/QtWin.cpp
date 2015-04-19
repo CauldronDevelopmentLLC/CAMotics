@@ -32,7 +32,6 @@
 #include <openscam/cutsim/CutWorkpiece.h>
 #include <openscam/remote/ConnectionManager.h>
 #include <openscam/stl/STL.h>
-#include <openscam/render/Renderer.h>
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>

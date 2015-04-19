@@ -37,6 +37,7 @@ namespace OpenSCAM {
   class ToolTable;
   class ToolPath;
   class Surface;
+  class Project;
 
   class CutSim : public Machine, public Task {
     unsigned threads;
@@ -50,6 +51,8 @@ namespace OpenSCAM {
     cb::SmartPointer<ToolPath>
     computeToolPath(const cb::SmartPointer<ToolTable> &tools,
                     const std::vector<std::string> &files);
+    cb::SmartPointer<ToolPath> computeToolPath(const Project &project);
+
     cb::SmartPointer<Surface>
     computeSurface(const cb::SmartPointer<ToolPath> &path,
                    const Rectangle3R &bounds, double resolution,

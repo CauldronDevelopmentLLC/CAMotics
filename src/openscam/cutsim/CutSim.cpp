@@ -24,6 +24,7 @@
 #include "ToolPath.h"
 #include "CutWorkpiece.h"
 #include "Sweep.h"
+#include "Project.h"
 
 #include <tplang/TPLContext.h>
 #include <tplang/Interpreter.h>
@@ -87,6 +88,18 @@ CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
 }
 
 
+SmartPointer<ToolPath> CutSim::computeToolPath(const Project &project) {
+  SmartPointer<ToolTable> tools = project.getToolTable();
+
+  vector<string> files;
+  Project::iterator it;
+  for (it = project.begin(); it != project.end(); it++)
+    files.push_back((*it)->getAbsolutePath());
+
+  return computeToolPath(tools, files);
+}
+
+
 cb::SmartPointer<Surface>
 CutSim::computeSurface(const SmartPointer<ToolPath> &path,
                        const Rectangle3R &bounds, double resolution,
@@ -100,6 +113,8 @@ CutSim::computeSurface(const SmartPointer<ToolPath> &path,
 
   // Smooth
   if (smooth && !task->shouldQuit()) {
+    LOG_INFO(1, "Smoothing");
+
     task->begin();
     task->update(0, "Smoothing...");
     surface->smooth();
