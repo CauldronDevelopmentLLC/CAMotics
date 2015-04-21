@@ -48,7 +48,7 @@ namespace OpenSCAM {
     virtual double eval(Reference &e);
     virtual double eval(Number &e);
 
-    cb::SmartPointer<Entity> simplify(const cb::SmartPointer<Entity> &entity);
+    cb::SmartPointer<Entity> reduce(const cb::SmartPointer<Entity> &entity);
   };
 }
 

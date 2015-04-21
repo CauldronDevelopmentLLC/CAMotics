@@ -23,6 +23,8 @@
 
 #include "Surface.h"
 
+#include <openscam/Real.h>
+
 #include <cbang/SmartPointer.h>
 
 #include <vector>
@@ -42,6 +44,7 @@ namespace OpenSCAM {
 
   public:
     ElementSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
+    ElementSurface(const ElementSurface &o);
     ElementSurface(unsigned dim);
     virtual ~ElementSurface();
 
@@ -49,11 +52,12 @@ namespace OpenSCAM {
     void addElement(const Vector3R *vertices);
 
     // From Surface
+    cb::SmartPointer<Surface> copy() const;
     uint64_t getCount() const {return count;}
     Rectangle3R getBounds() const {return bounds;}
     void draw();
     void exportSTL(STL &stl);
-    void simplify();
+    void reduce(Task &task);
   };
 }
 

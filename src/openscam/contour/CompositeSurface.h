@@ -39,14 +39,15 @@ namespace OpenSCAM {
     iterator begin() const {return surfaces.begin();}
     iterator end() const {return surfaces.end();}
 
-    cb::SmartPointer<Surface> collect();
+    cb::SmartPointer<Surface> consolidate();
 
     // From Surface
+    cb::SmartPointer<Surface> copy() const;
     uint64_t getCount() const;
     Rectangle3R getBounds() const;
     void draw();
     void exportSTL(STL &stl);
-    void simplify();
+    void reduce(Task &task);
   };
 }
 

@@ -31,7 +31,7 @@ using namespace OpenSCAM;
 void SurfaceThread::run() {
   try {
     if (!time) time = numeric_limits<double>::max();
-    surface = cutSim->computeSurface(path, bounds, resolution, time, simplify);
+    surface = cutSim->computeSurface(path, bounds, resolution, time);
   } CATCH_ERROR;
   completed();
 }

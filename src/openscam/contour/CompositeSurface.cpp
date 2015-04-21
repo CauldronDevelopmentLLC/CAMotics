@@ -30,11 +30,21 @@ void CompositeSurface::add(SmartPointer<Surface> s) {
 }
 
 
-cb::SmartPointer<Surface> CompositeSurface::collect() {
+cb::SmartPointer<Surface> CompositeSurface::consolidate() {
   if (surfaces.size() == 1) return surfaces[0];
   cb::SmartPointer<Surface> surface = new ElementSurface(surfaces);
   surfaces.clear();
   add(surface);
+  return surface;
+}
+
+
+SmartPointer<Surface> CompositeSurface::copy() const {
+  SmartPointer<CompositeSurface> surface = new CompositeSurface;
+
+  for (unsigned i = 0; i < surfaces.size(); i++)
+    surface->add(surfaces[i]->copy());
+
   return surface;
 }
 
@@ -65,7 +75,7 @@ void CompositeSurface::exportSTL(STL &stl) {
 }
 
 
-void CompositeSurface::simplify() {
-  if (1 < surfaces.size()) collect();
-  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->simplify();
+void CompositeSurface::reduce(Task &task) {
+  consolidate();
+  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->reduce(task);
 }

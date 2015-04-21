@@ -34,17 +34,15 @@ namespace OpenSCAM {
     Rectangle3R bounds;
     double resolution;
     double time;
-    bool simplify;
     cb::SmartPointer<Surface> surface;
 
   public:
     SurfaceThread(int event, QWidget *parent,
                   const cb::SmartPointer<CutSim> &cutSim,
                   const cb::SmartPointer<ToolPath> &path,
-                  const Rectangle3R &bounds, double resolution, double time,
-                  bool simplify) :
+                  const Rectangle3R &bounds, double resolution, double time) :
       CutSimThread(event, parent, cutSim), path(path), bounds(bounds),
-      resolution(resolution), time(time), simplify(simplify) {}
+      resolution(resolution), time(time) {}
 
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
 

@@ -64,12 +64,12 @@ using namespace OpenSCAM;
 
 QtWin::QtWin(Application &app) :
   QMainWindow(0), toolPathCompleteEvent(0), surfaceCompleteEvent(0),
-  ui(new Ui::OpenSCAMWindow), fileDialog(*this), app(app),
-  options(app.getOptions()), cutSim(new CutSim(options)),
+  reduceCompleteEvent(0), ui(new Ui::OpenSCAMWindow), fileDialog(*this),
+  app(app), options(app.getOptions()), cutSim(new CutSim(options)),
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), simplify(true), autoPlay(false), autoClose(false),
+  lastStatusActive(false), autoPlay(false), autoClose(false),
   currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
@@ -94,6 +94,7 @@ QtWin::QtWin(Application &app) :
   // Register user events
   toolPathCompleteEvent = QEvent::registerEventType();
   surfaceCompleteEvent = QEvent::registerEventType();
+  reduceCompleteEvent = QEvent::registerEventType();
 
   // Disable view bounds
   view->setShowBounds(false);
@@ -496,8 +497,7 @@ void QtWin::toolPathComplete() {
   // Start surface thread
   surfaceThread = new SurfaceThread(surfaceCompleteEvent, this, cutSim,
                                     toolPath, project->getWorkpieceBounds(),
-                                    project->getResolution(), view->getTime(),
-                                    simplify);
+                                    project->getResolution(), view->getTime());
   surfaceThread->start();
 
   // Auto play
@@ -521,9 +521,21 @@ void QtWin::surfaceComplete() {
 }
 
 
+void QtWin::reduceComplete() {
+  if (!reduceThread->getSurface().isNull()) {
+    surface = reduceThread->getSurface();
+    view->setSurface(surface);
+    redraw();
+  }
+
+  setStatusActive(false);
+}
+
+
 void QtWin::stop() {
   if (!toolPathThread.isNull()) toolPathThread->join();
   if (!surfaceThread.isNull()) surfaceThread->join();
+  if (!reduceThread.isNull()) reduceThread->join();
   setStatusActive(false);
 }
 
@@ -542,6 +554,23 @@ void QtWin::reload(bool now) {
     toolPathThread =
       new ToolPathThread(toolPathCompleteEvent, this, cutSim, project);
     toolPathThread->start();
+
+    setStatusActive(true);
+
+  } CBANG_CATCH_ERROR;
+}
+
+
+void QtWin::reduce() {
+  if (surface.isNull()) return;
+
+  try {
+    stop();
+
+    // Start tool path thread
+    reduceThread =
+      new ReduceThread(reduceCompleteEvent, this, cutSim, *surface);
+    reduceThread->start();
 
     setStatusActive(true);
 
@@ -1359,6 +1388,9 @@ bool QtWin::event(QEvent *event) {
   else if (surfaceCompleteEvent && event->type() == surfaceCompleteEvent)
     surfaceComplete();
 
+  else if (reduceCompleteEvent && event->type() == reduceCompleteEvent)
+    reduceComplete();
+
   else return QMainWindow::event(event);
 
   return true;
@@ -1457,11 +1489,6 @@ void QtWin::on_unitsComboBox_currentIndexChanged(int value) {
   if (project.isNull() || project->getUnits() == units) return;
   project->setUnits(units);
   updateUnits();
-}
-
-
-void QtWin::on_simplifyPushButton_clicked(bool active) {
-  simplify = active;
 }
 
 
@@ -1775,6 +1802,11 @@ void QtWin::on_actionStop_triggered() {
 
 void QtWin::on_actionRun_triggered() {
   reload(true);
+}
+
+
+void QtWin::on_actionReduce_triggered() {
+  reduce();
 }
 
 

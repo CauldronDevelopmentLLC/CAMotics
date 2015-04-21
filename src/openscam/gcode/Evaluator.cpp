@@ -143,7 +143,7 @@ double Evaluator::eval(Number &e) {
 }
 
 
-SmartPointer<Entity> Evaluator::simplify(const SmartPointer<Entity> &entity) {
+SmartPointer<Entity> Evaluator::reduce(const SmartPointer<Entity> &entity) {
   if (entity->isConstant()) return new Number(entity->eval(*this));
   return entity;
 }

@@ -26,16 +26,18 @@
 
 namespace OpenSCAM {
   class STL;
+  class Task;
 
   class Surface {
   public:
     virtual ~Surface() {}
 
+    virtual cb::SmartPointer<Surface> copy() const = 0;
     virtual uint64_t getCount() const = 0;
     virtual Rectangle3R getBounds() const = 0;
     virtual void draw() = 0;
     virtual void exportSTL(STL &stl) = 0;
-    virtual void simplify() = 0;
+    virtual void reduce(Task &task) = 0;
   };
 }
 

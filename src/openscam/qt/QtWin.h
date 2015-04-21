@@ -28,6 +28,7 @@
 #include "FileDialog.h"
 #include "ToolPathThread.h"
 #include "SurfaceThread.h"
+#include "ReduceThread.h"
 #include "LineBuffer.h"
 
 #include <openscam/Real.h>
@@ -65,6 +66,7 @@ namespace OpenSCAM {
 
     int toolPathCompleteEvent;
     int surfaceCompleteEvent;
+    int reduceCompleteEvent;
 
     cb::SmartPointer<Ui::OpenSCAMWindow> ui;
     NewDialog newDialog;
@@ -103,6 +105,7 @@ namespace OpenSCAM {
 
     cb::SmartPointer<ToolPathThread> toolPathThread;
     cb::SmartPointer<SurfaceThread> surfaceThread;
+    cb::SmartPointer<ReduceThread> reduceThread;
 
     bool dirty;
     bool simDirty;
@@ -111,7 +114,6 @@ namespace OpenSCAM {
     std::string lastStatus;
     bool lastStatusActive;
     cb::SmartPointer<Tool> currentTool;
-    bool simplify;
     bool autoPlay;
     bool autoClose;
 
@@ -164,9 +166,11 @@ namespace OpenSCAM {
 
     void toolPathComplete();
     void surfaceComplete();
+    void reduceComplete();
 
     void stop();
     void reload(bool now = false);
+    void reduce();
     void redraw(bool now = false);
     void snapshot();
     void exportData();
@@ -251,7 +255,6 @@ namespace OpenSCAM {
     void on_resolutionDoubleSpinBox_valueChanged(double value);
     void on_unitsComboBox_currentIndexChanged(int value);
 
-    void on_simplifyPushButton_clicked(bool active);
     void on_positionSlider_sliderMoved(int position);
 
     void on_projectTreeView_activated(const QModelIndex &index);
@@ -287,6 +290,7 @@ namespace OpenSCAM {
 
     void on_actionStop_triggered();
     void on_actionRun_triggered();
+    void on_actionReduce_triggered();
     void on_actionBegining_triggered();
     void on_actionSlower_triggered();
     void on_actionPlay_triggered();
