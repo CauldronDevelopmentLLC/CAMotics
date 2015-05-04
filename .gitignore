@@ -26,3 +26,8 @@ package.txt
 
 # Backup files
 *~
+
+# Programs
+openscam
+tplang
+oscam*
