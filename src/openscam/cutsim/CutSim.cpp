@@ -46,7 +46,7 @@ using namespace OpenSCAM;
 
 CutSim::CutSim(Options &options) :
   Machine(options), threads(SystemInfo::instance().getCPUCount()),
-  task(SmartPointer<Task>::ProtectedNull(this)) {
+  task(SmartPointer<Task>::Phony(this)) {
   options.pushCategory("Simulation");
   options.addTarget("threads", threads, "Number of simulation threads.");
   options.popCategory();
@@ -92,7 +92,7 @@ CutSim::computeSurface(const SmartPointer<ToolPath> &path,
   CutWorkpiece cutWP(new ToolSweep(path, time), new Workpiece(bounds));
 
   // Render
-  Renderer renderer(SmartPointer<Task>::Null(this));
+  Renderer renderer(SmartPointer<Task>::Phony(this));
   SmartPointer<Surface> surface = renderer.render(cutWP, threads, resolution);
 
   // Smooth

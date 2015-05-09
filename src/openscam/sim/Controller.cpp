@@ -41,7 +41,7 @@ using namespace OpenSCAM;
 
 Controller::Controller(MachineInterface &machine,
                        const SmartPointer<ToolTable> &tools) : tools(tools) {
-  this->machine.setParent(SmartPointer<MachineInterface>::Null(&machine));
+  this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
 
   if (tools.isNull()) this->tools = new ToolTable;
 

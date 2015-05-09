@@ -58,7 +58,7 @@ void Machine::move(const Move &move) {
 
   // Output
   if (moveStream.isNull() && !outputMoves.empty()) {
-    if (outputMoves == "-") moveStream = SmartPointer<ostream>::Null(&cout);
+    if (outputMoves == "-") moveStream = SmartPointer<ostream>::Phony(&cout);
     else moveStream = SystemUtilities::oopen(outputMoves);
   }
 

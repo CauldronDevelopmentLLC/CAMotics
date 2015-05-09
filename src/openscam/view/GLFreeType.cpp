@@ -224,7 +224,7 @@ void GLFreeType::displayList(FT_Face face, unsigned char ch) {
     for (int i = 0; i < width; i++) {
       expanded_data[2 * (i + j * width)] = 255;
       expanded_data[2 * (i + j * width) + 1] =
-        (i >= bitmap.width || j >= bitmap.rows) ?
+        (i >= (int)bitmap.width || j >= (int)bitmap.rows) ?
         0 : bitmap.buffer[i + bitmap.width * j];
     }
 
