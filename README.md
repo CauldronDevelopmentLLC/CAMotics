@@ -30,20 +30,23 @@ See http://openscam.org/
 GNU General Public License version 2+.  See the file COPYING.
 
 # Prerequisites
-  - C!     - http://cbang.org/
-  - Qt4    - http://qt-project.org/
-  - Cairo2 - http://cairographics.org/
-  - SCons  - http://www.scons.org/
+  - C! http://cbang.org/
+  - Qt4 http://qt-project.org/
+  - Cairo2 http://cairographics.org/
+  - FreeType2 http://www.freetype.org/
+  - V8 https://code.google.com/p/v8/
+  - SCons http://www.scons.org/
 
 On Debian based systems all the prerequisites, including thoese needed
 by C!, can be installed with the following command line:
 
     sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
-      libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
+      libexpat1-dev libboost-iostreams-dev libboost-system-dev \
       libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
-      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
+      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev \
+      libfreetype6-dev git
 
-# Building from Source
+# Building from Source on Debian
 This section describes how to build OpenSCAM from source on Debian based
 systems such as Ubuntu and Mint Linux.  If you are running Windows or OSX
 it is much easier to simply install prebuilt packages which can be found
@@ -75,7 +78,10 @@ In the OpenSCAM source code directory run:
     scons package
     sudo dpkg -i $(cat package.txt)
 
-## Build Warnings/Errors
+# Building from Source on Windows
+See [Building in Windows](Building_In_Windows.md).
+
+# Build Warnings/Errors
 If you get any build warnings, by default, the build will stop.  If you have
 problems building, especially with warnings related to the boost library you
 can ignore these warnings by building cbang and/or OpenSCAM with
