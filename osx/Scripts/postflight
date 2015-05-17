@@ -1,2 +1,5 @@
-#!/bin/sh
-open -a OpenSCAM.app
+#!/bin/bash
+
+su $USER -c 'open -a OpenSCAM.app'
+
+exit 0
