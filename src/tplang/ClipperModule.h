@@ -29,6 +29,8 @@
 namespace tplang {
   class ClipperModule : public cb::js::Module {
   public:
+    ClipperModule() {define(*this);}
+
     void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs

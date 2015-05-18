@@ -35,9 +35,8 @@ namespace tplang {
 
   public:
     GCodeModule(TPLContext &ctx) :
-    ctx(ctx), unitAdapter(ctx.find<MachineUnitAdapter>()) {}
+    ctx(ctx), unitAdapter(ctx.find<MachineUnitAdapter>()) {define(*this);}
 
-    // From cb::js::Module
     void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs

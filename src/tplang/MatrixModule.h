@@ -34,10 +34,8 @@ namespace tplang {
     MachineMatrix &matrix;
 
   public:
-    MatrixModule(TPLContext &ctx) :
-    ctx(ctx), matrix(ctx.find<MachineMatrix>()) {}
+    MatrixModule(TPLContext &ctx);
 
-    // From cb::js::Module
     void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs
