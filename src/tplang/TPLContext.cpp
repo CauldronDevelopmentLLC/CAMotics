@@ -25,6 +25,7 @@
 #include "ClipperModule.h"
 
 #include <cbang/Exception.h>
+#include <cbang/os/SystemUtilities.h>
 
 using namespace std;
 using namespace cb;
@@ -50,6 +51,14 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
   clipperMod->define(*this);
 
   set("dxf", addModule(new DXFModule(*this)));
+
+  // Add search paths
+  const char *paths = SystemUtilities::getenv("TPL_PATH");
+  if (paths) addSearchPaths(paths);
+
+  // Add .tpl to search extensions
+  clearSearchExtensions();
+  addSearchExtensions("/package.json .tpl .js .json");
 }
 
 
