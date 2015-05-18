@@ -18,7 +18,7 @@
 
 \******************************************************************************/
 
-#include "DXFLibrary.h"
+#include "DXFModule.h"
 
 #include <openscam/dxf/DXFReader.h>
 #include <openscam/dxf/DXFPoint.h>
@@ -35,23 +35,23 @@ using namespace cb;
 using namespace std;
 
 
-DXFLibrary::DXFLibrary(TPLContext &ctx) : js::Library(ctx), ctx(ctx) {
-  entityTmpl.set("cut()", this, &DXFLibrary::cutCB);
+DXFModule::DXFModule(TPLContext &ctx) : ctx(ctx) {
+  entityTmpl.set("cut()", this, &DXFModule::cutCB);
 }
 
 
-void DXFLibrary::add(js::ObjectTemplate &tmpl) {
-  tmpl.set("open(path)", this, &DXFLibrary::openCB);
+void DXFModule::define(js::ObjectTemplate &exports) {
+  exports.set("open(path)", this, &DXFModule::openCB);
 
-  tmpl.set("POINT",    DXFEntity::DXF_POINT);
-  tmpl.set("LINE",     DXFEntity::DXF_LINE);
-  tmpl.set("ARC",      DXFEntity::DXF_ARC);
-  tmpl.set("POLYLINE", DXFEntity::DXF_POLYLINE);
-  tmpl.set("SPLINE",   DXFEntity::DXF_SPLINE);
+  exports.set("POINT",    DXFEntity::DXF_POINT);
+  exports.set("LINE",     DXFEntity::DXF_LINE);
+  exports.set("ARC",      DXFEntity::DXF_ARC);
+  exports.set("POLYLINE", DXFEntity::DXF_POLYLINE);
+  exports.set("SPLINE",   DXFEntity::DXF_SPLINE);
 }
 
 
-js::Value DXFLibrary::openCB(const js::Arguments &args) {
+js::Value DXFModule::openCB(const js::Arguments &args) {
   string path =
     SystemUtilities::absolute(ctx.currentPath(), args.getString("path"));
 
@@ -178,6 +178,6 @@ js::Value DXFLibrary::openCB(const js::Arguments &args) {
 }
 
 
-js::Value DXFLibrary::cutCB(const js::Arguments &args) {
+js::Value DXFModule::cutCB(const js::Arguments &args) {
   return js::Value();
 }

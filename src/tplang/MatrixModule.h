@@ -18,27 +18,27 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MATRIX_LIBRARY_H
-#define TPLANG_MATRIX_LIBRARY_H
+#ifndef TPLANG_MATRIX_MODULE_H
+#define TPLANG_MATRIX_MODULE_H
 
 #include "TPLContext.h"
 #include "MachineMatrix.h"
 #include "MachineEnum.h"
 
-#include <cbang/js/Library.h>
+#include <cbang/js/Module.h>
 
 
 namespace tplang {
-  class MatrixLibrary : public cb::js::Library, public MachineEnum {
+  class MatrixModule : public cb::js::Module, public MachineEnum {
     TPLContext &ctx;
     MachineMatrix &matrix;
 
   public:
-    MatrixLibrary(TPLContext &ctx) :
-    cb::js::Library(ctx), ctx(ctx), matrix(ctx.find<MachineMatrix>()) {}
+    MatrixModule(TPLContext &ctx) :
+    ctx(ctx), matrix(ctx.find<MachineMatrix>()) {}
 
-    // From cb::js::Library
-    void add(cb::js::ObjectTemplate &tmpl);
+    // From cb::js::Module
+    void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs
     cb::js::Value pushMatrixCB(const cb::js::Arguments &args);
@@ -60,5 +60,5 @@ namespace tplang {
   };
 }
 
-#endif // TPLANG_MATRIX_LIBRARY_H
+#endif // TPLANG_MATRIX_MODULE_H
 

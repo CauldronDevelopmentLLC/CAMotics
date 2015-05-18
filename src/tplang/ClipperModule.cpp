@@ -18,7 +18,7 @@
 
 \******************************************************************************/
 
-#include "ClipperLibrary.h"
+#include "ClipperModule.h"
 
 #include <clipper/clipper.hpp>
 
@@ -27,17 +27,17 @@ using namespace ClipperLib;
 using namespace tplang;
 
 
-void ClipperLibrary::add(js::ObjectTemplate &tmpl) {
-  tmpl.set("offset(polys, delta, join, limit=1000, autoFix=true, "
-           "scale=1000000)", this, &ClipperLibrary::offsetCB);
+void ClipperModule::define(js::ObjectTemplate &exports) {
+  exports.set("offset(polys, delta, join, limit=1000, autoFix=true, "
+              "scale=1000000)", this, &ClipperModule::offsetCB);
 
-  tmpl.set("JOIN_SQUARE", jtSquare);
-  tmpl.set("JOIN_ROUND", jtRound);
-  tmpl.set("JOIN_MITER", jtMiter);
+  exports.set("JOIN_SQUARE", jtSquare);
+  exports.set("JOIN_ROUND", jtRound);
+  exports.set("JOIN_MITER", jtMiter);
 }
 
 
-js::Value ClipperLibrary::offsetCB(const js::Arguments &args) {
+js::Value ClipperModule::offsetCB(const js::Arguments &args) {
   uint32_t scale = args.getUint32("scale");
 
   // Convert JavaScript polys to Clipper polys

@@ -3,7 +3,7 @@ rapid(0, 0, 0);
 
 for (i = 1; i <= 40; i++) {
   loadIdentity();
-  var angle = PI / 20.0 * i;
+  var angle = Math.PI / 20.0 * i;
   rotate(angle, 1, 1, 1);
 
   print("(angle=" + angle + ")\n");

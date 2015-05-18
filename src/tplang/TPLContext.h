@@ -25,7 +25,7 @@
 
 #include <openscam/sim/ToolTable.h>
 
-#include <cbang/js/LibraryContext.h>
+#include <cbang/js/Environment.h>
 #include <cbang/config/Options.h>
 
 #include <vector>
@@ -33,8 +33,9 @@
 
 
 namespace tplang {
-  class TPLContext : public cb::js::LibraryContext {
+  class TPLContext : public cb::js::Environment {
     std::vector<std::string> paths;
+    std::vector<cb::SmartPointer<cb::js::Module> > modules;
 
   public:
     MachineInterface &machine;
@@ -46,6 +47,9 @@ namespace tplang {
     void pushPath(const std::string &path) {paths.push_back(path);}
     void popPath();
     const std::string &currentPath() const;
+
+    using cb::js::Environment::addModule;
+    cb::js::Module &addModule(const cb::SmartPointer<cb::js::Module> &module);
 
     template <typename T>
     T &find() {

@@ -18,25 +18,23 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_CLIPPER_LIBRARY_H
-#define TPLANG_CLIPPER_LIBRARY_H
+#ifndef TPLANG_CLIPPER_MODULE_H
+#define TPLANG_CLIPPER_MODULE_H
 
 #include "TPLContext.h"
 
-#include <cbang/js/Library.h>
+#include <cbang/js/Module.h>
 
 
 namespace tplang {
-  class ClipperLibrary : public cb::js::Library {
+  class ClipperModule : public cb::js::Module {
   public:
-    ClipperLibrary(TPLContext &ctx) : cb::js::Library(ctx) {}
-
-    void add(cb::js::ObjectTemplate &tmpl);
+    void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs
     cb::js::Value offsetCB(const cb::js::Arguments &args);
   };
 }
 
-#endif // TPLANG_CLIPPER_LIBRARY_H
+#endif // TPLANG_CLIPPER_MODULE_H
 

@@ -18,25 +18,25 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_DXFLIBRARY_H
-#define TPLANG_DXFLIBRARY_H
+#ifndef TPLANG_DXFMODULE_H
+#define TPLANG_DXFMODULE_H
 
 #include "TPLContext.h"
 
-#include <cbang/js/Library.h>
+#include <cbang/js/Module.h>
 
 
 namespace tplang {
-  class DXFLibrary : public cb::js::Library {
+  class DXFModule : public cb::js::Module {
     TPLContext &ctx;
     cb::js::ObjectTemplate layersTmpl;
     cb::js::ObjectTemplate entityTmpl;
 
   public:
-    DXFLibrary(TPLContext &ctx);
+    DXFModule(TPLContext &ctx);
 
-    // From cb::js::Library
-    void add(cb::js::ObjectTemplate &tmpl);
+    // From cb::js::Module
+    void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs
     cb::js::Value openCB(const cb::js::Arguments &args);
@@ -46,5 +46,5 @@ namespace tplang {
   };
 }
 
-#endif // TPLANG_DXFLIBRARY_H
+#endif // TPLANG_DXFMODULE_H
 
