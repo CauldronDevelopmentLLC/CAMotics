@@ -18,28 +18,27 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_GCODE_LIBRARY_H
-#define TPLANG_GCODE_LIBRARY_H
+#ifndef TPLANG_GCODE_MODULE_H
+#define TPLANG_GCODE_MODULE_H
 
 #include "TPLContext.h"
 #include "MachineUnitAdapter.h"
 #include "MachineEnum.h"
 
-#include <cbang/js/Library.h>
+#include <cbang/js/Module.h>
 
 
 namespace tplang {
-  class GCodeLibrary : public cb::js::Library, public MachineEnum {
+  class GCodeModule : public cb::js::Module, public MachineEnum {
     TPLContext &ctx;
     MachineUnitAdapter &unitAdapter;
 
   public:
-    GCodeLibrary(TPLContext &ctx) :
-    cb::js::Library(ctx), ctx(ctx),
-    unitAdapter(ctx.find<MachineUnitAdapter>()) {}
+    GCodeModule(TPLContext &ctx) :
+    ctx(ctx), unitAdapter(ctx.find<MachineUnitAdapter>()) {}
 
-    // From cb::js::Library
-    void add(cb::js::ObjectTemplate &tmpl);
+    // From cb::js::Module
+    void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs
     cb::js::Value gcodeCB(const cb::js::Arguments &args);
@@ -62,5 +61,5 @@ namespace tplang {
   };
 }
 
-#endif // TPLANG_GCODE_LIBRARY_H
+#endif // TPLANG_GCODE_MODULE_H
 

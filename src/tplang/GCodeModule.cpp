@@ -18,7 +18,7 @@
 
 \******************************************************************************/
 
-#include "GCodeLibrary.h"
+#include "GCodeModule.h"
 
 #include <openscam/sim/ToolTable.h>
 #include <openscam/sim/Controller.h>
@@ -34,52 +34,54 @@ using namespace std;
 using namespace cb;
 
 
-void GCodeLibrary::add(js::ObjectTemplate &tmpl) {
+void GCodeModule::define(js::ObjectTemplate &exports) {
 #define XYZ "x, y, z"
 #define ABC "a, b, c"
 #define UVW "u, v, w"
 #define IJK "i, j, k"
 #define AXES XYZ ", " ABC ", " UVW
 
-  tmpl.set("gcode(path)", this, &GCodeLibrary::gcodeCB);
-  tmpl.set("rapid(" AXES ", incremental=false)", this, &GCodeLibrary::rapidCB);
-  tmpl.set("irapid(" AXES ", incremental=true)", this, &GCodeLibrary::rapidCB);
-  tmpl.set("cut(" AXES ", incremental=false)", this, &GCodeLibrary::cutCB);
-  tmpl.set("icut(" AXES ", incremental=true)", this, &GCodeLibrary::cutCB);
-  tmpl.set("arc(x=0, y=0, z=0, angle, plane, incremental=true)", this,
-          &GCodeLibrary::arcCB);
-  tmpl.set("probe(" AXES ", toward=true, error=true, index=0, port=-1, "
-          "invert=false)", this, &GCodeLibrary::probeCB);
-  tmpl.set("dwell(seconds)", this, &GCodeLibrary::dwellCB);
-  tmpl.set("feed(rate, mode)", this, &GCodeLibrary::feedCB);
-  tmpl.set("speed(rate, surface, max)", this, &GCodeLibrary::speedCB);
-  tmpl.set("tool(number)", this, &GCodeLibrary::toolCB);
-  tmpl.set("units(type)", this, &GCodeLibrary::unitsCB);
-  tmpl.set("pause(optional=false)", this, &GCodeLibrary::pauseCB);
-  tmpl.set("tool_set(number, length, diameter, units, shape, snub=0, "
+  exports.set("gcode(path)", this, &GCodeModule::gcodeCB);
+  exports.set("rapid(" AXES ", incremental=false)", this,
+              &GCodeModule::rapidCB);
+  exports.set("irapid(" AXES ", incremental=true)", this,
+              &GCodeModule::rapidCB);
+  exports.set("cut(" AXES ", incremental=false)", this, &GCodeModule::cutCB);
+  exports.set("icut(" AXES ", incremental=true)", this, &GCodeModule::cutCB);
+  exports.set("arc(x=0, y=0, z=0, angle, plane, incremental=true)", this,
+          &GCodeModule::arcCB);
+  exports.set("probe(" AXES ", toward=true, error=true, index=0, port=-1, "
+          "invert=false)", this, &GCodeModule::probeCB);
+  exports.set("dwell(seconds)", this, &GCodeModule::dwellCB);
+  exports.set("feed(rate, mode)", this, &GCodeModule::feedCB);
+  exports.set("speed(rate, surface, max)", this, &GCodeModule::speedCB);
+  exports.set("tool(number)", this, &GCodeModule::toolCB);
+  exports.set("units(type)", this, &GCodeModule::unitsCB);
+  exports.set("pause(optional=false)", this, &GCodeModule::pauseCB);
+  exports.set("tool_set(number, length, diameter, units, shape, snub=0, "
            "front_angle=0, back_angle=0, orientation=0)", this,
-           &GCodeLibrary::toolSetCB);
-  tmpl.set("position()", this, &GCodeLibrary::positionCB);
+           &GCodeModule::toolSetCB);
+  exports.set("position()", this, &GCodeModule::positionCB);
 
-  tmpl.set("FEED_INVERSE_TIME", INVERSE_TIME);
-  tmpl.set("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
-  tmpl.set("FEED_UNITS_PER_REV", MM_PER_REVOLUTION);
+  exports.set("FEED_INVERSE_TIME", INVERSE_TIME);
+  exports.set("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
+  exports.set("FEED_UNITS_PER_REV", MM_PER_REVOLUTION);
 
-  tmpl.set("IMPERIAL", MachineUnitAdapter::IMPERIAL);
-  tmpl.set("METRIC", MachineUnitAdapter::METRIC);
+  exports.set("IMPERIAL", MachineUnitAdapter::IMPERIAL);
+  exports.set("METRIC", MachineUnitAdapter::METRIC);
 
-  tmpl.set("XY", XY);
-  tmpl.set("XZ", XZ);
-  tmpl.set("YZ", YZ);
-  tmpl.set("YV", YV);
-  tmpl.set("UV", UV);
-  tmpl.set("VW", VW);
+  exports.set("XY", XY);
+  exports.set("XZ", XZ);
+  exports.set("YZ", YZ);
+  exports.set("YV", YV);
+  exports.set("UV", UV);
+  exports.set("VW", VW);
 
-  tmpl.set("CYLINDRICAL", OpenSCAM::ToolShape::TS_CYLINDRICAL);
-  tmpl.set("CONICAL", OpenSCAM::ToolShape::TS_CONICAL);
-  tmpl.set("BALLNOSE", OpenSCAM::ToolShape::TS_BALLNOSE);
-  tmpl.set("SPHEROID", OpenSCAM::ToolShape::TS_SPHEROID);
-  tmpl.set("SNUBNOSE", OpenSCAM::ToolShape::TS_SNUBNOSE);
+  exports.set("CYLINDRICAL", OpenSCAM::ToolShape::TS_CYLINDRICAL);
+  exports.set("CONICAL", OpenSCAM::ToolShape::TS_CONICAL);
+  exports.set("BALLNOSE", OpenSCAM::ToolShape::TS_BALLNOSE);
+  exports.set("SPHEROID", OpenSCAM::ToolShape::TS_SPHEROID);
+  exports.set("SNUBNOSE", OpenSCAM::ToolShape::TS_SNUBNOSE);
 
 #undef XYZ
 #undef ABC
@@ -89,7 +91,7 @@ void GCodeLibrary::add(js::ObjectTemplate &tmpl) {
 }
 
 
-js::Value GCodeLibrary::gcodeCB(const js::Arguments &args) {
+js::Value GCodeModule::gcodeCB(const js::Arguments &args) {
   string path =
     SystemUtilities::absolute(ctx.getCurrentPath(), args.getString("path"));
 
@@ -104,7 +106,7 @@ js::Value GCodeLibrary::gcodeCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::rapidCB(const js::Arguments &args) {
+js::Value GCodeModule::rapidCB(const js::Arguments &args) {
   Axes axes = ctx.machine.getPosition();
   parseAxes(args, axes, args.getBoolean("incremental"));
   ctx.machine.move(axes, true);
@@ -113,7 +115,7 @@ js::Value GCodeLibrary::rapidCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::cutCB(const js::Arguments &args) {
+js::Value GCodeModule::cutCB(const js::Arguments &args) {
   Axes axes = ctx.machine.getPosition();
   parseAxes(args, axes, args.getBoolean("incremental"));
   ctx.machine.move(axes);
@@ -122,7 +124,7 @@ js::Value GCodeLibrary::cutCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::arcCB(const js::Arguments &args) {
+js::Value GCodeModule::arcCB(const js::Arguments &args) {
   // TODO Handle 'incremental=false'
 
   Vector3D
@@ -136,7 +138,7 @@ js::Value GCodeLibrary::arcCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::probeCB(const js::Arguments &args) {
+js::Value GCodeModule::probeCB(const js::Arguments &args) {
   bool toward = args.getBoolean("toward");
   bool error = args.getBoolean("error");
   uint32_t index = args.getUint32("index");
@@ -156,13 +158,13 @@ js::Value GCodeLibrary::probeCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::dwellCB(const js::Arguments &args) {
+js::Value GCodeModule::dwellCB(const js::Arguments &args) {
   ctx.machine.dwell(args["seconds"].toNumber());
   return js::Value();
 }
 
 
-js::Value GCodeLibrary::feedCB(const js::Arguments &args) {
+js::Value GCodeModule::feedCB(const js::Arguments &args) {
   // Return feed info if no arguments were given
   if (!args.getCount()) {
     js::Value array = js::Value::createArray(2);
@@ -191,7 +193,7 @@ js::Value GCodeLibrary::feedCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::speedCB(const js::Arguments &args) {
+js::Value GCodeModule::speedCB(const js::Arguments &args) {
   // Return spindle info if no arguments were given
   if (!args.getCount()) {
     js::Value array = js::Value::createArray(3);
@@ -220,7 +222,7 @@ js::Value GCodeLibrary::speedCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::toolCB(const js::Arguments &args) {
+js::Value GCodeModule::toolCB(const js::Arguments &args) {
   // Return tool number if no arguments were given
   if (!args.getCount()) return ctx.machine.getTool();
 
@@ -232,7 +234,7 @@ js::Value GCodeLibrary::toolCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::unitsCB(const js::Arguments &args) {
+js::Value GCodeModule::unitsCB(const js::Arguments &args) {
   MachineUnitAdapter::units_t units = unitAdapter.getUnits();
 
   if (args.has("type"))
@@ -251,13 +253,13 @@ js::Value GCodeLibrary::unitsCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::pauseCB(const js::Arguments &args) {
+js::Value GCodeModule::pauseCB(const js::Arguments &args) {
   ctx.machine.pause(args["optional"].toBoolean());
   return js::Value();
 }
 
 
-js::Value GCodeLibrary::toolSetCB(const js::Arguments &args) {
+js::Value GCodeModule::toolSetCB(const js::Arguments &args) {
   SmartPointer<OpenSCAM::Tool> tool = ctx.tools->get(args["number"].toUint32());
 
   uint32_t units;
@@ -285,11 +287,10 @@ js::Value GCodeLibrary::toolSetCB(const js::Arguments &args) {
 }
 
 
-js::Value GCodeLibrary::positionCB(const js::Arguments &args) {
+js::Value GCodeModule::positionCB(const js::Arguments &args) {
   Axes axes = ctx.machine.getPosition();
 
-  cb::js::ObjectTemplate tmpl;
-  js::Value obj = tmpl.create();
+  js::Value obj = js::Value::createObject();
 
   for (unsigned i = 0; Axes::AXES[i]; i++)
     obj.set(string(1, tolower(Axes::AXES[i])), axes.getIndex(i));
@@ -298,7 +299,7 @@ js::Value GCodeLibrary::positionCB(const js::Arguments &args) {
 }
 
 
-void GCodeLibrary::parseAxes(const js::Arguments &args, Axes &axes,
+void GCodeModule::parseAxes(const js::Arguments &args, Axes &axes,
                              bool incremental) {
   for (const char *axis ="xyzabcuvw"; *axis; axis++) {
     string name = string(1, *axis);

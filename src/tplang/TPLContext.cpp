@@ -19,6 +19,10 @@
 \******************************************************************************/
 
 #include "TPLContext.h"
+#include "GCodeModule.h"
+#include "MatrixModule.h"
+#include "DXFModule.h"
+#include "ClipperModule.h"
 
 #include <cbang/Exception.h>
 #include <cbang/os/SystemUtilities.h>
@@ -30,7 +34,13 @@ using namespace tplang;
 
 TPLContext::TPLContext(ostream &out, MachineInterface &machine,
                        const SmartPointer<OpenSCAM::ToolTable> &tools) :
-  js::LibraryContext(out), machine(machine), tools(tools) {
+  js::Environment(out), machine(machine), tools(tools) {
+
+  // Add modules
+  addModule(new GCodeModule(*this)).define(*this);
+  addModule(new MatrixModule(*this)).define(*this);
+  addModule("dxf", addModule(new DXFModule(*this)));
+  addModule("clipper", addModule(new ClipperModule));
 
   // Add search paths
   const char *paths = SystemUtilities::getenv("TPL_PATH");
@@ -39,4 +49,10 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
   // Add .tpl to search extensions
   clearSearchExtensions();
   addSearchExtensions("/package.json .tpl .js .json");
+}
+
+
+js::Module &TPLContext::addModule(const SmartPointer<js::Module> &module) {
+  modules.push_back(module);
+  return *module;
 }

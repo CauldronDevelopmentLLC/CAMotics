@@ -22,15 +22,9 @@
 #define TPLANG_INTERPRETER_H
 
 #include "TPLContext.h"
-#include "GCodeLibrary.h"
-#include "MatrixLibrary.h"
-#include "DXFLibrary.h"
-#include "ClipperLibrary.h"
 
 #include <cbang/io/Reader.h>
 #include <cbang/io/OutputSink.h>
-
-#include <cbang/js/StdLibrary.h>
 
 #include <ostream>
 
@@ -38,14 +32,9 @@
 namespace tplang {
   class Interpreter : public cb::Reader {
     TPLContext &ctx;
-    cb::js::StdLibrary stdLib;
-    GCodeLibrary gcodeLib;
-    MatrixLibrary matrixLib;
-    DXFLibrary dxfLib;
-    ClipperLibrary clipperLib;
 
   public:
-    Interpreter(TPLContext &ctx);
+    Interpreter(TPLContext &ctx) : ctx(ctx) {}
 
     // From cb::Reader
     void read(const cb::InputSource &source);

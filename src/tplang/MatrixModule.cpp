@@ -18,84 +18,84 @@
 
 \******************************************************************************/
 
-#include "MatrixLibrary.h"
+#include "MatrixModule.h"
 
 using namespace cb;
 using namespace tplang;
 
 
-void MatrixLibrary::add(js::ObjectTemplate &tmpl) {
-  tmpl.set("pushMatrix(matrix)", this, &MatrixLibrary::pushMatrixCB);
-  tmpl.set("popMatrix(matrix)", this, &MatrixLibrary::popMatrixCB);
-  tmpl.set("loadIdentity(matrix)", this, &MatrixLibrary::loadIdentityCB);
-  tmpl.set("scale(x=1, y=1, z=1, matrix)", this, &MatrixLibrary::scaleCB);
-  tmpl.set("translate(x=0, y=0, z=0, matrix)", this,
-           &MatrixLibrary::translateCB);
-  tmpl.set("rotate(angle, x=0, y=0, z=1, matrix)", this,
-           &MatrixLibrary::rotateCB);
-  tmpl.set("setMatrix(m, matrix)", this, &MatrixLibrary::setMatrixCB);
-  tmpl.set("getMatrix(m)", this, &MatrixLibrary::getMatrixCB);
+void MatrixModule::define(js::ObjectTemplate &exports) {
+  exports.set("pushMatrix(matrix)", this, &MatrixModule::pushMatrixCB);
+  exports.set("popMatrix(matrix)", this, &MatrixModule::popMatrixCB);
+  exports.set("loadIdentity(matrix)", this, &MatrixModule::loadIdentityCB);
+  exports.set("scale(x=1, y=1, z=1, matrix)", this, &MatrixModule::scaleCB);
+  exports.set("translate(x=0, y=0, z=0, matrix)", this,
+           &MatrixModule::translateCB);
+  exports.set("rotate(angle, x=0, y=0, z=1, matrix)", this,
+           &MatrixModule::rotateCB);
+  exports.set("setMatrix(m, matrix)", this, &MatrixModule::setMatrixCB);
+  exports.set("getMatrix(m)", this, &MatrixModule::getMatrixCB);
 
   // TODO Consider replacing these with get(X), get(Y), etc.
-  tmpl.set("getXYZ()", this, &MatrixLibrary::getXYZ);
-  tmpl.set("getX()", this, &MatrixLibrary::getX);
-  tmpl.set("getY()", this, &MatrixLibrary::getY);
-  tmpl.set("getZ()", this, &MatrixLibrary::getZ);
+  exports.set("getXYZ()", this, &MatrixModule::getXYZ);
+  exports.set("getX()", this, &MatrixModule::getX);
+  exports.set("getY()", this, &MatrixModule::getY);
+  exports.set("getZ()", this, &MatrixModule::getZ);
 }
 
 
-js::Value MatrixLibrary::pushMatrixCB(const js::Arguments &args) {
+js::Value MatrixModule::pushMatrixCB(const js::Arguments &args) {
   matrix.pushMatrix(parseMatrix(args));
   return js::Value();
 }
 
 
-js::Value MatrixLibrary::popMatrixCB(const js::Arguments &args) {
+js::Value MatrixModule::popMatrixCB(const js::Arguments &args) {
   matrix.popMatrix(parseMatrix(args));
   return js::Value();
 }
 
 
-js::Value MatrixLibrary::loadIdentityCB(const js::Arguments &args) {
+js::Value MatrixModule::loadIdentityCB(const js::Arguments &args) {
   matrix.loadIdentity(parseMatrix(args));
   return js::Value();
 }
 
 
-js::Value MatrixLibrary::scaleCB(const js::Arguments &args) {
+js::Value MatrixModule::scaleCB(const js::Arguments &args) {
   matrix.scale(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"),
                parseMatrix(args));
   return js::Value();
 }
 
 
-js::Value MatrixLibrary::translateCB(const js::Arguments &args) {
+js::Value MatrixModule::translateCB(const js::Arguments &args) {
   matrix.translate(args.getNumber("x"), args.getNumber("y"),
                    args.getNumber("z"), parseMatrix(args));
   return js::Value();
 }
 
 
-js::Value MatrixLibrary::rotateCB(const js::Arguments &args) {
+js::Value MatrixModule::rotateCB(const js::Arguments &args) {
   matrix.rotate(args.getNumber("angle"), args.getNumber("x"),
                 args.getNumber("y"), args.getNumber("z"), parseMatrix(args));
   return js::Value();
 }
 
 
-js::Value MatrixLibrary::setMatrixCB(const js::Arguments &args) {
+js::Value MatrixModule::setMatrixCB(const js::Arguments &args) {
   THROW("Not yet implemented");
   return js::Value();
 }
 
 
-js::Value MatrixLibrary::getMatrixCB(const js::Arguments &args) {
+js::Value MatrixModule::getMatrixCB(const js::Arguments &args) {
   THROW("Not yet implemented");
   return js::Value();
 }
 
 
-MatrixLibrary::axes_t MatrixLibrary::parseMatrix(const js::Arguments &args) {
+MatrixModule::axes_t MatrixModule::parseMatrix(const js::Arguments &args) {
   if (!args.has("matrix")) return XYZ;
 
   axes_t matrix = (axes_t)args["matrix"].toUint32();
@@ -105,7 +105,7 @@ MatrixLibrary::axes_t MatrixLibrary::parseMatrix(const js::Arguments &args) {
 }
 
 
-js::Value MatrixLibrary::getXYZ(const js::Arguments &args) {
+js::Value MatrixModule::getXYZ(const js::Arguments &args) {
   Vector3D v = ctx.machine.getPosition(XYZ);
   js::Value array = js::Value::createArray();
 
@@ -117,16 +117,16 @@ js::Value MatrixLibrary::getXYZ(const js::Arguments &args) {
 }
 
 
-js::Value MatrixLibrary::getX(const js::Arguments &args) {
+js::Value MatrixModule::getX(const js::Arguments &args) {
   return ctx.machine.getPosition(XYZ).x();
 }
 
 
-js::Value MatrixLibrary::getY(const js::Arguments &args) {
+js::Value MatrixModule::getY(const js::Arguments &args) {
   return ctx.machine.getPosition(XYZ).y();
 }
 
 
-js::Value MatrixLibrary::getZ(const js::Arguments &args) {
+js::Value MatrixModule::getZ(const js::Arguments &args) {
   return ctx.machine.getPosition(XYZ).z();
 }

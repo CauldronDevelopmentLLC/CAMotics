@@ -25,7 +25,7 @@ speed(2000); // Spin at 2000 RPM in the clockwise direction
 
 for (var i = 0; i < 4; i++) {
     squares(10, 5, -3, 5);
-    rotate(PI / 8);
+    rotate(Math.PI / 8);
 }
 
 speed(0); // Stop spinning

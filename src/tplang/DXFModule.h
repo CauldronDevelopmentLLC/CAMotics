@@ -18,25 +18,33 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_CLIPPER_LIBRARY_H
-#define TPLANG_CLIPPER_LIBRARY_H
+#ifndef TPLANG_DXFMODULE_H
+#define TPLANG_DXFMODULE_H
 
 #include "TPLContext.h"
 
-#include <cbang/js/Library.h>
+#include <cbang/js/Module.h>
 
 
 namespace tplang {
-  class ClipperLibrary : public cb::js::Library {
-  public:
-    ClipperLibrary(TPLContext &ctx) : cb::js::Library(ctx) {}
+  class DXFModule : public cb::js::Module {
+    TPLContext &ctx;
+    cb::js::ObjectTemplate layersTmpl;
+    cb::js::ObjectTemplate entityTmpl;
 
-    void add(cb::js::ObjectTemplate &tmpl);
+  public:
+    DXFModule(TPLContext &ctx);
+
+    // From cb::js::Module
+    void define(cb::js::ObjectTemplate &exports);
 
     // Javascript call backs
-    cb::js::Value offsetCB(const cb::js::Arguments &args);
+    cb::js::Value openCB(const cb::js::Arguments &args);
+
+    // Entity call backs
+    cb::js::Value cutCB(const cb::js::Arguments &args);
   };
 }
 
-#endif // TPLANG_CLIPPER_LIBRARY_H
+#endif // TPLANG_DXFMODULE_H
 

@@ -20,23 +20,9 @@
 
 #include "Interpreter.h"
 
-#include <cbang/js/Context.h>
-#include <cbang/js/Script.h>
-
 using namespace tplang;
 using namespace cb;
 using namespace std;
-
-
-Interpreter::Interpreter(TPLContext &ctx) :
-  ctx(ctx), stdLib(ctx), gcodeLib(ctx), matrixLib(ctx), dxfLib(ctx),
-  clipperLib(ctx) {
-  stdLib.add(ctx);
-  gcodeLib.add(ctx);
-  matrixLib.add(ctx);
-  dxfLib.add(ctx);
-  clipperLib.add(ctx);
-}
 
 
 void Interpreter::read(const InputSource &source) {
