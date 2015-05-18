@@ -37,17 +37,14 @@ using namespace std;
 
 DXFModule::DXFModule(TPLContext &ctx) : ctx(ctx) {
   entityTmpl.set("cut()", this, &DXFModule::cutCB);
-}
 
+  set("open(path)", this, &DXFModule::openCB);
 
-void DXFModule::define(js::ObjectTemplate &exports) {
-  exports.set("open(path)", this, &DXFModule::openCB);
-
-  exports.set("POINT",    DXFEntity::DXF_POINT);
-  exports.set("LINE",     DXFEntity::DXF_LINE);
-  exports.set("ARC",      DXFEntity::DXF_ARC);
-  exports.set("POLYLINE", DXFEntity::DXF_POLYLINE);
-  exports.set("SPLINE",   DXFEntity::DXF_SPLINE);
+  set("POINT",    DXFEntity::DXF_POINT);
+  set("LINE",     DXFEntity::DXF_LINE);
+  set("ARC",      DXFEntity::DXF_ARC);
+  set("POLYLINE", DXFEntity::DXF_POLYLINE);
+  set("SPLINE",   DXFEntity::DXF_SPLINE);
 }
 
 

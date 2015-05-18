@@ -37,10 +37,19 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
   js::Environment(out), machine(machine), tools(tools) {
 
   // Add modules
-  addModule(new GCodeModule(*this)).define(*this);
-  addModule(new MatrixModule(*this)).define(*this);
-  addModule("dxf", addModule(new DXFModule(*this)));
-  addModule("clipper", addModule(new ClipperModule));
+  SmartPointer<GCodeModule> gcodeMod = new GCodeModule(*this);
+  addModule(gcodeMod);
+  gcodeMod->define(*this);
+
+  SmartPointer<MatrixModule> matrixMod = new MatrixModule(*this);
+  addModule(matrixMod);
+  matrixMod->define(*this);
+
+  SmartPointer<ClipperModule> clipperMod = new ClipperModule;
+  addModule(clipperMod);
+  clipperMod->define(*this);
+
+  set("dxf", addModule(new DXFModule(*this)));
 
   // Add search paths
   const char *paths = SystemUtilities::getenv("TPL_PATH");

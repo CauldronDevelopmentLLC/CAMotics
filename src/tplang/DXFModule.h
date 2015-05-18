@@ -35,9 +35,6 @@ namespace tplang {
   public:
     DXFModule(TPLContext &ctx);
 
-    // From cb::js::Module
-    void define(cb::js::ObjectTemplate &exports);
-
     // Javascript call backs
     cb::js::Value openCB(const cb::js::Arguments &args);
 
