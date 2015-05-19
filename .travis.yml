@@ -1,6 +1,5 @@
 language: cpp
 compiler: gcc
-sudo: false
 
 env:
   global:
@@ -9,6 +8,15 @@ env:
   matrix:
     - DEBUG_BUILD=1
     - DEBUG_BUILD=0
+
+before_install:
+  - sudo apt-get update
+
+install:
+  - sudo apt-get install -y git scons libbz2-dev zlib1g-dev libexpat1-dev
+      libboost-iostreams-dev libboost-system-dev libboost-filesystem-dev
+      libboost-regex-dev libsqlite3-dev libv8-dev qt4-dev-tools libqt4-dev
+      libqt4-opengl-dev libcairo2-dev libfreetype6-dev
 
 before_script:
   - git clone https://github.com/CauldronDevelopmentLLC/cbang.git
