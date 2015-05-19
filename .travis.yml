@@ -4,7 +4,7 @@ sudo: false
 
 env:
   global:
-    - CBANG_HOME=$CI_HOME/cbang
+    - CBANG_HOME=$PWD/cbang
 
   matrix:
     - DEBUG_BUILD=1

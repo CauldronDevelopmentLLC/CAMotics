@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/CauldronDevelopmentLLC/cbang.svg)](https://travis-ci.org/CauldronDevelopmentLLC/cbang)
+[![Build Status](https://travis-ci.org/CauldronDevelopmentLLC/OpenSCAM.svg)](https://travis-ci.org/CauldronDevelopmentLLC/OpenSCAM)
 
 ![OpenSCAM Logo][1]
 
