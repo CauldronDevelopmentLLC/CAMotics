@@ -11,7 +11,7 @@ env:
     - DEBUG_BUILD=0
 
 before_script:
-  - git clone git@github.com:CauldronDevelopmentLLC/cbang.git
+  - git clone https://github.com/CauldronDevelopmentLLC/cbang.git
 
 script:
   - scons -C cbang debug=$DEBUG_BUILD -j 4

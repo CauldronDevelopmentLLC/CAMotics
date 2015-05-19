@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CauldronDevelopmentLLC/cbang.svg)](https://travis-ci.org/CauldronDevelopmentLLC/cbang)
+
 ![OpenSCAM Logo][1]
 
 OpenSCAM is an ​Open-Source software which can simulate 3-axis NC
