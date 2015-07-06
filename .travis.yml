@@ -1,0 +1,40 @@
+language: cpp
+compiler: gcc
+
+env:
+  global:
+    - CBANG_HOME=$PWD/cbang
+
+  matrix:
+    - DEBUG_BUILD=1
+    - DEBUG_BUILD=0
+
+install:
+  - sudo apt-get install -y libv8-dev qt4-dev-tools
+
+before_script:
+  - git clone https://github.com/CauldronDevelopmentLLC/cbang.git
+
+script:
+  - scons -C cbang debug=$DEBUG_BUILD -j 4
+  - scons debug=$DEBUG_BUILD -j 4
+
+addons:
+  apt:
+    packages:
+      - git
+      - scons
+      - libbz2-dev
+      - zlib1g-dev
+      - libexpat1-dev
+      - libboost-iostreams-dev
+      - libboost-system-dev
+      - libboost-filesystem-dev
+      - libboost-regex-dev
+      - libsqlite3-dev
+      - libv8-dev
+      - qt4-dev-tools
+      - libqt4-dev
+      - libqt4-opengl-dev
+      - libcairo2-dev
+      - libfreetype6-dev
