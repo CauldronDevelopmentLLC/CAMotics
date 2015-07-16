@@ -43,12 +43,14 @@ namespace OpenSCAM {
 
     cb::SmartPointer<DXFEntity> entity;
 
+    bool inBlock;
     bool warnEllipse;
     bool warn3DFace;
     bool warnSolid;
 
   public:
-    DXFReader() : warnEllipse(true), warn3DFace(true), warnSolid(true) {}
+    DXFReader() :
+      inBlock(false), warnEllipse(true), warn3DFace(true), warnSolid(true) {}
 
     void read(const cb::InputSource &source);
 
@@ -58,6 +60,8 @@ namespace OpenSCAM {
 
     // From DL_CreationAdapter
     void addLayer(const DL_LayerData &data);
+    void addBlock(const DL_BlockData &block) {inBlock = true;}
+    void endBlock() {inBlock = false;}
     void addPoint(const DL_PointData &point);
     void addLine(const DL_LineData &line);
     void addArc(const DL_ArcData &arc);
