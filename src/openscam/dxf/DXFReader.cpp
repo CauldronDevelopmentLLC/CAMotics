@@ -40,6 +40,8 @@ void DXFReader::read(const InputSource &source) {
 
 
 void DXFReader::addEntity(const SmartPointer<DXFEntity> &entity) {
+  if (inBlock) return; // TODO handle blocks
+
   layers_t::iterator it = layers.find(attributes.getLayer());
   if (it == layers.end())
     THROWS("DXF Undefined layer '" << attributes.getLayer() << "'");

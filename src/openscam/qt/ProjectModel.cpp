@@ -130,12 +130,12 @@ QVariant ProjectModel::data(const QModelIndex &index, int role) const {
 
 QModelIndex ProjectModel::index(int row, int column,
                                 const QModelIndex &parent) const {
-  if (!hasIndex(row, column, parent)) return QModelIndex();
+  if (row < 0 || column < 0) return QModelIndex();
+  if (!parent.isValid()) return createIndex(0, 0, PROJECT_ITEM);
 
   switch (getType(parent)) {
   case PATHS_ITEM: return createIndex(row, column, FILE_ITEM, row);
   case TOOLS_ITEM: return createIndex(row, column, TOOL_ITEM, row);
-  case NULL_ITEM:
   case PROJECT_ITEM:
     switch (row) {
     case 0: return createIndex(row, column, PATHS_ITEM);
@@ -164,7 +164,7 @@ QModelIndex ProjectModel::parent(const QModelIndex &index) const {
 
 int ProjectModel::rowCount(const QModelIndex &parent) const {
   switch (getType(parent)) {
-  case NULL_ITEM:
+  case NULL_ITEM: return 1;
   case PROJECT_ITEM: return 3;
   case PATHS_ITEM: return project->getFileCount();
   case TOOLS_ITEM: return project->getToolTable()->size() - 1;
