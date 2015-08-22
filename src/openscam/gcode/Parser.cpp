@@ -32,6 +32,7 @@
 #include <cbang/Exception.h>
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/parse/ParseScope.h>
+#include <cbang/util/DefaultCatch.h>
 
 #include <fstream>
 #include <cctype>
@@ -41,27 +42,36 @@ using namespace cb;
 using namespace OpenSCAM;
 
 
-void Parser::parse(OpenSCAM::Tokenizer &tokenizer, Processor &processor) {
-  while (!task->shouldQuit() && parseOne(tokenizer, processor)) continue;
+void Parser::parse(OpenSCAM::Tokenizer &tokenizer, Processor &processor,
+                   unsigned maxErrors) {
+  unsigned errors = 0;
+
+  while (!task->shouldQuit()) {
+    try {
+      if (!parseOne(tokenizer, processor)) break;
+
+    } catch (const Exception &e) {
+      LOG_ERROR(tokenizer.getLocation() << ":" << e.getMessage());
+      LOG_DEBUG(3, e);
+      if (maxErrors < ++errors) THROW("Too many parsing errors aborting");
+    }
+  }
 }
 
 
-void Parser::parse(const InputSource &source, Processor &processor) {
+void Parser::parse(const InputSource &source, Processor &processor,
+                   unsigned maxErrors) {
   Scanner scanner(source);
   OpenSCAM::Tokenizer tokenizer(scanner);
 
-  parse(tokenizer, processor);
+  parse(tokenizer, processor, maxErrors);
 }
 
 
 bool Parser::parseOne(OpenSCAM::Tokenizer &tokenizer, Processor &processor) {
-  try {
-    if (!tokenizer.hasMore()) return false;
-    processor(block(tokenizer));
-    return true;
-  } catch (const Exception &e) {
-    THROWCS("Exception @" << tokenizer.getLocation(), e);
-  }
+  if (!tokenizer.hasMore()) return false;
+  processor(block(tokenizer));
+  return true;
 }
 
 

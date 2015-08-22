@@ -49,8 +49,10 @@ namespace OpenSCAM {
   public:
     Parser(const cb::SmartPointer<Task> &task = new Task) : task(task) {}
 
-    void parse(Tokenizer &tokenizer, Processor &processor);
-    void parse(const cb::InputSource &source, Processor &processor);
+    void parse(Tokenizer &tokenizer, Processor &processor,
+               unsigned maxErrors = 32);
+    void parse(const cb::InputSource &source, Processor &processor,
+               unsigned maxErrors = 32);
 
     bool parseOne(Tokenizer &tokenizer, Processor &processor);
 

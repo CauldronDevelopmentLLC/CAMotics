@@ -42,7 +42,7 @@ void Interpreter::operator()(const SmartPointer<Block> &block) {
 
   FileLocation location = block->getLocation().getStart();
   location.setCol(-1);
-  SmartLogThreadPrefix prefix(SSTR(location << ": "));
+  SmartLogThreadPrefix prefix(SSTR(location << ":"));
 
   OCodeInterpreter::operator()(block);
 }

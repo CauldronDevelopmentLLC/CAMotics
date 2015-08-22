@@ -99,14 +99,14 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) try {
       case 'G': case 'M':
         // Find word with lowest priority
         if (!(code = word->getCode())) // Must be after eval
-          LOG_WARNING(word->getLine() << ':' << word->getCol() << ": " << *word
+          LOG_WARNING(word->getCol() << ':' << *word
                       << ": Invalid or unsupported code");
 
         else {
           // Check modal groups
           if (groups & code->group) {
-            LOG_ERROR(word->getLine() << ':' << word->getCol()
-                      << ": Cannot have more than one word from modal group "
+            LOG_ERROR(word->getCol()
+                      << ":Cannot have more than one word from modal group "
                       << ModalGroup(code->group) << ", Ignoring " << *code);
             continue;
           }
@@ -127,15 +127,15 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) try {
       case 'N':
       default:
         if (c == 'N' || !isalpha(c))
-          LOG_WARNING(word->getLine() << ':' << word->getCol() << ": " << *word
+          LOG_WARNING(word->getCol() << ':' << *word
                       << ": Invalid or unsupported code");
 
         else {
           int flag = 1 << (c - 'A');
           if (vars & flag)
-            LOG_WARNING(word->getLine() << ':' << word->getCol()
-                        << ": Word '" << c << "' repeated in block, only the "
-                        "last value will be recognized");
+            LOG_WARNING(word->getCol() << ":Word '" << c
+                        << "' repeated in block, only the last value will be "
+                        "recognized");
 
           vars |= flag; // Flag variable
 
@@ -149,8 +149,8 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) try {
 
     } else if ((*it)->instance<Comment>()) { // Ignore
 
-    } else LOG_WARNING("Unsupported or unexpected entity: " << (*it)->getLine()
-                       << ':' << (*it)->getCol() << ": " << **it);
+    } else LOG_WARNING((*it)->getCol()
+                       << ":Unsupported or unexpected entity: " << **it);
   }
 
   // Process command words in order of priority

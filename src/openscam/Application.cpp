@@ -53,6 +53,7 @@ Application::Application(const string &name) :
 
   cb::Logger::instance().setScreenStream(cerr);
   cb::Logger::instance().setLogThreadPrefix(true);
+  cb::Logger::instance().setLogTime(false);
 
   if (hasFeature(FEATURE_INFO)) {
     BuildInfo::addBuildInfo("Build");
