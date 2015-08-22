@@ -103,4 +103,4 @@ command and restarting CAMotics:
 
     gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
 
-[1]: http://raw.githubusercontent.com/CauldronDevelopmentLLC/CAMotics/master/images/camotics-logo.png
+[1]: https://raw.githubusercontent.com/CauldronDevelopmentLLC/CAMotics/master/images/camotics-logo.png
