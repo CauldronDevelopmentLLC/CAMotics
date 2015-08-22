@@ -1,4 +1,4 @@
-<openscam>
+<camotics>
   <!-- NC Files -->
   <nc-files>
     aztec_calendar.nc
@@ -18,4 +18,4 @@
   <tool_table>
     <tool length='10' number='30' radius='1.25' shape='CONICAL' units='MM'/>
   </tool_table>
-</openscam>
+</camotics>

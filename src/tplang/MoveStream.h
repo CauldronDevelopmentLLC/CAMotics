@@ -1,6 +1,6 @@
 /******************************************************************************\
 
-    OpenSCAM is an Open-Source CAM software.
+    CAMotics is an Open-Source CAM software.
     Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -21,13 +21,13 @@
 #ifndef TPLANG_MOVE_STREAM_H
 #define TPLANG_MOVE_STREAM_H
 
-#include <openscam/cutsim/Move.h>
+#include <camotics/cutsim/Move.h>
 
 
 namespace tplang {
   class MoveStream {
   public:
-    virtual void move(const OpenSCAM::Move &move) = 0;
+    virtual void move(const CAMotics::Move &move) = 0;
   };
 }
 

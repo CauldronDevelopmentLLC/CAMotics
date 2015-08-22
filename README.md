@@ -1,8 +1,8 @@
-![OpenSCAM Logo][1]
+![CAMotics Logo][1]
 
-OpenSCAM is an ​Open-Source software which can simulate 3-axis NC
+CAMotics is an ​Open-Source software which can simulate 3-axis NC
 machining. It is a fast, flexible and user friendly simulation
-software for the DIY and Open-Source community.  OpenSCAM works on
+software for the DIY and Open-Source community.  CAMotics works on
 Linux, OS-X and Windows.
 
 At home manufacturing is one of the next big technology
@@ -18,13 +18,13 @@ software is essential to using a CNC.
 
 Being able to simulate is a critical part of creating CNC tool
 paths. Programming a CNC with out a simulator is cutting with out
-measuring; it's both dangerous and expensive. With OpenSCAM you can
+measuring; it's both dangerous and expensive. With CAMotics you can
 preview the results of your cutting operation before you fire up your
 machine. This will save you time and money and open up a world of
 creative possibilities by allowing you to rapidly visualize and
 improve upon designs with out wasting material or breaking tools.
 
-See http://openscam.org/
+See http://camotics.org/
 
 # License
 GNU General Public License version 2+.  See the file COPYING.
@@ -44,63 +44,63 @@ by C!, can be installed with the following command line:
       qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
 
 # Building from Source
-This section describes how to build OpenSCAM from source on Debian based
+This section describes how to build CAMotics from source on Debian based
 systems such as Ubuntu and Mint Linux.  If you are running Windows or OSX
 it is much easier to simply install prebuilt packages which can be found
-at http://openscam.org/downloads  There are also prebuilt Debian packages
+at http://camotics.org/downloads  There are also prebuilt Debian packages
 you can try.
 
 ## Building C!
 
 Clone the C! git repository, build the software using scons and set the
-environment variable CBANG_HOME so the OpenSCAM build system can find it
+environment variable CBANG_HOME so the CAMotics build system can find it
 later:
 
     git clone https://github.com/CauldronDevelopmentLLC/cbang.git
     scons -C cbang
     export CBANG_HOME=$PWD/cbang
 
-## Building OpenSCAM
+## Building CAMotics
 
-Clone the OpenSCAM git repository and build the software using scons:
+Clone the CAMotics git repository and build the software using scons:
 
-    git clone https://github.com/CauldronDevelopmentLLC/OpenSCAM.git
-    cd OpenSCAM
+    git clone https://github.com/CauldronDevelopmentLLC/CAMotics.git
+    cd CAMotics
     scons
 
 ## Building & Installing the Debian Package
 
-In the OpenSCAM source code directory run:
+In the CAMotics source code directory run:
 
     scons package
-    sudo dpkg -i openscam_*.deb
+    sudo dpkg -i camotics_*.deb
 
 ## Build Warnings/Errors
 If you get any build warnings, by default, the build will stop.  If you have
 problems building, especially with warnings related to the boost library you
-can ignore these warnings by building cbang and/or OpenSCAM with
+can ignore these warnings by building cbang and/or CAMotics with
 `scons strict=0`.  This disables strict checking.  For example:
 
     scons -C cbang strict=0
-    cd OpenSCAM
+    cd CAMotics
     scons strict=0
 
-# Using OpenSCAM
+# Using CAMotics
 
-If you've installed the Debian package you should find OpenSCAM in your menu
-under Other.  Also you can simply run `openscam` on the command line.
+If you've installed the Debian package you should find CAMotics in your menu
+under Other.  Also you can simply run `camotics` on the command line.
 
 If you did not install the package, open a command line, go to the directory
-where you built OpenSCAM and run `./openscam`
+where you built CAMotics and run `./camotics`
 
 # Try the Examples
 
-Try out some of the examples in OpenSCAM's File -> Examples menu.
+Try out some of the examples in CAMotics's File -> Examples menu.
 
 ## No Icons in Menus in Linux
-If you don't see icons in OpenSCAM menus in Linux try running the following
-command and restarting OpenSCAM:
+If you don't see icons in CAMotics menus in Linux try running the following
+command and restarting CAMotics:
 
     gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
 
-[1]: https://raw.github.com/jcoffland/OpenSCAM/master/images/openscam-logo.png
+[1]: https://raw.github.com/jcoffland/CAMotics/master/images/camotics-logo.png

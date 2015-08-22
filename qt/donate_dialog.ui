@@ -26,8 +26,8 @@
    <string>Donate</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="openscam.qrc">
-    <normaloff>:/icons/openscam.png</normaloff>:/icons/openscam.png</iconset>
+   <iconset resource="camotics.qrc">
+    <normaloff>:/icons/camotics.png</normaloff>:/icons/camotics.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -36,7 +36,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>OpenSCAM took a lot of time and hard work to create.  If you find it useful please consider donating.  Your donations will go towards fixing bugs and adding new features.</string>
+      <string>CAMotics took a lot of time and hard work to create.  If you find it useful please consider donating.  Your donations will go towards fixing bugs and adding new features.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -72,7 +72,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="OpenSCAM::ClickWidget" name="paypalWidget1" native="true">
+      <widget class="CAMotics::ClickWidget" name="paypalWidget1" native="true">
        <property name="minimumSize">
         <size>
          <width>215</width>
@@ -134,7 +134,7 @@ QWidget:hover {
       </spacer>
      </item>
      <item>
-      <widget class="OpenSCAM::ClickWidget" name="paypalWidget2" native="true">
+      <widget class="CAMotics::ClickWidget" name="paypalWidget2" native="true">
        <property name="minimumSize">
         <size>
          <width>151</width>
@@ -203,7 +203,7 @@ QWidget:hover {
       </widget>
      </item>
      <item>
-      <widget class="OpenSCAM::ClickWidget" name="bitCoinWidget" native="true">
+      <widget class="CAMotics::ClickWidget" name="bitCoinWidget" native="true">
        <property name="minimumSize">
         <size>
          <width>192</width>
@@ -309,7 +309,7 @@ QWidget:hover {
         <string>Learn about BitCoin QRCodes.</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">background: url(:/images/openscam-bitcoin-donations.png) no-repeat;
+        <string notr="true">background: url(:/images/camotics-bitcoin-donations.png) no-repeat;
 </string>
        </property>
       </widget>
@@ -346,13 +346,13 @@ QWidget:hover {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>OpenSCAM::ClickWidget</class>
+   <class>CAMotics::ClickWidget</class>
    <extends>QWidget</extends>
-   <header>openscam/qt/ClickWidget.h</header>
+   <header>camotics/qt/ClickWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="openscam.qrc"/>
+  <include location="camotics.qrc"/>
  </resources>
  <connections>
   <connection>

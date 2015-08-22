@@ -1,4 +1,4 @@
-<openscam>
+<camotics>
   <!-- Note, all units are in mm regardless of 'units' option. -->
   <!-- NC Files -->
   <nc-files>
@@ -18,4 +18,4 @@
   <tool_table>
     <tool length='20' number='1' radius='1.25' shape='CYLINDRICAL' units='MM'/>
   </tool_table>
-</openscam>
+</camotics>

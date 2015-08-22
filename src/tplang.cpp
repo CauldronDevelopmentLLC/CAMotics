@@ -1,6 +1,6 @@
 /******************************************************************************\
 
-    OpenSCAM is an Open-Source CAM software.
+    CAMotics is an Open-Source CAM software.
     Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 
 \******************************************************************************/
 
-#include <openscam/Application.h>
-#include <openscam/cutsim/ToolPath.h>
-#include <openscam/sim/ToolTable.h>
-#include <openscam/sim/Machine.h>
+#include <camotics/Application.h>
+#include <camotics/cutsim/ToolPath.h>
+#include <camotics/sim/ToolTable.h>
+#include <camotics/sim/Machine.h>
 
 #include <tplang/TPLContext.h>
 #include <tplang/MachinePipeline.h>
@@ -41,10 +41,10 @@
 
 using namespace std;
 using namespace tplang;
-using namespace OpenSCAM;
+using namespace CAMotics;
 
 
-namespace OpenSCAM {
+namespace CAMotics {
   class TPLangApp : public Application {
     cb::SmartPointer<ToolTable> tools;
     tplang::MachinePipeline pipeline;
@@ -95,5 +95,5 @@ int main(int argc, char *argv[]) {
 
   if (!foundV8Args) cb::js::Javascript::init(0, 0);
 
-  return cb::doApplication<OpenSCAM::TPLangApp>(argc, argv);
+  return cb::doApplication<CAMotics::TPLangApp>(argc, argv);
 }

@@ -1,4 +1,4 @@
-<openscam>
+<camotics>
   <!-- NC Files -->
   <nc-files>
     box.tpl
@@ -16,4 +16,4 @@
   <tool_table>
     <tool length='1' number='1' radius='0.0625' shape='CYLINDRICAL' units='INCH'/>
   </tool_table>
-</openscam>
+</camotics>

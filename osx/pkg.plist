@@ -13,7 +13,7 @@
       <key>BundleOverwriteAction</key>
       <string>upgrade</string>
       <key>RootRelativeBundlePath</key>
-      <string>Applications/OpenSCAM.app</string>
+      <string>Applications/CAMotics.app</string>
       <key>BundlePostInstallScriptPath</key>
       <string>postflight</string>
     </dict>

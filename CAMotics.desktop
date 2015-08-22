@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=CAMotics
+Exec=camotics
+Terminal=false
+Categories=Science
+Comment=Open-Source Simulation & Computer Aided Machining
+Icon=camotics.png
+StartupNotify=true

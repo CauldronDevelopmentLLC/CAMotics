@@ -1,4 +1,4 @@
-<openscam>
+<camotics>
   <!-- NC Files -->
   <nc-files>
     scorpion.nc
@@ -16,4 +16,4 @@
   <tool_table>
     <tool cutter_length='12.7' length='12.7' number='1' radius='0.5' shape='CYLINDER' units='MM'/>
   </tool_table>
-</openscam>
+</camotics>

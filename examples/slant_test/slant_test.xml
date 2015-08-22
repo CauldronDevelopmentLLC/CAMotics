@@ -1,4 +1,4 @@
-<openscam>
+<camotics>
   <!-- NC Files -->
   <nc-files>
     slant_test.nc
@@ -12,4 +12,4 @@
   <tool_table>
     <tool cone_angle='45' front_angle='0' length='5.5' number='3' radius='0.5' shape='CONICAL'/>
   </tool_table>
-</openscam>
+</camotics>

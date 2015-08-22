@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: OpenSCAM
+Upstream-Name: CAMotics
 Upstream-Contact: Joseph Coffland <joseph@cauldrondevelopment.com>
-Source: https://cauldrondevelopment.com/svn/openscam/trunk/openscam
+Source: https://cauldrondevelopment.com/svn/camotics/trunk/camotics
 
 Files: *
 Copyright: 2011-2012, Cauldron Development LLC

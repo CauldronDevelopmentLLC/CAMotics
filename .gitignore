@@ -28,7 +28,9 @@ package.txt
 *~
 
 # Programs
-openscam
+camotics
 tplang
 gcodetool
-oscam*
+camoprobe
+camosim
+camoopt

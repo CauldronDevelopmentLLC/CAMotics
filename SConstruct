@@ -20,7 +20,7 @@ conf = env.CBConfigure()
 
 # Config vars
 env.Replace(PACKAGE_VERSION = version)
-env.Replace(BUILD_INFO_NS = 'OpenSCAM::BuildInfo')
+env.Replace(BUILD_INFO_NS = 'CAMotics::BuildInfo')
 
 # Qt4 tool
 env.Tool('qt4', toolpath = ['./config'])
@@ -36,7 +36,7 @@ if 'dist' in COMMAND_LINE_TARGETS:
     files = map(lambda l: l.split()[-1], lines)
     files = filter(lambda f: not os.path.isdir(f), files)
 
-    tar = env.TarBZ2Dist('openscam', files)
+    tar = env.TarBZ2Dist('camotics', files)
     Alias('dist', tar)
     Return()
 
@@ -77,7 +77,7 @@ for subdir in [
     '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'pcb', 'stl',
     'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'dxf',
     'dxf/dxflib']:
-    src += Glob('src/openscam/%s/*.cpp' % subdir)
+    src += Glob('src/camotics/%s/*.cpp' % subdir)
 
 for subdir in ['']:
     src += Glob('src/tplang/%s/*.cpp' % subdir)
@@ -90,12 +90,12 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 
 # Qt
-uic = [env.Uic4('build/ui_openscam.h', 'qt/openscam.ui')]
+uic = [env.Uic4('build/ui_camotics.h', 'qt/camotics.ui')]
 for dialog in 'export about donate new'.split():
     uic.append(env.Uic4('build/ui_%s_dialog.h' % dialog,
                         'qt/%s_dialog.ui' % dialog))
 
-qrc = env.Qrc4('build/qrc_openscam.cpp', 'qt/openscam.qrc')
+qrc = env.Qrc4('build/qrc_camotics.cpp', 'qt/camotics.qrc')
 src += qrc
 
 # Build Info
@@ -105,7 +105,7 @@ src += info
 
 
 # Build
-lib = env.Library('libOpenSCAM', src)
+lib = env.Library('libCAMotics', src)
 libs = [lib]
 Depends(lib, uic)
 
@@ -115,7 +115,7 @@ libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
 
 
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
-progs = 'openscam gcodetool oscamprobe oscamopt tplang oscamsim'
+progs = 'camotics gcodetool camoprobe camoopt tplang camosim'
 execs = []
 for prog in progs.split():
     p = env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
@@ -131,7 +131,7 @@ Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])
 # Install
 env.Alias('install', [env.get('install_prefix')])
 
-description = '''OpenSCAM is an  Open-Source software which can simulate
+description = '''CAMotics is an  Open-Source software which can simulate
 3-axis NC machining. It is a fast, flexible and user friendly simulation
 software for the DIY and Open-Source community.
 
@@ -147,7 +147,7 @@ easier. However, such software is essential to using a CNC.
 
 Being able to simulate is a critical part of creating usable CNC tool paths.
 Programming a CNC with out a simulator is cutting with out measuring; it's
-both dangerous and expensive. With OpenSCAM you can preview the results of
+both dangerous and expensive. With CAMotics you can preview the results of
 your cutting operations before you fire up your machine. This will
 save you time and money and open up a world of creative possibilities by
 allowing you to rapidly visualize and improve upon designs with out wasting
@@ -176,24 +176,24 @@ if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
     pkg = env.Packager(
-        'OpenSCAM',
+        'CAMotics',
         version = version,
         maintainer = 'Joseph Coffland <joseph@cauldrondevelopment.com>',
         vendor = 'Cauldron Development LLC',
-        url = 'http://openscam.com/',
+        url = 'http://camotics.com/',
         license = 'COPYING',
-        bug_url = 'http://openscam.com/',
+        bug_url = 'http://camotics.com/',
         summary = 'Open-Source Simulation & Computer Aided Machining',
         description = description,
         prefix = '/usr',
-        icons = ('osx/openscam.icns', 'images/openscam.png'),
+        icons = ('osx/camotics.icns', 'images/camotics.png'),
 
         documents = ['README.md', 'CHANGELOG.md'] + examples,
         programs = map(lambda x: str(x[0]), execs),
-        desktop_menu = ['OpenSCAM.desktop'],
+        desktop_menu = ['CAMotics.desktop'],
         changelog = 'CHANGELOG.md',
 
-        nsi = 'openscam.nsi',
+        nsi = 'camotics.nsi',
         msvc_redist = msvc_redist,
 
         deb_directory = 'debian',
@@ -207,13 +207,13 @@ if 'package' in COMMAND_LINE_TARGETS:
         rpm_group = 'Applications/Engineering',
         rpm_requires = 'expat, bzip2-libs',
 
-        app_id = 'org.openscam',
+        app_id = 'org.camotics',
         app_resources = [['osx/Resources', '.']],
         app_copyright = 'Copyright 2011-2014, Cauldron Development LLC',
-        app_signature = 'scam',
+        app_signature = 'camo',
         app_other_info = {
-            'CFBundleExecutable': 'openscam', # Overrides 'programs'
-            'CFBundleIconFile': 'openscam.icns',
+            'CFBundleExecutable': 'camotics', # Overrides 'programs'
+            'CFBundleIconFile': 'camotics.icns',
             },
         app_finish_cmd = 'macdeployqt',
         pkg_scripts = 'osx/Scripts',

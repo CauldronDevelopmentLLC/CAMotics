@@ -1,4 +1,4 @@
-<openscam>
+<camotics>
   <!-- NC Files -->
   <nc-files>
     text.tpl
@@ -16,4 +16,4 @@
   <tool_table>
     <tool length='0.25' number='1' radius='0.0625' shape='CONICAL' units='INCH'/>
   </tool_table>
-</openscam>
+</camotics>

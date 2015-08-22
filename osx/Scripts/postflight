@@ -1,5 +1,5 @@
 #!/bin/bash
 
-su $USER -c 'open -a OpenSCAM.app'
+su $USER -c 'open -a CAMotics.app'
 
 exit 0

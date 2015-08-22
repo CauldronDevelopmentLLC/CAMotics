@@ -1,4 +1,4 @@
-# OpenSCAM Changelog
+# CAMotics Changelog
 
 ## v0.2.5:
  - Fixed arcs.  #78, #85
@@ -61,7 +61,7 @@
  - Return current feed configuration if no args are given to 'feed()'.
  - Return current tool if no args are given to 'tool()'.
  - Fixed relative TPL matrix operations.
- - Added snapshot feature to OpenSCAM GUI.
+ - Added snapshot feature to CAMotics GUI.
  - Added icut() and irapid().
  - Fixed play/pause button update.
  - Added loop check box, off by default.
@@ -152,8 +152,8 @@
  - Fix: Adding an NC file to a new project gives it an absolute path.  #30
  - Fix: Saving project causes duplicate nc file entries in .xml.  #29
  - Fixed unary gcode expression parsing.
- - Correctly translate/scale G2/G3 moves with oscamtran.
- - Simplify constant g-code expressions in oscamtran.
+ - Correctly translate/scale G2/G3 moves with camotran.
+ - Simplify constant g-code expressions in camotran.
  - Move render resolution to project and save with project.
 
 ## v0.0.3:

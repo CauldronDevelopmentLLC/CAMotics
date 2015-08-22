@@ -1,6 +1,6 @@
 /******************************************************************************\
 
-    OpenSCAM is an Open-Source CAM software.
+    CAMotics is an Open-Source CAM software.
     Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -20,9 +20,9 @@
 
 #include "GCodeModule.h"
 
-#include <openscam/sim/ToolTable.h>
-#include <openscam/sim/Controller.h>
-#include <openscam/gcode/Interpreter.h>
+#include <camotics/sim/ToolTable.h>
+#include <camotics/sim/Controller.h>
+#include <camotics/gcode/Interpreter.h>
 
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/util/SmartFunctor.h>
@@ -77,11 +77,11 @@ void GCodeModule::define(js::ObjectTemplate &exports) {
   exports.set("UV", UV);
   exports.set("VW", VW);
 
-  exports.set("CYLINDRICAL", OpenSCAM::ToolShape::TS_CYLINDRICAL);
-  exports.set("CONICAL", OpenSCAM::ToolShape::TS_CONICAL);
-  exports.set("BALLNOSE", OpenSCAM::ToolShape::TS_BALLNOSE);
-  exports.set("SPHEROID", OpenSCAM::ToolShape::TS_SPHEROID);
-  exports.set("SNUBNOSE", OpenSCAM::ToolShape::TS_SNUBNOSE);
+  exports.set("CYLINDRICAL", CAMotics::ToolShape::TS_CYLINDRICAL);
+  exports.set("CONICAL", CAMotics::ToolShape::TS_CONICAL);
+  exports.set("BALLNOSE", CAMotics::ToolShape::TS_BALLNOSE);
+  exports.set("SPHEROID", CAMotics::ToolShape::TS_SPHEROID);
+  exports.set("SNUBNOSE", CAMotics::ToolShape::TS_SNUBNOSE);
 
 #undef XYZ
 #undef ABC
@@ -99,8 +99,8 @@ js::Value GCodeModule::gcodeCB(const js::Arguments &args) {
   SmartFunctor<TPLContext> popPath(&ctx, &TPLContext::popPath);
 
   Options options;
-  OpenSCAM::Controller controller(ctx.machine);
-  OpenSCAM::Interpreter(controller).read(path);
+  CAMotics::Controller controller(ctx.machine);
+  CAMotics::Interpreter(controller).read(path);
 
   return js::Value();
 }
@@ -260,21 +260,21 @@ js::Value GCodeModule::pauseCB(const js::Arguments &args) {
 
 
 js::Value GCodeModule::toolSetCB(const js::Arguments &args) {
-  SmartPointer<OpenSCAM::Tool> tool = ctx.tools->get(args["number"].toUint32());
+  SmartPointer<CAMotics::Tool> tool = ctx.tools->get(args["number"].toUint32());
 
   uint32_t units;
   double scale = 1;
   if (args.has("units")) units = args["units"].toUint32();
   else units = unitAdapter.getUnits();
   if (units == MachineUnitAdapter::METRIC)
-    tool->setUnits(OpenSCAM::ToolUnits::UNITS_MM);
+    tool->setUnits(CAMotics::ToolUnits::UNITS_MM);
   else {
-    tool->setUnits(OpenSCAM::ToolUnits::UNITS_INCH);
+    tool->setUnits(CAMotics::ToolUnits::UNITS_INCH);
     scale = 25.4;
   }
 
   if (args.has("shape"))
-    tool->setShape((OpenSCAM::ToolShape::enum_t)args["shape"].toUint32());
+    tool->setShape((CAMotics::ToolShape::enum_t)args["shape"].toUint32());
 
   tool->setLength(scale * args.getNumber("length"));
   tool->setDiameter(scale * args.getNumber("diameter"));

@@ -1,6 +1,6 @@
 /******************************************************************************\
 
-    OpenSCAM is an Open-Source CAM software.
+    CAMotics is an Open-Source CAM software.
     Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -21,20 +21,20 @@
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
 
-#include <openscam/Application.h>
-#include <openscam/sim/Machine.h>
-#include <openscam/cutsim/ToolPath.h>
-#include <openscam/gcode/Interpreter.h>
-#include <openscam/gcode/Printer.h>
-#include <openscam/gcode/Parser.h>
+#include <camotics/Application.h>
+#include <camotics/sim/Machine.h>
+#include <camotics/cutsim/ToolPath.h>
+#include <camotics/gcode/Interpreter.h>
+#include <camotics/gcode/Printer.h>
+#include <camotics/gcode/Parser.h>
 
 #include <iostream>
 
 using namespace std;
-using namespace OpenSCAM;
+using namespace CAMotics;
 
 
-namespace OpenSCAM {
+namespace CAMotics {
   class EvalApp : public Application, public Machine {
     Controller controller;
     ToolPath path;
@@ -44,7 +44,7 @@ namespace OpenSCAM {
 
   public:
     EvalApp() :
-      Application("OpenSCAM GCode Tool"), Machine(options), controller(*this),
+      Application("CAMotics GCode Tool"), Machine(options), controller(*this),
       path(controller.getToolTable()), printer(cout), parseOnly(false) {
 
       options.pushCategory("GCode Tool");
@@ -76,5 +76,5 @@ namespace OpenSCAM {
 
 
 int main(int argc, char *argv[]) {
-  return cb::doApplication<OpenSCAM::EvalApp>(argc, argv);
+  return cb::doApplication<CAMotics::EvalApp>(argc, argv);
 }

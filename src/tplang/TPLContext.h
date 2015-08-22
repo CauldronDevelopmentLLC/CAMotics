@@ -1,6 +1,6 @@
 /******************************************************************************\
 
-    OpenSCAM is an Open-Source CAM software.
+    CAMotics is an Open-Source CAM software.
     Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 
 #include "MachineAdapter.h"
 
-#include <openscam/sim/ToolTable.h>
+#include <camotics/sim/ToolTable.h>
 
 #include <cbang/js/Environment.h>
 #include <cbang/config/Options.h>
@@ -34,10 +34,10 @@ namespace tplang {
 
   public:
     MachineInterface &machine;
-    cb::SmartPointer<OpenSCAM::ToolTable> tools;
+    cb::SmartPointer<CAMotics::ToolTable> tools;
 
     TPLContext(std::ostream &out, MachineInterface &machine,
-               const cb::SmartPointer<OpenSCAM::ToolTable> &tools);
+               const cb::SmartPointer<CAMotics::ToolTable> &tools);
 
     using cb::js::Environment::addModule;
     cb::js::Module &addModule(const cb::SmartPointer<cb::js::Module> &module);

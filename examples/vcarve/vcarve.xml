@@ -1,4 +1,4 @@
-<openscam>
+<camotics>
   <!-- NC Files -->
   <nc-files>
     vcarve.ngc
@@ -16,4 +16,4 @@
   <tool_table>
     <tool length='2' number='1' radius='1' shape='CONICAL' units='MM'/>
   </tool_table>
-</openscam>
+</camotics>

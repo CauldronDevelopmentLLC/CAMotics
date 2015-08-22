@@ -1,6 +1,6 @@
 /******************************************************************************\
 
-    OpenSCAM is an Open-Source CAM software.
+    CAMotics is an Open-Source CAM software.
     Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -20,17 +20,17 @@
 
 #include "DXFModule.h"
 
-#include <openscam/dxf/DXFReader.h>
-#include <openscam/dxf/DXFPoint.h>
-#include <openscam/dxf/DXFLine.h>
-#include <openscam/dxf/DXFArc.h>
-#include <openscam/dxf/DXFPolyLine.h>
-#include <openscam/dxf/DXFSpline.h>
+#include <camotics/dxf/DXFReader.h>
+#include <camotics/dxf/DXFPoint.h>
+#include <camotics/dxf/DXFLine.h>
+#include <camotics/dxf/DXFArc.h>
+#include <camotics/dxf/DXFPolyLine.h>
+#include <camotics/dxf/DXFSpline.h>
 
 #include <cbang/os/SystemUtilities.h>
 
 using namespace tplang;
-using namespace OpenSCAM;
+using namespace CAMotics;
 using namespace cb;
 using namespace std;
 
