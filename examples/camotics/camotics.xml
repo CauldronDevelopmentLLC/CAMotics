@@ -6,15 +6,15 @@
   </nc-files>
 
   <!-- Renderer -->
-  <resolution v='0.125723'/>
+  <resolution v='0.116348'/>
   <resolution-mode v='HIGH'/>
 
   <!-- Workpiece -->
   <automatic-workpiece v='false'/>
-  <workpiece-max v='(128,20,-3)'/>
-  <workpiece-min v='(-10,-4,-6)'/>
+  <workpiece-max v='(122,18,-3)'/>
+  <workpiece-min v='(-3,-3,-6)'/>
 
   <tool_table>
-    <tool length='10' number='1' radius='5' shape='CONICAL' units='MM'/>
+    <tool length='10' number='1' radius='1.5' shape='BALLNOSE' units='MM'/>
   </tool_table>
 </camotics>
