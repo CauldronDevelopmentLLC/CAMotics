@@ -198,6 +198,7 @@ namespace CAMotics {
     void removeTool();
     void updateToolUI();
 
+    void updateWorkpiece();
     void loadWorkpiece();
     void setWorkpieceDim(unsigned dim, real value);
     void setWorkpieceOffset(unsigned dim, real value);

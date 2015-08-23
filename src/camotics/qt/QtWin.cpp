@@ -1061,6 +1061,12 @@ void QtWin::updateToolUI() {
 }
 
 
+void QtWin::updateWorkpiece() {
+  view->setWorkpiece(project->getWorkpieceBounds());
+  redraw();
+}
+
+
 void QtWin::loadWorkpiece() {
   if (project->getAutomaticWorkpiece()) on_automaticCuboidRadioButton_clicked();
   else on_manualCuboidRadioButton_clicked();
@@ -1089,9 +1095,7 @@ void QtWin::loadWorkpiece() {
   ui->yOffsetDoubleSpinBox->setSingleStep(step);
   ui->zOffsetDoubleSpinBox->setSingleStep(step);
 
-  // Update visual
-  view->setWorkpiece(bounds);
-  redraw();
+  updateWorkpiece();
 }
 
 
@@ -1100,8 +1104,8 @@ void QtWin::setWorkpieceDim(unsigned dim, real value) {
   Rectangle3R bounds = project->getWorkpieceBounds();
   bounds.rmax[dim] = bounds.rmin[dim] + value * scale;
   project->setWorkpieceBounds(bounds);
-  loadWorkpiece();
 
+  updateWorkpiece();
   redraw(true);
 }
 
@@ -1112,8 +1116,8 @@ void QtWin::setWorkpieceOffset(unsigned dim, real value) {
   bounds.rmax[dim] = bounds.getDimension(dim) + value * scale;
   bounds.rmin[dim] = value * scale;
   project->setWorkpieceBounds(bounds);
-  loadWorkpiece();
 
+  updateWorkpiece();
   redraw(true);
 }
 
