@@ -481,6 +481,7 @@ void QtWin::warning(const string &msg) {
 
 
 void QtWin::toolPathComplete() {
+  toolPathThread->join();
   toolPath = toolPathThread->getPath();
 
   // Update changed Project settings
@@ -525,22 +526,20 @@ void QtWin::toolPathComplete() {
 
 
 void QtWin::surfaceComplete() {
-  if (!surfaceThread->getSurface().isNull()) {
-    surface = surfaceThread->getSurface();
-    view->setSurface(surface);
-    redraw();
-  }
+  surfaceThread->join();
+  surface = surfaceThread->getSurface();
+  view->setSurface(surface);
+  redraw();
 
   setStatusActive(false);
 }
 
 
 void QtWin::reduceComplete() {
-  if (!reduceThread->getSurface().isNull()) {
-    surface = reduceThread->getSurface();
-    view->setSurface(surface);
-    redraw();
-  }
+  reduceThread->join();
+  surface = reduceThread->getSurface();
+  view->setSurface(surface);
+  redraw();
 
   setStatusActive(false);
 }
