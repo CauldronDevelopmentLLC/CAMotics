@@ -55,6 +55,7 @@ void SurfaceThread::run() {
       stl.readHeader(in);
 
       if (stl.getHash() == sim->computeHash()) {
+        LOG_INFO(1, "Loading precomputed surface from " << filename);
         stl.readBody(in, cutSim.get());
         surface = new ElementSurface(stl);
       }

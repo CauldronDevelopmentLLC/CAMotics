@@ -92,8 +92,7 @@ void ToolPathView::setPath(const SmartPointer<const ToolPath> &path) {
   // Output stats
   const Rectangle3R &bbox = getBounds();
   Vector3D dims = bbox.getDimensions();
-  LOG_INFO(1, "Tool Path Bounds: " << bbox);
-  LOG_INFO(1, "Tool Path Dimensions: " << dims);
+  LOG_INFO(1, "Tool Path bounds " << bbox << " dimensions " << dims);
 }
 
 

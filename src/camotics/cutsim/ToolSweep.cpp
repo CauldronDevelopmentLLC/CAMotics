@@ -57,7 +57,7 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
   // Partition nodes
   partition(nodes);
 
-  LOG_INFO(1, "AABBTree boxes=" << boxes << " leaves=" << getLeafCount()
+  LOG_INFO(3, "AABBTree boxes=" << boxes << " leaves=" << getLeafCount()
            << " height=" << getHeight());
 }
 

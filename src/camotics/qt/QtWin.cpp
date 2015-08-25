@@ -734,6 +734,8 @@ void QtWin::resetProject() {
 void QtWin::newProject() {
   if (!checkSave()) return;
 
+  LOG_INFO(1, "New project");
+
   resetProject();
   project = new Project(options);
 
