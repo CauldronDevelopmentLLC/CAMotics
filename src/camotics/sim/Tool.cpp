@@ -162,3 +162,20 @@ void Tool::write(XMLWriter &writer) const {
 
   writer.simpleElement("tool", getDescription(), attrs);
 }
+
+
+void Tool::write(JSON::Sink &sink, bool withNumber) const {
+  sink.beginDict();
+  if (withNumber) sink.insert("number", number);
+  sink.insert("units", getUnits().toString());
+  sink.insert("shape", getShape().toString());
+  sink.insert("length", getLength());
+  sink.insert("radius", getRadius());
+  if (getShape() == ToolShape::TS_SNUBNOSE)
+    sink.insert("snub_diameter", getSnubDiameter());
+  if (getFrontAngle()) sink.insert("font_angle", getFrontAngle());
+  if (getBackAngle()) sink.insert("back_angle", getBackAngle());
+  if (getOrientation()) sink.insert("orientation", getOrientation());
+  sink.insert("description", getDescription());
+  sink.endDict();
+}

@@ -48,8 +48,7 @@ using namespace CAMotics;
 
 
 CutSim::CutSim(Options &options) :
-  Machine(options), threads(SystemInfo::instance().getCPUCount()),
-  task(SmartPointer<Task>::Phony(this)) {
+  Machine(options), threads(SystemInfo::instance().getCPUCount()) {
   options.pushCategory("Simulation");
   options.addTarget("threads", threads, "Number of simulation threads.");
   options.popCategory();
@@ -63,28 +62,29 @@ SmartPointer<ToolPath>
 CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
                         const vector<string> &files) {
   // Setup
-  task->begin();
+  Task::begin();
   Machine::reset();
   Controller controller(*this, tools);
   path = new ToolPath(tools);
 
   // Interpret code
   try {
-    for (unsigned i = 0; i < files.size() && !task->shouldQuit(); i++) {
+    for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {
       if (!SystemUtilities::exists(files[i])) continue;
 
-      task->update(0, "Running " + files[i]);
+      Task::update(0, "Running " + files[i]);
 
       if (String::endsWith(files[i], ".tpl")) {
         tplang::TPLContext ctx(cout, *this, controller.getToolTable());
         ctx.pushPath(files[i]);
         tplang::Interpreter(ctx).read(files[i]);
 
-      } else Interpreter(controller, task).read(files[i]); // Assume GCode
+      } else // Assume GCode
+        Interpreter(controller, SmartPointer<Task>::Phony(this)).read(files[i]);
     }
   } CATCH_ERROR;
 
-  task->end();
+  Task::end();
   return path.adopt();
 }
 
@@ -101,16 +101,13 @@ SmartPointer<ToolPath> CutSim::computeToolPath(const Project &project) {
 }
 
 
-SmartPointer<Surface>
-CutSim::computeSurface(const SmartPointer<ToolPath> &path,
-                       const Rectangle3R &bounds, double resolution,
-                       double time) {
+SmartPointer<Surface> CutSim::computeSurface(const Simulation &sim) {
   // Setup cut simulation
-  CutWorkpiece cutWP(new ToolSweep(path, time), new Workpiece(bounds));
+  CutWorkpiece cutWP(new ToolSweep(sim.path, sim.time), sim.workpiece);
 
   // Render
   Renderer renderer(SmartPointer<Task>::Phony(this));
-  return renderer.render(cutWP, threads, resolution);
+  return renderer.render(cutWP, threads, sim.resolution);
 }
 
 
@@ -120,15 +117,15 @@ void CutSim::reduceSurface(Surface &surface) {
 
   double startCount = surface.getCount();
 
-  task->begin();
-  task->update(0, "Reducing...");
+  Task::begin();
+  Task::update(0, "Reducing...");
 
   surface.reduce(*this);
 
   unsigned count = surface.getCount();
   double r = (double)(startCount - count) / startCount * 100;
 
-  double delta = task->end();
+  double delta = Task::end();
 
   LOG_INFO(1, "Time: " << TimeInterval(delta)
            << String::printf(" Triangles: %u Reduction: %0.2f%%", count, r));

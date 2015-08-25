@@ -29,7 +29,7 @@ namespace CAMotics {
     cb::SmartPointer<Surface> surface;
 
   public:
-    ReduceThread(int event, QWidget *parent,
+    ReduceThread(cb::Application &app, int event, QWidget *parent,
                  const cb::SmartPointer<CutSim> &cutSim,
                  const Surface &surface);
 

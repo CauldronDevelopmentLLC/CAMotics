@@ -29,7 +29,7 @@
 #include <ostream>
 
 
-namespace cb {namespace JSON {class Sync;}}
+namespace cb {namespace JSON {class Sink;}}
 
 namespace CAMotics {
   class ToolTable;
@@ -47,7 +47,7 @@ namespace CAMotics {
 
     void add(const Move &move);
     void print(std::ostream &stream) const;
-    void exportJSON(cb::JSON::Sync &sync) const;
+    void write(cb::JSON::Sink &sink) const;
 
     using std::vector<Move>::operator[];
   };

@@ -37,6 +37,13 @@ using namespace cb;
 using namespace CAMotics;
 
 
+ElementSurface::ElementSurface(const STL &stl) :
+  dim(3), finalized(false), count(0) {
+  vbufs[0] = 0;
+  read(stl);
+}
+
+
 ElementSurface::ElementSurface(vector<SmartPointer<Surface> > &surfaces) :
   dim(0), finalized(false), count(0) {
   vbufs[0] = 0;
@@ -162,7 +169,48 @@ void ElementSurface::draw() {
 }
 
 
-void ElementSurface::exportSTL(STL &stl) {
+void ElementSurface::clear() {
+  finalized = false;
+
+  if (glDeleteBuffers && vbufs[0]) glDeleteBuffers(2, vbufs);
+  vertices.clear();
+  normals.clear();
+
+  count = 0;
+  bounds = Rectangle3R();
+}
+
+
+void ElementSurface::read(const STL &stl) {
+  if (dim != 3) THROW("STL quad export not supported");
+
+  clear();
+  count = stl.size();
+  vertices.resize(count * 9);
+  normals.resize(count * 9);
+
+  for (unsigned i = 0; i < count; i++) {
+    const Facet &f = stl[i];
+    Vector3R n = f.getNormal();
+    unsigned offset = i * 9;
+
+    // Normals
+    for (unsigned j = 0; j < 3; j++)
+      for (unsigned k = 0; k < 3; k++)
+        normals[offset + j * 3 + k] = n[k]; // STL has only a face normal
+
+    // Vertices
+    for (unsigned j = 0; j < 3; j++) {
+      for (unsigned k = 0; k < 3; k++)
+        vertices[offset + j * 3 + k] = f[j][k];
+
+      bounds.add(f[j]);
+    }
+  }
+}
+
+
+void ElementSurface::write(STL &stl) {
   if (dim != 3) THROW("STL quad export not supported");
 
   Vector3R p[3];
@@ -173,15 +221,14 @@ void ElementSurface::exportSTL(STL &stl) {
     // Compute surface normal
     Vector3R normal;
     for (unsigned j = 0; j < 3; j++)
-      normal += Vector3R(normals[offset + j + 0],
-                         normals[offset + j + 1],
-                         normals[offset + j + 2]);
-    normal = -normal.normalize();
+      normal += Vector3R(normals[offset + j * 3 + 0],
+                         normals[offset + j * 3 + 1],
+                         normals[offset + j * 3 + 2]);
+    normal = normal.normalize();
 
     for (unsigned j = 0; j < 3; j++)
-      p[j] = Vector3R(vertices[offset + j * 3 + 0],
-                      vertices[offset + j * 3 + 1],
-                      vertices[offset + j * 3 + 2]);
+      for (unsigned k = 0; k < 3; k++)
+        p[j][k] = vertices[offset + j * 3 + k];
 
     stl.push_back(Facet(p[0], p[1], p[2], normal));
   }

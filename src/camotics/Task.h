@@ -41,7 +41,7 @@ namespace CAMotics {
 
     virtual void interrupt() {interrupted = true;}
     virtual bool shouldQuit() const {return interrupted;}
-    virtual const std::string &getStatus() const;
+    virtual std::string getStatus() const;
     virtual double getProgress() const;
     virtual double getETA() const;
     virtual double getTime() const;

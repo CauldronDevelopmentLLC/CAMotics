@@ -21,11 +21,13 @@
 #ifndef CAMOTICS_CUT_SIM_H
 #define CAMOTICS_CUT_SIM_H
 
-#include <cbang/SmartPointer.h>
+#include "Simulation.h"
 
 #include <camotics/Task.h>
 #include <camotics/Geom.h>
 #include <camotics/sim/Machine.h>
+
+#include <cbang/SmartPointer.h>
 
 #include <vector>
 #include <string>
@@ -41,7 +43,6 @@ namespace CAMotics {
 
   class CutSim : public Machine, public Task {
     unsigned threads;
-    cb::SmartPointer<Task> task;
     cb::SmartPointer<ToolPath> path;
 
   public:
@@ -53,9 +54,7 @@ namespace CAMotics {
                     const std::vector<std::string> &files);
     cb::SmartPointer<ToolPath> computeToolPath(const Project &project);
 
-    cb::SmartPointer<Surface>
-    computeSurface(const cb::SmartPointer<ToolPath> &path,
-                   const Rectangle3R &bounds, double resolution, double time);
+    cb::SmartPointer<Surface> computeSurface(const Simulation &sim);
 
     void reduceSurface(Surface &surface);
 

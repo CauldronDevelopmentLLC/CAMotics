@@ -22,6 +22,8 @@
 
 #include <camotics/stl/STL.h>
 
+#include <cbang/json/Sink.h>
+
 #include <string>
 #include <limits>
 
@@ -84,7 +86,7 @@ void ToolPath::print(ostream &stream) const {
 }
 
 
-void ToolPath::exportJSON(JSON::Sync &sync) const {
+void ToolPath::write(JSON::Sink &sink) const {
   tplang::Axes lastPos(numeric_limits<double>::infinity());
   MoveType type = (MoveType::enum_t)-1;
   int line = -1;
@@ -92,39 +94,39 @@ void ToolPath::exportJSON(JSON::Sync &sync) const {
   double feed = -1;
   double speed = -1;
 
-  sync.beginList();
+  sink.beginList();
   for (unsigned i = 0; i < size(); i++) {
     const Move &move = at(i);
-    sync.appendDict(true);
+    sink.appendDict(true);
 
     // Axes
     for (unsigned j = 0; j < 9; j++)
       if (move.getEnd()[j] != lastPos[j])
-        sync.insert(string(1, tplang::Axes::toAxis(j)),
+        sink.insert(string(1, tplang::Axes::toAxis(j)),
                     lastPos[j] = move.getEnd()[j]);
 
     // Type
     if (type != move.getType())
-      sync.insert("type", (type = move.getType()).toString());
+      sink.insert("type", (type = move.getType()).toString());
 
     // Line number
     if (line != (int)move.getLine())
-      sync.insert("line", line = move.getLine());
+      sink.insert("line", line = move.getLine());
 
     // Tool
     if (tool != (int)move.getTool())
-      sync.insert("tool", tool = move.getTool());
+      sink.insert("tool", tool = move.getTool());
 
     // Feed
     if (feed != move.getFeed())
-      sync.insert("feed", feed = move.getFeed());
+      sink.insert("feed", feed = move.getFeed());
 
     // Speed
     if (speed != move.getSpeed())
-      sync.insert("speed", speed = move.getSpeed());
+      sink.insert("speed", speed = move.getSpeed());
 
-    sync.endDict();
+    sink.endDict();
   }
 
-  sync.endList();
+  sink.endList();
 }

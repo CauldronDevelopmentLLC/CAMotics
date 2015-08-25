@@ -19,13 +19,13 @@
 \******************************************************************************/
 
 #include "Project.h"
-
-#include "CutWorkpiece.h"
-#include "Project.h"
+#include "Workpiece.h"
+#include "Sweep.h"
+#include "ToolPath.h"
+#include "Move.h"
 
 #include <camotics/Geom.h>
 #include <camotics/sim/ToolTable.h>
-#include <camotics/cutsim/Sweep.h>
 
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/time/Time.h>
@@ -85,6 +85,13 @@ Project::~Project() {}
 
 void Project::markDirty() {
   dirty = true;
+}
+
+
+SmartPointer<Simulation> Project::makeSim(const SmartPointer<ToolPath> &path,
+                                          double time) const {
+  return new Simulation(tools, path, new Workpiece(getWorkpieceBounds()),
+                        resolution, time);
 }
 
 

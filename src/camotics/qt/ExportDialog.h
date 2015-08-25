@@ -31,17 +31,23 @@ namespace Ui {class ExportDialog;}
 
 namespace CAMotics {
   class ExportDialog : public QDialog {
+    Q_OBJECT;
+
     cb::SmartPointer<Ui::ExportDialog> ui;
 
   public:
     ExportDialog();
 
     void enableSurface(bool enable);
-    void enableToolPath(bool enable);
+    void enableSimData(bool enable);
 
     bool surfaceSelected() const;
     bool binarySTLSelected() const;
     bool compactJSONSelected() const;
+
+  protected slots:
+    void on_surfaceRadioButton_clicked();
+    void on_simDataRadioButton_clicked();
   };
 }
 

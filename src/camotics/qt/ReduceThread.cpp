@@ -29,10 +29,10 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ReduceThread::ReduceThread(int event, QWidget *parent,
+ReduceThread::ReduceThread(Application &app, int event, QWidget *parent,
                            const SmartPointer<CutSim> &cutSim,
                            const Surface &surface) :
-  CutSimThread(event, parent, cutSim), surface(surface.copy()) {}
+  CutSimThread(app, event, parent, cutSim), surface(surface.copy()) {}
 
 
 void ReduceThread::run() {

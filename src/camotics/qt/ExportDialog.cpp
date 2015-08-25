@@ -31,15 +31,15 @@ ExportDialog::ExportDialog() : ui(new Ui::ExportDialog) {
 
 
 void ExportDialog::enableSurface(bool enable) {
-  ui->surfaceFrame->setEnabled(enable);
+  ui->surfaceFrame->setEnabled(enable && surfaceSelected());
   ui->surfaceRadioButton->setEnabled(enable);
-  if (!enable) ui->toolPathRadioButton->setChecked(true);
+  if (!enable) ui->simDataRadioButton->setChecked(true);
 }
 
 
-void ExportDialog::enableToolPath(bool enable) {
-  ui->toolPathFrame->setEnabled(enable);
-  ui->toolPathRadioButton->setEnabled(enable);
+void ExportDialog::enableSimData(bool enable) {
+  ui->simDataFrame->setEnabled(enable && !surfaceSelected());
+  ui->simDataRadioButton->setEnabled(enable);
   if (!enable) ui->surfaceRadioButton->setChecked(true);
 }
 
@@ -56,4 +56,16 @@ bool ExportDialog::binarySTLSelected() const {
 
 bool ExportDialog::compactJSONSelected() const {
   return ui->compactJSONRadioButton->isChecked();
+}
+
+
+void ExportDialog::on_surfaceRadioButton_clicked() {
+  ui->surfaceFrame->setEnabled(true);
+  ui->simDataFrame->setEnabled(false);
+}
+
+
+void ExportDialog::on_simDataRadioButton_clicked() {
+  ui->surfaceFrame->setEnabled(false);
+  ui->simDataFrame->setEnabled(true);
 }

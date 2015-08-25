@@ -41,7 +41,7 @@ namespace CAMotics {
     cb::SmartPointer<ToolPath> path;
 
     public:
-    ToolPathThread(int event, QWidget *parent,
+    ToolPathThread(cb::Application &app, int event, QWidget *parent,
                    const cb::SmartPointer<CutSim> &cutSim,
                    const cb::SmartPointer<Project> &project);
 

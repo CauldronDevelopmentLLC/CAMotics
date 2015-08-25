@@ -47,6 +47,7 @@ namespace CAMotics {
     // From cb::Application
     int init(int argc, char *argv[]);
     void run();
+    void requestExit();
   };
 }
 

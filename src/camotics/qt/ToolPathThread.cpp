@@ -29,10 +29,10 @@ using namespace CAMotics;
 using namespace cb;
 
 
-ToolPathThread::ToolPathThread(int event, QWidget *parent,
+ToolPathThread::ToolPathThread(Application &app, int event, QWidget *parent,
                                const SmartPointer<CutSim> &cutSim,
                                const SmartPointer<Project> &project) :
-  CutSimThread(event, parent, cutSim),
+  CutSimThread(app, event, parent, cutSim),
   tools(new ToolTable(*project->getToolTable())) {
 
   for (Project::iterator it = project->begin(); it != project->end(); it++)

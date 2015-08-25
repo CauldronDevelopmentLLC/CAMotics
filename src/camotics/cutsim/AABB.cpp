@@ -119,7 +119,7 @@ unsigned AABB::getLeafCount() const {
 void AABB::collisions(const Vector3R &p, real time,
                       vector<const Move *> &moves) {
   if (!contains(p)) return;
-  if (move && move->getStartTime() <= time) moves.push_back(move);
+  if (move && (!time || move->getStartTime() <= time)) moves.push_back(move);
   if (left) left->collisions(p, time, moves);
   if (right) right->collisions(p, time, moves);
 }

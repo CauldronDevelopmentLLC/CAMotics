@@ -23,23 +23,19 @@
 
 #include "ResolutionMode.h"
 #include "NCFile.h"
+#include "Simulation.h"
 
+#include <camotics/Geom.h>
 #include <camotics/sim/ToolUnits.h>
 
 #include <cbang/config/OptionProxy.h>
-#include <cbang/util/OrderedDict.h>
-
-#include <camotics/Geom.h>
 
 #include <list>
 
 
 namespace CAMotics {
-  class ToolPath;
-  class CutWorkpiece;
   class ToolTable;
   class ToolPath;
-
 
   class Project {
     cb::OptionProxy options;
@@ -67,6 +63,9 @@ namespace CAMotics {
     bool isDirty() const {return dirty;}
     void markDirty();
     void markClean() {dirty = false;}
+
+    cb::SmartPointer<Simulation>
+    makeSim(const cb::SmartPointer<ToolPath> &path, double time) const;
 
     const std::string &getFilename() const {return filename;}
     void setFilename(const std::string &filename);

@@ -28,8 +28,8 @@
 #include <cbang/String.h>
 
 #include <cbang/log/Logger.h>
-
 #include <cbang/os/SystemUtilities.h>
+#include <cbang/json/Sink.h>
 
 #include <cbang/xml/XMLProcessor.h>
 #include <cbang/xml/XMLWriter.h>
@@ -165,4 +165,17 @@ void ToolTable::write(XMLWriter &writer) const {
   for (const_iterator it = begin(); it != end(); it++)
     if (it->second->getNumber()) it->second->write(writer);
   writer.endElement("tool_table");
+}
+
+
+void ToolTable::write(JSON::Sink &sink) const {
+  sink.beginDict();
+
+  for (const_iterator it = begin(); it != end(); it++)
+    if (it->second->getNumber()) {
+      sink.beginInsert(String(it->second->getNumber()));
+      it->second->write(sink, false);
+    }
+
+  sink.endDict();
 }

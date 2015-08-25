@@ -56,6 +56,7 @@ namespace CAMotics {
   class ConnectionManager;
   class Viewer;
   class Project;
+  class Simulation;
   class ProjectModel;
   class ToolPath;
   class CutWorkpiece;
@@ -96,6 +97,7 @@ namespace CAMotics {
     ValueSet valueSet;
     cb::SmartPointer<CutSim> cutSim;
     cb::SmartPointer<Project> project;
+    cb::SmartPointer<Simulation> sim;
     cb::SmartPointer<ConnectionManager> connectionManager;
     cb::SmartPointer<View> view;
     cb::SmartPointer<Viewer> viewer;
@@ -116,6 +118,7 @@ namespace CAMotics {
     cb::SmartPointer<Tool> currentTool;
     bool autoPlay;
     bool autoClose;
+    std::string defaultExample;
 
     typedef enum {
       NULL_VIEW,
@@ -139,6 +142,7 @@ namespace CAMotics {
     void init();
     void setUnitLabel(QLabel *label, real value, int precision = 2);
 
+    void loadDefaultExample();
     void loadExamples();
 
     void saveAllState();
@@ -168,6 +172,7 @@ namespace CAMotics {
     void surfaceComplete();
     void reduceComplete();
 
+    void quit();
     void stop();
     void reload(bool now = false);
     void reduce();

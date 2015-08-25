@@ -29,6 +29,7 @@
 #include <camotics/view/Viewer.h>
 #include <camotics/cutsim/CutSim.h>
 #include <camotics/cutsim/Project.h>
+#include <camotics/cutsim/Simulation.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 #include <camotics/remote/ConnectionManager.h>
 #include <camotics/stl/STL.h>
@@ -224,6 +225,15 @@ void QtWin::setUnitLabel(QLabel *label, real value, int precision) {
 }
 
 
+void QtWin::loadDefaultExample() {
+  if (defaultExample.empty()) newProject();
+  else {
+    openProject(defaultExample);
+    snapView('t');
+  }
+}
+
+
 void QtWin::loadExamples() {
   try {
     const char *paths[] = {
@@ -260,6 +270,7 @@ void QtWin::loadExamples() {
             name = String::capitalize(name);
 
             examples[name] = filename;
+            if (name == "Camotics") defaultExample = filename;
           }
         }
 
@@ -494,12 +505,6 @@ void QtWin::toolPathComplete() {
 
   redraw();
 
-  // Start surface thread
-  surfaceThread = new SurfaceThread(surfaceCompleteEvent, this, cutSim,
-                                    toolPath, project->getWorkpieceBounds(),
-                                    project->getResolution(), view->getTime());
-  surfaceThread->start();
-
   // Auto play
   if (autoPlay) {
     autoPlay = false;
@@ -507,6 +512,15 @@ void QtWin::toolPathComplete() {
     view->setFlag(View::PLAY_FLAG);
     view->reverse = false;
   }
+
+  // Simulation
+  sim = project->makeSim(toolPath, view->getTime());
+
+  // Load surface
+  surfaceThread =
+    new SurfaceThread(app, surfaceCompleteEvent, this, cutSim,
+                      project->getFilename(), sim);
+  surfaceThread->start();
 }
 
 
@@ -532,6 +546,13 @@ void QtWin::reduceComplete() {
 }
 
 
+void QtWin::quit() {
+  stop();
+  app.requestExit();
+  QCoreApplication::exit();
+}
+
+
 void QtWin::stop() {
   if (!toolPathThread.isNull()) toolPathThread->join();
   if (!surfaceThread.isNull()) surfaceThread->join();
@@ -552,7 +573,7 @@ void QtWin::reload(bool now) {
 
     // Start tool path thread
     toolPathThread =
-      new ToolPathThread(toolPathCompleteEvent, this, cutSim, project);
+      new ToolPathThread(app, toolPathCompleteEvent, this, cutSim, project);
     toolPathThread->start();
 
     setStatusActive(true);
@@ -569,7 +590,7 @@ void QtWin::reduce() {
 
     // Start tool path thread
     reduceThread =
-      new ReduceThread(reduceCompleteEvent, this, cutSim, *surface);
+      new ReduceThread(app, reduceCompleteEvent, this, cutSim, *surface);
     reduceThread->start();
 
     setStatusActive(true);
@@ -634,14 +655,13 @@ void QtWin::snapshot() {
 
 void QtWin::exportData() {
   // Check what we have to export
-
-  if (surface.isNull() && toolPath.isNull()) {
-    warning("Nothing to export.\nAdd a tool path or run a simulation.");
+  if (surface.isNull() && sim.isNull()) {
+    warning("Nothing to export.\nRun a simulation first.");
     return;
   }
 
   exportDialog.enableSurface(!surface.isNull());
-  exportDialog.enableToolPath(!toolPath.isNull());
+  exportDialog.enableSimData(!sim.isNull());
 
   // Run dialog
   if (exportDialog.exec() != QDialog::Accepted) return;
@@ -649,7 +669,8 @@ void QtWin::exportData() {
   // Select output file
   bool exportSurface  = exportDialog.surfaceSelected() && !surface.isNull();
 
-  string title = string("Export ") + (exportSurface ? "Surface" : "Tool Path");
+  string title = string("Export ") +
+    (exportSurface ? "Surface" : "Simulation Data");
   string fileTypes =
     SSTR((exportSurface ? "STL" : "JSON") << " Files ("
          << (exportSurface ? "*.stl" : "*.json") << ");;All Files (*.*)");
@@ -665,14 +686,15 @@ void QtWin::exportData() {
 
   // Export
   if (exportSurface) {
-    STL stl("CAMotics Surface");
-    surface->exportSTL(stl);
+    string hash = sim.isNull() ? "" : sim->computeHash();
+    STL stl("CAMotics Surface", hash);
+    surface->write(stl);
     stl.setBinary(exportDialog.binarySTLSelected());
     stl.write(*stream);
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());
-    toolPath->exportJSON(writer);
+    sim->write(writer);
     writer.close();
   }
 }
@@ -1402,8 +1424,10 @@ bool QtWin::event(QEvent *event) {
 
 
 void QtWin::closeEvent(QCloseEvent *event) {
-  if (checkSave()) event->accept();
-  else event->ignore();
+  if (checkSave()) {
+    quit();
+    event->accept();
+  } else event->ignore();
 }
 
 
@@ -1433,7 +1457,7 @@ void QtWin::animate() {
         if (eta) s += TimeInterval(eta).toString();
         ui->progressBar->setFormat(s.c_str());
 
-        showMessage("Simulation progress: " + s);
+        showMessage("Progress: " + s);
 
       } else {
         ui->progressBar->setValue(0);
@@ -1450,9 +1474,8 @@ void QtWin::animate() {
   if (isWindowModified() != modified) setWindowModified(modified);
 
   if (app.shouldQuit()) {
-    stop();
     checkSave(false);
-    QCoreApplication::exit();
+    quit();
   }
 }
 
@@ -1785,7 +1808,7 @@ void QtWin::on_zOffsetDoubleSpinBox_valueChanged(double value) {
 
 
 void QtWin::on_actionQuit_triggered() {
-  if (checkSave()) QCoreApplication::exit();
+  if (checkSave()) quit();
 }
 
 

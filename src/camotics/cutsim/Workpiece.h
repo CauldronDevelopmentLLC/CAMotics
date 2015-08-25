@@ -25,6 +25,7 @@
 
 #include <camotics/contour/FieldFunction.h>
 
+
 namespace CAMotics {
   class Workpiece : public Rectangle3R, public FieldFunction {
     Vector3R center;

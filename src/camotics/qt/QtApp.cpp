@@ -25,6 +25,7 @@
 
 #include <cbang/Info.h>
 #include <cbang/log/Logger.h>
+#include <cbang/js/Javascript.h>
 
 #include <vector>
 
@@ -100,7 +101,7 @@ void QtApp::run() {
   if (options["fullscreen"].toBoolean())
     qtWin.setWindowState(qtWin.windowState() | Qt::WindowFullScreen);
 
-  if (projectFile.empty()) qtWin.newProject();
+  if (projectFile.empty()) qtWin.loadDefaultExample();
   else qtWin.openProject(projectFile);
 
   qtWin.getView()->setSpeed(options["play-speed"].toInteger());
@@ -113,4 +114,10 @@ void QtApp::run() {
   // Start it up
   qtWin.show();
   qtApp.exec();
+}
+
+
+void QtApp::requestExit() {
+  js::Javascript::terminate(); // End TPL code
+  Application::requestExit();
 }

@@ -28,6 +28,8 @@
 
 
 namespace cb {
+  namespace JSON {class Sink;}
+
   class XMLWriter;
   class XMLAttributes;
 }
@@ -97,6 +99,7 @@ namespace CAMotics {
     void read(const cb::XMLAttributes &attrs);
     void write(cb::XMLWriter &writer) const;
 
+    void write(cb::JSON::Sink &sink, bool withNumber = true) const;
 
     inline static unsigned toIndex(char var) {
       switch (std::toupper(var)) {

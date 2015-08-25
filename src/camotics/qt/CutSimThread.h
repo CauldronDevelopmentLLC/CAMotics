@@ -21,6 +21,8 @@
 #ifndef CAMOTICS_CUT_SIM_THREAD_H
 #define CAMOTICS_CUT_SIM_THREAD_H
 
+#include "BackgroundThread.h"
+
 #include <camotics/cutsim/CutSim.h>
 
 #include <cbang/SmartPointer.h>
@@ -32,19 +34,14 @@
 namespace CAMotics {
   class CutSim;
 
-  class CutSimThread : public cb::Thread {
+  class CutSimThread : public BackgroundThread {
   protected:
-    int event;
-    QWidget *parent;
     cb::SmartPointer<CutSim> cutSim;
 
   public:
-    CutSimThread(int event, QWidget *parent,
+    CutSimThread(cb::Application &app, int event, QWidget *parent,
                  const cb::SmartPointer<CutSim> &cutSim) :
-      event(event), parent(parent), cutSim(cutSim) {}
-    ~CutSimThread() {join();}
-
-    void completed();
+      BackgroundThread(app, event, parent), cutSim(cutSim) {}
 
     // From cb::Thread
     void stop();

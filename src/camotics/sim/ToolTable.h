@@ -31,8 +31,6 @@
 
 #include <map>
 
-namespace cb {class XMLWriter;}
-
 
 namespace CAMotics {
   class ToolTable :
@@ -64,6 +62,7 @@ namespace CAMotics {
     void text(const std::string &text);
 
     void write(cb::XMLWriter &writer) const;
+    void write(cb::JSON::Sink &sink) const;
   };
 }
 

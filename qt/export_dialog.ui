@@ -35,7 +35,16 @@
    <property name="spacing">
     <number>4</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>4</number>
+   </property>
+   <property name="topMargin">
+    <number>4</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
+   <property name="bottomMargin">
     <number>4</number>
    </property>
    <item>
@@ -119,9 +128,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="toolPathRadioButton">
+    <widget class="QRadioButton" name="simDataRadioButton">
      <property name="text">
-      <string>Tool Path</string>
+      <string>Simulation Data</string>
      </property>
      <attribute name="buttonGroup">
       <string notr="true">buttonGroup</string>
@@ -129,7 +138,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="toolPathFrame">
+    <widget class="QFrame" name="simDataFrame">
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>

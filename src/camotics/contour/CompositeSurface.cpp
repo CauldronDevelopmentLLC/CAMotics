@@ -70,8 +70,8 @@ void CompositeSurface::draw() {
 }
 
 
-void CompositeSurface::exportSTL(STL &stl) {
-  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->exportSTL(stl);
+void CompositeSurface::write(STL &stl) {
+  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->write(stl);
 }
 
 

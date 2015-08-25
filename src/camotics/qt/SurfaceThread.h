@@ -25,24 +25,22 @@
 
 #include <camotics/Geom.h>
 #include <camotics/cutsim/ToolPath.h>
+#include <camotics/cutsim/Simulation.h>
 #include <camotics/contour/Surface.h>
 
 
 namespace CAMotics {
   class SurfaceThread : public CutSimThread {
-    cb::SmartPointer<ToolPath> path;
-    Rectangle3R bounds;
-    double resolution;
-    double time;
+    std::string filename;
+    cb::SmartPointer<Simulation> sim;
     cb::SmartPointer<Surface> surface;
 
   public:
-    SurfaceThread(int event, QWidget *parent,
+    SurfaceThread(cb::Application &app, int event, QWidget *parent,
                   const cb::SmartPointer<CutSim> &cutSim,
-                  const cb::SmartPointer<ToolPath> &path,
-                  const Rectangle3R &bounds, double resolution, double time) :
-      CutSimThread(event, parent, cutSim), path(path), bounds(bounds),
-      resolution(resolution), time(time) {}
+                  const std::string &filename,
+                  const cb::SmartPointer<Simulation> &sim) :
+      CutSimThread(app, event, parent, cutSim), filename(filename), sim(sim) {}
 
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
 

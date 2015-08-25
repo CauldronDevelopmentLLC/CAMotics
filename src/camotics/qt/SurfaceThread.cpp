@@ -20,18 +20,53 @@
 
 #include "SurfaceThread.h"
 
-#include <cbang/util/DefaultCatch.h>
+#include <camotics/stl/STL.h>
+#include <camotics/contour/ElementSurface.h>
 
-#include <limits>
+#include <cbang/util/DefaultCatch.h>
+#include <cbang/os/SystemUtilities.h>
+#include <cbang/iostream/BZip2Decompressor.h>
+
+#include <boost/iostreams/filtering_stream.hpp>
+namespace io = boost::iostreams;
 
 using namespace std;
+using namespace cb;
 using namespace CAMotics;
 
 
 void SurfaceThread::run() {
+  // Check for cached STL file
+  cutSim->Task::begin();
   try {
-    if (!time) time = numeric_limits<double>::max();
-    surface = cutSim->computeSurface(path, bounds, resolution, time);
+    string stlCache = SystemUtilities::swapExtension(filename, "stl");
+    bool hasCache = SystemUtilities::exists(stlCache);
+    bool hasBZ2Cache = SystemUtilities::exists(stlCache + ".bz2");
+
+    if (hasCache || hasBZ2Cache) {
+      string filename = stlCache + (hasBZ2Cache ? ".bz2" : "");
+      SmartPointer<istream> stream = SystemUtilities::iopen(filename);
+
+      io::filtering_istream in;
+      if (hasBZ2Cache) in.push(BZip2Decompressor());
+      in.push(*stream);
+
+      STL stl;
+      stl.readHeader(in);
+
+      if (stl.getHash() == sim->computeHash()) {
+        stl.readBody(in, cutSim.get());
+        surface = new ElementSurface(stl);
+      }
+    }
   } CATCH_ERROR;
+  cutSim->Task::end();
+
+  // Compute surface
+  if (surface.isNull())
+    try {
+      surface = cutSim->computeSurface(*sim);
+    } CATCH_ERROR;
+
   completed();
 }

@@ -136,24 +136,22 @@ namespace CAMotics {
       }
 
       // Generate tool path
-      cb::SmartPointer<ToolPath> path = cutSim.computeToolPath(project);
+      SmartPointer<ToolPath> path = cutSim.computeToolPath(project);
 
       // Configure simulation
       project.updateAutomaticWorkpiece(*path);
-      Rectangle3R bounds = project.getWorkpieceBounds();
-      double resolution = project.getResolution();
 
       // Simulate
       if (!time) time = numeric_limits<double>::max();
-      cb::SmartPointer<Surface> surface =
-        cutSim.computeSurface(path, bounds, resolution, time);
+      SmartPointer<Surface> surface =
+        cutSim.computeSurface(*project.makeSim(path, time));
 
       // Reduce
       if (reduce) cutSim.reduceSurface(*surface);
 
       // Export surface
       STL stl("CAMotics Surface");
-      surface->exportSTL(stl);
+      surface->write(stl);
       stl.setBinary(binary);
       stl.write(*output);
     }
@@ -168,5 +166,5 @@ namespace CAMotics {
 
 
 int main(int argc, char *argv[]) {
-  return cb::doApplication<CAMotics::SimApp>(argc, argv);
+  return doApplication<CAMotics::SimApp>(argc, argv);
 }

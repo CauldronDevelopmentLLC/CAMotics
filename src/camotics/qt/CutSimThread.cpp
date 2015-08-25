@@ -26,13 +26,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-void CutSimThread::completed() {
-  if (!cutSim->shouldQuit())
-    QCoreApplication::postEvent(parent, new QEvent((QEvent::Type)event));
-}
-
-
 void CutSimThread::stop() {
   cutSim->interrupt();
-  Thread::stop();
+  BackgroundThread::stop();
 }
