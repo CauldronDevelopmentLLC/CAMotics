@@ -18,42 +18,30 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_LINE_BUFFER_H
-#define CAMOTICS_LINE_BUFFER_H
+#ifndef CAMOTICS_CONSOLE_WRITER_H
+#define CAMOTICS_CONSOLE_WRITER_H
 
-#include <cbang/os/Mutex.h>
-#include <cbang/util/SmartLock.h>
+#include <QTextEdit>
 
-#include <string>
-#include <list>
+#include <vector>
 
 
 namespace CAMotics {
-  class LineBuffer : public cb::Mutex {
-    std::list<std::string> lines;
+  class ConsoleWriter {
+    QTextEdit *console;
+
+    std::vector<std::string> lines;
 
   public:
-    void append(const std::string &line) {
-      cb::SmartLock lock(this);
-      lines.push_back(line);
-    }
+    ConsoleWriter() : console(0) {}
 
-    bool hasLine() const {
-      cb::SmartLock lock(this);
-      return !lines.empty();
-    }
+  public:
+    void setConsole(QTextEdit *console) {this->console = console;}
 
-    std::string getLine() {
-      cb::SmartLock lock(this);
-      if (lines.empty()) return "";
-
-      std::string line = lines.front();
-      lines.pop_front();
-
-      return line;
-    }
+    void append(const std::string &line) {lines.push_back(line);}
+    void writeToConsole();
   };
 }
 
-#endif // CAMOTICS_LINE_BUFFER_H
+#endif // CAMOTICS_CONSOLE_WRITER_H
 

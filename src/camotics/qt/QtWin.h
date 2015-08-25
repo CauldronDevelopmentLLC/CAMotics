@@ -29,7 +29,7 @@
 #include "ToolPathThread.h"
 #include "SurfaceThread.h"
 #include "ReduceThread.h"
-#include "LineBuffer.h"
+#include "ConsoleWriter.h"
 
 #include <camotics/Real.h>
 #include <camotics/view/GL.h>
@@ -81,9 +81,6 @@ namespace CAMotics {
     cb::SmartPointer<ProjectModel> projectModel;
     cb::SmartPointer<FileTabManager> fileTabManager;
 
-    LineBuffer lineBuffer;
-    cb::SmartPointer<cb::LineBufferStream<LineBuffer> > consoleStream;
-
     QIcon playIcon;
     QIcon pauseIcon;
     QIcon forwardIcon;
@@ -127,6 +124,9 @@ namespace CAMotics {
       FILE_VIEW,
     } ui_view_t;
     ui_view_t currentUIView;
+
+    ConsoleWriter consoleWriter;
+    cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
   public:
     QtWin(cb::Application &app);

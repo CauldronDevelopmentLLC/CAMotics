@@ -139,7 +139,8 @@ QtWin::QtWin(Application &app) :
   ui->console->setTextColor(QColor("#d9d9d9"));
 
   // Setup console stream
-  consoleStream = new LineBufferStream<LineBuffer>(lineBuffer);
+  consoleWriter.setConsole(ui->console);
+  consoleStream = new LineBufferStream<ConsoleWriter>(consoleWriter);
   Logger::instance().setScreenStream(*consoleStream);
 }
 
@@ -773,6 +774,7 @@ void QtWin::openProject(const string &_filename) {
   }
 
   showMessage("Opening " + filename);
+  LOG_INFO(1, "Opening " << filename);
 
   try {
     // Check if the file appears to be XML
@@ -1228,50 +1230,6 @@ void QtWin::hideConsole() {
 }
 
 
-void QtWin::appendConsole(const string &_line) {
-  cout << _line << endl;
-
-  string line = _line;
-  QColor saveColor = ui->console->textColor();
-
-  if (4 < line.size() && line[0] == 27 && line[1] == '[' &&
-      line[4] == 'm') {
-
-    int code = String::parseU8(line.substr(2, 2));
-    QColor color;
-
-    switch (code) {
-    case 30: color = QColor("#000000"); break;
-    case 31: color = QColor("#ff0000"); break;
-    case 32: color = QColor("#00ff00"); break;
-    case 33: color = QColor("#ffff00"); break;
-    case 34: color = QColor("#0000ff"); break;
-    case 35: color = QColor("#ff00ff"); break;
-    case 36: color = QColor("#00ffff"); break;
-    case 37: color = QColor("#ffffff"); break;
-
-    case 90: color = QColor("#555555"); break;
-    case 91: color = QColor("#ff5555"); break;
-    case 92: color = QColor("#55ff55"); break;
-    case 93: color = QColor("#ffff55"); break;
-    case 94: color = QColor("#5555ff"); break;
-    case 95: color = QColor("#ff55ff"); break;
-    case 96: color = QColor("#55ffff"); break;
-    case 97: color = QColor("#ffffff"); break;
-    }
-
-    line = line.substr(5);
-    ui->console->setTextColor(color);
-  }
-
-  if (String::endsWith(line, "\033[0m"))
-    line = line.substr(0, line.size() - 4);
-
-  ui->console->append(QByteArray(line.c_str()));
-  ui->console->setTextColor(saveColor);
-}
-
-
 void QtWin::setUIView(ui_view_t uiView) {
   if (uiView == currentUIView) return;
   currentUIView = uiView;
@@ -1465,7 +1423,7 @@ void QtWin::animate() {
     }
 
     // Copy log
-    while (lineBuffer.hasLine()) appendConsole(lineBuffer.getLine());
+    consoleWriter.writeToConsole();
 
   } CBANG_CATCH_ERROR;
 
