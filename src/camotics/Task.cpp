@@ -28,7 +28,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-const string &Task::getStatus() const {
+string Task::getStatus() const {
   SmartLock lock(this);
   return status;
 }
