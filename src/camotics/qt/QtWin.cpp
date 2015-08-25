@@ -92,6 +92,10 @@ QtWin::QtWin(Application &app) :
   connect(ui->actionSelectAll, SIGNAL(triggered()),
           fileTabManager.get(), SLOT(on_actionSelectAll_triggered()));
 
+  // Disable unimplemented console buttons
+  ui->errorsCheckBox->setVisible(false);
+  ui->warningsCheckBox->setVisible(false);
+
   // Register user events
   toolPathCompleteEvent = QEvent::registerEventType();
   surfaceCompleteEvent = QEvent::registerEventType();
@@ -2022,4 +2026,30 @@ void QtWin::on_actionAddTool_triggered() {
 
 void QtWin::on_actionRemoveTool_triggered() {
   removeTool();
+}
+
+
+void QtWin::on_actionHideConsole_triggered() {
+  QList<int> sizes = ui->splitter->sizes();
+  sizes[0] = 1;
+  sizes[1] = 0;
+  ui->splitter->setSizes(sizes);
+}
+
+
+void QtWin::on_actionShowConsole_triggered() {
+  QList<int> sizes = ui->splitter->sizes();
+  sizes[0] = 1;
+  sizes[1] = 1;
+  ui->splitter->setSizes(sizes);
+}
+
+
+void QtWin::on_hideConsolePushButton_clicked() {
+  on_actionHideConsole_triggered();
+}
+
+
+void QtWin::on_clearConsolePushButton_clicked() {
+  ui->console->clear();
 }

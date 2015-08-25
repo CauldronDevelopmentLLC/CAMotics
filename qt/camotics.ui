@@ -209,7 +209,7 @@
        </layout>
       </widget>
       <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayout_16">
+       <layout class="QVBoxLayout" name="consoleFrame">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -241,6 +241,17 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="hideConsolePushButton">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="camotics.qrc">
+              <normaloff>:/icons/hide.png</normaloff>:/icons/hide.png</iconset>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="clearConsolePushButton">
@@ -415,6 +426,9 @@
     <addaction name="actionRightView"/>
     <addaction name="actionTopView"/>
     <addaction name="actionBottomView"/>
+    <addaction name="separator"/>
+    <addaction name="actionHideConsole"/>
+    <addaction name="actionShowConsole"/>
    </widget>
    <widget class="QMenu" name="menuSimulate">
     <property name="title">
@@ -3360,6 +3374,30 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionHideConsole">
+   <property name="icon">
+    <iconset resource="camotics.qrc">
+     <normaloff>:/icons/hide.png</normaloff>:/icons/hide.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hide Console</string>
+   </property>
+   <property name="toolTip">
+    <string>Hide console</string>
+   </property>
+  </action>
+  <action name="actionShowConsole">
+   <property name="icon">
+    <iconset resource="camotics.qrc">
+     <normaloff>:/icons/show.png</normaloff>:/icons/show.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Console</string>
+   </property>
+   <property name="toolTip">
+    <string>Show console</string>
    </property>
   </action>
  </widget>

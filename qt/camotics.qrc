@@ -57,5 +57,7 @@
         <file>icons/paste.png</file>
         <file>icons/select-all.png</file>
         <file>icons/delete.png</file>
+        <file>icons/hide.png</file>
+        <file>icons/show.png</file>
     </qresource>
 </RCC>

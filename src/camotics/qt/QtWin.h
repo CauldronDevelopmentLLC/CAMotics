@@ -337,6 +337,12 @@ namespace CAMotics {
     void on_actionRemoveFile_triggered();
     void on_actionAddTool_triggered();
     void on_actionRemoveTool_triggered();
+
+    void on_actionHideConsole_triggered();
+    void on_actionShowConsole_triggered();
+
+    void on_hideConsolePushButton_clicked();
+    void on_clearConsolePushButton_clicked();
   };
 }
 
