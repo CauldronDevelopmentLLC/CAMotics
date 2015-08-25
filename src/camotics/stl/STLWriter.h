@@ -18,20 +18,32 @@
 
 \******************************************************************************/
 
-#include "Surface.h"
+#ifndef CAMOTICS_STL_WRITER_H
+#define CAMOTICS_STL_WRITER_H
 
-#include <camotics/stl/STLWriter.h>
+#include "STLSink.h"
 
-using namespace std;
-using namespace cb;
-using namespace CAMotics;
+#include <cbang/io/OutputSink.h>
 
 
-void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
-                       const string &hash) const {
-  STLWriter writer(sink, binary);
+namespace CAMotics {
+  class STLWriter : public STLSink {
+    cb::OutputSink sink;
+    std::ostream &stream;
+    bool binary;
 
-  writer.writeHeader(name, getCount(), hash);
-  write(writer);
-  writer.writeFooter(name, hash);
+  public:
+    STLWriter(const cb::OutputSink &sink, bool binary) :
+      sink(sink), stream(sink.getStream()), binary(binary) {}
+
+    void writeHeader(const std::string &name, uint32_t count,
+                     const std::string &hash = std::string());
+    void writeFacet(const cb::Vector3F &v1, const cb::Vector3F &v2,
+                    const cb::Vector3F &v3, const cb::Vector3F &normal);
+    void writeFooter(const std::string &name,
+                     const std::string &hash = std::string());
+  };
 }
+
+#endif // CAMOTICS_STL_WRITER_H
+

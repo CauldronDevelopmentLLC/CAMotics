@@ -23,7 +23,6 @@
 
 #include "Facet.h"
 
-#include <cbang/Packed.h>
 #include <cbang/io/IO.h>
 
 #include <iostream>
@@ -31,24 +30,17 @@
 
 namespace CAMotics {
   class Task;
+  class STLSink;
+  class STLSource;
 
-  class STL : public cb::IO, public std::vector<Facet> {
+  class STL : public std::vector<Facet> {
     std::string name;
     std::string hash;
-    bool binary;
-
-    struct BinaryTriangle {
-      float normal[3];
-      float v1[3];
-      float v2[3];
-      float v3[3];
-      uint16_t attrib;
-    } PACKED;
 
   public:
     STL(const std::string &name = std::string(),
         const std::string &hash = std::string()) :
-      name(name), hash(hash), binary(false) {}
+      name(name), hash(hash) {}
 
     const std::string &getName() const {return name;}
     void setName(const std::string &name) {this->name = name;}
@@ -56,24 +48,14 @@ namespace CAMotics {
     const std::string &getHash() const {return hash;}
     void setHash(const std::string &hash) {this->hash = hash;}
 
-    bool isBinary() const {return binary;}
-    void setBinary(bool binary) {this->binary = binary;}
-
     void add(const Facet &f) {push_back(f);}
-    void addFacet(const cb::Vector3F &v0, const cb::Vector3F &v1,
-                  const cb::Vector3F &v2, const cb::Vector3F &normal)
-    {add(Facet(v0, v1, v2, normal));}
 
-    void readHeader(const cb::InputSource &source);
-    void writeHeader(const cb::OutputSink &sink) const;
-    void readBody(const cb::InputSource &source, Task *task = 0);
-    void writeBody(const cb::OutputSink &sink, Task *task = 0) const;
-    void read(const cb::InputSource &source, Task *task);
-    void write(const cb::OutputSink &sink, Task *task) const;
+    void read(STLSource &source, Task *task = 0);
+    void write(STLSink &sink, Task *task = 0) const;
 
-    // From IO
-    void read(const cb::InputSource &source) {read(source, 0);}
-    void write(const cb::OutputSink &sink) const {write(sink, 0);}
+    void read(const cb::InputSource &source, Task *task = 0);
+    void write(const cb::OutputSink &sink, Task *task = 0,
+               bool binary = true) const;
   };
 }
 

@@ -18,20 +18,21 @@
 
 \******************************************************************************/
 
-#include "Surface.h"
+#ifndef CAMOTICS_STLBINARY_TRIANGLE_H
+#define CAMOTICS_STLBINARY_TRIANGLE_H
 
-#include <camotics/stl/STLWriter.h>
-
-using namespace std;
-using namespace cb;
-using namespace CAMotics;
+#include <cbang/Packed.h>
 
 
-void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
-                       const string &hash) const {
-  STLWriter writer(sink, binary);
-
-  writer.writeHeader(name, getCount(), hash);
-  write(writer);
-  writer.writeFooter(name, hash);
+namespace CAMotics {
+  struct STLBinaryTriangle {
+    float normal[3];
+    float v1[3];
+    float v2[3];
+    float v3[3];
+    uint16_t attrib;
+  } PACKED;
 }
+
+#endif // CAMOTICS_STLBINARY_TRIANGLE_H
+

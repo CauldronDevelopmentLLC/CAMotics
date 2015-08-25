@@ -31,6 +31,8 @@
 
 
 namespace CAMotics {
+  class STLSource;
+
   class ElementSurface : public Surface {
     unsigned dim;
     bool finalized;
@@ -43,7 +45,7 @@ namespace CAMotics {
     Rectangle3R bounds;
 
   public:
-    ElementSurface(const STL &stl);
+    ElementSurface(STLSource &source, Task *task = 0);
     ElementSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
     ElementSurface(const ElementSurface &o);
     ElementSurface(unsigned dim);
@@ -58,8 +60,8 @@ namespace CAMotics {
     Rectangle3R getBounds() const {return bounds;}
     void draw();
     void clear();
-    void read(const STL &stl);
-    void write(STL &stl);
+    void read(STLSource &source, Task *task = 0);
+    void write(STLSink &sink, Task *task = 0) const;
     void reduce(Task &task);
   };
 }

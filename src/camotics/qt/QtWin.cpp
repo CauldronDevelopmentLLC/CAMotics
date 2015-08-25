@@ -32,7 +32,7 @@
 #include <camotics/cutsim/Simulation.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 #include <camotics/remote/ConnectionManager.h>
-#include <camotics/stl/STL.h>
+#include <camotics/stl/STLWriter.h>
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>
@@ -691,10 +691,8 @@ void QtWin::exportData() {
   // Export
   if (exportSurface) {
     string hash = sim.isNull() ? "" : sim->computeHash();
-    STL stl("CAMotics Surface", hash);
-    surface->write(stl);
-    stl.setBinary(exportDialog.binarySTLSelected());
-    stl.write(*stream);
+    bool binary = exportDialog.binarySTLSelected();
+    surface->writeSTL(*stream, binary, "CAMotics Surface", hash);
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());

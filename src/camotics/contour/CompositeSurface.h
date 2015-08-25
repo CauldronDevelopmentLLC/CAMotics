@@ -46,7 +46,7 @@ namespace CAMotics {
     uint64_t getCount() const;
     Rectangle3R getBounds() const;
     void draw();
-    void write(STL &stl);
+    void write(STLSink &sink, Task *task = 0) const;
     void reduce(Task &task);
   };
 }

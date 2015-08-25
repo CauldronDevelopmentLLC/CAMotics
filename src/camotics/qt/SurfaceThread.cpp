@@ -20,7 +20,7 @@
 
 #include "SurfaceThread.h"
 
-#include <camotics/stl/STL.h>
+#include <camotics/stl/STLReader.h>
 #include <camotics/contour/ElementSurface.h>
 
 #include <cbang/util/DefaultCatch.h>
@@ -37,7 +37,6 @@ using namespace CAMotics;
 
 void SurfaceThread::run() {
   // Check for cached STL file
-  cutSim->Task::begin();
   try {
     string stlCache = SystemUtilities::swapExtension(filename, "stl");
     bool hasCache = SystemUtilities::exists(stlCache);
@@ -51,23 +50,24 @@ void SurfaceThread::run() {
       if (hasBZ2Cache) in.push(BZip2Decompressor());
       in.push(*stream);
 
-      STL stl;
-      stl.readHeader(in);
+      STLReader reader(in);
 
-      if (stl.getHash() == sim->computeHash()) {
+      string name;
+      string hash;
+      reader.readHeader(name, hash);
+
+      if (hash == sim->computeHash()) {
         LOG_INFO(1, "Loading precomputed surface from " << filename);
-        stl.readBody(in, cutSim.get());
-        surface = new ElementSurface(stl);
+        surface = new ElementSurface(reader, cutSim.get());
+        reader.readFooter();
       }
     }
   } CATCH_ERROR;
-  cutSim->Task::end();
 
   // Compute surface
-  if (surface.isNull())
-    try {
-      surface = cutSim->computeSurface(*sim);
-    } CATCH_ERROR;
+  try {
+    if (surface.isNull()) surface = cutSim->computeSurface(*sim);
+  } CATCH_ERROR;
 
   completed();
 }

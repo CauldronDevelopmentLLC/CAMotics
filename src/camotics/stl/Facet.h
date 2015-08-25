@@ -30,11 +30,13 @@ namespace CAMotics {
     cb::Vector3F normal;
 
   public:
+    Facet() : cb::Triangle3F(cb::Vector3F()) {}
     Facet(const cb::Vector3F &p1, const cb::Vector3F &p2,
           const cb::Vector3F &p3, const cb::Vector3F &normal) :
       cb::Triangle3F(p1, p2, p3), normal(normal) {}
 
     const cb::Vector3F &getNormal() const {return normal;}
+    cb::Vector3F &getNormal() {return normal;}
     void setNormal(const cb::Vector3F &normal) {this->normal = normal;}
   };
 }

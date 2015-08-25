@@ -18,20 +18,12 @@
 
 \******************************************************************************/
 
-#include "Surface.h"
+#include "STLSink.h"
+#include "Facet.h"
 
-#include <camotics/stl/STLWriter.h>
-
-using namespace std;
-using namespace cb;
 using namespace CAMotics;
 
 
-void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
-                       const string &hash) const {
-  STLWriter writer(sink, binary);
-
-  writer.writeHeader(name, getCount(), hash);
-  write(writer);
-  writer.writeFooter(name, hash);
+void STLSink::writeFacet(const Facet &facet) {
+  writeFacet(facet[0], facet[1], facet[2], facet.getNormal());
 }

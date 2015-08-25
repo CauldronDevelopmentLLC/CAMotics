@@ -18,20 +18,34 @@
 
 \******************************************************************************/
 
-#include "Surface.h"
+#ifndef CAMOTICS_STL_READER_H
+#define CAMOTICS_STL_READER_H
 
-#include <camotics/stl/STLWriter.h>
+#include "STLSource.h"
 
-using namespace std;
-using namespace cb;
-using namespace CAMotics;
+#include <cbang/io/InputSource.h>
+#include <cbang/io/Parser.h>
 
 
-void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
-                       const string &hash) const {
-  STLWriter writer(sink, binary);
+namespace CAMotics {
+  class STLReader : public STLSource {
+    cb::InputSource source;
+    std::istream &stream;
+    bool binary;
+    uint32_t count;
+    cb::Parser parser;
 
-  writer.writeHeader(name, getCount(), hash);
-  write(writer);
-  writer.writeFooter(name, hash);
+  public:
+    STLReader(const cb::InputSource &source);
+
+    uint32_t readHeader(std::string &name, std::string &hash);
+    uint32_t getFacetCount() const {return count;}
+    bool hasMore();
+    void readFacet(cb::Vector3F &v1, cb::Vector3F &v2,
+                   cb::Vector3F &v3, cb::Vector3F &normal);
+    void readFooter();
+  };
 }
+
+#endif // CAMOTICS_STL_READER_H
+

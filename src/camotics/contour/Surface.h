@@ -23,9 +23,11 @@
 
 #include <camotics/Geom.h>
 
+#include <cbang/io/OutputSink.h>
+
 
 namespace CAMotics {
-  class STL;
+  class STLSink;
   class Task;
 
   class Surface {
@@ -36,8 +38,11 @@ namespace CAMotics {
     virtual uint64_t getCount() const = 0;
     virtual Rectangle3R getBounds() const = 0;
     virtual void draw() = 0;
-    virtual void write(STL &stl) = 0;
+    virtual void write(STLSink &sink, Task *task = 0) const = 0;
     virtual void reduce(Task &task) = 0;
+
+    void writeSTL(const cb::OutputSink &sink, bool binary,
+                  const std::string &name, const std::string &hash) const;
   };
 }
 

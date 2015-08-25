@@ -70,8 +70,8 @@ void CompositeSurface::draw() {
 }
 
 
-void CompositeSurface::write(STL &stl) {
-  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->write(stl);
+void CompositeSurface::write(STLSink &sink, Task *task) const {
+  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->write(sink, task);
 }
 
 

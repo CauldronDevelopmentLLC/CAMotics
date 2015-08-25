@@ -18,20 +18,33 @@
 
 \******************************************************************************/
 
-#include "Surface.h"
+#ifndef CAMOTICS_STLSOURCE_H
+#define CAMOTICS_STLSOURCE_H
 
-#include <camotics/stl/STLWriter.h>
+#include <cbang/geom/Vector.h>
+#include <cbang/StdTypes.h>
 
-using namespace std;
-using namespace cb;
-using namespace CAMotics;
+#include <string>
 
 
-void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
-                       const string &hash) const {
-  STLWriter writer(sink, binary);
+namespace CAMotics {
+  class Facet;
 
-  writer.writeHeader(name, getCount(), hash);
-  write(writer);
-  writer.writeFooter(name, hash);
+  class STLSource {
+  public:
+    virtual ~STLSource() {}
+
+    virtual uint32_t readHeader(std::string &name, std::string &hash) = 0;
+    virtual uint32_t getFacetCount() const = 0;
+    virtual bool hasMore() = 0;
+    virtual void readFacet(cb::Vector3F &v1, cb::Vector3F &v2,
+                           cb::Vector3F &v3, cb::Vector3F &normal) = 0;
+    virtual void readFooter() = 0;
+
+    void readFacet(Facet &facet);
+    Facet readFacet();
+  };
 }
+
+#endif // CAMOTICS_STLSOURCE_H
+

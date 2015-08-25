@@ -25,7 +25,7 @@
 #include <camotics/Application.h>
 #include <camotics/cutsim/CutSim.h>
 #include <camotics/cutsim/Project.h>
-#include <camotics/stl/STL.h>
+#include <camotics/stl/STLWriter.h>
 #include <camotics/contour/Surface.h>
 
 #include <iostream>
@@ -143,17 +143,15 @@ namespace CAMotics {
 
       // Simulate
       if (!time) time = numeric_limits<double>::max();
-      SmartPointer<Surface> surface =
-        cutSim.computeSurface(*project.makeSim(path, time));
+      SmartPointer<Simulation> sim = project.makeSim(path, time);
+      SmartPointer<Surface> surface = cutSim.computeSurface(*sim);
 
       // Reduce
       if (reduce) cutSim.reduceSurface(*surface);
 
       // Export surface
-      STL stl("CAMotics Surface");
-      surface->write(stl);
-      stl.setBinary(binary);
-      stl.write(*output);
+      surface->writeSTL(*output, binary, "CAMotics Surface",
+                        sim->computeHash());
     }
 
 

@@ -25,8 +25,10 @@
 #include <cbang/Exception.h>
 #include <cbang/log/Logger.h>
 
+#include <camotics/Task.h>
 #include <camotics/view/GL.h>
-#include <camotics/stl/STL.h>
+#include <camotics/stl/STLSource.h>
+#include <camotics/stl/STLSink.h>
 
 #include <map>
 #include <limits>
@@ -37,10 +39,10 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ElementSurface::ElementSurface(const STL &stl) :
+ElementSurface::ElementSurface(STLSource &source, Task *task) :
   dim(3), finalized(false), count(0) {
   vbufs[0] = 0;
-  read(stl);
+  read(source, task);
 }
 
 
@@ -181,36 +183,51 @@ void ElementSurface::clear() {
 }
 
 
-void ElementSurface::read(const STL &stl) {
+void ElementSurface::read(STLSource &source, Task *task) {
   if (dim != 3) THROW("STL quad export not supported");
 
   clear();
-  count = stl.size();
-  vertices.resize(count * 9);
-  normals.resize(count * 9);
 
-  for (unsigned i = 0; i < count; i++) {
-    const Facet &f = stl[i];
-    Vector3R n = f.getNormal();
-    unsigned offset = i * 9;
+  uint32_t facets = source.getFacetCount(); // ASCII STL files return 0
+  if (facets) {
+    normals.reserve(9 * facets);
+    vertices.reserve(9 * facets);
+  }
+
+  Vector3F v[3];
+  Vector3F n;
+
+  for (unsigned i = 0; source.hasMore(); i++) {
+    // Read facet
+    source.readFacet(v[0], v[1], v[2], n);
 
     // Normals
     for (unsigned j = 0; j < 3; j++)
       for (unsigned k = 0; k < 3; k++)
-        normals[offset + j * 3 + k] = n[k]; // STL has only a face normal
+        normals.push_back(n[k]); // STL has only a face normal
 
     // Vertices
     for (unsigned j = 0; j < 3; j++) {
       for (unsigned k = 0; k < 3; k++)
-        vertices[offset + j * 3 + k] = f[j][k];
+        vertices.push_back(v[j][k]);
 
-      bounds.add(f[j]);
+      bounds.add(v[j]);
     }
+
+    if (task) {
+      if (!facets && 100000 < i) i = 0;
+      task->update((double)i / (facets ? facets : 100000),
+                   "Reading STL surface");
+    }
+
+    count++;
   }
+
+  task->update(1, "Idle");
 }
 
 
-void ElementSurface::write(STL &stl) {
+void ElementSurface::write(STLSink &sink, Task *task) const {
   if (dim != 3) THROW("STL quad export not supported");
 
   Vector3R p[3];
@@ -230,7 +247,9 @@ void ElementSurface::write(STL &stl) {
       for (unsigned k = 0; k < 3; k++)
         p[j][k] = vertices[offset + j * 3 + k];
 
-    stl.push_back(Facet(p[0], p[1], p[2], normal));
+    sink.writeFacet(p[0], p[1], p[2], normal);
+
+    if (task) task->update((double)i / count, "Writing STL surface");
   }
 }
 
