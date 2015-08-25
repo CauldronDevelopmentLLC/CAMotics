@@ -20,8 +20,6 @@
 
 #include "ToolPath.h"
 
-#include <camotics/stl/STL.h>
-
 #include <cbang/json/Sink.h>
 
 #include <string>
