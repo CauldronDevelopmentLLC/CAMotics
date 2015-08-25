@@ -20,17 +20,17 @@
 .sconsign.dblite
 
 # Build byproducts
-build
-config.log
-package.txt
+/build
+/config.log
+/package.txt
 
 # Backup files
 *~
 
 # Programs
-camotics
-tplang
-gcodetool
-camoprobe
-camosim
-camoopt
+/camotics
+/tplang
+/gcodetool
+/camoprobe
+/camosim
+/camoopt
