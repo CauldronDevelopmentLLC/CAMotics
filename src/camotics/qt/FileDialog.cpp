@@ -23,6 +23,7 @@
 #include "QtWin.h"
 
 #include <cbang/os/SystemUtilities.h>
+#include <cbang/log/Logger.h>
 
 #include <QString>
 
@@ -43,9 +44,17 @@ string FileDialog::open(const string &title, const string &filters,
   setAcceptMode(save ? AcceptSave : AcceptOpen);
   setConfirmOverwrite(save);
 
-  if (!filename.empty()) {
+  if (filename.empty()) {
     selectFile(QString());
-    setDirectory(QString::fromAscii(filename.c_str()));
+    setDirectory(SystemUtilities::getcwd().c_str());
+
+  } else if (SystemUtilities::isDirectory(filename)) {
+    selectFile(QString());
+    setDirectory(filename.c_str());
+
+  } else {
+    selectFile(SystemUtilities::basename(filename).c_str());
+    setDirectory(SystemUtilities::dirname(filename).c_str());
   }
 
   if (exec() != Accepted) return "";

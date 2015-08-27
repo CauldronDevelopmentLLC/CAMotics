@@ -621,19 +621,19 @@ void QtWin::redraw(bool now) {
 
 
 void QtWin::snapshot() {
-  string filename;
+  string filename = project->getFilename();
   QPixmap pixmap;
 
   switch (currentUIView) {
   case SIMULATION_VIEW:
-    filename = SystemUtilities::basename(project->getFilename());
-    filename = SystemUtilities::splitExt(filename)[0];
     pixmap = QPixmap::fromImage(ui->simulationView->grabFrameBuffer(true));
     break;
 
   case TOOL_VIEW:
     if (currentTool.isNull()) return;
-    filename = String::printf("tool%d", currentTool->getNumber());
+    filename = SystemUtilities::
+      joinPath(SystemUtilities::dirname(filename),
+               String::printf("tool%d", currentTool->getNumber()));
     pixmap = QPixmap::grabWidget(ui->toolView);
     break;
 
@@ -648,7 +648,7 @@ void QtWin::snapshot() {
   }
   fileTypes += ")";
 
-  filename += ".png";
+  filename = SystemUtilities::swapExtension(filename, "png");
   filename = openFile("Save snapshot", fileTypes, filename, true);
   if (filename.empty()) return;
 
@@ -679,9 +679,9 @@ void QtWin::exportData() {
     SSTR((exportSurface ? "STL" : "JSON") << " Files ("
          << (exportSurface ? "*.stl" : "*.json") << ");;All Files (*.*)");
 
-  string filename = SystemUtilities::basename(project->getFilename());
-  vector<string> parts = SystemUtilities::splitExt(filename);
-  filename = parts[0] + (exportSurface ? ".stl" : ".json");
+  string filename = project->getFilename();
+  filename =
+    SystemUtilities::swapExtension(filename, (exportSurface ? "stl" : "json"));
 
   filename = openFile(title, fileTypes, filename, true);
 
@@ -703,7 +703,11 @@ void QtWin::exportData() {
 
 
 string QtWin::openFile(const string &title, const string &filters,
-                       const string &filename, bool save) {
+                       const string &_filename, bool save) {
+  string filename = _filename;
+  if (filename.empty() && !project.isNull())
+    filename = SystemUtilities::dirname(project->getFilename());
+
   return fileDialog.open(title, filters, filename, save);
 }
 
@@ -824,13 +828,8 @@ bool QtWin::saveProject(bool saveAs) {
   string filename = project->getFilename();
 
   if (saveAs || filename.empty()) {
-    if (!filename.empty()) {
-      string ext = SystemUtilities::extension(filename);
-
-      if (ext.empty()) filename += ".xml";
-      else if (ext != "xml")
-        filename = filename.substr(0, filename.length() - ext.length()) + "xml";
-    }
+    if (!filename.empty())
+      filename = SystemUtilities::swapExtension(filename, "xml");
 
     filename = openFile("Save Project", "Projects (*.xml)", filename, true);
     if (filename.empty()) return false;
