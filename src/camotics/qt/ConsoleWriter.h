@@ -27,19 +27,20 @@
 
 
 namespace CAMotics {
-  class ConsoleWriter {
-    QTextEdit *console;
+  class ConsoleWriter : public QTextEdit {
+    Q_OBJECT;
 
     std::vector<std::string> lines;
 
   public:
-    ConsoleWriter() : console(0) {}
+    ConsoleWriter(QWidget *parent = 0) : QTextEdit(parent) {}
 
   public:
-    void setConsole(QTextEdit *console) {this->console = console;}
-
     void append(const std::string &line) {lines.push_back(line);}
     void writeToConsole();
+
+    // From QTextEdit
+    void mouseDoubleClickEvent(QMouseEvent *e);
   };
 }
 

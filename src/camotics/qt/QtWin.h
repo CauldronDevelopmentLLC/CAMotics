@@ -29,7 +29,6 @@
 #include "ToolPathThread.h"
 #include "SurfaceThread.h"
 #include "ReduceThread.h"
-#include "ConsoleWriter.h"
 
 #include <camotics/Real.h>
 #include <camotics/view/GL.h>
@@ -61,6 +60,7 @@ namespace CAMotics {
   class ToolPath;
   class CutWorkpiece;
   class FileTabManager;
+  class ConsoleWriter;
 
   class QtWin : public QMainWindow {
     Q_OBJECT;
@@ -125,7 +125,6 @@ namespace CAMotics {
     } ui_view_t;
     ui_view_t currentUIView;
 
-    ConsoleWriter consoleWriter;
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
   public:
@@ -194,6 +193,7 @@ namespace CAMotics {
     void addFile();
     void removeFile();
     bool checkSave(bool canCancel = true);
+    void activateFile(const std::string &filename, int line = -1, int col = -1);
 
     void updateActions();
     void updateUnits();

@@ -44,7 +44,8 @@ FileTabManager::FileTabManager(QtWin &win, QTabWidget &tabWidget,
   QObject(&win), win(win), tabWidget(tabWidget), offset(offset) {}
 
 
-void FileTabManager::open(const cb::SmartPointer<NCFile> &file) {
+void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
+                          int line, int col) {
   // Check if we already have this file open in a tab
   unsigned tab;
   for (tab = offset; tab < (unsigned)tabWidget.count(); tab++)
@@ -80,8 +81,29 @@ void FileTabManager::open(const cb::SmartPointer<NCFile> &file) {
     QApplication::restoreOverrideCursor();
   }
 
+  // Get editor
+  NCEdit *editor = (NCEdit *)tabWidget.widget(tab);
+
   // Switch to tab
   tabWidget.setCurrentIndex(tab);
+
+  // Select line and column
+  if (0 < line) {
+    QTextCursor c = editor->textCursor();
+
+    c.setPosition(0, QTextCursor::MoveAnchor);
+    c.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, line - 1);
+
+    if (0 < col)
+      c.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, col);
+
+    c.select(QTextCursor::LineUnderCursor);
+
+    editor->setTextCursor(c);
+  }
+
+  // Grab focus
+  editor->grabKeyboard();
 }
 
 
@@ -100,6 +122,9 @@ const SmartPointer<NCFile> &FileTabManager::getFile(unsigned tab) const {
 bool FileTabManager::checkSave(unsigned tab) {
   if (!isModified(tab)) return true;
 
+  // Select tab
+  tabWidget.setCurrentIndex(tab);
+
   int response =
     QMessageBox::question(&win, "File Modified", "The current file has "
                           "been modifed.  Would you like to save it?",
@@ -108,6 +133,34 @@ bool FileTabManager::checkSave(unsigned tab) {
 
   if (response == QMessageBox::Yes) save(tab);
   else if (response == QMessageBox::Cancel) return false;
+  return true;
+}
+
+
+bool FileTabManager::checkSaveAll() {
+  bool all = false;
+
+  for (int tab = offset; tab < tabWidget.count(); tab++)
+    if (isModified(tab)) {
+      if (!all) {
+        // Select tab
+        tabWidget.setCurrentIndex(tab);
+
+        int response =
+          QMessageBox::question(&win, "File Modified", "The current file has "
+                                "been modifed.  Would you like to save?",
+                                QMessageBox::Cancel | QMessageBox::No |
+                                QMessageBox::Save | QMessageBox::SaveAll,
+                                QMessageBox::SaveAll);
+
+        if (response == QMessageBox::SaveAll) all = true;
+        if (response == QMessageBox::No) continue;
+        if (response == QMessageBox::Cancel) return false;
+      }
+
+      save(tab);
+    }
+
   return true;
 }
 

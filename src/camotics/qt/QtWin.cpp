@@ -143,8 +143,7 @@ QtWin::QtWin(Application &app) :
   ui->console->setTextColor(QColor("#d9d9d9"));
 
   // Setup console stream
-  consoleWriter.setConsole(ui->console);
-  consoleStream = new LineBufferStream<ConsoleWriter>(consoleWriter);
+  consoleStream = new LineBufferStream<ConsoleWriter>(*ui->console);
   Logger::instance().setScreenStream(*consoleStream);
 }
 
@@ -917,9 +916,7 @@ void QtWin::removeFile() {
 
 
 bool QtWin::checkSave(bool canCancel) {
-  for (int tab = 2; tab < ui->tabWidget->count(); tab++)
-    if (!fileTabManager->checkSave(tab)) return false;
-
+  if (!fileTabManager->checkSaveAll()) return false;
   if (project.isNull() || !project->isDirty()) return true;
 
   int response =
@@ -932,6 +929,12 @@ bool QtWin::checkSave(bool canCancel) {
   if (response == QMessageBox::Yes) return saveProject();
   else if (response != QMessageBox::No) return false;
   return true;
+}
+
+
+void QtWin::activateFile(const string &filename, int line, int col) {
+  SmartPointer<NCFile> file = project->findFile(filename);
+  if (!file.isNull()) fileTabManager->open(file, line, col);
 }
 
 
@@ -1426,7 +1429,7 @@ void QtWin::animate() {
     }
 
     // Copy log
-    consoleWriter.writeToConsole();
+    ui->console->writeToConsole();
 
   } CBANG_CATCH_ERROR;
 
@@ -1788,6 +1791,7 @@ void QtWin::on_actionStop_triggered() {
 
 
 void QtWin::on_actionRun_triggered() {
+  fileTabManager->checkSaveAll();
   reload(true);
 }
 

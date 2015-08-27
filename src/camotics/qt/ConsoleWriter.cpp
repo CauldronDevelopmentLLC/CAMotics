@@ -19,6 +19,7 @@
 \******************************************************************************/
 
 #include "ConsoleWriter.h"
+#include "QtWin.h"
 
 #include <cbang/String.h>
 #include <cbang/log/Logger.h>
@@ -26,6 +27,7 @@
 
 #include <QColor>
 #include <QByteArray>
+#include <QTextBlock>
 
 #include <iostream>
 
@@ -35,8 +37,6 @@ using namespace CAMotics;
 
 
 void ConsoleWriter::writeToConsole() {
-  if (!console) THROW("Console not set");
-
   // Only access lines while holding cb::Logger lock
   SmartLock lock(&Logger::instance());
 
@@ -45,7 +45,7 @@ void ConsoleWriter::writeToConsole() {
 
     cout << line << endl;
 
-    QColor saveColor = console->textColor();
+    QColor saveColor = QTextEdit::textColor();
 
     if (4 < line.size() && line[0] == 27 && line[1] == '[' && line[4] == 'm') {
 
@@ -73,15 +73,37 @@ void ConsoleWriter::writeToConsole() {
       }
 
       line = line.substr(5);
-      console->setTextColor(color);
+      QTextEdit::setTextColor(color);
     }
 
     if (String::endsWith(line, "\033[0m"))
       line = line.substr(0, line.size() - 4);
 
-    console->append(QByteArray(line.c_str()));
-    console->setTextColor(saveColor);
+    QTextEdit::append(QByteArray(line.c_str()));
+    QTextEdit::setTextColor(saveColor);
   }
 
   lines.clear();
+}
+
+
+void ConsoleWriter::mouseDoubleClickEvent(QMouseEvent *e) {
+  QTextEdit::mouseDoubleClickEvent(e);
+
+  QByteArray array = textCursor().block().text().toUtf8();
+  string line = string(array.data(), array.length());
+
+  vector<string> groups;
+  String::find(line, "((ERROR)|(WARNING)):"
+               "\\s*(at)?\\s*(([^:]+:[^\\d])?[^:]+):(\\d+)(:(\\d+))?", &groups);
+
+  if (7 < groups.size()) {
+    string filename = groups[5];
+    uint32_t line = String::parseU32(groups[7]);
+    uint32_t column = groups[9].empty() ? 0 : String::parseU32(groups[9]);
+
+    QtWin *win = dynamic_cast<QtWin *>(window());
+    if (!win) LOG_ERROR("Failed to get window");
+    else win->activateFile(filename, line, column);
+  }
 }

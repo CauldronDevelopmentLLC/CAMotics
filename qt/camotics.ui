@@ -270,7 +270,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTextEdit" name="console">
+         <widget class="CAMotics::ConsoleWriter" name="console">
           <property name="styleSheet">
            <string notr="true">QTextEdit {
   background-color: #343434;
@@ -3406,6 +3406,11 @@
    <class>CAMotics::GLView</class>
    <extends>QWidget</extends>
    <header>camotics/qt/GLView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CAMotics::ConsoleWriter</class>
+   <extends>QTextEdit</extends>
+   <header>camotics/qt/ConsoleWriter.h</header>
   </customwidget>
  </customwidgets>
  <resources>
