@@ -59,14 +59,15 @@ void ToolPath::print(ostream &stream, bool metric) const {
     switch (move.getType()) {
     case MoveType::MOVE_RAPID: stream << "G0"; break;
     case MoveType::MOVE_CUTTING: stream << "G1"; break;
-    case MoveType::MOVE_PROBE: stream << "G1"; break; // TODO
-    case MoveType::MOVE_DRILL: stream << "G1"; break; // TODO
+    case MoveType::MOVE_PROBE: stream << "G1"; break;
+    case MoveType::MOVE_DRILL: stream << "G1"; break;
     }
 
     // Axes
     for (unsigned axis = 0; axis < 9; axis++)
       if (start.getIndex(axis) != end.getIndex(axis)) {
         double value = end.getIndex(axis);
+        // TODO revisit this
         if (fabs(value) < 0.0000000000001) value = 0;
         stream << ' ' << Axes::toAxis(axis)
                << String::printf("%.8g", value * scale);
