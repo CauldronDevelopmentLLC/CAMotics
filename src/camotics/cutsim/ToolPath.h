@@ -46,7 +46,7 @@ namespace CAMotics {
     const cb::SmartPointer<ToolTable> &getTools() const {return tools;}
 
     void add(const Move &move);
-    void print(std::ostream &stream) const;
+    void print(std::ostream &stream, bool metric = true) const;
     void write(cb::JSON::Sink &sink) const;
 
     using std::vector<Move>::operator[];

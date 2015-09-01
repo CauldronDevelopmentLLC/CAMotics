@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>225</width>
-    <height>325</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>225</width>
-    <height>325</height>
+    <height>400</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>225</width>
-    <height>325</height>
+    <height>446</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -121,6 +121,58 @@
        <widget class="QRadioButton" name="asciiSTLRadioButton">
         <property name="text">
          <string>ASCII (Text)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="gcodeRadioButton">
+     <property name="text">
+      <string>GCode</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="gcodeFrame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>30</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Units</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="metricUnitsRadioButton">
+        <property name="text">
+         <string>Metric</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="imperialUnitsRadioButton">
+        <property name="text">
+         <string>Imperial</string>
         </property>
        </widget>
       </item>

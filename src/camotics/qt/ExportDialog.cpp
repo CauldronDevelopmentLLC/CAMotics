@@ -33,14 +33,18 @@ ExportDialog::ExportDialog() : ui(new Ui::ExportDialog) {
 void ExportDialog::enableSurface(bool enable) {
   ui->surfaceFrame->setEnabled(enable && surfaceSelected());
   ui->surfaceRadioButton->setEnabled(enable);
-  if (!enable) ui->simDataRadioButton->setChecked(true);
+}
+
+
+void ExportDialog::enableGCode(bool enable) {
+  ui->gcodeFrame->setEnabled(enable && gcodeSelected());
+  ui->gcodeRadioButton->setEnabled(enable);
 }
 
 
 void ExportDialog::enableSimData(bool enable) {
-  ui->simDataFrame->setEnabled(enable && !surfaceSelected());
+  ui->simDataFrame->setEnabled(enable && simDataSelected());
   ui->simDataRadioButton->setEnabled(enable);
-  if (!enable) ui->surfaceRadioButton->setChecked(true);
 }
 
 
@@ -49,8 +53,23 @@ bool ExportDialog::surfaceSelected() const {
 }
 
 
+bool ExportDialog::gcodeSelected() const {
+  return ui->gcodeRadioButton->isChecked();
+}
+
+
+bool ExportDialog::simDataSelected() const {
+  return ui->simDataRadioButton->isChecked();
+}
+
+
 bool ExportDialog::binarySTLSelected() const {
   return ui->binarySTLRadioButton->isChecked();
+}
+
+
+bool ExportDialog::metricUnitsSelected() const {
+  return ui->metricUnitsRadioButton->isChecked();
 }
 
 
@@ -61,11 +80,20 @@ bool ExportDialog::compactJSONSelected() const {
 
 void ExportDialog::on_surfaceRadioButton_clicked() {
   ui->surfaceFrame->setEnabled(true);
+  ui->gcodeFrame->setEnabled(false);
+  ui->simDataFrame->setEnabled(false);
+}
+
+
+void ExportDialog::on_gcodeRadioButton_clicked() {
+  ui->surfaceFrame->setEnabled(false);
+  ui->gcodeFrame->setEnabled(true);
   ui->simDataFrame->setEnabled(false);
 }
 
 
 void ExportDialog::on_simDataRadioButton_clicked() {
   ui->surfaceFrame->setEnabled(false);
+  ui->gcodeFrame->setEnabled(false);
   ui->simDataFrame->setEnabled(true);
 }

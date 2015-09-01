@@ -664,34 +664,50 @@ void QtWin::exportData() {
   }
 
   exportDialog.enableSurface(!surface.isNull());
+  exportDialog.enableGCode(!sim.isNull());
   exportDialog.enableSimData(!sim.isNull());
 
   // Run dialog
   if (exportDialog.exec() != QDialog::Accepted) return;
 
   // Select output file
-  bool exportSurface  = exportDialog.surfaceSelected() && !surface.isNull();
+  string title = "Export ";
+  string fileTypes;
+  string ext;
 
-  string title = string("Export ") +
-    (exportSurface ? "Surface" : "Simulation Data");
-  string fileTypes =
-    SSTR((exportSurface ? "STL" : "JSON") << " Files ("
-         << (exportSurface ? "*.stl" : "*.json") << ");;All Files (*.*)");
+  if (exportDialog.surfaceSelected()) {
+    title += "Surface";
+    fileTypes = "STL Files (*.stl)";
+    ext = "stl";
 
-  string filename = project->getFilename();
-  filename =
-    SystemUtilities::swapExtension(filename, (exportSurface ? "stl" : "json"));
+  } else if (exportDialog.gcodeSelected()) {
+    title += "GCode";
+    fileTypes = "GCode Files (*.gcode, *.nc, *.ngc)";
+    ext = "gcode";
 
+  } else {
+    title += "Simulation Data";
+    fileTypes = "JSON Files (*.json)";
+    ext = "json";
+  }
+
+  fileTypes += ";;All Files (*.*)";
+
+  // Open output file
+  string filename = SystemUtilities::swapExtension(project->getFilename(), ext);
   filename = openFile(title, fileTypes, filename, true);
 
   if (filename.empty()) return;
   SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::out);
 
   // Export
-  if (exportSurface) {
+  if (exportDialog.surfaceSelected()) {
     string hash = sim.isNull() ? "" : sim->computeHash();
     bool binary = exportDialog.binarySTLSelected();
     surface->writeSTL(*stream, binary, "CAMotics Surface", hash);
+
+  } else if (exportDialog.gcodeSelected()) {
+    sim->path->print(*stream, exportDialog.metricUnitsSelected());
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());

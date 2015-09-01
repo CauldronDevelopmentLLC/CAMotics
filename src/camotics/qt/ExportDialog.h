@@ -39,14 +39,20 @@ namespace CAMotics {
     ExportDialog();
 
     void enableSurface(bool enable);
+    void enableGCode(bool enable);
     void enableSimData(bool enable);
 
     bool surfaceSelected() const;
+    bool gcodeSelected() const;
+    bool simDataSelected() const;
+
     bool binarySTLSelected() const;
+    bool metricUnitsSelected() const;
     bool compactJSONSelected() const;
 
   protected slots:
     void on_surfaceRadioButton_clicked();
+    void on_gcodeRadioButton_clicked();
     void on_simDataRadioButton_clicked();
   };
 }

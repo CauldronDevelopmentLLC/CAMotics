@@ -43,9 +43,12 @@ void ToolPath::add(const Move &move) {
 }
 
 
-void ToolPath::print(ostream &stream) const {
+void ToolPath::print(ostream &stream, bool metric) const {
   real lastFeed = 0;
   real lastSpeed = 0;
+  real scale = metric ? 1 : (1 / 25.4);
+
+  stream << (metric ? "G21 (metric)\n" : "G20 (imperial)\n");
 
   for (unsigned i = 0; i < size(); i++) {
     const Move &move = at(i);
@@ -66,12 +69,13 @@ void ToolPath::print(ostream &stream) const {
         double value = end.getIndex(axis);
         // TODO revisit this
         if (fabs(value) < 0.0000000000001) value = 0;
-        stream << ' ' << Axes::toAxis(axis) << String::printf("%.14g", value);
+        stream << ' ' << Axes::toAxis(axis)
+               << String::printf("%.8g", value * scale);
       }
 
     // Feed
     if (move.getType() != MoveType::MOVE_RAPID) {
-      if (move.getFeed() != lastFeed) stream << " F" << move.getFeed();
+      if (move.getFeed() != lastFeed) stream << " F" << move.getFeed() * scale;
       lastFeed = move.getFeed();
     }
 
