@@ -38,6 +38,7 @@
 #include <cbang/os/SystemInfo.h>
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/util/DefaultCatch.h>
+#include <cbang/util/SmartFunctor.h>
 #include <cbang/time/TimeInterval.h>
 
 #include <limits>
@@ -48,7 +49,7 @@ using namespace CAMotics;
 
 
 CutSim::CutSim(Options &options) :
-  Machine(options), threads(SystemInfo::instance().getCPUCount()) {
+  Machine(options), threads(SystemInfo::instance().getCPUCount()), errors(0) {
   options.pushCategory("Simulation");
   options.addTarget("threads", threads, "Number of simulation threads.");
   options.popCategory();
@@ -61,30 +62,40 @@ CutSim::~CutSim() {}
 SmartPointer<ToolPath>
 CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
                         const vector<string> &files) {
-  // Setup
+  // Task tracking
   Task::begin();
+  SmartFunctor<Task, double (Task::*)()> endTask(this, &Task::end);
+
+  // Setup
+  clearErrors();
   Machine::reset();
   Controller controller(*this, tools);
   path = new ToolPath(tools);
 
   // Interpret code
-  try {
-    for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {
-      if (!SystemUtilities::exists(files[i])) continue;
+  for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {
+    if (!SystemUtilities::exists(files[i])) continue;
 
-      Task::update(0, "Running " + files[i]);
+    Task::update(0, "Running " + files[i]);
 
-      if (String::endsWith(files[i], ".tpl")) {
-        tplang::TPLContext ctx(cout, *this, controller.getToolTable());
-        ctx.pushPath(files[i]);
+    if (String::endsWith(files[i], ".tpl")) {
+      tplang::TPLContext ctx(cout, *this, controller.getToolTable());
+      ctx.pushPath(files[i]);
+      try {
         tplang::Interpreter(ctx).read(files[i]);
+      } catch (const Exception &e) {
+        LOG_ERROR(e);
+        errors++;
+      }
 
-      } else // Assume GCode
-        Interpreter(controller, SmartPointer<Task>::Phony(this)).read(files[i]);
+    } else {
+      // Assume GCode
+      Interpreter interp(controller, SmartPointer<Task>::Phony(this));
+      interp.read(files[i]);
+      errors += interp.getErrorCount();
     }
-  } CATCH_ERROR;
+  }
 
-  Task::end();
   return path.adopt();
 }
 

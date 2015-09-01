@@ -41,8 +41,6 @@ function gear(teeth, depth, diameter, peak, trough, hole) {
   rapid({z: zSafe});
 }
 
-asfasdf
-
 gear(24, 8, 100, 0.8, -0.8, 6);
 translate(85, 25);
 gear(12, 8, 50, 0.8, -0.8, 4);

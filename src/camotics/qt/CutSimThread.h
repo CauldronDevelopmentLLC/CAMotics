@@ -43,6 +43,8 @@ namespace CAMotics {
                  const cb::SmartPointer<CutSim> &cutSim) :
       BackgroundThread(app, event, parent), cutSim(cutSim) {}
 
+    unsigned getErrorCount() const {return cutSim->getErrorCount();}
+
     // From cb::Thread
     void stop();
   };

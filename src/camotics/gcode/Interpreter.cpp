@@ -31,9 +31,13 @@ using namespace CAMotics;
 
 
 void Interpreter::read(const InputSource &source) {
+  Parser parser(getTask());
+
   try {
-    Parser(getTask()).parse(source, *this);
+    parser.parse(source, *this);
   } catch (const EndProgram &) {}
+
+  errors += parser.getErrorCount();
 }
 
 

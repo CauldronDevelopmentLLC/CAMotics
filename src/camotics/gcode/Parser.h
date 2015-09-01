@@ -45,9 +45,14 @@ namespace CAMotics {
 
   class Parser {
     cb::SmartPointer<Task> task;
+    unsigned errors;
 
   public:
-    Parser(const cb::SmartPointer<Task> &task = new Task) : task(task) {}
+    Parser(const cb::SmartPointer<Task> &task = new Task) :
+      task(task), errors(0) {}
+
+    void resetErrorCount() {errors = 0;}
+    unsigned getErrorCount() {return errors;}
 
     void parse(Tokenizer &tokenizer, Processor &processor,
                unsigned maxErrors = 32);

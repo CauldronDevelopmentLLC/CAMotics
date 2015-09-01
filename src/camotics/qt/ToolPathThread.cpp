@@ -42,8 +42,10 @@ ToolPathThread::ToolPathThread(Application &app, int event, QWidget *parent,
 
 void ToolPathThread::run() {
   v8::Locker locker;
+
   try {
     path = cutSim->computeToolPath(tools, files);
   } CATCH_ERROR;
+
   completed();
 }

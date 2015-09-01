@@ -44,8 +44,6 @@ using namespace CAMotics;
 
 void Parser::parse(CAMotics::Tokenizer &tokenizer, Processor &processor,
                    unsigned maxErrors) {
-  unsigned errors = 0;
-
   while (!task->shouldQuit()) {
     try {
       if (!parseOne(tokenizer, processor)) break;

@@ -44,10 +44,14 @@ namespace CAMotics {
   class CutSim : public Machine, public Task {
     unsigned threads;
     cb::SmartPointer<ToolPath> path;
+    unsigned errors;
 
   public:
     CutSim(cb::Options &options);
     ~CutSim();
+
+    void clearErrors() {errors = 0;}
+    unsigned getErrorCount() const {return errors;}
 
     cb::SmartPointer<ToolPath>
     computeToolPath(const cb::SmartPointer<ToolTable> &tools,

@@ -29,10 +29,15 @@
 
 namespace CAMotics {
   class Interpreter : public OCodeInterpreter, public cb::Reader {
+  protected:
+    unsigned errors;
+
   public:
     Interpreter(Controller &controller,
                 const cb::SmartPointer<Task> &task = new Task) :
-      OCodeInterpreter(controller, task) {}
+      OCodeInterpreter(controller, task), errors(0) {}
+
+    unsigned getErrorCount() const {return errors;}
 
     // From cb::Reader
     void read(const cb::InputSource &source);

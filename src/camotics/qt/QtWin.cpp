@@ -486,6 +486,16 @@ void QtWin::warning(const string &msg) {
 
 void QtWin::toolPathComplete() {
   toolPathThread->join();
+
+  if (toolPathThread->getErrorCount()) {
+    const char *msg = "Errors were encountered during tool path generation.  "
+      "See the console output for more details";
+
+    QMessageBox::critical(this, "Tool path errors", msg, QMessageBox::Ok);
+
+    showConsole();
+  }
+
   toolPath = toolPathThread->getPath();
 
   // Update changed Project settings
