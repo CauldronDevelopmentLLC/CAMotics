@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '0.3.0'
+version = '1.0.0'
 major, minor, revision = version.split('.')
 
 # Setup
@@ -187,6 +187,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         description = description,
         prefix = '/usr',
         icons = ('osx/camotics.icns', 'images/camotics.png'),
+        platform_independent = ('lib'),
 
         documents = ['README.md', 'CHANGELOG.md'] + examples,
         programs = map(lambda x: str(x[0]), execs),
@@ -200,16 +201,19 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_section = 'miscellaneous',
         deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
             'libexpat1, libsqlite3-0, libqtcore4, libqtgui4, libqt4-opengl, ' +\
-            'libcairo2, libv8-dev',
+            'libcairo2',
         deb_priority = 'optional',
+        deb_replaces = 'openscam',
 
         rpm_license = 'GPLv2+',
         rpm_group = 'Applications/Engineering',
-        rpm_requires = 'expat, bzip2-libs',
+        rpm_requires = 'expat, bzip2-libs, libqtcore4, libqtgui4, ' +\
+            'libqt4-opengl, libcairo2',
+        rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics',
-        app_resources = [['osx/Resources', '.']],
-        app_copyright = 'Copyright 2011-2014, Cauldron Development LLC',
+        app_resources = [['osx/Resources', '.'], ['lib', 'lib']],
+        app_copyright = 'Copyright 2011-2015, Cauldron Development LLC',
         app_signature = 'camo',
         app_other_info = {
             'CFBundleExecutable': 'camotics', # Overrides 'programs'

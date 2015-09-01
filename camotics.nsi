@@ -91,6 +91,11 @@ Section -Install
   File "$%%QT4DIR%%\plugins\imageformats\qtga4.dll"
   File "$%%QT4DIR%%\plugins\imageformats\qtiff4.dll"
 
+  ; Libs
+  SetOverwrite on
+  SetOutPath "$INSTDIR\lib"
+  File /r "lib\*.*"
+
   ; Examples
   SetOverwrite on
   SetOutPath "$INSTDIR\examples"

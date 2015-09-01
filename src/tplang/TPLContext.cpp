@@ -51,6 +51,14 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
 
   set("dxf", addModule(new DXFModule(*this)));
 
+  // Add system search paths
+  addSearchPaths("/usr/share/tplang");
+  addSearchPaths("/usr/share/camotics");
+  addSearchPaths(SystemUtilities::getExecutablePath() + "/lib");
+#ifdef __APPLE__
+  addSearchPaths(SystemUtilities::getExecutablePath() + "/Resources/lib");
+#endif
+
   // Add search paths
   const char *paths = SystemUtilities::getenv("TPL_PATH");
   if (paths) addSearchPaths(paths);
