@@ -1948,7 +1948,7 @@ void QtWin::on_actionHelp_triggered() {
 }
 
 
-void QtWin::on_actionCutSurface_activated() {
+void QtWin::on_actionCutSurface_triggered() {
   PROTECT_UI_UPDATE;
 
   view->setFlag(View::WIRE_FLAG, false);
@@ -1964,7 +1964,7 @@ void QtWin::on_actionCutSurface_activated() {
 }
 
 
-void QtWin::on_actionWorkpieceSurface_activated() {
+void QtWin::on_actionWorkpieceSurface_triggered() {
   PROTECT_UI_UPDATE;
 
   view->setFlag(View::WIRE_FLAG, false);
@@ -1980,7 +1980,7 @@ void QtWin::on_actionWorkpieceSurface_activated() {
 }
 
 
-void QtWin::on_actionWireSurface_activated() {
+void QtWin::on_actionWireSurface_triggered() {
   PROTECT_UI_UPDATE;
 
   view->setFlag(View::WIRE_FLAG, true);
@@ -1996,7 +1996,7 @@ void QtWin::on_actionWireSurface_activated() {
 }
 
 
-void QtWin::on_actionHideSurface_activated() {
+void QtWin::on_actionHideSurface_triggered() {
   PROTECT_UI_UPDATE;
 
   view->setFlag(View::SHOW_SURFACE_FLAG, false);

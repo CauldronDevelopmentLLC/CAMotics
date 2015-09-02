@@ -324,10 +324,10 @@ namespace CAMotics {
     void on_actionTopView_triggered() {snapView('t');}
     void on_actionBottomView_triggered() {snapView('b');}
 
-    void on_actionCutSurface_activated();
-    void on_actionWorkpieceSurface_activated();
-    void on_actionWireSurface_activated();
-    void on_actionHideSurface_activated();
+    void on_actionCutSurface_triggered();
+    void on_actionWorkpieceSurface_triggered();
+    void on_actionWireSurface_triggered();
+    void on_actionHideSurface_triggered();
     void on_actionTool_triggered(bool checked);
     void on_actionWorkpieceBounds_triggered(bool checked);
     void on_actionAxes_triggered(bool checked);
