@@ -195,6 +195,9 @@ if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
 
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
+    qt_pkgs = 'libqtcore%(qt)s, libqtgui%(qt)s, libqt%(qt)s-opengl' % \
+        {'qt': qt_version}
+
     pkg = env.Packager(
         'CAMotics',
         version = version,
@@ -220,15 +223,13 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
         deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
-            'libqtcore%(qt)s, libqtgui%(qt)s, libqt%(qt)s-opengl, libcairo2' % \
-            {qt: qt_version},
+            'libcairo2, ' + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
         rpm_license = 'GPLv2+',
         rpm_group = 'Applications/Engineering',
-        rpm_requires = ('expat, bzip2-libs, libqtcore%(qt), libqtgui%(qt), ' +\
-            'libqt%(qt)-opengl, libcairo2') % {qt: qt_version},
+        rpm_requires = 'expat, bzip2-libs, libcairo2, ' + qt_pkgs,
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics',
