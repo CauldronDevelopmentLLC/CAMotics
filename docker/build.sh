@@ -4,7 +4,7 @@ BUILD=true
 CMD=/host/build.sh
 
 if [ "$DEBUG" == "" ]; then DEBUG=0; fi
-if [ "$DOCKERFILE" == "" ]; then DOCKERFILE=Dockerfile.qt4; fi
+if [ "$DOCKERFILE" == "" ]; then DOCKERFILE=ubuntu/precise/qt4/Dockerfile; fi
 if [ "$DOCKERTAG" == "" ]; then DOCKERTAG=camotics-ubuntu-precise; fi
 
 for i in "$@"; do
@@ -12,7 +12,7 @@ for i in "$@"; do
         -d) DEBUG=1 ;;
         -r) BUILD=false ;;
         -s) CMD=/bin/bash ;;
-        -5) DOCKERFILE=Dockerfile.qt5 ;;
+        -5) DOCKERFILE=ubuntu/precise/qt5/Dockerfile ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo "  -d         Build in debug mode."
