@@ -1508,7 +1508,7 @@ void QtWin::on_unitsComboBox_currentIndexChanged(int value) {
 }
 
 
-void QtWin::on_positionSlider_sliderMoved(int position) {
+void QtWin::on_positionSlider_valueChanged(int position) {
   view->path->setByRatio((double)position / 10000);
   redraw();
 }

@@ -261,7 +261,7 @@ namespace CAMotics {
     void on_resolutionDoubleSpinBox_valueChanged(double value);
     void on_unitsComboBox_currentIndexChanged(int value);
 
-    void on_positionSlider_sliderMoved(int position);
+    void on_positionSlider_valueChanged(int position);
 
     void on_projectTreeView_activated(const QModelIndex &index);
     void on_projectTreeView_customContextMenuRequested(QPoint point);
