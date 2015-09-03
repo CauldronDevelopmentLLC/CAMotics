@@ -18,47 +18,17 @@
 
 \******************************************************************************/
 
-#include "GLView.h"
-
-#include "QtWin.h"
 #include "GLEWInit.h"
 
-#include <QGLFormat>
+#include <camotics/view/GL.h>
 
-using namespace CAMotics;
-
-
-GLView::GLView(QWidget *parent) :
-  QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::SampleBuffers), parent), id(0),
-  qtWin(0) {}
+#include <cbang/Exception.h>
 
 
-void GLView::mousePressEvent(QMouseEvent *event) {
-  if (qtWin) qtWin->glViewMousePressEvent(id, event);
-}
-
-
-void GLView::mouseMoveEvent(QMouseEvent *event) {
-  if (qtWin) qtWin->glViewMouseMoveEvent(id, event);
-}
-
-
-void GLView::wheelEvent(QWheelEvent *event) {
-  if (qtWin) qtWin->glViewWheelEvent(id, event);
-}
-
-
-void GLView::initializeGL() {
-  GLEWInit();
-  if (qtWin) qtWin->initializeGL(id);
-}
-
-
-void GLView::resizeGL(int w, int h) {
-  if (qtWin) qtWin->resizeGL(id, w, h);
-}
-
-
-void GLView::paintGL() {
-  if (qtWin) qtWin->paintGL(id);
+namespace CAMotics {
+  void GLEWInit() {
+    GLenum err = glewInit();
+    if (err != GLEW_OK)
+      THROWS("Initializing GLEW: " << glewGetErrorString(err));
+  }
 }

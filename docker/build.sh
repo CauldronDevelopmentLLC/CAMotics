@@ -31,24 +31,29 @@ if [ "$DOCKER_GUEST" == "true" ]; then
         exit 1
     fi
 
-    NCORES=$(grep -c ^processor /proc/cpuinfo)
-
     cd
+
+    NCORES=$(grep -c ^processor /proc/cpuinfo)
+    export SCONS_OPTIONS=$PWD/scons-options.py
+    (
+        echo "mostly_static=1"
+        echo "prefer_dynamic='m'"
+        echo "debug=$DEBUG"
+        echo "compiler='clang'"
+        echo "num_jobs=$NCORES"
+    ) > $SCONS_OPTIONS
 
     export CBANG_HOME=$PWD/cbang
 
-    export GCC=/usr/bin/clang
-    export GXX=/usr/bin/clang++
-
     rm -rf cbang &&
     git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git &&
-    scons -C cbang -j$NCORES debug=$DEBUG compiler=clang &&
+    scons -C cbang &&
 
     rm -rf CAMotics &&
     git clone --depth=1 \
       https://github.com/CauldronDevelopmentLLC/CAMotics.git &&
-    scons -C CAMotics -j$NCORES mostly_static=1 prefer_dynamic=m debug=$DEBUG compiler=clang &&
-    scons -C CAMotics -j$NCORES mostly_static=1 prefer_dynamic=m package &&
+    scons -C CAMotics &&
+    scons -C CAMotics package &&
 
     cp CAMotics/camo{tics,sim,opt,probe} CAMotics/camotics_*.deb /host/ &&
 
