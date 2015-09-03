@@ -29,7 +29,7 @@ using namespace CAMotics;
 
 
 Workpiece::Workpiece(const Rectangle3R &r) :
-  Rectangle3R(r), center(getCenter()) {
-  Vector3R halfDim = getDimensions() / 2;
+  Rectangle3R(r), center(r.getCenter()) {
+  Vector3R halfDim = r.getDimensions() / 2;
   halfDim2 = halfDim * halfDim;
 }
