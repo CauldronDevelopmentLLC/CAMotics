@@ -91,8 +91,8 @@ void QtApp::run() {
   QApplication qtApp(argc, (char **)&args[0]);
 
   string org = Info::instance().get(getName(), "Organization");
-  QCoreApplication::setOrganizationName(QString::fromAscii(org.c_str()));
-  QCoreApplication::setApplicationName(QString::fromAscii(getName().c_str()));
+  QCoreApplication::setOrganizationName(QString::fromLatin1(org.c_str()));
+  QCoreApplication::setApplicationName(QString::fromLatin1(getName().c_str()));
 
   QtWin qtWin(*this);
   qtWin.init();

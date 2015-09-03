@@ -119,9 +119,9 @@ QVariant ProjectModel::data(const QModelIndex &index, int role) const {
   switch (getType(index)) {
   case PROJECT_ITEM: return QString("Project");
   case PATHS_ITEM: return QString("Paths");
-  case FILE_ITEM: return QString::fromAscii(getFile(offset).c_str());
+  case FILE_ITEM: return QString::fromLatin1(getFile(offset).c_str());
   case TOOLS_ITEM: return QString("Tools");
-  case TOOL_ITEM: return QString::fromAscii(getToolString(offset).c_str());
+  case TOOL_ITEM: return QString::fromLatin1(getToolString(offset).c_str());
   case WORKPIECE_ITEM: return QString("Workpiece");
   default: return QVariant();
   }

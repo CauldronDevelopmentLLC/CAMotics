@@ -39,8 +39,8 @@ FileDialog::FileDialog(QtWin &win) : QFileDialog(&win), win(win) {
 
 string FileDialog::open(const string &title, const string &filters,
                         const string &filename, bool save) {
-  setWindowTitle(QString::fromAscii(title.c_str()));
-  setNameFilter(QString::fromAscii(filters.c_str()));
+  setWindowTitle(QString::fromLatin1(title.c_str()));
+  setNameFilter(QString::fromLatin1(filters.c_str()));
   setAcceptMode(save ? AcceptSave : AcceptOpen);
   setConfirmOverwrite(save);
 
@@ -61,7 +61,7 @@ string FileDialog::open(const string &title, const string &filters,
 
   QStringList names = selectedFiles();
   if (!names.size()) return "";
-  string path = names.at(0).toAscii().data();
+  string path = names.at(0).toLatin1().data();
 
   if (SystemUtilities::isDirectory(path)) {
     win.warning("Cannot open directory");
