@@ -195,8 +195,8 @@ if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
 
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
-    qt_pkgs = 'libqtcore%(qt)s, libqtgui%(qt)s, libqt%(qt)s-opengl' % \
-        {'qt': qt_version}
+    if qt_version == '5': qt_pkgs = 'libqt5core5a, libqt5gui5, libqt5opengl5'
+    else: qt_pkgs = 'libqtcore4, libqtgui4, libqt4-opengl'
 
     pkg = env.Packager(
         'CAMotics',

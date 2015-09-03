@@ -144,14 +144,16 @@ namespace CAMotics {
       // Simulate
       if (!time) time = numeric_limits<double>::max();
       SmartPointer<Simulation> sim = project.makeSim(path, time);
-      SmartPointer<Surface> surface = cutSim.computeSurface(*sim);
+      SmartPointer<Surface> surface;
+      if (!shouldQuit()) surface = cutSim.computeSurface(*sim);
 
       // Reduce
-      if (reduce) cutSim.reduceSurface(*surface);
+      if (reduce && !shouldQuit()) cutSim.reduceSurface(*surface);
 
       // Export surface
-      surface->writeSTL(*output, binary, "CAMotics Surface",
-                        sim->computeHash());
+      if (shouldQuit())
+        surface->writeSTL(*output, binary, "CAMotics Surface",
+                          sim->computeHash());
     }
 
 
