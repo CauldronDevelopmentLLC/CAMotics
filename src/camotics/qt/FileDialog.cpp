@@ -37,6 +37,11 @@ FileDialog::FileDialog(QtWin &win) : QFileDialog(&win), win(win) {
 }
 
 
+static bool is_writable(const string &path) {
+  return QFileInfo(path.c_str()).isWritable();
+}
+
+
 string FileDialog::open(const string &title, const string &filters,
                         const string &filename, bool save) {
   setWindowTitle(QString::fromLatin1(title.c_str()));
@@ -44,18 +49,25 @@ string FileDialog::open(const string &title, const string &filters,
   setAcceptMode(save ? AcceptSave : AcceptOpen);
   setConfirmOverwrite(save);
 
+  string cwd = SystemUtilities::getcwd();
+  string dir;
+
   if (filename.empty()) {
     selectFile(QString());
-    setDirectory(SystemUtilities::getcwd().c_str());
+    dir = cwd;
 
   } else if (SystemUtilities::isDirectory(filename)) {
     selectFile(QString());
-    setDirectory(filename.c_str());
+    dir = filename;
 
   } else {
     selectFile(SystemUtilities::basename(filename).c_str());
-    setDirectory(SystemUtilities::dirname(filename).c_str());
+    dir = SystemUtilities::dirname(filename);
   }
+
+  if (is_writable(dir)) setDirectory(dir.c_str());
+  else if (is_writable(cwd)) setDirectory(cwd.c_str());
+  else setDirectory(QDir::homePath());
 
   if (exec() != Accepted) return "";
 

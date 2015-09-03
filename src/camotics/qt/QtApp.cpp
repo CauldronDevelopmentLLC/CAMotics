@@ -66,6 +66,12 @@ int QtApp::init(int argc, char *argv[]) {
   int ret = cb::Application::init(argc, argv);
   if (ret < 0) return ret;
 
+#if 0x050000 < QT_VERSION
+  QGuiApplication guiApp(argc, argv);
+  QScreen *screen = guiApp.primaryScreen();
+  Info::instance().add("System", "DPI", String(screen->logicalDotsPerInch()));
+#endif
+
   printInfo();
 
   // Get project file

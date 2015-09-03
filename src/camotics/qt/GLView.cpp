@@ -24,6 +24,9 @@
 
 #include <QGLFormat>
 
+extern "C" int glewInit();
+extern "C" const char *glewGetErrorString(int err);
+
 using namespace CAMotics;
 
 
@@ -48,6 +51,9 @@ void GLView::wheelEvent(QWheelEvent *event) {
 
 
 void GLView::initializeGL() {
+  int err = glewInit();
+  if (err) THROWS("Initializing GLEW: " << glewGetErrorString(err));
+
   if (qtWin) qtWin->initializeGL(id);
 }
 

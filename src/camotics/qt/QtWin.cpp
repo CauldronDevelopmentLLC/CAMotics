@@ -69,9 +69,9 @@ QtWin::QtWin(Application &app) :
   app(app), options(app.getOptions()), cutSim(new CutSim(options)),
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
-  dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), currentTool(0), autoPlay(false), autoClose(false),
-  currentUIView(NULL_VIEW) {
+  lastRedraw(0), dirty(false), simDirty(false), inUIUpdate(false),
+  lastProgress(0), lastStatusActive(false), currentTool(0), autoPlay(false),
+  autoClose(false), currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
   ui->simulationView->init(SIMULATION_VIEW, this);
@@ -157,7 +157,7 @@ void QtWin::init() {
   // Start animation timer
   animationTimer.setSingleShot(false);
   connect(&animationTimer, SIGNAL(timeout()), this, SLOT(animate()));
-  animationTimer.start(100);
+  animationTimer.start(50);
 
   // Simulation and Tool View tabs are not closeable
   ui->tabWidget->setTabsClosable(true);
@@ -437,9 +437,6 @@ void QtWin::glViewWheelEvent(unsigned id, QWheelEvent *event) {
 void QtWin::initializeGL(unsigned id) {
   LOG_DEBUG(5, "initializeGL(" << id << ")");
 
-  GLenum err = glewInit();
-  if (err != GLEW_OK) THROWS("Initializing GLEW: " << glewGetErrorString(err));
-
   switch (id) {
   case SIMULATION_VIEW:
     view->glInit();
@@ -613,7 +610,9 @@ void QtWin::reduce() {
 
 
 void QtWin::redraw(bool now) {
-  if (now) {
+  if (now && 0.05 < Timer::now() - lastRedraw) {
+    lastRedraw = Timer::now();
+
     switch (currentUIView) {
     case SIMULATION_VIEW:
       updateWorkpieceBounds();

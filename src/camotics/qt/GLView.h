@@ -25,8 +25,6 @@
 #include <winsock2.h> // Must come before below
 #endif
 
-#include <camotics/view/GL.h>
-
 #include <QGLWidget>
 
 

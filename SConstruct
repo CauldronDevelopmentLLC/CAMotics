@@ -13,7 +13,9 @@ env = Environment(ENV = os.environ,
                   TARGET_ARCH = os.environ.get('TARGET_ARCH', 'x86'))
 env.Tool('config', toolpath = [cbang])
 env.CBAddVariables(
-    ('install_prefix', 'Installation directory prefix', '/usr/local/'))
+    ('install_prefix', 'Installation directory prefix', '/usr/local/'),
+    EnumVariable('qt_version', 'Version of Qt to use', 'auto',
+                 allowed_values = ('auto', '4', '5')))
 env.CBLoadTools(
     'compiler cbang dist freetype2 opengl build_info packager')
 conf = env.CBConfigure()
@@ -22,8 +24,25 @@ conf = env.CBConfigure()
 env.Replace(PACKAGE_VERSION = version)
 env.Replace(BUILD_INFO_NS = 'CAMotics::BuildInfo')
 
-# Qt4 tool
-env.Tool('qt4', toolpath = ['./config'])
+# Qt5 tool
+qt_version = env.get('qt_version')
+if qt_version in ('auto', '5'):
+    try:
+        env.Tool('qt5', toolpath = ['./config'])
+        qt_version = '5'
+        env.EnableQtModules = env.EnableQt5Modules
+        env.Uic = env.Uic5
+        env.Qrc = env.Qrc5
+    except:
+        qt_version = '4'
+
+if qt_version == '4':
+    # Qt4 tool
+    env.Tool('qt4', toolpath = ['./config'])
+    qt_version = '4'
+    env.EnableQtModules = env.EnableQt4Modules
+    env.Uic = env.Uic4
+    env.Qrc = env.Qrc4
 
 # Dist
 if 'dist' in COMMAND_LINE_TARGETS:
@@ -51,7 +70,8 @@ if not env.GetOption('clean'):
     env.CBDefine('GLEW_STATIC')
 
     # Qt
-    env.EnableQt4Modules('QtCore QtGui QtOpenGL'.split())
+    env.EnableQtModules('QtCore QtGui QtOpenGL'.split())
+    env.Append(CCFLAGS = ['-fPIC'])
 
     conf.CBConfig('freetype2')
     conf.CBConfig('opengl')
@@ -90,12 +110,12 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 
 # Qt
-uic = [env.Uic4('build/ui_camotics.h', 'qt/camotics.ui')]
+uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
 for dialog in 'export about donate new'.split():
-    uic.append(env.Uic4('build/ui_%s_dialog.h' % dialog,
-                        'qt/%s_dialog.ui' % dialog))
+    uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
+                       'qt/%s_dialog.ui' % dialog))
 
-qrc = env.Qrc4('build/qrc_camotics.cpp', 'qt/camotics.qrc')
+qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
 src += qrc
 
 # Build Info
@@ -200,14 +220,15 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
         deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
-            'libqtcore4, libqtgui4, libqt4-opengl, libcairo2',
+            'libqtcore%(qt)s, libqtgui%(qt)s, libqt%(qt)s-opengl, libcairo2' % \
+            {qt: qt_version},
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
         rpm_license = 'GPLv2+',
         rpm_group = 'Applications/Engineering',
-        rpm_requires = 'expat, bzip2-libs, libqtcore4, libqtgui4, ' +\
-            'libqt4-opengl, libcairo2',
+        rpm_requires = ('expat, bzip2-libs, libqtcore%(qt), libqtgui%(qt), ' +\
+            'libqt%(qt)-opengl, libcairo2') % {qt: qt_version},
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics',

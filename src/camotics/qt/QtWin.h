@@ -31,7 +31,6 @@
 #include "ReduceThread.h"
 
 #include <camotics/Real.h>
-#include <camotics/view/GL.h>
 #include <camotics/view/View.h>
 #include <camotics/view/ToolView.h>
 #include <camotics/value/ValueSet.h>
@@ -42,8 +41,12 @@
 #include <cbang/iostream/LineBufferDevice.h>
 #endif
 
+#include <QtGlobal>
+#if QT_VERSION < 0x050000
 #include <QtGui>
-
+#else
+#include <QtWidgets>
+#endif
 
 namespace cb {class Application;}
 namespace Ui {class CAMoticsWindow;}
@@ -106,6 +109,7 @@ namespace CAMotics {
     cb::SmartPointer<SurfaceThread> surfaceThread;
     cb::SmartPointer<ReduceThread> reduceThread;
 
+    double lastRedraw;
     bool dirty;
     bool simDirty;
     unsigned inUIUpdate;
