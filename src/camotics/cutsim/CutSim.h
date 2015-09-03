@@ -54,7 +54,7 @@ namespace CAMotics {
     unsigned getErrorCount() const {return errors;}
 
     cb::SmartPointer<ToolPath>
-    computeToolPath(const cb::SmartPointer<ToolTable> &tools,
+    computeToolPath(const ToolTable &tools,
                     const std::vector<std::string> &files);
     cb::SmartPointer<ToolPath> computeToolPath(const Project &project);
 

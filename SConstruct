@@ -200,8 +200,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
         deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
-            'libexpat1, libsqlite3-0, libqtcore4, libqtgui4, libqt4-opengl, ' +\
-            'libcairo2',
+            'libqtcore4, libqtgui4, libqt4-opengl, libcairo2',
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 

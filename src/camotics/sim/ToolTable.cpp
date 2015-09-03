@@ -42,14 +42,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ToolTable::ToolTable() {
+ToolTable::ToolTable() : current(-1) {
   clear();
-}
-
-
-ToolTable::ToolTable(const ToolTable &o) {
-  for (const_iterator it = o.begin(); it != o.end(); it++)
-    add(new Tool(*it->second));
 }
 
 
@@ -58,27 +52,35 @@ bool ToolTable::has(unsigned tool) const {
 }
 
 
-const SmartPointer<Tool> &ToolTable::get(unsigned tool) {
+const Tool &ToolTable::get(unsigned tool) const {
+  const_iterator it = find(tool);
+  if (it != end()) return it->second;
+
+  THROWS("Non-existant tool " << tool);
+}
+
+
+Tool &ToolTable::get(unsigned tool) {
   iterator it = find(tool);
   if (it != end()) return it->second;
 
   LOG_WARNING("Auto-creating non-existant tool " << tool);
-  return (*this)[tool] = new Tool(tool);
+  return (*this)[tool] = Tool(tool);
 }
 
 
-void ToolTable::add(SmartPointer<Tool> tool) {
-  if (!insert(value_type(tool->getNumber(), tool)).second)
-    THROWS("Tool with number " << tool->getNumber()
+void ToolTable::add(const Tool &tool) {
+  if (!insert(value_type(tool.getNumber(), tool)).second)
+    THROWS("Tool with number " << tool.getNumber()
            << " already in tool table");
 
-  LOG_INFO(3, "Added tool " << tool->getNumber() << " with radius "
-           << tool->getRadius());
+  LOG_INFO(3, "Added tool " << tool.getNumber() << " with radius "
+           << tool.getRadius());
 }
 
 
 void ToolTable::clear() {
-  map<unsigned, SmartPointer<Tool> >::clear();
+  map<unsigned, Tool>::clear();
   add(Tool::null); // Tool zero
 }
 
@@ -98,13 +100,13 @@ void ToolTable::operator()(const SmartPointer<Block> &block) {
     unsigned number = T->getValue();
     unsigned pocket = P ? P->getValue() : number;
 
-    SmartPointer<Tool> tool = new Tool(number, pocket);
+    Tool tool(number, pocket);
 
-    if (D) tool->setRadius(D->getValue() / 2);
+    if (D) tool.setRadius(D->getValue() / 2);
 
     for (const char *c = "XYZABCUVWIJQ"; *c; c++) {
       Word *word = block->findWord(*c);
-      if (word) tool->set(*c, word->getValue());
+      if (word) tool.set(*c, word->getValue());
     }
 
     // Add tool
@@ -132,10 +134,9 @@ void ToolTable::startElement(const string &name, const XMLAttributes &attrs) {
     if (attrs.has("number")) number = String::parseU32(attrs["number"]);
     else number = size();
 
-    SmartPointer<Tool> tool = new Tool(number);
-    current = tool;
-
-    tool->read(attrs);
+    Tool tool(number);
+    current = number;
+    tool.read(attrs);
 
     add(tool);
   }
@@ -143,18 +144,20 @@ void ToolTable::startElement(const string &name, const XMLAttributes &attrs) {
 
 
 void ToolTable::endElement(const std::string &name) {
-  current = 0;
+  current = -1;
 }
 
 
 void ToolTable::text(const std::string &text) {
-  if (!current.isNull()) {
+  if (0 <= current) {
     string desc = String::trim(text);
     if (!desc.empty()) {
-      if (!current->getDescription().empty())
-        desc = current->getDescription() + " " + desc;
+      Tool &tool = get(current);
 
-      current->setDescription(desc);
+      if (!tool.getDescription().empty())
+        desc = tool.getDescription() + " " + desc;
+
+      tool.setDescription(desc);
     }
   }
 }
@@ -163,7 +166,7 @@ void ToolTable::text(const std::string &text) {
 void ToolTable::write(XMLWriter &writer) const {
   writer.startElement("tool_table");
   for (const_iterator it = begin(); it != end(); it++)
-    if (it->second->getNumber()) it->second->write(writer);
+    if (it->second.getNumber()) it->second.write(writer);
   writer.endElement("tool_table");
 }
 
@@ -172,9 +175,9 @@ void ToolTable::write(JSON::Sink &sink) const {
   sink.beginDict();
 
   for (const_iterator it = begin(); it != end(); it++)
-    if (it->second->getNumber()) {
-      sink.beginInsert(String(it->second->getNumber()));
-      it->second->write(sink, false);
+    if (it->second.getNumber()) {
+      sink.beginInsert(String(it->second.getNumber()));
+      it->second.write(sink, false);
     }
 
   sink.endDict();

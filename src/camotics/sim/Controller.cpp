@@ -39,12 +39,9 @@ using namespace tplang;
 using namespace CAMotics;
 
 
-Controller::Controller(MachineInterface &machine,
-                       const SmartPointer<ToolTable> &tools) : tools(tools) {
+Controller::Controller(MachineInterface &machine, const ToolTable &tools) :
+  tools(tools) {
   this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
-
-  if (tools.isNull()) this->tools = new ToolTable;
-
   reset();
 }
 

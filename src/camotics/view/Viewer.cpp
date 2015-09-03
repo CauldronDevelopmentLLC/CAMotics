@@ -123,9 +123,9 @@ void Viewer::draw(const View &view) {
     glTranslatef(currentPosition.x(), currentPosition.y(),
                  currentPosition.z());
 
-    ToolTable &tools = *view.path->getPath()->getTools();
+    const ToolTable &tools = view.path->getPath()->getTools();
     const Move &move = view.path->getMove();
-    const Tool &tool = *tools.get(move.getTool());
+    const Tool &tool = tools.get(move.getTool());
     double diameter = tool.getDiameter();
     double radius = tool.getRadius();
     double length = tool.getLength();

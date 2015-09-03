@@ -36,7 +36,7 @@ namespace CAMotics {
   class Project;
 
   class ToolPathThread : public CutSimThread {
-    cb::SmartPointer<ToolTable> tools;
+    ToolTable tools;
     std::vector<std::string> files;
     cb::SmartPointer<ToolPath> path;
 

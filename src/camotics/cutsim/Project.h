@@ -27,6 +27,7 @@
 
 #include <camotics/Geom.h>
 #include <camotics/sim/ToolUnits.h>
+#include <camotics/sim/ToolTable.h>
 
 #include <cbang/config/OptionProxy.h>
 
@@ -41,7 +42,7 @@ namespace CAMotics {
     cb::OptionProxy options;
     std::string filename;
 
-    cb::SmartPointer<ToolTable> tools;
+    ToolTable tools;
 
     double resolution;
 
@@ -71,7 +72,8 @@ namespace CAMotics {
     void setFilename(const std::string &filename);
     std::string getDirectory() const;
 
-    const cb::SmartPointer<ToolTable> &getToolTable() const {return tools;}
+    const ToolTable &getToolTable() const {return tools;}
+    ToolTable &getToolTable() {return tools;}
 
     void setUnits(ToolUnits units);
     ToolUnits getUnits() const;

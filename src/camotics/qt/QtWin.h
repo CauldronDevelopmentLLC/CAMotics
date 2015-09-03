@@ -112,7 +112,7 @@ namespace CAMotics {
     double lastProgress;
     std::string lastStatus;
     bool lastStatusActive;
-    cb::SmartPointer<Tool> currentTool;
+    Tool *currentTool;
     bool autoPlay;
     bool autoClose;
     std::string defaultExample;

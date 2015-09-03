@@ -60,8 +60,7 @@ CutSim::~CutSim() {}
 
 
 SmartPointer<ToolPath>
-CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
-                        const vector<string> &files) {
+CutSim::computeToolPath(const ToolTable &tools, const vector<string> &files) {
   // Task tracking
   Task::begin();
   SmartFunctor<Task, double (Task::*)()> endTask(this, &Task::end);
@@ -79,8 +78,9 @@ CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
     Task::update(0, "Running " + files[i]);
 
     if (String::endsWith(files[i], ".tpl")) {
-      tplang::TPLContext ctx(cout, *this, controller.getToolTable());
+      tplang::TPLContext ctx(cout, *this, tools);
       ctx.pushPath(files[i]);
+
       try {
         tplang::Interpreter(ctx).read(files[i]);
       } catch (const Exception &e) {
@@ -101,14 +101,12 @@ CutSim::computeToolPath(const SmartPointer<ToolTable> &tools,
 
 
 SmartPointer<ToolPath> CutSim::computeToolPath(const Project &project) {
-  SmartPointer<ToolTable> tools = project.getToolTable();
-
   vector<string> files;
   Project::iterator it;
   for (it = project.begin(); it != project.end(); it++)
     files.push_back((*it)->getAbsolutePath());
 
-  return computeToolPath(tools, files);
+  return computeToolPath(project.getToolTable(), files);
 }
 
 

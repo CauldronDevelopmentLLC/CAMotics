@@ -35,6 +35,7 @@ namespace CAMotics {
     Workpiece(const Rectangle3R &r);
 
     Rectangle3R getBounds() const {return *this;}
+    bool isValid() const {return getVolume();}
 
     // From FieldFunction
     bool contains(const Vector3R &p) {return Rectangle3R::contains(p);}

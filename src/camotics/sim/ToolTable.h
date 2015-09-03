@@ -25,7 +25,6 @@
 
 #include <camotics/gcode/Processor.h>
 
-#include <cbang/SmartPointer.h>
 #include <cbang/xml/XMLHandlerFactory.h>
 #include <cbang/xml/XMLHandler.h>
 
@@ -34,18 +33,18 @@
 
 namespace CAMotics {
   class ToolTable :
-    public std::map<unsigned, cb::SmartPointer<Tool> >, public Processor,
+    public std::map<unsigned, Tool>, public Processor,
     public cb::XMLHandlerFactory, public cb::XMLHandler {
 
-    cb::SmartPointer<Tool> current; ///< Used during XML parsing
+    int current; ///< Used during XML parsing
 
   public:
     ToolTable();
-    ToolTable(const ToolTable &o);
 
     bool has(unsigned tool) const;
-    const cb::SmartPointer<Tool> &get(unsigned tool);
-    void add(cb::SmartPointer<Tool> tool);
+    const Tool &get(unsigned tool) const;
+    Tool &get(unsigned tool);
+    void add(const Tool &tool);
     void clear();
 
     // From Processor

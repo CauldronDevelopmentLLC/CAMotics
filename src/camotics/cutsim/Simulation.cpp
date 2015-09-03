@@ -57,13 +57,13 @@ void Simulation::write(JSON::Sink &sink) const {
   sink.beginDict();
 
   sink.beginInsert("tools");
-  tools->write(sink);
+  tools.write(sink);
 
   sink.beginInsert("path");
   path->write(sink);
 
   sink.beginInsert("workpiece");
-  workpiece->write(sink);
+  workpiece.write(sink);
 
   sink.insert("resolution", resolution);
   sink.insert("time", time);

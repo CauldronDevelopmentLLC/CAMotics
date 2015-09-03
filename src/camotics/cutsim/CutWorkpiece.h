@@ -33,16 +33,16 @@
 namespace CAMotics {
   class CutWorkpiece : public FieldFunction {
     cb::SmartPointer<ToolSweep> toolSweep;
-    cb::SmartPointer<Workpiece> workpiece;
+    Workpiece workpiece;
 
     uint64_t samples;
 
   public:
     CutWorkpiece(cb::SmartPointer<ToolSweep> toolSweep,
-                 cb::SmartPointer<Workpiece> workpiece);
+                 const Workpiece &workpiece);
 
-    cb::SmartPointer<ToolSweep> getToolSweep() {return toolSweep;}
-    cb::SmartPointer<Workpiece> getWorkpiece() {return workpiece;}
+    const cb::SmartPointer<ToolSweep> &getToolSweep() const {return toolSweep;}
+    const Workpiece &getWorkpiece() const {return workpiece;}
 
     uint64_t getSampleCount() const {return samples;}
     void clearSampleCount() {samples = 0;}

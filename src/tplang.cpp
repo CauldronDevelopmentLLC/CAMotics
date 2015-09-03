@@ -46,12 +46,11 @@ using namespace CAMotics;
 
 namespace CAMotics {
   class TPLangApp : public Application {
-    cb::SmartPointer<ToolTable> tools;
+    ToolTable tools;
     tplang::MachinePipeline pipeline;
 
   public:
-    TPLangApp() :
-      Application("Tool Path Language"), tools(new ToolTable) {
+    TPLangApp() : Application("Tool Path Language") {
 
       pipeline.add(new MachineUnitAdapter);
       pipeline.add(new MachineLinearizer);

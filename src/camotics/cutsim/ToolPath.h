@@ -24,6 +24,7 @@
 #include "Move.h"
 
 #include <camotics/Geom.h>
+#include <camotics/sim/ToolTable.h>
 
 #include <vector>
 #include <ostream>
@@ -32,18 +33,18 @@
 namespace cb {namespace JSON {class Sink;}}
 
 namespace CAMotics {
-  class ToolTable;
   class STL;
 
   class ToolPath : public std::vector<Move>, public Rectangle3R {
-    cb::SmartPointer<ToolTable> tools;
+    ToolTable tools;
 
   public:
-    ToolPath(const cb::SmartPointer<ToolTable> &tools) : tools(tools) {}
+    ToolPath(const ToolTable &tools) : tools(tools) {}
     ~ToolPath();
 
     const Rectangle3R &getBounds() const {return *this;}
-    const cb::SmartPointer<ToolTable> &getTools() const {return tools;}
+    const ToolTable &getTools() const {return tools;}
+    ToolTable &getTools() {return tools;}
 
     void add(const Move &move);
     void print(std::ostream &stream, bool metric = true) const;

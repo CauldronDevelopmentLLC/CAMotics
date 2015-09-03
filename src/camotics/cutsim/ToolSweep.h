@@ -40,7 +40,6 @@ namespace CAMotics {
   class ToolSweep : public FieldFunction, public AABBTree {
     cb::SmartPointer<ToolPath> path;
     std::vector<cb::SmartPointer<Sweep> > sweeps;
-    cb::SmartPointer<ToolTable> tools;
     uint64_t hitTests;
     real time;
 

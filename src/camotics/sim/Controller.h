@@ -70,7 +70,7 @@ namespace CAMotics {
 
   protected:
     tplang::MachineUnitAdapter machine;
-    cb::SmartPointer<ToolTable> tools;
+    ToolTable tools;
 
     double params[MAX_ADDRESS];
     typedef std::map<std::string, double> named_t;
@@ -104,13 +104,12 @@ namespace CAMotics {
 
   public:
     Controller(tplang::MachineInterface &machine,
-               const cb::SmartPointer<ToolTable> &tools = 0);
+               const ToolTable &tools = ToolTable());
     virtual ~Controller() {}
 
     // State variables
-    const cb::SmartPointer<ToolTable> &getToolTable() {return tools;}
-    Tool &getTool(unsigned tool) {return *tools->get(tool);}
-    const Tool &getTool(unsigned tool) const {return *tools->get(tool);}
+    const ToolTable &getToolTable() {return tools;}
+    Tool &getTool(unsigned tool) {return tools.get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
 
     const cb::LocationRange &getLocation() const;

@@ -33,7 +33,7 @@ using namespace tplang;
 
 
 TPLContext::TPLContext(ostream &out, MachineInterface &machine,
-                       const SmartPointer<CAMotics::ToolTable> &tools) :
+                       const CAMotics::ToolTable &tools) :
   js::Environment(out), machine(machine), tools(tools) {
 
   // Add modules

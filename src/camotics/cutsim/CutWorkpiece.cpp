@@ -28,12 +28,12 @@ using namespace CAMotics;
 
 
 CutWorkpiece::CutWorkpiece(SmartPointer<ToolSweep> toolSweep,
-                           SmartPointer<Workpiece> workpiece) :
+                           const Workpiece &workpiece) :
   toolSweep(toolSweep), workpiece(workpiece), samples(0) {}
 
 
 bool CutWorkpiece::isValid() const {
-  if (workpiece.isNull()) return false;
+  if (workpiece.isValid()) return false;
 
   Rectangle3R bounds = getBounds();
   for (unsigned i = 0; i < 3; i++)
@@ -47,23 +47,23 @@ bool CutWorkpiece::isValid() const {
 
 Rectangle3R CutWorkpiece::getBounds() const {
   Rectangle3R bb;
-  if (!workpiece.isNull()) bb = workpiece->getBounds();
+  if (workpiece.isValid()) bb = workpiece.getBounds();
   else if (!toolSweep.isNull()) bb = toolSweep->getBounds();
   return bb;
 }
 
 
 bool CutWorkpiece::canCull(const Rectangle3R &bbox) {
-  if (workpiece.isNull()) return !toolSweep->intersects(bbox);
+  if (!workpiece.isValid()) return !toolSweep->intersects(bbox);
 
-  if (!workpiece->intersects(bbox)) return true;
+  if (!workpiece.intersects(bbox)) return true;
 
-  return workpiece->getBounds().shrink(Vector3R(0.00001)).contains(bbox) &&
+  return workpiece.getBounds().shrink(Vector3R(0.00001)).contains(bbox) &&
     !toolSweep->intersects(bbox);
 }
 
 
 bool CutWorkpiece::contains(const Vector3R &p) {
-  if (workpiece.isNull()) return toolSweep->contains(p);
-  return workpiece->contains(p) && !toolSweep->contains(p);
+  if (!workpiece.isValid()) return toolSweep->contains(p);
+  return workpiece.contains(p) && !toolSweep->contains(p);
 }

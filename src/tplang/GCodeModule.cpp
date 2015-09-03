@@ -227,7 +227,7 @@ js::Value GCodeModule::toolCB(const js::Arguments &args) {
   if (!args.getCount()) return ctx.machine.getTool();
 
   uint32_t number = args["number"].toUint32();
-  ctx.tools->get(number); // Make sure it exists
+  ctx.tools.get(number); // Make sure it exists
   ctx.machine.setTool(number);
 
   return ctx.machine.getTool();
@@ -260,28 +260,28 @@ js::Value GCodeModule::pauseCB(const js::Arguments &args) {
 
 
 js::Value GCodeModule::toolSetCB(const js::Arguments &args) {
-  SmartPointer<CAMotics::Tool> tool = ctx.tools->get(args["number"].toUint32());
+  CAMotics::Tool &tool = ctx.tools.get(args["number"].toUint32());
 
   uint32_t units;
   double scale = 1;
   if (args.has("units")) units = args["units"].toUint32();
   else units = unitAdapter.getUnits();
   if (units == MachineUnitAdapter::METRIC)
-    tool->setUnits(CAMotics::ToolUnits::UNITS_MM);
+    tool.setUnits(CAMotics::ToolUnits::UNITS_MM);
   else {
-    tool->setUnits(CAMotics::ToolUnits::UNITS_INCH);
+    tool.setUnits(CAMotics::ToolUnits::UNITS_INCH);
     scale = 25.4;
   }
 
   if (args.has("shape"))
-    tool->setShape((CAMotics::ToolShape::enum_t)args["shape"].toUint32());
+    tool.setShape((CAMotics::ToolShape::enum_t)args["shape"].toUint32());
 
-  tool->setLength(scale * args.getNumber("length"));
-  tool->setDiameter(scale * args.getNumber("diameter"));
-  tool->setSnubDiameter(scale * args.getNumber("snub"));
-  tool->setFrontAngle(args.getNumber("front_angle"));
-  tool->setBackAngle(args.getNumber("back_angle"));
-  tool->setOrientation(args.getNumber("orientation"));
+  tool.setLength(scale * args.getNumber("length"));
+  tool.setDiameter(scale * args.getNumber("diameter"));
+  tool.setSnubDiameter(scale * args.getNumber("snub"));
+  tool.setFrontAngle(args.getNumber("front_angle"));
+  tool.setBackAngle(args.getNumber("back_angle"));
+  tool.setOrientation(args.getNumber("orientation"));
 
   return js::Value();
 }

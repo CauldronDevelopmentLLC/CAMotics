@@ -50,7 +50,7 @@ namespace CAMotics {
 
   public:
     static const char *VARS;
-    static cb::SmartPointer<Tool> null;
+    static Tool null;
 
     Tool(unsigned number = 0, unsigned pocket = 0,
          ToolUnits units = ToolUnits::UNITS_MM);

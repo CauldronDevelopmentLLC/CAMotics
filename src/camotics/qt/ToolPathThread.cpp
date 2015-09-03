@@ -32,8 +32,7 @@ using namespace cb;
 ToolPathThread::ToolPathThread(Application &app, int event, QWidget *parent,
                                const SmartPointer<CutSim> &cutSim,
                                const SmartPointer<Project> &project) :
-  CutSimThread(app, event, parent, cutSim),
-  tools(new ToolTable(*project->getToolTable())) {
+  CutSimThread(app, event, parent, cutSim), tools(project->getToolTable()) {
 
   for (Project::iterator it = project->begin(); it != project->end(); it++)
     files.push_back((*it)->getAbsolutePath());

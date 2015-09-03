@@ -21,6 +21,8 @@
 #ifndef CAMOTICS_TOOL_VIEW_H
 #define CAMOTICS_TOOL_VIEW_H
 
+#include <camotics/sim/Tool.h>
+
 #include <cbang/SmartPointer.h>
 
 typedef struct _cairo cairo_t;
@@ -30,7 +32,7 @@ namespace CAMotics {
   class Tool;
 
   class ToolView {
-    cb::SmartPointer<Tool> tool;
+    Tool tool;
     cb::SmartPointer<unsigned char>::Array buffer;
 
     int width;
@@ -41,7 +43,7 @@ namespace CAMotics {
     ToolView() : width(0), height(0), stride(0) {}
     ~ToolView();
 
-    void setTool(const cb::SmartPointer<Tool> &tool) {this->tool = tool;}
+    void setTool(const Tool &tool) {this->tool = tool;}
 
     const cb::SmartPointer<unsigned char>::Array &getBuffer() const
     {return buffer;}

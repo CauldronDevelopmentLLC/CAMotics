@@ -32,7 +32,8 @@ using namespace CAMotics;
 
 
 ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
-  path(path), tools(path->getTools()), hitTests(0), time(time) {
+  path(path), hitTests(0), time(time) {
+  ToolTable &tools = path->getTools();
   vector<Rectangle3R> bboxes;
   AABB *nodes = 0;
   unsigned boxes = 0;
@@ -43,7 +44,7 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
     unsigned tool = move.getTool();
 
     if (sweeps.size() <= tool) sweeps.resize(tool + 1);
-    if (sweeps[tool].isNull()) sweeps[tool] = tools->get(tool)->getSweep();
+    if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
 
     sweeps[tool]->getBBoxes(move.getStartPt(), move.getEndPt(), bboxes);
 

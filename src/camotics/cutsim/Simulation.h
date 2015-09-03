@@ -21,6 +21,10 @@
 #ifndef CAMOTICS_SIMULATION_H
 #define CAMOTICS_SIMULATION_H
 
+#include "Workpiece.h"
+
+#include <camotics/sim/ToolTable.h>
+
 #include <cbang/SmartPointer.h>
 
 #include <string>
@@ -35,16 +39,14 @@ namespace CAMotics {
 
   class Simulation {
   public:
-    cb::SmartPointer<ToolTable> tools;
+    ToolTable tools;
     cb::SmartPointer<ToolPath> path;
-    cb::SmartPointer<Workpiece> workpiece;
+    Workpiece workpiece;
     double resolution;
     double time;
 
-    Simulation(const cb::SmartPointer<ToolTable> &tools,
-               const cb::SmartPointer<ToolPath> &path,
-               const cb::SmartPointer<Workpiece> &workpiece,
-               double resolution, double time) :
+    Simulation(const ToolTable &tools, const cb::SmartPointer<ToolPath> &path,
+               const Workpiece &workpiece, double resolution, double time) :
       tools(tools), path(path), workpiece(workpiece), resolution(resolution),
       time(time) {}
 

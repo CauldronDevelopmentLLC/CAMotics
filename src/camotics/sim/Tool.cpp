@@ -40,7 +40,8 @@ using namespace CAMotics;
 
 
 const char *Tool::VARS = "XYZABCUVWRIJQ";
-SmartPointer<Tool> Tool::null = new Tool;
+Tool Tool::null;
+
 
 Tool::Tool(unsigned number, unsigned pocket, ToolUnits units) :
   number(number), pocket(pocket), units(units),

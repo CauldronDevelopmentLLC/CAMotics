@@ -34,10 +34,10 @@ namespace tplang {
 
   public:
     MachineInterface &machine;
-    cb::SmartPointer<CAMotics::ToolTable> tools;
+    CAMotics::ToolTable tools;
 
     TPLContext(std::ostream &out, MachineInterface &machine,
-               const cb::SmartPointer<CAMotics::ToolTable> &tools);
+               const CAMotics::ToolTable &tools);
 
     using cb::js::Environment::addModule;
     cb::js::Module &addModule(const cb::SmartPointer<cb::js::Module> &module);

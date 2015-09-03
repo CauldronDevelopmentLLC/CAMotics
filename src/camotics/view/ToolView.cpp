@@ -20,8 +20,6 @@
 
 #include "ToolView.h"
 
-#include <camotics/sim/Tool.h>
-
 #include <cbang/String.h>
 
 #include <cairo/cairo.h>
@@ -52,10 +50,10 @@ void ToolView::drawGuide(cairo_t *cr, double width, double x, double y,
   cairo_show_text(cr, text);
 
   // Value
-  double scale = tool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
   string s =
     String::printf("  %0.4f%s", value / scale,
-                   tool->getUnits() == ToolUnits::UNITS_MM ? "mm" : "in");
+                   tool.getUnits() == ToolUnits::UNITS_MM ? "mm" : "in");
   cairo_show_text(cr, s.c_str());
 
   // Connector
@@ -77,8 +75,6 @@ void ToolView::resize(int width, int height) {
 
 
 void ToolView::draw() {
-  if (tool.isNull()) return;
-
   cairo_surface_t *surface = cairo_image_surface_create_for_data
     (buffer.get(), CAIRO_FORMAT_ARGB32, width, height, stride);
   if (!surface) THROW("Failed to create cairo surface");
@@ -95,13 +91,13 @@ void ToolView::draw() {
   cairo_set_source_rgba(cr, fg, fg, fg, 1);
 
   // Get tool info
-  ToolShape shape = tool->getShape();
-  double length = tool->getLength();
-  double diameter = tool->getDiameter();
+  ToolShape shape = tool.getShape();
+  double length = tool.getLength();
+  double diameter = tool.getDiameter();
   double snubDiameter =
-    shape == ToolShape::TS_SNUBNOSE ? tool->getSnubDiameter() : 0;
+    shape == ToolShape::TS_SNUBNOSE ? tool.getSnubDiameter() : 0;
   string title =
-    String::printf("Tool #%d: ", tool->getNumber()) + tool->getText();
+    String::printf("Tool #%d: ", tool.getNumber()) + tool.getText();
 
   // Margin
   int margin = 50;

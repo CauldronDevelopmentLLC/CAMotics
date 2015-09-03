@@ -57,7 +57,7 @@ string ProjectModel::getFile(const QModelIndex &index) const {
 
 
 Tool &ProjectModel::getTool(unsigned i) const {
-  ToolTable &tools = *project->getToolTable();
+  ToolTable &tools = project->getToolTable();
 
   ToolTable::iterator it = tools.begin();
   it++; // Skip tool zero
@@ -65,7 +65,7 @@ Tool &ProjectModel::getTool(unsigned i) const {
 
   if (it == tools.end()) THROW("Invalid tool index");
 
-  return *it->second;
+  return it->second;
 }
 
 
@@ -82,7 +82,7 @@ string ProjectModel::getToolString(unsigned i) const {
 
 QModelIndex ProjectModel::getToolIndex(unsigned number) const {
   // Find tool index
-  ToolTable &tools = *project->getToolTable();
+  ToolTable &tools = project->getToolTable();
   int row = -1; // Skip tool zero
   for (ToolTable::iterator it = tools.begin(); it != tools.end(); it++) {
     if (it->first == number) break;
@@ -167,7 +167,7 @@ int ProjectModel::rowCount(const QModelIndex &parent) const {
   case NULL_ITEM: return 1;
   case PROJECT_ITEM: return 3;
   case PATHS_ITEM: return project->getFileCount();
-  case TOOLS_ITEM: return project->getToolTable()->size() - 1;
+  case TOOLS_ITEM: return project->getToolTable().size() - 1;
   default: return 0;
   }
 }

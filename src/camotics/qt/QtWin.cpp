@@ -70,7 +70,7 @@ QtWin::QtWin(Application &app) :
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), autoPlay(false), autoClose(false),
+  lastStatusActive(false), currentTool(0), autoPlay(false), autoClose(false),
   currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
@@ -639,7 +639,7 @@ void QtWin::snapshot() {
     break;
 
   case TOOL_VIEW:
-    if (currentTool.isNull()) return;
+    if (!currentTool) return;
     filename = SystemUtilities::
       joinPath(SystemUtilities::dirname(filename),
                String::printf("tool%d", currentTool->getNumber()));
@@ -753,7 +753,7 @@ void QtWin::resetProject() {
   view->setToolPath(0);
   view->setWorkpiece(Rectangle3R());
   view->setSurface(0);
-  currentTool.release();
+  currentTool = 0;
   view->resetView();
 
   // Close editor tabs
@@ -1015,21 +1015,21 @@ void QtWin::loadTool(unsigned number) {
 
   if (!number) {
     // Find a tool which is not the current tool
-    ToolTable &tools = *project->getToolTable();
+    ToolTable &tools = project->getToolTable();
     for (ToolTable::iterator it = tools.begin(); it != tools.end(); it++)
       if (it->first &&
-          (currentTool.isNull() || it->first != currentTool->getNumber())) {
+          (!currentTool || it->first != currentTool->getNumber())) {
         number = it->first;
         break;
       }
 
     if (!number) {
-      currentTool.release();
+      currentTool = 0;
       return;
     }
   }
 
-  currentTool = project->getToolTable()->get(number);
+  currentTool = &project->getToolTable().get(number);
 
   real scale =
     currentTool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
@@ -1055,11 +1055,11 @@ void QtWin::loadTool(unsigned number) {
 
 void QtWin::addTool() {
   if (project.isNull()) return;
-  ToolTable &tools = *project->getToolTable();
+  ToolTable &tools = project->getToolTable();
 
   for (unsigned i = 1; i < 1000; i++)
     if (!tools.has(i)) {
-      tools.add(new Tool(i, 0, project->getUnits()));
+      tools.add(Tool(i, 0, project->getUnits()));
       loadTool(i);
       setUIView(TOOL_VIEW);
       project->markDirty();
@@ -1072,7 +1072,7 @@ void QtWin::addTool() {
 
 
 void QtWin::removeTool() {
-  project->getToolTable()->erase(currentTool->getNumber());
+  project->getToolTable().erase(currentTool->getNumber());
   project->markDirty();
   projectModel->invalidate();
   loadTool(0);
@@ -1080,7 +1080,7 @@ void QtWin::removeTool() {
 
 
 void QtWin::updateToolUI() {
-  if (currentTool.isNull()) return;
+  if (!currentTool) return;
 
   // Get widgets
   QGraphicsView &view = *ui->toolView;
@@ -1096,7 +1096,7 @@ void QtWin::updateToolUI() {
   scene.setSceneRect(0, 0, width, height);
 
   // Update tool view
-  toolView->setTool(currentTool);
+  toolView->setTool(*currentTool);
   toolView->resize(width, height);
   toolView->draw();
 
@@ -1274,7 +1274,7 @@ void QtWin::setUIView(ui_view_t uiView) {
     break;
 
   case TOOL_VIEW:
-    if (currentTool.isNull()) loadTool(0);
+    if (!currentTool) loadTool(0);
     ui->tabWidget->setCurrentIndex(1);
     ui->settingsStack->setCurrentWidget(ui->toolProperties);
     break;
@@ -1580,7 +1580,7 @@ void QtWin::on_toolSpinBox_valueChanged(int value) {
 
   if (newNum == current) return;
 
-  ToolTable &tools = *project->getToolTable();
+  ToolTable &tools = project->getToolTable();
 
   while (newNum && newNum < current && tools.has(newNum)) newNum--;
   while (current < newNum && tools.has(newNum)) newNum++;
@@ -1589,7 +1589,7 @@ void QtWin::on_toolSpinBox_valueChanged(int value) {
   if (newNum != current) {
     currentTool->setNumber(newNum);
     tools.erase(current);
-    tools.add(currentTool);
+    tools.add(*currentTool);
     project->markDirty();
   }
 
