@@ -50,7 +50,6 @@ Pad::Pad(unsigned int length, unsigned int width, int clearance, int mask) :
     p2.y() = p1.y();
   }
 
-  this->thickness = thickness;
   this->mask += thickness;
   flags = "square";
 }
