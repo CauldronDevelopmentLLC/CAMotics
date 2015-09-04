@@ -20,6 +20,7 @@
 
 #include "ToolPathTask.h"
 
+#include <camotics/TaskFilter.h>
 #include <camotics/cutsim/Project.h>
 #include <camotics/sim/Controller.h>
 #include <camotics/gcode/Interpreter.h>
@@ -31,6 +32,11 @@
 #include <cbang/util/DefaultCatch.h>
 #include <cbang/util/SmartFunctor.h>
 #include <cbang/os/SystemUtilities.h>
+
+#include <boost/ref.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/file.hpp>
+namespace io = boost::iostreams;
 
 using namespace std;
 using namespace cb;
@@ -75,9 +81,16 @@ void ToolPathTask::run() {
       }
 
     } else {
+      // Track the file load
+      TaskFilter taskFilter(*this, SystemUtilities::getFileSize(files[i]));
+      io::filtering_istream stream;
+      stream.push(boost::ref(taskFilter));
+      stream.push(io::file(files[i], ios_base::in));
+      InputSource src(stream, files[i]);
+
       // Assume GCode
       Interpreter interp(controller, SmartPointer<Task>::Phony(this));
-      interp.read(files[i]);
+      interp.read(src);
       errors += interp.getErrorCount();
     }
   }
