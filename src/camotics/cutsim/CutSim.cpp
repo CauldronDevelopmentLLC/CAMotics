@@ -20,28 +20,12 @@
 
 #include "CutSim.h"
 
-#include "Workpiece.h"
-#include "ToolPath.h"
-#include "CutWorkpiece.h"
-#include "Sweep.h"
-#include "Project.h"
+#include "ToolPathTask.h"
+#include "SurfaceTask.h"
+#include "ReduceTask.h"
 
-#include <tplang/TPLContext.h>
-#include <tplang/Interpreter.h>
-
-#include <camotics/contour/Surface.h>
-#include <camotics/gcode/Interpreter.h>
-#include <camotics/render/Renderer.h>
-#include <camotics/sim/Controller.h>
-
-#include <cbang/js/Javascript.h>
+#include <cbang/config/Options.h>
 #include <cbang/os/SystemInfo.h>
-#include <cbang/os/SystemUtilities.h>
-#include <cbang/util/DefaultCatch.h>
-#include <cbang/util/SmartFunctor.h>
-#include <cbang/time/TimeInterval.h>
-
-#include <limits>
 
 using namespace std;
 using namespace cb;
@@ -49,105 +33,36 @@ using namespace CAMotics;
 
 
 CutSim::CutSim(Options &options) :
-  Machine(options), threads(SystemInfo::instance().getCPUCount()), errors(0) {
-  options.pushCategory("Simulation");
+  threads(SystemInfo::instance().getCPUCount()) {
   options.addTarget("threads", threads, "Number of simulation threads.");
-  options.popCategory();
 }
 
 
 CutSim::~CutSim() {}
 
 
-SmartPointer<ToolPath>
-CutSim::computeToolPath(const ToolTable &tools, const vector<string> &files) {
-  // Task tracking
-  Task::begin();
-  SmartFunctor<Task, double (Task::*)()> endTask(this, &Task::end);
-
-  // Setup
-  clearErrors();
-  Machine::reset();
-  Controller controller(*this, tools);
-  path = new ToolPath(tools);
-
-  // Interpret code
-  for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {
-    if (!SystemUtilities::exists(files[i])) continue;
-
-    Task::update(0, "Running " + files[i]);
-
-    if (String::endsWith(files[i], ".tpl")) {
-      tplang::TPLContext ctx(cout, *this, tools);
-      ctx.pushPath(files[i]);
-
-      try {
-        tplang::Interpreter(ctx).read(files[i]);
-      } catch (const Exception &e) {
-        LOG_ERROR(e);
-        errors++;
-      }
-
-    } else {
-      // Assume GCode
-      Interpreter interp(controller, SmartPointer<Task>::Phony(this));
-      interp.read(files[i]);
-      errors += interp.getErrorCount();
-    }
-  }
-
-  return path.adopt();
-}
-
-
 SmartPointer<ToolPath> CutSim::computeToolPath(const Project &project) {
-  vector<string> files;
-  Project::iterator it;
-  for (it = project.begin(); it != project.end(); it++)
-    files.push_back((*it)->getAbsolutePath());
-
-  return computeToolPath(project.getToolTable(), files);
+  task = new ToolPathTask(project);
+  task->run();
+  return task.cast<ToolPathTask>()->getPath();
 }
 
 
-SmartPointer<Surface> CutSim::computeSurface(const Simulation &sim) {
-  // Setup cut simulation
-  CutWorkpiece cutWP(new ToolSweep(sim.path, sim.time), sim.workpiece);
-
-  // Render
-  Renderer renderer(SmartPointer<Task>::Phony(this));
-  return renderer.render(cutWP, threads, sim.resolution);
+SmartPointer<Surface> CutSim::computeSurface
+(const SmartPointer<Simulation> &sim, const string &filename) {
+  task = new SurfaceTask(threads, filename, sim);
+  task->run();
+  return task.cast<SurfaceTask>()->getSurface();
 }
 
 
 
 void CutSim::reduceSurface(Surface &surface) {
-  LOG_INFO(1, "Reducing");
-
-  double startCount = surface.getCount();
-
-  Task::begin();
-  Task::update(0, "Reducing...");
-
-  surface.reduce(*this);
-
-  unsigned count = surface.getCount();
-  double r = (double)(startCount - count) / startCount * 100;
-
-  double delta = Task::end();
-
-  LOG_INFO(1, "Time: " << TimeInterval(delta)
-           << String::printf(" Triangles: %u Reduction: %0.2f%%", count, r));
+  task = new ReduceTask(surface);
+  task->run();
 }
 
 
 void CutSim::interrupt() {
-  js::Javascript::terminate(); // End TPL code
-  Task::interrupt();
-}
-
-
-void CutSim::move(const Move &move) {
-  Machine::move(move);
-  path->add(move);
+  if (!task.isNull()) task->interrupt();
 }

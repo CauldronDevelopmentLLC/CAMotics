@@ -49,6 +49,8 @@ namespace CAMotics {
     void begin();
     void update(double progress, const std::string &status = std::string());
     double end();
+
+    virtual void run() {};
   };
 }
 

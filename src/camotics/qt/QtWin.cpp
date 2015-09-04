@@ -27,12 +27,14 @@
 
 #include <camotics/Geom.h>
 #include <camotics/view/Viewer.h>
-#include <camotics/cutsim/CutSim.h>
 #include <camotics/cutsim/Project.h>
 #include <camotics/cutsim/Simulation.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 #include <camotics/remote/ConnectionManager.h>
 #include <camotics/stl/STLWriter.h>
+#include <camotics/cutsim/ToolPathTask.h>
+#include <camotics/cutsim/SurfaceTask.h>
+#include <camotics/cutsim/ReduceTask.h>
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>
@@ -64,9 +66,8 @@ using namespace CAMotics;
 
 
 QtWin::QtWin(Application &app) :
-  QMainWindow(0), toolPathCompleteEvent(0), surfaceCompleteEvent(0),
-  reduceCompleteEvent(0), ui(new Ui::CAMoticsWindow), fileDialog(*this),
-  app(app), options(app.getOptions()), cutSim(new CutSim(options)),
+  QMainWindow(0), ui(new Ui::CAMoticsWindow), fileDialog(*this),
+  app(app), options(app.getOptions()),
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   lastRedraw(0), dirty(false), simDirty(false), inUIUpdate(false),
@@ -92,14 +93,13 @@ QtWin::QtWin(Application &app) :
   connect(ui->actionSelectAll, SIGNAL(triggered()),
           fileTabManager.get(), SLOT(on_actionSelectAll_triggered()));
 
+  // ConcurrentTaskManager
+  taskMan.add(this);
+  taskCompleteEvent = QEvent::registerEventType();
+
   // Disable unimplemented console buttons
   ui->errorsCheckBox->setVisible(false);
   ui->warningsCheckBox->setVisible(false);
-
-  // Register user events
-  toolPathCompleteEvent = QEvent::registerEventType();
-  surfaceCompleteEvent = QEvent::registerEventType();
-  reduceCompleteEvent = QEvent::registerEventType();
 
   // Disable view bounds
   view->setShowBounds(false);
@@ -481,10 +481,8 @@ void QtWin::warning(const string &msg) {
 }
 
 
-void QtWin::toolPathComplete() {
-  toolPathThread->join();
-
-  if (toolPathThread->getErrorCount()) {
+void QtWin::toolPathComplete(ToolPathTask &task) {
+  if (task.getErrorCount()) {
     const char *msg = "Errors were encountered during tool path generation.  "
       "See the console output for more details";
 
@@ -493,7 +491,7 @@ void QtWin::toolPathComplete() {
     showConsole();
   }
 
-  toolPath = toolPathThread->getPath();
+  toolPath = task.getPath();
 
   // Update changed Project settings
   project->updateAutomaticWorkpiece(*toolPath);
@@ -529,16 +527,14 @@ void QtWin::toolPathComplete() {
   sim = project->makeSim(toolPath, view->getTime());
 
   // Load surface
-  surfaceThread =
-    new SurfaceThread(app, surfaceCompleteEvent, this, cutSim,
-                      project->getFilename(), sim);
-  surfaceThread->start();
+  surface.release();
+  unsigned threads = options["threads"].toInteger();
+  taskMan.add(new SurfaceTask(threads, project->getFilename(), sim));
 }
 
 
-void QtWin::surfaceComplete() {
-  surfaceThread->join();
-  surface = surfaceThread->getSurface();
+void QtWin::surfaceComplete(SurfaceTask &task) {
+  surface = task.getSurface();
   view->setSurface(surface);
   redraw();
 
@@ -546,9 +542,8 @@ void QtWin::surfaceComplete() {
 }
 
 
-void QtWin::reduceComplete() {
-  reduceThread->join();
-  surface = reduceThread->getSurface();
+void QtWin::reduceComplete(ReduceTask &task) {
+  surface = task.getSurface();
   view->setSurface(surface);
   redraw();
 
@@ -559,14 +554,13 @@ void QtWin::reduceComplete() {
 void QtWin::quit() {
   stop();
   app.requestExit();
+  taskMan.join();
   QCoreApplication::exit();
 }
 
 
 void QtWin::stop() {
-  if (!toolPathThread.isNull()) toolPathThread->join();
-  if (!surfaceThread.isNull()) surfaceThread->join();
-  if (!reduceThread.isNull()) reduceThread->join();
+  taskMan.interrupt();
   setStatusActive(false);
 }
 
@@ -579,16 +573,10 @@ void QtWin::reload(bool now) {
   simDirty = false;
 
   try {
-    stop();
-
-    // Start tool path thread
-    toolPathThread =
-      new ToolPathThread(app, toolPathCompleteEvent, this, cutSim, project);
-    toolPathThread->start();
-
+    // Queue Tool Path task
+    taskMan.add(new ToolPathTask(*project));
     setStatusActive(true);
-
-  } CBANG_CATCH_ERROR;
+  } CATCH_ERROR;
 }
 
 
@@ -596,16 +584,10 @@ void QtWin::reduce() {
   if (surface.isNull()) return;
 
   try {
-    stop();
-
-    // Start tool path thread
-    reduceThread =
-      new ReduceThread(app, reduceCompleteEvent, this, cutSim, *surface);
-    reduceThread->start();
-
+    // Queue reduce task
+    taskMan.add(new ReduceTask(*surface));
     setStatusActive(true);
-
-  } CBANG_CATCH_ERROR;
+  } CATCH_ERROR;
 }
 
 
@@ -1395,17 +1377,25 @@ void QtWin::updateProgramLine(const string &name, unsigned value) {
 }
 
 
+void QtWin::taskCompleted() {
+  QCoreApplication::postEvent
+    (this, new QEvent((QEvent::Type)taskCompleteEvent));
+}
+
+
 bool QtWin::event(QEvent *event) {
-  if (toolPathCompleteEvent && event->type() == toolPathCompleteEvent)
-    toolPathComplete();
+  if (event->type() != taskCompleteEvent) return QMainWindow::event(event);
 
-  else if (surfaceCompleteEvent && event->type() == surfaceCompleteEvent)
-    surfaceComplete();
+  while (taskMan.hasMore()) {
+    SmartPointer<Task> task = taskMan.remove();
 
-  else if (reduceCompleteEvent && event->type() == reduceCompleteEvent)
-    reduceComplete();
-
-  else return QMainWindow::event(event);
+    if (task.isInstance<ToolPathTask>())
+      toolPathComplete(*task.cast<ToolPathTask>());
+    else if (task.isInstance<SurfaceTask>())
+      surfaceComplete(*task.cast<SurfaceTask>());
+    else if (task.isInstance<ReduceTask>())
+      reduceComplete(*task.cast<ReduceTask>());
+  }
 
   return true;
 }
@@ -1432,14 +1422,14 @@ void QtWin::animate() {
     if (simDirty) reload(true);
 
     // Update progress
-    double progress = cutSim->getProgress();
-    string status = cutSim->getStatus();
+    double progress = taskMan.getProgress();
+    string status = taskMan.getStatus();
     if (lastProgress != progress || lastStatus != status) {
       lastProgress = progress;
       lastStatus = status;
 
       if (progress) {
-        double eta = cutSim->getETA();
+        double eta = taskMan.getETA();
         ui->progressBar->setValue(10000 * progress);
         string s = String::printf("%.2f%% ", progress * 100);
         if (eta) s += TimeInterval(eta).toString();

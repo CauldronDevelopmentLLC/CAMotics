@@ -26,11 +26,9 @@
 #include "AboutDialog.h"
 #include "DonateDialog.h"
 #include "FileDialog.h"
-#include "ToolPathThread.h"
-#include "SurfaceThread.h"
-#include "ReduceThread.h"
 
 #include <camotics/Real.h>
+#include <camotics/ConcurrentTaskManager.h>
 #include <camotics/view/View.h>
 #include <camotics/view/ToolView.h>
 #include <camotics/value/ValueSet.h>
@@ -54,7 +52,6 @@ class QMdiSubWindow;
 
 
 namespace CAMotics {
-  class CutSim;
   class ConnectionManager;
   class Viewer;
   class Project;
@@ -64,13 +61,13 @@ namespace CAMotics {
   class CutWorkpiece;
   class FileTabManager;
   class ConsoleWriter;
+  class ToolPathTask;
+  class SurfaceTask;
+  class ReduceTask;
 
-  class QtWin : public QMainWindow {
+
+  class QtWin : public QMainWindow, public TaskObserver {
     Q_OBJECT;
-
-    int toolPathCompleteEvent;
-    int surfaceCompleteEvent;
-    int reduceCompleteEvent;
 
     cb::SmartPointer<Ui::CAMoticsWindow> ui;
     NewDialog newDialog;
@@ -83,6 +80,8 @@ namespace CAMotics {
     QByteArray fullLayoutState;
     cb::SmartPointer<ProjectModel> projectModel;
     cb::SmartPointer<FileTabManager> fileTabManager;
+    ConcurrentTaskManager taskMan;
+    int taskCompleteEvent;
 
     QIcon playIcon;
     QIcon pauseIcon;
@@ -95,7 +94,6 @@ namespace CAMotics {
     cb::Options &options;
 
     ValueSet valueSet;
-    cb::SmartPointer<CutSim> cutSim;
     cb::SmartPointer<Project> project;
     cb::SmartPointer<Simulation> sim;
     cb::SmartPointer<ConnectionManager> connectionManager;
@@ -104,10 +102,6 @@ namespace CAMotics {
     cb::SmartPointer<ToolView> toolView;
     cb::SmartPointer<ToolPath> toolPath;
     cb::SmartPointer<Surface> surface;
-
-    cb::SmartPointer<ToolPathThread> toolPathThread;
-    cb::SmartPointer<SurfaceThread> surfaceThread;
-    cb::SmartPointer<ReduceThread> reduceThread;
 
     double lastRedraw;
     bool dirty;
@@ -171,9 +165,9 @@ namespace CAMotics {
     void message(const std::string &msg);
     void warning(const std::string &msg);
 
-    void toolPathComplete();
-    void surfaceComplete();
-    void reduceComplete();
+    void toolPathComplete(ToolPathTask &task);
+    void surfaceComplete(SurfaceTask &task);
+    void reduceComplete(ReduceTask &task);
 
     void quit();
     void stop();
@@ -251,6 +245,9 @@ namespace CAMotics {
     void updateProgramLine(const std::string &name, unsigned value);
 
   protected:
+    // From TaskObserver
+    void taskCompleted();
+
     // From QMainWindow
     bool event(QEvent *event);
     void closeEvent(QCloseEvent *event);

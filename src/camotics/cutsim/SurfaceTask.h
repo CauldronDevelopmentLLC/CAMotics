@@ -18,36 +18,32 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SURFACE_THREAD_H
-#define CAMOTICS_SURFACE_THREAD_H
+#ifndef CAMOTICS_SURFACE_TASK_H
+#define CAMOTICS_SURFACE_TASK_H
 
-#include "CutSimThread.h"
-
-#include <camotics/Geom.h>
-#include <camotics/cutsim/ToolPath.h>
+#include <camotics/Task.h>
 #include <camotics/cutsim/Simulation.h>
 #include <camotics/contour/Surface.h>
 
 
 namespace CAMotics {
-  class SurfaceThread : public CutSimThread {
+  class SurfaceTask : public Task {
+    unsigned threads;
     std::string filename;
     cb::SmartPointer<Simulation> sim;
     cb::SmartPointer<Surface> surface;
 
   public:
-    SurfaceThread(cb::Application &app, int event, QWidget *parent,
-                  const cb::SmartPointer<CutSim> &cutSim,
-                  const std::string &filename,
-                  const cb::SmartPointer<Simulation> &sim) :
-      CutSimThread(app, event, parent, cutSim), filename(filename), sim(sim) {}
+    SurfaceTask(unsigned threads, const std::string &filename,
+                const cb::SmartPointer<Simulation> &sim) :
+      threads(threads), filename(filename), sim(sim) {}
 
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
 
-    // From cb::Thread
+    // From Task
     void run();
   };
 }
 
-#endif // CAMOTICS_SURFACE_THREAD_H
+#endif // CAMOTICS_SURFACE_TASK_H
 

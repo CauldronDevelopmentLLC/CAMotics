@@ -135,7 +135,7 @@ libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
 
 
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
-progs = 'camotics gcodetool camoprobe camoopt tplang camosim'
+progs = 'camotics gcodetool camprobe camopt tplang camsim'
 execs = []
 for prog in progs.split():
     p = env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])

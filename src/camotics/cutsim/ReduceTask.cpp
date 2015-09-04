@@ -18,17 +18,36 @@
 
 \******************************************************************************/
 
-#include "BackgroundThread.h"
+#include "ReduceTask.h"
 
-#include <cbang/Application.h>
+#include <camotics/contour/Surface.h>
 
-#include <QCoreApplication>
+#include <cbang/util/DefaultCatch.h>
+#include <cbang/time/TimeInterval.h>
 
+using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-void BackgroundThread::completed() {
-  if (!app.shouldQuit())
-    QCoreApplication::postEvent(parent, new QEvent((QEvent::Type)event));
+ReduceTask::ReduceTask(const Surface &surface) : surface(surface.copy()) {}
+
+
+void ReduceTask::run() {
+  LOG_INFO(1, "Reducing");
+
+  double startCount = surface->getCount();
+
+  Task::begin();
+  Task::update(0, "Reducing...");
+
+  surface->reduce(*this);
+
+  unsigned count = surface->getCount();
+  double r = (double)(startCount - count) / startCount * 100;
+
+  double delta = Task::end();
+
+  LOG_INFO(1, "Time: " << TimeInterval(delta)
+           << String::printf(" Triangles: %u Reduction: %0.2f%%", count, r));
 }

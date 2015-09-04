@@ -24,8 +24,6 @@
 #include <tplang/MachinePipeline.h>
 #include <tplang/MoveStream.h>
 
-#include <cbang/config/Options.h>
-
 #include <ostream>
 
 
@@ -37,13 +35,10 @@ namespace CAMotics {
   class Machine : public tplang::MachinePipeline, public tplang::MoveStream {
     double time;
     double distance;
-    std::string outputMoves;
-    cb::SmartPointer<std::ostream> moveStream;
-
     // TODO Load machine configuration, ramp up/down, rapid feed, etc.
 
   public:
-    Machine(cb::Options &options);
+    Machine(double rapidFeed = 1000);
     virtual ~Machine() {} // Compiler needs this
 
     double getTime() const {return time;}

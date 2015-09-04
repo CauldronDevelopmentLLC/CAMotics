@@ -40,6 +40,8 @@ namespace CAMotics {
     cb::SmartPointer<QApplication> qtApp;
     cb::SmartPointer<QtWin> qtWin;
 
+    unsigned threads;
+
   public:
     explicit QtApp(QWidget *parent = 0);
     ~QtApp();

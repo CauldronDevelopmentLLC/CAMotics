@@ -18,31 +18,29 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_BACKGROUND_THREAD_H
-#define CAMOTICS_BACKGROUND_THREAD_H
+#ifndef CAMOTICS_REDUCE_TASK_H
+#define CAMOTICS_REDUCE_TASK_H
+
+#include <camotics/Task.h>
 
 #include <cbang/SmartPointer.h>
-#include <cbang/os/Thread.h>
-
-#include <QWidget>
-
-namespace cb {class Application;}
 
 
 namespace CAMotics {
-  class BackgroundThread : public cb::Thread {
-    cb::Application &app;
-    int event;
-    QWidget *parent;
+  class Surface;
+
+  class ReduceTask : public Task {
+    cb::SmartPointer<Surface> surface;
 
   public:
-    BackgroundThread(cb::Application &app, int event, QWidget *parent) :
-      app(app), event(event), parent(parent) {}
-    ~BackgroundThread() {join();}
+    ReduceTask(const Surface &surface);
 
-    void completed();
+    const cb::SmartPointer<Surface> &getSurface() const {return surface;}
+
+    // From Task
+    void run();
   };
 }
 
-#endif // CAMOTICS_BACKGROUND_THREAD_H
+#endif // CAMOTICS_REDUCE_TASK_H
 

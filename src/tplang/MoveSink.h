@@ -37,7 +37,7 @@ namespace tplang {
     double time;
 
   public:
-    MoveSink(MoveStream &stream, cb::Options &options);
+    MoveSink(MoveStream &stream, double rapidFeed);
 
     // From MachineInterface
     void reset();

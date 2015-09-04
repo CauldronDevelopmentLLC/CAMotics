@@ -21,52 +21,35 @@
 #ifndef CAMOTICS_CUT_SIM_H
 #define CAMOTICS_CUT_SIM_H
 
-#include "Simulation.h"
-
-#include <camotics/Task.h>
-#include <camotics/Geom.h>
-#include <camotics/sim/Machine.h>
-
 #include <cbang/SmartPointer.h>
 
-#include <vector>
-#include <string>
-
-
 namespace cb {class Options;}
+
 
 namespace CAMotics {
   class ToolTable;
   class ToolPath;
   class Surface;
   class Project;
+  class Simulation;
+  class Task;
 
-  class CutSim : public Machine, public Task {
+
+  class CutSim {
     unsigned threads;
-    cb::SmartPointer<ToolPath> path;
-    unsigned errors;
+    cb::SmartPointer<Task> task;
 
   public:
     CutSim(cb::Options &options);
     ~CutSim();
 
-    void clearErrors() {errors = 0;}
-    unsigned getErrorCount() const {return errors;}
-
-    cb::SmartPointer<ToolPath>
-    computeToolPath(const ToolTable &tools,
-                    const std::vector<std::string> &files);
     cb::SmartPointer<ToolPath> computeToolPath(const Project &project);
-
-    cb::SmartPointer<Surface> computeSurface(const Simulation &sim);
-
+    cb::SmartPointer<Surface> computeSurface
+    (const cb::SmartPointer<Simulation> &sim,
+     const std::string &filename = std::string());
     void reduceSurface(Surface &surface);
 
-    // From Task
     void interrupt();
-
-    // From Machine
-    void move(const Move &move);
   };
 }
 

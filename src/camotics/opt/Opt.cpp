@@ -37,7 +37,7 @@ using namespace CAMotics;
 
 
 Opt::Opt(Options &options, ostream &stream) :
-  Machine(options), Printer(stream), controller(*this), interp(controller),
+  Printer(stream), controller(*this), interp(controller),
   pathCount(0), cutCount(0), iterations(10000), runs(1), heatTarget(1.5),
   minTemp(0.01), heatRate(1.5), coolRate(0.95), reheatRate(2), timeout(10) {
 

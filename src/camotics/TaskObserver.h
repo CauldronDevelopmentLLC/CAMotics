@@ -18,33 +18,17 @@
 
 \******************************************************************************/
 
-#include "ToolPathThread.h"
+#ifndef CAMOTICS_TASK_OBSERVER_H
+#define CAMOTICS_TASK_OBSERVER_H
 
-#include <camotics/cutsim/Project.h>
+namespace CAMotics {
+  class TaskObserver {
+  public:
+    virtual ~TaskObserver() {}
 
-#include <cbang/js/Javascript.h>
-#include <cbang/util/DefaultCatch.h>
-
-using namespace CAMotics;
-using namespace cb;
-
-
-ToolPathThread::ToolPathThread(Application &app, int event, QWidget *parent,
-                               const SmartPointer<CutSim> &cutSim,
-                               const SmartPointer<Project> &project) :
-  CutSimThread(app, event, parent, cutSim), tools(project->getToolTable()) {
-
-  for (Project::iterator it = project->begin(); it != project->end(); it++)
-    files.push_back((*it)->getAbsolutePath());
+    virtual void taskCompleted() = 0;
+  };
 }
 
+#endif // CAMOTICS_TASK_OBSERVER_H
 
-void ToolPathThread::run() {
-  v8::Locker locker;
-
-  try {
-    path = cutSim->computeToolPath(tools, files);
-  } CATCH_ERROR;
-
-  completed();
-}

@@ -54,7 +54,6 @@ double Task::getTime() const {
 
 void Task::begin() {
   SmartLock lock(this);
-  interrupted = false;
   status.clear();
   progress = eta = 0;
   startTime = endTime = Timer::now();
@@ -65,7 +64,7 @@ void Task::update(double progress, const string &status) {
   SmartLock lock(this);
 
   this->progress = progress;
-  this->status = status;
+  if (!status.empty()) this->status = status;
 
   endTime = Timer::now();
   double delta = endTime - startTime;

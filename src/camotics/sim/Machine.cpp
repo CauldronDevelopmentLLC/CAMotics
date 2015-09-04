@@ -37,17 +37,12 @@ using namespace tplang;
 using namespace CAMotics;
 
 
-Machine::Machine(Options &options) : time(0), distance(0) {
+Machine::Machine(double rapidFeed) : time(0), distance(0) {
   add(new MachineUnitAdapter);
   add(new MachineLinearizer);
   add(new MachineMatrix);
-  add(new MoveSink(*this, options));
+  add(new MoveSink(*this, rapidFeed));
   add(new MachineState);
-
-  options.pushCategory("Machine");
-  options.addTarget("output-moves", outputMoves,
-                    "Print moves to file or standard out");
-  options.popCategory();
 }
 
 
@@ -55,14 +50,6 @@ void Machine::move(const Move &move) {
   // Measure
   distance += move.getDistance();
   time += move.getTime();
-
-  // Output
-  if (moveStream.isNull() && !outputMoves.empty()) {
-    if (outputMoves == "-") moveStream = SmartPointer<ostream>::Phony(&cout);
-    else moveStream = SystemUtilities::oopen(outputMoves);
-  }
-
-  if (!moveStream.isNull()) *moveStream << move << endl;
 
   LOG_INFO(3, "Machine: Move to " << move.getEndPt());
 }

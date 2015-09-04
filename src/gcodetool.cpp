@@ -44,7 +44,7 @@ namespace CAMotics {
 
   public:
     EvalApp() :
-      Application("CAMotics GCode Tool"), Machine(options), controller(*this),
+      Application("CAMotics GCode Tool"), controller(*this),
       path(controller.getToolTable()), printer(cout), parseOnly(false) {
 
       options.pushCategory("GCode Tool");

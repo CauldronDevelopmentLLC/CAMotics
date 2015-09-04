@@ -18,26 +18,44 @@
 
 \******************************************************************************/
 
-#include "ReduceThread.h"
+#ifndef CAMOTICS_TOOL_PATH_TASK_H
+#define CAMOTICS_TOOL_PATH_TASK_H
 
-#include <camotics/contour/Surface.h>
+#include <camotics/Task.h>
+#include <camotics/cutsim/ToolPath.h>
+#include <camotics/sim/ToolTable.h>
+#include <camotics/sim/Machine.h>
 
-#include <cbang/util/DefaultCatch.h>
-
-using namespace std;
-using namespace cb;
-using namespace CAMotics;
-
-
-ReduceThread::ReduceThread(Application &app, int event, QWidget *parent,
-                           const SmartPointer<CutSim> &cutSim,
-                           const Surface &surface) :
-  CutSimThread(app, event, parent, cutSim), surface(surface.copy()) {}
+#include <string>
+#include <vector>
 
 
-void ReduceThread::run() {
-  try {
-    cutSim->reduceSurface(*surface);
-  } CATCH_ERROR;
-  completed();
+namespace CAMotics {
+  class ToolTable;
+  class ToolPath;
+  class Project;
+
+  class ToolPathTask : public Machine, public Task {
+    ToolTable tools;
+    std::vector<std::string> files;
+
+    unsigned errors;
+    cb::SmartPointer<ToolPath> path;
+
+    public:
+    ToolPathTask(const Project &project);
+
+    unsigned getErrorCount() const {return errors;}
+    const cb::SmartPointer<ToolPath> &getPath() const {return path;}
+
+    // From Task
+    void run();
+    void interrupt();
+
+    // From Machine
+    void move(const Move &move);
+  };
 }
+
+#endif // CAMOTICS_TOOL_PATH_TASK_H
+

@@ -145,7 +145,7 @@ namespace CAMotics {
       if (!time) time = numeric_limits<double>::max();
       SmartPointer<Simulation> sim = project.makeSim(path, time);
       SmartPointer<Surface> surface;
-      if (!shouldQuit()) surface = cutSim.computeSurface(*sim);
+      if (!shouldQuit()) surface = cutSim.computeSurface(sim);
 
       // Reduce
       if (reduce && !shouldQuit()) cutSim.reduceSurface(*surface);

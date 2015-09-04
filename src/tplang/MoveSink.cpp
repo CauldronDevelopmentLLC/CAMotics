@@ -25,13 +25,8 @@ using namespace CAMotics;
 using namespace tplang;
 
 
-MoveSink::MoveSink(MoveStream &stream, Options &options) :
-  stream(stream), rapidFeed(1000) {
-
-  options.pushCategory("Machine");
-  options.addTarget("rapid-feed", rapidFeed,
-                    "The feed rate of rapid moves in mm/min.");
-  options.popCategory();
+MoveSink::MoveSink(MoveStream &stream, double rapidFeed) :
+  stream(stream), rapidFeed(rapidFeed) {
 }
 
 

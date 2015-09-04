@@ -18,10 +18,12 @@
 
 \******************************************************************************/
 
-#include "SurfaceThread.h"
+#include "SurfaceTask.h"
 
 #include <camotics/stl/STLReader.h>
 #include <camotics/contour/ElementSurface.h>
+#include <camotics/render/Renderer.h>
+#include <camotics/cutsim/CutWorkpiece.h>
 
 #include <cbang/util/DefaultCatch.h>
 #include <cbang/os/SystemUtilities.h>
@@ -35,7 +37,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-void SurfaceThread::run() {
+void SurfaceTask::run() {
   // Check for cached STL file
   try {
     string stlCache = SystemUtilities::swapExtension(filename, "stl");
@@ -58,16 +60,19 @@ void SurfaceThread::run() {
 
       if (hash == sim->computeHash()) {
         LOG_INFO(1, "Loading precomputed surface from " << filename);
-        surface = new ElementSurface(reader, cutSim.get());
+        surface = new ElementSurface(reader, this);
         reader.readFooter();
       }
     }
   } CATCH_ERROR;
 
   // Compute surface
-  try {
-    if (surface.isNull()) surface = cutSim->computeSurface(*sim);
-  } CATCH_ERROR;
+  if (surface.isNull()) {
+    // Setup cut simulation
+    CutWorkpiece cutWP(new ToolSweep(sim->path, sim->time), sim->workpiece);
 
-  completed();
+    // Render
+    Renderer renderer(SmartPointer<Task>::Phony(this));
+    surface = renderer.render(cutWP, threads, sim->resolution);
+  }
 }

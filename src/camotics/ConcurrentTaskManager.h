@@ -18,37 +18,54 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CUT_SIM_THREAD_H
-#define CAMOTICS_CUT_SIM_THREAD_H
+#ifndef CAMOTICS_CONCURRENT_TASK_MANAGER_H
+#define CAMOTICS_CONCURRENT_TASK_MANAGER_H
 
-#include "BackgroundThread.h"
-
-#include <camotics/cutsim/CutSim.h>
+#include "Task.h"
+#include "TaskObserver.h"
 
 #include <cbang/SmartPointer.h>
 #include <cbang/os/Thread.h>
+#include <cbang/os/Condition.h>
 
-#include <QWidget>
+#include <list>
+#include <set>
 
 
 namespace CAMotics {
-  class CutSim;
+  class ConcurrentTaskManager : public cb::Thread, public cb::Condition {
+    typedef std::list<cb::SmartPointer<Task> > queue_t;
 
-  class CutSimThread : public BackgroundThread {
-  protected:
-    cb::SmartPointer<CutSim> cutSim;
+    queue_t waiting;
+    cb::SmartPointer<Task> current;
+    queue_t done;
+
+    typedef std::set<TaskObserver *> observers_t;
+    observers_t observers;
 
   public:
-    CutSimThread(cb::Application &app, int event, QWidget *parent,
-                 const cb::SmartPointer<CutSim> &cutSim) :
-      BackgroundThread(app, event, parent), cutSim(cutSim) {}
+    ConcurrentTaskManager();
+    ~ConcurrentTaskManager();
 
-    unsigned getErrorCount() const {return cutSim->getErrorCount();}
+    double getProgress() const;
+    double getETA() const;
+    std::string getStatus() const;
 
-    // From cb::Thread
+    void add(const cb::SmartPointer<Task> &task, bool priority = true);
+    bool hasMore() const;
+    cb::SmartPointer<Task> remove();
+    void add(TaskObserver *observer);
+    void interrupt();
+
+    // From Thread
+    void run();
     void stop();
+
+  protected:
+    void interruptTasks();
+    void complete(const cb::SmartPointer<Task> &task);
   };
 }
 
-#endif // CAMOTICS_CUT_SIM_THREAD_H
+#endif // CAMOTICS_CONCURRENT_TASK_MANAGER_H
 

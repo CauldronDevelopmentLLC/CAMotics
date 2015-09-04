@@ -26,6 +26,7 @@
 #include <cbang/Info.h>
 #include <cbang/log/Logger.h>
 #include <cbang/js/Javascript.h>
+#include <cbang/os/SystemInfo.h>
 
 #include <vector>
 
@@ -34,7 +35,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-QtApp::QtApp(QWidget *parent) : CAMotics::Application("CAMotics") {
+QtApp::QtApp(QWidget *parent) : CAMotics::Application("CAMotics"),
+                                threads(SystemInfo::instance().getCPUCount()) {
   options.add("qt-style", "Set Qt style");
   options.add("fullscreen", "Start in fullscreen mode.")->setDefault(false);
   options.add("auto-play", "Automatically start tool path playback.")
@@ -43,6 +45,7 @@ QtApp::QtApp(QWidget *parent) : CAMotics::Application("CAMotics") {
   options.add("auto-close", "Automatically exit after tool path playback is "
               "complete.  Only valid with 'auto-play'")
     ->setDefault(false);
+  options.addTarget("threads", threads, "Number of simulation threads.");
 
   // Configure Logger
   Logger &logger = Logger::instance();
