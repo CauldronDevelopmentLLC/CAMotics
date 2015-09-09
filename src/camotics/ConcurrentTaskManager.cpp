@@ -108,6 +108,7 @@ void ConcurrentTaskManager::run() {
 
   while (!shouldShutdown() || !waiting.empty()) {
     if (waiting.empty()) Condition::wait();
+    if (waiting.empty()) break;
 
     current = waiting.front();
     waiting.pop_front();
@@ -131,6 +132,7 @@ void ConcurrentTaskManager::run() {
 void ConcurrentTaskManager::stop() {
   SmartLock lock(this);
   Thread::stop();
+  signal();
   interrupt();
 }
 
