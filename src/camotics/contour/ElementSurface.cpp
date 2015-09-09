@@ -78,7 +78,7 @@ ElementSurface::ElementSurface(const ElementSurface &o) :
 ElementSurface::ElementSurface(unsigned dim) :
   dim(dim), finalized(false), count(0) {
   vbufs[0] = 0;
-  if (dim < 2 || 3 < dim) THROWS("Invalid dimension");
+  if (dim < 3 || 4 < dim) THROWS("Invalid dimension");
 }
 
 
