@@ -81,7 +81,7 @@ if not env.GetOption('clean'):
     conf.CBCheckHome('cairo')
     conf.CBRequireLib('cairo')
     if env['PLATFORM'] == 'darwin':
-        conf.RequireOSXFramework('CoreGraphics')
+        conf.RequireOSXFramework('CoreText')
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
