@@ -184,7 +184,7 @@ void ElementSurface::clear() {
 
 
 void ElementSurface::read(STLSource &source, Task *task) {
-  if (dim != 3) THROW("STL quad export not supported");
+  if (dim != 3) THROW("STL quad import not supported");
 
   clear();
 
@@ -200,6 +200,16 @@ void ElementSurface::read(STLSource &source, Task *task) {
   for (unsigned i = 0; source.hasMore(); i++) {
     // Read facet
     source.readFacet(v[0], v[1], v[2], n);
+
+    // Validate
+    bool valid = n.isReal();
+    for (unsigned j = 0; j < 3; j++)
+      if (!v[j].isReal()) valid = false;
+
+    if (!valid) {
+      LOG_ERROR("Invalid vector in STL");
+      continue;
+    }
 
     // Normals
     for (unsigned j = 0; j < 3; j++)
