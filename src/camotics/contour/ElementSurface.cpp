@@ -30,10 +30,6 @@
 #include <camotics/stl/STLSource.h>
 #include <camotics/stl/STLSink.h>
 
-#include <map>
-#include <limits>
-#include <algorithm>
-
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
