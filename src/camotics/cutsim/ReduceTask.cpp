@@ -34,12 +34,12 @@ ReduceTask::ReduceTask(const Surface &surface) : surface(surface.copy()) {}
 
 
 void ReduceTask::run() {
-  LOG_INFO(1, "Reducing triangles");
+  LOG_INFO(1, "Reducing mesh");
 
   double startCount = surface->getCount();
 
   Task::begin();
-  Task::update(0, "Reducing triangles...");
+  Task::update(0, "Reducing mesh...");
 
   surface->reduce(*this);
 
