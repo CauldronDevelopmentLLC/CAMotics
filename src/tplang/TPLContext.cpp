@@ -51,9 +51,6 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
 
   set("dxf", addModule(new DXFModule(*this)));
 
-  // First search relative to the file itself
-  addSearchPaths("./tpl_lib");
-
   // Add TPL_PATH search paths
   const char *paths = SystemUtilities::getenv("TPL_PATH");
   if (paths) addSearchPaths(paths);
