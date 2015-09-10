@@ -193,7 +193,8 @@ void ElementSurface::read(STLSource &source, Task *task) {
   Vector3F v[3];
   Vector3F n;
 
-  for (unsigned i = 0; source.hasMore(); i++) {
+  for (unsigned i = 0; source.hasMore() && (!task || !task->shouldQuit());
+       i++) {
     // Read facet
     source.readFacet(v[0], v[1], v[2], n);
 
@@ -238,7 +239,7 @@ void ElementSurface::write(STLSink &sink, Task *task) const {
 
   Vector3R p[3];
 
-  for (unsigned i = 0; i < count; i++) {
+  for (unsigned i = 0; i < count && (!task || !task->shouldQuit()); i++) {
     unsigned offset = i * 9;
 
     // Compute surface normal
