@@ -51,6 +51,8 @@ QtApp::QtApp(QWidget *parent) : CAMotics::Application("CAMotics"),
   Logger &logger = Logger::instance();
   logger.setLogTime(false);
   logger.setLogNoInfoHeader(true);
+  logger.setLogCRLF(false);
+  logger.setLogColor(true);
 
   // Configure command line
   cmdLine.setAllowConfigAsFirstArg(false);
