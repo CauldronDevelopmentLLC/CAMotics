@@ -212,7 +212,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         description = description,
         prefix = '/usr',
         icons = ('osx/camotics.icns', 'images/camotics.png'),
-        platform_independent = ('lib'),
+        platform_independent = ('tpl_lib'),
 
         documents = ['README.md', 'CHANGELOG.md'] + examples,
         programs = map(lambda x: str(x[0]), execs),
@@ -235,7 +235,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics',
-        app_resources = [['osx/Resources', '.'], ['lib', 'lib']],
+        app_resources = [['osx/Resources', '.'], ['tpl_lib', 'tpl_lib']],
         app_copyright = 'Copyright 2011-2015, Cauldron Development LLC',
         app_signature = 'camo',
         app_other_info = {

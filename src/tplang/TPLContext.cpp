@@ -51,17 +51,23 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
 
   set("dxf", addModule(new DXFModule(*this)));
 
-  // Add system search paths
-  addSearchPaths("/usr/share/tplang");
-  addSearchPaths("/usr/share/camotics");
-  addSearchPaths(SystemUtilities::getExecutablePath() + "/lib");
-#ifdef __APPLE__
-  addSearchPaths(SystemUtilities::getExecutablePath() + "/Resources/lib");
-#endif
+  // First search relative to the file itself
+  addSearchPaths("./tpl_lib");
 
-  // Add search paths
+  // Add TPL_PATH search paths
   const char *paths = SystemUtilities::getenv("TPL_PATH");
   if (paths) addSearchPaths(paths);
+
+  // Add HOME search path
+  const char *home = SystemUtilities::getenv("HOME");
+  if (home) addSearchPaths(string(home) + "/.tpl_lib");
+
+  // Add system search paths
+  addSearchPaths("/usr/share/camotics/tpl_lib");
+  addSearchPaths(SystemUtilities::getExecutablePath() + "/tpl_lib");
+#ifdef __APPLE__
+  addSearchPaths(SystemUtilities::getExecutablePath() + "/Resources/tpl_lib");
+#endif
 
   // Add .tpl to search extensions
   clearSearchExtensions();
