@@ -25,13 +25,13 @@
 
 
 namespace CAMotics {
-  struct STLBinaryTriangle {
+  PACK(struct STLBinaryTriangle {
     float normal[3];
     float v1[3];
     float v2[3];
     float v3[3];
     uint16_t attrib;
-  } PACKED;
+  });
 }
 
 #endif // CAMOTICS_STLBINARY_TRIANGLE_H

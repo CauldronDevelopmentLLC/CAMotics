@@ -203,7 +203,7 @@ void ElementSurface::read(STLSource &source, Task *task) {
       if (!v[j].isReal()) valid = false;
 
     if (!valid) {
-      LOG_ERROR("Invalid vector in STL");
+      LOG_ERROR("Invalid facet in STL");
       continue;
     }
 
