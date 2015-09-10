@@ -24,27 +24,21 @@
 #include "Surface.h"
 #include "FieldFunction.h"
 
+#include <camotics/Task.h>
+
 #include <cbang/SmartPointer.h>
 #include <cbang/os/Mutex.h>
 #include <cbang/util/SmartLock.h>
 
 
 namespace CAMotics {
-  class ContourGenerator : cb::Mutex {
-  protected:
-    bool interrupt;
-
+  class ContourGenerator : public Task {
     double lastTime;
-    double progress;
-    double eta;
 
   public:
-    ContourGenerator() : interrupt(false), lastTime(0), progress(0), eta(0) {}
+    ContourGenerator() : lastTime(0) {}
 
-    void stop() {interrupt = true;}
     void updateProgress(double progress);
-    double getProgress() const {cb::SmartLock lock(this); return progress;}
-    double getETA() const {cb::SmartLock lock(this); return eta;}
 
     virtual cb::SmartPointer<Surface> getSurface() = 0;
     virtual void run(FieldFunction &func, const Rectangle3R &bbox,

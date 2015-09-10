@@ -36,7 +36,7 @@ void HermiteData::run(FieldFunction &func, const Rectangle3R &bbox, real step) {
   first->compute();
   SmartPointer<SampleSlice> second;
 
-  for (unsigned i = 0; i < slices && !interrupt; i++) {
+  for (unsigned i = 0; i < slices && !shouldQuit(); i++) {
     real z = zStart + i * step;
     second = new SampleSlice(func, plane, z, step);
     second->compute();

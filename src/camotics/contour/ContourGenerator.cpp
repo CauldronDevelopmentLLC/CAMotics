@@ -28,18 +28,9 @@ using namespace CAMotics;
 
 void ContourGenerator::updateProgress(double progress) {
   double now = Timer::now();
-  double tDelta = now - lastTime;
 
-  if (tDelta < 0.25) return;
-
-  SmartLock lock(this);
-
-  // ETA
-  double pDelta = progress - this->progress;
-  double remain = 1.0 - progress;
-  if (pDelta) eta = remain * tDelta / pDelta;
-
-  this->progress = progress;
-
-  lastTime = now;
+  if (0.25 < now - lastTime) {
+    lastTime = now;
+    Task::update(progress);
+  }
 }

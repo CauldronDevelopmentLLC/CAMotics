@@ -30,8 +30,7 @@
 #include <cbang/util/SmartLock.h>
 
 namespace CAMotics {
-  class RenderJob :
-    public cb::Thread, public cb::Mutex {
+  class RenderJob : public cb::Thread {
 
     cb::SmartPointer<ContourGenerator> generator;
 
@@ -47,7 +46,7 @@ namespace CAMotics {
     {return generator->getSurface();}
 
     double getProgress() {return generator->getProgress();}
-    double getETA() {return generator->getETA();}
+    //double getETA() {return generator->getETA();}
 
     // From Thread
     void run();

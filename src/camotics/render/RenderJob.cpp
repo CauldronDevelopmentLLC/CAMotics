@@ -48,10 +48,10 @@ RenderJob::RenderJob(FieldFunction &func, RenderMode mode,
 void RenderJob::run() {
   try {
     generator->run(func, bbox, resolution);
-  } CBANG_CATCH_WARNING;
+  } CATCH_WARNING;
 }
 
 
 void RenderJob::stop() {
-  if (!generator.isNull()) generator->stop();
+  if (!generator.isNull()) generator->interrupt();
 }

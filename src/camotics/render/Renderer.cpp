@@ -55,8 +55,8 @@ static void boxSplit(vector<Rectangle3R> &boxes, Rectangle3R box,
 
   else right.rmin.z() = left.rmax.z() = (box.rmin.z() + box.rmax.z()) / 2;
 
-  boxSplit(boxes, left, count - 2);
-  boxSplit(boxes, right, count - 2);
+  boxSplit(boxes, left, count / 2);
+  boxSplit(boxes, right, count / 2);
 }
 
 
@@ -76,12 +76,11 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
 
   // Divide work
   vector<Rectangle3R> jobBoxes;
-  boxSplit(jobBoxes, bbox, threads);
+  boxSplit(jobBoxes, bbox, 4 * threads);
   unsigned totalJobCount = jobBoxes.size();
 
   LOG_INFO(1, "Computing surface bounded by " << bbox << " at "
-           << resolution << " grid resolution in " << jobBoxes.size()
-           << " boxes");
+           << resolution << " grid resolution");
 
   // Run jobs
   SmartPointer<CompositeSurface> surface = new CompositeSurface;
@@ -135,7 +134,7 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
     }
 
     // Sleep
-    Timer::sleep(0.1);
+    Timer::sleep(0.25);
   }
 
 

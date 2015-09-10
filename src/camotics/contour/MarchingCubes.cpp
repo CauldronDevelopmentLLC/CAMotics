@@ -66,7 +66,7 @@ void MarchingCubes::run(FieldFunction &func, const Rectangle3R &bbox,
 
 void MarchingCubes::march(FieldFunction &func, const Vector3R &p,
                           const Vector3R &scale, const Vector3U &steps) {
-  if (interrupt) return;
+  if (shouldQuit()) return;
 
   if (steps[0] == 1 && steps[1] == 1 && steps[2] == 1) {
     Vector3R samplePt = p;

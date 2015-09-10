@@ -64,7 +64,7 @@ void DualContouring::run(FieldFunction &func, const Rectangle3R &bbox,
   SmartPointer<HermiteSlice> hermite[2];
   SmartPointer<CellSlice> cells[2];
 
-  for (unsigned i = 0; i < slices + 2 && !interrupt; i++) {
+  for (unsigned i = 0; i < slices + 2 && !shouldQuit(); i++) {
     samples[1] = new SampleSlice(func, plane, z, step);
     samples[1]->compute();
     z += step;
