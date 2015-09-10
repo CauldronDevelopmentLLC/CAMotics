@@ -876,10 +876,12 @@ void QtWin::revertProject() {
 
 
 void QtWin::newFile(bool tpl) {
-  string filename =
-    openFile(tpl ? "New TPL file" : "New GCode file",
-             tpl ? "TPL (*.tpl);;All files (*.*)" :
-             "GCode (*.nc *.ngc *.gcode);;All files", "", false);
+  string filename = project->getFilename();
+  filename = SystemUtilities::swapExtension(filename, tpl ? "tpl" : "ngc");
+
+  filename = openFile(tpl ? "New TPL file" : "New GCode file",
+                      tpl ? "TPL (*.tpl);;All files (*.*)" :
+                      "GCode (*.nc *.ngc *.gcode);;All files", filename, false);
   if (filename.empty()) return;
 
   string ext = SystemUtilities::extension(filename);
