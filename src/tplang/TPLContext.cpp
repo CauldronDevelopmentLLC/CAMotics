@@ -49,7 +49,7 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
   addModule(clipperMod);
   clipperMod->define(*this);
 
-  set("dxf", addModule(new DXFModule(*this)));
+  set("_dxf", addModule(new DXFModule(*this)));
 
   // Add TPL_PATH search paths
   const char *paths = SystemUtilities::getenv("TPL_PATH");
@@ -61,9 +61,11 @@ TPLContext::TPLContext(ostream &out, MachineInterface &machine,
 
   // Add system search paths
   addSearchPaths("/usr/share/camotics/tpl_lib");
-  addSearchPaths(SystemUtilities::getExecutablePath() + "/tpl_lib");
+  string exeDir =
+    SystemUtilities::dirname(SystemUtilities::getExecutablePath());
+  addSearchPaths(exeDir + "/tpl_lib");
 #ifdef __APPLE__
-  addSearchPaths(SystemUtilities::getExecutablePath() + "/Resources/tpl_lib");
+  addSearchPaths(exeDir + "/Resources/tpl_lib");
 #endif
 
   // Add .tpl to search extensions

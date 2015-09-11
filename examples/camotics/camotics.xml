@@ -2,17 +2,17 @@
   <!-- Note, all values are in mm regardless of 'units' option. -->
   <!-- NC Files -->
   <nc-files>
-    camotics.ngc
+    camotics.tpl
   </nc-files>
 
   <!-- Renderer -->
-  <resolution v='0.116348'/>
-  <resolution-mode v='HIGH'/>
+  <resolution v='0.15'/>
+  <resolution-mode v='MANUAL'/>
 
   <!-- Workpiece -->
   <automatic-workpiece v='false'/>
-  <workpiece-max v='(122,18,-3)'/>
-  <workpiece-min v='(-3,-3,-6)'/>
+  <workpiece-max v='(122,18,0)'/>
+  <workpiece-min v='(-3,-3,-3)'/>
 
   <tool_table>
     <tool length='10' number='1' radius='1.5' shape='BALLNOSE' units='MM'/>

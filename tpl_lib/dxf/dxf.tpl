@@ -21,8 +21,14 @@ function str(x) {
   return (typeof x == 'string') ? x : JSON.stringify(x);
 }
 
+
 function sqr(x) {
   return x * x;
+}
+
+
+function cube(x) {
+  return x * x * x;
 }
 
 
@@ -41,7 +47,64 @@ function distance2D(p1, p2) {
 }
 
 
-module.exports = {
+function quad_bezier(p, t) {
+  var c = [sqr(1 - t), 2 * (1 - t) * t, sqr(t)];
+
+  return {
+    x: c[0] * p[0].x + c[1] * p[1].x + c[2] * p[2].x,
+    y: c[0] * p[0].y + c[1] * p[1].y + c[2] * p[2].y
+  }
+}
+
+
+function quad_bezier_length(p) {
+  var l = 0;
+  var v = p[0];
+
+  for (var i = 1; i <= 100; i++) {
+    var u = quad_bezier(p, 0.01 * i);
+    l += distance2D(v, u);
+    v = u;
+  }
+
+  return l;
+}
+
+
+function cubic_bezier(p, t) {
+  var c = [cube(1 - t), 3 * sqr(1 - t) * t, 3 * (1 - t) * sqr(t), cube(t)];
+
+  return {
+    x: c[0] * p[0].x + c[1] * p[1].x + c[2] * p[2].x + c[3] * p[3].x,
+    y: c[0] * p[0].y + c[1] * p[1].y + c[2] * p[2].y + c[3] * p[3].y
+  }
+}
+
+
+function cubic_bezier_length(p) {
+  var l = 0;
+  var v = p[0];
+
+  for (var i = 1; i <= 100; i++) {
+    var u = cubic_bezier(p, 0.01 * i);
+    l += distance2D(v, u);
+    v = u;
+  }
+
+  return l;
+}
+
+
+function extend(target, source) {
+  for (var i in source)
+    if (source.hasOwnProperty(i))
+      target[i] = source[i];
+
+  return target;
+}
+
+
+module.exports = extend({
   // Vertices ******************************************************************
   line_vertices: function(l) {
     return [l.start, l.end];
@@ -75,12 +138,18 @@ module.exports = {
   },
 
 
+  spline_vertices: function(s) {
+    return s.ctrlPts;
+  },
+
+
   element_vertices: function(e) {
     switch (e.type) {
-    case POINT:    return [e];
-    case LINE:     return this.line_vertices(e);
-    case ARC:      return this.arc_vertices(e);
-    case POLYLINE: return this.polyline_vertices(e);
+    case _dxf.POINT:    return [e];
+    case _dxf.LINE:     return this.line_vertices(e);
+    case _dxf.ARC:      return this.arc_vertices(e);
+    case _dxf.POLYLINE: return this.polyline_vertices(e);
+    case _dxf.SPLINE:   return this.spline_vertices(e);
     default: throw 'Unsupported DXF element type ' + e.type;
     }
   },
@@ -89,7 +158,7 @@ module.exports = {
   // Flip **********************************************************************
   line_flip: function(l) {
     return {
-      type: LINE,
+      type: _dxf.LINE,
       start: l.end,
       end: l.start
     }
@@ -98,7 +167,7 @@ module.exports = {
 
   arc_flip: function(a) {
     return {
-      type: ARC,
+      type: _dxf.ARC,
       center: a.center,
       radius: a.radius,
       startAngle: a.endAngle,
@@ -110,18 +179,29 @@ module.exports = {
 
   polyline_flip: function(pl) {
     return {
-      type: POLYLINE,
+      type: _dxf.POLYLINE,
       vertices: [].concat(pl.vertices).reverse()
+    }
+  },
+
+
+  spline_flip: function(s) {
+    return {
+      type: _dxf.SPLINE,
+      degree: s.degree,
+      ctrlPts: [].concat(s.ctrlPts).reverse(),
+      knots: s.knots
     }
   },
 
 
   element_flip: function(e) {
     switch (e.type) {
-    case POINT:    return e;
-    case LINE:     return this.line_flip(e);
-    case ARC:      return this.arc_flip(e);
-    case POLYLINE: return this.polyline_flip(e);
+    case _dxf.POINT:    return e;
+    case _dxf.LINE:     return this.line_flip(e);
+    case _dxf.ARC:      return this.arc_flip(e);
+    case _dxf.POLYLINE: return this.polyline_flip(e);
+    case _dxf.SPLINE:   return this.spline_flip(e);
     default: throw 'Unsupported DXF element type ' + e.type;
     }
   },
@@ -204,18 +284,47 @@ module.exports = {
   },
 
 
-  element_cut: function(e) {
+  spline_cut: function(s, res) {
+    if (typeof res == 'undefined') res = units() == METRIC ? 1 : 1 / 25.4;
+
+    if (s.degree == 2) {
+      var steps = Math.ceil(quad_bezier_length(s.ctrlPts) / res);
+      var delta = 1 / steps;
+
+      for (var i = 0; i < steps; i++) {
+        v = quad_bezier(s.ctrlPts, delta * (i + 1));
+        this.tabbed_cut(v.x, v.y);
+      }
+
+
+    } else if (s.degree == 3) {
+      var steps = Math.ceil(cubic_bezier_length(s.ctrlPts) / res);
+      var delta = 1 / steps;
+
+      for (var i = 0; i < steps; i++) {
+        var v = cubic_bezier(s.ctrlPts, delta * (i + 1));
+        this.tabbed_cut(v.x, v.y);
+      }
+
+    } else
+      for (var i = 1; i < s.ctrlPts.length; i++)
+        this.tabbed_cut(s.ctrlPts[i].x, s.ctrlPts[i].y);
+  },
+
+
+  element_cut: function(e, res) {
     switch (e.type) {
-    case POINT:    return;
-    case LINE:     return line_cut(e);
-    case ARC:      return arc_cut(e);
-    case POLYLINE: return polyline_cut(e);
+    case _dxf.POINT:    return;
+    case _dxf.LINE:     return this.line_cut(e);
+    case _dxf.ARC:      return this.arc_cut(e);
+    case _dxf.POLYLINE: return this.polyline_cut(e);
+    case _dxf.SPLINE:   return this.spline_cut(e, res);
     default: throw 'Unsupported DXF element type ' + e.type;
     }
   },
 
 
-  layer_cut: function(layer, zSafe, zCut) {
+  layer_cut: function(layer, zSafe, zCut, res) {
     if (!layer.length) return;
     layer = [].concat(layer); // Copy layer
 
@@ -224,7 +333,7 @@ module.exports = {
       var match = this.find_closest(p, layer);
       var e = layer[match.i];
 
-      if (match.flip) e = element_flip(e);
+      if (match.flip) e = this.element_flip(e);
 
       var v = first(this.element_vertices(e));
       var d = distance2D(v, p);
@@ -237,7 +346,7 @@ module.exports = {
       cut({z: zCut});
       this.tabbed_cut(v.x, v.y);
 
-      this.element_cut(e);
+      this.element_cut(e, res);
 
       layer.splice(match.i, 1);
     }
@@ -317,8 +426,7 @@ module.exports = {
 
   arc_print: function(a) {
     this.point_print(a.center);
-    print('     ', dtoa(a.radius), ', ',
-          dtoa(a.startAngle), ', ',
+    print('     ', dtoa(a.radius), ', ', dtoa(a.startAngle), ', ',
           dtoa(a.endAngle));
   },
 
@@ -337,21 +445,24 @@ module.exports = {
 
 
   spline_print: function(s) {
-    print('(');
+    print(dtoa(s.degree) + ': (');
     this.vertices_print(s.ctrlPts);
     print('),(');
-    this.vertices_print(s.knots);
+    for (var i = 0; i < s.knots.length; i++) {
+      if (i) print(', ');
+      print(dtoa(s.knots[i]));
+    }
     print(')');
   },
 
 
   element_print: function(e) {
     switch (e.type) {
-    case POINT: this.point_print(e); break;
-    case LINE: this.line_print(e); break;
-    case ARC: this.arc_print(e); break;
-    case POLYLINE: this.polyline_print(e); break;
-    case SPLINE: this.spline_print(e); break;
+    case _dxf.POINT: this.point_print(e); break;
+    case _dxf.LINE: this.line_print(e); break;
+    case _dxf.ARC: this.arc_print(e); break;
+    case _dxf.POLYLINE: this.polyline_print(e); break;
+    case _dxf.SPLINE: this.spline_print(e); break;
     default: throw 'Unknown DXF layer element type ' + e.type;
     }
   },
@@ -359,11 +470,11 @@ module.exports = {
 
   element_label: function(e) {
     switch (e.type) {
-    case POINT:    return 'POINT';
-    case LINE:     return 'LINE';
-    case ARC:      return 'ARC';
-    case POLYLINE: return 'POLYLINE';
-    case SPLINE:   return 'SPLINE';
+    case _dxf.POINT:    return 'POINT';
+    case _dxf.LINE:     return 'LINE';
+    case _dxf.ARC:      return 'ARC';
+    case _dxf.POLYLINE: return 'POLYLINE';
+    case _dxf.SPLINE:   return 'SPLINE';
     default: throw 'Unknown DXF layer element type ' + e.type;
     }
   },
@@ -389,9 +500,6 @@ module.exports = {
   },
 
 
-  open: open,
-
-
   set_tabs: function (data) {tabs = data},
 
 
@@ -406,4 +514,5 @@ module.exports = {
       this.cut_polys(polys, zSafe, zDelta * (i + 1));
     }
   }
-}
+
+}, _dxf);

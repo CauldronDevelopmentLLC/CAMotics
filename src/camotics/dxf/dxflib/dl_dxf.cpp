@@ -957,6 +957,8 @@ void DL_Dxf::addSpline(DL_CreationInterface* creationInterface) {
 
       creationInterface->addKnot(k);
     }
+
+    creationInterface->endEntity();
 }
 
 
