@@ -38,7 +38,8 @@ void GCodeMachine::start() {
 
 
 void GCodeMachine::end() {
-  stream << "%\n";
+  // Probably should be part of the machine description.
+  stream << "M2\n";
 }
 
 
