@@ -52,7 +52,7 @@ ToolPathTask::ToolPathTask(const Project &project) :
 
 
 void ToolPathTask::run() {
-  v8::Locker locker;
+  js::Isolate::ScopePtr scope = isolate.getScope();
 
   // Task tracking
   Task::begin();
@@ -98,7 +98,7 @@ void ToolPathTask::run() {
 
 
 void ToolPathTask::interrupt() {
-  js::Javascript::terminate(); // End TPL code
+  isolate.interrupt();
   Task::interrupt();
 }
 

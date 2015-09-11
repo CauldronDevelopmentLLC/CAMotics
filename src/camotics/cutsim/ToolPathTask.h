@@ -26,6 +26,8 @@
 #include <camotics/sim/ToolTable.h>
 #include <camotics/sim/Machine.h>
 
+#include <cbang/js/Isolate.h>
+
 #include <string>
 #include <vector>
 
@@ -41,6 +43,8 @@ namespace CAMotics {
 
     unsigned errors;
     cb::SmartPointer<ToolPath> path;
+
+    cb::js::Isolate isolate;
 
     public:
     ToolPathTask(const Project &project);

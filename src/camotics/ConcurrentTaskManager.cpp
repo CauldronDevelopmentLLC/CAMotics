@@ -59,7 +59,8 @@ string ConcurrentTaskManager::getStatus() const {
 }
 
 
-void ConcurrentTaskManager::add(const SmartPointer<Task> &task, bool priority) {
+void ConcurrentTaskManager::add(const SmartPointer<Task>::Protected &task,
+                                bool priority) {
   SmartLock lock(this);
 
   if (shouldShutdown()) complete(task);
