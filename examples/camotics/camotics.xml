@@ -6,7 +6,7 @@
   </nc-files>
 
   <!-- Renderer -->
-  <resolution v='0.15'/>
+  <resolution v='0.175'/>
   <resolution-mode v='MANUAL'/>
 
   <!-- Workpiece -->
@@ -15,6 +15,6 @@
   <workpiece-min v='(-3,-3,-3)'/>
 
   <tool_table>
-    <tool length='10' number='1' radius='1.5' shape='BALLNOSE' units='MM'/>
+    <tool length='10' number='1' radius='1.25' shape='BALLNOSE' units='MM'/>
   </tool_table>
 </camotics>

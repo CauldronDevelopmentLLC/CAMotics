@@ -204,7 +204,8 @@ void ElementSurface::read(STLSource &source, Task *task) {
       if (!v[j].isReal()) valid = false;
 
     if (!valid) {
-      LOG_ERROR("Invalid facet in STL");
+      LOG_ERROR("Invalid facet in STL: normal=" << n << " triangle=("
+                << v[0] << ", " << v[1] << ", " << v[2] << ")");
       continue;
     }
 
@@ -242,13 +243,9 @@ void ElementSurface::write(STLSink &sink, Task *task) const {
   for (unsigned i = 0; i < count && (!task || !task->shouldQuit()); i++) {
     unsigned offset = i * 9;
 
-    // Compute surface normal
-    Vector3R normal;
-    for (unsigned j = 0; j < 3; j++)
-      normal += Vector3R(normals[offset + j * 3 + 0],
-                         normals[offset + j * 3 + 1],
-                         normals[offset + j * 3 + 2]);
-    normal = normal.normalize();
+    // The vertex normals are all the same
+    Vector3R normal =
+      Vector3R(normals[offset + 0], normals[offset + 1], normals[offset + 2]);
 
     for (unsigned j = 0; j < 3; j++)
       for (unsigned k = 0; k < 3; k++)

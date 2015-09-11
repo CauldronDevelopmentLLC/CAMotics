@@ -234,6 +234,7 @@ unsigned TriangleMesh::reduce(Task &task) {
       // Check for flips
       if (v.wouldFlip(neighbor) || neighbor.wouldFlip(v)) continue;
 
+      // Choose neighbor with the least number of neighbors
       unsigned numNeighbors = neighborNeighbors.size();
       if (numNeighbors < minNeighbors) {
         merge = &neighbor;
@@ -339,6 +340,8 @@ unsigned TriangleMesh::reduce(Task &task) {
 
     Triangle &t = triangles[i];
     if (t.deleted) continue;
+    t.updateNormal();
+    if (!t.normal.isReal()) continue; // Degenerate, discard
 
     count++;
 

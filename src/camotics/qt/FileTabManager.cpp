@@ -102,8 +102,8 @@ void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
     editor->setTextCursor(c);
   }
 
-  // Grab focus
-  editor->grabKeyboard();
+  // Get input focus
+  editor->setFocus();
 }
 
 

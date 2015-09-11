@@ -67,7 +67,7 @@ using namespace CAMotics;
 
 QtWin::QtWin(Application &app) :
   QMainWindow(0), ui(new Ui::CAMoticsWindow), fileDialog(*this),
-  app(app), options(app.getOptions()),
+  taskCompleteEvent(0), app(app), options(app.getOptions()),
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
   lastRedraw(0), dirty(false), simDirty(false), inUIUpdate(false),
