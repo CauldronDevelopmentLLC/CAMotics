@@ -91,10 +91,10 @@ Section -Install
   File "$%%QT4DIR%%\plugins\imageformats\qtga4.dll"
   File "$%%QT4DIR%%\plugins\imageformats\qtiff4.dll"
 
-  ; Libs
+  ; TPL Libs
   SetOverwrite on
-  SetOutPath "$INSTDIR\lib"
-  File /r "lib\*.*"
+  SetOutPath "$INSTDIR\tpl_lib"
+  File /r "tpl_lib\*.*"
 
   ; Examples
   SetOverwrite on
