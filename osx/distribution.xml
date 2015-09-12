@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
   <pkg-ref id="%(pkg_id)s"/>
-  <title>Open-Source Simulation &amp; Computer Aided Machining</title>
+  <title>CAMotics</title>
   <welcome file="Welcome.rtf"/>
   <license file="License.rtf"/>
   <conclusion file="Conclusion.rtf"/>
