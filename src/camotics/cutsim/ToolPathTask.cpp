@@ -103,7 +103,7 @@ void ToolPathTask::run() {
                  ProcessPriority::PRIORITY_LOW);
 
       // Get pipe stream
-      stream = SmartPointer<istream>::Phony(&proc->getStream(pipe));
+      stream = proc->getStream(pipe);
 
       // Copy output to log
       logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
