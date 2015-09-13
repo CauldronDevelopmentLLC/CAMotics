@@ -21,7 +21,7 @@
 #include "MachineUnitAdapter.h"
 
 using namespace cb;
-using namespace tplang;
+using namespace CAMotics;
 
 #define INCHES_PER_MM 0.0393701
 #define MM_PER_INCH 25.4

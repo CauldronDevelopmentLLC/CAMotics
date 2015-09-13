@@ -18,38 +18,35 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_MACHINE_H
-#define CAMOTICS_MACHINE_H
+#ifndef TPLANG_MOVE_SINK_H
+#define TPLANG_MOVE_SINK_H
 
-#include <tplang/MachinePipeline.h>
-#include <tplang/MoveStream.h>
+#include "MachineAdapter.h"
+#include "MoveStream.h"
 
-#include <ostream>
+#include <cbang/config/Options.h>
 
-
-namespace tplang {class MachineMatrix;}
 
 namespace CAMotics {
-  class Move;
+  class MoveSink : public MachineAdapter {
+    MoveStream &stream;
 
-  class Machine : public tplang::MachinePipeline, public tplang::MoveStream {
+    bool first;
+    bool probePending;
+    double rapidFeed;
     double time;
-    double distance;
-    // TODO Load machine configuration, ramp up/down, rapid feed, etc.
 
   public:
-    Machine(double rapidFeed = 1000);
-    virtual ~Machine() {} // Compiler needs this
-
-    double getTime() const {return time;}
-    double getDistance() const {return distance;}
+    MoveSink(MoveStream &stream, double rapidFeed);
 
     // From MachineInterface
-    void reset() {time = distance = 0; tplang::MachinePipeline::reset();}
+    void reset();
+    double input(unsigned port, input_mode_t mode, double timeout, bool error);
 
-    // From tplang::MoveStream
-    void move(const Move &move);
+    void move(const Axes &axes, bool rapid);
+    void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
   };
 }
 
-#endif // CAMOTICS_MACHINE_H
+#endif // TPLANG_MOVE_SINK_H
+

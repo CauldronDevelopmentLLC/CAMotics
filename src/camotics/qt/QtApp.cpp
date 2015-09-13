@@ -25,7 +25,6 @@
 
 #include <cbang/Info.h>
 #include <cbang/log/Logger.h>
-#include <cbang/js/Javascript.h>
 #include <cbang/os/SystemInfo.h>
 
 #include <vector>
@@ -129,6 +128,5 @@ void QtApp::run() {
 
 
 void QtApp::requestExit() {
-  js::Javascript::terminate(); // End TPL code
   Application::requestExit();
 }

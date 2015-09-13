@@ -18,29 +18,26 @@
 
 \******************************************************************************/
 
-#include "Axes.h"
+#ifndef TPLANG_MACHINE_PIPELINE_H
+#define TPLANG_MACHINE_PIPELINE_H
 
-using namespace std;
-using namespace cb;
-using namespace tplang;
+#include "MachineAdapter.h"
+
+#include <cbang/SmartPointer.h>
+
+#include <vector>
 
 
-const char *Axes::AXES = "XYZABCUVW";
+namespace CAMotics {
+  class MachinePipeline : public MachineAdapter {
+    std::vector<cb::SmartPointer<MachineInterface> > pipeline;
 
+  public:
+    MachinePipeline() {}
 
-void Axes::applyXYZMatrix(const Matrix4x4D &m) {
-  Vector4D v(m * Vector4D(getX(), getY(), getZ(), 1));
-  setXYZ(v[0], v[1], v[2]);
+    void add(const cb::SmartPointer<MachineInterface> &m);
+  };
 }
 
+#endif // TPLANG_MACHINE_PIPELINE_H
 
-void Axes::applyABCMatrix(const Matrix4x4D &m) {
-  Vector4D v(m * Vector4D(getA(), getB(), getC(), 1));
-  setABC(v[0], v[1], v[2]);
-}
-
-
-void Axes::applyUVWMatrix(const Matrix4x4D &m) {
-  Vector4D v(m * Vector4D(getU(), getV(), getW(), 1));
-  setUVW(v[0], v[1], v[2]);
-}

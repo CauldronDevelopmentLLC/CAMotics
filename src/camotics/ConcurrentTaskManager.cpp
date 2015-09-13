@@ -59,8 +59,8 @@ string ConcurrentTaskManager::getStatus() const {
 }
 
 
-void ConcurrentTaskManager::add(const SmartPointer<Task>::Protected &task,
-                                bool priority) {
+void ConcurrentTaskManager::addTask(const SmartPointer<Task>::Protected &task,
+                                    bool priority) {
   SmartLock lock(this);
 
   if (shouldShutdown()) complete(task);
@@ -90,13 +90,15 @@ SmartPointer<Task> ConcurrentTaskManager::remove() {
 }
 
 
-void ConcurrentTaskManager::add(TaskObserver *observer) {
+void ConcurrentTaskManager::addObserver(TaskObserver *observer) {
   SmartLock lock(this);
   observers.insert(observer);
 }
 
 
 void ConcurrentTaskManager::interrupt() {
+  SmartLock lock(this);
+
   if (!current.isNull()) current->interrupt();
 
   for (queue_t::iterator it = waiting.begin(); it != waiting.end(); it++)
@@ -139,6 +141,8 @@ void ConcurrentTaskManager::stop() {
 
 
 void ConcurrentTaskManager::complete(const cb::SmartPointer<Task> &task) {
+  SmartLock lock(this);
+
   if (task->shouldQuit()) return;
 
   done.push_back(task);

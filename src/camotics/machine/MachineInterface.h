@@ -29,7 +29,7 @@
 #include <cbang/geom/Matrix.h>
 
 
-namespace tplang {
+namespace CAMotics {
   class MachineMatrix;
 
   class MachineInterface : public MachineEnum {

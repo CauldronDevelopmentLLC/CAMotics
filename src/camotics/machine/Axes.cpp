@@ -18,35 +18,29 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MOVE_SINK_H
-#define TPLANG_MOVE_SINK_H
+#include "Axes.h"
 
-#include "MachineAdapter.h"
-#include "MoveStream.h"
-
-#include <cbang/config/Options.h>
+using namespace std;
+using namespace cb;
+using namespace CAMotics;
 
 
-namespace tplang {
-  class MoveSink : public MachineAdapter {
-    MoveStream &stream;
+const char *Axes::AXES = "XYZABCUVW";
 
-    bool first;
-    bool probePending;
-    double rapidFeed;
-    double time;
 
-  public:
-    MoveSink(MoveStream &stream, double rapidFeed);
-
-    // From MachineInterface
-    void reset();
-    double input(unsigned port, input_mode_t mode, double timeout, bool error);
-
-    void move(const tplang::Axes &axes, bool rapid);
-    void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
-  };
+void Axes::applyXYZMatrix(const Matrix4x4D &m) {
+  Vector4D v(m * Vector4D(getX(), getY(), getZ(), 1));
+  setXYZ(v[0], v[1], v[2]);
 }
 
-#endif // TPLANG_MOVE_SINK_H
 
+void Axes::applyABCMatrix(const Matrix4x4D &m) {
+  Vector4D v(m * Vector4D(getA(), getB(), getC(), 1));
+  setABC(v[0], v[1], v[2]);
+}
+
+
+void Axes::applyUVWMatrix(const Matrix4x4D &m) {
+  Vector4D v(m * Vector4D(getU(), getV(), getW(), 1));
+  setUVW(v[0], v[1], v[2]);
+}

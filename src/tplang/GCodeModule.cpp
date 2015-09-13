@@ -30,6 +30,7 @@
 #include <math.h>
 
 using namespace tplang;
+using namespace CAMotics;
 using namespace std;
 using namespace cb;
 
@@ -67,8 +68,8 @@ void GCodeModule::define(js::ObjectTemplate &exports) {
   exports.set("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
   exports.set("FEED_UNITS_PER_REV", MM_PER_REVOLUTION);
 
-  exports.set("IMPERIAL", MachineUnitAdapter::IMPERIAL);
-  exports.set("METRIC", MachineUnitAdapter::METRIC);
+  exports.set("IMPERIAL", CAMotics::MachineUnitAdapter::IMPERIAL);
+  exports.set("METRIC", CAMotics::MachineUnitAdapter::METRIC);
 
   exports.set("XY", XY);
   exports.set("XZ", XZ);
@@ -235,15 +236,15 @@ js::Value GCodeModule::toolCB(const js::Arguments &args) {
 
 
 js::Value GCodeModule::unitsCB(const js::Arguments &args) {
-  MachineUnitAdapter::units_t units = unitAdapter.getUnits();
+  CAMotics::MachineUnitAdapter::units_t units = unitAdapter.getUnits();
 
   if (args.has("type"))
     switch (args["type"].toUint32()) {
-    case MachineUnitAdapter::IMPERIAL:
-      unitAdapter.setUnits(MachineUnitAdapter::IMPERIAL);
+    case CAMotics::MachineUnitAdapter::IMPERIAL:
+      unitAdapter.setUnits(CAMotics::MachineUnitAdapter::IMPERIAL);
       break;
-    case MachineUnitAdapter::METRIC:
-      unitAdapter.setUnits(MachineUnitAdapter::METRIC);
+    case CAMotics::MachineUnitAdapter::METRIC:
+      unitAdapter.setUnits(CAMotics::MachineUnitAdapter::METRIC);
       break;
     default: THROWS("Units type must be one of IMPERIAL or METRIC");
     }
@@ -266,7 +267,7 @@ js::Value GCodeModule::toolSetCB(const js::Arguments &args) {
   double scale = 1;
   if (args.has("units")) units = args["units"].toUint32();
   else units = unitAdapter.getUnits();
-  if (units == MachineUnitAdapter::METRIC)
+  if (units == CAMotics::MachineUnitAdapter::METRIC)
     tool.setUnits(CAMotics::ToolUnits::UNITS_MM);
   else {
     tool.setUnits(CAMotics::ToolUnits::UNITS_INCH);

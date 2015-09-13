@@ -25,9 +25,8 @@
 #include "Addresses.h"
 #include "CoordinateSystem.h"
 
-#include <tplang/MachineInterface.h>
-#include <tplang/MachineUnitAdapter.h>
-
+#include <camotics/machine/MachineInterface.h>
+#include <camotics/machine/MachineUnitAdapter.h>
 #include <camotics/cutsim/Move.h>
 #include <camotics/gcode/VarTypes.h>
 #include <camotics/gcode/ModalGroup.h>
@@ -69,7 +68,7 @@ namespace CAMotics {
     static const int MAX_VAR = 26;
 
   protected:
-    tplang::MachineUnitAdapter machine;
+    MachineUnitAdapter machine;
     ToolTable tools;
 
     double params[MAX_ADDRESS];
@@ -83,7 +82,7 @@ namespace CAMotics {
     // State variables
     const Code *activeMotion;
     CoordinateSystem coordSystems[9];
-    tplang::MachineInterface::plane_t plane;
+    MachineInterface::plane_t plane;
     bool latheDiameterMode;
     bool cutterRadiusComp;
     bool toolLengthComp;
@@ -96,14 +95,14 @@ namespace CAMotics {
     bool arcIncrementalDistanceMode;
     bool moveInAbsoluteCoords;
 
-    tplang::MachineInterface::feed_mode_t feedMode;
-    tplang::MachineInterface::spin_mode_t spinMode;
+    MachineInterface::feed_mode_t feedMode;
+    MachineInterface::spin_mode_t spinMode;
     dir_t spindleDir;
     double speed;
     double maxSpindleSpeed;
 
   public:
-    Controller(tplang::MachineInterface &machine,
+    Controller(MachineInterface &machine,
                const ToolTable &tools = ToolTable());
     virtual ~Controller() {}
 
@@ -122,8 +121,8 @@ namespace CAMotics {
     CoordinateSystem &getCoordinateSystem(unsigned i);
     const CoordinateSystem &getCoordinateSystem(unsigned i) const;
 
-    tplang::MachineInterface::plane_t getPlane() const {return plane;}
-    void setPlane(tplang::MachineInterface::plane_t plane);
+    MachineInterface::plane_t getPlane() const {return plane;}
+    void setPlane(MachineInterface::plane_t plane);
 
     bool getLatheDiameterMode() const {return latheDiameterMode;}
     bool getLatheRadiusMode() const {return !latheDiameterMode;}
@@ -168,8 +167,8 @@ namespace CAMotics {
     double getOffsetVar(char c) const;
 
     static unsigned letterToVarType(char axis);
-    static const char *getPlaneAxes(tplang::MachineInterface::plane_t plane);
-    static const char *getPlaneOffsets(tplang::MachineInterface::plane_t plane);
+    static const char *getPlaneAxes(MachineInterface::plane_t plane);
+    static const char *getPlaneOffsets(MachineInterface::plane_t plane);
 
     char getPlaneXAxis() const {return getPlaneAxes(getPlane())[0];}
     char getPlaneYAxis() const {return getPlaneAxes(getPlane())[1];}
@@ -185,17 +184,17 @@ namespace CAMotics {
     void setAxisAbsolutePosition(char axis, double pos);
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
-    tplang::Axes getPosition(bool absolute = false) const;
+    Axes getPosition(bool absolute = false) const;
     void setAxisPosition(char axis, double pos);
-    void setPosition(const tplang::Axes &axes, bool absolute = false);
-    tplang::Axes getNextPosition(int vars) const;
+    void setPosition(const Axes &axes, bool absolute = false);
+    Axes getNextPosition(int vars) const;
 
     std::string getVarGroupStr(const char *group, bool usedOnly = true) const;
 
     void reset();
     void newBlock();
     virtual void execute(const Code &code, int vars);
-    void doMove(const tplang::Axes &pos, bool rapid);
+    void doMove(const Axes &pos, bool rapid);
     void makeMove(int vars, bool rapid);
     void moveAxis(char axis, double value, bool rapid);
 

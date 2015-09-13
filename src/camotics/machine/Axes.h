@@ -28,7 +28,7 @@
 #include <cctype>
 
 
-namespace tplang {
+namespace CAMotics {
   class Axes : public cb::Vector<9, double> {
   public:
     typedef cb::Vector<9, double> Super_T;

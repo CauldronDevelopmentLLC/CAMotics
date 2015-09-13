@@ -18,26 +18,27 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MACHINE_PIPELINE_H
-#define TPLANG_MACHINE_PIPELINE_H
+#include "MachinePipeline.h"
 
-#include "MachineAdapter.h"
-
-#include <cbang/SmartPointer.h>
-
-#include <vector>
+using namespace cb;
+using namespace CAMotics;
 
 
-namespace tplang {
-  class MachinePipeline : public MachineAdapter {
-    std::vector<cb::SmartPointer<MachineInterface> > pipeline;
+void MachinePipeline::add(const SmartPointer<MachineInterface> &m) {
+  if (pipeline.empty()) setParent(m);
+  else {
+    MachineAdapter *adapter =
+      dynamic_cast<MachineAdapter *>(pipeline.back().get());
 
-  public:
-    MachinePipeline() {}
+    if (!adapter) THROW("Pipeline already terminated");
+    adapter->setParent(m);
+  }
 
-    void add(const cb::SmartPointer<MachineInterface> &m);
-  };
+  MachineAdapter *adapter = dynamic_cast<MachineAdapter *>(m.get());
+  SmartPointer<MachineInterface> parent;
+  if (adapter) parent = adapter->getParent();
+
+  pipeline.push_back(m);
+
+  if (!parent.isNull()) add(parent);
 }
-
-#endif // TPLANG_MACHINE_PIPELINE_H
-

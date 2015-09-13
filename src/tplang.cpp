@@ -21,25 +21,33 @@
 #include <camotics/Application.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/sim/ToolTable.h>
-#include <camotics/sim/Machine.h>
+
+#include <camotics/machine/Machine.h>
+#include <camotics/machine/MachinePipeline.h>
+#include <camotics/machine/MachineState.h>
+#include <camotics/machine/MachineMatrix.h>
+#include <camotics/machine/MachineLinearizer.h>
+#include <camotics/machine/MachineUnitAdapter.h>
+#include <camotics/machine/GCodeMachine.h>
 
 #include <tplang/TPLContext.h>
-#include <tplang/MachinePipeline.h>
-#include <tplang/MachineState.h>
-#include <tplang/MachineMatrix.h>
-#include <tplang/MachineLinearizer.h>
-#include <tplang/MachineUnitAdapter.h>
-#include <tplang/GCodeMachine.h>
 #include <tplang/Interpreter.h>
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
+#include <cbang/os/SystemUtilities.h>
 #include <cbang/js/Javascript.h>
+#include <cbang/config/MinConstraint.h>
+
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/stream.hpp>
+namespace io = boost::iostreams;
 
 #include <iostream>
 #include <vector>
 
 using namespace std;
+using namespace cb;
 using namespace tplang;
 using namespace CAMotics;
 
@@ -47,16 +55,23 @@ using namespace CAMotics;
 namespace CAMotics {
   class TPLangApp : public Application {
     ToolTable tools;
-    tplang::MachinePipeline pipeline;
+    MachinePipeline pipeline;
+
+    string out;
+    bool force;
 
   public:
-    TPLangApp() : Application("Tool Path Language") {
+    TPLangApp() :
+      Application("Tool Path Language"), out("-"), force(false) {
+      cmdLine.addTarget("out", out, "Filename for GCode output or '-' to write "
+                        "to the standard output stream");
+      cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
 
-      pipeline.add(new MachineUnitAdapter);
-      pipeline.add(new MachineLinearizer);
-      pipeline.add(new MachineMatrix);
-      pipeline.add(new GCodeMachine(cout));
-      pipeline.add(new MachineState);
+      Option &opt =
+        *cmdLine.add("pipe", "Specify a output file descriptor, overrides "
+                     "the 'out' option");
+      opt.setType(Option::INTEGER_TYPE);
+      opt.setConstraint(new MinConstraint<int>(0));
     }
 
     // From cb::Application
@@ -67,8 +82,28 @@ namespace CAMotics {
 
     // From cb::Reader
     void read(const cb::InputSource &source) {
+      SmartPointer<ostream> stream;
+
+      if (cmdLine["--pipe"].hasValue()) {
+        int pipe = cmdLine["--pipe"].toInteger();
+        stream = new io::stream<io::file_descriptor>(pipe, io::close_handle);
+
+      } else if (out == "-") stream = SmartPointer<ostream>::Phony(&cout);
+      else {
+        if (SystemUtilities::exists(out) && !force)
+          THROWS("File '" << out << "' already exists");
+        stream = SystemUtilities::oopen(out);
+      }
+
+      pipeline.add(new MachineUnitAdapter);
+      pipeline.add(new MachineLinearizer);
+      pipeline.add(new MachineMatrix);
+      pipeline.add(new GCodeMachine(*stream));
+      pipeline.add(new MachineState);
+
       tplang::TPLContext ctx(cout, pipeline, tools);
       tplang::Interpreter(ctx).read(source);
+      stream->flush();
       cout.flush();
     }
   };

@@ -35,7 +35,6 @@ namespace io = boost::iostreams;
 
 using namespace std;
 using namespace cb;
-using namespace tplang;
 using namespace CAMotics;
 
 

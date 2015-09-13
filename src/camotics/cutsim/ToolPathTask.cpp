@@ -25,13 +25,13 @@
 #include <camotics/sim/Controller.h>
 #include <camotics/gcode/Interpreter.h>
 
-#include <tplang/TPLContext.h>
-#include <tplang/Interpreter.h>
-
-#include <cbang/js/Javascript.h>
 #include <cbang/util/DefaultCatch.h>
 #include <cbang/util/SmartFunctor.h>
+
 #include <cbang/os/SystemUtilities.h>
+#include <cbang/os/Subprocess.h>
+
+#include <cbang/log/AsyncCopyStreamToLog.h>
 
 #include <boost/ref.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -51,9 +51,12 @@ ToolPathTask::ToolPathTask(const Project &project) :
 }
 
 
-void ToolPathTask::run() {
-  js::Isolate::ScopePtr scope = isolate.getScope();
+ToolPathTask::~ToolPathTask() {
+  interrupt();
+}
 
+
+void ToolPathTask::run() {
   // Task tracking
   Task::begin();
   SmartFunctor<Task, double (Task::*)()> endTask(this, &Task::end);
@@ -69,37 +72,79 @@ void ToolPathTask::run() {
 
     Task::update(0, "Running " + files[i]);
 
+    SmartPointer<istream> stream;
+    SmartPointer<TaskFilter> taskFilter;
+
     if (String::endsWith(files[i], ".tpl")) {
-      tplang::TPLContext ctx(cout, *this, tools);
-      ctx.pushPath(files[i]);
+      // Get executable name
+      string cmd =
+        SystemUtilities::dirname(SystemUtilities::getExecutablePath()) +
+        "/tplang";
+#ifdef _WIN32
+      cmd += ".exe";
+#endif
 
-      try {
-        tplang::Interpreter(ctx).read(files[i]);
-      } catch (const Exception &e) {
-        LOG_ERROR(e);
-        errors++;
-      }
+      if (!SystemUtilities::exists(cmd)) cmd = "tplang";
 
-    } else {
+      // Create process
+      proc = new Subprocess;
+
+      // Add file
+      cmd += " " + files[i];
+
+      // Add pipe
+      unsigned pipe = proc->createPipe(false);
+      cmd += SSTR(" --pipe 0x" << hex << proc->getPipeHandle(pipe));
+
+      // Execute
+      LOG_DEBUG(1, "Executing: " << cmd);
+      proc->exec(cmd, Subprocess::SHELL | Subprocess::REDIR_STDOUT |
+                 Subprocess::MERGE_STDOUT_AND_STDERR,
+                 ProcessPriority::PRIORITY_LOW);
+
+      // Get pipe stream
+      stream = SmartPointer<istream>::Phony(&proc->getStream(pipe));
+
+      // Copy output to log
+      logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
+      logCopier->start();
+
+    } else { // Assume it's just GCode
       // Track the file load
-      TaskFilter taskFilter(*this, SystemUtilities::getFileSize(files[i]));
-      io::filtering_istream stream;
-      stream.push(boost::ref(taskFilter));
-      stream.push(io::file(files[i], ios_base::in));
-      InputSource src(stream, files[i]);
+      io::filtering_istream *filter = new io::filtering_istream;
+      stream = filter;
 
-      // Assume GCode
-      Interpreter interp(controller, SmartPointer<Task>::Phony(this));
-      interp.read(src);
-      errors += interp.getErrorCount();
+      taskFilter =
+        new TaskFilter(*this, SystemUtilities::getFileSize(files[i]));
+      filter->push(boost::ref(*taskFilter));
+      filter->push(io::file(files[i], ios_base::in));
+    }
+
+    InputSource src(*stream, files[i]);
+
+    // Parse GCode
+    Interpreter interp(controller, SmartPointer<Task>::Phony(this));
+    interp.read(src);
+    errors += interp.getErrorCount();
+
+    // Wait for Subprocess
+    if (!proc.isNull() && proc->wait()) errors++;
+
+    // Stop the log copier
+    if (!logCopier.isNull()) {
+      logCopier->join();
+      logCopier.release();
     }
   }
+
+  proc.release();
 }
 
 
 void ToolPathTask::interrupt() {
-  isolate.interrupt();
   Task::interrupt();
+  if (!proc.isNull()) proc->kill(true);
+  if (!logCopier.isNull()) logCopier->stop();
 }
 
 

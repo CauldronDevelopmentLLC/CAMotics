@@ -18,38 +18,36 @@
 
 \******************************************************************************/
 
-#include "Machine.h"
+#ifndef TPLANG_TRANS_MATRIX_H
+#define TPLANG_TRANS_MATRIX_H
 
-#include <tplang/MachineState.h>
-#include <tplang/MoveSink.h>
-#include <tplang/MachineMatrix.h>
-#include <tplang/MachineLinearizer.h>
-#include <tplang/MachineUnitAdapter.h>
-
-#include <camotics/cutsim/Move.h>
-
-#include <cbang/log/Logger.h>
-#include <cbang/os/SystemUtilities.h>
-
-using namespace cb;
-using namespace std;
-using namespace tplang;
-using namespace CAMotics;
+#include <cbang/geom/Matrix.h>
 
 
-Machine::Machine(double rapidFeed) : time(0), distance(0) {
-  add(new MachineUnitAdapter);
-  add(new MachineLinearizer);
-  add(new MachineMatrix);
-  add(new MoveSink(*this, rapidFeed));
-  add(new MachineState);
+namespace CAMotics {
+  class TransMatrix {
+    cb::Matrix4x4D m;
+    cb::Matrix4x4D i;
+
+  public:
+    TransMatrix();
+
+    const cb::Matrix4x4D &getMatrix() const {return m;}
+    void setMatrix(const cb::Matrix4x4D &m);
+
+    const cb::Matrix4x4D &getInverse() const {return i;}
+    void setInverse(const cb::Matrix4x4D &i);
+
+    void identity();
+    void scale(const cb::Vector3D &o);
+    void translate(const cb::Vector3D &o);
+    void rotate(double angle, const cb::Vector3D &o);
+    void reflect(const cb::Vector3D &o);
+
+    cb::Vector3D transform(const cb::Vector3D &p) const;
+    cb::Vector3D invert(const cb::Vector3D &p) const;
+  };
 }
 
+#endif // TPLANG_TRANS_MATRIX_H
 
-void Machine::move(const Move &move) {
-  // Measure
-  distance += move.getDistance();
-  time += move.getTime();
-
-  LOG_INFO(3, "Machine: Move to " << move.getEndPt());
-}

@@ -208,7 +208,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="layoutWidget1">
        <layout class="QVBoxLayout" name="consoleFrame">
         <property name="spacing">
          <number>0</number>
@@ -438,8 +438,6 @@
     <addaction name="actionRun"/>
     <addaction name="separator"/>
     <addaction name="actionPlay"/>
-    <addaction name="actionBegining"/>
-    <addaction name="actionEnd"/>
     <addaction name="actionSlower"/>
     <addaction name="actionFaster"/>
     <addaction name="actionDirection"/>
@@ -501,8 +499,6 @@
    <addaction name="actionReduce"/>
    <addaction name="separator"/>
    <addaction name="actionPlay"/>
-   <addaction name="actionBegining"/>
-   <addaction name="actionEnd"/>
    <addaction name="actionSlower"/>
    <addaction name="actionFaster"/>
    <addaction name="actionDirection"/>
@@ -2975,18 +2971,6 @@
     <string>Alt+7</string>
    </property>
   </action>
-  <action name="actionBegining">
-   <property name="icon">
-    <iconset resource="camotics.qrc">
-     <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
-   </property>
-   <property name="text">
-    <string>Begining</string>
-   </property>
-   <property name="toolTip">
-    <string>Jump to start of tool path animation</string>
-   </property>
-  </action>
   <action name="actionSlower">
    <property name="icon">
     <iconset resource="camotics.qrc">
@@ -3021,18 +3005,6 @@
    </property>
    <property name="toolTip">
     <string>Speed up tool path animation</string>
-   </property>
-  </action>
-  <action name="actionEnd">
-   <property name="icon">
-    <iconset resource="camotics.qrc">
-     <normaloff>:/icons/end.png</normaloff>:/icons/end.png</iconset>
-   </property>
-   <property name="text">
-    <string>End</string>
-   </property>
-   <property name="toolTip">
-    <string>Jump to end of tool path animation</string>
    </property>
   </action>
   <action name="actionDirection">

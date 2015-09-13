@@ -24,7 +24,7 @@ using namespace cb;
 using namespace tplang;
 
 MatrixModule::MatrixModule(TPLContext &ctx) :
-  ctx(ctx), matrix(ctx.find<MachineMatrix>()) {define(*this);}
+  ctx(ctx), matrix(ctx.find<CAMotics::MachineMatrix>()) {define(*this);}
 
 
 void MatrixModule::define(js::ObjectTemplate &exports) {

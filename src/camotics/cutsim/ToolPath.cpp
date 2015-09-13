@@ -27,7 +27,6 @@
 
 using namespace std;
 using namespace cb;
-using namespace tplang;
 using namespace CAMotics;
 
 
@@ -88,7 +87,7 @@ void ToolPath::print(ostream &stream, bool metric) const {
 
 
 void ToolPath::write(JSON::Sink &sink) const {
-  tplang::Axes lastPos(numeric_limits<double>::infinity());
+  Axes lastPos(numeric_limits<double>::infinity());
   MoveType type = (MoveType::enum_t)-1;
   int line = -1;
   int tool = -1;
@@ -103,8 +102,7 @@ void ToolPath::write(JSON::Sink &sink) const {
     // Axes
     for (unsigned j = 0; j < 9; j++)
       if (move.getEnd()[j] != lastPos[j])
-        sink.insert(string(1, tplang::Axes::toAxis(j)),
-                    lastPos[j] = move.getEnd()[j]);
+        sink.insert(string(1, Axes::toAxis(j)), lastPos[j] = move.getEnd()[j]);
 
     // Type
     if (type != move.getType())

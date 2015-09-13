@@ -18,18 +18,7 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MOVE_STREAM_H
-#define TPLANG_MOVE_STREAM_H
+#include "MoveStream.h"
 
-#include <camotics/cutsim/Move.h>
-
-
-namespace tplang {
-  class MoveStream {
-  public:
-    virtual void move(const CAMotics::Move &move) = 0;
-  };
-}
-
-#endif // TPLANG_MOVE_STREAM_H
+using namespace CAMotics;
 

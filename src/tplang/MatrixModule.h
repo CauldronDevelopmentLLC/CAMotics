@@ -22,16 +22,17 @@
 #define TPLANG_MATRIX_MODULE_H
 
 #include "TPLContext.h"
-#include "MachineMatrix.h"
-#include "MachineEnum.h"
+
+#include <camotics/machine/MachineMatrix.h>
+#include <camotics/machine/MachineEnum.h>
 
 #include <cbang/js/Module.h>
 
 
 namespace tplang {
-  class MatrixModule : public cb::js::Module, public MachineEnum {
+  class MatrixModule : public cb::js::Module, public CAMotics::MachineEnum {
     TPLContext &ctx;
-    MachineMatrix &matrix;
+    CAMotics::MachineMatrix &matrix;
 
   public:
     MatrixModule(TPLContext &ctx);

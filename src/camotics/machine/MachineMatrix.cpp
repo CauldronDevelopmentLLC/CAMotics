@@ -23,7 +23,7 @@
 #include <cbang/Exception.h>
 #include <cbang/log/Logger.h>
 
-using namespace tplang;
+using namespace CAMotics;
 using namespace cb;
 
 

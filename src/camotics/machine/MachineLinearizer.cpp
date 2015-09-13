@@ -21,7 +21,7 @@
 #include "MachineLinearizer.h"
 
 using namespace cb;
-using namespace tplang;
+using namespace CAMotics;
 
 
 void MachineLinearizer::arc(const Vector3D &offset, double angle,

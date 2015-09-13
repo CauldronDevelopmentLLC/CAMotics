@@ -298,11 +298,9 @@ namespace CAMotics {
     void on_actionStop_triggered();
     void on_actionRun_triggered();
     void on_actionReduce_triggered();
-    void on_actionBegining_triggered();
     void on_actionSlower_triggered();
     void on_actionPlay_triggered();
     void on_actionFaster_triggered();
-    void on_actionEnd_triggered();
     void on_actionDirection_triggered();
 
     void on_actionExport_triggered();

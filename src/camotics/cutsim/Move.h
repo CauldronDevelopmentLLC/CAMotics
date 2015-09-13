@@ -23,11 +23,10 @@
 
 #include "MoveType.h"
 
-#include <tplang/Axes.h>
-
 #include <camotics/Geom.h>
 #include <camotics/sim/Tool.h>
 #include <camotics/view/Color.h>
+#include <camotics/machine/Axes.h>
 
 #include <ostream>
 
@@ -35,8 +34,8 @@ namespace CAMotics {
   class Move : public Segment3R, public MoveType {
   protected:
     MoveType type;
-    tplang::Axes start;
-    tplang::Axes end;
+    Axes start;
+    Axes end;
     unsigned tool;
     real feed;
     real speed;
@@ -49,12 +48,12 @@ namespace CAMotics {
   public:
     Move() : type(MoveType::MOVE_RAPID), tool(0), feed(0), speed(0), line(0),
              dist(0), time(0), startTime(0) {}
-    Move(MoveType type, const tplang::Axes &start, const tplang::Axes &end,
+    Move(MoveType type, const Axes &start, const Axes &end,
          real startTime, unsigned tool, real feed, real speed, unsigned line);
 
     MoveType getType() const {return type;}
-    const tplang::Axes &getStart() const {return start;}
-    const tplang::Axes &getEnd() const {return end;}
+    const Axes &getStart() const {return start;}
+    const Axes &getEnd() const {return end;}
     const Vector3R &getStartPt() const {return Segment3R::getStart();}
     const Vector3R &getEndPt() const {return Segment3R::getEnd();}
     unsigned getTool() const {return tool;}

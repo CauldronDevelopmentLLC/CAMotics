@@ -24,7 +24,7 @@
 #include "MachineAdapter.h"
 
 
-namespace tplang {
+namespace CAMotics {
   class MachineUnitAdapter : virtual public MachineAdapter {
   public:
     typedef enum {IMPERIAL, METRIC} units_t;
@@ -50,7 +50,7 @@ namespace tplang {
      */
     void setUnits(units_t units) {this->units = units;}
 
-    // From tplang::MachineInterface
+    // From MachineInterface
     double getFeed(feed_mode_t *mode = 0) const;
     void setFeed(double feed, feed_mode_t mode = MM_PER_MINUTE);
 

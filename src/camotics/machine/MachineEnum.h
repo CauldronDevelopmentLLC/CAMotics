@@ -18,41 +18,23 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_GCODE_MACHINE_H
-#define TPLANG_GCODE_MACHINE_H
+#ifndef TPLANG_MACHINE_ENUM_H
+#define TPLANG_MACHINE_ENUM_H
 
-#include "MachineAdapter.h"
-
-#include <ostream>
-
-namespace tplang {
-  class GCodeMachine : public MachineAdapter {
-    std::ostream &stream;
-
-    bool mistCoolant;
-    bool floodCoolant;
-
-    Axes position;
-
+namespace CAMotics {
+  class MachineEnum {
   public:
-    GCodeMachine(std::ostream &stream) :
-      stream(stream), mistCoolant(false), floodCoolant(false) {}
-
-    // From MachineInterface
-    void start();
-    void end();
-
-    void setFeed(double feed, feed_mode_t mode);
-    void setSpeed(double speed, spin_mode_t mode, double max);
-    void setTool(unsigned tool);
-
-    int findPort(port_t type, unsigned index);
-    double input(unsigned port, input_mode_t mode, double timeout, bool error);
-    void output(unsigned port, double value, bool sync);
-
-    void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
+    typedef enum {MM_PER_MINUTE, INVERSE_TIME, MM_PER_REVOLUTION} feed_mode_t;
+    typedef enum {REVOLUTIONS_PER_MINUTE, CONSTANT_SURFACE_SPEED} spin_mode_t;
+    typedef enum {IMMEDIATE, START_ON_RISE, START_ON_FALL, START_WHEN_HIGH,
+                  START_WHEN_LOW, STOP_ON_RISE, STOP_ON_FALL, STOP_WHEN_HIGH,
+                  STOP_WHEN_LOW} input_mode_t;
+    typedef enum {XY, XZ, YZ, YV, UV, UW, VW} plane_t;
+    typedef enum {XYZ, ABC, UVW, AXES_COUNT} axes_t;
+    typedef enum {OK, TIMEOUT, CONDITION, LIMIT} async_error_t;
+    typedef enum {MIST_COOLANT, FLOOD_COOLANT, PROBE, ANALOG, DIGITAL} port_t;
   };
 }
 
-#endif // TPLANG_GCODE_MACHINE_H
+#endif // TPLANG_MACHINE_ENUM_H
+

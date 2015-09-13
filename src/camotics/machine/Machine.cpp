@@ -18,27 +18,37 @@
 
 \******************************************************************************/
 
-#include "MachinePipeline.h"
+#include "Machine.h"
+
+#include "MachineState.h"
+#include "MoveSink.h"
+#include "MachineMatrix.h"
+#include "MachineLinearizer.h"
+#include "MachineUnitAdapter.h"
+
+#include <camotics/cutsim/Move.h>
+
+#include <cbang/log/Logger.h>
+#include <cbang/os/SystemUtilities.h>
 
 using namespace cb;
-using namespace tplang;
+using namespace std;
+using namespace CAMotics;
 
 
-void MachinePipeline::add(const SmartPointer<MachineInterface> &m) {
-  if (pipeline.empty()) setParent(m);
-  else {
-    MachineAdapter *adapter =
-      dynamic_cast<MachineAdapter *>(pipeline.back().get());
+Machine::Machine(double rapidFeed) : time(0), distance(0) {
+  add(new MachineUnitAdapter);
+  add(new MachineLinearizer);
+  add(new MachineMatrix);
+  add(new MoveSink(*this, rapidFeed));
+  add(new MachineState);
+}
 
-    if (!adapter) THROW("Pipeline already terminated");
-    adapter->setParent(m);
-  }
 
-  MachineAdapter *adapter = dynamic_cast<MachineAdapter *>(m.get());
-  SmartPointer<MachineInterface> parent;
-  if (adapter) parent = adapter->getParent();
+void Machine::move(const Move &move) {
+  // Measure
+  distance += move.getDistance();
+  time += move.getTime();
 
-  pipeline.push_back(m);
-
-  if (!parent.isNull()) add(parent);
+  LOG_INFO(3, "Machine: Move to " << move.getEndPt());
 }

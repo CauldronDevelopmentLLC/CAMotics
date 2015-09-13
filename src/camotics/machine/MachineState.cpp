@@ -23,7 +23,7 @@
 #include <cbang/Exception.h>
 
 using namespace cb;
-using namespace tplang;
+using namespace CAMotics;
 
 
 void MachineState::reset() {

@@ -25,7 +25,7 @@
 
 #include <camotics/gcode/Printer.h>
 
-#include <camotics/sim/Machine.h>
+#include <camotics/machine/Machine.h>
 #include <camotics/sim/Controller.h>
 #include <camotics/gcode/Interpreter.h>
 

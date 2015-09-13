@@ -21,7 +21,7 @@
 #ifndef CAMOTICS_TOOL_H
 #define CAMOTICS_TOOL_H
 
-#include <tplang/Axes.h>
+#include <camotics/machine/Axes.h>
 
 #include "ToolShape.h"
 #include "ToolUnits.h"
@@ -38,7 +38,7 @@ namespace cb {
 namespace CAMotics {
   class Sweep;
 
-  class Tool : public tplang::Axes {
+  class Tool : public Axes {
   protected:
     unsigned number;
     unsigned pocket;
@@ -64,9 +64,9 @@ namespace CAMotics {
     void set(char c, double value) {setIndex(toIndex(c), value);}
 
     double getIndex(unsigned i) const
-    {return i < 9 ? tplang::Axes::getIndex(i) : vars[i - 9];}
+    {return i < 9 ? Axes::getIndex(i) : vars[i - 9];}
     void setIndex(unsigned i, double value)
-    {if (i < 9) tplang::Axes::setIndex(i, value); else vars[i - 9] = value;}
+    {if (i < 9) Axes::setIndex(i, value); else vars[i - 9] = value;}
 
     ToolUnits getUnits() const {return units;}
     void setUnits(ToolUnits units) {this->units = units;}
@@ -107,7 +107,7 @@ namespace CAMotics {
       case 'I': return 10;
       case 'J': return 11;
       case 'Q': return 12;
-      default: return tplang::Axes::toIndex(var);
+      default: return Axes::toIndex(var);
       }
     }
 
@@ -118,7 +118,7 @@ namespace CAMotics {
       case 10: return 'I';
       case 11: return 'J';
       case 12: return 'Q';
-      default: return tplang::Axes::toAxis(i);
+      default: return Axes::toAxis(i);
       }
     }
   };

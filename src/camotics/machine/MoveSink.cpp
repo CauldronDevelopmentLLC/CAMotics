@@ -22,7 +22,7 @@
 
 using namespace cb;
 using namespace CAMotics;
-using namespace tplang;
+using namespace CAMotics;
 
 
 MoveSink::MoveSink(MoveStream &stream, double rapidFeed) :

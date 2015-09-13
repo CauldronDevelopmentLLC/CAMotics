@@ -18,23 +18,41 @@
 
 \******************************************************************************/
 
-#ifndef MACHINE_LINEARIZER_H
-#define MACHINE_LINEARIZER_H
+#ifndef TPLANG_GCODE_MACHINE_H
+#define TPLANG_GCODE_MACHINE_H
 
 #include "MachineAdapter.h"
 
+#include <ostream>
 
-namespace tplang {
-  class MachineLinearizer : public MachineAdapter {
-    double arcPrecision;
+namespace CAMotics {
+  class GCodeMachine : public MachineAdapter {
+    std::ostream &stream;
+
+    bool mistCoolant;
+    bool floodCoolant;
+
+    Axes position;
 
   public:
-    MachineLinearizer(double arcPrecision = 360) : arcPrecision(arcPrecision) {}
+    GCodeMachine(std::ostream &stream) :
+      stream(stream), mistCoolant(false), floodCoolant(false) {}
 
-    // From tplang::MachineInterface
-    void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
+    // From MachineInterface
+    void start();
+    void end();
+
+    void setFeed(double feed, feed_mode_t mode);
+    void setSpeed(double speed, spin_mode_t mode, double max);
+    void setTool(unsigned tool);
+
+    int findPort(port_t type, unsigned index);
+    double input(unsigned port, input_mode_t mode, double timeout, bool error);
+    void output(unsigned port, double value, bool sync);
+
+    void dwell(double seconds);
+    void move(const Axes &axes, bool rapid);
   };
 }
 
-#endif // MACHINE_LINEARIZER_H
-
+#endif // TPLANG_GCODE_MACHINE_H

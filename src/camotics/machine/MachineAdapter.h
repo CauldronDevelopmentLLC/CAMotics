@@ -26,7 +26,7 @@
 #include <cbang/SmartPointer.h>
 
 
-namespace tplang {
+namespace CAMotics {
   class MachineAdapter : public MachineInterface {
     cb::SmartPointer<MachineInterface> parent;
 

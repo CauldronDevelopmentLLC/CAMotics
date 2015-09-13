@@ -32,7 +32,7 @@ using namespace cb;
 using namespace tplang;
 
 
-TPLContext::TPLContext(ostream &out, MachineInterface &machine,
+TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
                        const CAMotics::ToolTable &tools) :
   js::Environment(out), machine(machine), tools(tools) {
 

@@ -26,7 +26,7 @@
 #include <camotics/Geom.h>
 #include <camotics/gcode/Printer.h>
 
-#include <camotics/sim/Machine.h>
+#include <camotics/machine/Machine.h>
 #include <camotics/gcode/Interpreter.h>
 
 #include <cbang/SmartPointer.h>

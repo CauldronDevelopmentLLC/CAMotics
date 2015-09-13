@@ -23,7 +23,6 @@
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 
-using namespace tplang;
 using namespace CAMotics;
 using namespace cb;
 using namespace std;

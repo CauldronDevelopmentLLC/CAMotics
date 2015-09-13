@@ -21,8 +21,7 @@
 #ifndef TPLANG_TPLCONTEXT_H
 #define TPLANG_TPLCONTEXT_H
 
-#include "MachineAdapter.h"
-
+#include <camotics/machine/MachineAdapter.h>
 #include <camotics/sim/ToolTable.h>
 
 #include <cbang/js/Environment.h>
@@ -33,10 +32,10 @@ namespace tplang {
     std::vector<cb::SmartPointer<cb::js::Module> > modules;
 
   public:
-    MachineInterface &machine;
+    CAMotics::MachineInterface &machine;
     CAMotics::ToolTable tools;
 
-    TPLContext(std::ostream &out, MachineInterface &machine,
+    TPLContext(std::ostream &out, CAMotics::MachineInterface &machine,
                const CAMotics::ToolTable &tools);
 
     using cb::js::Environment::addModule;
@@ -44,7 +43,8 @@ namespace tplang {
 
     template <typename T>
     T &find() {
-      MachineAdapter *adapter = dynamic_cast<MachineAdapter *>(&machine);
+      CAMotics::MachineAdapter *adapter =
+        dynamic_cast<CAMotics::MachineAdapter *>(&machine);
       if (!adapter) THROW("Not found");
       return adapter->find<T>();
     }

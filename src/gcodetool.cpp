@@ -22,7 +22,7 @@
 #include <cbang/ApplicationMain.h>
 
 #include <camotics/Application.h>
-#include <camotics/sim/Machine.h>
+#include <camotics/machine/Machine.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/gcode/Interpreter.h>
 #include <camotics/gcode/Printer.h>

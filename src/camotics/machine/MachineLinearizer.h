@@ -18,23 +18,23 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MACHINE_ENUM_H
-#define TPLANG_MACHINE_ENUM_H
+#ifndef MACHINE_LINEARIZER_H
+#define MACHINE_LINEARIZER_H
 
-namespace tplang {
-  class MachineEnum {
+#include "MachineAdapter.h"
+
+
+namespace CAMotics {
+  class MachineLinearizer : public MachineAdapter {
+    double arcPrecision;
+
   public:
-    typedef enum {MM_PER_MINUTE, INVERSE_TIME, MM_PER_REVOLUTION} feed_mode_t;
-    typedef enum {REVOLUTIONS_PER_MINUTE, CONSTANT_SURFACE_SPEED} spin_mode_t;
-    typedef enum {IMMEDIATE, START_ON_RISE, START_ON_FALL, START_WHEN_HIGH,
-                  START_WHEN_LOW, STOP_ON_RISE, STOP_ON_FALL, STOP_WHEN_HIGH,
-                  STOP_WHEN_LOW} input_mode_t;
-    typedef enum {XY, XZ, YZ, YV, UV, UW, VW} plane_t;
-    typedef enum {XYZ, ABC, UVW, AXES_COUNT} axes_t;
-    typedef enum {OK, TIMEOUT, CONDITION, LIMIT} async_error_t;
-    typedef enum {MIST_COOLANT, FLOOD_COOLANT, PROBE, ANALOG, DIGITAL} port_t;
+    MachineLinearizer(double arcPrecision = 360) : arcPrecision(arcPrecision) {}
+
+    // From MachineInterface
+    void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
   };
 }
 
-#endif // TPLANG_MACHINE_ENUM_H
+#endif // MACHINE_LINEARIZER_H
 

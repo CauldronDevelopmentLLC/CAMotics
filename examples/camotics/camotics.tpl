@@ -8,3 +8,7 @@ units(METRIC); // This must match the units of the DXF file
 feed(40);
 
 dxf.layer_cut(layer, zSafe, cutDepth);
+
+while (true) {
+  print("hello\n");
+}

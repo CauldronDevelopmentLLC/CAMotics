@@ -27,7 +27,7 @@
 
 using namespace cb;
 using namespace std;
-using namespace tplang;
+using namespace CAMotics;
 
 
 void GCodeMachine::start() {

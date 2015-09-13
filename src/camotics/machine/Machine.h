@@ -18,35 +18,37 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_TRANS_MATRIX_H
-#define TPLANG_TRANS_MATRIX_H
+#ifndef CAMOTICS_MACHINE_H
+#define CAMOTICS_MACHINE_H
 
-#include <cbang/geom/Matrix.h>
+#include "MachinePipeline.h"
+#include "MoveStream.h"
 
-namespace tplang {
-  class TransMatrix {
-    cb::Matrix4x4D m;
-    cb::Matrix4x4D i;
+#include <ostream>
+
+
+namespace CAMotics {
+  class Move;
+  class MachineMatrix;
+
+  class Machine : public MachinePipeline, public MoveStream {
+    double time;
+    double distance;
+    // TODO Load machine configuration, ramp up/down, rapid feed, etc.
 
   public:
-    TransMatrix();
+    Machine(double rapidFeed = 1000);
+    virtual ~Machine() {} // Compiler needs this
 
-    const cb::Matrix4x4D &getMatrix() const {return m;}
-    void setMatrix(const cb::Matrix4x4D &m);
+    double getTime() const {return time;}
+    double getDistance() const {return distance;}
 
-    const cb::Matrix4x4D &getInverse() const {return i;}
-    void setInverse(const cb::Matrix4x4D &i);
+    // From MachineInterface
+    void reset() {time = distance = 0; MachinePipeline::reset();}
 
-    void identity();
-    void scale(const cb::Vector3D &o);
-    void translate(const cb::Vector3D &o);
-    void rotate(double angle, const cb::Vector3D &o);
-    void reflect(const cb::Vector3D &o);
-
-    cb::Vector3D transform(const cb::Vector3D &p) const;
-    cb::Vector3D invert(const cb::Vector3D &p) const;
+    // From MoveStream
+    void move(const Move &move);
   };
 }
 
-#endif // TPLANG_TRANS_MATRIX_H
-
+#endif // CAMOTICS_MACHINE_H

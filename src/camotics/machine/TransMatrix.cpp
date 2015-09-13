@@ -20,7 +20,7 @@
 
 #include "TransMatrix.h"
 
-using namespace tplang;
+using namespace CAMotics;
 using namespace cb;
 
 

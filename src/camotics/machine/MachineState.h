@@ -24,7 +24,7 @@
 #include "MachineInterface.h"
 
 
-namespace tplang {
+namespace CAMotics {
   class MachineState : public MachineInterface {
     bool started;
 

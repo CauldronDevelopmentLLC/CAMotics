@@ -94,7 +94,7 @@ QtWin::QtWin(Application &app) :
           fileTabManager.get(), SLOT(on_actionSelectAll_triggered()));
 
   // ConcurrentTaskManager
-  taskMan.add(this);
+  taskMan.addObserver(this);
   taskCompleteEvent = QEvent::registerEventType();
 
   // Disable unimplemented console buttons
@@ -529,7 +529,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
   // Load surface
   surface.release();
   unsigned threads = options["threads"].toInteger();
-  taskMan.add(new SurfaceTask(threads, project->getFilename(), sim));
+  taskMan.addTask(new SurfaceTask(threads, project->getFilename(), sim));
 }
 
 
@@ -574,7 +574,7 @@ void QtWin::reload(bool now) {
 
   try {
     // Queue Tool Path task
-    taskMan.add(new ToolPathTask(*project));
+    taskMan.addTask(new ToolPathTask(*project));
     setStatusActive(true);
   } CATCH_ERROR;
 }
@@ -585,7 +585,7 @@ void QtWin::reduce() {
 
   try {
     // Queue reduce task
-    taskMan.add(new ReduceTask(*surface));
+    taskMan.addTask(new ReduceTask(*surface));
     setStatusActive(true);
   } CATCH_ERROR;
 }
@@ -1818,14 +1818,6 @@ void QtWin::on_actionReduce_triggered() {
 }
 
 
-void QtWin::on_actionBegining_triggered() {
-  view->path->setByRatio(0);
-  view->clearFlag(View::PLAY_FLAG);
-  view->reverse = false;
-  redraw();
-}
-
-
 void QtWin::on_actionSlower_triggered() {
   view->decSpeed();
 }
@@ -1838,14 +1830,6 @@ void QtWin::on_actionPlay_triggered() {
 
 void QtWin::on_actionFaster_triggered() {
   view->incSpeed();
-}
-
-
-void QtWin::on_actionEnd_triggered() {
-  view->path->setByRatio(1);
-  view->clearFlag(View::PLAY_FLAG);
-  view->reverse = true;
-  redraw();
 }
 
 

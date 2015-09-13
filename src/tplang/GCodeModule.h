@@ -22,20 +22,22 @@
 #define TPLANG_GCODE_MODULE_H
 
 #include "TPLContext.h"
-#include "MachineUnitAdapter.h"
-#include "MachineEnum.h"
+
+#include <camotics/machine/MachineUnitAdapter.h>
+#include <camotics/machine/MachineEnum.h>
 
 #include <cbang/js/Module.h>
 
 
 namespace tplang {
-  class GCodeModule : public cb::js::Module, public MachineEnum {
+  class GCodeModule : public cb::js::Module, public CAMotics::MachineEnum {
     TPLContext &ctx;
-    MachineUnitAdapter &unitAdapter;
+    CAMotics::MachineUnitAdapter &unitAdapter;
 
   public:
     GCodeModule(TPLContext &ctx) :
-    ctx(ctx), unitAdapter(ctx.find<MachineUnitAdapter>()) {define(*this);}
+    ctx(ctx), unitAdapter(ctx.find<CAMotics::MachineUnitAdapter>())
+    {define(*this);}
 
     void define(cb::js::ObjectTemplate &exports);
 
@@ -55,7 +57,7 @@ namespace tplang {
     cb::js::Value positionCB(const cb::js::Arguments &args);
 
   protected:
-    void parseAxes(const cb::js::Arguments &args, Axes &axes,
+    void parseAxes(const cb::js::Arguments &args, CAMotics::Axes &axes,
                    bool incremental = false);
   };
 }

@@ -24,13 +24,16 @@
 #include <camotics/Task.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/sim/ToolTable.h>
-#include <camotics/sim/Machine.h>
-
-#include <cbang/js/Isolate.h>
+#include <camotics/machine/Machine.h>
 
 #include <string>
 #include <vector>
 
+
+namespace cb {
+  class Subprocess;
+  class Thread;
+}
 
 namespace CAMotics {
   class ToolTable;
@@ -44,10 +47,12 @@ namespace CAMotics {
     unsigned errors;
     cb::SmartPointer<ToolPath> path;
 
-    cb::js::Isolate isolate;
+    cb::SmartPointer<cb::Subprocess> proc;
+    cb::SmartPointer<cb::Thread> logCopier;
 
     public:
     ToolPathTask(const Project &project);
+    ~ToolPathTask();
 
     unsigned getErrorCount() const {return errors;}
     const cb::SmartPointer<ToolPath> &getPath() const {return path;}

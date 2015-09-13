@@ -27,7 +27,7 @@
 #include <vector>
 
 
-namespace tplang {
+namespace CAMotics {
   class MachineMatrix : virtual public MachineAdapter {
     typedef std::vector<TransMatrix> matrices_t;
     matrices_t matrices[AXES_COUNT];
