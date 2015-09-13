@@ -97,7 +97,7 @@ void ToolPathTask::run() {
       cmd += SSTR(" --pipe 0x" << hex << proc->getPipeHandle(pipe));
 
       // Execute
-      LOG_DEBUG(1, "Executing: " << cmd);
+      LOG_DEBUG(2, "Executing: " << cmd);
       proc->exec(cmd, Subprocess::SHELL | Subprocess::REDIR_STDOUT |
                  Subprocess::MERGE_STDOUT_AND_STDERR,
                  ProcessPriority::PRIORITY_LOW);
