@@ -39,9 +39,16 @@
 #include <cbang/js/Javascript.h>
 #include <cbang/config/MinConstraint.h>
 
+#include <boost/version.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
 namespace io = boost::iostreams;
+
+#if BOOST_VERSION < 104400
+#define BOOST_CLOSE_HANDLE true
+#else
+#define BOOST_CLOSE_HANDLE io::close_handle
+#endif
 
 #include <iostream>
 #include <vector>
@@ -86,7 +93,7 @@ namespace CAMotics {
 
       if (cmdLine["--pipe"].hasValue()) {
         int pipe = cmdLine["--pipe"].toInteger();
-        stream = new io::stream<io::file_descriptor>(pipe, io::close_handle);
+        stream = new io::stream<io::file_descriptor>(pipe, BOOST_CLOSE_HANDLE);
 
       } else if (out == "-") stream = SmartPointer<ostream>::Phony(&cout);
       else {
