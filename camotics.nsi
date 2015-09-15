@@ -55,8 +55,6 @@ Section -Install
   ; Install files
   SetOutPath "$INSTDIR"
   File ${PRODUCT_EXE}
-  File "camprobe.exe"
-  File "camopt.exe"
   File "gcodetool.exe"
   File "tplang.exe"
   File "images\${PRODUCT_ICON}"
