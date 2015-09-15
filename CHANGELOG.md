@@ -9,7 +9,7 @@
  - All jobs now run in the background
  - Provide progress feedback when large GCode files are being loaded
  - Auto load a demo project #104
- - No longer output '%' at end of program
+ - Output 'M2' instead of '%' at end of GCode
  - Ability to reduce the number of triangles in the simulated workpiece
  - Allow exporting GCode from GUI
  - Ability to run simulations from the command line
