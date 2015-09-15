@@ -197,6 +197,15 @@ if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
 
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
+    # Code sign key password
+    path = os.environ.get('CODE_SIGN_KEY_PASS_FILE')
+    if path is not None:
+        code_sign_key_pass = open(path, 'r').read().strip()
+    else: code_sign_key_pass = None
+
+    if 'SIGNTOOL' in os.environ: env['SIGNTOOL'] = os.environ['SIGNTOOL']
+
+    # Qt version
     if qt_version == '5': qt_pkgs = 'libqt5core5a, libqt5gui5, libqt5opengl5'
     else: qt_pkgs = 'libqtcore4, libqtgui4, libqt4-opengl'
 
@@ -221,6 +230,9 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         nsi = 'camotics.nsi',
         msvc_redist = msvc_redist,
+        timestamp_url = 'http://timestamp.comodoca.com/authenticode',
+        code_sign_key = os.environ.get('CODE_SIGN_KEY', None),
+        code_sign_key_pass = code_sign_key_pass,
 
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
