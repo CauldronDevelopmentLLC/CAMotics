@@ -143,7 +143,7 @@ void ToolPathTask::run() {
 
 void ToolPathTask::interrupt() {
   Task::interrupt();
-  if (!proc.isNull()) proc->kill(true);
+  if (!proc.isNull()) try {proc->kill(true);} CATCH_ERROR;
   if (!logCopier.isNull()) logCopier->stop();
 }
 
