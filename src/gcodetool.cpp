@@ -30,11 +30,6 @@
 
 #include <iostream>
 
-// This causes Windows to not automatically create a console
-#ifdef _WIN32
-#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
-#endif
-
 using namespace std;
 using namespace CAMotics;
 

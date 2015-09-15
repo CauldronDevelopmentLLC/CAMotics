@@ -99,8 +99,8 @@ void ToolPathTask::run() {
       // Execute
       LOG_DEBUG(2, "Executing: " << cmd);
       proc->exec(cmd, Subprocess::SHELL | Subprocess::REDIR_STDOUT |
-                 Subprocess::MERGE_STDOUT_AND_STDERR,
-                 ProcessPriority::PRIORITY_LOW);
+                 Subprocess::MERGE_STDOUT_AND_STDERR |
+                 Subprocess::W32_HIDE_WINDOW, ProcessPriority::PRIORITY_LOW);
 
       // Get pipe stream
       stream = proc->getStream(pipe);
