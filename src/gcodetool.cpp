@@ -52,10 +52,8 @@ namespace CAMotics {
       Application("CAMotics GCode Tool"), controller(*this),
       path(controller.getToolTable()), printer(cout), parseOnly(false) {
 
-      options.pushCategory("GCode Tool");
-      options.addTarget("parse", parseOnly,
+      cmdLine.addTarget("parse", parseOnly,
                         "Only parse the GCode, don't evaluate it");
-      options.popCategory();
     }
 
     // From Application

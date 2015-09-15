@@ -65,6 +65,8 @@ Application::Application(const string &name) :
     info.add(name, "Author", "Joseph Coffland <joseph@camotics.org>");
     info.add(name, "Organization", "Cauldron Development LLC");
   }
+
+  cmdLine.setShowKeywordOpts(false);
 }
 
 

@@ -85,15 +85,13 @@ namespace CAMotics {
       cmdLine.setAllowConfigAsFirstArg(false);
       cmdLine.setAllowPositionalArgs(true);
 
-      options.pushCategory("Simulation");
-      options.addTarget("time", time, "Simulation end time in seconds.  "
+      cmdLine.addTarget("time", time, "Simulation end time in seconds.  "
                         "A value of zero simulates the entire path.");
-      options.addTarget("reduce", reduce, "Reduce cut workpiece.");
-      options.addTarget("binary", binary,
+      cmdLine.addTarget("reduce", reduce, "Reduce cut workpiece.");
+      cmdLine.addTarget("binary", binary,
                         "Output binary STL, otherwise ASCII.");
-      options.addTarget("resolution", resolution, "Valid values are 'low', "
+      cmdLine.addTarget("resolution", resolution, "Valid values are 'low', "
                         "'medium', 'high' or a decimal value.");
-      options.popCategory();
 
       Logger::instance().setLogTime(false);
       Logger::instance().setLogNoInfoHeader(true);
