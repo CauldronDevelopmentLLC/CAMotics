@@ -71,7 +71,7 @@ if not env.GetOption('clean'):
 
     # Qt
     env.EnableQtModules('QtCore QtGui QtOpenGL'.split())
-    env.Append(CCFLAGS = ['-fPIC'])
+    if env['PLATFORM'] != 'win32': env.Append(CCFLAGS = ['-fPIC'])
 
     conf.CBConfig('freetype2')
     conf.CBConfig('opengl')
@@ -153,7 +153,7 @@ Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])
 # Install
 env.Alias('install', [env.get('install_prefix')])
 
-description = '''CAMotics is an  Open-Source software which can simulate
+description = '''CAMotics is an Open-Source software which can simulate
 3-axis NC machining. It is a fast, flexible and user friendly simulation
 software for the DIY and Open-Source community.
 
