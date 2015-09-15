@@ -78,8 +78,9 @@ void ToolPathTask::run() {
     if (String::endsWith(files[i], ".tpl")) {
       // Get executable name
       string cmd =
-        SystemUtilities::dirname(SystemUtilities::getExecutablePath()) +
-        "/tplang";
+        SystemUtilities::joinPath
+        (SystemUtilities::dirname(SystemUtilities::getExecutablePath()),
+         "tplang");
 #ifdef _WIN32
       cmd += ".exe";
 #endif
@@ -93,8 +94,9 @@ void ToolPathTask::run() {
       cmd += " " + files[i];
 
       // Add pipe
-      unsigned pipe = proc->createPipe(false);
-      cmd += SSTR(" --pipe 0x" << hex << proc->getPipeHandle(pipe));
+      //unsigned pipe = proc->createPipe(false);
+      //cmd += SSTR(" --pipe 0x" << hex << proc->getPipeHandle(pipe));
+      unsigned pipe = 1;
 
       // Execute
       LOG_DEBUG(2, "Executing: " << cmd);
@@ -107,8 +109,8 @@ void ToolPathTask::run() {
       stream = proc->getStream(pipe);
 
       // Copy output to log
-      logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
-      logCopier->start();
+      //logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
+      //logCopier->start();
 
     } else { // Assume it's just GCode
       // Track the file load
