@@ -34,7 +34,7 @@ using namespace CAMotics;
 
 
 void DXFReader::read(const InputSource &source) {
-  SmartPointer<DL_Dxf> dxf = = new DL_Dxf;
+  SmartPointer<DL_Dxf> dxf = new DL_Dxf;
 
   if (!dxf->in(source.getStream(), this))
     THROWS("Failed to read '" << source << "' as DXF");
