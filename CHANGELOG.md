@@ -1,5 +1,26 @@
 # CAMotics Changelog
 
+## v1.0.0:
+ - Added GCode/TPL editor/viewer #89
+ - Added console in GUI
+ - Warn and popup console on errors
+ - Double click on error in console jumps to line in code
+ - Fixed problems with editing workpiece values
+ - All jobs now run in the background
+ - Provide progress feedback when large GCode files are being loaded
+ - Auto load a demo project #104
+ - No longer output '%' at end of program
+ - Ability to reduce the number of triangles in the simulated workpiece
+ - Allow exporting GCode from GUI
+ - Ability to run simulations from the command line
+ - Fixed STL export in Windows #81
+ - Fixed problems runing with different locale settings #100
+ - Fixed v8 linking problems
+ - Fixed problems with automatic workpiece z-axis #105
+ - Fixed filename problems when opening and saving files #87
+ - Fixed Ubuntu 12.04 crashes #86
+ - Preliminary support for TPL and TPL libraries
+
 ## v0.2.5:
  - Fixed arcs.  #78, #85
 
