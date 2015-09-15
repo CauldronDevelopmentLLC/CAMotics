@@ -53,6 +53,11 @@ namespace io = boost::iostreams;
 #include <iostream>
 #include <vector>
 
+// This causes Windows to not automatically create a console
+#if defined(_WIN32) && !defined(DEBUG)
+#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+#endif
+
 using namespace std;
 using namespace cb;
 using namespace tplang;
