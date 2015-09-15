@@ -57,6 +57,7 @@ Section -Install
   File ${PRODUCT_EXE}
   File "gcodetool.exe"
   File "tplang.exe"
+  File "camsim.exe"
   File "images\${PRODUCT_ICON}"
   File ${PRODUCT_LICENSE}
   File "README.md"
