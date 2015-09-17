@@ -87,20 +87,23 @@ void ToolPathTask::run() {
 
       if (!SystemUtilities::exists(cmd)) cmd = "tplang";
 
+      // Build args
+      vector<string> args;
+      args.push_back(cmd);
+
       // Create process
       proc = new Subprocess;
 
       // Add file
-      cmd += " " + files[i];
+      args.push_back(files[i]);
 
       // Add pipe
-      //unsigned pipe = proc->createPipe(false);
-      //cmd += SSTR(" --pipe 0x" << hex << proc->getPipeHandle(pipe));
-      unsigned pipe = 1;
+      unsigned pipe = proc->createPipe(false);
+      args.push_back("--pipe");
+      args.push_back(String((unsigned)proc->getPipeHandle(pipe)));
 
       // Execute
-      LOG_DEBUG(2, "Executing: " << cmd);
-      proc->exec(cmd, Subprocess::SHELL | Subprocess::REDIR_STDOUT |
+      proc->exec(args, Subprocess::SHELL | Subprocess::REDIR_STDOUT |
                  Subprocess::MERGE_STDOUT_AND_STDERR |
                  Subprocess::W32_HIDE_WINDOW,
                  ProcessPriority::PRIORITY_LOW);
@@ -109,8 +112,8 @@ void ToolPathTask::run() {
       stream = proc->getStream(pipe);
 
       // Copy output to log
-      //logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
-      //logCopier->start();
+      logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
+      logCopier->start();
 
     } else { // Assume it's just GCode
       // Track the file load
