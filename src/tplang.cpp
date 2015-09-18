@@ -92,7 +92,13 @@ namespace CAMotics {
       SmartPointer<ostream> stream;
 
       if (cmdLine["--pipe"].hasValue()) {
-        int pipe = cmdLine["--pipe"].toInteger();
+#ifdef _WIN32
+        typedef HANDLE handle_t;
+#else
+        typedef int handle_t;
+#endif
+
+        handle_t pipe = (handle_t)cmdLine["--pipe"].toInteger();
         stream = new io::stream<io::file_descriptor>(pipe, BOOST_CLOSE_HANDLE);
 
       } else if (out == "-") stream = SmartPointer<ostream>::Phony(&cout);
