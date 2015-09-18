@@ -124,7 +124,7 @@ void Tokenizer::next() {
   bool needAdvance = true;
   char c = (char)scanner.peek();
   switch (c) {
-  case 0: current.set(EOF_TOKEN, ""); needAdvance = false; break;
+  case 0: current.set(EOF_TOKEN, ""); return;
 
   case '%': break; // Ignore program delimiter
   case ';': comment(); needAdvance = false; break;

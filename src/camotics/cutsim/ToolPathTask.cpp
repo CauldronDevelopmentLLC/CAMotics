@@ -105,7 +105,7 @@ void ToolPathTask::run() {
       args.push_back(String((unsigned)proc->getPipeHandle(pipe)));
 
       // Execute
-      proc->exec(args, Subprocess::SHELL | Subprocess::REDIR_STDOUT |
+      proc->exec(args, Subprocess::REDIR_STDOUT |
                  Subprocess::MERGE_STDOUT_AND_STDERR |
                  Subprocess::W32_HIDE_WINDOW,
                  ProcessPriority::PRIORITY_LOW);
