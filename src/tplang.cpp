@@ -67,6 +67,8 @@ namespace CAMotics {
     string out;
     bool force;
 
+    SmartPointer<ostream> stream;
+
   public:
     TPLangApp() :
       Application("Tool Path Language"), out("-"), force(false) {
@@ -82,14 +84,9 @@ namespace CAMotics {
     }
 
     // From cb::Application
-    void requestExit() {
-      Application::requestExit();
-      cb::js::Javascript::terminate();
-    }
-
-    // From cb::Reader
-    void read(const cb::InputSource &source) {
-      SmartPointer<ostream> stream;
+    int init(int argc, char *argv[]) {
+      int ret = cb::Application::init(argc, argv);
+      if (ret == -1) return ret;
 
       if (cmdLine["--pipe"].hasValue()) {
 #ifdef _WIN32
@@ -108,12 +105,24 @@ namespace CAMotics {
         stream = SystemUtilities::oopen(out);
       }
 
+      // Build machine pipeline
       pipeline.add(new MachineUnitAdapter);
       pipeline.add(new MachineLinearizer);
       pipeline.add(new MachineMatrix);
       pipeline.add(new GCodeMachine(*stream));
       pipeline.add(new MachineState);
 
+      return ret;
+    }
+
+
+    void requestExit() {
+      Application::requestExit();
+      cb::js::Javascript::terminate();
+    }
+
+    // From cb::Reader
+    void read(const cb::InputSource &source) {
       tplang::TPLContext ctx(cout, pipeline, tools);
       tplang::Interpreter(ctx).read(source);
       stream->flush();
