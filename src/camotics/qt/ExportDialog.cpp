@@ -30,6 +30,32 @@ ExportDialog::ExportDialog() : ui(new Ui::ExportDialog) {
 }
 
 
+int ExportDialog::exec() {
+  bool change = false;
+
+  if (!ui->surfaceRadioButton->isEnabled() && surfaceSelected()) change = true;
+  if (!ui->gcodeRadioButton->isEnabled() && gcodeSelected()) change = true;
+  if (!ui->simDataRadioButton->isEnabled() && simDataSelected()) change = true;
+
+  if (change) {
+    if (ui->surfaceRadioButton->isEnabled()) {
+      ui->surfaceRadioButton->setChecked(true);
+      on_surfaceRadioButton_clicked();
+
+    } else if (ui->gcodeRadioButton->isEnabled()) {
+      ui->gcodeRadioButton->setChecked(true);
+      on_gcodeRadioButton_clicked();
+
+    } else if (ui->simDataRadioButton->isEnabled()) {
+      ui->simDataRadioButton->setChecked(true);
+      on_simDataRadioButton_clicked();
+    }
+  }
+
+  return QDialog::exec();
+}
+
+
 void ExportDialog::enableSurface(bool enable) {
   ui->surfaceFrame->setEnabled(enable && surfaceSelected());
   ui->surfaceRadioButton->setEnabled(enable);

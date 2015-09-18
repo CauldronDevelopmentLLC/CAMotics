@@ -38,6 +38,9 @@ namespace CAMotics {
   public:
     ExportDialog();
 
+    // From QDialog
+    int exec();
+
     void enableSurface(bool enable);
     void enableGCode(bool enable);
     void enableSimData(bool enable);
