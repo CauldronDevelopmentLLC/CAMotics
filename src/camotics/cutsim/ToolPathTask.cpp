@@ -68,14 +68,16 @@ void ToolPathTask::run() {
 
   // Interpret code
   for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {
-    if (!SystemUtilities::exists(files[i])) continue;
+    string filename = files[i];
 
-    Task::update(0, "Running " + files[i]);
+    if (!SystemUtilities::exists(filename)) continue;
+
+    Task::update(0, "Running " + filename);
 
     SmartPointer<istream> stream;
     SmartPointer<TaskFilter> taskFilter;
 
-    if (String::endsWith(files[i], ".tpl")) {
+    if (String::endsWith(filename, ".tpl")) {
       // Get executable name
       string cmd =
         SystemUtilities::joinPath
@@ -95,7 +97,7 @@ void ToolPathTask::run() {
       proc = new Subprocess;
 
       // Add file
-      args.push_back(files[i]);
+      args.push_back(filename);
 
       // Add pipe
       unsigned pipe = proc->createPipe(false);
@@ -115,18 +117,21 @@ void ToolPathTask::run() {
       logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
       logCopier->start();
 
+      // Change file name so GCode error messages make sense
+      filename = "<generated gcode>";
+
     } else { // Assume it's just GCode
       // Track the file load
       io::filtering_istream *filter = new io::filtering_istream;
       stream = filter;
 
       taskFilter =
-        new TaskFilter(*this, SystemUtilities::getFileSize(files[i]));
+        new TaskFilter(*this, SystemUtilities::getFileSize(filename));
       filter->push(boost::ref(*taskFilter));
-      filter->push(io::file(files[i], ios_base::in));
+      filter->push(io::file(filename, ios_base::in));
     }
 
-    InputSource src(*stream, files[i]);
+    InputSource src(*stream, filename);
 
     // Parse GCode
     Interpreter interp(controller, SmartPointer<Task>::Phony(this));
