@@ -93,7 +93,7 @@ namespace CAMotics {
 
       if (cmdLine["--pipe"].hasValue()) {
 #ifdef _WIN32
-        typedef HANDLE handle_t;
+        typedef void *handle_t;
 #else
         typedef int handle_t;
 #endif
