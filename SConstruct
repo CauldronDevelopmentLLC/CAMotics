@@ -14,6 +14,7 @@ env = Environment(ENV = os.environ,
 env.Tool('config', toolpath = [cbang])
 env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
+    BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     EnumVariable('qt_version', 'Version of Qt to use', 'auto',
                  allowed_values = ('auto', '4', '5')))
 env.CBLoadTools(
@@ -205,9 +206,12 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     if 'SIGNTOOL' in os.environ: env['SIGNTOOL'] = os.environ['SIGNTOOL']
 
-    # Qt version
-    if qt_version == '5': qt_pkgs = 'libqt5core5a, libqt5gui5, libqt5opengl5'
-    else: qt_pkgs = 'libqtcore4, libqtgui4, libqt4-opengl'
+    # Qt dependencies
+    if env.get('qt_deps'):
+        if qt_version == '5':
+            qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5'
+        else: qt_pkgs = ', libqtcore4, libqtgui4, libqt4-opengl'
+    else: qt_pkgs = ''
 
     pkg = env.Packager(
         'CAMotics',
@@ -237,13 +241,13 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
         deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
-            'libcairo2, libssl1.0.0, libglu1, ' + qt_pkgs,
+            'libcairo2, libssl1.0.0, libglu1' + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
         rpm_license = 'GPLv2+',
         rpm_group = 'Applications/Engineering',
-        rpm_requires = 'expat, bzip2-libs, libcairo2, ' + qt_pkgs,
+        rpm_requires = 'expat, bzip2-libs, libcairo2' + qt_pkgs,
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics',
