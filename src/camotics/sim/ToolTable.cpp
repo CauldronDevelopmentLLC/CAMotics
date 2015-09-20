@@ -56,7 +56,7 @@ const Tool &ToolTable::get(unsigned tool) const {
   const_iterator it = find(tool);
   if (it != end()) return it->second;
 
-  THROWS("Non-existant tool " << tool);
+  THROWS("Missing tool " << tool);
 }
 
 
