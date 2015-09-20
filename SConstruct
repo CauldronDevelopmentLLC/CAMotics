@@ -237,7 +237,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
         deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
-            'libcairo2, ' + qt_pkgs,
+            'libcairo2, libssl1.0.0, libglu1, ' + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
