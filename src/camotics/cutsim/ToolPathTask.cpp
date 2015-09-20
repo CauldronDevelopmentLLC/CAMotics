@@ -128,7 +128,7 @@ void ToolPathTask::run() {
       taskFilter =
         new TaskFilter(*this, SystemUtilities::getFileSize(filename));
       filter->push(boost::ref(*taskFilter));
-      filter->push(io::file(filename, ios_base::in));
+      filter->push(io::file_source(filename));
     }
 
     InputSource src(*stream, filename);
