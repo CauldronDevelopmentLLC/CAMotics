@@ -301,6 +301,9 @@ module.exports = extend({
   polyline_cut: function(pl) {
     for (var i = 1; i < pl.vertices.length; i++)
       this.tabbed_cut(pl.vertices[i].x, pl.vertices[i].y);
+
+    if (pl.vertices.length)
+      this.tabbed_cut(pl.vertices[0].x, pl.vertices[0].y);
   },
 
 
