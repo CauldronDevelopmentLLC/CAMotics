@@ -21,6 +21,7 @@
 #include "GCodeMachine.h"
 
 #include <cbang/Exception.h>
+#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 
 #include <limits>
@@ -28,6 +29,26 @@
 using namespace cb;
 using namespace std;
 using namespace CAMotics;
+
+
+namespace {
+  struct dtos {
+    double x;
+    dtos(double x) : x(x) {
+      if (Math::isnan(x))
+        THROW("Numerical error in GCode stream:  NaN, caused by a divide by "
+              "zero or other math error.");
+
+      if (Math::isinf(x))
+        THROW("Numerical error in GCode stream: Infiniate value");
+    }
+  };
+
+
+  inline ostream &operator<<(ostream &stream, const dtos &d) {
+    return stream << d.x;
+  }
+}
 
 
 void GCodeMachine::start() {
@@ -58,7 +79,7 @@ void GCodeMachine::setFeed(double feed, feed_mode_t mode) {
                    "UNITS_PER_MIN or UNITS_PER_REV");
     }
 
-  if (feed != oldFeed) stream << "F" << String(feed) << '\n';
+  if (feed != oldFeed) stream << "F" << dtos(feed) << '\n';
 }
 
 
@@ -72,14 +93,14 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
     switch (mode) {
     case REVOLUTIONS_PER_MINUTE: stream << "G97\n";
     case CONSTANT_SURFACE_SPEED:
-      stream << "G96 S" << String(fabs(speed));
-      if (max) stream << " D" << max;
+      stream << "G96 S" << dtos(fabs(speed));
+      if (max) stream << " D" << dtos(max);
       stream << '\n';
     }
 
   if (oldSpeed != speed) {
-    if (0 < speed) stream << "M3 S" << String(speed) << '\n';
-    else if (speed < 0) stream << "M4 S" << String(-speed) << '\n';
+    if (0 < speed) stream << "M3 S" << dtos(speed) << '\n';
+    else if (speed < 0) stream << "M4 S" << dtos(-speed) << '\n';
     else stream << "M5\n";
   }
 }
@@ -135,7 +156,7 @@ void GCodeMachine::output(unsigned port, double value, bool sync) {
 
 
 void GCodeMachine::dwell(double seconds) {
-  stream << "G4 P" << String(seconds) << '\n';
+  stream << "G4 P" << dtos(seconds) << '\n';
   MachineAdapter::dwell(seconds);
 }
 
@@ -155,7 +176,7 @@ void GCodeMachine::move(const Axes &axes, bool rapid) {
         first = false;
       }
 
-      stream << ' ' << *axis << String(axes.get(*axis));
+      stream << ' ' << *axis << dtos(axes.get(*axis));
     }
 
   if (!first) {
