@@ -1,0 +1,19 @@
+<camotics>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
+  <!-- NC Files -->
+  <nc-files>
+    lamp_shade.tpl
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution-mode v='MANUAL'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(295,495,0)'/>
+  <workpiece-min v='(-5,-5,-6)'/>
+
+  <tool_table>
+    <tool length='10' number='1' radius='0.79375' shape='CYLINDRICAL' units='MM'/>
+  </tool_table>
+</camotics>
