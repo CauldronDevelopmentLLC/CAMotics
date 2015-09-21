@@ -2,7 +2,7 @@
   <!-- Note, all values are in mm regardless of 'units' option. -->
   <!-- NC Files -->
   <nc-files>
-    lamp_shade.tpl
+    lampshade.tpl
   </nc-files>
 
   <!-- Renderer -->
