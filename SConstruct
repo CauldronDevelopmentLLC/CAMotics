@@ -181,7 +181,7 @@ examples = []
 if 'package' in COMMAND_LINE_TARGETS:
     import subprocess
 
-    cmd = 'git ls-files  examples/'
+    cmd = 'git ls-files examples/'
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     examples = p.communicate()[0]
     examples = map(lambda x: [x, x], examples.split())
