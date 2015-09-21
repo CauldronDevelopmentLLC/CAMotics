@@ -148,7 +148,7 @@ ask_uninstall:
     "CAMotics replaces OpenSCAM.  Do you want to uninstall OpenSCAM?" \
     IDNO done
 
-  ExecWait "$INSTDIR\..\OpenSCAM\Uninstall.exe" /S
+  ExecWait '"$INSTDIR\..\OpenSCAM\Uninstall.exe" /S'
 
 done:
   Return
