@@ -131,15 +131,21 @@ void ToolPathTask::run() {
       filter->push(io::file_source(filename));
     }
 
-    InputSource src(*stream, filename);
+    try {
+      InputSource src(*stream, filename);
 
-    // Parse GCode
-    Interpreter interp(controller, SmartPointer<Task>::Phony(this));
-    interp.read(src);
-    errors += interp.getErrorCount();
+      // Parse GCode
+      Interpreter interp(controller, SmartPointer<Task>::Phony(this));
+      interp.read(src);
+      errors += interp.getErrorCount();
+
+    } catch (const Exception &e) {
+      LOG_ERROR(e);
+      errors++;
+    }
 
     // Wait for Subprocess
-    if (!proc.isNull() && proc->wait()) errors++;
+    if (!proc.isNull() && proc->waitFor(5, 10)) errors++;
 
     // Stop the log copier
     if (!logCopier.isNull()) {
