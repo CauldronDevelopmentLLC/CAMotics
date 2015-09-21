@@ -46,7 +46,7 @@ namespace {
 
 
   inline ostream &operator<<(ostream &stream, const dtos &d) {
-    return stream << d.x;
+    return stream << String(d.x);
   }
 }
 
