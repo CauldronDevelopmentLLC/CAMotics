@@ -140,6 +140,17 @@ write_uninstaller:
   # Install MSVC redist
   ExecWait '"$INSTDIR\${MSVCREDIST}" /q:a /c:"VCREDI~1.EXE /q:a /c:""msiexec /i vcredist.msi /qb!"" "'
 
+  # Uninstall OpenSCAM
+  IfFileExists "$INSTDIR\..\OpenSCAM\Uninstall.exe" ask_uninstall done
+
+ask_uninstall:
+  MessageBox MB_YESNO \
+    "CAMotics replaces OpenSCAM.  Do you want to uninstall OpenSCAM?" \
+    IDNO done
+
+  ExecWait "$INSTDIR\..\OpenSCAM\Uninstall.exe" /S
+
+done:
   Return
 
 abort:
