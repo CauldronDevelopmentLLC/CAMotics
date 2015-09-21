@@ -34,3 +34,8 @@
 /camprobe
 /camsim
 /camopt
+
+# Packages
+*.deb
+*.rpm
+*.exe
