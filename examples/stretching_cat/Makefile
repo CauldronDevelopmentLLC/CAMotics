@@ -1,9 +1,7 @@
-TARGETS=stretching_cat.ngc
+all: stretching_cat.dxf
 
-all: $(TARGETS)
+%.dxf: %.eps
+	pstoedit -dt -f 'dxf_s:-polyaslines -mm' $< $@
 
-%.ngc: %.ngc.in
-	ncpp $< > $@
-
-clean:
-	rm -f $(TARGETS)
+%.eps: %.svg
+	inkscape -f $< -E $@

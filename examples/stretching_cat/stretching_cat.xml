@@ -1,12 +1,13 @@
 <camotics>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
   <!-- NC Files -->
   <nc-files>
-    stretching_cat.ngc
+    stretching_cat.tpl
   </nc-files>
 
   <!-- Renderer -->
-  <resolution v='0.928318'/>
-  <resolution-mode v='MEDIUM'/>
+  <resolution v='0.5'/>
+  <resolution-mode v='MANUAL'/>
 
   <!-- Workpiece -->
   <automatic-workpiece v='false'/>
