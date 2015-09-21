@@ -65,7 +65,7 @@ TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
     SystemUtilities::dirname(SystemUtilities::getExecutablePath());
   addSearchPaths(exeDir + "/tpl_lib");
 #ifdef __APPLE__
-  addSearchPaths(exeDir + "/Resources/tpl_lib");
+  addSearchPaths(exeDir + "/../Resources/tpl_lib");
 #endif
 
   // Add .tpl to search extensions
