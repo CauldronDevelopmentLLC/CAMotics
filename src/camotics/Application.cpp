@@ -72,10 +72,8 @@ Application::Application(const string &name) :
 
 
 void Application::run() {
-  try {
-    const vector<string> &args = cmdLine.getPositionalArgs();
-    if (args.empty()) read(cb::InputSource(cin, "<stdin>"));
-    vector<string>::const_iterator it;
-    for (it = args.begin(); it != args.end(); it++) read(*it);
-  } CATCH_ERROR;
+  const vector<string> &args = cmdLine.getPositionalArgs();
+  if (args.empty()) read(cb::InputSource(cin, "<stdin>"));
+  vector<string>::const_iterator it;
+  for (it = args.begin(); it != args.end(); it++) read(*it);
 }
