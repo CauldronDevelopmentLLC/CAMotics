@@ -515,6 +515,8 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 
   redraw();
 
+  if (task.getErrorCount()) return; // Don't simluate on errors
+
   // Auto play
   if (autoPlay) {
     autoPlay = false;
