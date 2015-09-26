@@ -265,9 +265,6 @@ module.exports = extend({
       }
     }
 
-    var v = this.element_vertices(layer[best]);
-    if (flip) v = [].concat(v).reverse();
-
     return {i: best, flip: flip};
   },
 
