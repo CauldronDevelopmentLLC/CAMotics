@@ -32,7 +32,6 @@ namespace CAMotics {
   class MoveSink : public MachineAdapter {
     MoveStream &stream;
 
-    bool first;
     bool probePending;
     double rapidFeed;
     double time;
