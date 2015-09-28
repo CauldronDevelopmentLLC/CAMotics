@@ -21,7 +21,7 @@
 #ifndef CAMOTICS_TOOL_PATH_H
 #define CAMOTICS_TOOL_PATH_H
 
-#include "Move.h"
+#include "MoveStream.h"
 
 #include <camotics/Geom.h>
 #include <camotics/sim/ToolTable.h>
@@ -35,7 +35,8 @@ namespace cb {namespace JSON {class Sink;}}
 namespace CAMotics {
   class STL;
 
-  class ToolPath : public std::vector<Move>, public Rectangle3R {
+  class ToolPath :
+    public std::vector<Move>, public Rectangle3R, public MoveStream {
     ToolTable tools;
 
   public:
@@ -46,11 +47,13 @@ namespace CAMotics {
     const ToolTable &getTools() const {return tools;}
     ToolTable &getTools() {return tools;}
 
-    void add(const Move &move);
     void print(std::ostream &stream, bool metric = true) const;
     void write(cb::JSON::Sink &sink) const;
 
     using std::vector<Move>::operator[];
+
+    // From MoveStream
+    void move(const Move &move);
   };
 }
 

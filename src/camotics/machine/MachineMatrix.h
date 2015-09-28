@@ -40,8 +40,8 @@ namespace CAMotics {
     void loadIdentity(axes_t matrix = XYZ);
     void scale(double x, double y, double z, axes_t matrix = XYZ);
     void translate(double x, double y, double z, axes_t matrix = XYZ);
-    void rotate(double angle, double x, double y, double z,
-                axes_t matrix = XYZ);
+    void rotate(double angle, double x, double y, double z, double a, double b,
+                double c, axes_t matrix = XYZ);
     void reflect(double x, double y, double z, axes_t matrix = XYZ);
 
     // From MachineInterface

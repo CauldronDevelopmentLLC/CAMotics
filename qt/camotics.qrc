@@ -59,5 +59,6 @@
         <file>icons/delete.png</file>
         <file>icons/hide.png</file>
         <file>icons/show.png</file>
+        <file>icons/optimize.png</file>
     </qresource>
 </RCC>

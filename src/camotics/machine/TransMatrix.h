@@ -41,7 +41,7 @@ namespace CAMotics {
     void identity();
     void scale(const cb::Vector3D &o);
     void translate(const cb::Vector3D &o);
-    void rotate(double angle, const cb::Vector3D &o);
+    void rotate(double angle, const cb::Vector3D &o, const cb::Vector3D &u);
     void reflect(const cb::Vector3D &o);
 
     cb::Vector3D transform(const cb::Vector3D &p) const;

@@ -64,7 +64,7 @@ Tool &ToolTable::get(unsigned tool) {
   iterator it = find(tool);
   if (it != end()) return it->second;
 
-  LOG_WARNING("Auto-creating non-existant tool " << tool);
+  LOG_WARNING("Auto-creating missing tool " << tool);
   return (*this)[tool] = Tool(tool);
 }
 

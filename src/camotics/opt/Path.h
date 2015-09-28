@@ -28,11 +28,10 @@
 #include <list>
 
 namespace CAMotics {
-  class Path : public std::list<Move> {
+  class Path : public std::vector<Move> {
   public:
-
-    const Vector3R &startPoint() const {return front()[0];}
-    const Vector3R &endPoint() const {return back()[1];}
+    const Vector3R &startPoint() const {return front().getStartPt();}
+    const Vector3R &endPoint() const {return back().getEndPt();}
     void reverse();
     double costTo(const Path &o) const
     {return endPoint().distance(o.startPoint());}

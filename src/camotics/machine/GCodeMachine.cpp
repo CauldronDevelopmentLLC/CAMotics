@@ -186,3 +186,9 @@ void GCodeMachine::move(const Axes &axes, bool rapid) {
     MachineAdapter::move(position, rapid);
   }
 }
+
+
+void GCodeMachine::pause(bool optional) const {
+  stream << (optional ? "M1" : "M0") << '\n';
+  MachineAdapter::pause(optional);
+}

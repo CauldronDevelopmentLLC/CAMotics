@@ -22,123 +22,185 @@
 
 #include "AnnealState.h"
 
+#include <camotics/cutsim/ToolPath.h>
+#include <camotics/machine/MachineState.h>
+#include <camotics/machine/MoveSink.h>
+
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
-#include <cbang/config/Options.h>
 #include <cbang/time/Time.h>
-#include <cbang/os/SystemUtilities.h>
-
-#include <camotics/gcode/Parser.h>
-#include <camotics/gcode/Codes.h>
 
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-Opt::Opt(Options &options, ostream &stream) :
-  Printer(stream), controller(*this), interp(controller),
-  pathCount(0), cutCount(0), iterations(10000), runs(1), heatTarget(1.5),
-  minTemp(0.01), heatRate(1.5), coolRate(0.95), reheatRate(2), timeout(10) {
+Opt::Opt(const ToolPath &path) :
+  cutCount(0), iterations(10000), runs(1), heatTarget(1.5),
+  minTemp(0.01), heatRate(1.5), coolRate(0.95), reheatRate(2), timeout(10),
+  zSafe(5), tools(path.getTools()) {
 
-  options.pushCategory("Opt");
-  options.addTarget("iterations", iterations,
-                    "Number of iterations per annealing round");
-  options.addTarget("runs", runs, "Number of optimization runs");
-  options.addTarget("heat-target", heatTarget, "Stop heating the "
-                    "system when the average cost reaches this ratio of the "
-                    "starting cost, after a brief greedy optimization.");
-  options.addTarget("min-temp", minTemp, "Stop the optimization if the "
-                    "temperature drops below this level.");
-  options.addTarget("heat-rate", heatRate, "The rate at which to heat up the "
-                    "system as a ratio of the current temperature.");
-  options.addTarget("cool-rate", coolRate, "The rate at which to cool the "
-                    "system between rounds as a ratio of the current "
-                    "temperature.");
-  options.addTarget("reheat-rate", reheatRate, "The rate at which to reheat "
-                    "the system as a ratio of the current temperature.  "
-                    "Reheating occures when the best cost was improved during "
-                    "a round.");
-  options.addTarget("timeout", timeout, "Stop the optimization if no "
-                    "improvement occures with in this many seconds.");
-  options.popCategory();
+  srand(Time::now()); // Randomize
+
+  for (unsigned i = 0; i < path.size(); i++) add(path[i]);
+}
+
+
+void Opt::run() {
+  double initialCost = computeCost();
+
+  LOG_INFO(1, "Optimizing " << paths.size() << " paths with " << cutCount
+           << " cuts initial cost " << initialCost);
+
+  double cost = optimize();
+
+  LOG_INFO(1, "Final cost was " << cost << ", an improvement of "
+           << 100 - cost / initialCost * 100 << "% or " << initialCost / cost
+           << 'x');
+
+  path = new ToolPath(tools);
+  extract(*path);
 }
 
 
 double Opt::computeCost() const {
   double cost = 0;
+  paths_t::const_iterator last = paths.end();
 
-  for (unsigned i = 0; i < groups.size(); i++)
-    cost += groups[i]->computeCost();
+  for (paths_t::const_iterator it = paths.begin(); it != paths.end(); it++) {
+    if (last != paths.end()) cost += last->costTo(*it);
+    last = it;
+  }
 
   return cost;
 }
 
 
-void Opt::read(const InputSource &source) {
-  pathCount = 0;
-  cutCount = 0;
-  groups.clear();
-  srand(Time::now());
+void Opt::add(const Move &move) {
+  if (paths.empty()) paths.push_back(Path());
 
-  // Parse program
-  try {
-    Parser().parse(source, interp);
-  } catch (const EndProgram &) {}
+  bool cutting = move.getType() == MoveType::MOVE_CUTTING;
 
-  double initialCost = computeCost();
-
-  LOG_INFO(1, "Groups: " << groups.size());
-  LOG_INFO(1, "Paths: " << pathCount);
-  LOG_INFO(1, "Cuts: " << cutCount);
-  LOG_INFO(1, "Initial cost: " << initialCost);
-
-  double cost = 0;
-  for (unsigned i = 0; i < groups.size(); i++) {
-    LOG_INFO(1, "Optimizing group " << i);
-    cost += optimize(*groups[i]);
-  }
-
-  LOG_INFO(1, "Final cost: " << cost);
-  LOG_INFO(1, "Improvement: " << 100 - cost / initialCost * 100 << "% or "
-           << initialCost / cost << 'x');
-
-  // TODO output modified GCode
-}
-
-
-void Opt::move(const Move &move) {
-  if (move.getType() == MoveType::MOVE_CUTTING) {
-    if (currentPath.isNull()) currentPath = new Path;
-    currentPath->push_back(move);
+  if (cutting) {
+    paths.back().push_back(move);
     cutCount++;
 
-  } else if (!currentPath.isNull()) {
-    if (currentGroup.isNull()) {
-      currentGroup = new Group;
-      groups.push_back(currentGroup);
-    }
-    currentGroup->push_back(currentPath.adopt());
-    pathCount++;
-  }
+  } else if (!paths.back().empty())
+    paths.push_back(Path());
 }
 
 
-void Opt::operator()(const SmartPointer<Block> &block) {
-  interp(block);
+double Opt::optimize() {
+  AnnealState start(paths);
+  AnnealState best(paths);
+  AnnealState veryBest(paths);
+  AnnealState current(paths);
 
-  // TODO
+  for (unsigned run = 0; run < runs && !shouldQuit(); run++) {
+    best = start;
 
-  if (!block->isDeleted()) {
+    // Greedy run
+    round(0, iterations, current, best);
+ 
+    double T = 1;
+    double average;
+    double target = best.cost * heatTarget;
+
+    // Increase temperature up to target 
+    LOG_INFO(1, "Heating up");
+    do {
+      T *= heatRate;
+      average = round(T, iterations, current, best); 
+    } while (average < target && !shouldQuit());
+
+    // Run until cold
+    LOG_INFO(1, "Anealing");
+    uint64_t lastImprovement = Time::now();
+
+    while (!shouldQuit()) {
+      double tempBest = best.cost;
+      round(T, iterations, current, best);
+
+      if (best.cost < tempBest) {
+        LOG_INFO(1, "Temperature " << T << " Cost " << best.cost);
+
+        lastImprovement = Time::now();
+        T *= reheatRate;
+
+      } else T *= coolRate;
+
+      if (T < minTemp) break; // Frozen
+      if (timeout < Time::now() - lastImprovement) break;
+    }
+
+    if (best.cost < veryBest.cost) veryBest = best;
   }
 
-  Printer::operator()(block);
+  best = veryBest;
+
+  // Rearrange vector
+  if (best.cost < current.cost) {
+    vector<Path> tmp(paths.begin(), paths.end());
+    paths.clear();
+
+    for (unsigned i = 0; i < tmp.size(); i++) {
+      if (best.flip[best.index[i]]) tmp[best.index[i]].reverse();
+      paths.push_back(tmp[best.index[i]]);
+    }
+  }
+  
+  return best.cost;
+}
+
+
+void Opt::extract(ToolPath &path) const {
+  MoveSink sink(path, 1000); // TODO get rapid feed rate
+  sink.setParent(new MachineState);
+  sink.reset();
+
+  Axes axes = sink.getPosition();
+  sink.move(axes, true);
+
+  for (paths_t::const_iterator it = paths.begin(); it != paths.end() &&
+         !shouldQuit(); it++) {
+    Vector3R last = sink.getPosition().getXYZ();
+    Vector3R next = it->startPoint();
+
+    sink.setTool(it->begin()->getTool());
+    sink.setFeed(it->begin()->getFeed());
+    sink.setSpeed(it->begin()->getSpeed());
+
+    if (last != next) {
+      axes = sink.getPosition();
+      axes.setZ(zSafe);
+      sink.move(axes, true);
+
+      axes.setX(next.x());
+      axes.setY(next.y());
+      sink.move(axes, true);
+
+      axes.setZ(next.z());
+      sink.move(axes, false);
+    }
+
+    for (unsigned i = 0; i < it->size(); i++) {
+      const Move &move = it->at(i);
+
+      sink.setTool(move.getTool());
+      sink.setFeed(move.getFeed());
+      sink.setSpeed(move.getSpeed());
+      sink.move(move.getEnd(), false);
+    }
+  }
+
+  axes = sink.getPosition();
+  axes.setZ(zSafe);
+  sink.move(axes, true);
 }
 
 
 static bool accept(double delta, double T) {
-  return
-    delta < 0 ? true : (rand() < exp(-delta / (T * 0.00001)) * RAND_MAX);
+  return delta < 0 ? true : (rand() < exp(-delta / (T * 0.00001)) * RAND_MAX);
 }
 
 
@@ -146,7 +208,7 @@ double Opt::round(double T, unsigned iterations, AnnealState &current,
                   AnnealState &best) {
   double average = 0;
 
-  for (unsigned round = 0; round < iterations; round++) {
+  for (unsigned round = 0; round < iterations && !shouldQuit(); round++) {
     unsigned first = rand() % best.index.size();
     unsigned second = rand() % best.index.size();
     unsigned mode = rand() % 3;
@@ -194,66 +256,4 @@ double Opt::round(double T, unsigned iterations, AnnealState &current,
            << " Average " << average << " Best " << best.cost);
 
   return average;
-}
-
-
-double Opt::optimize(Group &group) {
-  AnnealState start(group);
-  AnnealState best(group);
-  AnnealState veryBest(group);
-  AnnealState current(group);
-
-  for (unsigned run = 0; run < runs; run++) {
-    best = start;
-
-    // Greedy run
-    round(0, iterations, current, best);
- 
-    double T = 1;
-    double average;
-    double target = best.cost * heatTarget;
-
-    // Increase temperature up to target 
-    LOG_INFO(1, "Heating up");
-    do {
-      T *= heatRate;
-      average = round(T, iterations, current, best); 
-    } while (average < target);
-
-    // Run until cold
-    LOG_INFO(1, "Anealing");
-    uint64_t lastImprovement = Time::now();
-
-    while (true) {
-      double tempBest = best.cost;
-      round(T, iterations, current, best);
-
-      if (best.cost < tempBest) {
-        LOG_INFO(1, "Temperature " << T << " Cost " << best.cost);
-
-        lastImprovement = Time::now();
-        T *= reheatRate;
-
-      } else T *= coolRate;
-
-      if (T < minTemp) break; // Frozen
-      if (timeout < Time::now() - lastImprovement) break;
-    }
-
-    if (best.cost < veryBest.cost) veryBest = best;
-  }
-
-  best = veryBest;
-
-  // Rearrange vector
-  if (best.cost < current.cost) {
-    vector<SmartPointer<Path> > tmp(group.begin(), group.end());
-    group.clear();
-    for (unsigned i = 0; i < tmp.size(); i++) {
-      if (best.flip[best.index[i]]) tmp[best.index[i]]->reverse();
-      group.push_back(tmp[best.index[i]]);
-    }
-  }
-  
-  return best.cost;
 }

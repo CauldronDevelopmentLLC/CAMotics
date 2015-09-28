@@ -19,19 +19,21 @@
 \******************************************************************************/
 
 #include "AnnealState.h"
+#include "Path.h"
 
-#include "Group.h"
+#include <cbang/geom/Vector.h>
+
 
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-AnnealState::AnnealState(Group &group) : group(group) {
+AnnealState::AnnealState(const paths_t &paths) : paths(paths) {
   index.clear();
   flip.clear();
 
-  for (unsigned i = 0; i < group.size(); i++) {
+  for (unsigned i = 0; i < paths.size(); i++) {
     index.push_back(i);
     flip.push_back(false);
   }
@@ -55,8 +57,8 @@ void AnnealState::flipIndex(unsigned i) {
 
 
 double AnnealState::computeCost(unsigned first, unsigned second) const {
-  const Path &path1 = *group.at(index[first]);
-  const Path &path2 = *group.at(index[second]);
+  const Path &path1 = paths.at(index[first]);
+  const Path &path2 = paths.at(index[second]);
 
   const Vector3D &p1 =
     flip[index[first]] ? path1.startPoint() : path1.endPoint();

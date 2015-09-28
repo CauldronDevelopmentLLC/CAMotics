@@ -46,9 +46,9 @@ double MoveSink::input(unsigned port, input_mode_t mode, double timeout,
 
 
 void MoveSink::move(const Axes &axes, bool rapid) {
-  if (first) first = false; // Ignore first move
+  //if (first) first = false; // Ignore first move
 
-  else if (getPosition() != axes) {
+  if (getPosition() != axes) {
     MoveType type = rapid ? Move::MOVE_RAPID :
       (probePending ? Move::MOVE_PROBE : Move::MOVE_CUTTING);
 

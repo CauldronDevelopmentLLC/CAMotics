@@ -33,15 +33,6 @@ using namespace CAMotics;
 ToolPath::~ToolPath() {}
 
 
-void ToolPath::add(const Move &move) {
-  push_back(move);
-
-  // Bounds
-  Rectangle3R::add(move.getStartPt());
-  Rectangle3R::add(move.getEndPt());
-}
-
-
 void ToolPath::print(ostream &stream, bool metric) const {
   real lastFeed = 0;
   real lastSpeed = 0;
@@ -83,6 +74,8 @@ void ToolPath::print(ostream &stream, bool metric) const {
 
     stream << '\n';
   }
+
+  stream << "M2" << flush;
 }
 
 
@@ -128,4 +121,13 @@ void ToolPath::write(JSON::Sink &sink) const {
   }
 
   sink.endList();
+}
+
+
+void ToolPath::move(const Move &move) {
+  push_back(move);
+
+  // Bounds
+  Rectangle3R::add(move.getStartPt());
+  Rectangle3R::add(move.getEndPt());
 }

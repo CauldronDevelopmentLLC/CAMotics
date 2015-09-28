@@ -21,66 +21,59 @@
 #ifndef CAMOTICS_OPT_H
 #define CAMOTICS_OPT_H
 
-#include "Group.h"
+#include "Path.h"
 
 #include <camotics/Geom.h>
-#include <camotics/gcode/Printer.h>
-
-#include <camotics/machine/Machine.h>
-#include <camotics/gcode/Interpreter.h>
+#include <camotics/Task.h>
+#include <camotics/sim/ToolTable.h>
 
 #include <cbang/SmartPointer.h>
-#include <cbang/io/Reader.h>
 
-#include <string>
-#include <istream>
-
-
-namespace cb {class Options;}
 
 namespace CAMotics {
+  class ToolPath;
   class AnnealState;
 
-  class Opt : public Machine, public Printer, public cb::Reader {
-    Controller controller;
-    Interpreter interp;
-
-    unsigned pathCount;
+  class Opt : public Task {
     unsigned cutCount;
 
-    typedef std::vector<cb::SmartPointer<Group> > groups_t;
-    groups_t groups;
+    typedef std::vector<Path> paths_t;
+    paths_t paths;
 
-    cb::SmartPointer<Path> currentPath;
-    cb::SmartPointer<Group> currentGroup;
+    unsigned iterations; ///< Iterations per annealing round
+    unsigned runs;       ///< Number of optimization runs
+    double heatTarget;   ///< Stop heating the system when the average cost
+                         ///< reaches this ratio of the starting cost, after a
+                         ///< brief greedy optimization
+    double minTemp;      ///< Stop opt if temperature drops below this level
+    double heatRate;     ///< Rate to heat up system as ratio of current temp
+    double coolRate;     ///< Rate to cool system between rounds as ratio of
+                         ///< current temp
+    double reheatRate;   ///< Rate to reheat system as ratio of current temp
+                         ///< Reheating occurs when best cost improved
+    unsigned timeout;    ///< Stop opt if no improvement in this many seconds
+    double zSafe;        ///< Safe Z height
 
-    unsigned iterations;
-    unsigned runs;
-    double heatTarget;
-    double minTemp;
-    double heatRate;
-    double coolRate;
-    double reheatRate;
-    unsigned timeout;
+    ToolTable tools;
+    cb::SmartPointer<ToolPath> path;
 
   public:
-    Opt(cb::Options &options, std::ostream &stream);
+    Opt(const ToolPath &path);
+
+    const cb::SmartPointer<ToolPath> &getPath() const {return path;}
+
+    // From Task
+    void run();
 
     double computeCost() const;
 
-    // From cb::Reader
-    void read(const cb::InputSource &source);
-
-    // From Machine
-    void move(const Move &move);
-
-    // From Processor
-    void operator()(const cb::SmartPointer<Block> &block);
+    void add(const Move &move);
+    double optimize();
+    void extract(ToolPath &path) const;
 
   protected:
     double round(double T, unsigned iterations, AnnealState &current,
                  AnnealState &best);
-    double optimize(Group &group);
   };
 }
 

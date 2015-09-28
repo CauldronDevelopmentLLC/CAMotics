@@ -67,7 +67,7 @@ namespace CAMotics {
     // From Machine
     void move(const Move &move) {
       Machine::move(move);
-      path.add(move);
+      path.move(move);
     }
   };
 }

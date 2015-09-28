@@ -20,10 +20,13 @@
 
 #include "Path.h"
 
+#include <algorithm>
+
 using namespace std;
 using namespace CAMotics;
 
+
 void Path::reverse() {
-  list<Move>::reverse();
+  std::reverse(begin(), end());
   for (iterator it = begin(); it != end(); it++) it->reverse();
 }

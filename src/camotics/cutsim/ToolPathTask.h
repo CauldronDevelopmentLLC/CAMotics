@@ -36,8 +36,6 @@ namespace cb {
 }
 
 namespace CAMotics {
-  class ToolTable;
-  class ToolPath;
   class Project;
 
   class ToolPathTask : public Machine, public Task {

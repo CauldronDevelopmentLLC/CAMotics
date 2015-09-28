@@ -351,7 +351,7 @@
      <x>0</x>
      <y>0</y>
      <width>1004</width>
-     <height>29</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -497,6 +497,7 @@
    <addaction name="actionStop"/>
    <addaction name="actionRun"/>
    <addaction name="actionReduce"/>
+   <addaction name="actionOptimize"/>
    <addaction name="separator"/>
    <addaction name="actionPlay"/>
    <addaction name="actionSlower"/>
@@ -3370,6 +3371,18 @@
    </property>
    <property name="toolTip">
     <string>Show console</string>
+   </property>
+  </action>
+  <action name="actionOptimize">
+   <property name="icon">
+    <iconset resource="camotics.qrc">
+     <normaloff>:/icons/optimize.png</normaloff>:/icons/optimize.png</iconset>
+   </property>
+   <property name="text">
+    <string>Optimize</string>
+   </property>
+   <property name="toolTip">
+    <string>Optimize rapid moves</string>
    </property>
   </action>
  </widget>

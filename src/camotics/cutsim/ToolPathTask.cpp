@@ -167,5 +167,5 @@ void ToolPathTask::interrupt() {
 
 void ToolPathTask::move(const Move &move) {
   Machine::move(move);
-  path->add(move);
+  path->move(move);
 }

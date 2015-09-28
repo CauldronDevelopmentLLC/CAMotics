@@ -23,18 +23,20 @@
 
 #include <vector>
 
+
 namespace CAMotics {
-  class Group;
+  class Path;
 
   class AnnealState {
   public:
-    const Group &group;
-    
+    typedef std::vector<Path> paths_t;
+    const paths_t &paths;
+
     std::vector<unsigned> index;
     std::vector<bool> flip;
     double cost;
     
-    AnnealState(Group &group);
+    AnnealState(const paths_t &paths);
     
     AnnealState &operator=(const AnnealState &o);
     

@@ -22,7 +22,8 @@
 #define CAMOTICS_MACHINE_H
 
 #include "MachinePipeline.h"
-#include "MoveStream.h"
+
+#include <camotics/cutsim/MoveStream.h>
 
 #include <ostream>
 

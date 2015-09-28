@@ -33,9 +33,9 @@ void MatrixModule::define(js::ObjectTemplate &exports) {
   exports.set("loadIdentity(matrix)", this, &MatrixModule::loadIdentityCB);
   exports.set("scale(x=1, y=1, z=1, matrix)", this, &MatrixModule::scaleCB);
   exports.set("translate(x=0, y=0, z=0, matrix)", this,
-           &MatrixModule::translateCB);
-  exports.set("rotate(angle, x=0, y=0, z=1, matrix)", this,
-           &MatrixModule::rotateCB);
+              &MatrixModule::translateCB);
+  exports.set("rotate(angle, x=0, y=0, z=1, a=0, b=0, c=0, matrix)", this,
+              &MatrixModule::rotateCB);
   exports.set("setMatrix(m, matrix)", this, &MatrixModule::setMatrixCB);
   exports.set("getMatrix(m)", this, &MatrixModule::getMatrixCB);
 
@@ -81,7 +81,8 @@ js::Value MatrixModule::translateCB(const js::Arguments &args) {
 
 js::Value MatrixModule::rotateCB(const js::Arguments &args) {
   matrix.rotate(args.getNumber("angle"), args.getNumber("x"),
-                args.getNumber("y"), args.getNumber("z"), parseMatrix(args));
+                args.getNumber("y"), args.getNumber("z"), args.getNumber("a"),
+                args.getNumber("b"), args.getNumber("c"), parseMatrix(args));
   return js::Value();
 }
 

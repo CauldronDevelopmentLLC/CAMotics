@@ -64,6 +64,7 @@ namespace CAMotics {
   class ToolPathTask;
   class SurfaceTask;
   class ReduceTask;
+  class Opt;
 
 
   class QtWin : public QMainWindow, public TaskObserver {
@@ -165,14 +166,19 @@ namespace CAMotics {
     void message(const std::string &msg);
     void warning(const std::string &msg);
 
+    void loadToolPath(const cb::SmartPointer<ToolPath> &toolPath,
+                      bool simulate);
+
     void toolPathComplete(ToolPathTask &task);
     void surfaceComplete(SurfaceTask &task);
     void reduceComplete(ReduceTask &task);
+    void optimizeComplete(Opt &task);
 
     void quit();
     void stop();
     void reload(bool now = false);
     void reduce();
+    void optimize();
     void redraw(bool now = false);
     void snapshot();
     void exportData();
@@ -298,6 +304,7 @@ namespace CAMotics {
     void on_actionStop_triggered();
     void on_actionRun_triggered();
     void on_actionReduce_triggered();
+    void on_actionOptimize_triggered();
     void on_actionSlower_triggered();
     void on_actionPlay_triggered();
     void on_actionFaster_triggered();

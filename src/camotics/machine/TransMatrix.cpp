@@ -76,60 +76,72 @@ void TransMatrix::translate(const Vector3D &o) {
   }
   t[3][3] = 1;
 
-  m = t * m;
+  m = m * t;
 
   for (unsigned j = 0; j < 3; j++)
     t[j][3] = -o[j];
 
-  i = i * t;
+  i = t * i;
 }
 
 
 namespace {
-  void makeRotationMatrix(Matrix4x4D &r, double angle, const Vector3D &v) {
-    double c = cos(angle);
-    double s = sin(angle);
-    double l = 1.0 - c;
+  void makeRotationMatrix(Matrix4x4D &r, double angle, const Vector3D &m,
+                          const Vector3D &n) {
+    double co = cos(angle);
+    double si = sin(angle);
+    double l = 1.0 - co;
+    double u = m.x();
+    double v = m.y();
+    double w = m.z();
+    double a = n.x();
+    double b = n.y();
+    double c = n.z();
 
-    r[0][0] = c + v.x() * v.x() * l;
-    r[1][1] = c + v.y() * v.y() * l;
-    r[2][2] = c + v.z() * v.z() * l;
+    r[0][0] = u * u + (v * v + w * w) * co;
+    r[0][1] = u * v * l - w * si;
+    r[0][2] = u * w * l + v * si;
+    r[0][3] =
+      (a * (v * v + w * w) - u * (b * v + c * w)) * l + (b * w - c * v) * si;
+    r[1][0] = u * v * l + w * si;
+    r[1][1] = v * v + (u * u + w * w) * co;
+    r[1][2] = v * w * l - u * si;
+    r[1][3] =
+      (b * (u * u + w * w) - v * (a * u + c * w)) * l + (c * u - a * w) * si;
+    r[2][0] = u * w * l - v * si;
+    r[2][1] = v * w * l + u * si;
+    r[2][2] = w * w + (u * u + v * v) * co;
+    r[2][3] =
+      (c * (u * u + v * v) - w * (a * u + b * v)) * l + (a * v - b * u) * si;
+    r[3][0] = 0;
+    r[3][1] = 0;
+    r[3][2] = 0;
     r[3][3] = 1;
-
-    double tmp1 = v.x() * v.y() * l;
-    double tmp2 = v.z() * s;
-    r[1][0] = tmp1 + tmp2;
-    r[0][1] = tmp1 - tmp2;
-    tmp1 = v.x() * v.z() * l;
-    tmp2 = v.y() * s;
-    r[2][0] = tmp1 - tmp2;
-    r[0][2] = tmp1 + tmp2;
-    tmp1 = v.y() * v.z() * l;
-    tmp2 = v.x() * s;
-    r[2][1] = tmp1 + tmp2;
-    r[1][2] = tmp1 - tmp2;
   }
 }
 
 
-void TransMatrix::rotate(double angle, const Vector3D &o) {
+void TransMatrix::rotate(double angle, const Vector3D &_v, const Vector3D &_u) {
   if (!angle) return;
-  if (!o[0] && !o[1] && !o[2]) THROW("Invalid rotation axis (0,0,0)");
+  if (!_v[0] && !_v[1] && !_v[2]) THROW("Invalid rotation axis (0,0,0)");
 
-  Vector3D v = o;
+  Vector3D v = _v;
   v = v.normalize();
+  Vector3D u = transform(_u);
 
   Matrix4x4D t;
 
-  makeRotationMatrix(t, angle, v);
+  makeRotationMatrix(t, angle, v, u);
   m = t * m;
-  makeRotationMatrix(t, -angle, v);
+  makeRotationMatrix(t, -angle, v, u);
   i = i * t;
 }
 
 
-void TransMatrix::reflect(const Vector3D &o) {
+void TransMatrix::reflect(const Vector3D &_o) {
   Matrix4x4D t;
+
+  Vector3D o = transform(_o);
 
   t[0][0] = 1 - 2 * o[0] * o[0];
   t[0][1] = t[1][0] = -2 * o[0] * o[1];

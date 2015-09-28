@@ -22,7 +22,8 @@
 #define TPLANG_MOVE_SINK_H
 
 #include "MachineAdapter.h"
-#include "MoveStream.h"
+
+#include <camotics/cutsim/MoveStream.h>
 
 #include <cbang/config/Options.h>
 

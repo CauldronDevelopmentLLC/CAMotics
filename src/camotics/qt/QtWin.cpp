@@ -35,6 +35,7 @@
 #include <camotics/cutsim/ToolPathTask.h>
 #include <camotics/cutsim/SurfaceTask.h>
 #include <camotics/cutsim/ReduceTask.h>
+#include <camotics/opt/Opt.h>
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>
@@ -97,9 +98,12 @@ QtWin::QtWin(Application &app) :
   taskMan.addObserver(this);
   taskCompleteEvent = QEvent::registerEventType();
 
-  // Disable unimplemented console buttons
+  // Hide unimplemented console buttons
   ui->errorsCheckBox->setVisible(false);
   ui->warningsCheckBox->setVisible(false);
+
+  // Hide unfinished optimize
+  ui->actionOptimize->setVisible(false);
 
   // Disable view bounds
   view->setShowBounds(false);
@@ -481,17 +485,9 @@ void QtWin::warning(const string &msg) {
 }
 
 
-void QtWin::toolPathComplete(ToolPathTask &task) {
-  if (task.getErrorCount()) {
-    const char *msg = "Errors were encountered during tool path generation.  "
-      "See the console output for more details";
-
-    QMessageBox::critical(this, "Tool path errors", msg, QMessageBox::Ok);
-
-    showConsole();
-  }
-
-  toolPath = task.getPath();
+void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
+                         bool simulate) {
+  this->toolPath = toolPath;
 
   // Update changed Project settings
   project->updateAutomaticWorkpiece(*toolPath);
@@ -515,7 +511,10 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 
   redraw();
 
-  if (task.getErrorCount()) return; // Don't simluate on errors
+  if (!simulate) {
+    setStatusActive(false);
+    return;
+  }
 
   // Auto play
   if (autoPlay) {
@@ -535,6 +534,20 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 }
 
 
+void QtWin::toolPathComplete(ToolPathTask &task) {
+  if (task.getErrorCount()) {
+    const char *msg = "Errors were encountered during tool path generation.  "
+      "See the console output for more details";
+
+    QMessageBox::critical(this, "Tool path errors", msg, QMessageBox::Ok);
+
+    showConsole();
+  }
+
+  loadToolPath(task.getPath(), !task.getErrorCount());
+}
+
+
 void QtWin::surfaceComplete(SurfaceTask &task) {
   surface = task.getSurface();
   view->setSurface(surface);
@@ -550,6 +563,11 @@ void QtWin::reduceComplete(ReduceTask &task) {
   redraw();
 
   setStatusActive(false);
+}
+
+
+void QtWin::optimizeComplete(Opt &opt) {
+  loadToolPath(opt.getPath(), true);
 }
 
 
@@ -588,6 +606,17 @@ void QtWin::reduce() {
   try {
     // Queue reduce task
     taskMan.addTask(new ReduceTask(*surface));
+    setStatusActive(true);
+  } CATCH_ERROR;
+}
+
+
+void QtWin::optimize() {
+  if (toolPath.isNull()) return;
+
+  try {
+    // Queue optimize task
+    taskMan.addTask(new Opt(*toolPath));
     setStatusActive(true);
   } CATCH_ERROR;
 }
@@ -1399,6 +1428,8 @@ bool QtWin::event(QEvent *event) {
       surfaceComplete(*task.cast<SurfaceTask>());
     else if (task.isInstance<ReduceTask>())
       reduceComplete(*task.cast<ReduceTask>());
+    else if (task.isInstance<Opt>())
+      optimizeComplete(*task.cast<Opt>());
   }
 
   return true;
@@ -1817,6 +1848,11 @@ void QtWin::on_actionRun_triggered() {
 
 void QtWin::on_actionReduce_triggered() {
   reduce();
+}
+
+
+void QtWin::on_actionOptimize_triggered() {
+  optimize();
 }
 
 

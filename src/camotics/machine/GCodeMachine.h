@@ -52,6 +52,7 @@ namespace CAMotics {
 
     void dwell(double seconds);
     void move(const Axes &axes, bool rapid);
+    void pause(bool optional) const;
   };
 }
 

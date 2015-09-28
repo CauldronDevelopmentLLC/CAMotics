@@ -18,24 +18,20 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GROUP_H
-#define CAMOTICS_GROUP_H
+#ifndef TPLANG_MOVE_STREAM_H
+#define TPLANG_MOVE_STREAM_H
 
-#include "Path.h"
+#include "Move.h"
 
-#include <camotics/gcode/ast/Block.h>
-
-#include <cbang/SmartPointer.h>
-
-#include <vector>
 
 namespace CAMotics {
-  class Group : public std::vector<cb::SmartPointer<Path> > {
+  class MoveStream {
   public:
-    std::vector<cb::SmartPointer<Block> > setup;
+    virtual ~MoveStream() {}
 
-    double computeCost() const;
+    virtual void move(const Move &move) = 0;
   };
 }
 
-#endif // CAMOTICS_GROUP_H
+#endif // TPLANG_MOVE_STREAM_H
+

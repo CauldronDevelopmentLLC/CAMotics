@@ -34,11 +34,5 @@ void MachinePipeline::add(const SmartPointer<MachineInterface> &m) {
     adapter->setParent(m);
   }
 
-  MachineAdapter *adapter = dynamic_cast<MachineAdapter *>(m.get());
-  SmartPointer<MachineInterface> parent;
-  if (adapter) parent = adapter->getParent();
-
   pipeline.push_back(m);
-
-  if (!parent.isNull()) add(parent);
 }
