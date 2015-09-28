@@ -175,6 +175,22 @@ module.exports = extend({
   },
 
 
+  element_com: function(e) {
+    var v = this.element_vertices(e);
+    var c = {x: 0, y: 0};
+
+    for (var i = 0; i < v.length; i++) {
+      c.x += v[i].x;
+      c.y += v[i].y;
+    }
+
+    c.x /= v.length;
+    c.y /= v.length;
+
+    return c;
+  },
+
+
   // Flip **********************************************************************
   line_flip: function(l) {
     return {
@@ -373,7 +389,59 @@ module.exports = extend({
   },
 
 
+  layer_cut_step: function(layer, zSafe, zCut, maxZStep, res) {
+    // Compute steps and step down
+    var steps = Math.ceil(Math.abs(zCut / maxZStep));
+    var zStepDown = zCut / steps;
+
+    // Do steps
+    for (var i = 0; i < steps; i++)
+      this.layer_cut(layer, zSafe, zStepDown * (i + 1), res);
+  },
+
+
   // Polygons ******************************************************************
+  poly_com: function(poly) {
+    // TODO broken?
+    var c = {x: 0, y: 0};
+
+    for (var i = 0; i < poly.length; i++) {
+      c.x += poly[i][0];
+      c.y += poly[i][1];
+    }
+
+    c.x /= poly.length;
+    c.y /= poly.length;
+
+    return c;
+  },
+
+
+  polys_com: function(polys) {
+    // TODO broken?
+    var c = {x: 0, y: 0};
+
+    for (var i = 0; i < polys.length; i++) {
+      if (!polys[i].length) continue;
+
+      var pc = this.poly_com(polys[i]);
+      c.x += pc[0];
+      c.y += pc[1];
+    }
+
+    c.x /= polys.length;
+    c.y /= polys.length;
+
+    return c;
+  },
+
+
+  layer_com: function(layer) {
+    var polys = this.layer_to_polys(layer);
+    return this.polys_com(polys);
+  },
+
+
   layer_to_polys: function(layer) {
     if (!layer.length) return [];
     layer = [].concat(layer); // Copy layer
