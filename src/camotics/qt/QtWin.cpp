@@ -143,9 +143,6 @@ QtWin::QtWin(Application &app) :
   statusLabel = new QLabel;
   statusBar()->addPermanentWidget(statusLabel);
 
-  // Setup console color
-  ui->console->setTextColor(QColor("#d9d9d9"));
-
   // Setup console stream
   consoleStream = new LineBufferStream<ConsoleWriter>(*ui->console);
   Logger::instance().setScreenStream(*consoleStream);
@@ -592,6 +589,10 @@ void QtWin::reload(bool now) {
     return;
   }
   simDirty = false;
+
+  // Reset console
+  ui->console->document()->clear();
+  ui->console->setTextColor(QColor("#d9d9d9"));
 
   try {
     // Queue Tool Path task
