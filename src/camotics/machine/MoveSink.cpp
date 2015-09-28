@@ -25,9 +25,7 @@ using namespace CAMotics;
 using namespace CAMotics;
 
 
-MoveSink::MoveSink(MoveStream &stream, double rapidFeed) :
-  stream(stream), rapidFeed(rapidFeed) {
-}
+MoveSink::MoveSink(MoveStream &stream) : stream(stream) {}
 
 
 void MoveSink::reset() {
@@ -50,8 +48,7 @@ void MoveSink::move(const Axes &axes, bool rapid) {
       (probePending ? Move::MOVE_PROBE : Move::MOVE_CUTTING);
 
     Move move(type, getPosition(), axes, time, getTool(),
-              rapid ? rapidFeed : getFeed(), getSpeed(),
-              getLocation().getStart().getLine());
+              getFeed(), getSpeed(), getLocation().getStart().getLine());
 
     time += move.getTime();
 

@@ -25,7 +25,7 @@
 
 #include <camotics/gcode/Printer.h>
 
-#include <camotics/machine/Machine.h>
+#include <camotics/machine/MachineState.h>
 #include <camotics/sim/Controller.h>
 #include <camotics/gcode/Interpreter.h>
 
@@ -40,7 +40,7 @@ namespace CAMotics {
   class Word;
 
   class Probe :
-    public Machine, public Controller, public Printer, public cb::Reader {
+    public MachineState, public Controller, public Printer, public cb::Reader {
     Interpreter interp;
 
   public:

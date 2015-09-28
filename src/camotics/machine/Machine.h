@@ -25,30 +25,22 @@
 
 #include <camotics/cutsim/MoveStream.h>
 
-#include <ostream>
-
 
 namespace CAMotics {
   class Move;
   class MachineMatrix;
 
   class Machine : public MachinePipeline, public MoveStream {
-    double time;
-    double distance;
+    MoveStream &stream;
+
     // TODO Load machine configuration, ramp up/down, rapid feed, etc.
+    double rapidFeed;
 
   public:
-    Machine(double rapidFeed = 1000);
-    virtual ~Machine() {} // Compiler needs this
-
-    double getTime() const {return time;}
-    double getDistance() const {return distance;}
-
-    // From MachineInterface
-    void reset() {time = distance = 0; MachinePipeline::reset();}
+    Machine(MoveStream &stream, double rapidFeed = 1000);
 
     // From MoveStream
-    void move(const Move &move);
+    void move(Move &move);
   };
 }
 

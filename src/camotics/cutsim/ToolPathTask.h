@@ -24,7 +24,6 @@
 #include <camotics/Task.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/sim/ToolTable.h>
-#include <camotics/machine/Machine.h>
 
 #include <string>
 #include <vector>
@@ -38,12 +37,13 @@ namespace cb {
 namespace CAMotics {
   class Project;
 
-  class ToolPathTask : public Machine, public Task {
+  class ToolPathTask : public Task {
     ToolTable tools;
     std::vector<std::string> files;
 
     unsigned errors;
     cb::SmartPointer<ToolPath> path;
+    cb::SmartPointer<std::vector<char> > gcode;
 
     cb::SmartPointer<cb::Subprocess> proc;
     cb::SmartPointer<cb::Thread> logCopier;
@@ -54,13 +54,11 @@ namespace CAMotics {
 
     unsigned getErrorCount() const {return errors;}
     const cb::SmartPointer<ToolPath> &getPath() const {return path;}
+    const cb::SmartPointer<std::vector<char> > &getGCode() const {return gcode;}
 
     // From Task
     void run();
     void interrupt();
-
-    // From Machine
-    void move(const Move &move);
   };
 }
 

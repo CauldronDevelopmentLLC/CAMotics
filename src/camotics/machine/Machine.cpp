@@ -29,26 +29,26 @@
 #include <camotics/cutsim/Move.h>
 
 #include <cbang/log/Logger.h>
-#include <cbang/os/SystemUtilities.h>
 
 using namespace cb;
 using namespace std;
 using namespace CAMotics;
 
 
-Machine::Machine(double rapidFeed) : time(0), distance(0) {
+Machine::Machine(MoveStream &stream, double rapidFeed) :
+  stream(stream), rapidFeed(rapidFeed) {
   add(new MachineUnitAdapter);
   add(new MachineLinearizer);
   add(new MachineMatrix);
-  add(new MoveSink(*this, rapidFeed));
+  add(new MoveSink(*this));
   add(new MachineState);
 }
 
 
-void Machine::move(const Move &move) {
-  // Measure
-  distance += move.getDistance();
-  time += move.getTime();
+void Machine::move(Move &move) {
+  if (move.getType() == Move::MOVE_RAPID) move.setFeed(rapidFeed);
+
+  stream.move(move);
 
   LOG_INFO(3, "Machine: Move to " << move.getEndPt());
 }

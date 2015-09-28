@@ -58,7 +58,9 @@ namespace CAMotics {
     const Vector3R &getEndPt() const {return Segment3R::getEnd();}
     unsigned getTool() const {return tool;}
     real getFeed() const {return feed;}
+    void setFeed(real feed) {this->feed = feed;}
     real getSpeed() const {return speed;}
+    void setSpeed(real speed) {this->speed = speed;}
     unsigned getLine() const {return line;}
 
     real getDistance() const {return dist;}

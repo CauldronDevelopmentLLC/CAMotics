@@ -40,7 +40,7 @@ using namespace CAMotics;
 
 
 Probe::Probe(Options &options, std::ostream &stream) :
-  Controller((Machine &)*this), Printer(stream),
+  Controller((MachineState &)*this), Printer(stream),
   interp(*this), gridSize(5), clearHeight(1), probeDepth(-1), probeFeed(5),
   liftOff(false), liftOffFeed(0.5), minMem(2000), maxMem(5400),
   useLastZExpression(true), pass(0), didOutputProbe(false) {

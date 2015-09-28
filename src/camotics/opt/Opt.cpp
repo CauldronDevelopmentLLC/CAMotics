@@ -154,7 +154,7 @@ double Opt::optimize() {
 
 
 void Opt::extract(ToolPath &path) const {
-  MoveSink sink(path, 1000); // TODO get rapid feed rate
+  MoveSink sink(path);
   sink.setParent(new MachineState);
   sink.reset();
 

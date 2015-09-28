@@ -37,7 +37,7 @@ namespace CAMotics {
     double time;
 
   public:
-    MoveSink(MoveStream &stream, double rapidFeed);
+    MoveSink(MoveStream &stream);
 
     // From MachineInterface
     void reset();

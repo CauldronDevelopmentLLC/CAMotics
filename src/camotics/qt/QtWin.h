@@ -102,6 +102,7 @@ namespace CAMotics {
     cb::SmartPointer<Viewer> viewer;
     cb::SmartPointer<ToolView> toolView;
     cb::SmartPointer<ToolPath> toolPath;
+    cb::SmartPointer<std::vector<char> > gcode;
     cb::SmartPointer<Surface> surface;
 
     double lastRedraw;

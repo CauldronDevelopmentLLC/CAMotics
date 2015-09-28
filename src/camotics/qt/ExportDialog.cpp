@@ -33,18 +33,18 @@ ExportDialog::ExportDialog() : ui(new Ui::ExportDialog) {
 int ExportDialog::exec() {
   bool change = false;
 
-  if (!ui->surfaceRadioButton->isEnabled() && surfaceSelected()) change = true;
   if (!ui->gcodeRadioButton->isEnabled() && gcodeSelected()) change = true;
+  if (!ui->surfaceRadioButton->isEnabled() && surfaceSelected()) change = true;
   if (!ui->simDataRadioButton->isEnabled() && simDataSelected()) change = true;
 
   if (change) {
-    if (ui->surfaceRadioButton->isEnabled()) {
-      ui->surfaceRadioButton->setChecked(true);
-      on_surfaceRadioButton_clicked();
-
-    } else if (ui->gcodeRadioButton->isEnabled()) {
+    if (ui->gcodeRadioButton->isEnabled()) {
       ui->gcodeRadioButton->setChecked(true);
       on_gcodeRadioButton_clicked();
+
+    } else if (ui->surfaceRadioButton->isEnabled()) {
+      ui->surfaceRadioButton->setChecked(true);
+      on_surfaceRadioButton_clicked();
 
     } else if (ui->simDataRadioButton->isEnabled()) {
       ui->simDataRadioButton->setChecked(true);
@@ -63,7 +63,6 @@ void ExportDialog::enableSurface(bool enable) {
 
 
 void ExportDialog::enableGCode(bool enable) {
-  ui->gcodeFrame->setEnabled(enable && gcodeSelected());
   ui->gcodeRadioButton->setEnabled(enable);
 }
 
@@ -94,11 +93,6 @@ bool ExportDialog::binarySTLSelected() const {
 }
 
 
-bool ExportDialog::metricUnitsSelected() const {
-  return ui->metricUnitsRadioButton->isChecked();
-}
-
-
 bool ExportDialog::compactJSONSelected() const {
   return ui->compactJSONRadioButton->isChecked();
 }
@@ -106,20 +100,17 @@ bool ExportDialog::compactJSONSelected() const {
 
 void ExportDialog::on_surfaceRadioButton_clicked() {
   ui->surfaceFrame->setEnabled(true);
-  ui->gcodeFrame->setEnabled(false);
   ui->simDataFrame->setEnabled(false);
 }
 
 
 void ExportDialog::on_gcodeRadioButton_clicked() {
   ui->surfaceFrame->setEnabled(false);
-  ui->gcodeFrame->setEnabled(true);
   ui->simDataFrame->setEnabled(false);
 }
 
 
 void ExportDialog::on_simDataRadioButton_clicked() {
   ui->surfaceFrame->setEnabled(false);
-  ui->gcodeFrame->setEnabled(false);
   ui->simDataFrame->setEnabled(true);
 }

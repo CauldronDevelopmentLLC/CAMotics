@@ -29,7 +29,7 @@ namespace CAMotics {
   public:
     virtual ~MoveStream() {}
 
-    virtual void move(const Move &move) = 0;
+    virtual void move(Move &move) = 0;
   };
 }
 

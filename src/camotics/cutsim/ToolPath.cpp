@@ -33,52 +33,6 @@ using namespace CAMotics;
 ToolPath::~ToolPath() {}
 
 
-void ToolPath::print(ostream &stream, bool metric) const {
-  real lastFeed = 0;
-  real lastSpeed = 0;
-  real scale = metric ? 1 : (1 / 25.4);
-
-  stream << (metric ? "G21 (metric)\n" : "G20 (imperial)\n");
-
-  for (unsigned i = 0; i < size(); i++) {
-    const Move &move = at(i);
-    const Axes &start = move.getStart();
-    const Axes &end = move.getEnd();
-
-    // Move type
-    switch (move.getType()) {
-    case MoveType::MOVE_RAPID: stream << "G0"; break;
-    case MoveType::MOVE_CUTTING: stream << "G1"; break;
-    case MoveType::MOVE_PROBE: stream << "G1"; break; // TODO
-    case MoveType::MOVE_DRILL: stream << "G1"; break; // TODO
-    }
-
-    // Axes
-    for (unsigned axis = 0; axis < 9; axis++)
-      if (start.getIndex(axis) != end.getIndex(axis)) {
-        double value = end.getIndex(axis);
-        if (fabs(value) < 0.0000000000001) value = 0;
-        stream << ' ' << Axes::toAxis(axis)
-               << String::printf("%.8g", value * scale);
-      }
-
-    // Feed
-    if (move.getType() != MoveType::MOVE_RAPID) {
-      if (move.getFeed() != lastFeed) stream << " F" << move.getFeed() * scale;
-      lastFeed = move.getFeed();
-    }
-
-    // Speed
-    if (move.getSpeed() != lastSpeed) stream << " S" << move.getSpeed();
-    lastSpeed = move.getSpeed();
-
-    stream << '\n';
-  }
-
-  stream << "M2" << flush;
-}
-
-
 void ToolPath::write(JSON::Sink &sink) const {
   Axes lastPos(numeric_limits<double>::infinity());
   MoveType type = (MoveType::enum_t)-1;
@@ -124,7 +78,7 @@ void ToolPath::write(JSON::Sink &sink) const {
 }
 
 
-void ToolPath::move(const Move &move) {
+void ToolPath::move(Move &move) {
   push_back(move);
 
   // Bounds

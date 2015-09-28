@@ -47,13 +47,13 @@ namespace CAMotics {
     const ToolTable &getTools() const {return tools;}
     ToolTable &getTools() {return tools;}
 
-    void print(std::ostream &stream, bool metric = true) const;
+    void print() const {}
     void write(cb::JSON::Sink &sink) const;
 
     using std::vector<Move>::operator[];
 
     // From MoveStream
-    void move(const Move &move);
+    void move(Move &move);
   };
 }
 

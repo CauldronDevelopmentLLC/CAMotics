@@ -24,12 +24,16 @@
 #include <camotics/cutsim/Project.h>
 #include <camotics/sim/Controller.h>
 #include <camotics/gcode/Interpreter.h>
+#include <camotics/machine/Machine.h>
 
 #include <cbang/util/DefaultCatch.h>
 #include <cbang/util/SmartFunctor.h>
 
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/os/Subprocess.h>
+
+#include <cbang/iostream/VectorDevice.h>
+#include <cbang/iostream/TeeFilter.h>
 
 #include <cbang/log/AsyncCopyStreamToLog.h>
 
@@ -62,9 +66,11 @@ void ToolPathTask::run() {
   SmartFunctor<Task, double (Task::*)()> endTask(this, &Task::end);
 
   // Setup
-  Machine::reset();
-  Controller controller(*this, tools);
   path = new ToolPath(tools);
+  // TODO load machine configuration
+  Machine machine(*path);
+  machine.reset();
+  Controller controller(machine, tools);
 
   // Interpret code
   for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {
@@ -75,8 +81,19 @@ void ToolPathTask::run() {
     Task::update(0, "Running " + filename);
 
     SmartPointer<istream> stream;
-    SmartPointer<TaskFilter> taskFilter;
+    io::filtering_istream filter;
 
+    // Track the file load
+    TaskFilter taskFilter(*this);
+    filter.push(boost::ref(taskFilter));
+
+    // Copy the GCode
+    gcode = new vector<char>;
+    VectorStream<> vstream(*gcode);
+    TeeFilter teeFilter(vstream);
+    filter.push(teeFilter);
+
+    // Generate tool path
     if (String::endsWith(filename, ".tpl")) {
       // Get executable name
       string cmd =
@@ -112,6 +129,7 @@ void ToolPathTask::run() {
 
       // Get pipe stream
       stream = proc->getStream(pipe);
+      filter.push(*stream);
 
       // Copy output to log
       logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
@@ -120,19 +138,11 @@ void ToolPathTask::run() {
       // Change file name so GCode error messages make sense
       filename = "<generated gcode>";
 
-    } else { // Assume it's just GCode
-      // Track the file load
-      io::filtering_istream *filter = new io::filtering_istream;
-      stream = filter;
-
-      taskFilter =
-        new TaskFilter(*this, SystemUtilities::getFileSize(filename));
-      filter->push(boost::ref(*taskFilter));
-      filter->push(io::file_source(filename));
-    }
+    } else // Assume it's just GCode
+      filter.push(io::file_source(filename));
 
     try {
-      InputSource src(*stream, filename);
+      InputSource src(filter, filename);
 
       // Parse GCode
       Interpreter interp(controller, SmartPointer<Task>::Phony(this));
@@ -162,10 +172,4 @@ void ToolPathTask::interrupt() {
   Task::interrupt();
   if (!proc.isNull()) try {proc->kill(true);} CATCH_ERROR;
   if (!logCopier.isNull()) logCopier->stop();
-}
-
-
-void ToolPathTask::move(const Move &move) {
-  Machine::move(move);
-  path->move(move);
 }

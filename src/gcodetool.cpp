@@ -22,57 +22,87 @@
 #include <cbang/ApplicationMain.h>
 
 #include <camotics/Application.h>
-#include <camotics/machine/Machine.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/gcode/Interpreter.h>
 #include <camotics/gcode/Printer.h>
 #include <camotics/gcode/Parser.h>
 
+#include <camotics/machine/MachinePipeline.h>
+#include <camotics/machine/MachineState.h>
+#include <camotics/machine/MachineLinearizer.h>
+#include <camotics/machine/MachineUnitAdapter.h>
+#include <camotics/machine/GCodeMachine.h>
+
 #include <iostream>
 
 using namespace std;
+using namespace cb;
 using namespace CAMotics;
 
 
 namespace CAMotics {
-  class EvalApp : public Application, public Machine {
-    Controller controller;
-    ToolPath path;
-    Printer printer;
+  class GCodeTool : public Application {
+    MachinePipeline pipeline;
+    SmartPointer<Controller> controller;
 
+    bool linearize;
     bool parseOnly;
+    bool metric;
 
   public:
-    EvalApp() :
-      Application("CAMotics GCode Tool"), controller(*this),
-      path(controller.getToolTable()), printer(cout), parseOnly(false) {
+    GCodeTool() :
+      Application("CAMotics GCode Tool"), linearize(true), parseOnly(false) {
 
+      cmdLine.addTarget("linearize", linearize,
+                        "Convert all moves to straight line movements.");
       cmdLine.addTarget("parse", parseOnly,
-                        "Only parse the GCode, don't evaluate it");
+                        "Only parse the GCode, don't evaluate it.");
+      cmdLine.addTarget("metric", metric, "Output in metric units.");
+      cmdLine.add("imperial", 0, this, &GCodeTool::imperialAction,
+                  "Output in imperial units.")->setType(Option::BOOLEAN_TYPE);
     }
+
 
     // From Application
     void run() {
+      if (!parseOnly) {
+        MachineUnitAdapter::units_t units =
+          metric ? MachineUnitAdapter::METRIC : MachineUnitAdapter::IMPERIAL;
+        pipeline.add(new MachineUnitAdapter(units));
+        if (linearize) pipeline.add(new MachineLinearizer);
+        pipeline.add(new GCodeMachine(cout));
+        pipeline.add(new MachineState);
+
+        controller = new Controller(pipeline);
+      }
+
       Application::run();
-      path.print(cout);
       cout << flush;
     }
 
+
     // From cb::Reader
-    void read(const cb::InputSource &source) {
-      if (parseOnly) Parser().parse(source, printer);
-      Interpreter(controller).read(source);
+    void read(const InputSource &source) {
+      if (parseOnly) {
+        Printer printer(cout);
+        Parser().parse(source, printer);
+
+      } else {
+        pipeline.start();
+        Interpreter(*controller).read(source);
+        pipeline.end();
+      }
     }
 
-    // From Machine
-    void move(const Move &move) {
-      Machine::move(move);
-      path.move(move);
+
+    int imperialAction(Option &opt) {
+      metric = !opt.toBoolean();
+      return 0;
     }
   };
 }
 
 
 int main(int argc, char *argv[]) {
-  return cb::doApplication<CAMotics::EvalApp>(argc, argv);
+  return doApplication<CAMotics::GCodeTool>(argc, argv);
 }

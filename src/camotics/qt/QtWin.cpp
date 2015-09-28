@@ -544,6 +544,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
     showConsole();
   }
 
+  gcode = task.getGCode();
   loadToolPath(task.getPath(), !task.getErrorCount());
 }
 
@@ -686,7 +687,7 @@ void QtWin::exportData() {
   }
 
   exportDialog.enableSurface(!surface.isNull());
-  exportDialog.enableGCode(!sim.isNull());
+  exportDialog.enableGCode(!gcode.isNull());
   exportDialog.enableSimData(!sim.isNull());
 
   // Run dialog
@@ -729,7 +730,7 @@ void QtWin::exportData() {
     surface->writeSTL(*stream, binary, "CAMotics Surface", hash);
 
   } else if (exportDialog.gcodeSelected()) {
-    sim->path->print(*stream, exportDialog.metricUnitsSelected());
+    stream->write(&gcode->front(), gcode->size());
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());

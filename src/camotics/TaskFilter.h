@@ -40,14 +40,17 @@ namespace CAMotics {
     struct category : boost::iostreams::multichar_dual_use_filter::category,
       boost::iostreams::flushable_tag {};
 
-    TaskFilter(Task &task, uint64_t total) :
+    TaskFilter(Task &task, uint64_t total = 100000) :
       task(task), total(total), count(0) {}
+
+    void setTotal(uint64_t total) {this->total = total;}
 
     template<typename Source>
     std::streamsize read(Source &src, char *s, std::streamsize n) {
       n = boost::iostreams::read(src, s, n);
       if (n > 0) {
         count += n;
+        while (total && total <= count) count -= total;
         task.update((double)count / total);
       }
       return n;
@@ -58,6 +61,7 @@ namespace CAMotics {
       n = boost::iostreams::write(dest, s, n);
       if (n > 0) {
         count += n;
+        while (total && total <= count) count -= total;
         task.update((double)count / total);
       }
       return n;

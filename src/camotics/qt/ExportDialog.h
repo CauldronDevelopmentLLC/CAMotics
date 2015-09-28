@@ -50,7 +50,6 @@ namespace CAMotics {
     bool simDataSelected() const;
 
     bool binarySTLSelected() const;
-    bool metricUnitsSelected() const;
     bool compactJSONSelected() const;
 
   protected slots:
