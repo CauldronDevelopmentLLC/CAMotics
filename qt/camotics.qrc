@@ -60,5 +60,7 @@
         <file>icons/hide.png</file>
         <file>icons/show.png</file>
         <file>icons/optimize.png</file>
+        <file>icons/find.png</file>
+        <file>icons/replace.png</file>
     </qresource>
 </RCC>

@@ -359,6 +359,47 @@ bool NCEdit::isFolded(int line) const {
 }
 
 
+bool NCEdit::findOnce(QString find, bool regex, int options) {
+  QTextCursor cursor = textCursor();
+  QTextDocument::FindFlag opts = (QTextDocument::FindFlag)options;
+
+  if (regex) cursor = document()->find(QRegExp(find), cursor, opts);
+  else cursor = document()->find(find, cursor, opts);
+
+  if (!cursor.isNull()) {
+    setTextCursor(cursor);
+    return true;
+  }
+
+  return false;
+}
+
+
+void NCEdit::find(QString find, bool regex, int options) {
+  bool found = true;
+
+  if (!findOnce(find, regex, options)) {
+    setTextCursor(QTextCursor()); // Wrap around
+    if (!findOnce(find, regex, options)) found = false;
+  }
+
+  emit findResult(found);
+}
+
+
+void NCEdit::replace(QString find, QString replace, bool regex, int options,
+                     bool all) {
+  bool found;
+
+  do {
+    textCursor().insertText(replace);
+    found = findOnce(find, regex, options);
+  } while (found && all);
+
+  emit findResult(found);
+}
+
+
 void NCEdit::updateSidebar() {
   if (!showLineNumbers && !codeFolding) {
     sidebar->hide();
@@ -479,6 +520,20 @@ void NCEdit::toggleFold(int line) {
 }
 
 
+void NCEdit::contextMenuEvent(QContextMenuEvent *e) {
+  QMenu *menu = createStandardContextMenu();
+
+  menu->addSeparator();
+  menu->addAction(QIcon(":/icons/replace.png"), "&Find && Replace",
+                  this, SIGNAL(find()))->setShortcut(QKeySequence::Find);
+  menu->addAction(QIcon(":/icons/find.png"), "Find &Next", this,
+                  SIGNAL(findNext()))->setShortcut(QKeySequence::FindNext);
+
+  menu->exec(e->globalPos());
+  delete menu;
+}
+
+
 void NCEdit::keyPressEvent(QKeyEvent *e) {
   if (e->key() == Qt::Key_Tab) insertPlainText("  ");
   else QPlainTextEdit::keyPressEvent(e);
@@ -487,6 +542,9 @@ void NCEdit::keyPressEvent(QKeyEvent *e) {
 
 void NCEdit::keyReleaseEvent(QKeyEvent *e) {
   if (e->key() != Qt::Key_Tab) QPlainTextEdit::keyReleaseEvent(e);
+
+  if (e->matches(QKeySequence::Find)) emit find();
+  if (e->matches(QKeySequence::FindNext)) emit findNext();
 }
 
 

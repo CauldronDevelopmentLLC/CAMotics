@@ -18,45 +18,43 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONSOLE_WRITER_H
-#define CAMOTICS_CONSOLE_WRITER_H
+#ifndef CAMOTICS_FIND_DIALOG_H
+#define CAMOTICS_FIND_DIALOG_H
 
-#include <QTextEdit>
-#include <QMenu>
+#include <cbang/SmartPointer.h>
 
-#include <vector>
+#include <QDialog>
+
+
+namespace Ui {class FindDialog;}
 
 
 namespace CAMotics {
-  class ConsoleWriter : public QTextEdit {
+  class FindDialog : public QDialog {
     Q_OBJECT;
 
-    QMenu menu;
+    cb::SmartPointer<Ui::FindDialog> ui;
 
-    std::vector<std::string> lines;
+    bool wasReplace;
 
   public:
-    ConsoleWriter(QWidget *parent = 0);
+    FindDialog(bool replace);
 
-    void append(const std::string &line) {lines.push_back(line);}
-    void writeToConsole();
-
-    // From QTextEdit
-    void mouseDoubleClickEvent(QMouseEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
-    void contextMenuEvent(QContextMenuEvent *e);
-
-    bool findOnce(QString text, bool regex, int options);
+    void findReplace(bool find, bool all);
 
   signals:
-    void find();
-    void findNext();
-    void findResult(bool);
+    void find(QString find, bool regex, int options);
+    void replace(QString find, QString replace, bool regex, int options,
+                 bool all);
 
   protected slots:
-    void on_find(QString text, bool regex, int options);
+    void show();
+    void find();
+    void findResult(bool found);
+    void replace();
+    void replaceAll();
   };
 }
 
-#endif // CAMOTICS_CONSOLE_WRITER_H
+#endif // CAMOTICS_FIND_DIALOG_H
 

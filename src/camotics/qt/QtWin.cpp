@@ -23,7 +23,6 @@
 #include "ui_camotics.h"
 
 #include "ProjectModel.h"
-#include "FileTabManager.h"
 
 #include <camotics/Geom.h>
 #include <camotics/view/Viewer.h>
@@ -67,7 +66,8 @@ using namespace CAMotics;
 
 
 QtWin::QtWin(Application &app) :
-  QMainWindow(0), ui(new Ui::CAMoticsWindow), fileDialog(*this),
+  QMainWindow(0), ui(new Ui::CAMoticsWindow), findDialog(false),
+  findAndReplaceDialog(true), fileDialog(*this),
   taskCompleteEvent(0), app(app), options(app.getOptions()),
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
@@ -79,20 +79,40 @@ QtWin::QtWin(Application &app) :
   ui->simulationView->init(SIMULATION_VIEW, this);
 
   // FileTabManager
-  fileTabManager = new FileTabManager(*this, *ui->tabWidget, 2);
-
   connect(ui->actionUndo, SIGNAL(triggered()),
-          fileTabManager.get(), SLOT(on_actionUndo_triggered()));
+          ui->fileTabManager, SLOT(on_actionUndo_triggered()));
   connect(ui->actionRedo, SIGNAL(triggered()),
-          fileTabManager.get(), SLOT(on_actionRedo_triggered()));
+          ui->fileTabManager, SLOT(on_actionRedo_triggered()));
   connect(ui->actionCut, SIGNAL(triggered()),
-          fileTabManager.get(), SLOT(on_actionCut_triggered()));
+          ui->fileTabManager, SLOT(on_actionCut_triggered()));
   connect(ui->actionCopy, SIGNAL(triggered()),
-          fileTabManager.get(), SLOT(on_actionCopy_triggered()));
+          ui->fileTabManager, SLOT(on_actionCopy_triggered()));
   connect(ui->actionPaste, SIGNAL(triggered()),
-          fileTabManager.get(), SLOT(on_actionPaste_triggered()));
+          ui->fileTabManager, SLOT(on_actionPaste_triggered()));
   connect(ui->actionSelectAll, SIGNAL(triggered()),
-          fileTabManager.get(), SLOT(on_actionSelectAll_triggered()));
+          ui->fileTabManager, SLOT(on_actionSelectAll_triggered()));
+
+  // Find
+  connect(ui->console, SIGNAL(find()), &findDialog, SLOT(show()));
+  connect(ui->console, SIGNAL(findNext()), &findDialog, SLOT(find()));
+  connect(ui->console, SIGNAL(findResult(bool)), &findDialog,
+          SLOT(findResult(bool)));
+  connect(&findDialog, SIGNAL(find(QString, bool, int)), ui->console,
+          SLOT(on_find(QString, bool, int)));
+
+  // Find & Replace
+  connect(ui->fileTabManager, SIGNAL(find()), &findAndReplaceDialog,
+          SLOT(show()));
+  connect(ui->fileTabManager, SIGNAL(findNext()), &findAndReplaceDialog,
+          SLOT(find()));
+  connect(ui->fileTabManager, SIGNAL(findResult(bool)), &findAndReplaceDialog,
+          SLOT(findResult(bool)));
+  connect(&findAndReplaceDialog, SIGNAL(find(QString, bool, int)),
+          ui->fileTabManager, SLOT(on_find(QString, bool, int)));
+  connect(&findAndReplaceDialog,
+          SIGNAL(replace(QString, QString, bool, int, bool)),
+          ui->fileTabManager,
+          SLOT(on_replace(QString, QString, bool, int, bool)));
 
   // ConcurrentTaskManager
   taskMan.addObserver(this);
@@ -161,8 +181,8 @@ void QtWin::init() {
   animationTimer.start(50);
 
   // Simulation and Tool View tabs are not closeable
-  ui->tabWidget->setTabsClosable(true);
-  QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
+  ui->fileTabManager->setTabsClosable(true);
+  QTabBar *tabBar = ui->fileTabManager->findChild<QTabBar *>();
   for (int i = 0; i < tabBar->count(); i++) {
     tabBar->setTabButton(i, QTabBar::RightSide, 0);
     tabBar->setTabButton(i, QTabBar::LeftSide, 0);
@@ -771,8 +791,8 @@ void QtWin::resetProject() {
   view->resetView();
 
   // Close editor tabs
-  fileTabManager->closeAll(false, true);
-  ui->tabWidget->setCurrentIndex(0);
+  ui->fileTabManager->closeAll(false, true);
+  ui->fileTabManager->setCurrentIndex(0);
 }
 
 
@@ -883,7 +903,7 @@ bool QtWin::saveProject(bool saveAs) {
 
   try {
     project->save(filename);
-    fileTabManager->saveAll();
+    ui->fileTabManager->saveAll();
     showMessage("Saved " + filename);
     return true;
   } CATCH_ERROR;
@@ -904,7 +924,7 @@ void QtWin::revertProject() {
 
   project->markClean();
   openProject(filename);
-  fileTabManager->revertAll();
+  ui->fileTabManager->revertAll();
 }
 
 
@@ -958,7 +978,7 @@ void QtWin::removeFile() {
 
 
 bool QtWin::checkSave(bool canCancel) {
-  if (!fileTabManager->checkSaveAll()) return false;
+  if (!ui->fileTabManager->checkSaveAll()) return false;
   if (project.isNull() || !project->isDirty()) return true;
 
   int response =
@@ -976,12 +996,12 @@ bool QtWin::checkSave(bool canCancel) {
 
 void QtWin::activateFile(const string &filename, int line, int col) {
   SmartPointer<NCFile> file = project->findFile(filename);
-  if (!file.isNull()) fileTabManager->open(file, line, col);
+  if (!file.isNull()) ui->fileTabManager->open(file, line, col);
 }
 
 
 void QtWin::updateActions() {
-  unsigned tab = ui->tabWidget->currentIndex();
+  unsigned tab = ui->fileTabManager->currentIndex();
   bool fileTab = 2 <= tab;
 
   if (!fileTab) {
@@ -994,11 +1014,11 @@ void QtWin::updateActions() {
     ui->actionRevertFile->setText("Revert File");
 
   } else {
-    SmartPointer<NCFile> file = fileTabManager->getFile(tab);
+    SmartPointer<NCFile> file = ui->fileTabManager->getFile(tab);
     string basename = SystemUtilities::basename(file->getAbsolutePath());
     QString title = QString(basename.c_str());
 
-    bool modified = fileTabManager->isModified(tab);
+    bool modified = ui->fileTabManager->isModified(tab);
     bool exists = file->exists();
 
     ui->actionSaveFile->setEnabled(modified);
@@ -1285,13 +1305,13 @@ void QtWin::setUIView(ui_view_t uiView) {
   // Select view widgets
   switch (uiView) {
   case SIMULATION_VIEW:
-    ui->tabWidget->setCurrentIndex(0);
+    ui->fileTabManager->setCurrentIndex(0);
     ui->settingsStack->setCurrentWidget(ui->simulationProperties);
     break;
 
   case TOOL_VIEW:
     if (!currentTool) loadTool(0);
-    ui->tabWidget->setCurrentIndex(1);
+    ui->fileTabManager->setCurrentIndex(1);
     ui->settingsStack->setCurrentWidget(ui->toolProperties);
     break;
 
@@ -1495,7 +1515,7 @@ void QtWin::animate() {
 }
 
 
-void QtWin::on_tabWidget_currentChanged(int index) {
+void QtWin::on_fileTabManager_currentChanged(int index) {
   switch (index) {
   case 0: setUIView(SIMULATION_VIEW); break;
   case 1: setUIView(TOOL_VIEW); break;
@@ -1503,11 +1523,6 @@ void QtWin::on_tabWidget_currentChanged(int index) {
   }
 
   updateActions();
-}
-
-
-void QtWin::on_tabWidget_tabCloseRequested(int index) {
-  fileTabManager->close(index, true, false);
 }
 
 
@@ -1543,7 +1558,7 @@ void QtWin::on_positionSlider_valueChanged(int position) {
 void QtWin::on_projectTreeView_activated(const QModelIndex &index) {
   switch (projectModel->getType(index)) {
   case ProjectModel::FILE_ITEM:
-    fileTabManager->open(project->getFile(projectModel->getOffset(index)));
+    ui->fileTabManager->open(project->getFile(projectModel->getOffset(index)));
     break;
 
   case ProjectModel::PATHS_ITEM:
@@ -1843,7 +1858,7 @@ void QtWin::on_actionStop_triggered() {
 
 
 void QtWin::on_actionRun_triggered() {
-  fileTabManager->checkSaveAll();
+  ui->fileTabManager->checkSaveAll();
   reload(true);
 }
 
@@ -1896,18 +1911,18 @@ void QtWin::on_actionSaveAs_triggered() {
 
 
 void QtWin::on_actionSaveFile_triggered() {
-  fileTabManager->save(ui->tabWidget->currentIndex());
+  ui->fileTabManager->save();
 }
 
 
 void QtWin::on_actionSaveFileAs_triggered() {
-  fileTabManager->save(ui->tabWidget->currentIndex(), true);
+  ui->fileTabManager->saveAs();
   projectModel->invalidate();
 }
 
 
 void QtWin::on_actionRevertFile_triggered() {
-  fileTabManager->revert(ui->tabWidget->currentIndex());
+  ui->fileTabManager->revert();
 }
 
 

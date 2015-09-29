@@ -123,6 +123,16 @@ namespace CAMotics {
     bool isFoldable(int line) const;
     bool isFolded(int line) const;
 
+    bool findOnce(QString find, bool regex, int options);
+    void find(QString find, bool regex, int options);
+    void replace(QString find, QString replace, bool regex, int options,
+                 bool all);
+
+  signals:
+    void find();
+    void findNext();
+    void findResult(bool);
+
   public slots:
     void updateSidebar();
     void mark(const QString &str,
@@ -137,12 +147,13 @@ namespace CAMotics {
     void toggleFold(int line);
 
   protected:
+    void contextMenuEvent(QContextMenuEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
     void resizeEvent(QResizeEvent *e);
     void wheelEvent(QWheelEvent *e);
 
-  private slots:
+  protected slots:
     void updateCursor();
     void updateSidebar(const QRect &rect, int d);
   };

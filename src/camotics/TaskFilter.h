@@ -40,7 +40,7 @@ namespace CAMotics {
     struct category : boost::iostreams::multichar_dual_use_filter::category,
       boost::iostreams::flushable_tag {};
 
-    TaskFilter(Task &task, uint64_t total = 100000) :
+    TaskFilter(Task &task, uint64_t total = 1000000) :
       task(task), total(total), count(0) {}
 
     void setTotal(uint64_t total) {this->total = total;}

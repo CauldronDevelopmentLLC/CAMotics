@@ -33,15 +33,14 @@ namespace CAMotics {
   class NCEdit;
 
 
-  class FileTabManager : public QObject {
+  class FileTabManager : public QTabWidget {
     Q_OBJECT;
 
-    QtWin &win;
-    QTabWidget &tabWidget;
+    QtWin *win;
     unsigned offset;
 
   public:
-    FileTabManager(QtWin &win, QTabWidget &tabWidget, unsigned offset);
+    FileTabManager(QWidget *parent = 0);
 
     void open(const cb::SmartPointer<NCFile> &file,
               int line = -1, int col = -1);
@@ -49,8 +48,11 @@ namespace CAMotics {
     const cb::SmartPointer<NCFile> &getFile(unsigned tab) const;
     bool checkSave(unsigned tab);
     bool checkSaveAll();
+    void save();
+    void saveAs();
     void save(unsigned tab, bool saveAs = false);
     void saveAll();
+    void revert();
     void revert(unsigned tab);
     void revertAll();
     void close(unsigned tab, bool canSave = true, bool removeTab = true);
@@ -60,7 +62,14 @@ namespace CAMotics {
     NCEdit *getEditor(unsigned tab) const;
     NCEdit *getCurrentEditor() const;
 
+  signals:
+    void find();
+    void findNext();
+    void findResult(bool);
+
   protected slots:
+    void on_tabCloseRequested(int index);
+
     void on_modificationChanged(bool changed);
 
     void on_actionUndo_triggered();
@@ -69,6 +78,10 @@ namespace CAMotics {
     void on_actionCopy_triggered();
     void on_actionPaste_triggered();
     void on_actionSelectAll_triggered();
+
+    void on_find(QString find, bool regex, int options);
+    void on_replace(QString find, QString replace, bool regex, int options,
+                    bool all);
   };
 }
 

@@ -36,6 +36,19 @@ using namespace cb;
 using namespace CAMotics;
 
 
+ConsoleWriter::ConsoleWriter(QWidget *parent) : QTextEdit(parent) {
+  menu.addAction(QIcon(":/icons/copy.png"), "&Copy", this, SLOT(copy()))
+    ->setShortcut(QKeySequence::Copy);
+  menu.addAction(QIcon(":/icons/select-all.png"), "Select &All", this,
+                 SLOT(selectAll()))->setShortcut(QKeySequence::SelectAll);
+  menu.addSeparator();
+  menu.addAction(QIcon(":/icons/find.png"), "&Find", this, SIGNAL(find()))
+    ->setShortcut(QKeySequence::Find);
+  menu.addAction("Find &Next", this, SIGNAL(findNext())
+                 )->setShortcut(QKeySequence::FindNext);
+}
+
+
 void ConsoleWriter::writeToConsole() {
   // Only access lines while holding cb::Logger lock
   SmartLock lock(&Logger::instance());
@@ -106,4 +119,45 @@ void ConsoleWriter::mouseDoubleClickEvent(QMouseEvent *e) {
     if (!win) LOG_ERROR("Failed to get window");
     else win->activateFile(filename, line, column);
   }
+}
+
+
+void ConsoleWriter::keyReleaseEvent(QKeyEvent *e) {
+  if (e->matches(QKeySequence::Find)) emit find();
+  if (e->matches(QKeySequence::FindNext)) emit findNext();
+
+  QTextEdit::keyReleaseEvent(e);
+}
+
+
+void ConsoleWriter::contextMenuEvent(QContextMenuEvent *e) {
+  menu.popup(e->globalPos());
+}
+
+
+bool ConsoleWriter::findOnce(QString find, bool regex, int options) {
+  QTextCursor cursor = textCursor();
+  QTextDocument::FindFlag opts = (QTextDocument::FindFlag)options;
+
+  if (regex) cursor = document()->find(QRegExp(find), cursor, opts);
+  else cursor = document()->find(find, cursor, opts);
+
+  if (!cursor.isNull()) {
+    setTextCursor(cursor);
+    return true;
+  }
+
+  return false;
+}
+
+
+void ConsoleWriter::on_find(QString find, bool regex, int options) {
+  bool found = true;
+
+  if (!findOnce(find, regex, options)) {
+    setTextCursor(QTextCursor()); // Wrap around
+    if (!findOnce(find, regex, options)) found = false;
+  }
+
+  emit findResult(found);
 }

@@ -25,6 +25,7 @@
 #include "ExportDialog.h"
 #include "AboutDialog.h"
 #include "DonateDialog.h"
+#include "FindDialog.h"
 #include "FileDialog.h"
 
 #include <camotics/Real.h>
@@ -59,7 +60,6 @@ namespace CAMotics {
   class ProjectModel;
   class ToolPath;
   class CutWorkpiece;
-  class FileTabManager;
   class ConsoleWriter;
   class ToolPathTask;
   class SurfaceTask;
@@ -75,12 +75,13 @@ namespace CAMotics {
     ExportDialog exportDialog;
     AboutDialog aboutDialog;
     DonateDialog donateDialog;
+    FindDialog findDialog;
+    FindDialog findAndReplaceDialog;
     FileDialog fileDialog;
     QTimer animationTimer;
     QGraphicsScene toolScene;
     QByteArray fullLayoutState;
     cb::SmartPointer<ProjectModel> projectModel;
-    cb::SmartPointer<FileTabManager> fileTabManager;
     ConcurrentTaskManager taskMan;
     int taskCompleteEvent;
 
@@ -262,8 +263,7 @@ namespace CAMotics {
   protected slots:
     void animate();
 
-    void on_tabWidget_currentChanged(int index);
-    void on_tabWidget_tabCloseRequested(int index);
+    void on_fileTabManager_currentChanged(int index);
 
     void on_resolutionComboBox_currentIndexChanged(int index);
     void on_resolutionDoubleSpinBox_valueChanged(double value);
