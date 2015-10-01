@@ -195,7 +195,8 @@ SmartPointer<Entity> Parser::numberRefOrExpr(CAMotics::Tokenizer &tokenizer) {
   case TokenType::NUMBER_TOKEN: return number(tokenizer);
   case TokenType::ADD_TOKEN:
   case TokenType::SUB_TOKEN: return unaryOp(tokenizer);
-  default: THROW("Expected number, reference, or bracked expression");
+  default: THROWS("Expected number, reference, or bracked expression, found "
+                  << tokenizer.getType());
   }
 }
 
@@ -323,10 +324,10 @@ SmartPointer<Entity> Parser::unaryOp(CAMotics::Tokenizer &tokenizer) {
   switch(tokenizer.getType()) {
   case TokenType::ADD_TOKEN: op = Operator::ADD_OP; break;
   case TokenType::SUB_TOKEN: op = Operator::SUB_OP; break;
-  default: break;
+  default:
+    THROWS("Expected unary - or + operator, found " << tokenizer.getType());
   }
 
-  if (op == Operator::NO_OP) THROW("Expected unary - or + operator");
   tokenizer.advance();
 
   return new UnaryOp(op, numberRefOrExpr(tokenizer));
