@@ -2711,7 +2711,7 @@
     <string>Export</string>
    </property>
    <property name="toolTip">
-    <string>Export the surface</string>
+    <string>Export surface, gcode or simulation data</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
