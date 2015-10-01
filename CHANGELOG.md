@@ -1,5 +1,11 @@
 # CAMotics Changelog
 
+## v1.0.1:
+ - Find & replace in editor
+ - Find in console
+ - Export correct GCode from GUI
+ - Fixed TPL module.exports handling
+
 ## v1.0.0:
  - Added GCode/TPL editor/viewer #89
  - Added console in GUI
