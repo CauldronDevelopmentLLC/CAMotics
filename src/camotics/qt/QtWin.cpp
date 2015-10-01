@@ -702,7 +702,7 @@ void QtWin::snapshot() {
 
 void QtWin::exportData() {
   // Check what we have to export
-  if (surface.isNull() && sim.isNull()) {
+  if (surface.isNull() && gcode.isNull() && sim.isNull()) {
     warning("Nothing to export.\nRun a simulation first.");
     return;
   }
