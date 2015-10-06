@@ -29,6 +29,11 @@ using namespace std;
 using namespace CAMotics;
 
 
+namespace {
+  int whiteSpace[] = {0x20, 0x09, 0x0d, 0xfeff, 0};
+}
+
+
 bool Tokenizer::isID(const string &id) const {
   return isType(ID_TOKEN) &&
     cb::String::toUpper(id) == cb::String::toUpper(getValue());
@@ -79,7 +84,7 @@ void Tokenizer::number(bool positive) {
     value.append(string(1, c));
 
     scanner.advance();
-    scanner.skipWhiteSpace(" \t\r");
+    scanner.skipWhiteSpace(whiteSpace);
     if (!scanner.hasMore()) break;
     c = scanner.peek();
 
@@ -112,7 +117,7 @@ void Tokenizer::id() {
 
 
 void Tokenizer::next() {
-  scanner.skipWhiteSpace(" \t\r");
+  scanner.skipWhiteSpace(whiteSpace);
 
   cb::FileLocation start = scanner.getLocation();
 
@@ -122,7 +127,7 @@ void Tokenizer::next() {
   }
 
   bool needAdvance = true;
-  char c = (char)scanner.peek();
+  int c = scanner.peek();
   switch (c) {
   case 0: current.set(EOF_TOKEN, ""); return;
 
@@ -163,8 +168,7 @@ void Tokenizer::next() {
       needAdvance = false;
 
     } else
-      THROWS("Invalid character: '"
-             << cb::String::escapeC(string(1, c)) << "'");
+      THROWS("Invalid character: '" << cb::String::escapeC(c) << "'");
   }
 
   if (needAdvance) scanner.advance();
