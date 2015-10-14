@@ -34,7 +34,7 @@ Move::Move(MoveType type, const Axes &start, const Axes &end, real startTime,
   start(start), end(end), tool(tool), feed(feed), speed(speed), line(line),
   dist(start.distance(end)), time(dist / feed * 60), startTime(startTime) {
 
-  if (!feed) {
+  if (type != MoveType::MOVE_RAPID && !feed) {
     time = 0;
 
     static bool warned = false;

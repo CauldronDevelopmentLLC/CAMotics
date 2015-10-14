@@ -188,11 +188,11 @@ const Code Codes::gcodes[] = {
 
   {'G', 90, 17, MG::MG_DISTANCE, VT::VT_NONE,
    "XYZ Absolute Distance Mode"},
-  {'G', 90.1, 17, MG::MG_DISTANCE, VT::VT_NONE,
+  {'G', 90.1, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
    "IJK Absolute Distance Mode"},
   {'G', 91, 17, MG::MG_DISTANCE, VT::VT_NONE,
    "XYZ Incremental Distance Mode"},
-  {'G', 91.1, 17, MG::MG_DISTANCE, VT::VT_NONE,
+  {'G', 91.1, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
    "IJK Incremental Distance Mode"},
 
   {'G', 92, 19, MG::MG_ZERO, VT::VT_AXIS,

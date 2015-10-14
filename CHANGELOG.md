@@ -6,6 +6,7 @@
  - Fix predefined position moves (G28 & G30)
  - Handle UTF-8 Byte Order Marker
  - Allow exporting GCode without simulated surface
+ - Don't warn about zero feed on rapid moves
 
 ## v1.0.1:
  - Find & replace in editor
