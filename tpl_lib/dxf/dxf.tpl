@@ -475,7 +475,7 @@ module.exports = extend({
   },
 
 
-  cut_polys: function(polys, zSafe, zCut) {
+  cut_polys: function(polys, zSafe, zCut, zFeed) {
     if (!polys.length) return;
 
     for (var i = 0; i < polys.length; i++) {
@@ -489,7 +489,10 @@ module.exports = extend({
         rapid(v[0], v[1]);
       }
 
+      var f = feed()[0];
+      if (typeof zFeed != 'undefined') feed(zFeed);
       cut({z: zCut});
+      feed(f);
 
       for (var j = 0; j < poly.length; j++)
         this.tabbed_cut(poly[j][0], poly[j][1]);
@@ -591,7 +594,7 @@ module.exports = extend({
   set_tabs: function (data) {tabs = data},
 
 
-  cut_layer_offset: function (layer, delta, zSafe, zCut, steps) {
+  cut_layer_offset: function (layer, delta, zSafe, zCut, steps, zFeed) {
     if (typeof steps == 'undefined') steps = 1;
 
     var zDelta = zCut / steps;
@@ -599,7 +602,7 @@ module.exports = extend({
     for (var i = 0; i < steps; i++) {
       var polys = this.layer_to_polys(layer);
       if (delta) polys = this.offset_polys(polys, delta);
-      this.cut_polys(polys, zSafe, zDelta * (i + 1));
+      this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed);
     }
   }
 
