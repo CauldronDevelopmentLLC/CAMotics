@@ -118,62 +118,66 @@ void Viewer::draw(const View &view) {
   //if (view.isFlagSet(View::SHOW_BBTREE_FLAG)) cutWP->drawBB();
 
   // Tool
-  if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->getPath().isNull()) {
-    Vector3R currentPosition = view.path->getPosition();
-    glTranslatef(currentPosition.x(), currentPosition.y(),
-                 currentPosition.z());
-
+  if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->isEmpty()) {
     const ToolTable &tools = view.path->getPath()->getTools();
     const Move &move = view.path->getMove();
-    const Tool &tool = tools.get(move.getTool());
-    double diameter = tool.getDiameter();
-    double radius = tool.getRadius();
-    double length = tool.getLength();
-    ToolShape shape = tool.getShape();
+    unsigned toolID = move.getTool();
 
-    if (radius <= 0) {
-      // Default tool specs
-      radius = 25.4 / 8;
-      shape = ToolShape::TS_CONICAL;
+    if (tools.has(toolID)) {
+      const Tool &tool = tools.get(toolID);
+      double diameter = tool.getDiameter();
+      double radius = tool.getRadius();
+      double length = tool.getLength();
+      ToolShape shape = tool.getShape();
 
-      glColor4f(1, 0, 0, 1); // Red
+      Vector3R currentPosition = view.path->getPosition();
+      glTranslatef(currentPosition.x(), currentPosition.y(),
+                   currentPosition.z());
 
-    } else glColor4f(1, 0.5, 0, 1); // Orange
+      if (radius <= 0) {
+        // Default tool specs
+        radius = 25.4 / 8;
+        shape = ToolShape::TS_CONICAL;
 
-    if (length <= 0) length = 50;
+        glColor4f(1, 0, 0, 1); // Red
 
-    switch (shape) {
-    case ToolShape::TS_SPHEROID: {
-      glMatrixMode(GL_MODELVIEW);
-      glPushMatrix();
-      glTranslatef(0, 0, length / 2);
-      glScaled(1, 1, length / diameter);
-      gluSphere((GLUquadric *)toolQuad, radius, 100, 100);
-      glPopMatrix();
-      break;
-    }
+      } else glColor4f(1, 0.5, 0, 1); // Orange
 
-    case ToolShape::TS_BALLNOSE:
-      glPushMatrix();
-      glTranslatef(0, 0, radius);
-      gluSphere((GLUquadric *)toolQuad, radius, 100, 100);
-      drawCylinder((GLUquadric *)toolQuad, radius, radius, length - radius);
-      glPopMatrix();
-      break;
+      if (length <= 0) length = 50;
 
-    case ToolShape::TS_SNUBNOSE:
-      drawCylinder((GLUquadric *)toolQuad, tool.getSnubDiameter() / 2, radius,
-                   length);
-      break;
+      switch (shape) {
+      case ToolShape::TS_SPHEROID: {
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glTranslatef(0, 0, length / 2);
+        glScaled(1, 1, length / diameter);
+        gluSphere((GLUquadric *)toolQuad, radius, 100, 100);
+        glPopMatrix();
+        break;
+      }
 
-    case ToolShape::TS_CONICAL:
-      drawCylinder((GLUquadric *)toolQuad, 0, radius, length);
-      break;
+      case ToolShape::TS_BALLNOSE:
+        glPushMatrix();
+        glTranslatef(0, 0, radius);
+        gluSphere((GLUquadric *)toolQuad, radius, 100, 100);
+        drawCylinder((GLUquadric *)toolQuad, radius, radius, length - radius);
+        glPopMatrix();
+        break;
 
-    case ToolShape::TS_CYLINDRICAL:
-    default:
-      drawCylinder((GLUquadric *)toolQuad, radius, radius, length);
-      break;
+      case ToolShape::TS_SNUBNOSE:
+        drawCylinder((GLUquadric *)toolQuad, tool.getSnubDiameter() / 2, radius,
+                     length);
+        break;
+
+      case ToolShape::TS_CONICAL:
+        drawCylinder((GLUquadric *)toolQuad, 0, radius, length);
+        break;
+
+      case ToolShape::TS_CYLINDRICAL:
+      default:
+        drawCylinder((GLUquadric *)toolQuad, radius, radius, length);
+        break;
+      }
     }
   }
 

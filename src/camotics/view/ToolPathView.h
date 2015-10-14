@@ -63,6 +63,8 @@ namespace CAMotics {
     ToolPathView(ValueSet &valueSet);
     ~ToolPathView();
 
+    bool isEmpty() const {return path.isNull() || path->empty();}
+
     cb::SmartPointer<const ToolPath> getPath() const {return path;}
     void setPath(const cb::SmartPointer<const ToolPath> &path);
 
