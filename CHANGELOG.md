@@ -1,5 +1,12 @@
 # CAMotics Changelog
 
+## v1.0.2:
+ - Implemented absolute arc mode
+ - Implemented incremental distance mode
+ - Fix predefined position moves (G28 & G30)
+ - Handle UTF-8 Byte Order Marker
+ - Allow exporting GCode without simulated surface
+
 ## v1.0.1:
  - Find & replace in editor
  - Find in console
