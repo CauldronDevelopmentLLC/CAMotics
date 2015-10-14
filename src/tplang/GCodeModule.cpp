@@ -50,7 +50,7 @@ void GCodeModule::define(js::ObjectTemplate &exports) {
   exports.set("cut(" AXES ", incremental=false)", this, &GCodeModule::cutCB);
   exports.set("icut(" AXES ", incremental=true)", this, &GCodeModule::cutCB);
   exports.set("arc(x=0, y=0, z=0, angle, plane, incremental=true)", this,
-          &GCodeModule::arcCB);
+              &GCodeModule::arcCB);
   exports.set("probe(" AXES ", toward=true, error=true, index=0, port=-1, "
           "invert=false)", this, &GCodeModule::probeCB);
   exports.set("dwell(seconds)", this, &GCodeModule::dwellCB);
