@@ -218,8 +218,10 @@ void ToolPathView::draw() {
   if (!numColors || !numVertices) return;
 
   // Setup GL Buffers
+  bool useBuffers = glGenBuffers && glBindBuffer && glBufferData;
+
   // Colors
-  if (glGenBuffers && !colors.empty()) {
+  if (useBuffers && !colors.empty()) {
     if (!colorVBuf) glGenBuffers(1, &colorVBuf);
     glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
@@ -228,7 +230,7 @@ void ToolPathView::draw() {
   }
 
   // Vertices
-  if (glGenBuffers && !vertices.empty()) {
+  if (useBuffers && !vertices.empty()) {
     if (!vertexVBuf) glGenBuffers(1, &vertexVBuf);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
@@ -246,14 +248,14 @@ void ToolPathView::draw() {
   glEnableClientState(GL_COLOR_ARRAY);
 
   // Colors
-  if (glBindBuffer) {
+  if (useBuffers) {
     glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glColorPointer(3, GL_FLOAT, 0, 0);
 
   } else glColorPointer(3, GL_FLOAT, 0, &colors[0]);
 
   // Vertices
-  if (glBindBuffer) {
+  if (useBuffers) {
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
