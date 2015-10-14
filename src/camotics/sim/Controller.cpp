@@ -585,12 +585,16 @@ void Controller::arc(int vars, bool clockwise) {
   } else {
     // Get arc center
     const char *offsets = getPlaneOffsets(getPlane());
-    Vector2D offset =
-      Vector2D(vars & letterToVarType(offsets[0]) ? getVar(offsets[0]) : 0,
-              vars & letterToVarType(offsets[1]) ? getVar(offsets[1]) : 0);
+    Vector2D offset;
 
-    if (arcIncrementalDistanceMode) center = start + offset;
-    else center = offset;
+    if (arcIncrementalDistanceMode) {
+      offset =
+        Vector2D(vars & letterToVarType(offsets[0]) ? getVar(offsets[0]) : 0,
+                 vars & letterToVarType(offsets[1]) ? getVar(offsets[1]) : 0);
+      center = start + offset;
+
+    } else center = Vector2D(getVar(offsets[0]) + getAxisOffset(axes[0]),
+                             getVar(offsets[1]) + getAxisOffset(axes[1]));
 
     // Check that the radius matches
     radius = start.distance(center);
