@@ -114,10 +114,12 @@ void Controller::set(const string &name, double value) {
 }
 
 
-double Controller::getOffsetVar(char axis) const {
+double Controller::getOffsetVar(char axis, bool absolute) const {
   LOG_INFO(6, "getOffsetVar(" << axis << ") var=" << getVar(axis) << " offset="
            << getAxisOffset(axis));
-  return getVar(axis) + getAxisOffset(axis);
+
+  return getVar(axis) +
+    (absolute ? getAxisOffset(axis) : getAxisAbsolutePosition(axis));
 }
 
 
@@ -244,15 +246,13 @@ double Controller::getAxisPosition(char axis) const {
 }
 
 
-Axes Controller::getPosition(bool absolute) const {
+Axes Controller::getAbsolutePosition() const {
   Axes pos;
 
   for (const char *axes = Axes::AXES; *axes; axes++)
-    if (absolute) pos.set(*axes, getAxisAbsolutePosition(*axes));
-    else pos.set(*axes, getAxisPosition(*axes));
+    pos.set(*axes, getAxisAbsolutePosition(*axes));
 
-  LOG_INFO(5, "Controller: Current " << (absolute ? "absolute" : "relative")
-           <<  " position is " << pos);
+  LOG_INFO(5, "Controller: Current absolute position is " << pos);
 
   return pos;
 }
@@ -263,22 +263,20 @@ void Controller::setAxisPosition(char axis, double pos) {
 }
 
 
-void Controller::setPosition(const Axes &axes, bool absolute) {
-  LOG_INFO(5, "Controller: Set " << (absolute ? "absolute" : "relative")
-           << " position to " << axes);
+void Controller::setAbsolutePosition(const Axes &axes) {
+  LOG_INFO(5, "Controller: Set absolute position to " << axes);
 
   for (const char *var = Axes::AXES; *var; var++)
-    if (absolute) setAxisAbsolutePosition(*var, axes.get(*var));
-    else setAxisPosition(*var, axes.get(*var));
+    setAxisAbsolutePosition(*var, axes.get(*var));
 }
 
 
-Axes Controller::getNextPosition(int vars) const {
+Axes Controller::getNextPosition(int vars, bool absolute) const {
   Axes pos;
 
   for (const char *axes = Axes::AXES; *axes; axes++)
     if (vars & letterToVarType(*axes))
-      pos.set(*axes, getOffsetVar(*axes));
+      pos.set(*axes, getOffsetVar(*axes, absolute));
     else pos.set(*axes, getAxisAbsolutePosition(*axes));
 
   LOG_INFO(5, "Controller: Next position is " << pos);
@@ -357,8 +355,8 @@ void Controller::execute(const Code &code, int vars) {
   switch (code.type) {
   case 'G':
     switch ((unsigned)(10 * code.number)) {
-    case 0: makeMove(vars, true); return;
-    case 10: makeMove(vars, false); return;
+    case 0: makeMove(vars, true, !incrementalDistanceMode); return;
+    case 10: makeMove(vars, false, !incrementalDistanceMode); return;
 
     case 20: arc(vars, true); return;
     case 30: arc(vars, false); return;
@@ -390,18 +388,27 @@ void Controller::execute(const Code &code, int vars) {
     case 210: machine.setMetric(); break;
 
     case 280:
-      if (vars & VT_AXIS) makeMove(vars, true);
-      loadPredefined1();
-      makeMove(vars, true);
+      if (vars & VT_AXIS) {
+        makeMove(vars, true, true);
+        loadPredefined1(vars);
+
+      } else loadPredefined1(VT_AXIS);
+
+      makeMove(0, true, true);
       break;
+
     case 281: storePredefined1(); break;
 
     case 300:
-      // TODO fix this
-      if (vars & VT_AXIS) makeMove(vars, true);
-      loadPredefined1();
-      makeMove(vars, true);
+      if (vars & VT_AXIS) {
+        makeMove(vars, true, true);
+        loadPredefined2(vars);
+
+      } else loadPredefined2(VT_AXIS);
+
+      makeMove(0, true, true);
       break;
+
     case 301: storePredefined2(); break;
 
     case 330: spindleSynchronizedMotion(false); break;
@@ -449,17 +456,15 @@ void Controller::execute(const Code &code, int vars) {
       else naiveCamTolerance = 0;
       break;
 
-    case 730: // TODO Drilling cycle w/ chip breaking
-    case 760: // TODO Threading cycle
-      implemented = false;
-      break;
+    case 730: implemented = false; break; // TODO Drill cycle w/ chip breaking
+    case 760: implemented = false; break; // TODO Thread cycle
 
     case 800: modalMotion = false; break;
 
-    case 810: drill(vars, false, false, false); break; // Drilling cycle
-    case 820: drill(vars, true, false, false); break; // Drilling Cycle w/ Dwell
-    case 830: implemented = false; break; // TODO Peck Drilling
-    case 840: implemented = false; break; // TODO Right-Hand Tapping
+    case 810: drill(vars, false, false, false); break; // Drill cycle
+    case 820: drill(vars, true, false, false); break; // Drill Cycle w/ Dwell
+    case 830: implemented = false; break; // TODO Peck Drill
+    case 840: implemented = false; break; // TODO Right-Hand Tap
     case 850: drill(vars, false, true, false); // No Dwell, Feed Out
     case 860: drill(vars, false, false, true); // Spindle Stop, Rapid Out
     case 870: implemented = false; break; // TODO Back Boring
@@ -467,8 +472,8 @@ void Controller::execute(const Code &code, int vars) {
     case 890: drill(vars, true, true, false); // Dwell, Feed Out
 
     case 900: incrementalDistanceMode = false; break;
-    case 901: arcIncrementalDistanceMode = false; implemented = false; break;
-    case 910: incrementalDistanceMode = true; implemented = false; break;
+    case 901: arcIncrementalDistanceMode = false; break;
+    case 910: incrementalDistanceMode = true; break;
     case 911: arcIncrementalDistanceMode = true; break;
 
     case 920: setGlobalOffsets(vars); break;
@@ -519,24 +524,23 @@ void Controller::execute(const Code &code, int vars) {
 
 void Controller::doMove(const Axes &pos, bool rapid) {
   machine.move(pos, rapid);
-  setPosition(pos, true);
+  setAbsolutePosition(pos);
 }
 
 
-void Controller::makeMove(int vars, bool rapid) {
-  doMove(getNextPosition(vars), rapid);
+void Controller::makeMove(int vars, bool rapid, bool absolute) {
+  doMove(getNextPosition(vars, absolute), rapid);
 }
 
 
 void Controller::moveAxis(char axis, double value, bool rapid) {
-  Axes pos = getPosition(true);
+  Axes pos = getAbsolutePosition();
   pos.set(axis, value);
   doMove(pos, rapid);
 }
 
 
 void Controller::arc(int vars, bool clockwise) {
-  // TODO Handle Arc Absolute Mode
   // TODO Affected by cutter radius compensation
   // TODO Make sure this is correct for planes XZ and YZ
 
@@ -544,8 +548,8 @@ void Controller::arc(int vars, bool clockwise) {
   if (getPlane() == MachineInterface::XZ) clockwise = !clockwise;
 
   // Compute start and end points
-  Axes current = getPosition(true);
-  Axes target = getNextPosition(vars);
+  Axes current = getAbsolutePosition();
+  Axes target = getNextPosition(vars, !incrementalDistanceMode);
   Vector2D start = Vector2D(current.get(axes[0]), current.get(axes[1]));
   Vector2D finish = Vector2D(target.get(axes[0]), target.get(axes[1]));
   Vector2D center;
@@ -584,7 +588,9 @@ void Controller::arc(int vars, bool clockwise) {
     Vector2D offset =
       Vector2D(vars & letterToVarType(offsets[0]) ? getVar(offsets[0]) : 0,
               vars & letterToVarType(offsets[1]) ? getVar(offsets[1]) : 0);
-    center = start + offset;
+
+    if (arcIncrementalDistanceMode) center = start + offset;
+    else center = offset;
 
     // Check that the radius matches
     radius = start.distance(center);
@@ -630,14 +636,13 @@ void Controller::spindleSynchronizedMotion(bool rigidTap) {
 
 void Controller::straightProbe(int vars, bool towardWorkpiece,
                                bool signalError) {
-  // TODO Handle Incremental Distance Mode
-
   int port = machine.findPort(MachineInterface::PROBE);
   if (port != -1)
     machine.input(port, towardWorkpiece ? MachineInterface::STOP_WHEN_HIGH :
                   MachineInterface::STOP_WHEN_LOW, signalError);
 
-  makeMove(vars, false);
+  makeMove(vars, false, !incrementalDistanceMode);
+
   LOG_INFO(3, "Controller: straight probe "
            << (towardWorkpiece ? "toward" : "away from") << " workpiece"
            << (signalError ? " with error signal" : ""));
@@ -666,14 +671,14 @@ void Controller::drill(int vars, bool dwell, bool feedOut, bool spindleStop) {
     if (!i && z < r) moveAxis(getPlaneZAxis(), r, true);
 
     // Traverse to XY
-    makeMove(xyVars, true);
-    
+    makeMove(xyVars, true, !incrementalDistanceMode);
+
     // Traverse to Z if above
     z = getAxisPosition(getPlaneZAxis());
     if (z != r) moveAxis(getPlaneZAxis(), r, true);
 
     // Drill
-    makeMove(zVar, false);
+    makeMove(zVar, false, !incrementalDistanceMode);
 
     // Dwell
     if (dwell) this->dwell(getVar('P'));
@@ -768,23 +773,23 @@ void Controller::storePredefined2() {
 }
 
 
-void Controller::loadPredefined1() {
-  setAxisAbsolutePosition('X', get(PREDEFINED1_X));
-  setAxisAbsolutePosition('Y', get(PREDEFINED1_Y));
-  setAxisAbsolutePosition('Z', get(PREDEFINED1_Z));
-  setAxisAbsolutePosition('U', get(PREDEFINED1_U));
-  setAxisAbsolutePosition('V', get(PREDEFINED1_V));
-  setAxisAbsolutePosition('W', get(PREDEFINED1_W));
+void Controller::loadPredefined1(int vars) {
+  if (vars & VT_X) setAxisAbsolutePosition('X', get(PREDEFINED1_X));
+  if (vars & VT_Y) setAxisAbsolutePosition('Y', get(PREDEFINED1_Y));
+  if (vars & VT_Z) setAxisAbsolutePosition('Z', get(PREDEFINED1_Z));
+  if (vars & VT_U) setAxisAbsolutePosition('U', get(PREDEFINED1_U));
+  if (vars & VT_V) setAxisAbsolutePosition('V', get(PREDEFINED1_V));
+  if (vars & VT_W) setAxisAbsolutePosition('W', get(PREDEFINED1_W));
 }
 
 
-void Controller::loadPredefined2() {
-  setAxisAbsolutePosition('X', get(PREDEFINED2_X));
-  setAxisAbsolutePosition('Y', get(PREDEFINED2_Y));
-  setAxisAbsolutePosition('Z', get(PREDEFINED2_Z));
-  setAxisAbsolutePosition('U', get(PREDEFINED2_U));
-  setAxisAbsolutePosition('V', get(PREDEFINED2_V));
-  setAxisAbsolutePosition('W', get(PREDEFINED2_W));
+void Controller::loadPredefined2(int vars) {
+  if (vars & VT_X) setAxisAbsolutePosition('X', get(PREDEFINED2_X));
+  if (vars & VT_Y) setAxisAbsolutePosition('Y', get(PREDEFINED2_Y));
+  if (vars & VT_Z) setAxisAbsolutePosition('Z', get(PREDEFINED2_Z));
+  if (vars & VT_U) setAxisAbsolutePosition('U', get(PREDEFINED2_U));
+  if (vars & VT_V) setAxisAbsolutePosition('V', get(PREDEFINED2_V));
+  if (vars & VT_W) setAxisAbsolutePosition('W', get(PREDEFINED2_W));
 }
 
 

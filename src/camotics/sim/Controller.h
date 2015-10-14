@@ -164,7 +164,7 @@ namespace CAMotics {
     {varExprs[c - 'A'] = entity;}
     const cb::SmartPointer<Entity> &getVarExpr(char c) const
     {return varExprs[c - 'A'];}
-    double getOffsetVar(char c) const;
+    double getOffsetVar(char c, bool absolute) const;
 
     static unsigned letterToVarType(char axis);
     static const char *getPlaneAxes(MachineInterface::plane_t plane);
@@ -184,10 +184,10 @@ namespace CAMotics {
     void setAxisAbsolutePosition(char axis, double pos);
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
-    Axes getPosition(bool absolute = false) const;
+    Axes getAbsolutePosition() const;
     void setAxisPosition(char axis, double pos);
-    void setPosition(const Axes &axes, bool absolute = false);
-    Axes getNextPosition(int vars) const;
+    void setAbsolutePosition(const Axes &axes);
+    Axes getNextPosition(int vars, bool absolute) const;
 
     std::string getVarGroupStr(const char *group, bool usedOnly = true) const;
 
@@ -195,7 +195,7 @@ namespace CAMotics {
     void newBlock();
     virtual void execute(const Code &code, int vars);
     void doMove(const Axes &pos, bool rapid);
-    void makeMove(int vars, bool rapid);
+    void makeMove(int vars, bool rapid, bool absolute);
     void moveAxis(char axis, double value, bool rapid);
 
     void arc(int vars, bool clockwise);
@@ -212,8 +212,8 @@ namespace CAMotics {
     void loadToolVarOffsets(int vars);
     void storePredefined1();
     void storePredefined2();
-    void loadPredefined1();
-    void loadPredefined2();
+    void loadPredefined1(int vars);
+    void loadPredefined2(int vars);
     void setGlobalOffsets(int vars);
     void resetGlobalOffsets(bool clearMemory);
     void restoreGlobalOffsets();
