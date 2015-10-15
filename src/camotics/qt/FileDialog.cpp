@@ -44,8 +44,8 @@ static bool is_writable(const string &path) {
 
 string FileDialog::open(const string &title, const string &filters,
                         const string &filename, bool save) {
-  setWindowTitle(QString::fromLatin1(title.c_str()));
-  setNameFilter(QString::fromLatin1(filters.c_str()));
+  setWindowTitle(QString::fromUtf8(title.c_str()));
+  setNameFilter(QString::fromUtf8(filters.c_str()));
   setAcceptMode(save ? AcceptSave : AcceptOpen);
   setConfirmOverwrite(save);
 
@@ -73,7 +73,7 @@ string FileDialog::open(const string &title, const string &filters,
 
   QStringList names = selectedFiles();
   if (!names.size()) return "";
-  string path = names.at(0).toLatin1().data();
+  string path = names.at(0).toUtf8().data();
 
   if (SystemUtilities::isDirectory(path)) {
     win.warning("Cannot open directory");

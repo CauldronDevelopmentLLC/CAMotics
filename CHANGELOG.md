@@ -1,5 +1,7 @@
 # CAMotics Changelog
 
+## v1.0.3:
+
 ## v1.0.2:
  - Implemented absolute arc mode
  - Implemented incremental distance mode

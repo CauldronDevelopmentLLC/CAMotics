@@ -270,7 +270,7 @@ void QtWin::loadExamples() {
 
     string root = ".";
     string appPath =
-      QCoreApplication::applicationFilePath().toLatin1().data();
+      QCoreApplication::applicationFilePath().toUtf8().data();
     if (appPath.empty()) LOG_WARNING("Couldn't get application path");
     else root = SystemUtilities::dirname(appPath);
 
@@ -488,7 +488,7 @@ void QtWin::paintGL(unsigned id) {
 
 
 void QtWin::showMessage(const string &msg, double timeout) {
-  ui->statusbar->showMessage(QString::fromLatin1(msg.c_str()), timeout * 1000);
+  ui->statusbar->showMessage(QString::fromUtf8(msg.c_str()), timeout * 1000);
 }
 
 
@@ -1080,7 +1080,7 @@ void QtWin::loadTool(unsigned number) {
     ui->snubDiameterDoubleSpinBox->
       setValue(currentTool->getSnubDiameter() * scale);
     ui->descriptionLineEdit->
-      setText(QString::fromLatin1(currentTool->getDescription().c_str()));
+      setText(QString::fromUtf8(currentTool->getDescription().c_str()));
   }
 
   on_shapeComboBox_currentIndexChanged(currentTool->getShape());
@@ -1361,7 +1361,7 @@ void QtWin::updateZ(const string &name, real value) {
 
 void QtWin::updateCurrentTime(const string &name, double value) {
   QString text =
-    QString::fromLatin1(TimeInterval(value, true).toString().c_str());
+    QString::fromUtf8(TimeInterval(value, true).toString().c_str());
   ui->currentTimeLabel->setText(text);
 }
 
@@ -1373,7 +1373,7 @@ void QtWin::updateCurrentDistance(const string &name, double value) {
 
 void QtWin::updateRemainingTime(const string &name, double value) {
   QString text =
-    QString::fromLatin1(TimeInterval(value, true).toString().c_str());
+    QString::fromUtf8(TimeInterval(value, true).toString().c_str());
   ui->remainingTimeLabel->setText(text);
 }
 
@@ -1385,7 +1385,7 @@ void QtWin::updateRemainingDistance(const string &name, double value) {
 
 void QtWin::updateTotalTime(const string &name, double value) {
   QString text =
-    QString::fromLatin1(TimeInterval(value, true).toString().c_str());
+    QString::fromUtf8(TimeInterval(value, true).toString().c_str());
   ui->totalTimeLabel->setText(text);
 }
 
@@ -1745,7 +1745,7 @@ void QtWin::on_snubDiameterDoubleSpinBox_valueChanged(double value) {
 void QtWin::on_descriptionLineEdit_textChanged(const QString &value) {
   PROTECT_UI_UPDATE;
 
-  string description = value.toLatin1().data();
+  string description = value.toUtf8().data();
 
   if (description == currentTool->getDescription()) return;
 
@@ -1896,7 +1896,7 @@ void QtWin::on_actionDirection_triggered() {
 void QtWin::on_actionExamples_triggered() {
   QAction *action = (QAction *)QObject::sender();
   if (action->toolTip().isEmpty()) return;
-  openProject(action->toolTip().toLatin1().data());
+  openProject(action->toolTip().toUtf8().data());
 }
 
 

@@ -31,7 +31,7 @@ using namespace CAMotics;
 void ClickWidget::mousePressEvent(QMouseEvent *event) {
   QString url = statusTip();
 
-  LOG_INFO(1, "Opening URL " << url.toLatin1().data());
+  LOG_INFO(1, "Opening URL " << url.toUtf8().data());
 
   QDesktopServices::openUrl(url);
 }
