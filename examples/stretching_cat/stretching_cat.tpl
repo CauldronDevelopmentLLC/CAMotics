@@ -5,7 +5,7 @@ var zSafe = 5;             // Safe height
 var cutDepth = -10.4;      // Total cut depth
 var maxZStep = 3;          // Max depth of cut per pass
 var toolDia = 1/16 * 25.4; // Metric diameter of the tool
-var offset = 50;           // Array X & Y offset
+var offset = 100;          // Array X & Y offset
 var rows = 2;
 var cols = 4;
 
