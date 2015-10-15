@@ -1,8 +1,12 @@
 # CAMotics Changelog
 
+## v1.0.4:
+ - Clear surface on reload.
+
 ## v1.0.3:
  - Handle non-latin characters in filenames.
  - Fixed stretching cat example.
+ - Fixed G90.1 mode in Windows.
 
 ## v1.0.2:
  - Implemented absolute arc mode

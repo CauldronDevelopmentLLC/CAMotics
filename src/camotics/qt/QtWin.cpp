@@ -546,6 +546,7 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
 
   // Load surface
   surface.release();
+  view->setSurface(0);
   unsigned threads = options["threads"].toInteger();
   taskMan.addTask(new SurfaceTask(threads, project->getFilename(), sim));
 }
