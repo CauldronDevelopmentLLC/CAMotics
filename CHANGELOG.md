@@ -1,6 +1,8 @@
 # CAMotics Changelog
 
 ## v1.0.3:
+ - Handle non-latin characters in filenames.
+ - Fixed stretching cat example.
 
 ## v1.0.2:
  - Implemented absolute arc mode

@@ -354,7 +354,7 @@ void Controller::execute(const Code &code, int vars) {
 
   switch (code.type) {
   case 'G':
-    switch ((unsigned)(10 * code.number)) {
+    switch ((unsigned)floor(10 * code.number + 0.5)) {
     case 0: makeMove(vars, true, !incrementalDistanceMode); return;
     case 10: makeMove(vars, false, !incrementalDistanceMode); return;
 
