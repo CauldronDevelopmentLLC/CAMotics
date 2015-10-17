@@ -48,8 +48,6 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QFileDialog>
-#include <QImage>
-#include <QGraphicsPixmapItem>
 #include <QMessageBox>
 #include <QImageWriter>
 #include <QMovie>
@@ -70,13 +68,22 @@ QtWin::QtWin(Application &app) :
   findAndReplaceDialog(true), fileDialog(*this),
   taskCompleteEvent(0), app(app), options(app.getOptions()),
   connectionManager(new ConnectionManager(options)),
-  view(new View(valueSet)), viewer(new Viewer), toolView(new ToolView),
-  lastRedraw(0), dirty(false), simDirty(false), inUIUpdate(false),
-  lastProgress(0), lastStatusActive(false), currentTool(0), autoPlay(false),
-  autoClose(false), currentUIView(NULL_VIEW) {
+  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0), dirty(false),
+  simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
+  autoPlay(false), autoClose(false), currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
   ui->simulationView->init(SIMULATION_VIEW, this);
+
+  // Tool tables
+  ui->toolTable->setScene(&toolTableScene);
+  ui->toolLibrary->setScene(&toolLibraryScene);
+
+  connect(&toolTableScene, SIGNAL(addTool()), this, SLOT(on_addTool()));
+  connect(&toolTableScene, SIGNAL(editTool(unsigned)), this,
+          SLOT(on_editTool(unsigned)));
+  connect(&toolTableScene, SIGNAL(removeTool(unsigned)), this,
+          SLOT(on_removeTool(unsigned)));
 
   // FileTabManager
   connect(ui->actionUndo, SIGNAL(triggered()),
@@ -654,7 +661,6 @@ void QtWin::redraw(bool now) {
       updateWorkpieceBounds();
       ui->simulationView->updateGL();
       break;
-    case TOOL_VIEW: updateToolUI(); break;
     default: break;
     }
 
@@ -666,23 +672,8 @@ void QtWin::redraw(bool now) {
 
 void QtWin::snapshot() {
   string filename = project->getFilename();
-  QPixmap pixmap;
-
-  switch (currentUIView) {
-  case SIMULATION_VIEW:
-    pixmap = QPixmap::fromImage(ui->simulationView->grabFrameBuffer(true));
-    break;
-
-  case TOOL_VIEW:
-    if (!currentTool) return;
-    filename = SystemUtilities::
-      joinPath(SystemUtilities::dirname(filename),
-               String::printf("tool%d", currentTool->getNumber()));
-    pixmap = QPixmap::grabWidget(ui->toolView);
-    break;
-
-  default: return;
-  }
+  QPixmap pixmap =
+    QPixmap::fromImage(ui->simulationView->grabFrameBuffer(true));
 
   QList<QByteArray> formats = QImageWriter::supportedImageFormats();
   string fileTypes = "Image files (";
@@ -788,7 +779,6 @@ void QtWin::resetProject() {
   view->setToolPath(0);
   view->setWorkpiece(Rectangle3R());
   view->setSurface(0);
-  currentTool = 0;
   view->resetView();
 
   // Close editor tabs
@@ -1047,46 +1037,24 @@ void QtWin::updateUnits() {
 }
 
 
-void QtWin::loadTool(unsigned number) {
+void QtWin::updateToolTables() {
+  ToolTable tools;
+  if (!project.isNull()) tools = project->getToolTable();
+  toolTableScene.update(tools, ui->toolTable->maximumViewportSize());
+}
+
+
+void QtWin::editTool(unsigned number) {
   if (project.isNull()) return;
 
-  if (!number) {
-    // Find a tool which is not the current tool
-    ToolTable &tools = project->getToolTable();
-    for (ToolTable::iterator it = tools.begin(); it != tools.end(); it++)
-      if (it->first &&
-          (!currentTool || it->first != currentTool->getNumber())) {
-        number = it->first;
-        break;
-      }
+  Tool &tool = project->getToolTable().get(number);
 
-    if (!number) {
-      currentTool = 0;
-      return;
-    }
-  }
+  toolDialog.setTool(tool);
+  if (toolDialog.edit() != QDialog::Accepted) return;
 
-  currentTool = &project->getToolTable().get(number);
-
-  real scale =
-    currentTool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
-
-  {
-    LOCK_UI_UPDATES;
-    ui->toolSpinBox->setValue(number);
-    ui->toolUnitsComboBox->setCurrentIndex(currentTool->getUnits());
-    ui->shapeComboBox->setCurrentIndex(currentTool->getShape());
-    ui->lengthDoubleSpinBox->setValue(currentTool->getLength() * scale);
-    ui->diameterDoubleSpinBox->setValue(currentTool->getDiameter() * scale);
-    ui->snubDiameterDoubleSpinBox->
-      setValue(currentTool->getSnubDiameter() * scale);
-    ui->descriptionLineEdit->
-      setText(QString::fromUtf8(currentTool->getDescription().c_str()));
-  }
-
-  on_shapeComboBox_currentIndexChanged(currentTool->getShape());
-
-  updateToolUI();
+  project->markDirty();
+  projectModel->invalidate();
+  updateToolTables();
 }
 
 
@@ -1096,11 +1064,13 @@ void QtWin::addTool() {
 
   for (unsigned i = 1; i < 1000; i++)
     if (!tools.has(i)) {
-      tools.add(Tool(i, 0, project->getUnits()));
-      loadTool(i);
-      setUIView(TOOL_VIEW);
+      toolDialog.getTool().setNumber(i);
+      if (toolDialog.edit() != QDialog::Accepted) return;
+      tools.add(toolDialog.getTool());
+
       project->markDirty();
       projectModel->invalidate();
+      updateToolTables();
       return;
     }
 
@@ -1108,48 +1078,11 @@ void QtWin::addTool() {
 }
 
 
-void QtWin::removeTool() {
-  project->getToolTable().erase(currentTool->getNumber());
+void QtWin::removeTool(unsigned number) {
+  project->getToolTable().erase(number);
   project->markDirty();
   projectModel->invalidate();
-  loadTool(0);
-}
-
-
-void QtWin::updateToolUI() {
-  if (!currentTool) return;
-
-  // Get widgets
-  QGraphicsView &view = *ui->toolView;
-  QGraphicsScene &scene = toolScene;
-  view.setScene(&scene);
-
-  // Get dimensions
-  int width = view.frameSize().width();
-  int height = view.frameSize().height();
-
-  // Set dimensions
-  scene.clear();
-  scene.setSceneRect(0, 0, width, height);
-
-  // Update tool view
-  toolView->setTool(*currentTool);
-  toolView->resize(width, height);
-  toolView->draw();
-
-  // Paint image
-  int stride = toolView->getStride();
-  unsigned char *data = toolView->getBuffer().get();
-  QImage image(data, width, height, stride, QImage::Format_ARGB32);
-  QGraphicsPixmapItem *item =
-    new QGraphicsPixmapItem(QPixmap::fromImage(image));
-
-  scene.addItem(item);
-  scene.update();
-
-  // Select correct tool line
-  unsigned number = currentTool->getNumber();
-  ui->projectTreeView->setCurrentIndex(projectModel->getToolIndex(number));
+  updateToolTables();
 }
 
 
@@ -1310,11 +1243,12 @@ void QtWin::setUIView(ui_view_t uiView) {
     ui->settingsStack->setCurrentWidget(ui->simulationProperties);
     break;
 
-  case TOOL_VIEW:
-    if (!currentTool) loadTool(0);
+  case TOOL_VIEW: {
     ui->fileTabManager->setCurrentIndex(1);
     ui->settingsStack->setCurrentWidget(ui->toolProperties);
+    updateToolTables();
     break;
+  }
 
   default: break;
   }
@@ -1467,6 +1401,12 @@ void QtWin::closeEvent(QCloseEvent *event) {
 }
 
 
+void QtWin::resizeEvent(QResizeEvent *event) {
+  updateToolTables();
+  QMainWindow::resizeEvent(event);
+}
+
+
 void QtWin::animate() {
   try {
     dirty = connectionManager->update() || dirty;
@@ -1568,12 +1508,9 @@ void QtWin::on_projectTreeView_activated(const QModelIndex &index) {
     setUIView(SIMULATION_VIEW);
     break;
 
-  case ProjectModel::TOOL_ITEM: {
-    setUIView(TOOL_VIEW);
-    Tool &tool = projectModel->getTool(index);
-    loadTool(tool.getNumber());
+  case ProjectModel::TOOL_ITEM:
+    editTool(projectModel->getOffset(index) + 1);
     break;
-  }
 
   case ProjectModel::TOOLS_ITEM:
     setUIView(TOOL_VIEW);
@@ -1595,166 +1532,14 @@ void QtWin::on_projectTreeView_customContextMenuRequested(QPoint point) {
   ui->actionRemoveFile->setEnabled(type == ProjectModel::FILE_ITEM);
   ui->actionRemoveTool->setEnabled(type == ProjectModel::TOOL_ITEM);
 
-  switch (type) {
-  case ProjectModel::FILE_ITEM: break;
-  case ProjectModel::TOOL_ITEM: {
-    Tool &tool = projectModel->getTool(projectModel->getOffset(index));
-    loadTool(tool.getNumber());
-    break;
-  }
-
-  default: break;
-  }
-
   QMenu menu;
   menu.addAction(ui->actionAddFile);
   menu.addAction(ui->actionRemoveFile);
   menu.addSeparator();
   menu.addAction(ui->actionAddTool);
+  menu.addAction(ui->actionEditTool);
   menu.addAction(ui->actionRemoveTool);
   menu.exec(ui->projectTreeView->mapToGlobal(point));
-}
-
-
-void QtWin::on_toolSpinBox_valueChanged(int value) {
-  int current = currentTool->getNumber();
-  int newNum = value;
-
-  if (newNum == current) return;
-
-  ToolTable &tools = project->getToolTable();
-
-  while (newNum && newNum < current && tools.has(newNum)) newNum--;
-  while (current < newNum && tools.has(newNum)) newNum++;
-  if (!newNum) newNum = current;
-
-  if (newNum != current) {
-    currentTool->setNumber(newNum);
-    tools.erase(current);
-    tools.add(*currentTool);
-    project->markDirty();
-  }
-
-  if (value != newNum) ui->toolSpinBox->setValue(newNum);
-
-  projectModel->invalidate();
-  redraw(true);
-}
-
-
-void QtWin::on_toolUnitsComboBox_currentIndexChanged(int value) {
-  ToolUnits units = (ToolUnits::enum_t)value;
-
-  real step = units == ToolUnits::UNITS_MM ? 1 : 0.125;
-  ui->lengthDoubleSpinBox->setSingleStep(step);
-  ui->diameterDoubleSpinBox->setSingleStep(step);
-  ui->snubDiameterDoubleSpinBox->setSingleStep(step);
-
-  PROTECT_UI_UPDATE;
-
-  if (units == currentTool->getUnits()) return;
-
-  currentTool->setUnits(units);
-  project->markDirty();
-  loadTool(currentTool->getNumber());
-
-  projectModel->invalidate();
-  redraw(true);
-}
-
-
-void QtWin::on_shapeComboBox_currentIndexChanged(int value) {
-  ToolShape shape = (ToolShape::enum_t)value;
-
-  real scale = currentTool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
-  real length = currentTool->getLength();
-  real radius = currentTool->getRadius();
-  if (shape == ToolShape::TS_BALLNOSE && length < radius)
-    ui->lengthDoubleSpinBox->setValue(radius / scale);
-
-  ui->snubDiameterDoubleSpinBox->setVisible(shape == ToolShape::TS_SNUBNOSE);
-  ui->snubDiameterLabel->setVisible(shape == ToolShape::TS_SNUBNOSE);
-
-  PROTECT_UI_UPDATE;
-
-  if (shape == currentTool->getShape()) return;
-
-  currentTool->setShape(shape);
-  project->markDirty();
-
-  projectModel->invalidate();
-  redraw(true);
-}
-
-
-void QtWin::on_lengthDoubleSpinBox_valueChanged(double value) {
-  real scale = currentTool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
-  value *= scale;
-
-  real radius = currentTool->getRadius();
-  if (currentTool->getShape() == ToolShape::TS_BALLNOSE && value < radius) {
-    value = radius;
-    ui->lengthDoubleSpinBox->setValue(value / scale);
-  }
-
-  PROTECT_UI_UPDATE;
-
-  if (value == currentTool->getLength()) return;
-
-  currentTool->setLength(value);
-  project->markDirty();
-
-  redraw(true);
-}
-
-
-void QtWin::on_diameterDoubleSpinBox_valueChanged(double value) {
-  real scale = currentTool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
-  value *= scale;
-
-  real length = currentTool->getLength();
-  if (currentTool->getShape() == ToolShape::TS_BALLNOSE && length < value / 2)
-    ui->lengthDoubleSpinBox->setValue(value / 2 / scale);
-
-  PROTECT_UI_UPDATE;
-
-  if (value == currentTool->getDiameter()) return;
-
-  currentTool->setDiameter(value);
-  project->markDirty();
-
-  projectModel->invalidate();
-  redraw(true);
-}
-
-
-void QtWin::on_snubDiameterDoubleSpinBox_valueChanged(double value) {
-  PROTECT_UI_UPDATE;
-
-  real scale = currentTool->getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
-  value *= scale;
-
-  if (value == currentTool->getSnubDiameter()) return;
-
-  currentTool->setSnubDiameter(value);
-  project->markDirty();
-
-  redraw(true);
-}
-
-
-void QtWin::on_descriptionLineEdit_textChanged(const QString &value) {
-  PROTECT_UI_UPDATE;
-
-  string description = value.toUtf8().data();
-
-  if (description == currentTool->getDescription()) return;
-
-  currentTool->setDescription(description);
-  project->markDirty();
-
-  projectModel->invalidate();
-  redraw(true);
 }
 
 
@@ -2082,8 +1867,15 @@ void QtWin::on_actionAddTool_triggered() {
 }
 
 
+void QtWin::on_actionEditTool_triggered() {
+  QModelIndex index = ui->projectTreeView->currentIndex();
+  editTool(projectModel->getOffset(index) + 1);
+}
+
+
 void QtWin::on_actionRemoveTool_triggered() {
-  removeTool();
+  QModelIndex index = ui->projectTreeView->currentIndex();
+  removeTool(projectModel->getOffset(index) + 1);
 }
 
 

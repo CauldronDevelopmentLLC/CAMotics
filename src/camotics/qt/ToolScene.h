@@ -18,46 +18,23 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_GCODE_MACHINE_H
-#define TPLANG_GCODE_MACHINE_H
+#ifndef CAMOTICS_TOOL_SCENE_H
+#define CAMOTICS_TOOL_SCENE_H
 
-#include "MachineAdapter.h"
+#include "ToolGraphicsItem.h"
 
-#include <ostream>
 
 namespace CAMotics {
-  class GCodeMachine : public MachineAdapter {
-    std::ostream &stream;
-
-    bool mistCoolant;
-    bool floodCoolant;
-
-    Axes position;
-
-    cb::FileLocation location;
+  class ToolScene : public QGraphicsScene {
+    ToolGraphicsItem *item;
 
   public:
-    GCodeMachine(std::ostream &stream) :
-      stream(stream), mistCoolant(false), floodCoolant(false) {}
+    ToolScene();
 
-    void beginLine();
-
-    // From MachineInterface
-    void start();
-    void end();
-
-    void setFeed(double feed, feed_mode_t mode);
-    void setSpeed(double speed, spin_mode_t mode, double max);
-    void setTool(unsigned tool);
-
-    int findPort(port_t type, unsigned index);
-    double input(unsigned port, input_mode_t mode, double timeout, bool error);
-    void output(unsigned port, double value, bool sync);
-
-    void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
-    void pause(bool optional);
+    void update(const Tool &tool, int width, int height);
+    void update(const Tool &tool, const QSize &size);
   };
 }
 
-#endif // TPLANG_GCODE_MACHINE_H
+#endif // CAMOTICS_TOOL_SCENE_H
+

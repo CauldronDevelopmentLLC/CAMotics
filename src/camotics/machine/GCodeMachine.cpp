@@ -22,6 +22,7 @@
 
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
+#include <cbang/net/URI.h>
 #include <cbang/log/Logger.h>
 
 #include <limits>
@@ -47,6 +48,29 @@ namespace {
 
   inline ostream &operator<<(ostream &stream, const dtos &d) {
     return stream << String(d.x);
+  }
+}
+
+
+void GCodeMachine::beginLine() {
+#define DIGIT_CHARS        "1234567890"
+#define LOWER_CHARS        "abcdefghijklmnopqrstuvwxyz"
+#define UPPER_CHARS        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define ALPHA_CHARS        LOWER_CHARS UPPER_CHARS
+#define ALPHANUMERIC_CHARS ALPHA_CHARS DIGIT_CHARS
+#define UNESCAPED ALPHANUMERIC_CHARS "-_.!~*/"
+
+  const FileLocation &newLoc = getLocation().getStart();
+  const string &filename = newLoc.getFilename();
+
+  if (filename != location.getFilename()) {
+    stream << "(File: '" << URI::encode(filename, UNESCAPED) << "')\n";
+    location.setFilename(filename);
+  }
+
+  if (newLoc.getLine() != location.getLine()) {
+    stream << "N" << newLoc.getLine() << ' ';
+    location.setLine(newLoc.getLine());
   }
 }
 
@@ -79,7 +103,10 @@ void GCodeMachine::setFeed(double feed, feed_mode_t mode) {
                    "UNITS_PER_MIN or UNITS_PER_REV");
     }
 
-  if (feed != oldFeed) stream << "F" << dtos(feed) << '\n';
+  if (feed != oldFeed) {
+    beginLine();
+    stream << "F" << dtos(feed) << '\n';
+  }
 }
 
 
@@ -90,6 +117,8 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
   MachineAdapter::setSpeed(speed, mode, max);
 
   if (oldMode != mode)
+    beginLine();
+
     switch (mode) {
     case REVOLUTIONS_PER_MINUTE: stream << "G97\n";
     case CONSTANT_SURFACE_SPEED:
@@ -99,6 +128,8 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
     }
 
   if (oldSpeed != speed) {
+    beginLine();
+
     if (0 < speed) stream << "M3 S" << dtos(speed) << '\n';
     else if (speed < 0) stream << "M4 S" << dtos(-speed) << '\n';
     else stream << "M5\n";
@@ -111,7 +142,10 @@ void GCodeMachine::setTool(unsigned tool) {
 
   MachineAdapter::setTool(tool);
 
-  if (oldTool != tool) stream << "M6 T" << tool << '\n';
+  if (oldTool != tool) {
+    beginLine();
+    stream << "M6 T" << tool << '\n';
+  }
 }
 
 
@@ -156,6 +190,7 @@ void GCodeMachine::output(unsigned port, double value, bool sync) {
 
 
 void GCodeMachine::dwell(double seconds) {
+  beginLine();
   stream << "G4 P" << dtos(seconds) << '\n';
   MachineAdapter::dwell(seconds);
 }
@@ -172,6 +207,7 @@ void GCodeMachine::move(const Axes &axes, bool rapid) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (!is_near(position.get(*axis), axes.get(*axis))) {
       if (first) {
+        beginLine();
         stream << 'G' << (rapid ? '0' : '1');
         first = false;
       }
@@ -188,7 +224,8 @@ void GCodeMachine::move(const Axes &axes, bool rapid) {
 }
 
 
-void GCodeMachine::pause(bool optional) const {
+void GCodeMachine::pause(bool optional) {
+  beginLine();
   stream << (optional ? "M1" : "M0") << '\n';
   MachineAdapter::pause(optional);
 }

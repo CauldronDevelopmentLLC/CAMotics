@@ -78,3 +78,15 @@ js::Module &TPLContext::addModule(const SmartPointer<js::Module> &module) {
   modules.push_back(module);
   return *module;
 }
+
+
+void TPLContext::pushPath(const std::string &path) {
+  Environment::pushPath(path);
+  machine.setLocation(FileLocation(path));
+}
+
+
+void TPLContext::popPath() {
+  Environment::popPath();
+  machine.setLocation(FileLocation(getCurrentPath()));
+}

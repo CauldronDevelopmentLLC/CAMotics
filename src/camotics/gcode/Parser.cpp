@@ -51,7 +51,7 @@ void Parser::parse(CAMotics::Tokenizer &tokenizer, Processor &processor,
     } catch (const Exception &e) {
       LOG_ERROR(tokenizer.getLocation() << ":" << e.getMessage());
       LOG_DEBUG(3, e);
-      if (maxErrors < ++errors) THROW("Too many parsing errors aborting");
+      if (maxErrors < ++errors) THROW("Too many errors aborting");
     }
   }
 }

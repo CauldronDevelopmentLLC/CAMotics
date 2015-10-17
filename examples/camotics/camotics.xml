@@ -16,5 +16,13 @@
 
   <tool_table>
     <tool length='10' number='1' radius='1.25' shape='BALLNOSE' units='MM'/>
+    <tool length='10' number='2' radius='1' shape='CYLINDRICAL' units='MM'/>
+    <tool length='10' number='3' radius='1' shape='CYLINDRICAL' units='MM'/>
+    <tool length='10' number='4' radius='1' shape='CYLINDRICAL' units='MM'/>
+    <tool length='10' number='5' radius='1' shape='CYLINDRICAL' units='MM'/>
+    <tool length='10' number='6' radius='1' shape='CYLINDRICAL' units='MM'/>
+    <tool length='10' number='7' radius='1' shape='CYLINDRICAL' units='MM'/>
+    <tool length='10' number='8' radius='1' shape='CYLINDRICAL' units='MM'/>
+    <tool length='10' number='9' radius='1' shape='CYLINDRICAL' units='MM'/>
   </tool_table>
 </camotics>

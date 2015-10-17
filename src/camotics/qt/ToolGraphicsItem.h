@@ -18,46 +18,41 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_GCODE_MACHINE_H
-#define TPLANG_GCODE_MACHINE_H
+#ifndef CAMOTICS_TOOL_GRAPHICS_ITEM_H
+#define CAMOTICS_TOOL_GRAPHICS_ITEM_H
 
-#include "MachineAdapter.h"
+#include <camotics/sim/Tool.h>
+#include <camotics/view/ToolView.h>
 
-#include <ostream>
+#include <QtGlobal>
+#if QT_VERSION < 0x050000
+#include <QtGui>
+#else
+#include <QtWidgets>
+#endif
+
+
 
 namespace CAMotics {
-  class GCodeMachine : public MachineAdapter {
-    std::ostream &stream;
-
-    bool mistCoolant;
-    bool floodCoolant;
-
-    Axes position;
-
-    cb::FileLocation location;
+  class ToolGraphicsItem : public QGraphicsPixmapItem {
+    ToolView toolView;
+    unsigned number;
+    bool highlight;
 
   public:
-    GCodeMachine(std::ostream &stream) :
-      stream(stream), mistCoolant(false), floodCoolant(false) {}
+    ToolGraphicsItem(QGraphicsItem *parent = 0);
 
-    void beginLine();
+    unsigned getNumber() const {return number;}
 
-    // From MachineInterface
-    void start();
-    void end();
+    void update(const Tool &tool, int width, int height);
 
-    void setFeed(double feed, feed_mode_t mode);
-    void setSpeed(double speed, spin_mode_t mode, double max);
-    void setTool(unsigned tool);
-
-    int findPort(port_t type, unsigned index);
-    double input(unsigned port, input_mode_t mode, double timeout, bool error);
-    void output(unsigned port, double value, bool sync);
-
-    void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
-    void pause(bool optional);
+    // From QGraphicsItem
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget);
   };
 }
 
-#endif // TPLANG_GCODE_MACHINE_H
+#endif // CAMOTICS_TOOL_GRAPHICS_ITEM_H
+

@@ -222,7 +222,7 @@ namespace CAMotics {
 
     virtual void setMatrix(const cb::Matrix4x4D &m, axes_t matrix = XYZ) = 0;
 
-    virtual void pause(bool optional = true) const = 0;
+    virtual void pause(bool optional = true) = 0;
 
     /***
      * Returns once all outstanding moves have completed unless @param timeout
@@ -230,7 +230,7 @@ namespace CAMotics {
      * seconds, is reached sooner.  Reaching the timeout will not set the
      * TIMEOUT error.
      */
-    virtual bool synchronize(double timeout = 0) const = 0;
+    virtual bool synchronize(double timeout = 0) = 0;
 
     /// Halt all movement immediately and cancel any pending operations.
     virtual void abort() = 0;

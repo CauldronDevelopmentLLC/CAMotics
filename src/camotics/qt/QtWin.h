@@ -27,6 +27,8 @@
 #include "DonateDialog.h"
 #include "FindDialog.h"
 #include "FileDialog.h"
+#include "ToolDialog.h"
+#include "ToolTableScene.h"
 
 #include <camotics/Real.h>
 #include <camotics/ConcurrentTaskManager.h>
@@ -77,9 +79,11 @@ namespace CAMotics {
     DonateDialog donateDialog;
     FindDialog findDialog;
     FindDialog findAndReplaceDialog;
+    ToolDialog toolDialog;
     FileDialog fileDialog;
+    ToolTableScene toolTableScene;
+    ToolTableScene toolLibraryScene;
     QTimer animationTimer;
-    QGraphicsScene toolScene;
     QByteArray fullLayoutState;
     cb::SmartPointer<ProjectModel> projectModel;
     ConcurrentTaskManager taskMan;
@@ -101,7 +105,6 @@ namespace CAMotics {
     cb::SmartPointer<ConnectionManager> connectionManager;
     cb::SmartPointer<View> view;
     cb::SmartPointer<Viewer> viewer;
-    cb::SmartPointer<ToolView> toolView;
     cb::SmartPointer<ToolPath> toolPath;
     cb::SmartPointer<std::vector<char> > gcode;
     cb::SmartPointer<Surface> surface;
@@ -113,7 +116,6 @@ namespace CAMotics {
     double lastProgress;
     std::string lastStatus;
     bool lastStatusActive;
-    Tool *currentTool;
     bool autoPlay;
     bool autoClose;
     std::string defaultExample;
@@ -203,11 +205,11 @@ namespace CAMotics {
 
     void updateActions();
     void updateUnits();
+    void updateToolTables();
 
-    void loadTool(unsigned number);
+    void editTool(unsigned number);
     void addTool();
-    void removeTool();
-    void updateToolUI();
+    void removeTool(unsigned number);
 
     void updateWorkpiece();
     void loadWorkpiece();
@@ -259,9 +261,14 @@ namespace CAMotics {
     // From QMainWindow
     bool event(QEvent *event);
     void closeEvent(QCloseEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
   protected slots:
     void animate();
+
+    void on_addTool() {addTool();}
+    void on_editTool(unsigned tool) {editTool(tool);}
+    void on_removeTool(unsigned tool) {removeTool(tool);}
 
     void on_fileTabManager_currentChanged(int index);
 
@@ -273,14 +280,6 @@ namespace CAMotics {
 
     void on_projectTreeView_activated(const QModelIndex &index);
     void on_projectTreeView_customContextMenuRequested(QPoint point);
-
-    void on_toolSpinBox_valueChanged(int value);
-    void on_toolUnitsComboBox_currentIndexChanged(int value);
-    void on_shapeComboBox_currentIndexChanged(int value);
-    void on_lengthDoubleSpinBox_valueChanged(double value);
-    void on_diameterDoubleSpinBox_valueChanged(double value);
-    void on_snubDiameterDoubleSpinBox_valueChanged(double value);
-    void on_descriptionLineEdit_textChanged(const QString &value);
 
     void on_automaticCuboidRadioButton_clicked();
     void on_marginDoubleSpinBox_valueChanged(double value);
@@ -343,6 +342,7 @@ namespace CAMotics {
     void on_actionAddFile_triggered();
     void on_actionRemoveFile_triggered();
     void on_actionAddTool_triggered();
+    void on_actionEditTool_triggered();
     void on_actionRemoveTool_triggered();
 
     void on_actionHideConsole_triggered();

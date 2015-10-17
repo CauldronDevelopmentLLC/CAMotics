@@ -55,7 +55,7 @@ void GCodeInterpreter::setReference(const std::string &name, double value) {
 }
 
 
-void GCodeInterpreter::operator()(const SmartPointer<Block> &block) try {
+void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   if (block->isDeleted()) return;
 
   LOG_DEBUG(5, "Block: " << *block);
@@ -195,14 +195,11 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) try {
         const Code *code = word->getCode();
         if (!code) continue; // Invalid or unsupported
 
-        if (priority == code->priority)
-          try {
-            controller.setLocation(word->getLocation());
-            controller.execute(*code, vars);
-            if (code->group == MG_MOTION) controller.setActiveMotion(code);
-          } catch (const Exception &e) {
-            THROWCS(word->getCol() << ": Exception executing word", e);
-          }
+        if (priority == code->priority) {
+          controller.setLocation(word->getLocation());
+          controller.execute(*code, vars);
+          if (code->group == MG_MOTION) controller.setActiveMotion(code);
+        }
 
         wordPriority = code->priority;
       }
@@ -215,9 +212,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) try {
         lowestPriority = wordPriority;
     }
   }
- } catch (const Exception &e) {
-  THROWCS("Exception executing block", e);
- }
+}
 
 
 double GCodeInterpreter::lookupReference(unsigned num) {

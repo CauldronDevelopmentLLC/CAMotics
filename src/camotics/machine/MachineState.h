@@ -79,8 +79,8 @@ namespace CAMotics {
     const cb::Matrix4x4D &getMatrix(axes_t matrix) const;
     void setMatrix(const cb::Matrix4x4D &m, axes_t matrix);
 
-    void pause(bool optional) const {}
-    bool synchronize(double timeout) const {return true;}
+    void pause(bool optional) {}
+    bool synchronize(double timeout) {return true;}
     void abort() {}
 
     async_error_t readAsyncError() {return OK;}

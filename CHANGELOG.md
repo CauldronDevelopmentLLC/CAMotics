@@ -2,6 +2,7 @@
 
 ## v1.0.4:
  - Clear surface on reload.
+ - Cutting move with zero feed is now an error.
 
 ## v1.0.3:
  - Handle non-latin characters in filenames.

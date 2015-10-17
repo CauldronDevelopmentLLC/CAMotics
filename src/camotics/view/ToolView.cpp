@@ -81,6 +81,8 @@ void ToolView::draw() {
 
   cairo_t *cr = cairo_create(surface);
 
+  bool simple = width < 300 || height < 300;
+
   // Background & foreground
   const double bg = 1.0;
   const double fg = 0.2;
@@ -96,21 +98,21 @@ void ToolView::draw() {
   double diameter = tool.getDiameter();
   double snubDiameter =
     shape == ToolShape::TS_SNUBNOSE ? tool.getSnubDiameter() : 0;
-  string title =
-    String::printf("Tool #%d: ", tool.getNumber()) + tool.getText();
+  string title = String::printf("#%d", tool.getNumber());
+  if (!simple) title = "Tool " + title + ": " + tool.getText();
 
   // Margin
-  int margin = 50;
+  int margin = simple ? 12 : 50;
   cairo_save(cr);
   cairo_translate(cr, margin, margin);
   double w = width - 2 * margin;
-  double h = height - 2 * margin;
+  double h = height - (simple ? 1 : 2) * margin - (simple ? 1 : 0);
 
   // Title
-  cairo_move_to(cr, w / 2, -20);
+  cairo_move_to(cr, w / 2, simple ? -2 : -20);
   cairo_select_font_face(cr, "serif", CAIRO_FONT_SLANT_NORMAL,
                          CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(cr, 16);
+  cairo_set_font_size(cr, simple ? 12 : 16);
   cairo_text_extents_t extents;
   cairo_text_extents(cr, title.c_str(), &extents);
   cairo_rel_move_to(cr, -extents.width / 2, 0);
@@ -169,15 +171,17 @@ void ToolView::draw() {
   h *= scale;
 
   // Guides
-  x = w / 2.0;
-  y = h + 5;
-  drawGuide(cr, diameter * scale, x, y, "Diameter", diameter);
-  if (shape == ToolShape::TS_SNUBNOSE)
-    drawGuide(cr, snubDiameter * scale, x, y + 15, "Snub Diameter",
-              snubDiameter);
+  if (!simple) {
+    x = w / 2.0;
+    y = h + 5;
+    drawGuide(cr, diameter * scale, x, y, "Diameter", diameter);
+    if (shape == ToolShape::TS_SNUBNOSE)
+      drawGuide(cr, snubDiameter * scale, x, y + 15, "Snub Diameter",
+                snubDiameter);
 
-  cairo_rotate(cr, M_PI / 2.0);
-  drawGuide(cr, length * scale, h / 2.0, -20, "Length", length);
+    cairo_rotate(cr, M_PI / 2.0);
+    drawGuide(cr, length * scale, h / 2.0, -20, "Length", length);
+  }
 
   // Cleanup
   cairo_destroy(cr);

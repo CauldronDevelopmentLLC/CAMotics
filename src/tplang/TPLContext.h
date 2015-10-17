@@ -48,6 +48,10 @@ namespace tplang {
       if (!adapter) THROW("Not found");
       return adapter->find<T>();
     }
+
+    // From cb::js::Environment
+    void pushPath(const std::string &path);
+    void popPath();
   };
 }
 

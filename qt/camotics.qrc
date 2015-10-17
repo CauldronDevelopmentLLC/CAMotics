@@ -62,5 +62,6 @@
         <file>icons/optimize.png</file>
         <file>icons/find.png</file>
         <file>icons/replace.png</file>
+        <file>icons/edit.png</file>
     </qresource>
 </RCC>

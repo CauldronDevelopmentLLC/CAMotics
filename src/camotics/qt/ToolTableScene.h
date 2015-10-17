@@ -18,46 +18,40 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_GCODE_MACHINE_H
-#define TPLANG_GCODE_MACHINE_H
+#ifndef CAMOTICS_TOOL_TABLE_SCENE_H
+#define CAMOTICS_TOOL_TABLE_SCENE_H
 
-#include "MachineAdapter.h"
+#include <camotics/sim/ToolTable.h>
 
-#include <ostream>
+#include <QtGlobal>
+#if QT_VERSION < 0x050000
+#include <QtGui>
+#else
+#include <QtWidgets>
+#endif
+
 
 namespace CAMotics {
-  class GCodeMachine : public MachineAdapter {
-    std::ostream &stream;
+  class ToolGraphicsItem;
 
-    bool mistCoolant;
-    bool floodCoolant;
-
-    Axes position;
-
-    cb::FileLocation location;
+  class ToolTableScene : public QGraphicsScene {
+    Q_OBJECT;
 
   public:
-    GCodeMachine(std::ostream &stream) :
-      stream(stream), mistCoolant(false), floodCoolant(false) {}
+    void update(const ToolTable &tools, QSize dims);
 
-    void beginLine();
+    ToolGraphicsItem *toolAt(const QPointF &p);
 
-    // From MachineInterface
-    void start();
-    void end();
+    // From QGraphicsScene
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 
-    void setFeed(double feed, feed_mode_t mode);
-    void setSpeed(double speed, spin_mode_t mode, double max);
-    void setTool(unsigned tool);
-
-    int findPort(port_t type, unsigned index);
-    double input(unsigned port, input_mode_t mode, double timeout, bool error);
-    void output(unsigned port, double value, bool sync);
-
-    void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
-    void pause(bool optional);
+  signals:
+    void addTool();
+    void editTool(unsigned number);
+    void removeTool(unsigned number);
   };
 }
 
-#endif // TPLANG_GCODE_MACHINE_H
+#endif // CAMOTICS_TOOL_TABLE_SCENE_H
+

@@ -51,6 +51,9 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
+      <property name="handleWidth">
+       <number>6</number>
+      </property>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <property name="spacing">
@@ -59,7 +62,7 @@
         <item>
          <widget class="CAMotics::FileTabManager" name="fileTabManager">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="simulationTab">
            <property name="styleSheet">
@@ -173,7 +176,7 @@
            <attribute name="title">
             <string>Tool View</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
+           <layout class="QVBoxLayout" name="verticalLayout_27">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -190,16 +193,131 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QGraphicsView" name="toolView">
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
+             <widget class="QSplitter" name="splitter_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
               </property>
-              <property name="verticalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOff</enum>
-              </property>
-              <property name="horizontalScrollBarPolicy">
-               <enum>Qt::ScrollBarAlwaysOff</enum>
-              </property>
+              <widget class="QGroupBox" name="groupBox_4">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="title">
+                <string>Tool Library</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_28">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QGraphicsView" name="toolLibrary">
+                  <property name="horizontalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QGroupBox" name="groupBox_6">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="title">
+                <string>Active Tool Table</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QGraphicsView" name="toolTable">
+                  <property name="horizontalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="loadDefaultToolTablePushButton">
+                    <property name="text">
+                     <string>Load Default</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="camotics.qrc">
+                      <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="saveDefaultToolTablePushButton">
+                    <property name="text">
+                     <string>Save As Default</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="camotics.qrc">
+                      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
            </layout>
@@ -1299,7 +1417,7 @@
      <item>
       <widget class="QStackedWidget" name="settingsStack">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="simulationProperties">
         <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -1944,207 +2062,6 @@
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <item>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_44">
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Tool</string>
-                </property>
-                <property name="buddy">
-                 <cstring>toolSpinBox</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="toolSpinBox">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>1000</number>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_50">
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Description</string>
-                </property>
-                <property name="buddy">
-                 <cstring>descriptionLineEdit</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="descriptionLineEdit"/>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_45">
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Units</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="toolUnitsComboBox">
-                <item>
-                 <property name="text">
-                  <string>mm</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>inch</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_46">
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Shape</string>
-                </property>
-                <property name="buddy">
-                 <cstring>shapeComboBox</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QComboBox" name="shapeComboBox">
-                <item>
-                 <property name="text">
-                  <string>Cylindrical</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Conical</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Ballnose</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Spheroid</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Snubnose</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_47">
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Length</string>
-                </property>
-                <property name="buddy">
-                 <cstring>lengthDoubleSpinBox</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QDoubleSpinBox" name="lengthDoubleSpinBox">
-                <property name="decimals">
-                 <number>4</number>
-                </property>
-                <property name="minimum">
-                 <double>0.000100000000000</double>
-                </property>
-                <property name="maximum">
-                 <double>1000000.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_48">
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Diameter</string>
-                </property>
-                <property name="buddy">
-                 <cstring>diameterDoubleSpinBox</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QDoubleSpinBox" name="diameterDoubleSpinBox">
-                <property name="decimals">
-                 <number>4</number>
-                </property>
-                <property name="minimum">
-                 <double>0.000100000000000</double>
-                </property>
-                <property name="maximum">
-                 <double>1000000.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="snubDiameterLabel">
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Snub Diameter</string>
-                </property>
-                <property name="buddy">
-                 <cstring>snubDiameterDoubleSpinBox</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="1">
-               <widget class="QDoubleSpinBox" name="snubDiameterDoubleSpinBox">
-                <property name="decimals">
-                 <number>4</number>
-                </property>
-                <property name="minimum">
-                 <double>0.000000000000000</double>
-                </property>
-                <property name="maximum">
-                 <double>1000000.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
             <item>
              <spacer name="verticalSpacer_2">
               <property name="orientation">
@@ -3377,6 +3294,14 @@
    </property>
    <property name="toolTip">
     <string>Optimize rapid moves</string>
+   </property>
+  </action>
+  <action name="actionEditTool">
+   <property name="text">
+    <string>Edit Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit selected tool</string>
    </property>
   </action>
  </widget>
