@@ -38,6 +38,8 @@ namespace CAMotics {
     Q_OBJECT;
 
   public:
+    ToolTableScene();
+
     void update(const ToolTable &tools, QSize dims);
 
     ToolGraphicsItem *toolAt(const QPointF &p);
@@ -45,11 +47,16 @@ namespace CAMotics {
     // From QGraphicsScene
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+    void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
+    void dropEvent(QGraphicsSceneDragDropEvent *event);
 
   signals:
     void addTool();
     void editTool(unsigned number);
     void removeTool(unsigned number);
+    void exportToolTable();
+    void importToolTable();
   };
 }
 

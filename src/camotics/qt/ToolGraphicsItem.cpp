@@ -20,12 +20,16 @@
 
 #include "ToolGraphicsItem.h"
 
+#include <cbang/log/Logger.h>
+
 using namespace CAMotics;
 
 
 ToolGraphicsItem::ToolGraphicsItem(QGraphicsItem *parent) :
   QGraphicsPixmapItem(parent), number(0), highlight(false) {
   setAcceptHoverEvents(true);
+  setCursor(Qt::OpenHandCursor);
+  setAcceptedMouseButtons(Qt::LeftButton);
 }
 
 
@@ -55,6 +59,36 @@ void ToolGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 void ToolGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
   highlight = false;
   QGraphicsPixmapItem::update();
+}
+
+
+void ToolGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+  setCursor(Qt::ClosedHandCursor);
+}
+
+
+void ToolGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+  setCursor(Qt::OpenHandCursor);
+}
+
+
+void ToolGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+#if 0
+  if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton))
+      .length() < QApplication::startDragDistance()) {
+    return;
+  }
+
+  QDrag *drag = new QDrag(event->widget());
+  QMimeData *mime = new QMimeData;
+  mime->setData("application/x-camotics-tool", QByteArray());
+  drag->setMimeData(mime);
+  drag->setPixmap(pixmap());
+  drag->setHotSpot(QPoint(pixmap().width() / 2, pixmap().height() / 2));
+  drag->exec();
+
+  setCursor(Qt::OpenHandCursor);
+#endif
 }
 
 

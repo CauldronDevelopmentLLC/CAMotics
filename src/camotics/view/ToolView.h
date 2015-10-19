@@ -53,6 +53,8 @@ namespace CAMotics {
 
     void drawGuide(cairo_t *cr, double width, double x, double y,
                    const char *text, double value);
+    void drawText(cairo_t *cr, const std::string &text, unsigned fontSize,
+                  bool bold);
 
     void resize(int w, int h);
     void draw();

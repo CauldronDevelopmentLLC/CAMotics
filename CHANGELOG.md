@@ -3,6 +3,11 @@
 ## v1.0.4:
  - Clear surface on reload.
  - Cutting move with zero feed is now an error.
+ - Allow tool zero.
+ - Import/export tool table.
+ - Improved tool table editing.
+ - Attempt to fix missing tool paths in Windows 8.1 with Intel HD4000.
+ - Default tool table.
 
 ## v1.0.3:
  - Handle non-latin characters in filenames.

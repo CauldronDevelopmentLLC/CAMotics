@@ -77,13 +77,16 @@ QtWin::QtWin(Application &app) :
 
   // Tool tables
   ui->toolTable->setScene(&toolTableScene);
-  ui->toolLibrary->setScene(&toolLibraryScene);
 
   connect(&toolTableScene, SIGNAL(addTool()), this, SLOT(on_addTool()));
   connect(&toolTableScene, SIGNAL(editTool(unsigned)), this,
           SLOT(on_editTool(unsigned)));
   connect(&toolTableScene, SIGNAL(removeTool(unsigned)), this,
           SLOT(on_removeTool(unsigned)));
+  connect(&toolTableScene, SIGNAL(exportToolTable()), ui->actionExportToolTable,
+          SIGNAL(triggered()));
+  connect(&toolTableScene, SIGNAL(importToolTable()), ui->actionImportToolTable,
+          SIGNAL(triggered()));
 
   // FileTabManager
   connect(ui->actionUndo, SIGNAL(triggered()),
@@ -795,6 +798,9 @@ void QtWin::newProject() {
   resetProject();
   project = new Project(options);
 
+  // Load default tool table
+  loadDefaultToolTable();
+
   reload();
   loadProject();
 }
@@ -865,6 +871,9 @@ void QtWin::openProject(const string &_filename) {
       // Assume TPL or G-Code and create a new project with the file
       project = new Project(options);
       project->addFile(filename);
+
+      // Load default tool table
+      loadDefaultToolTable();
     }
   } CATCH_ERROR;
 
@@ -1044,17 +1053,41 @@ void QtWin::updateToolTables() {
 }
 
 
-void QtWin::editTool(unsigned number) {
-  if (project.isNull()) return;
-
-  Tool &tool = project->getToolTable().get(number);
-
-  toolDialog.setTool(tool);
-  if (toolDialog.edit() != QDialog::Accepted) return;
-
+void QtWin::toolsChanged() {
   project->markDirty();
   projectModel->invalidate();
   updateToolTables();
+}
+
+
+void QtWin::editTool(unsigned number) {
+  if (project.isNull()) return;
+
+  ToolTable &tools = project->getToolTable();
+
+  if (tools.has(number)) toolDialog.setTool(tools.get(number));
+  else toolDialog.getTool().setNumber(number);
+
+  if (toolDialog.edit() != QDialog::Accepted) return;
+
+  Tool &tool = toolDialog.getTool();
+
+  if (tool.getNumber() != number) {
+    if (tools.has(tool.getNumber())) {
+      int response = QMessageBox::question
+        (this, "Overwrite Tool?",
+         QString().sprintf("Tool %d already exists.  Do you want to overwrite "
+                           "it?", tool.getNumber()),
+         QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+
+      if (response == QMessageBox::No) return;
+    }
+
+    tools.erase(number);
+  }
+
+  tools.set(tool);
+  toolsChanged();
 }
 
 
@@ -1064,13 +1097,7 @@ void QtWin::addTool() {
 
   for (unsigned i = 1; i < 1000; i++)
     if (!tools.has(i)) {
-      toolDialog.getTool().setNumber(i);
-      if (toolDialog.edit() != QDialog::Accepted) return;
-      tools.add(toolDialog.getTool());
-
-      project->markDirty();
-      projectModel->invalidate();
-      updateToolTables();
+      editTool(i);
       return;
     }
 
@@ -1080,9 +1107,75 @@ void QtWin::addTool() {
 
 void QtWin::removeTool(unsigned number) {
   project->getToolTable().erase(number);
-  project->markDirty();
-  projectModel->invalidate();
-  updateToolTables();
+  toolsChanged();
+}
+
+
+void QtWin::exportToolTable() {
+  if (project.isNull()) return;
+  const ToolTable &tools = project->getToolTable();
+
+  string filename =
+    SystemUtilities::dirname(project->getFilename()) + "/tools.json";
+
+  filename =
+    openFile("Export tool table", "Tool table files (*.json)", filename, true);
+
+  if (filename.empty()) return;
+
+  *SystemUtilities::oopen(filename) << tools;
+}
+
+
+void QtWin::importToolTable() {
+  if (project.isNull()) return;
+
+  string filename =
+    openFile("Import tool table", "Tool table files (*.json)", "", false);
+
+  if (filename.empty()) return;
+
+  ToolTable tools;
+  *SystemUtilities::iopen(filename) >> tools;
+
+  if (tools.empty()) {
+    warning("'" + filename + "' empty or not a tool table");
+    return;
+  }
+
+  project->getToolTable() = tools;
+  toolsChanged();
+}
+
+
+void QtWin::saveDefaultToolTable() {
+  if (project.isNull()) return;
+
+  ostringstream str;
+  str << project->getToolTable() << flush;
+  string tools = str.str();
+
+  QSettings settings;
+  settings.setValue("ToolTable/Default", tools.c_str());
+
+  showMessage("Default tool table saved");
+}
+
+
+void QtWin::loadDefaultToolTable() {
+  if (project.isNull()) return;
+
+  QSettings settings;
+  QByteArray data = settings.value("ToolTable/Default").toString().toUtf8();
+
+  if (data.isEmpty()) return;
+
+  istringstream str(data.data());
+  ToolTable tools;
+  str >> tools;
+
+  project->getToolTable() = tools;
+  toolsChanged();
 }
 
 
@@ -1240,12 +1333,10 @@ void QtWin::setUIView(ui_view_t uiView) {
   switch (uiView) {
   case SIMULATION_VIEW:
     ui->fileTabManager->setCurrentIndex(0);
-    ui->settingsStack->setCurrentWidget(ui->simulationProperties);
     break;
 
   case TOOL_VIEW: {
     ui->fileTabManager->setCurrentIndex(1);
-    ui->settingsStack->setCurrentWidget(ui->toolProperties);
     updateToolTables();
     break;
   }
@@ -1509,7 +1600,7 @@ void QtWin::on_projectTreeView_activated(const QModelIndex &index) {
     break;
 
   case ProjectModel::TOOL_ITEM:
-    editTool(projectModel->getOffset(index) + 1);
+    editTool(projectModel->getTool(index).getNumber());
     break;
 
   case ProjectModel::TOOLS_ITEM:
@@ -1530,6 +1621,7 @@ void QtWin::on_projectTreeView_customContextMenuRequested(QPoint point) {
   if (index.isValid()) type = projectModel->getType(index);
 
   ui->actionRemoveFile->setEnabled(type == ProjectModel::FILE_ITEM);
+  ui->actionEditTool->setEnabled(type == ProjectModel::TOOL_ITEM);
   ui->actionRemoveTool->setEnabled(type == ProjectModel::TOOL_ITEM);
 
   QMenu menu;
@@ -1712,16 +1804,6 @@ void QtWin::on_actionRevertFile_triggered() {
 }
 
 
-void QtWin::on_actionExport_triggered() {
-  exportData();
-}
-
-
-void QtWin::on_actionSnapshot_triggered() {
-  snapshot();
-}
-
-
 void QtWin::on_actionFullscreen_triggered(bool checked) {
   if (checked) showFullScreen();
   else showNormal();
@@ -1869,13 +1951,13 @@ void QtWin::on_actionAddTool_triggered() {
 
 void QtWin::on_actionEditTool_triggered() {
   QModelIndex index = ui->projectTreeView->currentIndex();
-  editTool(projectModel->getOffset(index) + 1);
+  editTool(projectModel->getTool(index).getNumber());
 }
 
 
 void QtWin::on_actionRemoveTool_triggered() {
   QModelIndex index = ui->projectTreeView->currentIndex();
-  removeTool(projectModel->getOffset(index) + 1);
+  removeTool(projectModel->getTool(index).getNumber());
 }
 
 

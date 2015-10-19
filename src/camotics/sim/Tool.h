@@ -21,10 +21,12 @@
 #ifndef CAMOTICS_TOOL_H
 #define CAMOTICS_TOOL_H
 
-#include <camotics/machine/Axes.h>
-
 #include "ToolShape.h"
 #include "ToolUnits.h"
+
+#include <camotics/machine/Axes.h>
+
+#include <cbang/json/Serializable.h>
 
 
 namespace cb {
@@ -38,7 +40,7 @@ namespace cb {
 namespace CAMotics {
   class Sweep;
 
-  class Tool : public Axes {
+  class Tool : public Axes, cb::JSON::Serializable {
   protected:
     unsigned number;
     unsigned pocket;
@@ -74,6 +76,7 @@ namespace CAMotics {
     void setShape(ToolShape shape) {this->shape = shape;}
     const std::string &getDescription() const {return description;}
     void setDescription(const std::string &x) {this->description = x;}
+    std::string getSizeText() const;
     std::string getText() const;
 
     double getLength() const {return getZ();}
@@ -99,7 +102,11 @@ namespace CAMotics {
     void read(const cb::XMLAttributes &attrs);
     void write(cb::XMLWriter &writer) const;
 
-    void write(cb::JSON::Sink &sink, bool withNumber = true) const;
+    void write(cb::JSON::Sink &sink, bool withNumber) const;
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const {write(sink, true);}
 
     inline static unsigned toIndex(char var) {
       switch (std::toupper(var)) {

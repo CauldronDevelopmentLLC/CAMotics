@@ -59,6 +59,8 @@ namespace CAMotics {
     unsigned numVertices;
     unsigned numColors;
 
+    bool useVBuffers;
+
   public:
     ToolPathView(ValueSet &valueSet);
     ~ToolPathView();

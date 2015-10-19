@@ -57,7 +57,8 @@ namespace CAMotics {
     void showEvent(QShowEvent *event);
 
   protected slots:
-    void on_toolUnitsComboBox_currentIndexChanged(int value);
+    void on_numberSpinBox_valueChanged(int value);
+    void on_unitsComboBox_currentIndexChanged(int value);
     void on_shapeComboBox_currentIndexChanged(int value);
     void on_lengthDoubleSpinBox_valueChanged(double value);
     void on_diameterDoubleSpinBox_valueChanged(double value);

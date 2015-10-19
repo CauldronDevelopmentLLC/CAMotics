@@ -82,7 +82,6 @@ namespace CAMotics {
     ToolDialog toolDialog;
     FileDialog fileDialog;
     ToolTableScene toolTableScene;
-    ToolTableScene toolLibraryScene;
     QTimer animationTimer;
     QByteArray fullLayoutState;
     cb::SmartPointer<ProjectModel> projectModel;
@@ -207,9 +206,14 @@ namespace CAMotics {
     void updateUnits();
     void updateToolTables();
 
+    void toolsChanged();
     void editTool(unsigned number);
     void addTool();
     void removeTool(unsigned number);
+    void exportToolTable();
+    void importToolTable();
+    void saveDefaultToolTable();
+    void loadDefaultToolTable();
 
     void updateWorkpiece();
     void loadWorkpiece();
@@ -310,8 +314,13 @@ namespace CAMotics {
     void on_actionFaster_triggered();
     void on_actionDirection_triggered();
 
-    void on_actionExport_triggered();
-    void on_actionSnapshot_triggered();
+    void on_actionExportToolTable_triggered() {exportToolTable();}
+    void on_actionImportToolTable_triggered() {importToolTable();}
+    void on_actionSaveDefaultToolTable_triggered() {saveDefaultToolTable();}
+    void on_actionLoadDefaultToolTable_triggered() {loadDefaultToolTable();}
+
+    void on_actionExport_triggered() {exportData();}
+    void on_actionSnapshot_triggered() {snapshot();}
 
     void on_actionFullscreen_triggered(bool checked);
     void on_actionDefaultLayout_triggered();

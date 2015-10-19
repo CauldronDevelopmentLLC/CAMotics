@@ -35,7 +35,8 @@ ToolDialog::ToolDialog() : ui(new Ui::ToolDialog) {
 int ToolDialog::edit() {
   double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
 
-  ui->toolUnitsComboBox->setCurrentIndex(tool.getUnits());
+  ui->numberSpinBox->setValue(tool.getNumber());
+  ui->unitsComboBox->setCurrentIndex(tool.getUnits());
   ui->shapeComboBox->setCurrentIndex(tool.getShape());
   ui->lengthDoubleSpinBox->setValue(tool.getLength() * scale);
   ui->diameterDoubleSpinBox->setValue(tool.getDiameter() * scale);
@@ -68,13 +69,26 @@ void ToolDialog::showEvent(QShowEvent *event) {
 }
 
 
-void ToolDialog::on_toolUnitsComboBox_currentIndexChanged(int value) {
+void ToolDialog::on_numberSpinBox_valueChanged(int value) {
+  if ((unsigned)value == tool.getNumber()) return;
+
+  tool.setNumber((unsigned)value);
+  update();
+}
+
+
+void ToolDialog::on_unitsComboBox_currentIndexChanged(int value) {
   ToolUnits units = (ToolUnits::enum_t)value;
 
   double step = units == ToolUnits::UNITS_MM ? 1 : 0.125;
   ui->lengthDoubleSpinBox->setSingleStep(step);
   ui->diameterDoubleSpinBox->setSingleStep(step);
   ui->snubDiameterDoubleSpinBox->setSingleStep(step);
+
+  const char *suffix = units == ToolUnits::UNITS_MM ? "mm" : "in";
+  ui->lengthDoubleSpinBox->setSuffix(suffix);
+  ui->diameterDoubleSpinBox->setSuffix(suffix);
+  ui->snubDiameterDoubleSpinBox->setSuffix(suffix);
 
   if (units == tool.getUnits()) return;
 

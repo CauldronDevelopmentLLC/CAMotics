@@ -34,7 +34,8 @@
 namespace CAMotics {
   class ToolTable :
     public std::map<unsigned, Tool>, public Processor,
-    public cb::XMLHandlerFactory, public cb::XMLHandler {
+    public cb::XMLHandlerFactory, public cb::XMLHandler,
+    public cb::JSON::Serializable {
 
     int current; ///< Used during XML parsing
 
@@ -44,8 +45,8 @@ namespace CAMotics {
     bool has(unsigned tool) const;
     const Tool &get(unsigned tool) const;
     Tool &get(unsigned tool);
+    void set(const Tool &tool);
     void add(const Tool &tool);
-    void clear();
 
     // From Processor
     void operator()(const cb::SmartPointer<Block> &block);
@@ -61,6 +62,9 @@ namespace CAMotics {
     void text(const std::string &text);
 
     void write(cb::XMLWriter &writer) const;
+
+    // From JSON::Serializable
+    void read(const cb::JSON::Value &value);
     void write(cb::JSON::Sink &sink) const;
   };
 }

@@ -33,10 +33,10 @@ using namespace CAMotics;
 
 
 ToolPathView::ToolPathView(ValueSet &valueSet) :
-  values(valueSet), byRemote(true), ratio(1), line(0),
-  totalTime(0), totalDistance(0), currentTime(0), currentDistance(0),
-  currentLine(0), dirty(true), colorVBuf(0), vertexVBuf(0),
-  numVertices(0), numColors(0) {
+  values(valueSet), byRemote(true), ratio(1), line(0), totalTime(0),
+  totalDistance(0), currentTime(0), currentDistance(0), currentLine(0),
+  dirty(true), colorVBuf(0), vertexVBuf(0), numVertices(0), numColors(0),
+  useVBuffers(glGenBuffers && glBindBuffer && glBufferData) {
 
   values.add("x", currentPosition.x());
   values.add("y", currentPosition.y());
@@ -195,6 +195,7 @@ void ToolPathView::update() {
         colors.push_back(color[i]);
         vertices.push_back(start[i]);
       }
+
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
         vertices.push_back(end[i]);
@@ -205,6 +206,25 @@ void ToolPathView::update() {
 
   numColors = colors.size() / 3;
   numVertices = vertices.size() / 3;
+
+  // Setup GL Buffers
+  // Colors
+  if (useVBuffers && !colors.empty()) {
+    if (!colorVBuf) glGenBuffers(1, &colorVBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
+    glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float), &colors[0],
+                 GL_STATIC_DRAW);
+    colors.clear();
+  }
+
+  // Vertices
+  if (useVBuffers && !vertices.empty()) {
+    if (!vertexVBuf) glGenBuffers(1, &vertexVBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+    glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float), &vertices[0],
+                 GL_STATIC_DRAW);
+    vertices.clear();
+  }
 
   values.updated();
   dirty = false;
@@ -217,49 +237,22 @@ void ToolPathView::draw() {
 
   if (!numColors || !numVertices) return;
 
-  // Setup GL Buffers
-  bool useBuffers = glGenBuffers && glBindBuffer && glBufferData;
-
   // Colors
-  if (useBuffers && !colors.empty()) {
-    if (!colorVBuf) glGenBuffers(1, &colorVBuf);
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-    glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
-                 &colors[0], GL_STATIC_DRAW);
-    colors.clear();
-  }
-
-  // Vertices
-  if (useBuffers && !vertices.empty()) {
-    if (!vertexVBuf) glGenBuffers(1, &vertexVBuf);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
-                 &vertices[0], GL_STATIC_DRAW);
-    vertices.clear();
-  }
-
-  // Setup color indices
-  glIndexub(MoveType::MOVE_RAPID   + 1); glColor3fv(&Color::RED[0]);
-  glIndexub(MoveType::MOVE_CUTTING + 1); glColor3fv(&Color::GREEN[0]);
-  glIndexub(MoveType::MOVE_PROBE   + 1); glColor3fv(&Color::BLUE[0]);
-  glIndexub(MoveType::MOVE_DRILL   + 1); glColor3fv(&Color::YELLOW[0]);
-
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-
-  // Colors
-  if (useBuffers) {
+  if (useVBuffers) {
     glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glColorPointer(3, GL_FLOAT, 0, 0);
 
   } else glColorPointer(3, GL_FLOAT, 0, &colors[0]);
 
   // Vertices
-  if (useBuffers) {
+  if (useVBuffers) {
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
   } else glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
 
   // Draw
   glLineWidth(1);

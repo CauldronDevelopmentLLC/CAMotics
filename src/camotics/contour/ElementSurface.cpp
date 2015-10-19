@@ -92,12 +92,12 @@ void ElementSurface::finalize() {
     // Vertices
     glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
-                    &vertices[0], GL_STATIC_DRAW);
+                 &vertices[0], GL_STATIC_DRAW);
 
     // Normals
     glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
-                    &normals[0], GL_STATIC_DRAW);
+                 &normals[0], GL_STATIC_DRAW);
   }
 
   finalized = true;

@@ -30,6 +30,7 @@
 #include <cbang/log/Logger.h>
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/json/Sink.h>
+#include <cbang/json/Dict.h>
 
 #include <cbang/xml/XMLProcessor.h>
 #include <cbang/xml/XMLWriter.h>
@@ -42,9 +43,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ToolTable::ToolTable() : current(-1) {
-  clear();
-}
+ToolTable::ToolTable() : current(-1) {}
 
 
 bool ToolTable::has(unsigned tool) const {
@@ -69,6 +68,11 @@ Tool &ToolTable::get(unsigned tool) {
 }
 
 
+void ToolTable::set(const Tool &tool) {
+  insert(value_type(tool.getNumber(), tool)).first->second = tool;
+}
+
+
 void ToolTable::add(const Tool &tool) {
   if (!insert(value_type(tool.getNumber(), tool)).second)
     THROWS("Tool with number " << tool.getNumber()
@@ -76,12 +80,6 @@ void ToolTable::add(const Tool &tool) {
 
   LOG_INFO(3, "Added tool " << tool.getNumber() << " with radius "
            << tool.getRadius());
-}
-
-
-void ToolTable::clear() {
-  map<unsigned, Tool>::clear();
-  add(Tool::null); // Tool zero
 }
 
 
@@ -166,19 +164,33 @@ void ToolTable::text(const std::string &text) {
 void ToolTable::write(XMLWriter &writer) const {
   writer.startElement("tool_table");
   for (const_iterator it = begin(); it != end(); it++)
-    if (it->second.getNumber()) it->second.write(writer);
+    it->second.write(writer);
   writer.endElement("tool_table");
+}
+
+
+
+void ToolTable::read(const JSON::Value &value) {
+  clear();
+
+  for (unsigned i = 0; i < value.size(); i++) {
+    string key = value.keyAt(i);
+    unsigned number = String::parseU32(key);
+    Tool tool(number);
+
+    tool.read(value.getDict(i));
+    set(tool);
+  }
 }
 
 
 void ToolTable::write(JSON::Sink &sink) const {
   sink.beginDict();
 
-  for (const_iterator it = begin(); it != end(); it++)
-    if (it->second.getNumber()) {
-      sink.beginInsert(String(it->second.getNumber()));
-      it->second.write(sink, false);
-    }
+  for (const_iterator it = begin(); it != end(); it++) {
+    sink.beginInsert(String(it->second.getNumber()));
+    it->second.write(sink, false);
+  }
 
   sink.endDict();
 }

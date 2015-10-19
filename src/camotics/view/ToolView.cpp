@@ -51,9 +51,8 @@ void ToolView::drawGuide(cairo_t *cr, double width, double x, double y,
 
   // Value
   double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
-  string s =
-    String::printf("  %0.4f%s", value / scale,
-                   tool.getUnits() == ToolUnits::UNITS_MM ? "mm" : "in");
+  string s = "  " + String(value / scale) +
+    (tool.getUnits() == ToolUnits::UNITS_MM ? "mm" : "in");
   cairo_show_text(cr, s.c_str());
 
   // Connector
@@ -61,6 +60,19 @@ void ToolView::drawGuide(cairo_t *cr, double width, double x, double y,
   cairo_line_to(cr, x, y + 12);
   cairo_rel_line_to(cr, 0, -8);
   cairo_stroke(cr);
+}
+
+
+void ToolView::drawText(cairo_t *cr, const string &text, unsigned fontSize,
+                        bool bold) {
+  cairo_select_font_face(cr, "serif", CAIRO_FONT_SLANT_NORMAL,
+                         bold ? CAIRO_FONT_WEIGHT_BOLD :
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, fontSize);
+  cairo_text_extents_t extents;
+  cairo_text_extents(cr, text.c_str(), &extents);
+  cairo_rel_move_to(cr, -extents.width / 2, 0);
+  cairo_show_text(cr, text.c_str());
 }
 
 
@@ -98,32 +110,34 @@ void ToolView::draw() {
   double diameter = tool.getDiameter();
   double snubDiameter =
     shape == ToolShape::TS_SNUBNOSE ? tool.getSnubDiameter() : 0;
-  string title = String::printf("#%d", tool.getNumber());
-  if (!simple) title = "Tool " + title + ": " + tool.getText();
+  string title = String::printf("Tool #%d", tool.getNumber());
+  if (!simple) title = title + ": " + tool.getText();
 
   // Margin
-  int margin = simple ? 12 : 50;
+  int margin = simple ? 14 : 50;
   cairo_save(cr);
   cairo_translate(cr, margin, margin);
   double w = width - 2 * margin;
-  double h = height - (simple ? 1 : 2) * margin - (simple ? 1 : 0);
+  double h = height - 2 * margin;
 
   // Title
   cairo_move_to(cr, w / 2, simple ? -2 : -20);
-  cairo_select_font_face(cr, "serif", CAIRO_FONT_SLANT_NORMAL,
-                         CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(cr, simple ? 12 : 16);
-  cairo_text_extents_t extents;
-  cairo_text_extents(cr, title.c_str(), &extents);
-  cairo_rel_move_to(cr, -extents.width / 2, 0);
-  cairo_show_text(cr, title.c_str());
+  drawText(cr, title, simple ? 12 : 16, true);
+
+  // Subtitle
+  if (simple) {
+    cairo_move_to(cr, w / 2, h + 10);
+    drawText(cr, tool.getSizeText(), 10, true);
+  }
 
   // Scale
-  double maxDim = diameter;
-  if (shape == ToolShape::TS_SNUBNOSE && diameter < snubDiameter)
-    maxDim = snubDiameter;
-  if (maxDim < length) maxDim = length;
-  double scale = h / maxDim;
+  double xDim = (shape == ToolShape::TS_SNUBNOSE && diameter < snubDiameter) ?
+    snubDiameter : diameter;
+  double yDim = length;
+  double xScale = w / xDim;
+  double yScale = h / yDim;
+  double scale = xScale < yScale ? xScale : yScale;
+
   cairo_save(cr);
   cairo_scale(cr, scale, scale);
   w /= scale;
@@ -180,7 +194,7 @@ void ToolView::draw() {
                 snubDiameter);
 
     cairo_rotate(cr, M_PI / 2.0);
-    drawGuide(cr, length * scale, h / 2.0, -20, "Length", length);
+    drawGuide(cr, length * scale, h / 2.0, 3, "Length", length);
   }
 
   // Cleanup

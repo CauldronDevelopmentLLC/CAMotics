@@ -28,16 +28,25 @@ using namespace std;
 using namespace CAMotics;
 
 
+ToolTableScene::ToolTableScene() {}
+
+
 void ToolTableScene::update(const ToolTable &tools, QSize dims) {
   QGraphicsScene::clear();
 
-  const unsigned toolWidth = 50;
-  const unsigned toolHeight = 50;
+  if (tools.empty()) return;
+
+  unsigned dpi = QDesktopWidget().logicalDpiX();
+  if (dpi < 50 || 10000 < dpi) dpi = 95; // Correct for implausible DPI
+  const unsigned toolWidth = dpi * 1.5;
+  const unsigned toolHeight = toolWidth;
   const unsigned margin = 4;
 
   const unsigned columns =
     (unsigned)floor((dims.width() - margin) / (double)(toolWidth + margin));
   const unsigned rows = (unsigned)ceil(tools.size() / (double)columns);
+
+  if (!columns) return;
 
   const unsigned width = dims.width();
   const unsigned height = (toolHeight + margin) * rows + margin;
@@ -49,7 +58,6 @@ void ToolTableScene::update(const ToolTable &tools, QSize dims) {
 
   for (ToolTable::const_iterator it = tools.begin(); it != tools.end(); it++) {
     const Tool &tool = it->second;
-    if (!tool.getNumber()) continue;
 
     // Tool
     ToolGraphicsItem *item = new ToolGraphicsItem;
@@ -77,27 +85,38 @@ ToolGraphicsItem *ToolTableScene::toolAt(const QPointF &p) {
 void ToolTableScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
   QGraphicsScene::contextMenuEvent(event);
 
+  QMenu menu;
+  unsigned number = 0;
+
+  menu.addAction(QIcon(":/icons/add.png"), "Add tool");
+
   ToolGraphicsItem *item = toolAt(event->scenePos());
   if (item) {
-    unsigned number = item->getNumber();
+    number = item->getNumber();
 
     QString suffix;
     suffix.sprintf(" tool #%d", number);
 
-    QMenu menu;
-
-    menu.addAction(QIcon(":/icons/add.png"), "Add tool");
     menu.addAction(QIcon(":/icons/edit.png"), QString("Edit") + suffix);
     menu.addAction(QIcon(":/icons/remove.png"), QString("Delete") + suffix);
+  }
 
-    QAction *action = menu.exec(event->screenPos());
-    if (!action) return;
+  menu.addSeparator();
+  menu.addAction(QIcon(":/icons/tool-import.png"), "Import tool table");
+  menu.addAction(QIcon(":/icons/tool-export.png"), "Export tool table");
 
-    switch (action->text()[0].toLatin1()) {
-    case 'A': emit addTool(); break;
-    case 'E': emit editTool(number); break;
-    case 'D': emit removeTool(number); break;
-    }
+  QAction *action = menu.exec(event->screenPos());
+  if (!action) return;
+
+  QByteArray text = action->text().toLatin1();
+  switch (text[0]) {
+  case 'A': emit addTool(); break;
+  case 'D': emit removeTool(number); break;
+  case 'E':
+    if (text[1] == 'd') emit editTool(number);
+    else emit exportToolTable();
+    break;
+  case 'I': emit importToolTable(); break;
   }
 }
 
@@ -107,4 +126,24 @@ void ToolTableScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 
   ToolGraphicsItem *item = toolAt(event->scenePos());
   if (item) emit editTool(item->getNumber());
+}
+
+
+void ToolTableScene::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
+  if (event->mimeData()->hasFormat("application/x-camotics-tool")) {
+    event->setDropAction(Qt::MoveAction);
+    event->accept();
+  }
+
+  QGraphicsScene::dragEnterEvent(event);
+}
+
+
+void ToolTableScene::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
+  // Note, default implementation ignores drags if an item does not accept it
+}
+
+
+void ToolTableScene::dropEvent(QGraphicsSceneDragDropEvent *event) {
+  QGraphicsScene::dropEvent(event);
 }

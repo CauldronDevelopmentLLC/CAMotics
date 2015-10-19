@@ -63,5 +63,7 @@
         <file>icons/find.png</file>
         <file>icons/replace.png</file>
         <file>icons/edit.png</file>
+        <file>icons/tool-export.png</file>
+        <file>icons/tool-import.png</file>
     </qresource>
 </RCC>

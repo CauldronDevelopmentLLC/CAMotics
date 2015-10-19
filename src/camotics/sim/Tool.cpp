@@ -64,14 +64,24 @@ Tool::Tool(unsigned number, unsigned pocket, ToolUnits units) :
 }
 
 
+string Tool::getSizeText() const {
+  double diameter = getDiameter();
+  double length = getLength();
+
+  if (getUnits() == ToolUnits::UNITS_INCH) {
+    diameter /= 25.4;
+    length /= 25.4;
+  }
+
+  return String::printf("%gx%g", diameter, length) +
+    String::toLower(getUnits().toString());
+}
+
+
 string Tool::getText() const {
   if (!description.empty()) return description;
 
-  double diameter = getDiameter();
-  if (getUnits() == ToolUnits::UNITS_INCH) diameter /= 25.4;
-
-  return String::printf("%g", diameter) +
-    String::toLower(getUnits().toString()) + " " +
+  return getSizeText() + " " +
     String::capitalize(String::toLower(getShape().toString()));
 }
 
@@ -167,16 +177,53 @@ void Tool::write(XMLWriter &writer) const {
 
 void Tool::write(JSON::Sink &sink, bool withNumber) const {
   sink.beginDict();
+
+  double scale = units == ToolUnits::UNITS_INCH ? 1.0 / 25.4 : 1;
+
   if (withNumber) sink.insert("number", number);
   sink.insert("units", getUnits().toString());
   sink.insert("shape", getShape().toString());
-  sink.insert("length", getLength());
-  sink.insert("radius", getRadius());
+  sink.insert("length", getLength() * scale);
+  sink.insert("diameter", getDiameter() * scale);
   if (getShape() == ToolShape::TS_SNUBNOSE)
-    sink.insert("snub_diameter", getSnubDiameter());
+    sink.insert("snub_diameter", getSnubDiameter() * scale);
   if (getFrontAngle()) sink.insert("font_angle", getFrontAngle());
   if (getBackAngle()) sink.insert("back_angle", getBackAngle());
   if (getOrientation()) sink.insert("orientation", getOrientation());
   sink.insert("description", getDescription());
+
   sink.endDict();
+}
+
+
+void Tool::read(const JSON::Value &value) {
+  setNumber(value.getU32("number", number));
+
+  if (value.hasString("units"))
+    units = ToolUnits::parse(value.getString("units"));
+
+  double scale = units == ToolUnits::UNITS_INCH ? 25.4 : 1;
+
+  if (value.hasString("shape"))
+    shape = ToolShape::parse(value.getString("shape"));
+
+  if (value.hasNumber("length"))
+    setLength(value.getNumber("length") * scale);
+
+  if (value.hasNumber("diameter"))
+    setDiameter(value.getNumber("diameter") * scale);
+
+  if (value.hasNumber("snub_diameter"))
+    setSnubDiameter(value.getNumber("snub_diameter") * scale);
+
+  if (value.hasNumber("front_angle"))
+    setFrontAngle(value.getNumber("front_angle"));
+
+  if (value.hasNumber("back_angle"))
+    setBackAngle(value.getNumber("back_angle"));
+
+  if (value.hasNumber("orientation"))
+    setOrientation(value.getNumber("orientation"));
+
+  setDescription(value.getString("description", ""));
 }
