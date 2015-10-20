@@ -48,7 +48,9 @@ using namespace CAMotics;
 
 
 ToolPathTask::ToolPathTask(const Project &project) :
-  tools(project.getToolTable()), errors(0) {
+  tools(project.getToolTable()),
+  units(project.getUnits() == ToolUnits::UNITS_MM ? Units::METRIC :
+        Units::IMPERIAL), errors(0) {
 
   for (Project::iterator it = project.begin(); it != project.end(); it++)
     files.push_back((*it)->getAbsolutePath());
@@ -110,11 +112,14 @@ void ToolPathTask::run() {
       vector<string> args;
       args.push_back(cmd);
 
-      // Create process
-      proc = new Subprocess;
+      // Add units
+      args.push_back(string("--units=") + units.toString());
 
       // Add file
       args.push_back(filename);
+
+      // Create process
+      proc = new Subprocess;
 
       // Add pipe
       unsigned pipe = proc->createPipe(false);

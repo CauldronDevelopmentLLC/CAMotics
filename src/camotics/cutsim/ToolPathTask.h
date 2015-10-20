@@ -22,6 +22,7 @@
 #define CAMOTICS_TOOL_PATH_TASK_H
 
 #include <camotics/Task.h>
+#include <camotics/Units.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/sim/ToolTable.h>
 
@@ -39,6 +40,7 @@ namespace CAMotics {
 
   class ToolPathTask : public Task {
     ToolTable tools;
+    Units units;
     std::vector<std::string> files;
 
     unsigned errors;
