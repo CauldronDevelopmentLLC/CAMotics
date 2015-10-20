@@ -51,7 +51,8 @@ namespace CAMotics {
 
   public:
     GCodeTool() :
-      Application("CAMotics GCode Tool"), linearize(true), parseOnly(false) {
+      Application("CAMotics GCode Tool"), linearize(true), parseOnly(false),
+      metric(true) {
 
       cmdLine.addTarget("linearize", linearize,
                         "Convert all moves to straight line movements.");
@@ -66,11 +67,10 @@ namespace CAMotics {
     // From Application
     void run() {
       if (!parseOnly) {
-        MachineUnitAdapter::units_t units =
-          metric ? MachineUnitAdapter::METRIC : MachineUnitAdapter::IMPERIAL;
-        pipeline.add(new MachineUnitAdapter(units));
+        Units units = metric ? Units::METRIC : Units::IMPERIAL;
+        pipeline.add(new MachineUnitAdapter(Units::METRIC, units));
         if (linearize) pipeline.add(new MachineLinearizer);
-        pipeline.add(new GCodeMachine(cout));
+        pipeline.add(new GCodeMachine(cout, units));
         pipeline.add(new MachineState);
 
         controller = new Controller(pipeline);

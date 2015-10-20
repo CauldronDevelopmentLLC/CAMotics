@@ -66,15 +66,19 @@ namespace CAMotics {
 
     string out;
     bool force;
+    bool metric;
 
     SmartPointer<ostream> stream;
 
   public:
     TPLangApp() :
-      Application("Tool Path Language"), out("-"), force(false) {
+      Application("Tool Path Language"), out("-"), force(false), metric(true) {
       cmdLine.addTarget("out", out, "Filename for GCode output or '-' to write "
                         "to the standard output stream");
       cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
+      cmdLine.addTarget("metric", metric, "Output in metric units.");
+      cmdLine.add("imperial", 0, this, &TPLangApp::imperialAction,
+                  "Output in imperial units.")->setType(Option::BOOLEAN_TYPE);
 
       Option &opt =
         *cmdLine.add("pipe", "Specify a output file descriptor, overrides "
@@ -105,11 +109,13 @@ namespace CAMotics {
         stream = SystemUtilities::oopen(out);
       }
 
+      Units units = metric ? Units::METRIC : Units::IMPERIAL;
+
       // Build machine pipeline
-      pipeline.add(new MachineUnitAdapter);
+      pipeline.add(new MachineUnitAdapter(Units::METRIC, units));
       pipeline.add(new MachineLinearizer);
       pipeline.add(new MachineMatrix);
-      pipeline.add(new GCodeMachine(*stream));
+      pipeline.add(new GCodeMachine(*stream, units));
       pipeline.add(new MachineState);
 
       return ret;
@@ -127,6 +133,12 @@ namespace CAMotics {
       tplang::Interpreter(ctx).read(source);
       stream->flush();
       cout.flush();
+    }
+
+
+    int imperialAction(Option &opt) {
+      metric = !opt.toBoolean();
+      return 0;
     }
   };
 }

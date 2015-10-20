@@ -76,8 +76,7 @@ void GCodeMachine::beginLine() {
 
 
 void GCodeMachine::start() {
-  // TODO allow output in imperial units
-  stream << "G21\n";
+  stream << (units == Units::METRIC ? "G21" : "G20") << "\n";
   // TODO set other GCode state
 }
 

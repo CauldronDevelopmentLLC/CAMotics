@@ -23,17 +23,18 @@
 
 #include "MachineAdapter.h"
 
+#include <camotics/Units.h>
+
 
 namespace CAMotics {
-  class MachineUnitAdapter : virtual public MachineAdapter {
-  public:
-    typedef enum {IMPERIAL, METRIC} units_t;
-
+  class MachineUnitAdapter : virtual public MachineAdapter, public Units {
   protected:
-    units_t units;
+    Units units;
+    Units targetUnits;
 
   public:
-    MachineUnitAdapter(units_t units = METRIC) : units(units) {}
+    MachineUnitAdapter(Units units = METRIC, Units targetUnits = METRIC) :
+      units(units), targetUnits(targetUnits) {}
 
     bool isMetric() const {return units == METRIC;}
     void setMetric() {setUnits(METRIC);}
@@ -42,27 +43,31 @@ namespace CAMotics {
     void setImperial() {setUnits(IMPERIAL);}
 
     /// @return the currently programed units.
-    units_t getUnits() const {return units;}
+    Units getUnits() const {return units;}
 
     /***
      * Set the active units, IMPERIAL or METRIC.
      * @throw cb::Exception if @param units is invalid.
      */
-    void setUnits(units_t units) {this->units = units;}
+    void setUnits(Units units) {this->units = units;}
 
     // From MachineInterface
-    double getFeed(feed_mode_t *mode = 0) const;
-    void setFeed(double feed, feed_mode_t mode = MM_PER_MINUTE);
+    double getFeed(feed_mode_t *mode) const;
+    void setFeed(double feed, feed_mode_t mode);
 
-    double getSpeed(spin_mode_t *mode = 0, double *max = 0) const;
-    void setSpeed(double speed, spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
-                  double max = 0);
+    double getSpeed(spin_mode_t *mode, double *max) const;
+    void setSpeed(double speed, spin_mode_t mode, double max);
 
     Axes getPosition() const;
     cb::Vector3D getPosition(axes_t axes) const;
 
-    void move(const Axes &axes, bool rapid = false);
-    void arc(const cb::Vector3D &offset, double angle, plane_t plane = XY);
+    void move(const Axes &axes, bool rapid);
+    void arc(const cb::Vector3D &offset, double angle, plane_t plane);
+
+    double mmInchIn() const;
+    double mmInchOut() const;
+    double meterFootIn() const;
+    double meterFootOut() const;
   };
 }
 

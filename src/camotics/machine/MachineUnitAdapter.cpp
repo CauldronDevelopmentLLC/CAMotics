@@ -23,9 +23,9 @@
 using namespace cb;
 using namespace CAMotics;
 
-#define INCHES_PER_MM 0.0393701
+#define INCHES_PER_MM (1.0 / 25.4)
 #define MM_PER_INCH 25.4
-#define FEET_PER_METER 3.28084
+#define FEET_PER_METER (1.0 / 0.3048)
 #define METER_PER_FOOT 0.3048
 
 
@@ -35,13 +35,13 @@ double MachineUnitAdapter::getFeed(feed_mode_t *_mode) const {
 
   if (_mode) *_mode = mode;
 
-  return mode == INVERSE_TIME || units == METRIC ? feed : feed * INCHES_PER_MM;
+  return mode == INVERSE_TIME ? feed : feed * mmInchIn();
 }
 
 
 void MachineUnitAdapter::setFeed(double feed, feed_mode_t mode) {
-  MachineAdapter::setFeed(mode == INVERSE_TIME || units == METRIC ? feed :
-                 feed * MM_PER_INCH, mode);
+  MachineAdapter::setFeed
+    (mode == INVERSE_TIME ? feed : feed * mmInchOut(), mode);
 }
 
 
@@ -51,38 +51,57 @@ double MachineUnitAdapter::getSpeed(spin_mode_t *_mode, double *max) const {
 
   if (_mode) *_mode = mode;
 
-  return mode != CONSTANT_SURFACE_SPEED || units == METRIC ? speed :
-    speed * FEET_PER_METER;
+  return mode != CONSTANT_SURFACE_SPEED ? speed : speed * meterFootIn();
 }
 
 
 void MachineUnitAdapter::setSpeed(double speed, spin_mode_t mode, double max) {
-  MachineAdapter::setSpeed(mode != CONSTANT_SURFACE_SPEED || units == METRIC ?
-                           speed : speed * METER_PER_FOOT, mode, max);
+  MachineAdapter::setSpeed
+    (mode != CONSTANT_SURFACE_SPEED ? speed : speed * meterFootOut(), mode,
+     max);
 }
 
 
 Axes MachineUnitAdapter::getPosition() const {
-  return units == METRIC ?
-    MachineAdapter::getPosition() :
-    MachineAdapter::getPosition() * INCHES_PER_MM;
+  return MachineAdapter::getPosition() * mmInchIn();
 }
 
 
 Vector3D MachineUnitAdapter::getPosition(axes_t axes) const {
-  return units == METRIC ?
-    MachineAdapter::getPosition(axes) :
-    MachineAdapter::getPosition(axes) * INCHES_PER_MM;
+  return MachineAdapter::getPosition(axes) * mmInchIn();
 }
 
 
 void MachineUnitAdapter::move(const Axes &axes, bool rapid) {
-  MachineAdapter::move(axes * (units == METRIC ? 1 : MM_PER_INCH), rapid);
+  MachineAdapter::move(axes * mmInchOut(), rapid);
 }
 
 
 void MachineUnitAdapter::arc(const Vector3D &offset, double angle,
                              plane_t plane) {
-  if (units == METRIC) MachineAdapter::arc(offset, angle, plane);
-  else MachineAdapter::arc(offset * MM_PER_INCH, angle, plane);
+  MachineAdapter::arc(offset * mmInchOut(), angle, plane);
+}
+
+
+double MachineUnitAdapter::mmInchIn() const {
+  return units == targetUnits ? 1 :
+    (targetUnits == METRIC ? INCHES_PER_MM : MM_PER_INCH);
+}
+
+
+double MachineUnitAdapter::mmInchOut() const {
+  return units == targetUnits ? 1 :
+    (targetUnits == METRIC ? MM_PER_INCH : INCHES_PER_MM);
+}
+
+
+double MachineUnitAdapter::meterFootIn() const {
+  return units == targetUnits ? 1 :
+    (targetUnits == METRIC ? FEET_PER_METER : METER_PER_FOOT);
+}
+
+
+double MachineUnitAdapter::meterFootOut() const {
+  return units == targetUnits ? 1 :
+    (targetUnits == METRIC ? METER_PER_FOOT : FEET_PER_METER);
 }

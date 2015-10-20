@@ -599,7 +599,7 @@ void Controller::arc(int vars, bool clockwise) {
     // Check that the radius matches
     radius = start.distance(center);
     double radiusDiff = fabs(radius - finish.distance(center));
-    if ((!machine.isMetric() && 0.0002 < radiusDiff) ||
+    if ((machine.isImperial() && 0.0002 < radiusDiff) ||
         (machine.isMetric() && 0.002 < radiusDiff)) {
       LOG_WARNING("Arc radiuses differ by " << radiusDiff);
       LOG_DEBUG(1," center=" << center << " start=" << start << " finish="

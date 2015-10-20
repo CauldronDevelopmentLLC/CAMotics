@@ -23,11 +23,14 @@
 
 #include "MachineAdapter.h"
 
+#include <camotics/Units.h>
+
 #include <ostream>
 
 namespace CAMotics {
   class GCodeMachine : public MachineAdapter {
     std::ostream &stream;
+    Units units;
 
     bool mistCoolant;
     bool floodCoolant;
@@ -37,8 +40,8 @@ namespace CAMotics {
     cb::FileLocation location;
 
   public:
-    GCodeMachine(std::ostream &stream) :
-      stream(stream), mistCoolant(false), floodCoolant(false) {}
+    GCodeMachine(std::ostream &stream, Units units) :
+      stream(stream), units(units), mistCoolant(false), floodCoolant(false) {}
 
     void beginLine();
 
