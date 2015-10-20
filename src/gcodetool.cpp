@@ -18,10 +18,7 @@
 
 \******************************************************************************/
 
-#include <cbang/Exception.h>
-#include <cbang/ApplicationMain.h>
-
-#include <camotics/Application.h>
+#include <camotics/CommandLineApp.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/gcode/Interpreter.h>
 #include <camotics/gcode/Printer.h>
@@ -33,6 +30,9 @@
 #include <camotics/machine/MachineUnitAdapter.h>
 #include <camotics/machine/GCodeMachine.h>
 
+#include <cbang/Exception.h>
+#include <cbang/ApplicationMain.h>
+
 #include <iostream>
 
 using namespace std;
@@ -41,36 +41,30 @@ using namespace CAMotics;
 
 
 namespace CAMotics {
-  class GCodeTool : public Application {
+  class GCodeTool : public CommandLineApp {
     MachinePipeline pipeline;
     SmartPointer<Controller> controller;
 
     bool linearize;
     bool parseOnly;
-    bool metric;
 
   public:
     GCodeTool() :
-      Application("CAMotics GCode Tool"), linearize(true), parseOnly(false),
-      metric(true) {
+      CommandLineApp("CAMotics GCode Tool"), linearize(true), parseOnly(false) {
 
       cmdLine.addTarget("linearize", linearize,
                         "Convert all moves to straight line movements.");
       cmdLine.addTarget("parse", parseOnly,
                         "Only parse the GCode, don't evaluate it.");
-      cmdLine.addTarget("metric", metric, "Output in metric units.");
-      cmdLine.add("imperial", 0, this, &GCodeTool::imperialAction,
-                  "Output in imperial units.")->setType(Option::BOOLEAN_TYPE);
     }
 
 
     // From Application
     void run() {
       if (!parseOnly) {
-        Units units = metric ? Units::METRIC : Units::IMPERIAL;
-        pipeline.add(new MachineUnitAdapter(Units::METRIC, units));
+        pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
         if (linearize) pipeline.add(new MachineLinearizer);
-        pipeline.add(new GCodeMachine(cout, units));
+        pipeline.add(new GCodeMachine(*stream, outputUnits));
         pipeline.add(new MachineState);
 
         controller = new Controller(pipeline);
@@ -84,7 +78,7 @@ namespace CAMotics {
     // From cb::Reader
     void read(const InputSource &source) {
       if (parseOnly) {
-        Printer printer(cout);
+        Printer printer(*stream);
         Parser().parse(source, printer);
 
       } else {
@@ -92,12 +86,6 @@ namespace CAMotics {
         Interpreter(*controller).read(source);
         pipeline.end();
       }
-    }
-
-
-    int imperialAction(Option &opt) {
-      metric = !opt.toBoolean();
-      return 0;
     }
   };
 }

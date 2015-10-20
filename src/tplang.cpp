@@ -18,7 +18,7 @@
 
 \******************************************************************************/
 
-#include <camotics/Application.h>
+#include <camotics/CommandLineApp.h>
 #include <camotics/cutsim/ToolPath.h>
 #include <camotics/sim/ToolTable.h>
 
@@ -35,22 +35,8 @@
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
-#include <cbang/os/SystemUtilities.h>
 #include <cbang/js/Javascript.h>
-#include <cbang/config/MinConstraint.h>
 
-#include <boost/version.hpp>
-#include <boost/iostreams/device/file_descriptor.hpp>
-#include <boost/iostreams/stream.hpp>
-namespace io = boost::iostreams;
-
-#if BOOST_VERSION < 104400
-#define BOOST_CLOSE_HANDLE true
-#else
-#define BOOST_CLOSE_HANDLE io::close_handle
-#endif
-
-#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -60,62 +46,24 @@ using namespace CAMotics;
 
 
 namespace CAMotics {
-  class TPLangApp : public Application {
+  class TPLangApp : public CommandLineApp {
     ToolTable tools;
     MachinePipeline pipeline;
 
-    string out;
-    bool force;
-    bool metric;
-
-    SmartPointer<ostream> stream;
-
   public:
     TPLangApp() :
-      Application("Tool Path Language"), out("-"), force(false), metric(true) {
-      cmdLine.addTarget("out", out, "Filename for GCode output or '-' to write "
-                        "to the standard output stream");
-      cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
-      cmdLine.addTarget("metric", metric, "Output in metric units.");
-      cmdLine.add("imperial", 0, this, &TPLangApp::imperialAction,
-                  "Output in imperial units.")->setType(Option::BOOLEAN_TYPE);
+      CommandLineApp("Tool Path Language Interpreter") {}
 
-      Option &opt =
-        *cmdLine.add("pipe", "Specify a output file descriptor, overrides "
-                     "the 'out' option");
-      opt.setType(Option::INTEGER_TYPE);
-      opt.setConstraint(new MinConstraint<int>(0));
-    }
-
-    // From cb::Application
+    // From CommandLineApp
     int init(int argc, char *argv[]) {
-      int ret = cb::Application::init(argc, argv);
+      int ret = CommandLineApp::init(argc, argv);
       if (ret == -1) return ret;
 
-      if (cmdLine["--pipe"].hasValue()) {
-#ifdef _WIN32
-        typedef void *handle_t;
-#else
-        typedef int handle_t;
-#endif
-
-        handle_t pipe = (handle_t)cmdLine["--pipe"].toInteger();
-        stream = new io::stream<io::file_descriptor>(pipe, BOOST_CLOSE_HANDLE);
-
-      } else if (out == "-") stream = SmartPointer<ostream>::Phony(&cout);
-      else {
-        if (SystemUtilities::exists(out) && !force)
-          THROWS("File '" << out << "' already exists");
-        stream = SystemUtilities::oopen(out);
-      }
-
-      Units units = metric ? Units::METRIC : Units::IMPERIAL;
-
       // Build machine pipeline
-      pipeline.add(new MachineUnitAdapter(Units::METRIC, units));
+      pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
       pipeline.add(new MachineLinearizer);
       pipeline.add(new MachineMatrix);
-      pipeline.add(new GCodeMachine(*stream, units));
+      pipeline.add(new GCodeMachine(*stream, outputUnits));
       pipeline.add(new MachineState);
 
       return ret;
@@ -133,12 +81,6 @@ namespace CAMotics {
       tplang::Interpreter(ctx).read(source);
       stream->flush();
       cout.flush();
-    }
-
-
-    int imperialAction(Option &opt) {
-      metric = !opt.toBoolean();
-      return 0;
     }
   };
 }
