@@ -527,7 +527,7 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
     autoPlay = false;
     view->path->setByRatio(0);
     view->setFlag(View::PLAY_FLAG);
-    view->reverse = false;
+    view->setReverse(false);
   }
 
   // Simulation

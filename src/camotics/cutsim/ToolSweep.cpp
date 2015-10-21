@@ -32,7 +32,8 @@ using namespace CAMotics;
 
 
 ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
-  path(path), hitTests(0), time(time) {
+  path(path), hitTests(0),
+  time(time ? time : std::numeric_limits<real>::max()) {
   ToolTable &tools = path->getTools();
   vector<Rectangle3R> bboxes;
   AABB *nodes = 0;

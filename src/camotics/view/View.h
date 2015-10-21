@@ -38,6 +38,14 @@ namespace CAMotics {
   class View : public ViewPort {
     ValueGroup values;
 
+    unsigned flags;
+    bool visible;
+
+    unsigned speed;
+    bool reverse;
+
+    double lastTime;
+
   public:
     cb::SmartPointer<ToolPathView> path;
     cb::SmartPointer<CuboidView> workpiece;
@@ -52,21 +60,7 @@ namespace CAMotics {
       SHOW_SURFACE_FLAG          = 1 << 6,
       SHOW_BBTREE_FLAG           = 1 << 7,
       PLAY_FLAG                  = 1 << 8,
-      LOOP_FLAG                  = 1 << 9,
     };
-
-    unsigned flags;
-    bool visible;
-
-    double fps;
-    unsigned speed;
-    bool reverse;
-
-    cb::Timer fpsTimer;
-    unsigned frames;
-    double frameTimes;
-
-    double lastTime;
 
     View(ValueSet &valueSet);
 
@@ -79,8 +73,8 @@ namespace CAMotics {
     void setSpeed(unsigned speed) {this->speed = speed;}
     void incSpeed();
     void decSpeed();
+    void setReverse(bool reverse) {this->reverse = reverse;}
     void changeDirection() {reverse = !reverse; values.updated();}
-    void frameTime(double delta);
 
     void setToolPath(const cb::SmartPointer<ToolPath> &toolPath);
     void setWorkpiece(const Rectangle3R &bounds);

@@ -80,6 +80,8 @@ namespace CAMotics {
     void decTime(double amount = 1);
 
     double getTime() const {return currentTime;}
+    bool atStart() const {return getTime() == 0;}
+    bool atEnd() const {return getTime() == getTotalTime();}
     double getRemainingTime() const {return totalTime - currentTime;}
     double getTotalTime() const {return totalTime;}
     double getTimeRatio() const {return currentTime / totalTime;}

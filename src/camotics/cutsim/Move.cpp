@@ -32,7 +32,10 @@ Move::Move(MoveType type, const Axes &start, const Axes &end, real startTime,
            unsigned tool, real feed, real speed, unsigned line) :
   Segment3R(start.getXYZ(), end.getXYZ()), type(type),
   start(start), end(end), tool(tool), feed(feed), speed(speed), line(line),
-  dist(start.distance(end)), time(dist / feed * 60), startTime(startTime) {
+  dist(start.distance(end)), time(feed ? dist / feed * 60 : 0),
+  startTime(startTime) {
+
+  // TODO fix rapid feed time
 
   if (type != MoveType::MOVE_RAPID && !feed)
     THROW("Cutting move with zero feed");

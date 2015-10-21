@@ -12,6 +12,8 @@
  - Simplified user interface.
  - Moved project units and resolution to settings dialog.
  - Default units, metric or imperial.
+ - Output line numbers and files in GCode.
+ - Fixed tool path play back problems.
 
 ## v1.0.3:
  - Handle non-latin characters in filenames.

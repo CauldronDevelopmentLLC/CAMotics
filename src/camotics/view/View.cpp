@@ -32,10 +32,10 @@ using namespace CAMotics;
 
 
 View::View(ValueSet &valueSet) :
-  values(valueSet), path(new ToolPathView(valueSet)), workpiece(new CuboidView),
-  flags(SHOW_PATH_FLAG | SHOW_TOOL_FLAG | SHOW_SURFACE_FLAG |
-        SHOW_WORKPIECE_BOUNDS_FLAG),
-  fps(0), speed(1), reverse(true), frames(0), frameTimes(0), lastTime(0)  {
+  values(valueSet), flags(SHOW_PATH_FLAG | SHOW_TOOL_FLAG | SHOW_SURFACE_FLAG |
+                          SHOW_WORKPIECE_BOUNDS_FLAG),
+  speed(1), reverse(false), lastTime(0), path(new ToolPathView(valueSet)),
+  workpiece(new CuboidView) {
 
   values.add("play_speed", speed);
   values.add("play_direction", reverse);
@@ -55,12 +55,6 @@ void View::decSpeed() {
 }
 
 
-void View::frameTime(double delta) {
-  frames++;
-  frameTimes += delta;
-}
-
-
 void View::setToolPath(const SmartPointer<ToolPath> &toolPath) {
   path->setPath(toolPath);
 }
@@ -77,39 +71,32 @@ void View::setSurface(const cb::SmartPointer<Surface> &surface) {
 
 
 bool View::update() {
-  bool changed = false;
-
   // Animate
   if (isFlagSet(PLAY_FLAG)) {
     double now = Timer::now();
+
     if (lastTime) {
       double delta = (now - lastTime) * speed;
+
       if (reverse) path->decTime(delta);
       else path->incTime(delta);
 
-      if (reverse) {
-        if (path->getTime() == 0) {
-          if (!isFlagSet(LOOP_FLAG)) clearFlag(PLAY_FLAG);
-          changeDirection();
-        }
+      if ((reverse && path->atStart()) || (!reverse && path->atEnd()))
+        clearFlag(PLAY_FLAG);
 
-      } else if (path->getTime() == path->getTotalTime()) {
-        if (!isFlagSet(LOOP_FLAG)) clearFlag(PLAY_FLAG);
-        changeDirection();
-      }
+      return true;
 
-      changed = true;
-    }
-    lastTime = now;
+    } else if (!reverse && path->atEnd()) {
+      path->setByRatio(0);
+      return true;
+
+    } else if (reverse && path->atStart()) {
+      path->setByRatio(1);
+      return true;
+
+    } else lastTime = now;
 
   } else lastTime = 0;
 
-  // FPS
-  if (fpsTimer.every(1) && frames) {
-    View::fps = frames / frameTimes;
-    frames = 0;
-    frameTimes = 0;
-  }
-
-  return changed;
+  return false;
 }

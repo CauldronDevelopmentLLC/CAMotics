@@ -57,6 +57,6 @@ void Sweep::getBBoxes(const Vector3R &start, const Vector3R &end,
 
 
 bool Sweep::contains(const Move &move, const Vector3R &p, double time) const {
-  return contains(move.getStartPt(), (time && time < move.getEndTime()) ?
+  return contains(move.getStartPt(), time < move.getEndTime() ?
                   move.getEndPtAtTime(time) : move.getEndPt(), p);
 }
