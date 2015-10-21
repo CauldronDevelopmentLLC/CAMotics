@@ -18,47 +18,37 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_TABLE_SCENE_H
-#define CAMOTICS_TOOL_TABLE_SCENE_H
+#ifndef CAMOTICS_SETTINGS_DIALOG_H
+#define CAMOTICS_SETTINGS_DIALOG_H
 
-#include <camotics/sim/ToolTable.h>
+#include <camotics/cutsim/Project.h>
 
-#include <QtGlobal>
-#if QT_VERSION < 0x050000
-#include <QtGui>
-#else
-#include <QtWidgets>
-#endif
+#include <cbang/SmartPointer.h>
+
+#include <QDialog>
+
+
+namespace Ui {class SettingsDialog;}
 
 
 namespace CAMotics {
-  class ToolGraphicsItem;
-
-  class ToolTableScene : public QGraphicsScene {
+  class SettingsDialog : public QDialog {
     Q_OBJECT;
 
+    cb::SmartPointer<Ui::SettingsDialog> ui;
+
+    Rectangle3R bounds;
+
   public:
-    ToolTableScene();
+    SettingsDialog();
 
-    void update(const ToolTable &tools, QSize dims);
+    void exec(Project &project);
 
-    ToolGraphicsItem *toolAt(const QPointF &p);
-
-    // From QGraphicsScene
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-    void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-    void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
-    void dropEvent(QGraphicsSceneDragDropEvent *event);
-
-  signals:
-    void addTool();
-    void editTool(unsigned number);
-    void removeTool(unsigned number);
-    void exportToolTable();
-    void importToolTable();
+  protected slots:
+    void on_resolutionComboBox_currentIndexChanged(int index);
+    void on_resolutionDoubleSpinBox_valueChanged(double value);
   };
 }
 
-#endif // CAMOTICS_TOOL_TABLE_SCENE_H
+#endif // CAMOTICS_SETTINGS_DIALOG_H
 

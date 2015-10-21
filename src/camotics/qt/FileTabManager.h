@@ -44,6 +44,7 @@ namespace CAMotics {
 
     void open(const cb::SmartPointer<NCFile> &file,
               int line = -1, int col = -1);
+    bool isFileTab(unsigned tab) const {return offset <= tab;}
     bool isModified(unsigned tab) const;
     const cb::SmartPointer<NCFile> &getFile(unsigned tab) const;
     bool checkSave(unsigned tab);

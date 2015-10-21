@@ -51,6 +51,14 @@ bool ToolTable::has(unsigned tool) const {
 }
 
 
+const Tool &ToolTable::at(unsigned index) const {
+  for (const_iterator it = begin(); it != end(); it++)
+    if (!index--) return it->second;
+
+  THROWS("No tool at index " << index);
+}
+
+
 const Tool &ToolTable::get(unsigned tool) const {
   const_iterator it = find(tool);
   if (it != end()) return it->second;

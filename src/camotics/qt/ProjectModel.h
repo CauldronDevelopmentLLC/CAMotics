@@ -45,7 +45,6 @@ namespace CAMotics {
       FILE_ITEM,
       TOOLS_ITEM,
       TOOL_ITEM,
-      WORKPIECE_ITEM,
     } item_t;
 
     ProjectModel(const cb::SmartPointer<Project> &project,
@@ -63,7 +62,7 @@ namespace CAMotics {
     QModelIndex getToolIndex(unsigned number) const;
 
     QModelIndex createIndex(int row, int column, item_t type,
-                            unsigned index) const;
+                            unsigned offset) const;
     using QAbstractItemModel::createIndex;
     item_t getType(const QModelIndex &index) const;
     unsigned getOffset(const QModelIndex &index) const;

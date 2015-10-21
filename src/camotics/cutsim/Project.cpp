@@ -142,21 +142,27 @@ void Project::setResolution(double x) {
 }
 
 
-void Project::updateResolution() {
-  if (getResolutionMode() == ResolutionMode::RESOLUTION_MANUAL) return;
-
-  Rectangle3R wpBounds = getWorkpieceBounds();
-  if (wpBounds == Rectangle3R()) return;
+double Project::computeResolution(ResolutionMode mode, Rectangle3R bounds) {
+  if (mode == ResolutionMode::RESOLUTION_MANUAL || bounds == Rectangle3R())
+    return 1;
 
   double divisor;
-  switch (getResolutionMode()) {
+  switch (mode) {
   case ResolutionMode::RESOLUTION_LOW: divisor = 100000; break;
   case ResolutionMode::RESOLUTION_HIGH: divisor = 5000000; break;
   case ResolutionMode::RESOLUTION_VERY_HIGH: divisor = 10000000; break;
   default: divisor = 250000; break; // Medium
   }
 
-  setResolution(pow(wpBounds.getVolume() / divisor, 1.0 / 3.0));
+  return pow(bounds.getVolume() / divisor, 1.0 / 3.0);
+}
+
+
+void Project::updateResolution() {
+  ResolutionMode mode = getResolutionMode();
+
+  if (mode != ResolutionMode::RESOLUTION_MANUAL)
+    setResolution(computeResolution(mode, getWorkpieceBounds()));
 }
 
 

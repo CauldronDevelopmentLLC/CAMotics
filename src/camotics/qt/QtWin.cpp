@@ -22,8 +22,6 @@
 
 #include "ui_camotics.h"
 
-#include "ProjectModel.h"
-
 #include <camotics/Geom.h>
 #include <camotics/view/Viewer.h>
 #include <camotics/cutsim/Project.h>
@@ -52,6 +50,7 @@
 #include <QImageWriter>
 #include <QMovie>
 #include <QDesktopWidget>
+#include <QStringListModel>
 
 #include <vector>
 
@@ -74,19 +73,6 @@ QtWin::QtWin(Application &app) :
 
   ui->setupUi(this);
   ui->simulationView->init(SIMULATION_VIEW, this);
-
-  // Tool tables
-  ui->toolTable->setScene(&toolTableScene);
-
-  connect(&toolTableScene, SIGNAL(addTool()), this, SLOT(on_addTool()));
-  connect(&toolTableScene, SIGNAL(editTool(unsigned)), this,
-          SLOT(on_editTool(unsigned)));
-  connect(&toolTableScene, SIGNAL(removeTool(unsigned)), this,
-          SLOT(on_removeTool(unsigned)));
-  connect(&toolTableScene, SIGNAL(exportToolTable()), ui->actionExportToolTable,
-          SIGNAL(triggered()));
-  connect(&toolTableScene, SIGNAL(importToolTable()), ui->actionImportToolTable,
-          SIGNAL(triggered()));
 
   // FileTabManager
   connect(ui->actionUndo, SIGNAL(triggered()),
@@ -181,6 +167,7 @@ QtWin::QtWin(Application &app) :
 
 QtWin::~QtWin() {
   saveAllState();
+  Logger::instance().setScreenStream(cout);
 }
 
 
@@ -246,17 +233,17 @@ void QtWin::init() {
 }
 
 
-void QtWin::setUnitLabel(QLabel *label, real value, int precision) {
+void QtWin::setUnitLabel(QLabel *label, real value, int precision,
+                         bool withUnit) {
   if (std::numeric_limits<real>::max() == abs(value) || Math::isinf(value) ||
       Math::isnan(value)) {
     label->setText("nan");
     return;
   }
 
-  ToolUnits units = ToolUnits::UNITS_MM;
-  if (!project.isNull()) units = project->getUnits();
-  real scale = units == ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
-  label->setText(QString().sprintf("%.*f", precision, value * scale));
+  real scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  label->setText(QString().sprintf("%.*f%s", precision, value * scale,
+                                   withUnit ? (isMetric() ? "mm" : "in") : ""));
 }
 
 
@@ -524,14 +511,6 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   view->setToolPath(toolPath);
   view->setWorkpiece(project->getWorkpieceBounds());
 
-  // Load resolution settings
-  LOCK_UI_UPDATES;
-  ui->resolutionDoubleSpinBox->setValue(project->getResolution());
-  ui->resolutionComboBox->setCurrentIndex(project->getResolutionMode());
-
-  // Units
-  ui->unitsComboBox->setCurrentIndex(project->getUnits());
-
   // Update UI
   loadWorkpiece();
   updateBounds();
@@ -767,13 +746,7 @@ string QtWin::openFile(const string &title, const string &filters,
 
 
 void QtWin::loadProject() {
-  if (projectModel.isNull()) {
-    projectModel = new ProjectModel(project, this);
-    ui->projectTreeView->setModel(projectModel.get());
-
-  } else projectModel->setProject(project);
-
-  ui->projectTreeView->expandAll();
+  updateFiles();
   project->markClean();
 }
 
@@ -798,9 +771,7 @@ void QtWin::newProject() {
   resetProject();
   project = new Project(options);
 
-  // Load default tool table
-  loadDefaultToolTable();
-
+  loadProjectDefaults();
   reload();
   loadProject();
 }
@@ -872,8 +843,7 @@ void QtWin::openProject(const string &_filename) {
       project = new Project(options);
       project->addFile(filename);
 
-      // Load default tool table
-      loadDefaultToolTable();
+      loadProjectDefaults();
     }
   } CATCH_ERROR;
 
@@ -928,6 +898,32 @@ void QtWin::revertProject() {
 }
 
 
+void QtWin::loadProjectDefaults() {
+  // Units
+  ToolUnits units =
+    (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
+  project->setUnits(units);
+
+  // Tool table
+  loadDefaultToolTable();
+}
+
+
+bool QtWin::isMetric() const {
+  return project.isNull() || project->isMetric();
+}
+
+
+void QtWin::updateFiles() {
+  QStringList list;
+
+  for (unsigned i = 0; i < project->getFileCount(); i++)
+    list.append(QString(project->getFile(i)->getRelativePath().c_str()));
+
+  ui->filesListView->setModel(new QStringListModel(list));
+}
+
+
 void QtWin::newFile(bool tpl) {
   string filename = project->getFilename();
   filename = SystemUtilities::swapExtension(filename, tpl ? "tpl" : "ngc");
@@ -950,8 +946,7 @@ void QtWin::newFile(bool tpl) {
   }
 
   project->addFile(filename);
-  projectModel->invalidate();
-  reload();
+  updateFiles();
 }
 
 
@@ -961,19 +956,19 @@ void QtWin::addFile() {
   if (filename.empty()) return;
 
   project->addFile(filename);
-  projectModel->invalidate();
-  reload();
+  updateFiles();
 }
 
 
-void QtWin::removeFile() {
-  QModelIndex index = ui->projectTreeView->currentIndex();
-  if (!index.isValid() ||
-      projectModel->getType(index) != ProjectModel::FILE_ITEM) return;
+void QtWin::editFile(unsigned index) {
+  SmartPointer<NCFile> file = project->getFile(index);
+  if (!file.isNull()) ui->fileTabManager->open(file);
+}
 
-  project->removeFile(projectModel->getOffset(index));
-  projectModel->invalidate();
-  reload();
+
+void QtWin::removeFile(unsigned index) {
+  project->removeFile(index);
+  updateFiles();
 }
 
 
@@ -1002,7 +997,7 @@ void QtWin::activateFile(const string &filename, int line, int col) {
 
 void QtWin::updateActions() {
   unsigned tab = ui->fileTabManager->currentIndex();
-  bool fileTab = 2 <= tab;
+  bool fileTab = ui->fileTabManager->isFileTab(tab);
 
   if (!fileTab) {
     ui->actionSaveFile->setEnabled(false);
@@ -1049,13 +1044,18 @@ void QtWin::updateUnits() {
 void QtWin::updateToolTables() {
   ToolTable tools;
   if (!project.isNull()) tools = project->getToolTable();
-  toolTableScene.update(tools, ui->toolTable->maximumViewportSize());
+
+  QStringList list;
+  for (ToolTable::iterator it = tools.begin(); it != tools.end(); it++)
+    list.append
+      (QString().sprintf("%d: %s", it->first, it->second.getText().c_str()));
+
+  ui->toolTableListView->setModel(new QStringListModel(list));
 }
 
 
 void QtWin::toolsChanged() {
   project->markDirty();
-  projectModel->invalidate();
   updateToolTables();
 }
 
@@ -1192,10 +1192,8 @@ void QtWin::loadWorkpiece() {
   LOCK_UI_UPDATES;
   ui->marginDoubleSpinBox->setValue(project->getWorkpieceMargin());
 
-  ToolUnits units = project->getUnits();
-
   // Bounds
-  real scale = units == ToolUnits::UNITS_MM ? 1 : 1 / 25.4;
+  real scale = isMetric() ? 1 : 1 / 25.4;
   Rectangle3R bounds = project->getWorkpieceBounds();
   ui->xDimDoubleSpinBox->setValue(bounds.getDimensions().x() * scale);
   ui->yDimDoubleSpinBox->setValue(bounds.getDimensions().y() * scale);
@@ -1204,8 +1202,17 @@ void QtWin::loadWorkpiece() {
   ui->yOffsetDoubleSpinBox->setValue(bounds.getMin().y() * scale);
   ui->zOffsetDoubleSpinBox->setValue(bounds.getMin().z() * scale);
 
+  // Units
+  const char *suffix = isMetric() ? "mm" : "in";
+  ui->xDimDoubleSpinBox->setSuffix(suffix);
+  ui->yDimDoubleSpinBox->setSuffix(suffix);
+  ui->zDimDoubleSpinBox->setSuffix(suffix);
+  ui->xOffsetDoubleSpinBox->setSuffix(suffix);
+  ui->yOffsetDoubleSpinBox->setSuffix(suffix);
+  ui->zOffsetDoubleSpinBox->setSuffix(suffix);
+
   // Update Workpiece steps
-  real step = units == ToolUnits::UNITS_MM ? 1 : 0.125;
+  real step = isMetric() ? 1 : 0.125;
   ui->xDimDoubleSpinBox->setSingleStep(step);
   ui->yDimDoubleSpinBox->setSingleStep(step);
   ui->zDimDoubleSpinBox->setSingleStep(step);
@@ -1218,7 +1225,7 @@ void QtWin::loadWorkpiece() {
 
 
 void QtWin::setWorkpieceDim(unsigned dim, real value) {
-  real scale = project->getUnits() == ToolUnits::UNITS_MM ? 1 : 25.4;
+  real scale = isMetric() ? 1 : 25.4;
   Rectangle3R bounds = project->getWorkpieceBounds();
   bounds.rmax[dim] = bounds.rmin[dim] + value * scale;
   project->setWorkpieceBounds(bounds);
@@ -1229,7 +1236,7 @@ void QtWin::setWorkpieceDim(unsigned dim, real value) {
 
 
 void QtWin::setWorkpieceOffset(unsigned dim, real value) {
-  real scale = project->getUnits() == ToolUnits::UNITS_MM ? 1 : 25.4;
+  real scale = isMetric() ? 1 : 25.4;
   Rectangle3R bounds = project->getWorkpieceBounds();
   bounds.rmax[dim] = bounds.getDimension(dim) + value * scale;
   bounds.rmin[dim] = value * scale;
@@ -1371,17 +1378,17 @@ void QtWin::updateTimeRatio(const string &name, double ratio) {
 
 
 void QtWin::updateX(const string &name, real value) {
-  setUnitLabel(ui->xLabel, value, 6);
+  setUnitLabel(ui->xLabel, value, isMetric() ? 4 : 5, true);
 }
 
 
 void QtWin::updateY(const string &name, real value) {
-  setUnitLabel(ui->yLabel, value, 6);
+  setUnitLabel(ui->yLabel, value, isMetric() ? 4 : 5, true);
 }
 
 
 void QtWin::updateZ(const string &name, real value) {
-  setUnitLabel(ui->zLabel, value, 6);
+  setUnitLabel(ui->zLabel, value, isMetric() ? 4 : 5, true);
 }
 
 
@@ -1558,80 +1565,60 @@ void QtWin::on_fileTabManager_currentChanged(int index) {
 }
 
 
-void QtWin::on_resolutionComboBox_currentIndexChanged(int index) {
-  PROTECT_UI_UPDATE;
-  project->setResolutionMode((ResolutionMode::enum_t)index);
-  ui->resolutionDoubleSpinBox->setValue(project->getResolution());
-}
-
-
-void QtWin::on_resolutionDoubleSpinBox_valueChanged(double value) {
-  PROTECT_UI_UPDATE;
-  project->setResolution(value);
-  project->setResolutionMode(ResolutionMode::RESOLUTION_MANUAL);
-  ui->resolutionComboBox->setCurrentIndex(ResolutionMode::RESOLUTION_MANUAL);
-}
-
-
-void QtWin::on_unitsComboBox_currentIndexChanged(int value) {
-  ToolUnits units = (ToolUnits::enum_t)value;
-  if (project.isNull() || project->getUnits() == units) return;
-  project->setUnits(units);
-  updateUnits();
-}
-
-
 void QtWin::on_positionSlider_valueChanged(int position) {
   view->path->setByRatio((double)position / 10000);
   redraw();
 }
 
 
-void QtWin::on_projectTreeView_activated(const QModelIndex &index) {
-  switch (projectModel->getType(index)) {
-  case ProjectModel::FILE_ITEM:
-    ui->fileTabManager->open(project->getFile(projectModel->getOffset(index)));
-    break;
-
-  case ProjectModel::PATHS_ITEM:
-  case ProjectModel::PROJECT_ITEM:
-  case ProjectModel::WORKPIECE_ITEM:
-    setUIView(SIMULATION_VIEW);
-    break;
-
-  case ProjectModel::TOOL_ITEM:
-    editTool(projectModel->getTool(index).getNumber());
-    break;
-
-  case ProjectModel::TOOLS_ITEM:
-    setUIView(TOOL_VIEW);
-    break;
-
-  default: break;
-  }
-
-  redraw(true);
+void QtWin::on_filesListView_activated(const QModelIndex &index) {
+  if (index.isValid()) editFile(index.row());
 }
 
 
-void QtWin::on_projectTreeView_customContextMenuRequested(QPoint point) {
-  QModelIndex index = ui->projectTreeView->indexAt(point);
+void QtWin::on_filesListView_customContextMenuRequested(QPoint point) {
+  QModelIndex index = ui->filesListView->indexAt(point);
+  bool valid = index.isValid();
 
-  ProjectModel::item_t type = ProjectModel::NULL_ITEM;
-  if (index.isValid()) type = projectModel->getType(index);
-
-  ui->actionRemoveFile->setEnabled(type == ProjectModel::FILE_ITEM);
-  ui->actionEditTool->setEnabled(type == ProjectModel::TOOL_ITEM);
-  ui->actionRemoveTool->setEnabled(type == ProjectModel::TOOL_ITEM);
+  ui->actionEditFile->setEnabled(valid);
+  ui->actionRemoveFile->setEnabled(valid);
 
   QMenu menu;
+
   menu.addAction(ui->actionAddFile);
+  menu.addAction(ui->actionEditFile);
   menu.addAction(ui->actionRemoveFile);
-  menu.addSeparator();
+
+  menu.exec(ui->filesListView->mapToGlobal(point));
+}
+
+
+void QtWin::on_toolTableListView_activated(const QModelIndex &index) {
+  if (index.isValid())
+    editTool(project->getToolTable().at(index.row()).getNumber());
+}
+
+
+void QtWin::on_toolTableListView_customContextMenuRequested(QPoint point) {
+  QModelIndex index = ui->toolTableListView->indexAt(point);
+  bool valid = index.isValid();
+
+  ui->actionEditTool->setEnabled(valid);
+  ui->actionRemoveTool->setEnabled(valid);
+
+  QMenu menu;
+
   menu.addAction(ui->actionAddTool);
   menu.addAction(ui->actionEditTool);
   menu.addAction(ui->actionRemoveTool);
-  menu.exec(ui->projectTreeView->mapToGlobal(point));
+  menu.addSeparator();
+  menu.addAction(ui->actionImportToolTable);
+  menu.addAction(ui->actionExportToolTable);
+  menu.addSeparator();
+  menu.addAction(ui->actionLoadDefaultToolTable);
+  menu.addAction(ui->actionSaveDefaultToolTable);
+
+  menu.exec(ui->toolTableListView->mapToGlobal(point));
 }
 
 
@@ -1795,12 +1782,18 @@ void QtWin::on_actionSaveFile_triggered() {
 
 void QtWin::on_actionSaveFileAs_triggered() {
   ui->fileTabManager->saveAs();
-  projectModel->invalidate();
+  updateFiles();
 }
 
 
 void QtWin::on_actionRevertFile_triggered() {
   ui->fileTabManager->revert();
+}
+
+
+void QtWin::on_actionSettings_triggered() {
+  if (!project.isNull()) settingsDialog.exec(*project);
+  updateUnits();
 }
 
 
@@ -1939,8 +1932,13 @@ void QtWin::on_actionAddFile_triggered() {
 }
 
 
+void QtWin::on_actionEditFile_triggered() {
+  editFile(ui->filesListView->currentIndex().row());
+}
+
+
 void QtWin::on_actionRemoveFile_triggered() {
-  removeFile();
+  removeFile(ui->filesListView->currentIndex().row());
 }
 
 
@@ -1950,14 +1948,14 @@ void QtWin::on_actionAddTool_triggered() {
 
 
 void QtWin::on_actionEditTool_triggered() {
-  QModelIndex index = ui->projectTreeView->currentIndex();
-  editTool(projectModel->getTool(index).getNumber());
+  int row = ui->toolTableListView->currentIndex().row();
+  editTool(project->getToolTable().at(row).getNumber());
 }
 
 
 void QtWin::on_actionRemoveTool_triggered() {
-  QModelIndex index = ui->projectTreeView->currentIndex();
-  removeTool(projectModel->getTool(index).getNumber());
+  int row = ui->toolTableListView->currentIndex().row();
+  removeTool(project->getToolTable().at(row).getNumber());
 }
 
 

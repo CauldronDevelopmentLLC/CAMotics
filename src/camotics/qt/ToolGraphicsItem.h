@@ -37,23 +37,13 @@ namespace CAMotics {
   class ToolGraphicsItem : public QGraphicsPixmapItem {
     ToolView toolView;
     unsigned number;
-    bool highlight;
 
   public:
     ToolGraphicsItem(QGraphicsItem *parent = 0);
 
     unsigned getNumber() const {return number;}
 
-    void update(const Tool &tool, int width, int height);
-
-    // From QGraphicsItem
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget);
+    void update(const Tool &tool, const QSize &size);
   };
 }
 

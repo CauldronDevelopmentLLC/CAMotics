@@ -43,6 +43,7 @@ namespace CAMotics {
     ToolTable();
 
     bool has(unsigned tool) const;
+    const Tool &at(unsigned index) const;
     const Tool &get(unsigned tool) const;
     Tool &get(unsigned tool);
     void set(const Tool &tool);

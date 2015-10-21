@@ -93,8 +93,8 @@ QModelIndex ProjectModel::getToolIndex(unsigned number) const {
 
 
 QModelIndex ProjectModel::createIndex(int row, int column, item_t type,
-                                      unsigned index) const {
-  return createIndex(row, column, index << 8 | type);
+                                      unsigned offset) const {
+  return createIndex(row, column, (offset << 8) | type);
 }
 
 
@@ -121,7 +121,6 @@ QVariant ProjectModel::data(const QModelIndex &index, int role) const {
   case FILE_ITEM: return QString::fromUtf8(getFile(offset).c_str());
   case TOOLS_ITEM: return QString("Tools");
   case TOOL_ITEM: return QString::fromUtf8(getToolString(offset).c_str());
-  case WORKPIECE_ITEM: return QString("Workpiece");
   default: return QVariant();
   }
 }
@@ -130,16 +129,15 @@ QVariant ProjectModel::data(const QModelIndex &index, int role) const {
 QModelIndex ProjectModel::index(int row, int column,
                                 const QModelIndex &parent) const {
   if (row < 0 || column < 0) return QModelIndex();
-  if (!parent.isValid()) return createIndex(0, 0, PROJECT_ITEM);
 
   switch (getType(parent)) {
+  case NULL_ITEM: return createIndex(0, 0, PROJECT_ITEM);
   case PATHS_ITEM: return createIndex(row, column, FILE_ITEM, row);
   case TOOLS_ITEM: return createIndex(row, column, TOOL_ITEM, row);
   case PROJECT_ITEM:
     switch (row) {
     case 0: return createIndex(row, column, PATHS_ITEM);
     case 1: return createIndex(row, column, TOOLS_ITEM);
-    case 2: return createIndex(row, column, WORKPIECE_ITEM);
     }
     // Fall through
 
@@ -150,10 +148,8 @@ QModelIndex ProjectModel::index(int row, int column,
 
 QModelIndex ProjectModel::parent(const QModelIndex &index) const {
   switch (getType(index)) {
-  case PATHS_ITEM:
-  case TOOLS_ITEM:
-  case WORKPIECE_ITEM:
-    return createIndex(0, 0, PROJECT_ITEM);
+  case PATHS_ITEM: return createIndex(0, 0, PROJECT_ITEM);
+  case TOOLS_ITEM: return createIndex(0, 0, PROJECT_ITEM);
   case FILE_ITEM: return createIndex(0, 0, PATHS_ITEM);
   case TOOL_ITEM: return createIndex(1, 0, TOOLS_ITEM);
   default: return QModelIndex();
@@ -164,7 +160,7 @@ QModelIndex ProjectModel::parent(const QModelIndex &index) const {
 int ProjectModel::rowCount(const QModelIndex &parent) const {
   switch (getType(parent)) {
   case NULL_ITEM: return 1;
-  case PROJECT_ITEM: return 3;
+  case PROJECT_ITEM: return 2;
   case PATHS_ITEM: return project->getFileCount();
   case TOOLS_ITEM: return project->getToolTable().size();
   default: return 0;

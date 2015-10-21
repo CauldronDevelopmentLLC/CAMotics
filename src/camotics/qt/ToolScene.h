@@ -26,12 +26,11 @@
 
 namespace CAMotics {
   class ToolScene : public QGraphicsScene {
-    ToolGraphicsItem *item;
+    ToolGraphicsItem item;
 
   public:
     ToolScene();
 
-    void update(const Tool &tool, int width, int height);
     void update(const Tool &tool, const QSize &size);
   };
 }

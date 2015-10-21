@@ -40,7 +40,7 @@ using namespace std;
 
 
 FileTabManager::FileTabManager(QWidget *parent) :
-  QTabWidget(parent), win(0), offset(2) {
+  QTabWidget(parent), win(0), offset(1) {
 
   while (parent && !win) {
     win = dynamic_cast<QtWin *>(parent);

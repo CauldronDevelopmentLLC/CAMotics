@@ -24,11 +24,11 @@
 #include "NewDialog.h"
 #include "ExportDialog.h"
 #include "AboutDialog.h"
+#include "SettingsDialog.h"
 #include "DonateDialog.h"
 #include "FindDialog.h"
 #include "FileDialog.h"
 #include "ToolDialog.h"
-#include "ToolTableScene.h"
 
 #include <camotics/Real.h>
 #include <camotics/ConcurrentTaskManager.h>
@@ -59,7 +59,6 @@ namespace CAMotics {
   class Viewer;
   class Project;
   class Simulation;
-  class ProjectModel;
   class ToolPath;
   class CutWorkpiece;
   class ConsoleWriter;
@@ -76,15 +75,14 @@ namespace CAMotics {
     NewDialog newDialog;
     ExportDialog exportDialog;
     AboutDialog aboutDialog;
+    SettingsDialog settingsDialog;
     DonateDialog donateDialog;
     FindDialog findDialog;
     FindDialog findAndReplaceDialog;
     ToolDialog toolDialog;
     FileDialog fileDialog;
-    ToolTableScene toolTableScene;
     QTimer animationTimer;
     QByteArray fullLayoutState;
-    cb::SmartPointer<ProjectModel> projectModel;
     ConcurrentTaskManager taskMan;
     int taskCompleteEvent;
 
@@ -141,7 +139,8 @@ namespace CAMotics {
     void setAutoClose(bool x = true) {autoClose = x;}
 
     void init();
-    void setUnitLabel(QLabel *label, real value, int precision = 2);
+    void setUnitLabel(QLabel *label, real value, int precision = 2,
+                      bool withUnit = false);
 
     void loadDefaultExample();
     void loadExamples();
@@ -196,9 +195,14 @@ namespace CAMotics {
     void openProject(const std::string &filename = std::string());
     bool saveProject(bool saveas = false);
     void revertProject();
+    void loadProjectDefaults();
+    bool isMetric() const;
+
+    void updateFiles();
     void newFile(bool tpl);
     void addFile();
-    void removeFile();
+    void editFile(unsigned index);
+    void removeFile(unsigned index);
     bool checkSave(bool canCancel = true);
     void activateFile(const std::string &filename, int line = -1, int col = -1);
 
@@ -275,15 +279,13 @@ namespace CAMotics {
     void on_removeTool(unsigned tool) {removeTool(tool);}
 
     void on_fileTabManager_currentChanged(int index);
-
-    void on_resolutionComboBox_currentIndexChanged(int index);
-    void on_resolutionDoubleSpinBox_valueChanged(double value);
-    void on_unitsComboBox_currentIndexChanged(int value);
-
     void on_positionSlider_valueChanged(int position);
 
-    void on_projectTreeView_activated(const QModelIndex &index);
-    void on_projectTreeView_customContextMenuRequested(QPoint point);
+    void on_filesListView_activated(const QModelIndex &index);
+    void on_filesListView_customContextMenuRequested(QPoint point);
+
+    void on_toolTableListView_activated(const QModelIndex &index);
+    void on_toolTableListView_customContextMenuRequested(QPoint point);
 
     void on_automaticCuboidRadioButton_clicked();
     void on_marginDoubleSpinBox_valueChanged(double value);
@@ -319,6 +321,7 @@ namespace CAMotics {
     void on_actionSaveDefaultToolTable_triggered() {saveDefaultToolTable();}
     void on_actionLoadDefaultToolTable_triggered() {loadDefaultToolTable();}
 
+    void on_actionSettings_triggered();
     void on_actionExport_triggered() {exportData();}
     void on_actionSnapshot_triggered() {snapshot();}
 
@@ -349,6 +352,7 @@ namespace CAMotics {
     void on_actionToolPath_triggered(bool checked);
 
     void on_actionAddFile_triggered();
+    void on_actionEditFile_triggered();
     void on_actionRemoveFile_triggered();
     void on_actionAddTool_triggered();
     void on_actionEditTool_triggered();

@@ -114,7 +114,7 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 # Qt
 uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
-for dialog in 'export about donate find new tool'.split():
+for dialog in 'export about donate find new tool settings'.split():
     uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
                        'qt/%s_dialog.ui' % dialog))
 

@@ -23,18 +23,13 @@
 using namespace CAMotics;
 
 
-ToolScene::ToolScene() : item(new ToolGraphicsItem) {
-  QGraphicsScene::addItem(item);
-}
-
-
-void ToolScene::update(const Tool &tool, int width, int height) {
-  QGraphicsScene::setSceneRect(0, 0, width, height);
-  item->update(tool, width, height);
-  QGraphicsScene::update();
+ToolScene::ToolScene() {
+  QGraphicsScene::addItem(&item);
 }
 
 
 void ToolScene::update(const Tool &tool, const QSize &size) {
-  update(tool, size.width(), size.height());
+  QGraphicsScene::setSceneRect(0, 0, size.width(), size.height());
+  item.update(tool, size);
+  QGraphicsScene::update();
 }

@@ -77,11 +77,13 @@ namespace CAMotics {
 
     void setUnits(ToolUnits units);
     ToolUnits getUnits() const;
+    bool isMetric() const {return getUnits() == ToolUnits::UNITS_MM;}
 
     ResolutionMode getResolutionMode() const;
-    void setResolutionMode(ResolutionMode x);
+    void setResolutionMode(ResolutionMode mode);
     double getResolution() const {return resolution;}
-    void setResolution(double x);
+    void setResolution(double resolution);
+    static double computeResolution(ResolutionMode mode, Rectangle3R bounds);
     void updateResolution();
 
     void load(const std::string &filename);
