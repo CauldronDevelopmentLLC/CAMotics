@@ -39,6 +39,8 @@ namespace CAMotics {
 
     Rectangle3R bounds;
 
+    bool changing;
+
   public:
     SettingsDialog();
 

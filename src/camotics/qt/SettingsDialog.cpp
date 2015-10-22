@@ -29,7 +29,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SettingsDialog::SettingsDialog() : ui(new Ui::SettingsDialog) {
+SettingsDialog::SettingsDialog() : ui(new Ui::SettingsDialog), changing(false) {
   ui->setupUi(this);
 }
 
@@ -61,13 +61,21 @@ void SettingsDialog::exec(Project &project) {
 
 
 void SettingsDialog::on_resolutionComboBox_currentIndexChanged(int index) {
+  if (changing) return;
+
   ResolutionMode mode = (ResolutionMode::enum_t)index;
   double resolution = Project::computeResolution(mode, bounds);
 
+  changing = true;
   ui->resolutionDoubleSpinBox->setValue(resolution);
+  changing = false;
 }
 
 
 void SettingsDialog::on_resolutionDoubleSpinBox_valueChanged(double value) {
+  if (changing) return;
+
+  changing = true;
   ui->resolutionComboBox->setCurrentIndex(ResolutionMode::RESOLUTION_MANUAL);
+  changing = false;
 }
