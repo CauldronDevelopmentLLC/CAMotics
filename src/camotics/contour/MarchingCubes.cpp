@@ -28,10 +28,12 @@ using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
-// These tables are used so that everything can be done in little loops that
-// you can look at all at once rather than in pages and pages of unrolled code.
+
+// These tables are used so that everything can be done in tight loops rather
+// than in pages and pages of unrolled code.
+//
 // vertexOffset lists the positions, relative to vertex0, of each of the 8
-// vertices of a cube
+// vertices of a cube.
 static const Vector3R vertexOffset[8] = {
   Vector3R(0, 0, 0), Vector3R(1, 0, 0), Vector3R(1, 1, 0), Vector3R(0, 1, 0),
   Vector3R(0, 0, 1), Vector3R(1, 0, 1), Vector3R(1, 1, 1), Vector3R(0, 1, 1),
@@ -49,7 +51,7 @@ void MarchingCubes::run(FieldFunction &func, const Rectangle3R &bbox,
   surface = new ElementSurface(3);
 
   // Compute steps
-  Vector3U steps = bbox.getDimensions() / step;
+  Vector3U steps = bbox.getDimensions() / step / 2;
   for (int i = 0; i < 3; i++) if (steps[i] < 2) steps[i] = 2;
 
   // Compute scaling
@@ -72,7 +74,7 @@ void MarchingCubes::march(FieldFunction &func, const Vector3R &p,
     Vector3R samplePt = p;
 
     if (tetrahedrons) marchTetrahedrons(func, samplePt, scale);
-    else marchCube(func, samplePt, scale);
+    else marchAdaptiveCube(func, samplePt, scale);
 
     // Progress
     completedCells++;
@@ -106,23 +108,66 @@ void MarchingCubes::march(FieldFunction &func, const Vector3R &p,
 }
 
 
-// marchCube() performs the Marching Cubes algorithm on a single cube
-void MarchingCubes::marchCube(FieldFunction &func, const Vector3R &p,
-                              const Vector3R &scale) {
+void MarchingCubes::marchAdaptiveCube(FieldFunction &func, const Vector3R &p,
+                                      const Vector3R &scale) {
+  vector<Vector3R> vertices;
+  int type = marchCube(func, p, scale, vertices);
+  recurAdaptiveCube(func, p, scale, 2, type, vertices);
+}
+
+
+void MarchingCubes::recurAdaptiveCube(FieldFunction &func, const Vector3R &p,
+                                      const Vector3R &parentScale,
+                                      unsigned depth, int parentType,
+                                      const vector<Vector3R> &parent) {
+  vector<Vector3R> vertices[8];
+  Vector3R offsets[8];
+  int types[8];
+
+  // March children
+  Vector3R scale = parentScale / 2.0;
+  bool recur = false;
+  for (unsigned i = 0; i < 8; i++) {
+    offsets[i] = p + vertexOffset[i] * scale;
+    types[i] = marchCube(func, offsets[i], scale, vertices[i]);
+    if (types[i] != parentType && types[i] != -1)
+      recur = true;
+  }
+
+  if (recur)
+    for (unsigned i = 0; i < 8; i++) {
+      if (depth && types[i] != -1)
+        recurAdaptiveCube(func, offsets[i], scale, depth - 1, types[i],
+                          vertices[i]);
+
+      else
+        for (unsigned j = 0; j < vertices[i].size(); j += 3)
+          surface->addElement(&vertices[i][j]);
+    }
+  else
+    for (unsigned i = 0; i < parent.size(); i += 3)
+      surface->addElement(&parent[i]);
+}
+
+
+/// Performs the Marching Cubes algorithm on a single cube.
+int MarchingCubes::marchCube(FieldFunction &func, const Vector3R &p,
+                             const Vector3R &scale,
+                             vector<Vector3R> &vertices) {
   // edgeConnection lists the index of the endpoint vertices for each of the
-  // 12 edges of the cube
+  // 12 edges of the cube.
   static const int edgeConnection[12][2] = {
     {0, 1}, {1, 2}, {2, 3}, {3, 0},
     {4, 5}, {5, 6}, {6, 7}, {7, 4},
     {0, 4}, {1, 5}, {2, 6}, {3, 7}
   };
 
-  // Make a local copy of the status at the cube's corners
+  // Make a local copy of the status at the cube's corners.
   bool cubeInside[8];
   for (int i = 0; i < 8; i++)
     cubeInside[i] = func.contains(p + vertexOffset[i] * scale);
 
-  // Find which vertices are inside of the surface and which are outside
+  // Find which vertices are inside of the surface and which are outside.
   int flagIndex = 0;
   for (int i = 0; i < 8; i++)
     if (!cubeInside[i]) flagIndex |= 1 << i;
@@ -131,14 +176,13 @@ void MarchingCubes::marchCube(FieldFunction &func, const Vector3R &p,
   int edgeFlags = cubeEdgeFlags[flagIndex];
 
   // If the corners of the cube are all entirely inside or all outside of the
-  // surface, then there will be no intersections
-  if (!edgeFlags) return;
+  // surface, then there will be no intersections.
+  if (!edgeFlags) return -1;
 
-  // Find the point of intersection of the surface with each edge
-  // Then find the normal to the surface at those points
+  // Find the point of intersection of the surface with each edge.
   Vector3R edgeVertex[12];
   for (int i = 0; i < 12; i++) {
-    // If there is an intersection on this edge
+    // If there is an intersection on this edge.
     if (edgeFlags & (1 << i)) {
       Vector3R v1 = p + vertexOffset[edgeConnection[i][0]] * scale;
       Vector3R v2 = p + vertexOffset[edgeConnection[i][1]] * scale;
@@ -148,16 +192,16 @@ void MarchingCubes::marchCube(FieldFunction &func, const Vector3R &p,
     }
   }
 
-  // Draw the triangles that were found. There can be up to five per cube
+  // Draw the triangles that were found.  There can be up to five per cube.
   for (int j = 0; j < 5; j++) {
     if (triangleConnectionTable[flagIndex][3 * j] < 0) break;
 
-    Vector3R vertices[3];
     for (int i = 0; i < 3; i++)
-      vertices[i] = edgeVertex[triangleConnectionTable[flagIndex][3 * j + i]];
-
-    surface->addElement(vertices);
+      vertices.push_back
+        (edgeVertex[triangleConnectionTable[flagIndex][3 * j + i]]);
   }
+
+  return flagIndex;
 }
 
 
@@ -177,10 +221,10 @@ void MarchingCubes::marchTetrahedron(FieldFunction &func, Vector3R *position,
   // there will be no intersections
   if (!edgeFlags) return;
 
-  // Find the point of intersection of the surface with each edge
-  //  Then find the normal to the surface at those points
+  // Find the point of intersection of the surface with each edge.
+  // Then find the normal to the surface at those points.
   for (int i = 0; i < 6; i++) {
-    // if there is an intersection on this edge
+    // If there is an intersection on this edge.
     if (edgeFlags & (1 << i)) {
       int vert0 = tetrahedronEdgeConnection[i][0];
       int vert1 = tetrahedronEdgeConnection[i][1];
@@ -205,8 +249,8 @@ void MarchingCubes::marchTetrahedron(FieldFunction &func, Vector3R *position,
 
 void MarchingCubes::marchTetrahedrons(FieldFunction &func, const Vector3R &p,
                                       const Vector3R &scale) {
-  //  tetrahedronsInACube lists the index of verticies from a cube
-  //  that made up each of the six tetrahedrons within the cube
+  // tetrahedronsInACube lists the index of verticies from a cube
+  // that made up each of the six tetrahedrons within the cube
   static const int tetrahedronsInACube[6][4] = {
     {0, 5, 1, 6}, {0, 1, 2, 6}, {0, 2, 3, 6},
     {0, 3, 7, 6}, {0, 7, 4, 6}, {0, 4, 5, 6},
@@ -240,12 +284,10 @@ const int tetrahedronEdgeFlags[16] = {
 };
 
 
-//  For each of the possible vertex states listed in tetrahedronEdgeFlags
+// For each of the possible vertex states listed in tetrahedronEdgeFlags
 // there is a specific triangulation of the edge intersection points.
-// tetrahedronTriangles lists all of them in the form of
-//  0-2 edge triples with the list terminated by the invalid value -1.
-//
-//  I generated this table by hand
+// tetrahedronTriangles lists all of them in the form of 0-2 edge triples with
+// the list terminated by the invalid value -1.
 const int tetrahedronTriangles[16][7] = {
   {-1, -1, -1, -1, -1, -1, -1},
   {0,  3,  2,  -1, -1, -1, -1},
@@ -268,22 +310,21 @@ const int tetrahedronTriangles[16][7] = {
   {-1, -1, -1, -1, -1, -1, -1},
 };
 
-// tetrahedronEdgeConnection lists the index of the endpoint vertices for
-// each of the 6 edges of the tetrahedron
+
+// tetrahedronEdgeConnection lists the index of the endpoint vertices for each
+// of the 6 edges of the tetrahedron.
 const int tetrahedronEdgeConnection[6][2] = {
   {0, 1}, {1, 2}, {2, 0}, {0, 3}, {1, 3}, {2, 3}
 };
 
 
-//  For any edge, if one vertex is inside of the surface and the other is
-// outside of the surface then the edge intersects the surface
-//  For each of the 8 vertices of the cube can be two possible states : either
-// inside or outside of the surface
-//  For any cube the are 2^8=256 possible sets of vertex states
-//  This table lists the edges intersected by the surface for all 256 possible
-//  vertex states
-//  There are 12 edges. For each entry in the table, if edge #n is intersected,
-// then bit #n is set to 1
+// For any edge, if one vertex is inside of the surface and the other is
+// outside of the surface then the edge intersects the surface.  Each of the
+// 8 vertices of the cube can be either inside or outside of the surface.  For
+// any cube the are 2^8=256 possible vertex states.  This table lists the
+// edges intersected by the surface for all 256 possible vertex states.  There
+// are 12 edges in a cube.  For each entry in the table, if edge #n is
+// intersected, then bit #n is set to 1.
 const int cubeEdgeFlags[256] = {
   0x000, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c, 0x80c, 0x905, 0xa0f,
   0xb06, 0xc0a, 0xd03, 0xe09, 0xf00, 0x190, 0x099, 0x393, 0x29a, 0x596, 0x49f,
@@ -312,16 +353,12 @@ const int cubeEdgeFlags[256] = {
 };
 
 
-//  For each of the possible vertex states listed in cubeEdgeFlags there is a
+// For each of the possible vertex states listed in cubeEdgeFlags there is a
 // specific triangulation of the edge intersection points.
 // triangleConnectionTable lists all of them in the form of 0-5 edge triples
-// with the list terminated by the invalid value -1.
-//  For example: triangleConnectionTable[3] list the 2 triangles formed when
-// corner[0] and corner[1] are inside of the surface, but the rest of the cube
-// is not.
-// 
-//  I found this table in an example program someone wrote long ago. It was
-//  probably generated by hand
+// with the list terminated by the sentinal value -1.  For example:
+// triangleConnectionTable[3] list the 2 triangles formed when corner[0] and
+// corner[1] are inside of the surface, but the rest of the cube is not.
 const int triangleConnectionTable[256][16] = {
   {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
   {0,  8,  3,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},

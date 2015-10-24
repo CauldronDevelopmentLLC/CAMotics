@@ -27,6 +27,8 @@
 
 #include <camotics/Geom.h>
 
+#include <vector>
+
 
 namespace CAMotics {
   class MarchingCubes : public ContourGenerator {
@@ -46,8 +48,13 @@ namespace CAMotics {
   protected:
     void march(FieldFunction &func, const Vector3R &p,
                const Vector3R &scale, const cb::Vector3U &steps);
-    void marchCube(FieldFunction &func, const Vector3R &p,
-                   const Vector3R &scale);
+    void marchAdaptiveCube(FieldFunction &func, const Vector3R &p,
+                           const Vector3R &scale);
+    void recurAdaptiveCube(FieldFunction &func, const Vector3R &p,
+                           const Vector3R &scale, unsigned depth,
+                           int parentType, const std::vector<Vector3R> &parent);
+    int marchCube(FieldFunction &func, const Vector3R &p,
+                  const Vector3R &scale, std::vector<Vector3R> &vertices);
     void marchTetrahedron(FieldFunction &func, Vector3R *position,
                           bool *inside);
     void marchTetrahedrons(FieldFunction &func, const Vector3R &p,
