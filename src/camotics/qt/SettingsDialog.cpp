@@ -31,6 +31,12 @@ using namespace CAMotics;
 
 SettingsDialog::SettingsDialog() : ui(new Ui::SettingsDialog), changing(false) {
   ui->setupUi(this);
+
+#ifndef DEBUG
+  // Hide render mode controls
+  ui->renderModeLabel->setVisible(false);
+  ui->renderModeComboBox->setVisible(false);
+#endif
 }
 
 
@@ -39,6 +45,7 @@ void SettingsDialog::exec(Project &project) {
 
   ui->resolutionDoubleSpinBox->setValue(project.getResolution());
   ui->resolutionComboBox->setCurrentIndex(project.getResolutionMode());
+  ui->renderModeComboBox->setCurrentIndex(project.getRenderMode() - 1);
   ui->unitsComboBox->setCurrentIndex(project.getUnits());
 
   QSettings settings;
@@ -52,6 +59,9 @@ void SettingsDialog::exec(Project &project) {
 
   int index = ui->resolutionComboBox->currentIndex();
   project.setResolutionMode((ResolutionMode::enum_t)index);
+
+  index = ui->renderModeComboBox->currentIndex() + 1;
+  project.setRenderMode((RenderMode::enum_t)index);
 
   ToolUnits units = (ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
   project.setUnits(units);

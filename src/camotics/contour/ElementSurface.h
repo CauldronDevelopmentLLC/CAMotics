@@ -53,6 +53,7 @@ namespace CAMotics {
 
     void finalize();
     void addElement(const Vector3R *vertices);
+    void addElement(const Vector3R *vertices, const Vector3R &normal);
 
     // From Surface
     cb::SmartPointer<Surface> copy() const;

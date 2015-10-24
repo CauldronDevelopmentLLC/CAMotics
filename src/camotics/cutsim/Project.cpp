@@ -41,8 +41,9 @@ using namespace CAMotics;
 
 
 Project::Project(Options &_options, const std::string &filename) :
-  options(_options), filename(filename), resolution(1), workpieceMargin(5),
-  watch(true), lastWatch(0), dirty(false) {
+  options(_options), filename(filename), resolution(1),
+  mode(RenderMode::MCUBES_MODE), workpieceMargin(5), watch(true),
+  lastWatch(0), dirty(false) {
 
   options.setAllowReset(true);
 
@@ -57,6 +58,7 @@ Project::Project(Options &_options, const std::string &filename) :
               "'manual'.  If 'manual' then 'resolution' will be used.",
               new EnumConstraint<ResolutionMode>)->setDefault("medium");
   options.addTarget("resolution", resolution, "Renderer grid resolution");
+  options.addTarget("render-mode", mode, "Render surface generation mode.");
   options.popCategory();
 
   options.pushCategory("NC Files");
@@ -90,7 +92,8 @@ void Project::markDirty() {
 
 SmartPointer<Simulation> Project::makeSim(const SmartPointer<ToolPath> &path,
                                           double time) const {
-  return new Simulation(tools, path, getWorkpieceBounds(), resolution, time);
+  return
+    new Simulation(tools, path, getWorkpieceBounds(), resolution, time, mode);
 }
 
 

@@ -105,23 +105,32 @@ void ElementSurface::finalize() {
 
 
 void ElementSurface::addElement(const Vector3R *vertices) {
-  count++;
-
-  // Add to bounds
-  for (unsigned i = 0; i < dim; i++) bounds.add(vertices[i]);
-
   // Compute face normal
   Vector3R normal =
     (vertices[1] - vertices[0]).cross(vertices[dim - 1] - vertices[0]);
+
+  // Normalize
   real length = normal.length();
   if (length == 0) return; // Degenerate element, skip
-  normal /= length; // Normalize
+  normal /= length;
 
-  for (unsigned i = 0; i < dim; i++)
+  // Add it
+  addElement(vertices, normal);
+}
+
+
+void ElementSurface::addElement(const Vector3R *vertices,
+                                const Vector3R &normal) {
+  count++;
+
+  for (unsigned i = 0; i < dim; i++) {
+    bounds.add(vertices[i]);
+
     for (unsigned j = 0; j < 3; j++) {
       this->vertices.push_back(vertices[i][j]);
       normals.push_back(normal[j]);
     }
+  }
 }
 
 

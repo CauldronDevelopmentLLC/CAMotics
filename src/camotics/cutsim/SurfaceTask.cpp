@@ -73,6 +73,6 @@ void SurfaceTask::run() {
 
     // Render
     Renderer renderer(SmartPointer<Task>::Phony(this));
-    surface = renderer.render(cutWP, threads, sim->resolution);
+    surface = renderer.render(cutWP, threads, sim->resolution, sim->mode);
   }
 }

@@ -24,6 +24,7 @@
 #include "Workpiece.h"
 
 #include <camotics/sim/ToolTable.h>
+#include <camotics/render/RenderMode.h>
 
 #include <cbang/SmartPointer.h>
 
@@ -44,11 +45,13 @@ namespace CAMotics {
     Workpiece workpiece;
     double resolution;
     double time;
+    RenderMode mode;
 
     Simulation(const ToolTable &tools, const cb::SmartPointer<ToolPath> &path,
-               const Workpiece &workpiece, double resolution, double time) :
+               const Workpiece &workpiece, double resolution, double time,
+               RenderMode mode) :
       tools(tools), path(path), workpiece(workpiece), resolution(resolution),
-      time(time) {}
+      time(time), mode(mode) {}
 
     std::string computeHash() const;
     void write(cb::JSON::Sink &sink) const;

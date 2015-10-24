@@ -28,6 +28,7 @@
 #include <camotics/Geom.h>
 #include <camotics/sim/ToolUnits.h>
 #include <camotics/sim/ToolTable.h>
+#include <camotics/render/RenderMode.h>
 
 #include <cbang/config/OptionProxy.h>
 
@@ -45,6 +46,7 @@ namespace CAMotics {
     ToolTable tools;
 
     double resolution;
+    RenderMode mode;
 
     double workpieceMargin;
     std::string workpieceMin;
@@ -85,6 +87,9 @@ namespace CAMotics {
     void setResolution(double resolution);
     static double computeResolution(ResolutionMode mode, Rectangle3R bounds);
     void updateResolution();
+
+    RenderMode getRenderMode() const {return mode;}
+    void setRenderMode(RenderMode mode) {this->mode = mode;}
 
     void load(const std::string &filename);
     void save(const std::string &filename = std::string());
