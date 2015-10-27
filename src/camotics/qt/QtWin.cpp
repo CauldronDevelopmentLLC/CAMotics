@@ -19,6 +19,7 @@
 \******************************************************************************/
 
 #include "QtWin.h"
+#include "Settings.h"
 
 #include "ui_camotics.h"
 
@@ -42,7 +43,6 @@
 #include <cbang/util/DefaultCatch.h>
 #include <cbang/time/TimeInterval.h>
 
-#include <QSettings>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QFileDialog>
@@ -72,7 +72,6 @@ QtWin::QtWin(Application &app) :
   autoPlay(false), autoClose(false), currentUIView(NULL_VIEW) {
 
   ui->setupUi(this);
-  ui->simulationView->init(SIMULATION_VIEW, this);
 
   // FileTabManager
   connect(ui->actionUndo, SIGNAL(triggered()),
@@ -323,18 +322,18 @@ void QtWin::loadExamples() {
 
 
 void QtWin::saveAllState() {
-  QSettings settings;
-  settings.setValue("MainWindow/State", saveState());
-  settings.setValue("MainWindow/Geometry", saveGeometry());
-  settings.setValue("Console/Splitter", ui->splitter->saveState());
+  Settings settings;
+  settings.set("MainWindow/State", saveState());
+  settings.set("MainWindow/Geometry", saveGeometry());
+  settings.set("Console/Splitter", ui->splitter->saveState());
 }
 
 
 void QtWin::restoreAllState() {
-  QSettings settings;
-  restoreState(settings.value("MainWindow/State").toByteArray());
-  restoreGeometry(settings.value("MainWindow/Geometry").toByteArray());
-  ui->splitter->restoreState(settings.value("Console/Splitter").toByteArray());
+  Settings settings;
+  restoreState(settings.get("MainWindow/State").toByteArray());
+  restoreGeometry(settings.get("MainWindow/Geometry").toByteArray());
+  ui->splitter->restoreState(settings.get("Console/Splitter").toByteArray());
 }
 
 
@@ -414,7 +413,7 @@ void QtWin::snapView(char v) {
 }
 
 
-void QtWin::glViewMousePressEvent(unsigned id, QMouseEvent *event) {
+void QtWin::glViewMousePressEvent(QMouseEvent *event) {
   SmartPointer<ViewPort> viewPort = getCurrentViewPort();
   if (viewPort.isNull()) return;
 
@@ -426,7 +425,7 @@ void QtWin::glViewMousePressEvent(unsigned id, QMouseEvent *event) {
 }
 
 
-void QtWin::glViewMouseMoveEvent(unsigned id, QMouseEvent *event) {
+void QtWin::glViewMouseMoveEvent(QMouseEvent *event) {
   SmartPointer<ViewPort> viewPort = getCurrentViewPort();
   if (viewPort.isNull()) return;
 
@@ -441,7 +440,7 @@ void QtWin::glViewMouseMoveEvent(unsigned id, QMouseEvent *event) {
 }
 
 
-void QtWin::glViewWheelEvent(unsigned id, QWheelEvent *event) {
+void QtWin::glViewWheelEvent(QWheelEvent *event) {
   SmartPointer<ViewPort> viewPort = getCurrentViewPort();
   if (viewPort.isNull()) return;
 
@@ -452,35 +451,23 @@ void QtWin::glViewWheelEvent(unsigned id, QWheelEvent *event) {
 }
 
 
-void QtWin::initializeGL(unsigned id) {
-  LOG_DEBUG(5, "initializeGL(" << id << ")");
-
-  switch (id) {
-  case SIMULATION_VIEW:
-    view->glInit();
-    viewer->init();
-    break;
-  }
+void QtWin::initializeGL() {
+  view->glInit();
+  viewer->init();
 }
 
 
-void QtWin::resizeGL(unsigned id, int w, int h) {
-  LOG_DEBUG(5, "resizeGL(" << id << ", " << w << ", " << h << ")");
-
-  switch (id) {
-  case SIMULATION_VIEW: view->resize(w, h); break;
-  }
+void QtWin::resizeGL(int w, int h) {
+  LOG_DEBUG(5, "resizeGL(" << w << ", " << h << ")");
+  view->resize(w, h);
 }
 
 
-void QtWin::paintGL(unsigned id) {
-  LOG_DEBUG(5, "paintGL(" << id << ")");
+void QtWin::paintGL() {
+  LOG_DEBUG(5, "paintGL()");
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  switch (id) {
-  case SIMULATION_VIEW: viewer->draw(*view); break;
-  }
+  viewer->draw(*view);
 }
 
 
@@ -508,6 +495,8 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   project->updateResolution();
 
   // Setup view
+  view->setFlag(View::PATH_VBOS_FLAG,
+                Settings().get("Settings/VBO/Path", true).toBool());
   view->setToolPath(toolPath);
   view->setWorkpiece(project->getWorkpieceBounds());
 
@@ -559,6 +548,8 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 void QtWin::surfaceComplete(SurfaceTask &task) {
   surface = task.getSurface();
   view->setSurface(surface);
+  view->setFlag(View::SURFACE_VBOS_FLAG,
+                Settings().get("Settings/VBO/Surface", true).toBool());
   redraw();
 
   setStatusActive(false);

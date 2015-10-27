@@ -44,6 +44,8 @@ namespace CAMotics {
     uint64_t count;
     Rectangle3R bounds;
 
+    bool useVBOs;
+
   public:
     ElementSurface(STLSource &source, Task *task = 0);
     ElementSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
@@ -51,7 +53,7 @@ namespace CAMotics {
     ElementSurface(unsigned dim);
     virtual ~ElementSurface();
 
-    void finalize();
+    void finalize(bool withVBOs);
     void addElement(const Vector3R *vertices);
     void addElement(const Vector3R *vertices, const Vector3R &normal);
 
@@ -59,7 +61,7 @@ namespace CAMotics {
     cb::SmartPointer<Surface> copy() const;
     uint64_t getCount() const {return count;}
     Rectangle3R getBounds() const {return bounds;}
-    void draw();
+    void draw(bool withVBOs);
     void clear();
     void read(STLSource &source, Task *task = 0);
     void write(STLSink &sink, Task *task = 0) const;

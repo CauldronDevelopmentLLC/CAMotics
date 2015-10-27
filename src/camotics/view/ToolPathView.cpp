@@ -36,7 +36,7 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
   values(valueSet), byRemote(true), ratio(1), line(0), totalTime(0),
   totalDistance(0), currentTime(0), currentDistance(0), currentLine(0),
   dirty(true), colorVBuf(0), vertexVBuf(0), numVertices(0), numColors(0),
-  useVBuffers(glGenBuffers && glBindBuffer && glBufferData) {
+  useVBOs(true) {
 
   values.add("x", currentPosition.x());
   values.add("y", currentPosition.y());
@@ -62,15 +62,15 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
 
 
 ToolPathView::~ToolPathView() {
-  if (glDeleteBuffers) {
-    if (colorVBuf) glDeleteBuffers(1, &colorVBuf);
-    if (vertexVBuf) glDeleteBuffers(1, &vertexVBuf);
-  }
+  if (colorVBuf) glDeleteBuffers(1, &colorVBuf);
+  if (vertexVBuf) glDeleteBuffers(1, &vertexVBuf);
 }
 
 
-void ToolPathView::setPath(const SmartPointer<const ToolPath> &path) {
+void ToolPathView::setPath(const SmartPointer<const ToolPath> &path,
+                           bool withVBOs) {
   this->path = path;
+  useVBOs = haveVBOs() && withVBOs;
 
   totalTime = 0;
   totalDistance = 0;
@@ -137,6 +137,8 @@ const char *ToolPathView::getDirection() const {
 
 void ToolPathView::update() {
   if (!dirty) return;
+
+  LOG_DEBUG(1, "Path VBOs " << (useVBOs ? "enabled" : "disabled"));
 
   currentTime = 0;
   currentDistance = 0;
@@ -209,7 +211,7 @@ void ToolPathView::update() {
 
   // Setup GL Buffers
   // Colors
-  if (useVBuffers && !colors.empty()) {
+  if (useVBOs && !colors.empty()) {
     if (!colorVBuf) glGenBuffers(1, &colorVBuf);
     glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float), &colors[0],
@@ -218,7 +220,7 @@ void ToolPathView::update() {
   }
 
   // Vertices
-  if (useVBuffers && !vertices.empty()) {
+  if (useVBOs && !vertices.empty()) {
     if (!vertexVBuf) glGenBuffers(1, &vertexVBuf);
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float), &vertices[0],
@@ -237,19 +239,19 @@ void ToolPathView::draw() {
 
   if (!numColors || !numVertices) return;
 
-  // Colors
-  if (useVBuffers) {
+  if (useVBOs) {
     glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glColorPointer(3, GL_FLOAT, 0, 0);
 
-  } else glColorPointer(3, GL_FLOAT, 0, &colors[0]);
-
-  // Vertices
-  if (useVBuffers) {
     glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
-  } else glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  } else {
+    glColorPointer(3, GL_FLOAT, 0, &colors[0]);
+    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+  }
 
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);

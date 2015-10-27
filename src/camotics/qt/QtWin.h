@@ -156,13 +156,13 @@ namespace CAMotics {
     cb::SmartPointer<ViewPort> getCurrentViewPort() const;
     void snapView(char v);
 
-    void glViewMousePressEvent(unsigned id, QMouseEvent *event);
-    void glViewMouseMoveEvent(unsigned id, QMouseEvent *event);
-    void glViewWheelEvent(unsigned id, QWheelEvent *event);
+    void glViewMousePressEvent(QMouseEvent *event);
+    void glViewMouseMoveEvent(QMouseEvent *event);
+    void glViewWheelEvent(QWheelEvent *event);
 
-    void initializeGL(unsigned id);
-    void resizeGL(unsigned id, int w, int h);
-    void paintGL(unsigned id);
+    void initializeGL();
+    void resizeGL(int w, int h);
+    void paintGL();
 
     void showMessage(const std::string &msg, double timeout = 30);
     void message(const std::string &msg);

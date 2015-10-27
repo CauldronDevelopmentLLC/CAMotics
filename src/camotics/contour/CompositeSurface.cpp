@@ -65,8 +65,8 @@ Rectangle3R CompositeSurface::getBounds() const {
 }
 
 
-void CompositeSurface::draw() {
-  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->draw();
+void CompositeSurface::draw(bool withVBOs) {
+  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->draw(withVBOs);
 }
 
 

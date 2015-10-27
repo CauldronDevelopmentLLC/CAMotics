@@ -60,6 +60,8 @@ namespace CAMotics {
       SHOW_SURFACE_FLAG          = 1 << 6,
       SHOW_BBTREE_FLAG           = 1 << 7,
       PLAY_FLAG                  = 1 << 8,
+      PATH_VBOS_FLAG             = 1 << 9,
+      SURFACE_VBOS_FLAG          = 1 << 10,
     };
 
     View(ValueSet &valueSet);

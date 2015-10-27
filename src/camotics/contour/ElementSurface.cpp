@@ -36,14 +36,14 @@ using namespace CAMotics;
 
 
 ElementSurface::ElementSurface(STLSource &source, Task *task) :
-  dim(3), finalized(false), count(0) {
+  dim(3), finalized(false), count(0), useVBOs(true) {
   vbufs[0] = 0;
   read(source, task);
 }
 
 
 ElementSurface::ElementSurface(vector<SmartPointer<Surface> > &surfaces) :
-  dim(0), finalized(false), count(0) {
+  dim(0), finalized(false), count(0), useVBOs(true) {
   vbufs[0] = 0;
 
   for (unsigned i = 0; i < surfaces.size(); i++) {
@@ -79,15 +79,17 @@ ElementSurface::ElementSurface(unsigned dim) :
 
 
 ElementSurface::~ElementSurface() {
-  if (glDeleteBuffers && vbufs[0]) glDeleteBuffers(2, vbufs);
+  if (vbufs[0]) glDeleteBuffers(2, vbufs);
 }
 
 
-void ElementSurface::finalize() {
+void ElementSurface::finalize(bool withVBOs) {
   if (finalized) return;
 
-  if (glGenBuffers) {
-    glGenBuffers(2, vbufs);
+  useVBOs = haveVBOs() && withVBOs;
+
+  if (useVBOs) {
+    if (!vbufs[0]) glGenBuffers(2, vbufs);
 
     // Vertices
     glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
@@ -139,17 +141,19 @@ SmartPointer<Surface> ElementSurface::copy() const {
 }
 
 
-void ElementSurface::draw() {
+void ElementSurface::draw(bool withVBOs) {
   if (!count) return; // Nothing to draw
 
-  finalize();
+  finalize(withVBOs);
 
-  if (glBindBuffer) {
+  if (useVBOs) {
     glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
     glNormalPointer(GL_FLOAT, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   } else {
     glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
@@ -170,16 +174,12 @@ void ElementSurface::draw() {
 
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
-
-  // Unbind  buffer
-  if (glBindBuffer) glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
 void ElementSurface::clear() {
   finalized = false;
 
-  if (glDeleteBuffers && vbufs[0]) glDeleteBuffers(2, vbufs);
   vertices.clear();
   normals.clear();
 

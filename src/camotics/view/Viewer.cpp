@@ -104,7 +104,7 @@ void Viewer::draw(const View &view) {
     view.setWire(view.isFlagSet(View::WIRE_FLAG));
 
     if (!surface.isNull() && view.isFlagSet(View::SHOW_SURFACE_FLAG))
-      surface->draw();
+      surface->draw(view.isFlagSet(View::SURFACE_VBOS_FLAG));
 
     if (view.isFlagSet(View::SHOW_WORKPIECE_FLAG)) view.workpiece->draw();
 

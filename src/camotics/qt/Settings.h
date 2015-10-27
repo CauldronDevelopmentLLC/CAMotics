@@ -18,54 +18,23 @@
 
 \******************************************************************************/
 
-#include "GLView.h"
+#ifndef CAMOTICS_SETTINGS_H
+#define CAMOTICS_SETTINGS_H
 
-#include "QtWin.h"
-#include "GLEWInit.h"
+#include <QSettings>
 
-#include <QGLFormat>
-
-using namespace CAMotics;
+#include <string>
 
 
-GLView::GLView(QWidget *parent) :
-  QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::SampleBuffers), parent) {
+namespace CAMotics {
+  class Settings : public QSettings {
+  public:
+    bool has(const std::string &name) const;
+    QVariant get(const std::string &name,
+                 const QVariant &defaultValue = QVariant()) const;
+    void set(const std::string &name, const QVariant &value);
+  };
 }
 
+#endif // CAMOTICS_SETTINGS_H
 
-QtWin &GLView::getQtWin() const {
-  QtWin *qtWin = dynamic_cast<QtWin *>(window());
-  if (!qtWin) THROW("QtWin not found");
-  return *qtWin;
-}
-
-
-void GLView::mousePressEvent(QMouseEvent *event) {
-  getQtWin().glViewMousePressEvent(event);
-}
-
-
-void GLView::mouseMoveEvent(QMouseEvent *event) {
-  getQtWin().glViewMouseMoveEvent(event);
-}
-
-
-void GLView::wheelEvent(QWheelEvent *event) {
-  getQtWin().glViewWheelEvent(event);
-}
-
-
-void GLView::initializeGL() {
-  GLEWInit();
-  getQtWin().initializeGL();
-}
-
-
-void GLView::resizeGL(int w, int h) {
-  getQtWin().resizeGL(w, h);
-}
-
-
-void GLView::paintGL() {
-  getQtWin().paintGL();
-}

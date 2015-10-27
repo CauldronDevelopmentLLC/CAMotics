@@ -33,7 +33,8 @@ using namespace CAMotics;
 
 View::View(ValueSet &valueSet) :
   values(valueSet), flags(SHOW_PATH_FLAG | SHOW_TOOL_FLAG | SHOW_SURFACE_FLAG |
-                          SHOW_WORKPIECE_BOUNDS_FLAG),
+                          SHOW_WORKPIECE_BOUNDS_FLAG | PATH_VBOS_FLAG |
+                          SURFACE_VBOS_FLAG),
   speed(1), reverse(false), lastTime(0), path(new ToolPathView(valueSet)),
   workpiece(new CuboidView) {
 
@@ -56,7 +57,7 @@ void View::decSpeed() {
 
 
 void View::setToolPath(const SmartPointer<ToolPath> &toolPath) {
-  path->setPath(toolPath);
+  path->setPath(toolPath, flags & PATH_VBOS_FLAG);
 }
 
 

@@ -18,54 +18,22 @@
 
 \******************************************************************************/
 
-#include "GLView.h"
+#include "Settings.h"
 
-#include "QtWin.h"
-#include "GLEWInit.h"
-
-#include <QGLFormat>
-
+using namespace std;
 using namespace CAMotics;
 
 
-GLView::GLView(QWidget *parent) :
-  QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::SampleBuffers), parent) {
+bool Settings::has(const string &name) const {
+  return contains(name.c_str());
 }
 
 
-QtWin &GLView::getQtWin() const {
-  QtWin *qtWin = dynamic_cast<QtWin *>(window());
-  if (!qtWin) THROW("QtWin not found");
-  return *qtWin;
+QVariant Settings::get(const string &name, const QVariant &defaultValue) const {
+  return value(name.c_str(), defaultValue);
 }
 
 
-void GLView::mousePressEvent(QMouseEvent *event) {
-  getQtWin().glViewMousePressEvent(event);
-}
-
-
-void GLView::mouseMoveEvent(QMouseEvent *event) {
-  getQtWin().glViewMouseMoveEvent(event);
-}
-
-
-void GLView::wheelEvent(QWheelEvent *event) {
-  getQtWin().glViewWheelEvent(event);
-}
-
-
-void GLView::initializeGL() {
-  GLEWInit();
-  getQtWin().initializeGL();
-}
-
-
-void GLView::resizeGL(int w, int h) {
-  getQtWin().resizeGL(w, h);
-}
-
-
-void GLView::paintGL() {
-  getQtWin().paintGL();
+void Settings::set(const string &name, const QVariant &value) {
+  setValue(name.c_str(), value);
 }

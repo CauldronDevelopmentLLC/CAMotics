@@ -34,4 +34,9 @@ namespace CAMotics {
     if (err != GL_NO_ERROR)
       LOG_ERROR(message << "GL error: " << err << ": " << gluErrorString(err));
   }
+
+
+  bool haveVBOs() {
+    return glGenBuffers && glBindBuffer && glBufferData && glDeleteBuffers;
+  }
 }

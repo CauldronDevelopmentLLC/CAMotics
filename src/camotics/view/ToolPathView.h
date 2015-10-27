@@ -59,7 +59,7 @@ namespace CAMotics {
     unsigned numVertices;
     unsigned numColors;
 
-    bool useVBuffers;
+    bool useVBOs;
 
   public:
     ToolPathView(ValueSet &valueSet);
@@ -68,7 +68,7 @@ namespace CAMotics {
     bool isEmpty() const {return path.isNull() || path->empty();}
 
     cb::SmartPointer<const ToolPath> getPath() const {return path;}
-    void setPath(const cb::SmartPointer<const ToolPath> &path);
+    void setPath(const cb::SmartPointer<const ToolPath> &path, bool withVBOs);
 
     Rectangle3R getBounds() const
     {return path.isNull() ? Rectangle3R() : path->getBounds();}

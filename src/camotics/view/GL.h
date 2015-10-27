@@ -35,6 +35,8 @@
 
 namespace CAMotics {
   void checkGLError(const std::string &message = std::string());
+
+  bool haveVBOs();
 }
 
 #ifdef __DEBUG

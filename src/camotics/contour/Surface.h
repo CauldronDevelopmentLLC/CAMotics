@@ -37,7 +37,7 @@ namespace CAMotics {
     virtual cb::SmartPointer<Surface> copy() const = 0;
     virtual uint64_t getCount() const = 0;
     virtual Rectangle3R getBounds() const = 0;
-    virtual void draw() = 0;
+    virtual void draw(bool withVBOs) = 0;
     virtual void write(STLSink &sink, Task *task = 0) const = 0;
     virtual void reduce(Task &task) = 0;
 

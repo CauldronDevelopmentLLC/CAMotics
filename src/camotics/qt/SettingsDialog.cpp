@@ -19,10 +19,11 @@
 \******************************************************************************/
 
 #include "SettingsDialog.h"
+#include "Settings.h"
+
+#include <camotics/view/GL.h>
 
 #include "ui_settings_dialog.h"
-
-#include <QSettings>
 
 using namespace std;
 using namespace cb;
@@ -48,10 +49,18 @@ void SettingsDialog::exec(Project &project) {
   ui->renderModeComboBox->setCurrentIndex(project.getRenderMode() - 1);
   ui->unitsComboBox->setCurrentIndex(project.getUnits());
 
-  QSettings settings;
+  Settings settings;
 
   ui->defaultUnitsComboBox->
-    setCurrentIndex(settings.value("Settings/Units").toInt());
+    setCurrentIndex(settings.get("Settings/Units",
+                                 ToolUnits::UNITS_MM).toInt());
+  ui->surfaceVBOsCheckBox->
+    setChecked(settings.get("Settings/VBO/Surface", true).toBool());
+  ui->pathVBOsCheckBox->
+    setChecked(settings.get("Settings/VBO/Path", true).toBool());
+
+  ui->surfaceVBOsCheckBox->setEnabled(haveVBOs());
+  ui->pathVBOsCheckBox->setEnabled(haveVBOs());
 
   if (QDialog::exec() != QDialog::Accepted) return;
 
@@ -66,7 +75,9 @@ void SettingsDialog::exec(Project &project) {
   ToolUnits units = (ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
   project.setUnits(units);
 
-  settings.setValue("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
+  settings.set("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
+  settings.set("Settings/VBO/Surface", ui->surfaceVBOsCheckBox->isChecked());
+  settings.set("Settings/VBO/Path", ui->pathVBOsCheckBox->isChecked());
 }
 
 

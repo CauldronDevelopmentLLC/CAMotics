@@ -34,14 +34,11 @@ namespace CAMotics {
   class GLView : public QGLWidget {
     Q_OBJECT;
 
-    unsigned id;
-    QtWin *qtWin;
-
   public:
     GLView(QWidget *parent = 0);
     ~GLView() {}
 
-    void init(unsigned id, QtWin *qtWin) {this->id = id; this->qtWin = qtWin;}
+    QtWin &getQtWin() const;
 
     // From QWidget
     void mousePressEvent(QMouseEvent *event);

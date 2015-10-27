@@ -36,8 +36,8 @@ Vector3R FieldFunction::getEdgeIntersect(const Vector3R &v1, bool inside1,
   Vector3R b = v2;
   Vector3R mid;
 
-  for (unsigned i = 0; i < 10; i++) {
-    // Sample mid point
+  // Binary search for intersection point
+  for (unsigned i = 0; i < 8; i++) {
     mid = a + (b - a) * 0.5;
     if (contains(mid) == inside1) a = mid;
     else b = mid;
