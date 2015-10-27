@@ -75,16 +75,20 @@ namespace CAMotics {
       bool wouldFlip(Vertex &a, Vertex &b) const;
     };
 
-    std::vector<float> &vertices;
-    std::vector<float> &normals;
     double lastUpdate;
 
+  protected:
+    std::vector<float> vertices;
+    std::vector<float> normals;
+
   public:
-    TriangleMesh(std::vector<float> &vertices, std::vector<float> &normals) :
-      vertices(vertices), normals(normals), lastUpdate(0) {}
+    TriangleMesh() : lastUpdate(0) {}
+    TriangleMesh(const TriangleMesh &o);
+
+    unsigned getCount() const {return vertices.size() / 9;}
 
     void weld(float threshold = std::numeric_limits<float>::epsilon() * 10);
-    unsigned reduce(Task &task);
+    void reduce(Task &task);
 
   protected:
     bool update(Task &task, unsigned step, unsigned steps, unsigned current,

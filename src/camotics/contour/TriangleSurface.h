@@ -22,6 +22,7 @@
 #define CAMOTICS_TRIANGLE_SURFACE_H
 
 #include "Surface.h"
+#include "TriangleMesh.h"
 
 #include <camotics/Real.h>
 
@@ -33,17 +34,13 @@
 namespace CAMotics {
   class STLSource;
 
-  class TriangleSurface : public Surface {
+  class TriangleSurface : public Surface, public TriangleMesh {
     bool finalized;
 
     unsigned vbufs[2];
-    std::vector<float> vertices;
-    std::vector<float> normals;
-
-    uint64_t count;
-    Rectangle3R bounds;
-
     bool useVBOs;
+
+    Rectangle3R bounds;
 
   public:
     TriangleSurface(STLSource &source, Task *task = 0);
@@ -58,7 +55,7 @@ namespace CAMotics {
 
     // From Surface
     cb::SmartPointer<Surface> copy() const;
-    uint64_t getCount() const {return count;}
+    uint64_t getCount() const {return TriangleMesh::getCount();}
     Rectangle3R getBounds() const {return bounds;}
     void draw(bool withVBOs);
     void clear();

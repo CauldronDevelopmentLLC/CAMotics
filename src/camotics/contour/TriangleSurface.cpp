@@ -36,14 +36,14 @@ using namespace CAMotics;
 
 
 TriangleSurface::TriangleSurface(STLSource &source, Task *task) :
-  finalized(false), count(0), useVBOs(true) {
+  finalized(false), useVBOs(true) {
   vbufs[0] = 0;
   read(source, task);
 }
 
 
 TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
-  finalized(false), count(0), useVBOs(true) {
+  finalized(false), useVBOs(true) {
   vbufs[0] = 0;
 
   for (unsigned i = 0; i < surfaces.size(); i++) {
@@ -53,7 +53,6 @@ TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
     // Copy surface data
     vertices.insert(vertices.end(), s->vertices.begin(), s->vertices.end());
     normals.insert(normals.end(), s->normals.begin(), s->normals.end());
-    count += s->count;
     bounds.add(s->bounds);
 
     surfaces[i] = 0; // Free memory as we go
@@ -62,14 +61,12 @@ TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
 
 
 TriangleSurface::TriangleSurface(const TriangleSurface &o) :
-  finalized(false), vertices(o.vertices), normals(o.normals),
-  count(o.count), bounds(o.bounds) {
+  TriangleMesh(o), finalized(false), bounds(o.bounds) {
   vbufs[0] = 0;
 }
 
 
-TriangleSurface::TriangleSurface() :
-  finalized(false), count(0) {
+TriangleSurface::TriangleSurface() : finalized(false) {
   vbufs[0] = 0;
 }
 
@@ -118,8 +115,6 @@ void TriangleSurface::add(const Vector3R vertices[3]) {
 
 
 void TriangleSurface::add(const Vector3R vertices[3], const Vector3R &normal) {
-  count++;
-
   for (unsigned i = 0; i < 3; i++) {
     bounds.add(vertices[i]);
 
@@ -137,7 +132,7 @@ SmartPointer<Surface> TriangleSurface::copy() const {
 
 
 void TriangleSurface::draw(bool withVBOs) {
-  if (!count) return; // Nothing to draw
+  if (!getCount()) return; // Nothing to draw
 
   finalize(withVBOs);
 
@@ -158,7 +153,7 @@ void TriangleSurface::draw(bool withVBOs) {
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
 
-  glDrawArrays(GL_TRIANGLES, 0, count * 3);
+  glDrawArrays(GL_TRIANGLES, 0, getCount() * 3);
 
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
@@ -171,7 +166,6 @@ void TriangleSurface::clear() {
   vertices.clear();
   normals.clear();
 
-  count = 0;
   bounds = Rectangle3R();
 }
 
@@ -222,8 +216,6 @@ void TriangleSurface::read(STLSource &source, Task *task) {
       task->update((double)i / (facets ? facets : 100000),
                    "Reading STL surface");
     }
-
-    count++;
   }
 
   task->update(1, "Idle");
@@ -233,7 +225,7 @@ void TriangleSurface::read(STLSource &source, Task *task) {
 void TriangleSurface::write(STLSink &sink, Task *task) const {
   Vector3R p[3];
 
-  for (unsigned i = 0; i < count && (!task || !task->shouldQuit()); i++) {
+  for (unsigned i = 0; i < getCount() && (!task || !task->shouldQuit()); i++) {
     unsigned offset = i * 9;
 
     // The vertex normals are all the same
@@ -246,14 +238,12 @@ void TriangleSurface::write(STLSink &sink, Task *task) const {
 
     sink.writeFacet(p[0], p[1], p[2], normal);
 
-    if (task) task->update((double)i / count, "Writing STL surface");
+    if (task) task->update((double)i / getCount(), "Writing STL surface");
   }
 }
 
 
 void TriangleSurface::reduce(Task &task) {
-  TriangleMesh mesh(vertices, normals);
-
-  mesh.weld();
-  count = mesh.reduce(task);
+  weld();
+  TriangleMesh::reduce(task);
 }

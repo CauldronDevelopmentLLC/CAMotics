@@ -33,6 +33,10 @@ using namespace cb;
 using namespace CAMotics;
 
 
+TriangleMesh::TriangleMesh(const TriangleMesh &o) :
+  vertices(o.vertices), normals(o.normals) {}
+
+
 void TriangleMesh::Vertex::set(const Vector3R &v) {
   for (unsigned i = 0; i < 3; i++) (*this)[i] = v[i];
 }
@@ -171,8 +175,8 @@ void TriangleMesh::weld(float threshold) {
 }
 
 
-unsigned TriangleMesh::reduce(Task &task) {
-  unsigned count = vertices.size() / 9;
+void TriangleMesh::reduce(Task &task) {
+  unsigned count = getCount();
 
   // Build triangles and find unique vertices
   vector<SmartPointer<Vertex> > vertices;
@@ -184,7 +188,7 @@ unsigned TriangleMesh::reduce(Task &task) {
   unsigned index = 0;
 
   for (unsigned i = 0; i < count; i++) {
-    if (!update(task, 0, 4, i, count)) return count;
+    if (!update(task, 0, 4, i, count)) return;
 
     Triangle &t = triangles[i];
 
@@ -205,7 +209,7 @@ unsigned TriangleMesh::reduce(Task &task) {
 
   // Collapse edges
   for (unsigned i = 0; i < vertices.size(); i++) {
-    if (!update(task, 1, 4, i, vertices.size())) return count;
+    if (!update(task, 1, 4, i, vertices.size())) return;
 
     Vertex &v = *vertices[i];
 
@@ -279,7 +283,7 @@ unsigned TriangleMesh::reduce(Task &task) {
 
   // Flip edges
   for (unsigned i = 0; i < vertices.size(); i++) {
-    if (!update(task, 2, 4, i, vertices.size())) return count;
+    if (!update(task, 2, 4, i, vertices.size())) return;
 
     Vertex &v = *vertices[i];
 
@@ -333,17 +337,14 @@ unsigned TriangleMesh::reduce(Task &task) {
   // Reconstruct
   this->vertices.clear();
   this->normals.clear();
-  count = 0;
 
   for (unsigned i = 0; i < triangles.size(); i++) {
-    if (!update(task, 3, 4, i, triangles.size())) return 0;
+    if (!update(task, 3, 4, i, triangles.size())) return;
 
     Triangle &t = triangles[i];
     if (t.deleted) continue;
     t.updateNormal();
     if (!t.normal.isReal()) continue; // Degenerate, discard
-
-    count++;
 
     for (unsigned j = 0; j < 3; j++) {
       Vertex &v = *t.vertices[j];
@@ -356,8 +357,6 @@ unsigned TriangleMesh::reduce(Task &task) {
   }
 
   task.update(1);
-
-  return count;
 }
 
 
