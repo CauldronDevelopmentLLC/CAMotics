@@ -138,8 +138,6 @@ const char *ToolPathView::getDirection() const {
 void ToolPathView::update() {
   if (!dirty) return;
 
-  LOG_DEBUG(1, "Path VBOs " << (useVBOs ? "enabled" : "disabled"));
-
   currentTime = 0;
   currentDistance = 0;
   currentPosition = Vector3R();

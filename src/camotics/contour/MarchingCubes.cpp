@@ -46,7 +46,7 @@ extern const int tetrahedronEdgeFlags[16];
 
 void MarchingCubes::run(FieldFunction &func, const Rectangle3R &bbox,
                         real step) {
-  surface = new ElementSurface(3);
+  surface = new TriangleSurface;
 
   // Compute steps
   Vector3U steps = bbox.getDimensions() / step;
@@ -156,7 +156,7 @@ void MarchingCubes::marchCube(FieldFunction &func, const Vector3R &p,
     for (int i = 0; i < 3; i++)
       vertices[i] = edgeVertex[triangleConnectionTable[flagIndex][3 * j + i]];
 
-    surface->addElement(vertices);
+    surface->add(vertices);
   }
 }
 
@@ -198,7 +198,7 @@ void MarchingCubes::marchTetrahedron(FieldFunction &func, Vector3R *position,
     for (int i = 0; i < 3; i++)
       vertices[i] = edgeVertex[tetrahedronTriangles[flagIndex][3 * j + i]];
 
-    surface->addElement(vertices);
+    surface->add(vertices);
   }
 }
 

@@ -19,7 +19,7 @@
 \******************************************************************************/
 
 #include "CompositeSurface.h"
-#include "ElementSurface.h"
+#include "TriangleSurface.h"
 
 using namespace cb;
 using namespace CAMotics;
@@ -32,7 +32,7 @@ void CompositeSurface::add(SmartPointer<Surface> s) {
 
 cb::SmartPointer<Surface> CompositeSurface::consolidate() {
   if (surfaces.size() == 1) return surfaces[0];
-  cb::SmartPointer<Surface> surface = new ElementSurface(surfaces);
+  cb::SmartPointer<Surface> surface = new TriangleSurface(surfaces);
   surfaces.clear();
   add(surface);
   return surface;

@@ -50,7 +50,7 @@ static const int quadOffsets[16][3][3] = {
 
 void DualContouring::run(FieldFunction &func, const Rectangle3R &bbox,
                          real step) {
-  surface = new ElementSurface(4);
+  surface = new TriangleSurface;
 
   Vector3R dims = bbox.getDimensions();
   unsigned slices = (bbox.getHeight() + 1) / step;

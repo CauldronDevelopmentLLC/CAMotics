@@ -23,7 +23,7 @@
 
 #include "ContourGenerator.h"
 #include "FieldFunction.h"
-#include "ElementSurface.h"
+#include "TriangleSurface.h"
 
 #include <camotics/Geom.h>
 
@@ -31,7 +31,7 @@
 namespace CAMotics {
   class MarchingCubes : public ContourGenerator {
     bool tetrahedrons;
-    cb::SmartPointer<ElementSurface> surface;
+    cb::SmartPointer<TriangleSurface> surface;
 
     unsigned totalCells;
     unsigned completedCells;

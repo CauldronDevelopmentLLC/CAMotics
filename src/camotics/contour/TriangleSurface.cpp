@@ -18,7 +18,7 @@
 
 \******************************************************************************/
 
-#include "ElementSurface.h"
+#include "TriangleSurface.h"
 
 #include "TriangleMesh.h"
 
@@ -35,23 +35,20 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ElementSurface::ElementSurface(STLSource &source, Task *task) :
-  dim(3), finalized(false), count(0), useVBOs(true) {
+TriangleSurface::TriangleSurface(STLSource &source, Task *task) :
+  finalized(false), count(0), useVBOs(true) {
   vbufs[0] = 0;
   read(source, task);
 }
 
 
-ElementSurface::ElementSurface(vector<SmartPointer<Surface> > &surfaces) :
-  dim(0), finalized(false), count(0), useVBOs(true) {
+TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
+  finalized(false), count(0), useVBOs(true) {
   vbufs[0] = 0;
 
   for (unsigned i = 0; i < surfaces.size(); i++) {
-    ElementSurface *s = dynamic_cast<ElementSurface *>(surfaces[i].get());
-    if (!s) THROW("Expected an ElementSurface");
-
-    if (!i) dim = s->dim;
-    else if (dim != s->dim) THROWS("Surface dimension mismatch");
+    TriangleSurface *s = dynamic_cast<TriangleSurface *>(surfaces[i].get());
+    if (!s) THROW("Expected an TriangleSurface");
 
     // Copy surface data
     vertices.insert(vertices.end(), s->vertices.begin(), s->vertices.end());
@@ -64,26 +61,25 @@ ElementSurface::ElementSurface(vector<SmartPointer<Surface> > &surfaces) :
 }
 
 
-ElementSurface::ElementSurface(const ElementSurface &o) :
-  dim(o.dim), finalized(false), vertices(o.vertices), normals(o.normals),
+TriangleSurface::TriangleSurface(const TriangleSurface &o) :
+  finalized(false), vertices(o.vertices), normals(o.normals),
   count(o.count), bounds(o.bounds) {
   vbufs[0] = 0;
 }
 
 
-ElementSurface::ElementSurface(unsigned dim) :
-  dim(dim), finalized(false), count(0) {
+TriangleSurface::TriangleSurface() :
+  finalized(false), count(0) {
   vbufs[0] = 0;
-  if (dim < 3 || 4 < dim) THROWS("Invalid dimension");
 }
 
 
-ElementSurface::~ElementSurface() {
+TriangleSurface::~TriangleSurface() {
   if (vbufs[0]) glDeleteBuffers(2, vbufs);
 }
 
 
-void ElementSurface::finalize(bool withVBOs) {
+void TriangleSurface::finalize(bool withVBOs) {
   if (finalized) return;
 
   useVBOs = haveVBOs() && withVBOs;
@@ -106,10 +102,10 @@ void ElementSurface::finalize(bool withVBOs) {
 }
 
 
-void ElementSurface::addElement(const Vector3R *vertices) {
+void TriangleSurface::add(const Vector3R vertices[3]) {
   // Compute face normal
   Vector3R normal =
-    (vertices[1] - vertices[0]).cross(vertices[dim - 1] - vertices[0]);
+    (vertices[1] - vertices[0]).cross(vertices[2] - vertices[0]);
 
   // Normalize
   real length = normal.length();
@@ -117,15 +113,14 @@ void ElementSurface::addElement(const Vector3R *vertices) {
   normal /= length;
 
   // Add it
-  addElement(vertices, normal);
+  add(vertices, normal);
 }
 
 
-void ElementSurface::addElement(const Vector3R *vertices,
-                                const Vector3R &normal) {
+void TriangleSurface::add(const Vector3R vertices[3], const Vector3R &normal) {
   count++;
 
-  for (unsigned i = 0; i < dim; i++) {
+  for (unsigned i = 0; i < 3; i++) {
     bounds.add(vertices[i]);
 
     for (unsigned j = 0; j < 3; j++) {
@@ -136,12 +131,12 @@ void ElementSurface::addElement(const Vector3R *vertices,
 }
 
 
-SmartPointer<Surface> ElementSurface::copy() const {
-  return new ElementSurface(*this);
+SmartPointer<Surface> TriangleSurface::copy() const {
+  return new TriangleSurface(*this);
 }
 
 
-void ElementSurface::draw(bool withVBOs) {
+void TriangleSurface::draw(bool withVBOs) {
   if (!count) return; // Nothing to draw
 
   finalize(withVBOs);
@@ -163,21 +158,14 @@ void ElementSurface::draw(bool withVBOs) {
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
 
-  int mode;
-  switch (dim) {
-  case 3: mode = GL_TRIANGLES; break;
-  case 4: mode = GL_QUADS; break;
-  default: THROWS("Invalid surface element dimension " << dim);
-  }
-
-  glDrawArrays(mode, 0, count * dim);
+  glDrawArrays(GL_TRIANGLES, 0, count * 3);
 
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
-void ElementSurface::clear() {
+void TriangleSurface::clear() {
   finalized = false;
 
   vertices.clear();
@@ -188,9 +176,7 @@ void ElementSurface::clear() {
 }
 
 
-void ElementSurface::read(STLSource &source, Task *task) {
-  if (dim != 3) THROW("STL quad import not supported");
-
+void TriangleSurface::read(STLSource &source, Task *task) {
   clear();
 
   uint32_t facets = source.getFacetCount(); // ASCII STL files return 0
@@ -244,9 +230,7 @@ void ElementSurface::read(STLSource &source, Task *task) {
 }
 
 
-void ElementSurface::write(STLSink &sink, Task *task) const {
-  if (dim != 3) THROW("STL quad export not supported");
-
+void TriangleSurface::write(STLSink &sink, Task *task) const {
   Vector3R p[3];
 
   for (unsigned i = 0; i < count && (!task || !task->shouldQuit()); i++) {
@@ -267,12 +251,7 @@ void ElementSurface::write(STLSink &sink, Task *task) const {
 }
 
 
-void ElementSurface::reduce(Task &task) {
-  if (dim != 3) {
-    LOG_WARNING(__func__ << "() only implemented for triangles");
-    return;
-  }
-
+void TriangleSurface::reduce(Task &task) {
   TriangleMesh mesh(vertices, normals);
 
   mesh.weld();

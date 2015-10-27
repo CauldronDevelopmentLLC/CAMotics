@@ -21,7 +21,7 @@
 #include "SurfaceTask.h"
 
 #include <camotics/stl/STLReader.h>
-#include <camotics/contour/ElementSurface.h>
+#include <camotics/contour/TriangleSurface.h>
 #include <camotics/render/Renderer.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 
@@ -60,7 +60,7 @@ void SurfaceTask::run() {
 
       if (hash == sim->computeHash()) {
         LOG_INFO(1, "Loading precomputed surface from " << filename);
-        surface = new ElementSurface(reader, this);
+        surface = new TriangleSurface(reader, this);
         reader.readFooter();
       }
     }

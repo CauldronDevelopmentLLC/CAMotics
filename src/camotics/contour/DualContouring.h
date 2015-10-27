@@ -22,14 +22,14 @@
 #define CAMOTICS_DUAL_CONTOURING_H
 
 #include "ContourGenerator.h"
-#include "ElementSurface.h"
+#include "TriangleSurface.h"
 
 #include <camotics/Geom.h>
 
 
 namespace CAMotics {
   class DualContouring : public ContourGenerator {
-    cb::SmartPointer<ElementSurface> surface;
+    cb::SmartPointer<TriangleSurface> surface;
 
   public:
     // From ContourGenerator

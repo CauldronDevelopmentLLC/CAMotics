@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_ELEMENT_SURFACE_H
-#define CAMOTICS_ELEMENT_SURFACE_H
+#ifndef CAMOTICS_TRIANGLE_SURFACE_H
+#define CAMOTICS_TRIANGLE_SURFACE_H
 
 #include "Surface.h"
 
@@ -33,8 +33,7 @@
 namespace CAMotics {
   class STLSource;
 
-  class ElementSurface : public Surface {
-    unsigned dim;
+  class TriangleSurface : public Surface {
     bool finalized;
 
     unsigned vbufs[2];
@@ -47,15 +46,15 @@ namespace CAMotics {
     bool useVBOs;
 
   public:
-    ElementSurface(STLSource &source, Task *task = 0);
-    ElementSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
-    ElementSurface(const ElementSurface &o);
-    ElementSurface(unsigned dim);
-    virtual ~ElementSurface();
+    TriangleSurface(STLSource &source, Task *task = 0);
+    TriangleSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
+    TriangleSurface(const TriangleSurface &o);
+    TriangleSurface();
+    virtual ~TriangleSurface();
 
     void finalize(bool withVBOs);
-    void addElement(const Vector3R *vertices);
-    void addElement(const Vector3R *vertices, const Vector3R &normal);
+    void add(const Vector3R vertices[3]);
+    void add(const Vector3R vertices[3], const Vector3R &normal);
 
     // From Surface
     cb::SmartPointer<Surface> copy() const;
@@ -69,5 +68,5 @@ namespace CAMotics {
   };
 }
 
-#endif // CAMOTICS_ELEMENT_SURFACE_H
+#endif // CAMOTICS_TRIANGLE_SURFACE_H
 
