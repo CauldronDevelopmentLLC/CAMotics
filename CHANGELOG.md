@@ -1,5 +1,8 @@
 # CAMotics Changelog
 
+## v1.0.5:
+ - Add option to disable VBOs to help with faulty graphics drivers.
+
 ## v1.0.4:
  - Clear surface on reload.
  - Cutting move with zero feed is now an error.
