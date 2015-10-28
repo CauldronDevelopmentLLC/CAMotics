@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.0.5'
+version = '1.0.6'
 major, minor, revision = version.split('.')
 
 # Setup
@@ -86,6 +86,8 @@ if not env.GetOption('clean'):
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
+
+    conf.CBCheckLib('stdc++')
 
     # Extra static libs
     if env.get('static') or env.get('mostly_static'):

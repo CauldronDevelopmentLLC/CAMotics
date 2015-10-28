@@ -21,6 +21,8 @@
 #ifndef CAMOTICS_FIELD_FUNCTION_H
 #define CAMOTICS_FIELD_FUNCTION_H
 
+#include "Edge.h"
+
 #include <camotics/Geom.h>
 
 #include <vector>
@@ -30,9 +32,15 @@ namespace CAMotics {
   public:
     virtual ~FieldFunction() {} // Compiler needs this
 
+    Vector3R linearIntersect(Vector3R &a, bool aInside, Vector3R &b,
+                             bool bInside);
+    Vector3R findNormal(Vector3R &a, bool aInside, Vector3R &b, bool bInside);
+
     virtual bool contains(const Vector3R &p) = 0;
     virtual Vector3R getEdgeIntersect(const Vector3R &v1, bool inside1,
                                       const Vector3R &v2, bool inside2);
+    virtual Edge getEdge(const Vector3R &v1, bool inside1,
+                         const Vector3R &v2, bool inside2);
     virtual bool canCull(const Rectangle3R &bbox) {return false;}
   };
 }

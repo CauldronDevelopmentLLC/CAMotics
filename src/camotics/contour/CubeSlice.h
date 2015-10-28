@@ -18,22 +18,43 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_EDGE_H
-#define CAMOTICS_EDGE_H
+#ifndef CAMOTICS_CUBE_SLICE_H
+#define CAMOTICS_CUBE_SLICE_H
 
-#include <camotics/Geom.h>
+#include "VertexSlice.h"
+#include "FieldFunction.h"
+
+#include <cbang/SmartPointer.h>
+#include <cbang/StdTypes.h>
+
 
 namespace CAMotics {
-  class Edge {
-  public:
-    Vector3R vertex;
-    Vector3R normal;
+  class CubeSlice {
+    Rectangle3R bbox;
+    real maxStep;
 
-    Edge() {}
-    Edge(const Vector3R &vertex, const Vector3R &normal) :
-      vertex(vertex), normal(normal) {}
+    cb::Vector2U steps;
+    Vector2R step;
+
+    cb::SmartPointer<VertexSlice> left;
+    cb::SmartPointer<VertexSlice> right;
+    std::vector<std::vector<Edge> > edges[5];
+
+    bool shifted;
+
+  public:
+    CubeSlice(const Rectangle3R &bbox, real maxStep);
+
+    const Rectangle3R getBounds() const {return bbox;}
+
+    void compute(FieldFunction &func);
+    void shiftZ(real z);
+    uint8_t getEdges(unsigned x, unsigned y, Edge edges[12]) const;
+
+  protected:
+    bool isInside(int x, int y, int offset[3]) const;
   };
 }
 
-#endif // CAMOTICS_EDGE_H
+#endif // CAMOTICS_CUBE_SLICE_H
 

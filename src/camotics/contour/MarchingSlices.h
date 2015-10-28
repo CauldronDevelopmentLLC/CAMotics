@@ -18,22 +18,23 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_EDGE_H
-#define CAMOTICS_EDGE_H
+#ifndef CAMOTICS_MARCHING_SLICES_H
+#define CAMOTICS_MARCHING_SLICES_H
 
-#include <camotics/Geom.h>
+#include "ContourGenerator.h"
+#include "TriangleSurface.h"
+
 
 namespace CAMotics {
-  class Edge {
-  public:
-    Vector3R vertex;
-    Vector3R normal;
+  class MarchingSlices : public ContourGenerator {
+    cb::SmartPointer<TriangleSurface> surface;
 
-    Edge() {}
-    Edge(const Vector3R &vertex, const Vector3R &normal) :
-      vertex(vertex), normal(normal) {}
+  public:
+    // From ContourGenerator
+    cb::SmartPointer<Surface> getSurface() {return surface;}
+    void run(FieldFunction &func, const Rectangle3R &bbox, real step);
   };
 }
 
-#endif // CAMOTICS_EDGE_H
+#endif // CAMOTICS_MARCHING_SLICES_H
 

@@ -21,6 +21,7 @@
 #include "RenderJob.h"
 
 #include <camotics/contour/MarchingCubes.h>
+#include <camotics/contour/MarchingSlices.h>
 #include <camotics/contour/DualContouring.h>
 #include <camotics/contour/HermiteData.h>
 
@@ -36,7 +37,8 @@ RenderJob::RenderJob(FieldFunction &func, RenderMode mode,
                      real resolution, const Rectangle3R &bbox) :
   func(func), resolution(resolution), bbox(bbox) {
   switch (mode) {
-  case RenderMode::MCUBES_MODE: generator = new MarchingCubes(false); break;
+  case RenderMode::MCUBES_MODE: generator = new MarchingSlices; break;
+  case RenderMode::OLD_MCUBES_MODE: generator = new MarchingCubes(false); break;
   case RenderMode::MTETRA_MODE: generator = new MarchingCubes(true); break;
   case RenderMode::DC_MODE: generator = new DualContouring; break;
   case RenderMode::HERMITE_MODE: generator = new HermiteData; break;

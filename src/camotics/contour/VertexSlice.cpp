@@ -18,22 +18,36 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_EDGE_H
-#define CAMOTICS_EDGE_H
+#include "VertexSlice.h"
 
-#include <camotics/Geom.h>
+#include <limits>
 
-namespace CAMotics {
-  class Edge {
-  public:
-    Vector3R vertex;
-    Vector3R normal;
+using namespace std;
+using namespace cb;
+using namespace CAMotics;
 
-    Edge() {}
-    Edge(const Vector3R &vertex, const Vector3R &normal) :
-      vertex(vertex), normal(normal) {}
-  };
+
+VertexSlice::VertexSlice(const Rectangle2R &bbox, real maxStep, real z) :
+  bbox(bbox), z(z) {
+  // Compute steps and step
+  steps = (bbox.getDimensions() / maxStep).ceil();
+  step = bbox.getDimensions() / steps;
 }
 
-#endif // CAMOTICS_EDGE_H
 
+void VertexSlice::compute(FieldFunction &func) {
+  // Allocate space
+  resize(steps.x() + 1, vector<bool>(steps.y() + 1, false));
+
+  Vector3R p = Vector3R(0, 0, z);
+
+  for (unsigned x = 0; x <= steps.x(); x++) {
+    p.x() = bbox.rmin.x() + step.x() * x;
+
+    for (unsigned y = 0; y <= steps.y(); y++) {
+      p.y() = bbox.rmin.y() + step.y() * y;
+
+      at(x).at(y) = func.contains(p);
+    }
+  }
+}

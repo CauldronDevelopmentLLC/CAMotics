@@ -46,7 +46,7 @@ void SettingsDialog::exec(Project &project) {
 
   ui->resolutionDoubleSpinBox->setValue(project.getResolution());
   ui->resolutionComboBox->setCurrentIndex(project.getResolutionMode());
-  ui->renderModeComboBox->setCurrentIndex(project.getRenderMode() - 1);
+  ui->renderModeComboBox->setCurrentIndex(project.getRenderMode());
   ui->unitsComboBox->setCurrentIndex(project.getUnits());
 
   Settings settings;
@@ -69,7 +69,7 @@ void SettingsDialog::exec(Project &project) {
   int index = ui->resolutionComboBox->currentIndex();
   project.setResolutionMode((ResolutionMode::enum_t)index);
 
-  index = ui->renderModeComboBox->currentIndex() + 1;
+  index = ui->renderModeComboBox->currentIndex();
   project.setRenderMode((RenderMode::enum_t)index);
 
   ToolUnits units = (ToolUnits::enum_t)ui->unitsComboBox->currentIndex();

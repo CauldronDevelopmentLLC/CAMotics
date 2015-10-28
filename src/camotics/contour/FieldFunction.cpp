@@ -27,21 +27,49 @@ using namespace cb;
 using namespace CAMotics;
 
 
-Vector3R FieldFunction::getEdgeIntersect(const Vector3R &v1, bool inside1,
-                                         const Vector3R &v2, bool inside2) {
-  if (inside1 == inside2)
-    THROWS("There is no intersection between points " << v1 << " & " << v2);
+Vector3R FieldFunction::linearIntersect(Vector3R &a, bool aInside,
+                                        Vector3R &b, bool bInside) {
+  if (aInside == bInside)
+    THROWS("There is no intersection between points " << a << " & " << b);
 
-  Vector3R a = v1;
-  Vector3R b = v2;
   Vector3R mid;
 
   // Binary search for intersection point
   for (unsigned i = 0; i < 8; i++) {
     mid = a + (b - a) * 0.5;
-    if (contains(mid) == inside1) a = mid;
+    if (contains(mid) == aInside) a = mid;
     else b = mid;
   }
 
   return mid;
+}
+
+
+Vector3R FieldFunction::findNormal(Vector3R &a, bool aInside,
+                                   Vector3R &b, bool bInside) {
+  Vector3R normal;
+
+  // TODO
+
+  return normal;
+}
+
+
+Vector3R FieldFunction::getEdgeIntersect(const Vector3R &v1, bool inside1,
+                                         const Vector3R &v2, bool inside2) {
+  Vector3R a = v1;
+  Vector3R b = v2;
+  return linearIntersect(a, inside1, b, inside2);
+}
+
+
+Edge FieldFunction::getEdge(const Vector3R &v1, bool inside1,
+                            const Vector3R &v2, bool inside2) {
+  Vector3R a = v1;
+  Vector3R b = v2;
+
+  Edge e;
+  e.vertex = linearIntersect(a, inside1, b, inside2);
+  e.normal = findNormal(a, inside1, b, inside2);
+  return e;
 }

@@ -71,7 +71,7 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
 
   // Increase bounds a little
   Rectangle3R bbox = cutWorkpiece.getBounds();
-  real off = 2 * resolution - 0.00001;
+  real off = resolution * 0.9;
   bbox = bbox.grow(Vector3R(off, off, off));
 
   // Divide work
