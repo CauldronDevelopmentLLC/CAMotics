@@ -31,7 +31,6 @@ namespace CAMotics {
     unsigned height;
     double zoom;
     bool axes;
-    bool bounds;
 
     cb::Vector3D rotationStartVec;
     cb::QuaternionD rotationStart;
@@ -53,10 +52,6 @@ namespace CAMotics {
     void toggleShowAxes() {axes = !axes;}
     void setShowAxes(bool x) {axes = x;}
     bool getShowAxes() const {return axes;}
-
-    void toggleShowBounds() {bounds = !bounds;}
-    void setShowBounds(bool x) {bounds = x;}
-    bool getShowBounds() const {return bounds;}
 
     void zoomIn();
     void zoomOut();

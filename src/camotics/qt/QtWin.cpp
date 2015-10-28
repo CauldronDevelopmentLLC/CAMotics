@@ -120,9 +120,6 @@ QtWin::QtWin(Application &app) :
   // Hide unfinished optimize
   ui->actionOptimize->setVisible(false);
 
-  // Disable view bounds
-  view->setShowBounds(false);
-
   // Load icons
   playIcon.addFile(QString::fromUtf8(":/icons/play.png"), QSize(),
                    QIcon::Normal, QIcon::Off);

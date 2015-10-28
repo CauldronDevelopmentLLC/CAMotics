@@ -75,18 +75,17 @@ void Viewer::draw(const View &view) {
   bounds.add(view.workpiece->getBounds());
   view.glDraw(bounds);
 
+  // Enable Lighting
+  view.setLighting(true);
+
   // Workpiece bounds
   if (!view.isFlagSet(View::SHOW_WORKPIECE_FLAG) &&
       view.isFlagSet(View::SHOW_WORKPIECE_BOUNDS_FLAG)) {
-    glEnable(GL_DEPTH_TEST);
     glLineWidth(1);
     glColor4f(1, 1, 1, 0.5); // White
 
     BoundsView(view.workpiece->getBounds()).draw();
   }
-
-  // Enable Lighting
-  view.setLighting(true);
 
   // Tool path
   if (view.isFlagSet(View::SHOW_PATH_FLAG)) view.path->draw();

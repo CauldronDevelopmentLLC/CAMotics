@@ -21,7 +21,6 @@
 #include "ViewPort.h"
 
 #include "GL.h"
-#include "BoundsView.h"
 
 #include <cbang/log/Logger.h>
 
@@ -30,8 +29,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ViewPort::ViewPort() :
-  width(1024), height(768), zoom(1), axes(true), bounds(true) {
+ViewPort::ViewPort() : width(1024), height(768), zoom(1), axes(true) {
   resetView();
 }
 
@@ -141,7 +139,6 @@ void ViewPort::glInit() const {
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_POINT_SMOOTH);
   glShadeModel(GL_SMOOTH);
-  glEnable(GL_LINE_STIPPLE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
 
@@ -211,18 +208,6 @@ void ViewPort::glDraw(const Rectangle3R &bbox) const {
         drawAxis(axis, up, length, radius);
 
     setLighting(false);
-  }
-  
-  // Bounds
-  if (bounds) {
-    glEnable(GL_LINE_STIPPLE);
-    glLineStipple(1, 0x5555);
-    glLineWidth(1);
-    glColor4f(1, 1, 1, 0.5); // White
-
-    BoundsView(bbox).draw();
-
-    glDisable(GL_LINE_STIPPLE);
   }
 }
 
