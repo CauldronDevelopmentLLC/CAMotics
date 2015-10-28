@@ -33,10 +33,10 @@ using namespace CAMotics;
 SettingsDialog::SettingsDialog() : ui(new Ui::SettingsDialog), changing(false) {
   ui->setupUi(this);
 
-  //#ifndef DEBUG
-  // Hide render mode controls
-  ui->advancedTab->setVisible(false);
-  //#endif
+#ifndef DEBUG
+  // Hide advanced controls
+  ui->tabWidget->removeTab(1);
+#endif
 
   ui->tabWidget->setCurrentIndex(0); // Select first tab
 }
