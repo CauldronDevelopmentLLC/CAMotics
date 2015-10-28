@@ -36,6 +36,7 @@ SettingsDialog::SettingsDialog() : ui(new Ui::SettingsDialog), changing(false) {
 #ifndef DEBUG
   // Hide advanced controls
   ui->tabWidget->removeTab(1);
+  ui->tabWidget->tabBar()->hide();
 #endif
 
   ui->tabWidget->setCurrentIndex(0); // Select first tab

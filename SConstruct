@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.0.6'
+version = '1.0.7'
 major, minor, revision = version.split('.')
 
 # Setup

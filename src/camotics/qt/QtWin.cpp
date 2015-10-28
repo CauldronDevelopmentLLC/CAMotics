@@ -574,7 +574,7 @@ void QtWin::reload(bool now) {
   ui->console->setTextColor(QColor("#d9d9d9"));
 
   try {
-    // Queue Tool Path task
+    // Queue tool path task
     taskMan.addTask(new ToolPathTask(*project));
     setStatusActive(true);
   } CATCH_ERROR;

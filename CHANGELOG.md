@@ -1,7 +1,10 @@
 # CAMotics Changelog
 
+## v1.0.7:
+
 ## v1.0.6:
  - 4.5x simulation speed up.
+ - Fix for missing tool paths in Windows 8.1 with Intel HD4000.
 
 ## v1.0.5:
  - Add option to disable VBOs to help with faulty graphics drivers.
