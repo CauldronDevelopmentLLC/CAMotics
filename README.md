@@ -1,6 +1,8 @@
+[![Build Status](https://travis-ci.org/CauldronDevelopmentLLC/CAMotics.svg?branch=master)](https://travis-ci.org/CauldronDevelopmentLLC/CAMotics)
+
 ![CAMotics Logo][1]
 
-CAMotics is an ​Open-Source software which can simulate 3-axis NC
+CAMotics is an Open-Source software which can simulate 3-axis NC
 machining. It is a fast, flexible and user friendly simulation
 software for the DIY and Open-Source community.  CAMotics works on
 Linux, OS-X and Windows.
