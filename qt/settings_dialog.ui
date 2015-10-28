@@ -19,9 +19,6 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <property name="tabBarAutoHide">
-      <bool>false</bool>
-     </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
        <string>General</string>
