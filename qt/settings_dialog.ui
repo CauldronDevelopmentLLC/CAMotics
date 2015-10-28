@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>363</width>
-    <height>279</height>
+    <width>336</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,10 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <property name="tabBarAutoHide">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="generalTab">
       <attribute name="title">
        <string>General</string>
       </attribute>
@@ -153,37 +156,6 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="renderModeLabel">
-              <property name="font">
-               <font>
-                <underline>true</underline>
-               </font>
-              </property>
-              <property name="text">
-               <string>Render Mode</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="renderModeComboBox">
-              <item>
-               <property name="text">
-                <string>Marching Cubes</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Old Marching Cubes</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Marching Tetrahedra</string>
-               </property>
-              </item>
-             </widget>
-            </item>
            </layout>
           </item>
          </layout>
@@ -303,7 +275,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="advancedTab">
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
@@ -323,6 +295,82 @@
        <property name="bottomMargin">
         <number>4</number>
        </property>
+       <item>
+        <widget class="QGroupBox" name="simulationGroupBox">
+         <property name="title">
+          <string>Simulation</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="renderModeLabel">
+              <property name="font">
+               <font>
+                <underline>true</underline>
+               </font>
+              </property>
+              <property name="text">
+               <string>Render mode</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="renderModeComboBox">
+              <item>
+               <property name="text">
+                <string>Marching Cubes</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Cubical Marching Squares</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Old Marching Cubes</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Marching Tetrahedra</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="aabbCheckBox">
+            <property name="text">
+             <string>Show AABB (Axis Aligned Bounding Box)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="aabbLeavesCheckBox">
+            <property name="text">
+             <string>Show AABB leaves only</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">

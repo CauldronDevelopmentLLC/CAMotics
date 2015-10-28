@@ -18,23 +18,18 @@
 
 \******************************************************************************/
 
-#ifndef CBANG_ENUM_EXPAND
-#ifndef CAMOTICS_RENDER_MODE_H
-#define CAMOTICS_RENDER_MODE_H
+#include "CubicalMarchingSquares.h"
 
-#define CBANG_ENUM_NAME RenderMode
-#define CBANG_ENUM_NAMESPACE CAMotics
-#define CBANG_ENUM_PATH camotics/render
-#include <cbang/enum/MakeEnumeration.def>
+using namespace CAMotics;
 
-#endif // CAMOTICS_RENDER_MODE_H
-#else // CBANG_ENUM_EXPAND
 
-// EDX Register
-CBANG_ENUM(MCUBES_MODE)
-CBANG_ENUM(CMS_MODE)
-CBANG_ENUM(OLD_MCUBES_MODE)
-CBANG_ENUM(MTETRA_MODE)
-CBANG_ENUM(DC_MODE)
+void CubicalMarchingSquares::doSlice(FieldFunction &func,
+                                     const CubeSlice &slice, unsigned z) {
+}
 
-#endif // CBANG_ENUM_EXPAND
+
+void CubicalMarchingSquares::doCell(const CubeSlice &slice, unsigned x,
+                                    unsigned y) {
+  //uint8_t index = slice.getEdges(x, y, edges);
+  //Vector3R vertices[3];
+}

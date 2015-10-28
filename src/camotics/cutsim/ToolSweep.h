@@ -53,8 +53,6 @@ namespace CAMotics {
     real getTime() const {return time;}
     void setTime(real time) {this->time = time;}
 
-    void drawBB() {AABBTree::draw();}
-
     // From FieldFunction
     bool contains(const Vector3R &p);
   };

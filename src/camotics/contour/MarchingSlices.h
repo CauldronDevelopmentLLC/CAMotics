@@ -21,18 +21,16 @@
 #ifndef CAMOTICS_MARCHING_SLICES_H
 #define CAMOTICS_MARCHING_SLICES_H
 
-#include "ContourGenerator.h"
-#include "TriangleSurface.h"
+#include "SliceContourGenerator.h"
 
 
 namespace CAMotics {
-  class MarchingSlices : public ContourGenerator {
-    cb::SmartPointer<TriangleSurface> surface;
+  class MarchingSlices : public SliceContourGenerator {
+    Edge edges[12];
 
   public:
-    // From ContourGenerator
-    cb::SmartPointer<Surface> getSurface() {return surface;}
-    void run(FieldFunction &func, const Rectangle3R &bbox, real step);
+    // From SliceContourGenerator
+    void doCell(const CubeSlice &slice, unsigned x, unsigned y);
   };
 }
 

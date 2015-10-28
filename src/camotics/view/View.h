@@ -35,6 +35,9 @@
 #include <vector>
 
 namespace CAMotics {
+  class AABBTree;
+
+
   class View : public ViewPort {
     ValueGroup values;
 
@@ -50,6 +53,7 @@ namespace CAMotics {
     cb::SmartPointer<ToolPathView> path;
     cb::SmartPointer<CuboidView> workpiece;
     cb::SmartPointer<Surface> surface;
+    cb::SmartPointer<AABBTree> aabbTree;
 
     enum {
       WIRE_FLAG                  = 1 << 0,
@@ -59,12 +63,14 @@ namespace CAMotics {
       SHOW_TOOL_FLAG             = 1 << 5,
       SHOW_SURFACE_FLAG          = 1 << 6,
       SHOW_BBTREE_FLAG           = 1 << 7,
-      PLAY_FLAG                  = 1 << 8,
-      PATH_VBOS_FLAG             = 1 << 9,
-      SURFACE_VBOS_FLAG          = 1 << 10,
+      BBTREE_LEAVES_FLAG         = 1 << 8,
+      PLAY_FLAG                  = 1 << 9,
+      PATH_VBOS_FLAG             = 1 << 10,
+      SURFACE_VBOS_FLAG          = 1 << 11,
     };
 
     View(ValueSet &valueSet);
+    ~View();
 
     bool isFlagSet(unsigned flag) const {return flags & flag;}
     void setFlag(unsigned flag, bool on = true)
@@ -81,9 +87,11 @@ namespace CAMotics {
     void setToolPath(const cb::SmartPointer<ToolPath> &toolPath);
     void setWorkpiece(const Rectangle3R &bounds);
     void setSurface(const cb::SmartPointer<Surface> &surface);
+    void setAABBTree(const cb::SmartPointer<AABBTree> &aabbTree);
     double getTime() const {return path.isNull() ? 0 : path->getTime();}
 
     bool update();
+    void clear();
   };
 }
 

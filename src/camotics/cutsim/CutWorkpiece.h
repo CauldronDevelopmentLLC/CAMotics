@@ -38,7 +38,7 @@ namespace CAMotics {
     uint64_t samples;
 
   public:
-    CutWorkpiece(cb::SmartPointer<ToolSweep> toolSweep,
+    CutWorkpiece(const cb::SmartPointer<ToolSweep> &toolSweep,
                  const Workpiece &workpiece);
 
     const cb::SmartPointer<ToolSweep> &getToolSweep() const {return toolSweep;}
@@ -49,8 +49,6 @@ namespace CAMotics {
 
     bool isValid() const;
     Rectangle3R getBounds() const;
-
-    void drawBB() {toolSweep->drawBB();}
 
     // From FieldFunction
     bool contains(const Vector3R &p);

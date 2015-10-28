@@ -120,10 +120,10 @@ uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
     {0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1},
   };
 
-  uint8_t index = 0;
+  uint8_t vertexFlags = 0;
   for (unsigned i = 0; i < 8; i++)
     if (!isInside(x, y, vOffset[i]))
-      index |= 1 << i;
+      vertexFlags |= 1 << i;
 
   // eOffset[] maps cube indices to the 12 edges and edge flags as laid out in
   // the marching cubes tables.
@@ -148,23 +148,11 @@ uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
     {0, 0, 2}, {1, 0, 2}, {1, 1, 2}, {0, 1, 2},
   };
 
-  static const int edgeConnection[12][2] = {
-    {0, 1}, {1, 2}, {2, 3}, {3, 0},
-    {4, 5}, {5, 6}, {6, 7}, {7, 4},
-    {0, 4}, {1, 5}, {2, 6}, {3, 7}
-  };
-
   for (unsigned i = 0; i < 12; i++)
-    if (!(index & (1 << edgeConnection[i][0])) !=
-        !(index & (1 << edgeConnection[i][1]))) {
-      edges[i] =
-        this->edges[eOffset[i][2]][x + eOffset[i][0]][y + eOffset[i][1]];
+    edges[i] =
+      this->edges[eOffset[i][2]][x + eOffset[i][0]][y + eOffset[i][1]];
 
-      //LOG_DEBUG(1, "i=" << i << " edge=" << edges[i].vertex << " x=" << x
-      //          << " y=" << y);
-    }
-
-  return index;
+  return vertexFlags;
 }
 
 

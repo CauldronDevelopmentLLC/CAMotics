@@ -117,14 +117,6 @@ namespace CAMotics {
     bool autoClose;
     std::string defaultExample;
 
-    typedef enum {
-      NULL_VIEW,
-      SIMULATION_VIEW,
-      TOOL_VIEW,
-      FILE_VIEW,
-    } ui_view_t;
-    ui_view_t currentUIView;
-
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
   public:
@@ -153,7 +145,6 @@ namespace CAMotics {
     void defaultLayout();
     void minimalLayout();
 
-    cb::SmartPointer<ViewPort> getCurrentViewPort() const;
     void snapView(char v);
 
     void glViewMousePressEvent(QMouseEvent *event);
@@ -233,9 +224,6 @@ namespace CAMotics {
     void showConsole();
     void hideConsole();
     void appendConsole(const std::string &line);
-
-    // Views
-    void setUIView(ui_view_t uiView);
 
     // Value Observers
     void updatePlaySpeed(const std::string &name, unsigned value);

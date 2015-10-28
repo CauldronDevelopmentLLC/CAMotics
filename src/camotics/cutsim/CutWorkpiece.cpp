@@ -27,7 +27,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-CutWorkpiece::CutWorkpiece(SmartPointer<ToolSweep> toolSweep,
+CutWorkpiece::CutWorkpiece(const SmartPointer<ToolSweep> &toolSweep,
                            const Workpiece &workpiece) :
   toolSweep(toolSweep), workpiece(workpiece), samples(0) {}
 

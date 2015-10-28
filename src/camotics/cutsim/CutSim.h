@@ -27,7 +27,6 @@ namespace cb {class Options;}
 
 
 namespace CAMotics {
-  class ToolTable;
   class ToolPath;
   class Surface;
   class Project;

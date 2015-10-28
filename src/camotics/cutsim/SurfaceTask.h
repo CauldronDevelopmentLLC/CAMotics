@@ -27,18 +27,23 @@
 
 
 namespace CAMotics {
+  class AABBTree;
+
   class SurfaceTask : public Task {
     unsigned threads;
     std::string filename;
     cb::SmartPointer<Simulation> sim;
     cb::SmartPointer<Surface> surface;
+    cb::SmartPointer<AABBTree> aabbTree;
 
   public:
     SurfaceTask(unsigned threads, const std::string &filename,
                 const cb::SmartPointer<Simulation> &sim) :
       threads(threads), filename(filename), sim(sim) {}
+    ~SurfaceTask();
 
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
+    const cb::SmartPointer<AABBTree> &getAABBTree() const {return aabbTree;}
 
     // From Task
     void run();

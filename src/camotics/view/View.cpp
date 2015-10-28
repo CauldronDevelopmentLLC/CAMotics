@@ -19,8 +19,9 @@
 \******************************************************************************/
 
 #include "View.h"
-
 #include "GL.h"
+
+#include <camotics/cutsim/AABBTree.h>
 
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
@@ -42,6 +43,9 @@ View::View(ValueSet &valueSet) :
   values.add("play_direction", reverse);
   values.add("view_flags", flags);
 }
+
+
+View::~View() {}
 
 
 void View::incSpeed() {
@@ -66,8 +70,13 @@ void View::setWorkpiece(const Rectangle3R &bounds) {
 }
 
 
-void View::setSurface(const cb::SmartPointer<Surface> &surface) {
+void View::setSurface(const SmartPointer<Surface> &surface) {
   this->surface = surface;
+}
+
+
+void View::setAABBTree(const SmartPointer<AABBTree> &aabbTree) {
+  this->aabbTree = aabbTree;
 }
 
 
@@ -100,4 +109,13 @@ bool View::update() {
   } else lastTime = 0;
 
   return false;
+}
+
+
+void View::clear() {
+  setToolPath(0);
+  setWorkpiece(Rectangle3R());
+  setSurface(0);
+  setAABBTree(0);
+  resetView();
 }

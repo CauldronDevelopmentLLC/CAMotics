@@ -18,23 +18,22 @@
 
 \******************************************************************************/
 
-#ifndef CBANG_ENUM_EXPAND
-#ifndef CAMOTICS_RENDER_MODE_H
-#define CAMOTICS_RENDER_MODE_H
+#ifndef CAMOTICS_CUBICAL_MARCHING_SQUARES_H
+#define CAMOTICS_CUBICAL_MARCHING_SQUARES_H
 
-#define CBANG_ENUM_NAME RenderMode
-#define CBANG_ENUM_NAMESPACE CAMotics
-#define CBANG_ENUM_PATH camotics/render
-#include <cbang/enum/MakeEnumeration.def>
+#include "SliceContourGenerator.h"
 
-#endif // CAMOTICS_RENDER_MODE_H
-#else // CBANG_ENUM_EXPAND
 
-// EDX Register
-CBANG_ENUM(MCUBES_MODE)
-CBANG_ENUM(CMS_MODE)
-CBANG_ENUM(OLD_MCUBES_MODE)
-CBANG_ENUM(MTETRA_MODE)
-CBANG_ENUM(DC_MODE)
+namespace CAMotics {
+  class CubicalMarchingSquares : public SliceContourGenerator {
+    Edge edges[12];
 
-#endif // CBANG_ENUM_EXPAND
+  public:
+    // From SliceContourGenerator
+    void doSlice(FieldFunction &func, const CubeSlice &slice, unsigned z);
+    void doCell(const CubeSlice &slice, unsigned x, unsigned y);
+  };
+}
+
+#endif // CAMOTICS_CUBICAL_MARCHING_SQUARES_H
+

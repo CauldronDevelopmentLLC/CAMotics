@@ -69,7 +69,7 @@ QtWin::QtWin(Application &app) :
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), lastRedraw(0), dirty(false),
   simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
-  autoPlay(false), autoClose(false), currentUIView(NULL_VIEW) {
+  autoPlay(false), autoClose(false) {
 
   ui->setupUi(this);
 
@@ -185,7 +185,7 @@ void QtWin::init() {
   hideConsole();
 
   // Init GUI
-  setUIView(SIMULATION_VIEW);
+  ui->fileTabManager->setCurrentIndex(0);
   updateActions();
 
   // Init Layout
@@ -392,57 +392,36 @@ void QtWin::minimalLayout() {
 }
 
 
-SmartPointer<ViewPort> QtWin::getCurrentViewPort() const {
-  switch (currentUIView) {
-  case SIMULATION_VIEW: return view;
-  default: return 0;
-  }
-}
-
-
 void QtWin::snapView(char v) {
-  SmartPointer<ViewPort> viewPort = getCurrentViewPort();
-  if (viewPort.isNull()) return;
-
-  viewPort->resetView(v);
-
+  view->resetView(v);
   redraw();
 }
 
 
 void QtWin::glViewMousePressEvent(QMouseEvent *event) {
-  SmartPointer<ViewPort> viewPort = getCurrentViewPort();
-  if (viewPort.isNull()) return;
-
   if (event->buttons() & Qt::LeftButton)
-    viewPort->startRotation(event->x(), event->y());
+    view->startRotation(event->x(), event->y());
 
   else if (event->buttons() & (Qt::RightButton | Qt::MidButton))
-    viewPort->startTranslation(event->x(), event->y());
+    view->startTranslation(event->x(), event->y());
 }
 
 
 void QtWin::glViewMouseMoveEvent(QMouseEvent *event) {
-  SmartPointer<ViewPort> viewPort = getCurrentViewPort();
-  if (viewPort.isNull()) return;
-
   if (event->buttons() & Qt::LeftButton) {
-    viewPort->updateRotation(event->x(), event->y());
+    view->updateRotation(event->x(), event->y());
     redraw(true);
 
   } else if (event->buttons() & (Qt::RightButton | Qt::MidButton)) {
-    viewPort->updateTranslation(event->x(), event->y());
+    view->updateTranslation(event->x(), event->y());
     redraw(true);
   }
 }
 
 
 void QtWin::glViewWheelEvent(QWheelEvent *event) {
-  SmartPointer<ViewPort> viewPort = getCurrentViewPort();
-  if (viewPort.isNull()) return;
-
-  if (event->delta() < 0) viewPort->zoomIn();
-  else viewPort->zoomOut();
+  if (event->delta() < 0) view->zoomIn();
+  else view->zoomOut();
 
   redraw(true);
 }
@@ -522,6 +501,7 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   // Load surface
   surface.release();
   view->setSurface(0);
+  view->setAABBTree(0);
   unsigned threads = options["threads"].toInteger();
   taskMan.addTask(new SurfaceTask(threads, project->getFilename(), sim));
 }
@@ -545,6 +525,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 void QtWin::surfaceComplete(SurfaceTask &task) {
   surface = task.getSurface();
   view->setSurface(surface);
+  view->setAABBTree(task.getAABBTree());
   view->setFlag(View::SURFACE_VBOS_FLAG,
                 Settings().get("Settings/VBO/Surface", true).toBool());
   redraw();
@@ -626,13 +607,8 @@ void QtWin::redraw(bool now) {
   if (now && 0.05 < Timer::now() - lastRedraw) {
     lastRedraw = Timer::now();
 
-    switch (currentUIView) {
-    case SIMULATION_VIEW:
-      updateWorkpieceBounds();
-      ui->simulationView->updateGL();
-      break;
-    default: break;
-    }
+    updateWorkpieceBounds();
+    ui->simulationView->updateGL();
 
     dirty = false;
 
@@ -740,10 +716,7 @@ void QtWin::loadProject() {
 
 
 void QtWin::resetProject() {
-  view->setToolPath(0);
-  view->setWorkpiece(Rectangle3R());
-  view->setSurface(0);
-  view->resetView();
+  view->clear();
 
   // Close editor tabs
   ui->fileTabManager->closeAll(false, true);
@@ -1320,29 +1293,6 @@ void QtWin::hideConsole() {
 }
 
 
-void QtWin::setUIView(ui_view_t uiView) {
-  if (uiView == currentUIView) return;
-  currentUIView = uiView;
-
-  // Select view widgets
-  switch (uiView) {
-  case SIMULATION_VIEW:
-    ui->fileTabManager->setCurrentIndex(0);
-    break;
-
-  case TOOL_VIEW: {
-    ui->fileTabManager->setCurrentIndex(1);
-    updateToolTables();
-    break;
-  }
-
-  default: break;
-  }
-
-  redraw(true);
-}
-
-
 void QtWin::updatePlaySpeed(const string &name, unsigned value) {
   // TODO
   //ui->playbackSpeedLabel->setText(QString().sprintf("%dx", view->speed));
@@ -1543,12 +1493,7 @@ void QtWin::animate() {
 
 
 void QtWin::on_fileTabManager_currentChanged(int index) {
-  switch (index) {
-  case 0: setUIView(SIMULATION_VIEW); break;
-  case 1: setUIView(TOOL_VIEW); break;
-  default: setUIView(FILE_VIEW); break;
-  }
-
+  redraw();
   updateActions();
 }
 
@@ -1780,7 +1725,7 @@ void QtWin::on_actionRevertFile_triggered() {
 
 
 void QtWin::on_actionSettings_triggered() {
-  if (!project.isNull()) settingsDialog.exec(*project);
+  if (!project.isNull()) settingsDialog.exec(*project, *view);
   updateUnits();
 }
 

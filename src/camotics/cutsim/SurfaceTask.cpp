@@ -37,6 +37,9 @@ using namespace cb;
 using namespace CAMotics;
 
 
+SurfaceTask::~SurfaceTask() {}
+
+
 void SurfaceTask::run() {
   // Check for cached STL file
   try {
@@ -69,7 +72,9 @@ void SurfaceTask::run() {
   // Compute surface
   if (surface.isNull()) {
     // Setup cut simulation
-    CutWorkpiece cutWP(new ToolSweep(sim->path, sim->time), sim->workpiece);
+    SmartPointer<ToolSweep> sweep = new ToolSweep(sim->path, sim->time);
+    CutWorkpiece cutWP(sweep, sim->workpiece);
+    aabbTree = sweep; // Save for later viewing
 
     // Render
     Renderer renderer(SmartPointer<Task>::Phony(this));

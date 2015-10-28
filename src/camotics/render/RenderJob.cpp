@@ -23,7 +23,7 @@
 #include <camotics/contour/MarchingCubes.h>
 #include <camotics/contour/MarchingSlices.h>
 #include <camotics/contour/DualContouring.h>
-#include <camotics/contour/HermiteData.h>
+#include <camotics/contour/CubicalMarchingSquares.h>
 
 #include <cbang/Exception.h>
 #include <cbang/time/Timer.h>
@@ -38,10 +38,10 @@ RenderJob::RenderJob(FieldFunction &func, RenderMode mode,
   func(func), resolution(resolution), bbox(bbox) {
   switch (mode) {
   case RenderMode::MCUBES_MODE: generator = new MarchingSlices; break;
+  case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
   case RenderMode::OLD_MCUBES_MODE: generator = new MarchingCubes(false); break;
   case RenderMode::MTETRA_MODE: generator = new MarchingCubes(true); break;
   case RenderMode::DC_MODE: generator = new DualContouring; break;
-  case RenderMode::HERMITE_MODE: generator = new HermiteData; break;
   default: THROWS("Invalid or unsupported render mode " << mode);
   }
 }

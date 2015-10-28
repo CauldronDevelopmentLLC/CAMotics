@@ -34,7 +34,6 @@ namespace cb {namespace JSON {class Sink;}}
 
 
 namespace CAMotics {
-  class ToolTable;
   class ToolPath;
   class Workpiece;
 

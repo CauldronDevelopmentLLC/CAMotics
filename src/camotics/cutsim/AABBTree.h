@@ -37,7 +37,7 @@ namespace CAMotics {
 
   public:
     AABBTree(AABB *nodes = 0);
-    ~AABBTree();
+    virtual ~AABBTree();
 
     void partition(AABB *nodes);
 

@@ -22,6 +22,7 @@
 #define CAMOTICS_SETTINGS_DIALOG_H
 
 #include <camotics/cutsim/Project.h>
+#include <camotics/view/View.h>
 
 #include <cbang/SmartPointer.h>
 
@@ -44,7 +45,7 @@ namespace CAMotics {
   public:
     SettingsDialog();
 
-    void exec(Project &project);
+    void exec(Project &project, View &view);
 
   protected slots:
     void on_resolutionComboBox_currentIndexChanged(int index);

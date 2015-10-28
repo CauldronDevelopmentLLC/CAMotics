@@ -18,23 +18,29 @@
 
 \******************************************************************************/
 
-#ifndef CBANG_ENUM_EXPAND
-#ifndef CAMOTICS_RENDER_MODE_H
-#define CAMOTICS_RENDER_MODE_H
+#ifndef CAMOTICS_SLICE_CONTOUR_GENERATOR_H
+#define CAMOTICS_SLICE_CONTOUR_GENERATOR_H
 
-#define CBANG_ENUM_NAME RenderMode
-#define CBANG_ENUM_NAMESPACE CAMotics
-#define CBANG_ENUM_PATH camotics/render
-#include <cbang/enum/MakeEnumeration.def>
+#include "ContourGenerator.h"
+#include "TriangleSurface.h"
+#include "CubeSlice.h"
 
-#endif // CAMOTICS_RENDER_MODE_H
-#else // CBANG_ENUM_EXPAND
 
-// EDX Register
-CBANG_ENUM(MCUBES_MODE)
-CBANG_ENUM(CMS_MODE)
-CBANG_ENUM(OLD_MCUBES_MODE)
-CBANG_ENUM(MTETRA_MODE)
-CBANG_ENUM(DC_MODE)
+namespace CAMotics {
+  class SliceContourGenerator : public ContourGenerator {
+  protected:
+    cb::SmartPointer<TriangleSurface> surface;
 
-#endif // CBANG_ENUM_EXPAND
+  public:
+    virtual void doSlice(FieldFunction &func, const CubeSlice &slice,
+                         unsigned z) {}
+    virtual void doCell(const CubeSlice &slice, unsigned x, unsigned y) = 0;
+
+    // From ContourGenerator
+    cb::SmartPointer<Surface> getSurface() {return surface;}
+    void run(FieldFunction &func, const Rectangle3R &bbox, real step);
+  };
+}
+
+#endif // CAMOTICS_SLICE_CONTOUR_GENERATOR_H
+

@@ -23,6 +23,7 @@
 #include "ToolPathTask.h"
 #include "SurfaceTask.h"
 #include "ReduceTask.h"
+#include "AABBTree.h"
 
 #include <cbang/config/Options.h>
 #include <cbang/os/SystemInfo.h>

@@ -33,27 +33,32 @@ using namespace CAMotics;
 SettingsDialog::SettingsDialog() : ui(new Ui::SettingsDialog), changing(false) {
   ui->setupUi(this);
 
-#ifndef DEBUG
+  //#ifndef DEBUG
   // Hide render mode controls
-  ui->renderModeLabel->setVisible(false);
-  ui->renderModeComboBox->setVisible(false);
-#endif
+  ui->advancedTab->setVisible(false);
+  //#endif
+
+  ui->tabWidget->setCurrentIndex(0); // Select first tab
 }
 
 
-void SettingsDialog::exec(Project &project) {
+void SettingsDialog::exec(Project &project, View &view) {
+  Settings settings;
+
   bounds = project.getWorkpieceBounds();
 
   ui->resolutionDoubleSpinBox->setValue(project.getResolution());
   ui->resolutionComboBox->setCurrentIndex(project.getResolutionMode());
-  ui->renderModeComboBox->setCurrentIndex(project.getRenderMode());
   ui->unitsComboBox->setCurrentIndex(project.getUnits());
-
-  Settings settings;
 
   ui->defaultUnitsComboBox->
     setCurrentIndex(settings.get("Settings/Units",
                                  ToolUnits::UNITS_MM).toInt());
+
+  ui->renderModeComboBox->setCurrentIndex(project.getRenderMode());
+  ui->aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
+  ui->aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
+
   ui->surfaceVBOsCheckBox->
     setChecked(settings.get("Settings/VBO/Surface", true).toBool());
   ui->pathVBOsCheckBox->
@@ -69,13 +74,16 @@ void SettingsDialog::exec(Project &project) {
   int index = ui->resolutionComboBox->currentIndex();
   project.setResolutionMode((ResolutionMode::enum_t)index);
 
+  ToolUnits units = (ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
+  project.setUnits(units);
+  settings.set("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
+
   index = ui->renderModeComboBox->currentIndex();
   project.setRenderMode((RenderMode::enum_t)index);
 
-  ToolUnits units = (ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
-  project.setUnits(units);
+  view.setFlag(View::SHOW_BBTREE_FLAG, ui->aabbCheckBox->isChecked());
+  view.setFlag(View::BBTREE_LEAVES_FLAG, ui->aabbLeavesCheckBox->isChecked());
 
-  settings.set("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
   settings.set("Settings/VBO/Surface", ui->surfaceVBOsCheckBox->isChecked());
   settings.set("Settings/VBO/Path", ui->pathVBOsCheckBox->isChecked());
 }
