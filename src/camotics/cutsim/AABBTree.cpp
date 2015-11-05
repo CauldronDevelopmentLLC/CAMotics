@@ -46,11 +46,6 @@ Rectangle3R AABBTree::getBounds() const {
 }
 
 
-bool AABBTree::intersects(const Rectangle3R &bbox) const {
-  return root ? root->intersects(bbox) : false;
-}
-
-
 void AABBTree::collisions(const Vector3R &p, real time,
                           vector<const Move *> &moves) {
   if (root) root->collisions(p, time, moves);

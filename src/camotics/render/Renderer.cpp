@@ -22,6 +22,7 @@
 
 #include "RenderJob.h"
 
+#include <camotics/Grid.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 #include <camotics/contour/CompositeSurface.h>
 
@@ -35,49 +36,22 @@ using namespace cb;
 using namespace CAMotics;
 
 
-static void boxSplit(vector<Rectangle3R> &boxes, Rectangle3R box,
-                     unsigned count) {
-  if (count < 2) {
-    boxes.push_back(box);
-    return;
-  }
-
-  Rectangle3R left(box);
-  Rectangle3R right(box);
-
-  // Split on largest dimension (reduces overlap)
-  if (box.getLength() <= box.getWidth() && box.getHeight() <= box.getWidth())
-    right.rmin.x() = left.rmax.x() = (box.rmin.x() + box.rmax.x()) / 2;
-
-  else if (box.getWidth() <= box.getLength() &&
-           box.getHeight() <= box.getLength())
-    right.rmin.y() = left.rmax.y() = (box.rmin.y() + box.rmax.y()) / 2;
-
-  else right.rmin.z() = left.rmax.z() = (box.rmin.z() + box.rmax.z()) / 2;
-
-  boxSplit(boxes, left, count / 2);
-  boxSplit(boxes, right, count / 2);
-}
-
-
 cb::SmartPointer<Surface>
 Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
                  double resolution, RenderMode mode) {
   // Setup
   task->begin();
 
-  cutWorkpiece.clearSampleCount();
-  cutWorkpiece.getToolSweep()->clearHitTests();
-
   // Increase bounds a little
   Rectangle3R bbox = cutWorkpiece.getBounds();
-  real off = resolution * 0.9;
+  real off = resolution * 0.90;
   bbox = bbox.grow(Vector3R(off, off, off));
 
   // Divide work
-  vector<Rectangle3R> jobBoxes;
-  boxSplit(jobBoxes, bbox, 4 * threads);
+  vector<Grid> jobBoxes;
+  Grid(bbox, resolution).partition(jobBoxes, threads * 4);
   unsigned totalJobCount = jobBoxes.size();
+  LOG_DEBUG(1, "Partitioned in to " << totalJobCount << " jobs");
 
   LOG_INFO(1, "Computing surface bounded by " << bbox << " at "
            << resolution << " grid resolution");
@@ -91,13 +65,11 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
 
     // Start new jobs
     while (!jobBoxes.empty() && jobs.size() < threads) {
-      Rectangle3R jobBox = jobBoxes.back();
-      jobBoxes.pop_back();
-
       SmartPointer<RenderJob> job =
-        new RenderJob(cutWorkpiece, mode, resolution, jobBox);
+        new RenderJob(cutWorkpiece, mode, jobBoxes.back());
       job->start();
       jobs.push_back(job);
+      jobBoxes.pop_back();
     }
 
 

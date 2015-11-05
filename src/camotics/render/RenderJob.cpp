@@ -33,9 +33,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-RenderJob::RenderJob(FieldFunction &func, RenderMode mode,
-                     real resolution, const Rectangle3R &bbox) :
-  func(func), resolution(resolution), bbox(bbox) {
+RenderJob::RenderJob(FieldFunction &func, RenderMode mode, const Grid &grid) :
+  func(func), grid(grid) {
   switch (mode) {
   case RenderMode::MCUBES_MODE: generator = new MarchingSlices; break;
   case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
@@ -49,7 +48,7 @@ RenderJob::RenderJob(FieldFunction &func, RenderMode mode,
 
 void RenderJob::run() {
   try {
-    generator->run(func, bbox, resolution);
+    generator->run(func, grid);
   } CATCH_WARNING;
 }
 

@@ -44,12 +44,14 @@ extern const int tetrahedronEdgeConnection[6][2];
 extern const int tetrahedronEdgeFlags[16];
 
 
-void MarchingCubes::run(FieldFunction &func, const Rectangle3R &bbox,
-                        real step) {
+void MarchingCubes::run(FieldFunction &func, const Grid &grid) {
   surface = new TriangleSurface;
 
+  // TODO fix this
+  Rectangle3R bbox = grid;
+
   // Compute steps
-  Vector3U steps = bbox.getDimensions() / step;
+  Vector3U steps = grid.getSteps();
   for (int i = 0; i < 3; i++) if (steps[i] < 2) steps[i] = 2;
 
   // Compute scaling
@@ -79,12 +81,6 @@ void MarchingCubes::march(FieldFunction &func, const Vector3R &p,
     updateProgress((double)completedCells / totalCells);
 
   } else {
-    // Cull empty boxes
-    if (4 < steps[0] + steps[1] + steps[2]) {
-      Vector3R max = p + Vector3R(steps[0], steps[1], steps[2]) * scale;
-      if (func.canCull(Rectangle3R(p, max))) return;
-    }
-
     // Find largest dimension
     unsigned maxDim = steps.findLargest();
 

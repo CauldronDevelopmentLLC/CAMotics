@@ -48,9 +48,12 @@ static const int quadOffsets[16][3][3] = {
 };
 
 
-void DualContouring::run(FieldFunction &func, const Rectangle3R &bbox,
-                         real step) {
+void DualContouring::run(FieldFunction &func, const Grid &grid) {
   surface = new TriangleSurface;
+
+  // TODO fix this
+  Rectangle3R bbox = grid;
+  real step = grid.getResolution();
 
   Vector3R dims = bbox.getDimensions();
   unsigned slices = (bbox.getHeight() + 1) / step;

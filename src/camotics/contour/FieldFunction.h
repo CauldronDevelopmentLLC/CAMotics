@@ -41,7 +41,6 @@ namespace CAMotics {
                                       const Vector3R &v2, bool inside2);
     virtual Edge getEdge(const Vector3R &v1, bool inside1,
                          const Vector3R &v2, bool inside2);
-    virtual bool canCull(const Rectangle3R &bbox) {return false;}
   };
 }
 

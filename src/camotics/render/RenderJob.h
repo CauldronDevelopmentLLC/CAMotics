@@ -35,12 +35,10 @@ namespace CAMotics {
     cb::SmartPointer<ContourGenerator> generator;
 
     FieldFunction &func;
-    real resolution;
-    Rectangle3R bbox;
+    Grid grid;
 
   public:
-    RenderJob(FieldFunction &func, RenderMode mode, real resolution,
-              const Rectangle3R &bbox);
+    RenderJob(FieldFunction &func, RenderMode mode, const Grid &grid);
 
     cb::SmartPointer<Surface> getSurface() const
     {return generator->getSurface();}

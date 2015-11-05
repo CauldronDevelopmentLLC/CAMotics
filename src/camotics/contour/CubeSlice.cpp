@@ -23,54 +23,48 @@
 #include <cbang/log/Logger.h>
 
 using namespace std;
+using namespace cb;
 using namespace CAMotics;
 
 
-CubeSlice::CubeSlice(const Rectangle3R &bbox, real maxStep) :
-  bbox(bbox), maxStep(maxStep), shifted(false) {
-
-  // Compute steps and step
-  Rectangle2R bbox2 = bbox.slice<2>();
-  steps = (bbox2.getDimensions() / maxStep).ceil();
-  step = bbox2.getDimensions() / steps;
-}
+CubeSlice::CubeSlice(const Grid &grid) : grid(grid), z(0), shifted(false) {}
 
 
 void CubeSlice::compute(FieldFunction &func) {
   // Vertices
   if (!shifted) {
-    left = new VertexSlice(bbox.slice<2>(), maxStep, bbox.getMin().z());
+    left = new VertexSlice(grid, z);
     left->compute(func);
   }
 
-  right = new VertexSlice(bbox.slice<2>(), maxStep, bbox.getMax().z());
+  right = new VertexSlice(grid, z + 1);
   right->compute(func);
 
   // Edges
+  const Vector3U &steps = grid.getSteps();
   for (unsigned i = 0; i < 5; i++)
     edges[i].resize(steps.x() + 1, vector<Edge>(steps.y() + 1));
 
-  Vector3R p = bbox.rmin;
-  static int vIndex[5][3] = {
-    {1, 0, 0}, // a
-    {0, 1, 0}, // b
-    {0, 0, 1}, // c
-    {1, 0, 1}, // d
-    {0, 1, 1}, // e
+  static Vector3U vIndex[5] = {
+    Vector3U(1, 0, 0), // a
+    Vector3U(0, 1, 0), // b
+    Vector3U(0, 0, 1), // c
+    Vector3U(1, 0, 1), // d
+    Vector3U(0, 1, 1), // e
   };
-  Vector3R offset(step.x(), step.y(), bbox.getDimensions().z());
 
+  double resolution = grid.getResolution();
   Vector3R offsets[5];
   for (unsigned i = 0; i < 5; i++)
-    offsets[i] = offset *
-      Vector3R(vIndex[i][0], vIndex[i][1], vIndex[i][2]);
+    offsets[i] = (Vector3D)vIndex[i] * resolution;
 
   // For each cell
+  Vector3R p(0, 0, grid.rmin.z() + resolution * z);
   for (unsigned x = 0; x <= steps.x(); x++) {
-    p.x() = bbox.rmin.x() + step.x() * x;
+    p.x() = grid.rmin.x() + resolution * x;
 
     for (unsigned y = 0; y <= steps.y(); y++) {
-      p.y() = bbox.rmin.y() + step.y() * y;
+      p.y() = grid.rmin.y() + resolution * y;
 
       Vector3R a = p;
       bool aInside = left->isInside(x, y);
@@ -95,7 +89,7 @@ void CubeSlice::compute(FieldFunction &func) {
 }
 
 
-void CubeSlice::shiftZ(real z) {
+void CubeSlice::shift() {
   // Vertices
   left = right;
   right.release();
@@ -104,20 +98,16 @@ void CubeSlice::shiftZ(real z) {
   edges[0] = edges[3];
   edges[1] = edges[4];
 
-  // Bounds
-  real deltaZ = bbox.getDimensions().z();
-  bbox.rmin.z() = z;
-  bbox.rmax.z() = z + deltaZ;
-
+  z++;
   shifted = true;
 }
 
 
 uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
   // This table maps vertices to the index needed for the marching cubes table.
-  static int vOffset[8][3] = {
-    {0, 0, 0}, {1, 0, 0}, {1, 1, 0}, {0, 1, 0},
-    {0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1},
+  static const Vector3U vOffset[8] = {
+    Vector3U(0, 0, 0), Vector3U(1, 0, 0), Vector3U(1, 1, 0), Vector3U(0, 1, 0),
+    Vector3U(0, 0, 1), Vector3U(1, 0, 1), Vector3U(1, 1, 1), Vector3U(0, 1, 1),
   };
 
   uint8_t vertexFlags = 0;
@@ -156,6 +146,6 @@ uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
 }
 
 
-bool CubeSlice::isInside(int x, int y, int offset[3]) const {
-  return (offset[2] ? right : left)->isInside(x + offset[0], y + offset[1]);
+bool CubeSlice::isInside(int x, int y, const Vector3U &offset) const {
+  return (offset[2] ? right : left)->isInside(x + offset.x(), y + offset.y());
 }

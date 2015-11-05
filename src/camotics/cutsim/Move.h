@@ -70,7 +70,7 @@ namespace CAMotics {
 
     Color getColor() const;
 
-    Vector3R getEndPtAtTime(real time) const;
+    Vector3R getPtAtTime(real time) const;
 
     void print(std::ostream &stream) const;
   };

@@ -24,29 +24,25 @@
 #include "FieldFunction.h"
 
 #include <camotics/Geom.h>
+#include <camotics/Grid.h>
 
 #include <vector>
 
 
 namespace CAMotics {
   class VertexSlice : public std::vector<std::vector<bool> > {
-    Rectangle2R bbox;
-    real z;
-
-    cb::Vector2U steps;
-    Vector2R step;
+    Grid grid;
+    unsigned z;
 
   public:
-    VertexSlice(const Rectangle2R &bbox, real maxStep, real z);
+    VertexSlice(const Grid &grid, unsigned z);
 
     bool isInside(unsigned x, unsigned y) const {return at(x).at(y);}
 
     void compute(FieldFunction &func);
 
-    const Rectangle2R &getBounds() const {return bbox;}
-    const cb::Vector2U &getSteps() const {return steps;}
-    const Vector2R &getStep() const {return step;}
-    real getZ() const {return z;}
+    const Grid &getGrid() const {return grid;}
+    unsigned getZ() const {return z;}
   };
 }
 

@@ -18,42 +18,34 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CUBE_SLICE_H
-#define CAMOTICS_CUBE_SLICE_H
+#ifndef CAMOTICS_GRID_H
+#define CAMOTICS_GRID_H
 
-#include "VertexSlice.h"
-#include "FieldFunction.h"
+#include "Geom.h"
 
-#include <camotics/Grid.h>
-
-#include <cbang/SmartPointer.h>
-#include <cbang/StdTypes.h>
+#include <vector>
 
 
 namespace CAMotics {
-  class CubeSlice {
-    Grid grid;
-    unsigned z;
-
-    cb::SmartPointer<VertexSlice> left;
-    cb::SmartPointer<VertexSlice> right;
-    std::vector<std::vector<Edge> > edges[5];
-
-    bool shifted;
+  class Grid : public cb::Rectangle3D {
+    double resolution;
+    cb::Vector3U steps;
 
   public:
-    CubeSlice(const Grid &grid);
+    Grid(const cb::Rectangle3D &bounds, double resolution);
+    Grid(const cb::Vector3D &rmin, const cb::Vector3U &steps,
+         double resolution);
 
-    const Grid getGrid() const {return grid;}
+    double getResolution() const {return resolution;}
+    const cb::Vector3U getSteps() const {return steps;}
+    unsigned getTotalCells() const;
 
-    void compute(FieldFunction &func);
-    void shift();
-    uint8_t getEdges(unsigned x, unsigned y, Edge edges[12]) const;
+    Grid slice(const cb::Vector3U &start) const;
+    Grid slice(const cb::Vector3U &start, const cb::Vector3U &end) const;
 
-  protected:
-    bool isInside(int x, int y, const cb::Vector3U &offset) const;
+    void partition(std::vector<Grid> &grids, unsigned count) const;
   };
 }
 
-#endif // CAMOTICS_CUBE_SLICE_H
+#endif // CAMOTICS_GRID_H
 

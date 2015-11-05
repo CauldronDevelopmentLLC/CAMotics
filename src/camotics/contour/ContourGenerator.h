@@ -25,6 +25,7 @@
 #include "FieldFunction.h"
 
 #include <camotics/Task.h>
+#include <camotics/Grid.h>
 
 #include <cbang/SmartPointer.h>
 #include <cbang/os/Mutex.h>
@@ -41,8 +42,7 @@ namespace CAMotics {
     void updateProgress(double progress);
 
     virtual cb::SmartPointer<Surface> getSurface() = 0;
-    virtual void run(FieldFunction &func, const Rectangle3R &bbox,
-                     real resolution) = 0;
+    virtual void run(FieldFunction &func, const Grid &grid) = 0;
   };
 }
 

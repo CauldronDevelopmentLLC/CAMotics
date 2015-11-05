@@ -33,6 +33,30 @@ using namespace CAMotics;
 ToolPath::~ToolPath() {}
 
 
+int ToolPath::find(real time, unsigned first, unsigned last) const {
+  // Base case, empty list
+  if (first == last) return -1;
+
+  // Base case, one item
+  if (first == last - 1) {
+    if (at(first).getStartTime() <= time && time <= at(first).getEndTime())
+      return first;
+
+    return -1;
+  }
+
+  // Recur
+  unsigned mid = (first + last) / 2;
+  if (time < at(mid).getStartTime()) return find(time, first, mid);
+  return find(time, mid, last);
+}
+
+
+int ToolPath::find(real time) const {
+  return find(time, 0, size());
+}
+
+
 void ToolPath::write(JSON::Sink &sink) const {
   Axes lastPos(numeric_limits<double>::infinity());
   MoveType type = (MoveType::enum_t)-1;

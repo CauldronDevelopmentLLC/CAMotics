@@ -47,6 +47,9 @@ namespace CAMotics {
     const ToolTable &getTools() const {return tools;}
     ToolTable &getTools() {return tools;}
 
+    int find(real time, unsigned first, unsigned last) const;
+    int find(real time) const;
+
     void print() const {}
     void write(cb::JSON::Sink &sink) const;
 

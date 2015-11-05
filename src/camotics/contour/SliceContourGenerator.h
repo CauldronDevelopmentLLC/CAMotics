@@ -38,7 +38,7 @@ namespace CAMotics {
 
     // From ContourGenerator
     cb::SmartPointer<Surface> getSurface() {return surface;}
-    void run(FieldFunction &func, const Rectangle3R &bbox, real step);
+    void run(FieldFunction &func, const Grid &grid);
   };
 }
 

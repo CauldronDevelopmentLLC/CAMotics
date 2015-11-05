@@ -178,7 +178,7 @@ void ToolPathView::update() {
         double time = ratio * totalTime;
         if (time < currentTime + moveTime) {
           double delta = time - currentTime;
-          end = move.getEndPtAtTime(time);
+          end = move.getPtAtTime(time);
           moveDistance *= delta / moveTime;
           moveTime = delta;
           partial = true;

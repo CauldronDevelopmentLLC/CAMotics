@@ -29,7 +29,7 @@ using namespace CAMotics;
 
 CutWorkpiece::CutWorkpiece(const SmartPointer<ToolSweep> &toolSweep,
                            const Workpiece &workpiece) :
-  toolSweep(toolSweep), workpiece(workpiece), samples(0) {}
+  toolSweep(toolSweep), workpiece(workpiece) {}
 
 
 bool CutWorkpiece::isValid() const {
@@ -50,16 +50,6 @@ Rectangle3R CutWorkpiece::getBounds() const {
   if (workpiece.isValid()) bb = workpiece.getBounds();
   else if (!toolSweep.isNull()) bb = toolSweep->getBounds();
   return bb;
-}
-
-
-bool CutWorkpiece::canCull(const Rectangle3R &bbox) {
-  if (!workpiece.isValid()) return !toolSweep->intersects(bbox);
-
-  if (!workpiece.intersects(bbox)) return true;
-
-  return workpiece.getBounds().shrink(Vector3R(0.00001)).contains(bbox) &&
-    !toolSweep->intersects(bbox);
 }
 
 

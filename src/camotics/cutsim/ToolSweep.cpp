@@ -26,14 +26,15 @@
 
 #include <cbang/log/Logger.h>
 
+#include <algorithm>
+
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
 ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
-  path(path), hitTests(0),
-  time(time ? time : std::numeric_limits<real>::max()) {
+  path(path), time(time ? time : std::numeric_limits<real>::max()) {
   ToolTable &tools = path->getTools();
   vector<Rectangle3R> bboxes;
   AABB *nodes = 0;
@@ -61,6 +62,29 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
 
   LOG_INFO(3, "AABBTree boxes=" << boxes << " leaves=" << getLeafCount()
            << " height=" << getHeight());
+}
+
+
+void ToolSweep::getChangeBounds(vector<Rectangle3R> &bboxes, real startTime,
+                                real endTime) const {
+  if (endTime < startTime) swap(startTime, endTime);
+  int firstMove = path->find(startTime);
+  int lastMove = path->find(endTime);
+
+  if (firstMove == -1) return;
+  if (lastMove == -1) lastMove = path->size() - 1;
+
+  for (int i = firstMove; i <= lastMove; i++) {
+    const Move &move = path->at(i);
+    unsigned tool = move.getTool();
+
+    Vector3R startPt =
+      i == firstMove ? move.getPtAtTime(startTime) : move.getStartPt();
+    Vector3R endPt =
+      i == lastMove ? move.getPtAtTime(endTime) : move.getEndPt();
+
+    sweeps[tool]->getBBoxes(startPt, endPt, bboxes);
+  }
 }
 
 

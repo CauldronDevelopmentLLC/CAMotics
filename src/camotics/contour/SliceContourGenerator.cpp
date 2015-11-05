@@ -24,25 +24,19 @@ using namespace cb;
 using namespace CAMotics;
 
 
-void SliceContourGenerator::run(FieldFunction &func, const Rectangle3R &bbox,
-                                real maxStep) {
+void SliceContourGenerator::run(FieldFunction &func, const Grid &grid) {
   surface = new TriangleSurface;
-
-  // Compute steps and step
-  Vector3U steps = (bbox.getDimensions() / maxStep).ceil();
-  Vector3R step = bbox.getDimensions() / steps;
 
   // Progress
   unsigned completedCells = 0;
-  unsigned totalCells = steps.x() * steps.y() * steps.z();
+  unsigned totalCells = grid.getTotalCells();
 
   // Compute slices
-  Rectangle3R sliceBBox = bbox;
-  sliceBBox.rmax.z() = sliceBBox.rmin.z() + step.z();
-  CubeSlice slice(sliceBBox, maxStep);
+  const Vector3U &steps = grid.getSteps();
+  CubeSlice slice(grid);
 
   for (unsigned z = 0; !shouldQuit() && z < steps.z(); z++) {
-    if (z) slice.shiftZ(bbox.rmin.z() + step.z() * z);
+    if (z) slice.shift();
     slice.compute(func);
     doSlice(func, slice, z);
 

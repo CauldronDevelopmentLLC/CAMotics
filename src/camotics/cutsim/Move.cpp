@@ -53,7 +53,7 @@ Color Move::getColor() const {
 }
 
 
-Vector3R Move::getEndPtAtTime(real time) const {
+Vector3R Move::getPtAtTime(real time) const {
   if (getEndTime() <= time) return getEndPt();
   if (time <= getStartTime()) return getStartPt();
   real delta = time - getStartTime();

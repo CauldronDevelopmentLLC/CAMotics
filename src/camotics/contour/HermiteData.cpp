@@ -25,7 +25,11 @@ using namespace cb;
 using namespace CAMotics;
 
 
-void HermiteData::run(FieldFunction &func, const Rectangle3R &bbox, real step) {
+void HermiteData::run(FieldFunction &func, const Grid &grid) {
+  // TODO fix this
+  Rectangle3R bbox = grid;
+  real step = grid.getResolution();
+
   unsigned slices = (bbox.getHeight() + 1) / step;
 
   Rectangle2R plane(Vector2R(bbox.getMin().x(), bbox.getMin().y()),
