@@ -31,7 +31,8 @@ namespace CAMotics {
   public:
     // From SliceContourGenerator
     void doSlice(FieldFunction &func, const CubeSlice &slice, unsigned z);
-    void doCell(const CubeSlice &slice, unsigned x, unsigned y);
+    void doCell(GridTreeRef &tree, const CubeSlice &slice, unsigned x,
+                unsigned y);
   };
 }
 

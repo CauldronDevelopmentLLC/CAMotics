@@ -36,9 +36,10 @@ namespace CAMotics {
 
     Rectangle3R getBounds() const {return *this;}
     bool isValid() const {return getVolume();}
+    using Rectangle3R::contains;
 
     // From FieldFunction
-    bool contains(const Vector3R &p) {return Rectangle3R::contains(p);}
+    real depth(const Vector3R &p) const;
   };
 }
 

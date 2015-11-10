@@ -24,52 +24,46 @@
 
 #include <camotics/Grid.h>
 #include <camotics/cutsim/CutWorkpiece.h>
-#include <camotics/contour/CompositeSurface.h>
 
 #include <cbang/log/Logger.h>
 #include <cbang/time/TimeInterval.h>
 #include <cbang/time/Timer.h>
 #include <cbang/String.h>
 
+#include <cmath>
+
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-cb::SmartPointer<Surface>
-Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
-                 double resolution, RenderMode mode) {
-  // Setup
-  task->begin();
-
-  // Increase bounds a little
-  Rectangle3R bbox = cutWorkpiece.getBounds();
-  real off = resolution * 0.90;
-  bbox = bbox.grow(Vector3R(off, off, off));
-
+void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
+                      const Rectangle3R &bbox, unsigned threads,
+                      RenderMode mode) {
   // Divide work
-  vector<Grid> jobBoxes;
-  Grid(bbox, resolution).partition(jobBoxes, threads * 4);
-  unsigned totalJobCount = jobBoxes.size();
-  LOG_DEBUG(1, "Partitioned in to " << totalJobCount << " jobs");
+  unsigned targetJobCount = pow(2, ceil(log(threads) / log(2)) + 2);
 
-  LOG_INFO(1, "Computing surface bounded by " << bbox << " at "
-           << resolution << " grid resolution");
+  vector<GridTreeRef> jobGrids;
+  tree.partition(jobGrids, bbox, targetJobCount);
+  unsigned totalJobCount = jobGrids.size();
+
+  LOG_DEBUG(1, "Partitioned in to " << totalJobCount << " jobs");
+  LOG_INFO(1, "Computing surface bounded by " << tree.getBounds() << " at "
+           << tree.getResolution() << " grid resolution");
 
   // Run jobs
-  SmartPointer<CompositeSurface> surface = new CompositeSurface;
   typedef list<SmartPointer<RenderJob> > jobs_t;
   jobs_t jobs;
   double lastUpdate = 0;
-  while (!task->shouldQuit() && !(jobBoxes.empty() && jobs.empty())) {
+  while (!task->shouldQuit() && !(jobGrids.empty() && jobs.empty())) {
 
     // Start new jobs
-    while (!jobBoxes.empty() && jobs.size() < threads) {
+    while (!jobGrids.empty() && jobs.size() < threads) {
       SmartPointer<RenderJob> job =
-        new RenderJob(cutWorkpiece, mode, jobBoxes.back());
+        new RenderJob(cutWorkpiece, mode, jobGrids.back());
       job->start();
       jobs.push_back(job);
-      jobBoxes.pop_back();
+      jobGrids.pop_back();
     }
 
 
@@ -78,7 +72,6 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
     for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit();)
       if ((*it)->getState() == Thread::THREAD_DONE) {
         (*it)->join();
-        surface->add((*it)->getSurface());
         it = jobs.erase(it);
       } else it++;
 
@@ -91,7 +84,7 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
       progress += (*it)->getProgress();
 
     // Add completed jobs
-    progress += totalJobCount - jobBoxes.size() - jobs.size();
+    progress += totalJobCount - jobGrids.size() - jobs.size();
     progress /= totalJobCount;
 
     task->update(progress, "Rendering surface");
@@ -106,28 +99,11 @@ Renderer::render(CutWorkpiece &cutWorkpiece, unsigned threads,
     }
 
     // Sleep
-    Timer::sleep(0.25);
+    Timer::sleep(0.1);
   }
 
 
   // Clean up remaining jobs in case of an early exit
   for (jobs_t::iterator it = jobs.begin(); it != jobs.end(); it++)
     (*it)->join();
-
-  if (shouldQuit()) {
-    task->end();
-    LOG_INFO(1, "Render aborted");
-    return 0;
-  }
-
-  // Done
-  double delta = task->end();
-  LOG_INFO(1, "Time: " << TimeInterval(delta)
-           << " Triangles: " << surface->getCount()
-           << " Triangles/sec: "
-           << String::printf("%0.2f", surface->getCount() / delta)
-           << " Resolution: " << resolution);
-
-
-  return surface;
 }

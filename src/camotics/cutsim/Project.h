@@ -68,7 +68,8 @@ namespace CAMotics {
     void markClean() {dirty = false;}
 
     cb::SmartPointer<Simulation>
-    makeSim(const cb::SmartPointer<ToolPath> &path, double time) const;
+    makeSim(const cb::SmartPointer<ToolPath> &path, double time,
+            unsigned threads) const;
 
     const std::string &getFilename() const {return filename;}
     void setFilename(const std::string &filename);

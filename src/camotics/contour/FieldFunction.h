@@ -32,15 +32,19 @@ namespace CAMotics {
   public:
     virtual ~FieldFunction() {} // Compiler needs this
 
-    Vector3R linearIntersect(Vector3R &a, bool aInside, Vector3R &b,
-                             bool bInside);
-    Vector3R findNormal(Vector3R &a, bool aInside, Vector3R &b, bool bInside);
+    Vector3R linearIntersect(Vector3R &a, real &aDepth, Vector3R &b,
+                             real &bDepth);
+    Vector3R findNormal(Vector3R &a, real aDepth, Vector3R &b, real bDepth);
+    bool contains(const Vector3R &p) const {return 0 <= depth(p);}
+    bool cull(const Vector3R &p, double offset) const;
 
-    virtual bool contains(const Vector3R &p) = 0;
-    virtual Vector3R getEdgeIntersect(const Vector3R &v1, bool inside1,
-                                      const Vector3R &v2, bool inside2);
-    virtual Edge getEdge(const Vector3R &v1, bool inside1,
-                         const Vector3R &v2, bool inside2);
+    virtual bool cull(const Rectangle3R &r) const {return false;}
+    virtual real depth(const Vector3R &p) const = 0;
+    virtual Edge getEdge(const Vector3R &v1, real depth1,
+                         const Vector3R &v2, real depth2);
+
+    Edge getEdge(const Vector3R &v1, bool inside1,
+                 const Vector3R &v2, bool inside2);
   };
 }
 

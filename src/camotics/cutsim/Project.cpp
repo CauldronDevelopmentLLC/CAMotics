@@ -91,9 +91,9 @@ void Project::markDirty() {
 
 
 SmartPointer<Simulation> Project::makeSim(const SmartPointer<ToolPath> &path,
-                                          double time) const {
-  return
-    new Simulation(tools, path, getWorkpieceBounds(), resolution, time, mode);
+                                          double time, unsigned threads) const {
+  return new Simulation(tools, path, getWorkpieceBounds(), resolution, time,
+                        mode, threads);
 }
 
 

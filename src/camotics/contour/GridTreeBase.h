@@ -18,25 +18,29 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_DUAL_CONTOURING_H
-#define CAMOTICS_DUAL_CONTOURING_H
-
-#include "ContourGenerator.h"
-#include "TriangleSurface.h"
+#ifndef CAMOTICS_GRID_TREE_BASE_H
+#define CAMOTICS_GRID_TREE_BASE_H
 
 #include <camotics/Geom.h>
 
+#include <vector>
+
 
 namespace CAMotics {
-  class DualContouring : public ContourGenerator {
-    cb::SmartPointer<TriangleSurface> surface;
+  class GridTreeLeaf;
 
+  class GridTreeBase {
   public:
-    // From ContourGenerator
-    cb::SmartPointer<Surface> getSurface() {return surface;}
-    void run(FieldFunction &func, const Grid &grid);
+    virtual ~GridTreeBase() {}
+
+    virtual bool isLeaf() const {return false;}
+    virtual unsigned getCount() const = 0;
+    virtual void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &steps,
+                            const cb::Vector3U &offset) {}
+    virtual void gather(std::vector<float> &vertices,
+                        std::vector<float> &normals) const = 0;
   };
 }
 
-#endif // CAMOTICS_DUAL_CONTOURING_H
+#endif // CAMOTICS_GRID_TREE_BASE_H
 

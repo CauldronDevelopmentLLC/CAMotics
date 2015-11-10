@@ -46,7 +46,8 @@ namespace CAMotics {
     Rectangle3R getBounds() const;
 
     // From FieldFunction
-    bool contains(const Vector3R &p);
+    bool cull(const Rectangle3R &r) const;
+    real depth(const Vector3R &p) const;
   };
 }
 

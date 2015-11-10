@@ -45,12 +45,13 @@ namespace CAMotics {
     double resolution;
     double time;
     RenderMode mode;
+    unsigned threads;
 
     Simulation(const ToolTable &tools, const cb::SmartPointer<ToolPath> &path,
                const Workpiece &workpiece, double resolution, double time,
-               RenderMode mode) :
+               RenderMode mode, unsigned threads) :
       tools(tools), path(path), workpiece(workpiece), resolution(resolution),
-      time(time), mode(mode) {}
+      time(time), mode(mode), threads(threads) {}
 
     std::string computeHash() const;
     void write(cb::JSON::Sink &sink) const;

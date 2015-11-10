@@ -25,6 +25,7 @@
 #include <camotics/sim/ToolTable.h>
 
 #include <cbang/log/Logger.h>
+#include <cbang/time/TimeInterval.h>
 
 #include <algorithm>
 
@@ -33,25 +34,48 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
-  path(path), time(time ? time : std::numeric_limits<real>::max()) {
+ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real startTime,
+                     real endTime) :
+  path(path), startTime(startTime), endTime(endTime) {
+
+  if (endTime < startTime) {
+    swap(startTime, endTime);
+    swap(this->startTime, this->endTime);
+  }
+
+  int firstMove = path->find(startTime);
+  int lastMove = path->find(endTime);
+
+  if (lastMove == -1) lastMove = path->size() - 1;
+  if (firstMove == -1) firstMove = lastMove + 1;
+
+  real duration = path->at(lastMove).getEndTime() - startTime;
+
+  LOG_DEBUG(1, "Times: start=" << TimeInterval(startTime) << " end="
+            << TimeInterval(startTime + duration) << " duration="
+            << TimeInterval(duration));
+  LOG_DEBUG(1, "Moves: first=" << firstMove << " last=" << lastMove);
+
   ToolTable &tools = path->getTools();
   vector<Rectangle3R> bboxes;
   AABB *nodes = 0;
   unsigned boxes = 0;
 
   // Gather nodes in a list
-  for (ToolPath::const_iterator it = path->begin(); it != path->end(); it++) {
-    const Move &move = *it;
+  for (int i = firstMove; i <= lastMove; i++) {
+    const Move &move = path->at(i);
     unsigned tool = move.getTool();
 
     if (sweeps.size() <= tool) sweeps.resize(tool + 1);
     if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
 
-    sweeps[tool]->getBBoxes(move.getStartPt(), move.getEndPt(), bboxes);
+    Vector3R startPt = move.getPtAtTime(startTime);
+    Vector3R endPt = move.getPtAtTime(endTime);
 
-    for (unsigned i = 0; i < bboxes.size(); i++)
-      nodes = (new AABB(&move, bboxes[i]))->prepend(nodes);
+    sweeps[tool]->getBBoxes(startPt, endPt, bboxes);
+
+    for (unsigned j = 0; j < bboxes.size(); j++)
+      nodes = (new AABB(&move, bboxes[j]))->prepend(nodes);
 
     boxes += bboxes.size();
     bboxes.clear();
@@ -60,43 +84,36 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real time) :
   // Partition nodes
   partition(nodes);
 
-  LOG_INFO(3, "AABBTree boxes=" << boxes << " leaves=" << getLeafCount()
-           << " height=" << getHeight());
+  LOG_DEBUG(1, "AABBTree boxes=" << boxes << " leaves=" << getLeafCount()
+            << " height=" << getHeight());
 }
 
 
-void ToolSweep::getChangeBounds(vector<Rectangle3R> &bboxes, real startTime,
-                                real endTime) const {
-  if (endTime < startTime) swap(startTime, endTime);
-  int firstMove = path->find(startTime);
-  int lastMove = path->find(endTime);
-
-  if (firstMove == -1) return;
-  if (lastMove == -1) lastMove = path->size() - 1;
-
-  for (int i = firstMove; i <= lastMove; i++) {
-    const Move &move = path->at(i);
-    unsigned tool = move.getTool();
-
-    Vector3R startPt =
-      i == firstMove ? move.getPtAtTime(startTime) : move.getStartPt();
-    Vector3R endPt =
-      i == lastMove ? move.getPtAtTime(endTime) : move.getEndPt();
-
-    sweeps[tool]->getBBoxes(startPt, endPt, bboxes);
-  }
+bool ToolSweep::cull(const Rectangle3R &r) const {
+  if (change.isNull()) return false;
+  return !change->intersects(r);
 }
 
 
-bool ToolSweep::contains(const Vector3R &p) {
+real ToolSweep::depth(const Vector3R &p) const {
   vector<const Move *> moves;
-  collisions(p, time, moves);
+  collisions(p, moves);
+
+  real d2 = -numeric_limits<real>::max();
 
   for (unsigned i = 0; i < moves.size(); i++) {
     const Move &move = *moves[i];
-    if (time < move.getStartTime()) continue;
-    if (sweeps[move.getTool()]->contains(move, p, time)) return true;
+
+    if (move.getEndTime() < startTime || endTime < move.getStartTime())
+      continue;
+
+    Vector3R startPt = move.getPtAtTime(startTime);
+    Vector3R endPt = move.getPtAtTime(endTime);
+
+    real sd2 = sweeps[move.getTool()]->depth(startPt, endPt, p);
+    if (0 <= sd2) return sd2; // Approx 5% faster
+    if (d2 < sd2) d2 = sd2;
   }
 
-  return false;
+  return d2;
 }

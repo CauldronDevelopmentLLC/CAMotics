@@ -20,9 +20,6 @@
 
 #include "Workpiece.h"
 
-#include <algorithm>
-#include <iostream>
-
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
@@ -32,4 +29,10 @@ Workpiece::Workpiece(const Rectangle3R &r) :
   Rectangle3R(r), center(r.getCenter()) {
   Vector3R halfDim = r.getDimensions() / 2;
   halfDim2 = halfDim * halfDim;
+}
+
+
+real Workpiece::depth(const Vector3R &p) const {
+  real d2 = p.distanceSquared(closestPointOnSurface(p));
+  return Rectangle3R::contains(p) ? d2 : -d2;
 }

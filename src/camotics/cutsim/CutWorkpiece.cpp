@@ -53,7 +53,12 @@ Rectangle3R CutWorkpiece::getBounds() const {
 }
 
 
-bool CutWorkpiece::contains(const Vector3R &p) {
-  if (!workpiece.isValid()) return toolSweep->contains(p);
-  return workpiece.contains(p) && !toolSweep->contains(p);
+bool CutWorkpiece::cull(const Rectangle3R &r) const {
+  return toolSweep->cull(r);
+}
+
+
+real CutWorkpiece::depth(const Vector3R &p) const {
+  if (!workpiece.isValid()) return toolSweep->depth(p);
+  return min(workpiece.depth(p), -toolSweep->depth(p));
 }

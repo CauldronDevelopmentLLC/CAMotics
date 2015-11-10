@@ -20,6 +20,8 @@
 
 #include "CompositeSweep.h"
 
+#include <limits>
+
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
@@ -39,11 +41,14 @@ void CompositeSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
 }
 
 
-bool CompositeSweep::contains(const Vector3R &start, const Vector3R &end,
-                              const Vector3R &p) const {
-  for (unsigned i = 0; i < children.size(); i++)
-    if (children[i]->contains(start, end, p - Vector3R(0, 0, zOffsets[i])))
-      return true;
+real CompositeSweep::depth(const Vector3R &start, const Vector3R &end,
+                           const Vector3R &p) const {
+  real d2 = -numeric_limits<real>::max();
 
-  return false;
+  for (unsigned i = 0; i < children.size(); i++) {
+    real cd2 = children[i]->depth(start, end, p - Vector3R(0, 0, zOffsets[i]));
+    if (d2 < cd2) d2 = cd2;
+  }
+
+  return d2;
 }

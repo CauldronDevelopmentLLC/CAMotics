@@ -28,8 +28,6 @@ void CubicalMarchingSquares::doSlice(FieldFunction &func,
 }
 
 
-void CubicalMarchingSquares::doCell(const CubeSlice &slice, unsigned x,
-                                    unsigned y) {
-  //uint8_t index = slice.getEdges(x, y, edges);
-  //Vector3R vertices[3];
+void CubicalMarchingSquares::doCell(GridTreeRef &tree, const CubeSlice &slice,
+                                    unsigned x, unsigned y) {
 }

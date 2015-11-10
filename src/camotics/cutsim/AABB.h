@@ -44,11 +44,12 @@ namespace CAMotics {
 
     Rectangle3R getBounds() const {return *this;}
     const Move *getMove() const {return move;}
+    bool isLeaf() const {return move;}
     unsigned getTreeHeight() const;
     unsigned getLeafCount() const;
 
-    void collisions(const Vector3R &p, real time,
-                    std::vector<const Move *> &moves);
+    bool intersects(const Rectangle3R &r);
+    void collisions(const Vector3R &p, std::vector<const Move *> &moves);
     void draw(bool leavesOnly = true, unsigned height = 1, unsigned depth = 0);
   };
 }

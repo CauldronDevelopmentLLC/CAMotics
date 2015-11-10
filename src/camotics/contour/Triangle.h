@@ -18,36 +18,21 @@
 
 \******************************************************************************/
 
-#include "RenderJob.h"
+#ifndef CAMOTICS_TRIANGLE_H
+#define CAMOTICS_TRIANGLE_H
 
-#include <camotics/contour/MarchingCubes.h>
-#include <camotics/contour/CubicalMarchingSquares.h>
-
-#include <cbang/Exception.h>
-#include <cbang/time/Timer.h>
-#include <cbang/util/DefaultCatch.h>
-
-using namespace cb;
-using namespace CAMotics;
+#include <camotics/Geom.h>
 
 
-RenderJob::RenderJob(FieldFunction &func, RenderMode mode, GridTreeRef &tree) :
-  func(func), tree(tree) {
-  switch (mode) {
-  case RenderMode::MCUBES_MODE: generator = new MarchingCubes; break;
-  case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
-  default: THROWS("Invalid or unsupported render mode " << mode);
-  }
+namespace CAMotics {
+  class Triangle {
+    cb::Vector3F vertices[3];
+
+  public:
+    const cb::Vector3F &operator[](unsigned i) const {return vertices[i];}
+    cb::Vector3F &operator[](unsigned i) {return vertices[i];}
+  };
 }
 
+#endif // CAMOTICS_TRIANGLE_H
 
-void RenderJob::run() {
-  try {
-    generator->run(func, tree);
-  } CATCH_WARNING;
-}
-
-
-void RenderJob::stop() {
-  if (!generator.isNull()) generator->interrupt();
-}

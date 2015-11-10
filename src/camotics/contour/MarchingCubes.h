@@ -21,38 +21,19 @@
 #ifndef CAMOTICS_MARCHING_CUBES_H
 #define CAMOTICS_MARCHING_CUBES_H
 
-#include "ContourGenerator.h"
-#include "FieldFunction.h"
-#include "TriangleSurface.h"
-
-#include <camotics/Geom.h>
+#include "SliceContourGenerator.h"
 
 
 namespace CAMotics {
-  class MarchingCubes : public ContourGenerator {
-    bool tetrahedrons;
-    cb::SmartPointer<TriangleSurface> surface;
-
-    unsigned totalCells;
-    unsigned completedCells;
+  class MarchingCubes : public SliceContourGenerator {
+    Edge edges[12];
 
   public:
-    MarchingCubes(bool tetrahedrons) : tetrahedrons(tetrahedrons) {}
-
-    // From ContourGenerator
-    cb::SmartPointer<Surface> getSurface() {return surface;}
-    void run(FieldFunction &func, const Grid &grid);
-
-  protected:
-    void march(FieldFunction &func, const Vector3R &p,
-               const Vector3R &scale, const cb::Vector3U &steps);
-    void marchCube(FieldFunction &func, const Vector3R &p,
-                   const Vector3R &scale);
-    void marchTetrahedron(FieldFunction &func, Vector3R *position,
-                          bool *inside);
-    void marchTetrahedrons(FieldFunction &func, const Vector3R &p,
-                           const Vector3R &scale);
+    // From SliceContourGenerator
+    void doCell(GridTreeRef &tree, const CubeSlice &slice, unsigned x,
+                unsigned y);
   };
 }
 
 #endif // CAMOTICS_MARCHING_CUBES_H
+

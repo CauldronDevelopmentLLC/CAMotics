@@ -40,20 +40,26 @@ namespace CAMotics {
   class ToolSweep : public FieldFunction, public AABBTree {
     cb::SmartPointer<ToolPath> path;
     std::vector<cb::SmartPointer<Sweep> > sweeps;
-    real time;
+
+    real startTime;
+    real endTime;
+
+    cb::SmartPointer<AABBTree> change;
 
   public:
-    ToolSweep(const cb::SmartPointer<ToolPath> &path,
-              real time = std::numeric_limits<real>::max());
+    ToolSweep(const cb::SmartPointer<ToolPath> &path, real startTime = 0,
+              real endTime = std::numeric_limits<real>::max());
 
-    real getTime() const {return time;}
-    void setTime(real time) {this->time = time;}
+    void setStartTime(real startTime) {this->startTime = startTime;}
+    void setEndTime(real endTime) {this->endTime = endTime;}
 
-    void getChangeBounds(std::vector<Rectangle3R> &bboxes, real startTime,
-                         real endTime) const;
+    const cb::SmartPointer<AABBTree> &getChange() const {return change;}
+    void setChange(const cb::SmartPointer<AABBTree> &change)
+    {this->change = change;}
 
     // From FieldFunction
-    bool contains(const Vector3R &p);
+    bool cull(const Rectangle3R &r) const;
+    real depth(const Vector3R &p) const;
   };
 }
 

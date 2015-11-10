@@ -33,6 +33,7 @@
 
 namespace CAMotics {
   class STLSource;
+  class GridTree;
 
   class TriangleSurface : public Surface, public TriangleMesh {
     bool finalized;
@@ -43,6 +44,7 @@ namespace CAMotics {
     Rectangle3R bounds;
 
   public:
+    TriangleSurface(const GridTree &tree);
     TriangleSurface(STLSource &source, Task *task = 0);
     TriangleSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
     TriangleSurface(const TriangleSurface &o);
@@ -50,8 +52,9 @@ namespace CAMotics {
     virtual ~TriangleSurface();
 
     void finalize(bool withVBOs);
-    void add(const Vector3R vertices[3]);
-    void add(const Vector3R vertices[3], const Vector3R &normal);
+    void add(const cb::Vector3F vertices[3]);
+    void add(const cb::Vector3F vertices[3], const cb::Vector3F &normal);
+    void add(const GridTree &tree);
 
     // From Surface
     cb::SmartPointer<Surface> copy() const;

@@ -18,25 +18,28 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_HERMITE_DATA_H
-#define CAMOTICS_HERMITE_DATA_H
+#ifndef CAMOTICS_GRID_TREE_H
+#define CAMOTICS_GRID_TREE_H
 
-#include "ContourGenerator.h"
-#include "HermiteSlice.h"
+#include "GridTreeNode.h"
 
-#include <cbang/SmartPointer.h>
+#include <camotics/Grid.h>
 
-#include <vector>
 
 namespace CAMotics {
-  class HermiteData :
-    std::vector<cb::SmartPointer<HermiteSlice> >, public ContourGenerator {
+  class GridTreeRef;
+
+  class GridTree : public GridTreeNode, public Grid {
   public:
-    // From ContourGenerator
-    cb::SmartPointer<Surface> getSurface() {return 0;}
-    void run(FieldFunction &func, const Grid &grid);
+    GridTree(const Grid &grid);
+    ~GridTree();
+
+    void partition(std::vector<GridTreeRef> &grids, const Rectangle3R &bbox,
+                   unsigned count);
+
+    void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset);
   };
 }
 
-#endif // CAMOTICS_HERMITE_DATA_H
+#endif // CAMOTICS_GRID_TREE_H
 

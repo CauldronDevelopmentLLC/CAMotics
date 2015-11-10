@@ -21,6 +21,7 @@
 #include "TriangleSurface.h"
 
 #include "TriangleMesh.h"
+#include "GridTree.h"
 
 #include <cbang/Exception.h>
 #include <cbang/log/Logger.h>
@@ -33,6 +34,13 @@
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
+
+
+TriangleSurface::TriangleSurface(const GridTree &tree) :
+  finalized(false), useVBOs(true) {
+  vbufs[0] = 0;
+  add(tree);
+}
 
 
 TriangleSurface::TriangleSurface(STLSource &source, Task *task) :
@@ -61,12 +69,12 @@ TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
 
 
 TriangleSurface::TriangleSurface(const TriangleSurface &o) :
-  TriangleMesh(o), finalized(false), bounds(o.bounds) {
+  TriangleMesh(o), finalized(false), useVBOs(o.useVBOs), bounds(o.bounds) {
   vbufs[0] = 0;
 }
 
 
-TriangleSurface::TriangleSurface() : finalized(false) {
+TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
   vbufs[0] = 0;
 }
 
@@ -99,9 +107,9 @@ void TriangleSurface::finalize(bool withVBOs) {
 }
 
 
-void TriangleSurface::add(const Vector3R vertices[3]) {
+void TriangleSurface::add(const Vector3F vertices[3]) {
   // Compute face normal
-  Vector3R normal =
+  Vector3F normal =
     (vertices[1] - vertices[0]).cross(vertices[2] - vertices[0]);
 
   // Normalize
@@ -114,7 +122,7 @@ void TriangleSurface::add(const Vector3R vertices[3]) {
 }
 
 
-void TriangleSurface::add(const Vector3R vertices[3], const Vector3R &normal) {
+void TriangleSurface::add(const Vector3F vertices[3], const Vector3F &normal) {
   for (unsigned i = 0; i < 3; i++) {
     bounds.add(vertices[i]);
 
@@ -123,6 +131,16 @@ void TriangleSurface::add(const Vector3R vertices[3], const Vector3R &normal) {
       normals.push_back(normal[j]);
     }
   }
+}
+
+
+void TriangleSurface::add(const GridTree &tree) {
+  unsigned start = getCount();
+
+  tree.gather(vertices, normals);
+
+  for (unsigned i = start; i < vertices.size(); i += 3)
+    bounds.add(Vector3F(vertices[i], vertices[i + 1], vertices[i + 2]));
 }
 
 
@@ -174,10 +192,6 @@ void TriangleSurface::read(STLSource &source, Task *task) {
   clear();
 
   uint32_t facets = source.getFacetCount(); // ASCII STL files return 0
-  if (facets) {
-    normals.reserve(9 * facets);
-    vertices.reserve(9 * facets);
-  }
 
   Vector3F v[3];
   Vector3F n;
@@ -198,18 +212,7 @@ void TriangleSurface::read(STLSource &source, Task *task) {
       continue;
     }
 
-    // Normals
-    for (unsigned j = 0; j < 3; j++)
-      for (unsigned k = 0; k < 3; k++)
-        normals.push_back(n[k]); // STL has only a face normal
-
-    // Vertices
-    for (unsigned j = 0; j < 3; j++) {
-      for (unsigned k = 0; k < 3; k++)
-        vertices.push_back(v[j][k]);
-
-      bounds.add(v[j]);
-    }
+    add(v, n);
 
     if (task) {
       if (!facets && 100000 < i) i = 0;
@@ -223,14 +226,14 @@ void TriangleSurface::read(STLSource &source, Task *task) {
 
 
 void TriangleSurface::write(STLSink &sink, Task *task) const {
-  Vector3R p[3];
+  Vector3F p[3];
 
   for (unsigned i = 0; i < getCount() && (!task || !task->shouldQuit()); i++) {
     unsigned offset = i * 9;
 
     // The vertex normals are all the same
-    Vector3R normal =
-      Vector3R(normals[offset + 0], normals[offset + 1], normals[offset + 2]);
+    Vector3F normal =
+      Vector3F(normals[offset + 0], normals[offset + 1], normals[offset + 2]);
 
     for (unsigned j = 0; j < 3; j++)
       for (unsigned k = 0; k < 3; k++)

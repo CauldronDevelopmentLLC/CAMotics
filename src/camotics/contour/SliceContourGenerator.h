@@ -22,23 +22,20 @@
 #define CAMOTICS_SLICE_CONTOUR_GENERATOR_H
 
 #include "ContourGenerator.h"
-#include "TriangleSurface.h"
 #include "CubeSlice.h"
+#include "GridTreeRef.h"
 
 
 namespace CAMotics {
   class SliceContourGenerator : public ContourGenerator {
-  protected:
-    cb::SmartPointer<TriangleSurface> surface;
-
   public:
     virtual void doSlice(FieldFunction &func, const CubeSlice &slice,
                          unsigned z) {}
-    virtual void doCell(const CubeSlice &slice, unsigned x, unsigned y) = 0;
+    virtual void doCell(GridTreeRef &tree, const CubeSlice &slice, unsigned x,
+                        unsigned y) = 0;
 
     // From ContourGenerator
-    cb::SmartPointer<Surface> getSurface() {return surface;}
-    void run(FieldFunction &func, const Grid &grid);
+    void run(FieldFunction &func, GridTreeRef &tree);
   };
 }
 

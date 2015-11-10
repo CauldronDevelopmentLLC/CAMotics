@@ -22,28 +22,26 @@
 #define CAMOTICS_SURFACE_TASK_H
 
 #include <camotics/Task.h>
-#include <camotics/cutsim/Simulation.h>
-#include <camotics/contour/Surface.h>
+
+#include <cbang/SmartPointer.h>
 
 
 namespace CAMotics {
-  class AABBTree;
+  class Simulation;
+  class SimulationRun;
+  class Surface;
+
 
   class SurfaceTask : public Task {
-    unsigned threads;
-    std::string filename;
-    cb::SmartPointer<Simulation> sim;
-    cb::SmartPointer<Surface> surface;
-    cb::SmartPointer<AABBTree> aabbTree;
+    cb::SmartPointer<SimulationRun> simRun;
 
   public:
-    SurfaceTask(unsigned threads, const std::string &filename,
-                const cb::SmartPointer<Simulation> &sim) :
-      threads(threads), filename(filename), sim(sim) {}
+    SurfaceTask(const cb::SmartPointer<Simulation> &sim);
+    SurfaceTask(const cb::SmartPointer<SimulationRun> &simRun);
     ~SurfaceTask();
 
-    const cb::SmartPointer<Surface> &getSurface() const {return surface;}
-    const cb::SmartPointer<AABBTree> &getAABBTree() const {return aabbTree;}
+    const cb::SmartPointer<SimulationRun> &getSimRun() const {return simRun;}
+    const cb::SmartPointer<Surface> &getSurface() const;
 
     // From Task
     void run();

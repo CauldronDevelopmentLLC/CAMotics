@@ -18,36 +18,41 @@
 
 \******************************************************************************/
 
-#include "RenderJob.h"
+#ifndef CAMOTICS_SIMULATION_RUN_H
+#define CAMOTICS_SIMULATION_RUN_H
 
-#include <camotics/contour/MarchingCubes.h>
-#include <camotics/contour/CubicalMarchingSquares.h>
-
-#include <cbang/Exception.h>
-#include <cbang/time/Timer.h>
-#include <cbang/util/DefaultCatch.h>
-
-using namespace cb;
-using namespace CAMotics;
+#include <cbang/SmartPointer.h>
 
 
-RenderJob::RenderJob(FieldFunction &func, RenderMode mode, GridTreeRef &tree) :
-  func(func), tree(tree) {
-  switch (mode) {
-  case RenderMode::MCUBES_MODE: generator = new MarchingCubes; break;
-  case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
-  default: THROWS("Invalid or unsupported render mode " << mode);
-  }
+namespace CAMotics {
+  class Simulation;
+  class ToolSweep;
+  class GridTree;
+  class Surface;
+  class AABBTree;
+  class Task;
+
+
+  class SimulationRun {
+    cb::SmartPointer<Simulation> sim;
+    cb::SmartPointer<ToolSweep> sweep;
+    cb::SmartPointer<GridTree> tree;
+    cb::SmartPointer<Surface> surface;
+
+    double lastTime;
+
+  public:
+    SimulationRun(const cb::SmartPointer<Simulation> &sim);
+    ~SimulationRun();
+
+    const cb::SmartPointer<Surface> &getSurface() const {return surface;}
+    cb::SmartPointer<AABBTree> getAABBTree() const;
+
+    void setEndTime(double endTime);
+
+    void compute(const cb::SmartPointer<Task> &task);
+  };
 }
 
+#endif // CAMOTICS_SIMULATION_RUN_H
 
-void RenderJob::run() {
-  try {
-    generator->run(func, tree);
-  } CATCH_WARNING;
-}
-
-
-void RenderJob::stop() {
-  if (!generator.isNull()) generator->interrupt();
-}

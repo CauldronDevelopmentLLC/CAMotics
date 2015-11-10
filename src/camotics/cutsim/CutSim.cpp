@@ -25,20 +25,12 @@
 #include "ReduceTask.h"
 #include "AABBTree.h"
 
-#include <cbang/config/Options.h>
-#include <cbang/os/SystemInfo.h>
-
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-CutSim::CutSim(Options &options) :
-  threads(SystemInfo::instance().getCPUCount()) {
-  options.addTarget("threads", threads, "Number of simulation threads.");
-}
-
-
+CutSim::CutSim() {}
 CutSim::~CutSim() {}
 
 
@@ -50,8 +42,8 @@ SmartPointer<ToolPath> CutSim::computeToolPath(const Project &project) {
 
 
 SmartPointer<Surface> CutSim::computeSurface
-(const SmartPointer<Simulation> &sim, const string &filename) {
-  task = new SurfaceTask(threads, filename, sim);
+(const SmartPointer<Simulation> &sim) {
+  task = new SurfaceTask(sim);
   task->run();
   return task.cast<SurfaceTask>()->getSurface();
 }

@@ -24,13 +24,14 @@
 #include "RenderMode.h"
 
 #include <camotics/Task.h>
+#include <camotics/Geom.h>
 
 #include <cbang/SmartPointer.h>
 
 
 namespace CAMotics {
   class CutWorkpiece;
-  class Surface;
+  class GridTree;
 
   class Renderer : public Task {
     cb::SmartPointer<Task> task;
@@ -38,9 +39,9 @@ namespace CAMotics {
   public:
     Renderer(const cb::SmartPointer<Task> &task = new Task) : task(task) {}
 
-    cb::SmartPointer<Surface>
-    render(CutWorkpiece &cutWorkpiece, unsigned threads,
-           double resolution, RenderMode mode = RenderMode::MCUBES_MODE);
+    void render(CutWorkpiece &cutWorkpiece, GridTree &tree,
+                const Rectangle3R &bbox, unsigned threads,
+                RenderMode mode = RenderMode::MCUBES_MODE);
   };
 }
 

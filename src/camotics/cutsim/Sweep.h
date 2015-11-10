@@ -42,10 +42,8 @@ namespace CAMotics {
                            real tolerance = 0.01) const = 0;
     virtual bool intersects(const Move &move, const Rectangle3R &box) const
     {return false;}
-    virtual bool contains(const Vector3R &start, const Vector3R &end,
-                          const Vector3R &p) const = 0;
-    virtual bool contains(const Move &move, const Vector3R &p,
-                          double time) const;
+    virtual real depth(const Vector3R &start, const Vector3R &end,
+                       const Vector3R &p) const = 0;
   };
 }
 

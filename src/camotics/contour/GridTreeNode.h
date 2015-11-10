@@ -18,36 +18,35 @@
 
 \******************************************************************************/
 
-#include "RenderJob.h"
+#ifndef CAMOTICS_GRID_TREE_NODEH
+#define CAMOTICS_GRID_TREE_NODEH
 
-#include <camotics/contour/MarchingCubes.h>
-#include <camotics/contour/CubicalMarchingSquares.h>
-
-#include <cbang/Exception.h>
-#include <cbang/time/Timer.h>
-#include <cbang/util/DefaultCatch.h>
-
-using namespace cb;
-using namespace CAMotics;
+#include "GridTreeBase.h"
 
 
-RenderJob::RenderJob(FieldFunction &func, RenderMode mode, GridTreeRef &tree) :
-  func(func), tree(tree) {
-  switch (mode) {
-  case RenderMode::MCUBES_MODE: generator = new MarchingCubes; break;
-  case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
-  default: THROWS("Invalid or unsupported render mode " << mode);
-  }
+namespace CAMotics {
+  class GridTreeNode : public GridTreeBase {
+  protected:
+    GridTreeBase *left;
+    GridTreeBase *right;
+
+    unsigned axis;
+    unsigned split;
+
+    unsigned count;
+
+  public:
+    GridTreeNode(const cb::Vector3U &steps);
+    ~GridTreeNode();
+
+    // From GridTreeBase
+    unsigned getCount() const {return count;}
+    void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &steps,
+                    const cb::Vector3U &offset);
+    void gather(std::vector<float> &vertices,
+                std::vector<float> &normals) const;
+  };
 }
 
+#endif // CAMOTICS_GRID_TREE_NODEH
 
-void RenderJob::run() {
-  try {
-    generator->run(func, tree);
-  } CATCH_WARNING;
-}
-
-
-void RenderJob::stop() {
-  if (!generator.isNull()) generator->interrupt();
-}

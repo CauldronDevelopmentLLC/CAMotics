@@ -20,6 +20,8 @@
 
 #include "ConicSweep.h"
 
+#include <limits>
+
 using namespace std;
 using namespace CAMotics;
 
@@ -37,8 +39,8 @@ void ConicSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
 
 
 
-bool ConicSweep::contains(const Vector3R &start, const Vector3R &end,
-                          const Vector3R &p) const {
+real ConicSweep::depth(const Vector3R &start, const Vector3R &end,
+                       const Vector3R &p) const {
   real x1 = start.x();
   real y1 = start.y();
   real z1 = start.z();
@@ -54,7 +56,7 @@ bool ConicSweep::contains(const Vector3R &start, const Vector3R &end,
   // Z height range
   real minZ = z1 < z2 ? z1 : z2;
   real maxZ = z1 < z2 ? z2 : z1;
-  if (z < minZ || maxZ + length < z) return false;
+  if (z < minZ || maxZ + length < z) return -numeric_limits<real>::max();
 
   real xLen = x2 - x1;
   real yLen = y2 - y1;
@@ -80,10 +82,10 @@ bool ConicSweep::contains(const Vector3R &start, const Vector3R &end,
 
   } else r2 = radius1 * radius1;
 
-  if (vertical) return p1.distanceSquared(q) < r2;
+  if (vertical) return r2 - p1.distanceSquared(q);
 
   Vector2R c = Segment2R(p1, p2).closest(q);
-  if (horizontal) return q.distanceSquared(c) < r2;
+  if (horizontal) return r2 - q.distanceSquared(c);
 
   // Slanting move
   // Find the ends of the line segment which passes through the move's
@@ -121,8 +123,7 @@ bool ConicSweep::contains(const Vector3R &start, const Vector3R &end,
   }
 
   real cDistSq = q.distanceSquared(c);
-  if (cDistSq < r2) return true;
-  if (!conical) return false;
+  if (!conical || cDistSq < r2) return r2 - cDistSq;
 
   // Look up and down the z-line for a closer point on the cone
   real maxRadius = radius1 < radius2 ? radius2 : radius1;
@@ -149,5 +150,5 @@ bool ConicSweep::contains(const Vector3R &start, const Vector3R &end,
   r2 = h * conicSlope + radius2;
   r2 *= r2;
 
-  return q.distanceSquared(c) < r2;
+  return r2 - q.distanceSquared(c);
 }

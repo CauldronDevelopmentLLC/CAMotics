@@ -18,36 +18,35 @@
 
 \******************************************************************************/
 
-#include "RenderJob.h"
-
-#include <camotics/contour/MarchingCubes.h>
-#include <camotics/contour/CubicalMarchingSquares.h>
+#include "GridTreeRef.h"
 
 #include <cbang/Exception.h>
-#include <cbang/time/Timer.h>
-#include <cbang/util/DefaultCatch.h>
 
+using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-RenderJob::RenderJob(FieldFunction &func, RenderMode mode, GridTreeRef &tree) :
-  func(func), tree(tree) {
-  switch (mode) {
-  case RenderMode::MCUBES_MODE: generator = new MarchingCubes; break;
-  case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
-  default: THROWS("Invalid or unsupported render mode " << mode);
-  }
+GridTreeRef::GridTreeRef(GridTree *ref, const Vector3U &offset,
+                         const Vector3U &steps) : ref(ref), offset(offset) {
+
+  setResolution(ref->getResolution());
+  setOffset(ref->getOffset() + (Vector3D)offset * ref->getResolution());
+  setSteps(steps);
 }
 
 
-void RenderJob::run() {
-  try {
-    generator->run(func, tree);
-  } CATCH_WARNING;
+unsigned GridTreeRef::getCount() const {
+  THROWS("Cannot call " << __func__ << " on GridTreeRef");
 }
 
 
-void RenderJob::stop() {
-  if (!generator.isNull()) generator->interrupt();
+void GridTreeRef::insertLeaf(GridTreeLeaf *leaf, const Vector3U &offset) {
+  ref->insertLeaf(leaf, this->offset + offset);
+}
+
+
+void GridTreeRef::gather(vector<float> &vertices,
+                         vector<float> &normals) const {
+  THROWS("Cannot call " << __func__ << " on GridTreeRef");
 }

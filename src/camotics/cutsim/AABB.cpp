@@ -112,16 +112,23 @@ unsigned AABB::getLeafCount() const {
   return
     (left ? left->getLeafCount() : 0) +
     (right ? right->getLeafCount() : 0) +
-    (move ? 1 : 0);
+    (isLeaf() ? 1 : 0);
 }
 
 
-void AABB::collisions(const Vector3R &p, real time,
-                      vector<const Move *> &moves) {
-  if (!contains(p)) return;
-  if (move && (move->getStartTime() <= time)) moves.push_back(move);
-  if (left) left->collisions(p, time, moves);
-  if (right) right->collisions(p, time, moves);
+bool AABB::intersects(const Rectangle3R &r) {
+  if (!Rectangle3R::intersects(r)) return false;
+
+  return isLeaf() ||
+    (left && left->intersects(r)) || (right && right->intersects(r));
+}
+
+
+void AABB::collisions(const Vector3R &p, vector<const Move *> &moves) {
+  if (!Rectangle3R::contains(p)) return;
+  if (isLeaf()) moves.push_back(move);
+  if (left) left->collisions(p, moves);
+  if (right) right->collisions(p, moves);
 }
 
 

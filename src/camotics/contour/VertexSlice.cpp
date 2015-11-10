@@ -27,24 +27,26 @@ using namespace cb;
 using namespace CAMotics;
 
 
-VertexSlice::VertexSlice(const Grid &grid, unsigned z) : grid(grid), z(z) {}
+VertexSlice::VertexSlice(const GridTreeRef &grid, unsigned z) :
+  grid(grid), z(z) {}
 
 
 void VertexSlice::compute(FieldFunction &func) {
   // Allocate space
   const Vector3U &steps = grid.getSteps();
-  resize(steps.x() + 1, vector<bool>(steps.y() + 1, false));
+  resize(steps.x() + 1,
+         vector<real>(steps.y() + 1, -numeric_limits<real>::max()));
 
   double resolution = grid.getResolution();
-  Vector3R p = Vector3R(0, 0, grid.rmin.z() + resolution * z);
+  Vector3R p = Vector3R(0, 0, grid.getOffset().z() + resolution * z);
 
   for (unsigned x = 0; x <= steps.x(); x++) {
-    p.x() = grid.rmin.x() + resolution * x;
+    p.x() = grid.getOffset().x() + resolution * x;
 
     for (unsigned y = 0; y <= steps.y(); y++) {
-      p.y() = grid.rmin.y() + resolution * y;
+      p.y() = grid.getOffset().y() + resolution * y;
 
-      at(x).at(y) = func.contains(p);
+      if (!func.cull(p, 2.1 * resolution)) at(x).at(y) = func.depth(p);
     }
   }
 }

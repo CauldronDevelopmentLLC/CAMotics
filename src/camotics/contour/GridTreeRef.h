@@ -18,36 +18,29 @@
 
 \******************************************************************************/
 
-#include "HermiteData.h"
+#ifndef CAMOTICS_GRID_TREE_REF_H
+#define CAMOTICS_GRID_TREE_REF_H
 
-using namespace std;
-using namespace cb;
-using namespace CAMotics;
+#include "GridTree.h"
 
 
-void HermiteData::run(FieldFunction &func, const Grid &grid) {
-  // TODO fix this
-  Rectangle3R bbox = grid;
-  real step = grid.getResolution();
+namespace CAMotics {
+  class GridTreeRef : public GridTreeBase, public Grid {
+    GridTree *ref;
+    cb::Vector3U offset;
 
-  unsigned slices = (bbox.getHeight() + 1) / step;
+  public:
+    GridTreeRef(GridTree *ref, const cb::Vector3U &offset,
+                const cb::Vector3U &steps);
 
-  Rectangle2R plane(Vector2R(bbox.getMin().x(), bbox.getMin().y()),
-                    Vector2R(bbox.getMax().x(), bbox.getMax().y()));
-  real zStart = bbox.getMin().z();
+    void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset);
 
-  SmartPointer<SampleSlice> first = new SampleSlice(func, plane, zStart, step);
-  first->compute();
-  SmartPointer<SampleSlice> second;
-
-  for (unsigned i = 0; i < slices && !shouldQuit(); i++) {
-    real z = zStart + i * step;
-    second = new SampleSlice(func, plane, z, step);
-    second->compute();
-
-    push_back(new HermiteSlice(first, second));
-    back()->compute();
-
-    first = second;
-  }
+    // From GridTreeBase
+    unsigned getCount() const;
+    void gather(std::vector<float> &vertices,
+                std::vector<float> &normals) const;
+  };
 }
+
+#endif // CAMOTICS_GRID_TREE_REF_H
+

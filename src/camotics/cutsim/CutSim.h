@@ -23,8 +23,6 @@
 
 #include <cbang/SmartPointer.h>
 
-namespace cb {class Options;}
-
 
 namespace CAMotics {
   class ToolPath;
@@ -35,17 +33,15 @@ namespace CAMotics {
 
 
   class CutSim {
-    unsigned threads;
     cb::SmartPointer<Task> task;
 
   public:
-    CutSim(cb::Options &options);
+    CutSim();
     ~CutSim();
 
     cb::SmartPointer<ToolPath> computeToolPath(const Project &project);
     cb::SmartPointer<Surface> computeSurface
-    (const cb::SmartPointer<Simulation> &sim,
-     const std::string &filename = std::string());
+    (const cb::SmartPointer<Simulation> &sim);
     void reduceSurface(Surface &surface);
 
     void interrupt();

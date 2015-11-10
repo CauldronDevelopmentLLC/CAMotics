@@ -22,14 +22,16 @@
 
 #include <cbang/Exception.h>
 
+#include <cmath>
+
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-Vector3R FieldFunction::linearIntersect(Vector3R &a, bool aInside,
-                                        Vector3R &b, bool bInside) {
-  if (aInside == bInside)
+Vector3R FieldFunction::linearIntersect(Vector3R &a, real &aDepth,
+                                        Vector3R &b, real &bDepth) {
+  if ((aDepth < 0) == (bDepth < 0))
     THROWS("There is no intersection between points " << a << " & " << b);
 
   Vector3R mid;
@@ -37,16 +39,24 @@ Vector3R FieldFunction::linearIntersect(Vector3R &a, bool aInside,
   // Binary search for intersection point
   for (unsigned i = 0; i < 8; i++) {
     mid = a + (b - a) * 0.5;
-    if (contains(mid) == aInside) a = mid;
-    else b = mid;
+    real midDepth = depth(mid);
+
+    if ((midDepth < 0) == (aDepth < 0)) {
+      a = mid;
+      aDepth = midDepth;
+
+    } else {
+      b = mid;
+      bDepth = midDepth;
+    }
   }
 
   return mid;
 }
 
 
-Vector3R FieldFunction::findNormal(Vector3R &a, bool aInside,
-                                   Vector3R &b, bool bInside) {
+Vector3R FieldFunction::findNormal(Vector3R &a, real aDepth,
+                                   Vector3R &b, real bDepth) {
   Vector3R normal;
 
   // TODO
@@ -55,21 +65,25 @@ Vector3R FieldFunction::findNormal(Vector3R &a, bool aInside,
 }
 
 
-Vector3R FieldFunction::getEdgeIntersect(const Vector3R &v1, bool inside1,
-                                         const Vector3R &v2, bool inside2) {
+bool FieldFunction::cull(const Vector3R &p, double offset) const {
+  return cull(Rectangle3R(p, p).grow(offset));
+}
+
+
+Edge FieldFunction::getEdge(const Vector3R &v1, real depth1,
+                            const Vector3R &v2, real depth2) {
   Vector3R a = v1;
   Vector3R b = v2;
-  return linearIntersect(a, inside1, b, inside2);
+
+  Edge e;
+  e.vertex = linearIntersect(a, depth1, b, depth2);
+  e.normal = findNormal(a, depth1, b, depth2);
+  return e;
+
 }
 
 
 Edge FieldFunction::getEdge(const Vector3R &v1, bool inside1,
                             const Vector3R &v2, bool inside2) {
-  Vector3R a = v1;
-  Vector3R b = v2;
-
-  Edge e;
-  e.vertex = linearIntersect(a, inside1, b, inside2);
-  e.normal = findNormal(a, inside1, b, inside2);
-  return e;
+  return getEdge(v1, (real)(inside1 ? 1 : -1), v2, (real)(inside2 ? 1 : -1));
 }

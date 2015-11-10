@@ -23,9 +23,9 @@
 
 #include "Surface.h"
 #include "FieldFunction.h"
+#include "GridTree.h"
 
 #include <camotics/Task.h>
-#include <camotics/Grid.h>
 
 #include <cbang/SmartPointer.h>
 #include <cbang/os/Mutex.h>
@@ -41,8 +41,7 @@ namespace CAMotics {
 
     void updateProgress(double progress);
 
-    virtual cb::SmartPointer<Surface> getSurface() = 0;
-    virtual void run(FieldFunction &func, const Grid &grid) = 0;
+    virtual void run(FieldFunction &func, GridTreeRef &tree) = 0;
   };
 }
 

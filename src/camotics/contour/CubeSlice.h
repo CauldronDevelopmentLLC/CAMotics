@@ -23,8 +23,7 @@
 
 #include "VertexSlice.h"
 #include "FieldFunction.h"
-
-#include <camotics/Grid.h>
+#include "GridTreeRef.h"
 
 #include <cbang/SmartPointer.h>
 #include <cbang/StdTypes.h>
@@ -32,7 +31,7 @@
 
 namespace CAMotics {
   class CubeSlice {
-    Grid grid;
+    const GridTreeRef &grid;
     unsigned z;
 
     cb::SmartPointer<VertexSlice> left;
@@ -42,16 +41,17 @@ namespace CAMotics {
     bool shifted;
 
   public:
-    CubeSlice(const Grid &grid);
+    CubeSlice(const GridTreeRef &grid);
 
-    const Grid getGrid() const {return grid;}
+    const GridTreeRef &getGrid() const {return grid;}
+    unsigned getZ() const {return z;}
 
     void compute(FieldFunction &func);
     void shift();
     uint8_t getEdges(unsigned x, unsigned y, Edge edges[12]) const;
 
   protected:
-    bool isInside(int x, int y, const cb::Vector3U &offset) const;
+    real depth(int x, int y, const cb::Vector3U &offset) const;
   };
 }
 

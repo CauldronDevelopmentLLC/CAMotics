@@ -29,15 +29,17 @@ Grid::Grid(const Rectangle3D &bounds, double resolution) :
   resolution(resolution), steps((bounds.getDimensions() / resolution).ceil()) {
 
   Vector3D dims((Vector3D)steps * resolution);
-
-  rmin = bounds.rmin - Vector3D(dims - bounds.getDimensions()) / 2;
-  rmax = rmin + dims;
+  offset = bounds.rmin - Vector3D(dims - bounds.getDimensions()) / 2;
 }
 
 
-Grid::Grid(const Vector3D &rmin, const Vector3U &steps, double resolution) :
-  Rectangle3D(rmin, rmin + (Vector3D)steps * resolution),
-  resolution(resolution), steps(steps) {}
+Grid::Grid(const Vector3D &offset, const Vector3U &steps, double resolution) :
+  offset(offset), resolution(resolution), steps(steps) {}
+
+
+Rectangle3R Grid::getBounds() const {
+  return Rectangle3R(offset, offset + (Vector3D)steps * resolution);
+}
 
 
 unsigned Grid::getTotalCells() const {
@@ -46,12 +48,19 @@ unsigned Grid::getTotalCells() const {
 
 
 Grid Grid::slice(const Vector3U &start) const {
-  return Grid(rmin + (Vector3D)start * resolution, steps - start, resolution);
+  return Grid(offset + (Vector3D)start * resolution, steps - start, resolution);
 }
 
 
 Grid Grid::slice(const Vector3U &start, const Vector3U &end) const {
-  return Grid(rmin + (Vector3D)start * resolution, end - start, resolution);
+  return Grid(offset + (Vector3D)start * resolution, end - start, resolution);
+}
+
+
+unsigned Grid::largestDim() const {
+  if (steps.y() <= steps.x() && steps.z() <= steps.x()) return 0;
+  if (steps.x() <= steps.y() && steps.z() <= steps.y()) return 1;
+  return 2;
 }
 
 
@@ -63,20 +72,29 @@ void Grid::partition(vector<Grid> &grids, unsigned count) const {
     return;
   }
 
-  Vector3U offset;
-
   // Partition on the largest dimension
-  if (getLength() <= getWidth() && getHeight() <= getWidth())
-    offset.x() = steps.x() / 2;
-  else if (getWidth() <= getLength() && getHeight() <= getLength())
-    offset.y() = steps.y() / 2;
-  else offset.z() = steps.z() / 2;
+  pair<Grid, Grid> parts = split(largestDim());
 
-  Grid left(rmin, steps - offset, resolution);
-  Vector3D rightMin(rmin + (Vector3D)offset * resolution);
-  offset = steps - left.getSteps();
-  Grid right(rightMin, steps - offset, resolution);
+  unsigned half = count / 2;
+  parts.first.partition(grids, half);
+  parts.second.partition(grids, count - half);
+}
 
-  left.partition(grids, count / 2);
-  right.partition(grids, count / 2);
+
+pair<Grid, Grid> Grid::split(unsigned axis) const {
+  pair<Grid, Grid> result(*this, Grid());
+
+  if (steps[axis] < 2) return result;
+
+  // Left
+  Vector3U stepOffset;
+  stepOffset[axis] = steps[axis] / 2;
+  result.first = Grid(offset, steps - stepOffset, resolution);
+
+  // Right
+  Vector3D rOffset(offset + (Vector3D)stepOffset * resolution);
+  stepOffset = steps - result.first.getSteps();
+  result.second = Grid(rOffset, steps - stepOffset, resolution);
+
+  return result;
 }

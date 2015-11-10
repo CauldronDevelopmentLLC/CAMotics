@@ -27,7 +27,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-CubeSlice::CubeSlice(const Grid &grid) : grid(grid), z(0), shifted(false) {}
+CubeSlice::CubeSlice(const GridTreeRef &grid) :
+  grid(grid), z(0), shifted(false) {}
 
 
 void CubeSlice::compute(FieldFunction &func) {
@@ -59,29 +60,32 @@ void CubeSlice::compute(FieldFunction &func) {
     offsets[i] = (Vector3D)vIndex[i] * resolution;
 
   // For each cell
-  Vector3R p(0, 0, grid.rmin.z() + resolution * z);
+  Vector3R p(0, 0, grid.getOffset().z() + resolution * z);
+
   for (unsigned x = 0; x <= steps.x(); x++) {
-    p.x() = grid.rmin.x() + resolution * x;
+    p.x() = grid.getOffset().x() + resolution * x;
 
     for (unsigned y = 0; y <= steps.y(); y++) {
-      p.y() = grid.rmin.y() + resolution * y;
+      p.y() = grid.getOffset().y() + resolution * y;
 
       Vector3R a = p;
-      bool aInside = left->isInside(x, y);
+      real aDepth = left->depth(x, y);
+      bool cull = func.cull(a, 2.1 * resolution);
 
-      for (unsigned i = shifted ? 2 : 0; i < 5; i++) {
+      for (unsigned i = (cull || shifted) ? 2 : 0; i < 5; i++) {
         if (x == steps.x() && (i == 0 || i == 3)) continue;
         if (y == steps.y() && (i == 1 || i == 4)) continue;
 
         Vector3R b = p + offsets[i];
-        bool bInside = isInside(x, y, vIndex[i]);
+        real bDepth = depth(x, y, vIndex[i]);
 
-        if (aInside != bInside)
-          edges[i][x][y] = func.getEdge(a, aInside, b, bInside);
+        if ((aDepth < 0) != (bDepth < 0) && !cull)
+          edges[i][x][y] = func.getEdge(a, aDepth, b, bDepth);
 
         if (i == 2) {
           a = b;
-          aInside = bInside;
+          aDepth = bDepth;
+          if (func.cull(a, 2.1 * resolution)) break;
         }
       }
     }
@@ -112,7 +116,7 @@ uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
 
   uint8_t vertexFlags = 0;
   for (unsigned i = 0; i < 8; i++)
-    if (!isInside(x, y, vOffset[i]))
+    if (depth(x, y, vOffset[i]) < 0)
       vertexFlags |= 1 << i;
 
   // eOffset[] maps cube indices to the 12 edges and edge flags as laid out in
@@ -146,6 +150,6 @@ uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
 }
 
 
-bool CubeSlice::isInside(int x, int y, const Vector3U &offset) const {
-  return (offset[2] ? right : left)->isInside(x + offset.x(), y + offset.y());
+real CubeSlice::depth(int x, int y, const Vector3U &offset) const {
+  return (offset[2] ? right : left)->depth(x + offset.x(), y + offset.y());
 }

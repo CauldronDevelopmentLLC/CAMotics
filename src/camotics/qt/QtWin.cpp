@@ -27,6 +27,7 @@
 #include <camotics/view/Viewer.h>
 #include <camotics/cutsim/Project.h>
 #include <camotics/cutsim/Simulation.h>
+#include <camotics/cutsim/SimulationRun.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 #include <camotics/remote/ConnectionManager.h>
 #include <camotics/stl/STLWriter.h>
@@ -69,7 +70,7 @@ QtWin::QtWin(Application &app) :
   connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), lastRedraw(0), dirty(false),
   simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
-  autoPlay(false), autoClose(false) {
+  autoPlay(false), autoClose(false), sliderMoving(false) {
 
   ui->setupUi(this);
 
@@ -496,14 +497,14 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   }
 
   // Simulation
-  sim = project->makeSim(toolPath, view->getTime());
+  sim =
+    project->makeSim(toolPath, view->getTime(), options["threads"].toInteger());
 
   // Load surface
   surface.release();
   view->setSurface(0);
   view->setAABBTree(0);
-  unsigned threads = options["threads"].toInteger();
-  taskMan.addTask(new SurfaceTask(threads, project->getFilename(), sim));
+  taskMan.addTask(new SurfaceTask(sim));
 }
 
 
@@ -523,9 +524,10 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 
 
 void QtWin::surfaceComplete(SurfaceTask &task) {
-  surface = task.getSurface();
+  simRun = task.getSimRun();
+  surface = simRun->getSurface();
   view->setSurface(surface);
-  view->setAABBTree(task.getAABBTree());
+  view->setAABBTree(simRun->getAABBTree());
   view->setFlag(View::SURFACE_VBOS_FLAG,
                 Settings().get("Settings/VBO/Surface", true).toBool());
   redraw();
@@ -1499,8 +1501,27 @@ void QtWin::on_fileTabManager_currentChanged(int index) {
 
 
 void QtWin::on_positionSlider_valueChanged(int position) {
-  view->path->setByRatio((double)position / 10000);
+  double ratio = position / 10000.0;
+
+  view->path->setByRatio(ratio);
   redraw();
+
+  if (simRun.isNull() || sliderMoving) return;
+
+  simRun->setEndTime(ratio * view->path->getTotalTime());
+
+  taskMan.addTask(new SurfaceTask(simRun));
+}
+
+
+void QtWin::on_positionSlider_sliderPressed() {
+  sliderMoving = true;
+}
+
+
+void QtWin::on_positionSlider_sliderReleased() {
+  sliderMoving = false;
+  on_positionSlider_valueChanged(ui->positionSlider->value());
 }
 
 

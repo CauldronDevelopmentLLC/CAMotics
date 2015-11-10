@@ -41,18 +41,18 @@ void SpheroidSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
 }
 
 
-bool SpheroidSweep::contains(const Vector3R &start, const Vector3R &end,
-                             const Vector3R &p) const {
+real SpheroidSweep::depth(const Vector3R &start, const Vector3R &end,
+                          const Vector3R &p) const {
   Vector3R s = start + Vector3R(0, 0, length / 2);
   Vector3R e = end + Vector3R(0, 0, length / 2);
 
   if (2 * radius == length) {
     Vector3R c = Segment3R(s, e).closest(p);
-    return p.distanceSquared(c) < radius2;
+    return radius2 - p.distanceSquared(c);
   }
 
   // Scale z axis to make spheroids round
   Vector3R pScaled = p * scale;
   Vector3R c = Segment3R(s * scale, e * scale).closest(pScaled);
-  return pScaled.distanceSquared(c) < radius2;
+  return radius2 - pScaled.distanceSquared(c);
 }

@@ -324,16 +324,6 @@
                 <string>Cubical Marching Squares</string>
                </property>
               </item>
-              <item>
-               <property name="text">
-                <string>Old Marching Cubes</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Marching Tetrahedra</string>
-               </property>
-              </item>
              </widget>
             </item>
             <item>

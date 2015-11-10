@@ -45,8 +45,8 @@ namespace CAMotics {
     unsigned getLeafCount() const {return root ? root->getLeafCount() : 0;}
     unsigned getHeight() const {return root ? root->getTreeHeight() : 0;}
 
-    void collisions(const Vector3R &p, real time,
-                    std::vector<const Move *> &moves);
+    bool intersects(const Rectangle3R &r) const;
+    void collisions(const Vector3R &p, std::vector<const Move *> &moves) const;
     void draw(bool leavesOnly = false);
   };
 }

@@ -19,14 +19,13 @@
 \******************************************************************************/
 
 #include "SliceContourGenerator.h"
+#include "TriangleSurface.h"
 
 using namespace cb;
 using namespace CAMotics;
 
 
-void SliceContourGenerator::run(FieldFunction &func, const Grid &grid) {
-  surface = new TriangleSurface;
-
+void SliceContourGenerator::run(FieldFunction &func, GridTreeRef &grid) {
   // Progress
   unsigned completedCells = 0;
   unsigned totalCells = grid.getTotalCells();
@@ -34,15 +33,23 @@ void SliceContourGenerator::run(FieldFunction &func, const Grid &grid) {
   // Compute slices
   const Vector3U &steps = grid.getSteps();
   CubeSlice slice(grid);
+  double resolution = grid.getResolution();
+  Vector3R p;
 
   for (unsigned z = 0; !shouldQuit() && z < steps.z(); z++) {
+    p.z() = grid.getOffset().z() + resolution * z;
+
     if (z) slice.shift();
     slice.compute(func);
     doSlice(func, slice, z);
 
     for (unsigned y = 0; y < steps.y(); y++) {
+      p.y() = grid.getOffset().y() + resolution * y;
+
       for (unsigned x = 0; x < steps.x(); x++) {
-        doCell(slice, x, y);
+        p.x() = grid.getOffset().x() + resolution * x;
+
+        if (!func.cull(p, resolution * 1.1)) doCell(grid, slice, x, y);
 
         // Progress
         if ((++completedCells & 7) == 0)

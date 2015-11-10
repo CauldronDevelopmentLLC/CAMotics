@@ -24,6 +24,7 @@
 #include "RenderMode.h"
 
 #include <camotics/contour/ContourGenerator.h>
+#include <camotics/contour/GridTreeRef.h>
 
 #include <cbang/os/Thread.h>
 #include <cbang/os/Mutex.h>
@@ -35,16 +36,12 @@ namespace CAMotics {
     cb::SmartPointer<ContourGenerator> generator;
 
     FieldFunction &func;
-    Grid grid;
+    GridTreeRef &tree;
 
   public:
-    RenderJob(FieldFunction &func, RenderMode mode, const Grid &grid);
-
-    cb::SmartPointer<Surface> getSurface() const
-    {return generator->getSurface();}
+    RenderJob(FieldFunction &func, RenderMode mode, GridTreeRef &tree);
 
     double getProgress() {return generator->getProgress();}
-    //double getETA() {return generator->getETA();}
 
     // From Thread
     void run();

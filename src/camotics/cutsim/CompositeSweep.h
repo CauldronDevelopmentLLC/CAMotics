@@ -40,8 +40,8 @@ namespace CAMotics {
     void getBBoxes(const Vector3R &start, const Vector3R &end,
                    std::vector<Rectangle3R> &bboxes,
                    real tolerance = 0.01) const;
-    bool contains(const Vector3R &start, const Vector3R &end,
-                  const Vector3R &p) const;
+    real depth(const Vector3R &start, const Vector3R &end,
+               const Vector3R &p) const;
   };
 }
 

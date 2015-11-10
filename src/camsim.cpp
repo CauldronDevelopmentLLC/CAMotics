@@ -18,15 +18,16 @@
 
 \******************************************************************************/
 
-#include <cbang/Exception.h>
-#include <cbang/ApplicationMain.h>
-#include <cbang/os/SystemUtilities.h>
-
 #include <camotics/Application.h>
 #include <camotics/cutsim/CutSim.h>
 #include <camotics/cutsim/Project.h>
 #include <camotics/stl/STLWriter.h>
 #include <camotics/contour/Surface.h>
+
+#include <cbang/Exception.h>
+#include <cbang/ApplicationMain.h>
+#include <cbang/os/SystemUtilities.h>
+#include <cbang/os/SystemInfo.h>
 
 #include <iostream>
 #include <limits>
@@ -62,6 +63,7 @@ namespace CAMotics {
     bool reduce;
     bool binary;
     string resolution;
+    unsigned threads;
 
     string input;
     SmartPointer<ostream> output;
@@ -72,7 +74,8 @@ namespace CAMotics {
   public:
     SimApp() :
       Application("CAMotics Sim"), time(0),
-      reduce(true), binary(true), project(options), cutSim(options) {
+      reduce(true), binary(true), threads(SystemInfo::instance().getCPUCount()),
+      project(options) {
 
       cmdLine.setUsageArgs
         ("[OPTIONS] <project.xml | input.gcode | input.tpl> <output.stl>");
@@ -87,6 +90,7 @@ namespace CAMotics {
                         "Output binary STL, otherwise ASCII.");
       cmdLine.addTarget("resolution", resolution, "Valid values are 'low', "
                         "'medium', 'high' or a decimal value.");
+      cmdLine.addTarget("threads", threads, "Number of simulation threads.");
 
       Logger::instance().setLogTime(false);
       Logger::instance().setLogNoInfoHeader(true);
@@ -141,7 +145,7 @@ namespace CAMotics {
 
       // Simulate
       if (!time) time = numeric_limits<double>::max();
-      SmartPointer<Simulation> sim = project.makeSim(path, time);
+      SmartPointer<Simulation> sim = project.makeSim(path, time, threads);
       SmartPointer<Surface> surface;
       if (!shouldQuit()) surface = cutSim.computeSurface(sim);
 

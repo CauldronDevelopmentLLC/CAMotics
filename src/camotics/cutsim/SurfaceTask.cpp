@@ -18,66 +18,53 @@
 
 \******************************************************************************/
 
+
 #include "SurfaceTask.h"
 
-#include <camotics/stl/STLReader.h>
-#include <camotics/contour/TriangleSurface.h>
-#include <camotics/render/Renderer.h>
-#include <camotics/cutsim/CutWorkpiece.h>
+#include <camotics/cutsim/SimulationRun.h>
+#include <camotics/contour/Surface.h>
 
-#include <cbang/util/DefaultCatch.h>
-#include <cbang/os/SystemUtilities.h>
-#include <cbang/iostream/BZip2Decompressor.h>
+#include <cbang/String.h>
+#include <cbang/time/TimeInterval.h>
+#include <cbang/log/Logger.h>
 
-#include <boost/iostreams/filtering_stream.hpp>
-namespace io = boost::iostreams;
-
-using namespace std;
 using namespace cb;
 using namespace CAMotics;
+
+
+SurfaceTask::SurfaceTask(const SmartPointer<Simulation> &sim) :
+  simRun(new SimulationRun(sim)) {}
+
+
+SurfaceTask::SurfaceTask(const SmartPointer<SimulationRun> &simRun) :
+  simRun(simRun) {}
 
 
 SurfaceTask::~SurfaceTask() {}
 
 
+const SmartPointer<Surface> &SurfaceTask::getSurface() const {
+  return simRun->getSurface();
+}
+
+
 void SurfaceTask::run() {
-  // Check for cached STL file
-  try {
-    string stlCache = SystemUtilities::swapExtension(filename, "stl");
-    bool hasCache = SystemUtilities::exists(stlCache);
-    bool hasBZ2Cache = SystemUtilities::exists(stlCache + ".bz2");
+  Task::begin();
 
-    if (hasCache || hasBZ2Cache) {
-      string filename = stlCache + (hasBZ2Cache ? ".bz2" : "");
-      SmartPointer<istream> stream = SystemUtilities::iopen(filename);
+  simRun->compute(SmartPointer<Task>::Phony(this));
 
-      io::filtering_istream in;
-      if (hasBZ2Cache) in.push(BZip2Decompressor());
-      in.push(*stream);
-
-      STLReader reader(in);
-
-      string name;
-      string hash;
-      reader.readHeader(name, hash);
-
-      if (hash == sim->computeHash()) {
-        LOG_INFO(1, "Loading precomputed surface from " << filename);
-        surface = new TriangleSurface(reader, this);
-        reader.readFooter();
-      }
-    }
-  } CATCH_ERROR;
-
-  // Compute surface
-  if (surface.isNull()) {
-    // Setup cut simulation
-    SmartPointer<ToolSweep> sweep = new ToolSweep(sim->path, sim->time);
-    CutWorkpiece cutWP(sweep, sim->workpiece);
-    aabbTree = sweep; // Save for later viewing
-
-    // Render
-    Renderer renderer(SmartPointer<Task>::Phony(this));
-    surface = renderer.render(cutWP, threads, sim->resolution, sim->mode);
+  // Time
+  if (shouldQuit()) {
+    Task::end();
+    LOG_INFO(1, "Render aborted");
+    return;
   }
+
+  // Done
+  SmartPointer<Surface> surface = simRun->getSurface();
+  double delta = Task::end();
+  LOG_INFO(1, "Time: " << TimeInterval(delta)
+           << " Triangles: " << surface->getCount()
+           << " Triangles/sec: "
+           << String::printf("%0.2f", surface->getCount() / delta));
 }

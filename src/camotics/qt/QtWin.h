@@ -59,6 +59,7 @@ namespace CAMotics {
   class Viewer;
   class Project;
   class Simulation;
+  class SimulationRun;
   class ToolPath;
   class CutWorkpiece;
   class ConsoleWriter;
@@ -99,6 +100,7 @@ namespace CAMotics {
     ValueSet valueSet;
     cb::SmartPointer<Project> project;
     cb::SmartPointer<Simulation> sim;
+    cb::SmartPointer<SimulationRun> simRun;
     cb::SmartPointer<ConnectionManager> connectionManager;
     cb::SmartPointer<View> view;
     cb::SmartPointer<Viewer> viewer;
@@ -116,6 +118,7 @@ namespace CAMotics {
     bool autoPlay;
     bool autoClose;
     std::string defaultExample;
+    bool sliderMoving;
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
@@ -268,6 +271,8 @@ namespace CAMotics {
 
     void on_fileTabManager_currentChanged(int index);
     void on_positionSlider_valueChanged(int position);
+    void on_positionSlider_sliderPressed();
+    void on_positionSlider_sliderReleased();
 
     void on_filesListView_activated(const QModelIndex &index);
     void on_filesListView_customContextMenuRequested(QPoint point);

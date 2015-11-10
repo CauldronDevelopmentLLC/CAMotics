@@ -18,38 +18,34 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CELL_SLICE_H
-#define CAMOTICS_CELL_SLICE_H
+#ifndef CAMOTICS_GRID_TREE_LEAF_H
+#define CAMOTICS_GRID_TREE_LEAF_H
 
-#include "HermiteSlice.h"
-#include "Cell.h"
+#include "GridTreeBase.h"
+#include "Triangle.h"
 
 #include <vector>
 
-namespace CAMotics {
-  class CellSlice {
-    cb::SmartPointer<HermiteSlice> first;
-    cb::SmartPointer<HermiteSlice> second;
-    const cb::Vector2U &dims;
-    const unsigned width;
 
-    std::vector<Cell> cells;
-    std::vector<uint32_t> cellIndices;
+namespace CAMotics {
+  class GridTreeLeaf : public GridTreeBase {
+    std::vector<Triangle> triangles;
+    std::vector<cb::Vector3F> normals;
 
   public:
-    CellSlice(const cb::SmartPointer<HermiteSlice> &first,
-              const cb::SmartPointer<HermiteSlice> &second) :
-      first(first), second(second), dims(first->getDimensions()),
-      width(dims.x()) {}
+    const std::vector<Triangle> &getTriangles() const {return triangles;}
+    const std::vector<cb::Vector3F> &getNormals() const {return normals;}
 
-    void compute();
+    void add(const Triangle &t, const cb::Vector3F &n);
+    void add(const Triangle &t);
 
-    const Cell *getCell(unsigned x, unsigned y) const {
-      uint32_t index = cellIndices[y * width + x];
-      return index ? &cells[index] : 0;
-    }
+    // From GridTreeBase
+    bool isLeaf() const {return true;}
+    unsigned getCount() const {return triangles.size();}
+    void gather(std::vector<float> &vertices,
+                std::vector<float> &normals) const;
   };
 }
 
-#endif // CAMOTICS_CELL_SLICE_H
+#endif // CAMOTICS_GRID_TREE_LEAF_H
 

@@ -22,26 +22,24 @@
 #define CAMOTICS_VERTEX_SLICE_H
 
 #include "FieldFunction.h"
-
-#include <camotics/Geom.h>
-#include <camotics/Grid.h>
+#include "GridTreeRef.h"
 
 #include <vector>
 
 
 namespace CAMotics {
-  class VertexSlice : public std::vector<std::vector<bool> > {
-    Grid grid;
+  class VertexSlice : public std::vector<std::vector<real> > {
+    const GridTreeRef &grid;
     unsigned z;
 
   public:
-    VertexSlice(const Grid &grid, unsigned z);
+    VertexSlice(const GridTreeRef &grid, unsigned z);
 
-    bool isInside(unsigned x, unsigned y) const {return at(x).at(y);}
+    real depth(unsigned x, unsigned y) const {return at(x).at(y);}
 
     void compute(FieldFunction &func);
 
-    const Grid &getGrid() const {return grid;}
+    const GridTreeRef &getGrid() const {return grid;}
     unsigned getZ() const {return z;}
   };
 }
