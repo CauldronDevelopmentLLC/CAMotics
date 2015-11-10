@@ -526,10 +526,13 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 void QtWin::surfaceComplete(SurfaceTask &task) {
   simRun = task.getSimRun();
   surface = simRun->getSurface();
+  if (surface.isNull()) simRun.release();
+
   view->setSurface(surface);
   view->setAABBTree(simRun->getAABBTree());
   view->setFlag(View::SURFACE_VBOS_FLAG,
                 Settings().get("Settings/VBO/Surface", true).toBool());
+
   redraw();
 
   setStatusActive(false);

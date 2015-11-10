@@ -94,5 +94,6 @@ void SimulationRun::compute(const SmartPointer<Task> &task) {
     // TODO race condition on surface SmartPointer
     surface = new TriangleSurface(*tree);
     lastTime = sim->time;
-  }
+
+  } else surface.release();
 }
