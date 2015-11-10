@@ -31,8 +31,9 @@ using namespace cb;
 using namespace CAMotics;
 
 
-RenderJob::RenderJob(FieldFunction &func, RenderMode mode, GridTreeRef &tree) :
-  func(func), tree(tree) {
+RenderJob::RenderJob(Condition &condition, FieldFunction &func, RenderMode mode,
+                     GridTreeRef &tree) :
+  condition(condition), func(func), tree(tree) {
   switch (mode) {
   case RenderMode::MCUBES_MODE: generator = new MarchingCubes; break;
   case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
@@ -45,6 +46,8 @@ void RenderJob::run() {
   try {
     generator->run(func, tree);
   } CATCH_WARNING;
+
+  condition.signal();
 }
 
 

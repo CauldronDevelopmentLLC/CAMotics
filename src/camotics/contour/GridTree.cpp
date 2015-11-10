@@ -48,7 +48,7 @@ void GridTree::partition(vector<GridTreeRef> &grids, const Rectangle3R &bbox,
 
     Rectangle3R intersection = bbox.intersection(bounds);
     if (intersection != bounds) {
-      LOG_DEBUG(1, "bbox=" << bbox << " intersection=" << intersection
+      LOG_DEBUG(3, "bbox=" << bbox << " intersection=" << intersection
                 << " bounds=" << bounds);
 
       intersection = (intersection - getOffset()) / getResolution();
@@ -58,7 +58,7 @@ void GridTree::partition(vector<GridTreeRef> &grids, const Rectangle3R &bbox,
       offset = iBounds.rmin;
       steps = iBounds.getDimensions();
 
-      LOG_DEBUG(1, "iBounds=" << iBounds << " steps=" << steps
+      LOG_DEBUG(3, "iBounds=" << iBounds << " steps=" << steps
                 << " orig steps=" << getSteps());
     }
 

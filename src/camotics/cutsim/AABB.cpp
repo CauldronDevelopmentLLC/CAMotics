@@ -108,14 +108,6 @@ unsigned AABB::getTreeHeight() const {
 }
 
 
-unsigned AABB::getLeafCount() const {
-  return
-    (left ? left->getLeafCount() : 0) +
-    (right ? right->getLeafCount() : 0) +
-    (isLeaf() ? 1 : 0);
-}
-
-
 bool AABB::intersects(const Rectangle3R &r) {
   if (!Rectangle3R::intersects(r)) return false;
 

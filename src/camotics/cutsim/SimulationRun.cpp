@@ -26,6 +26,9 @@
 #include <camotics/render/Renderer.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 
+#include <cbang/log/Logger.h>
+#include <cbang/time/TimeInterval.h>
+
 using namespace cb;
 using namespace CAMotics;
 
@@ -51,6 +54,8 @@ void SimulationRun::setEndTime(double endTime) {
 
 void SimulationRun::compute(const SmartPointer<Task> &task) {
   Rectangle3R bbox;
+
+  double start = task->getTime();
 
   if (sweep.isNull()) {
     // Tool sweep
@@ -82,8 +87,11 @@ void SimulationRun::compute(const SmartPointer<Task> &task) {
   Renderer renderer(task);
   renderer.render(cutWP, *tree, bbox, sim->threads, sim->mode);
 
+  LOG_DEBUG(1, "Render time " << TimeInterval(task->getTime() - start));
+
   // Extract surface
   if (!task->shouldQuit()) {
+    // TODO race condition on surface SmartPointer
     surface = new TriangleSurface(*tree);
     lastTime = sim->time;
   }

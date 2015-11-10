@@ -27,6 +27,7 @@
 #include <camotics/Geom.h>
 
 #include <cbang/SmartPointer.h>
+#include <cbang/os/Condition.h>
 
 
 namespace CAMotics {

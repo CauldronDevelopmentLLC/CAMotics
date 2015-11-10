@@ -42,7 +42,6 @@ namespace CAMotics {
     void partition(AABB *nodes);
 
     Rectangle3R getBounds() const;
-    unsigned getLeafCount() const {return root ? root->getLeafCount() : 0;}
     unsigned getHeight() const {return root ? root->getTreeHeight() : 0;}
 
     bool intersects(const Rectangle3R &r) const;

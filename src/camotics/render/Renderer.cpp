@@ -25,10 +25,11 @@
 #include <camotics/Grid.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 
+#include <cbang/String.h>
 #include <cbang/log/Logger.h>
 #include <cbang/time/TimeInterval.h>
 #include <cbang/time/Timer.h>
-#include <cbang/String.h>
+#include <cbang/util/SmartLock.h>
 
 #include <cmath>
 
@@ -40,68 +41,71 @@ using namespace CAMotics;
 void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
                       const Rectangle3R &bbox, unsigned threads,
                       RenderMode mode) {
-  // Divide work
-  unsigned targetJobCount = pow(2, ceil(log(threads) / log(2)) + 2);
-
-  vector<GridTreeRef> jobGrids;
-  tree.partition(jobGrids, bbox, targetJobCount);
-  unsigned totalJobCount = jobGrids.size();
-
-  LOG_DEBUG(1, "Partitioned in to " << totalJobCount << " jobs");
-  LOG_INFO(1, "Computing surface bounded by " << tree.getBounds() << " at "
-           << tree.getResolution() << " grid resolution");
-
-  // Run jobs
   typedef list<SmartPointer<RenderJob> > jobs_t;
   jobs_t jobs;
-  double lastUpdate = 0;
-  while (!task->shouldQuit() && !(jobGrids.empty() && jobs.empty())) {
 
-    // Start new jobs
-    while (!jobGrids.empty() && jobs.size() < threads) {
-      SmartPointer<RenderJob> job =
-        new RenderJob(cutWorkpiece, mode, jobGrids.back());
-      job->start();
-      jobs.push_back(job);
-      jobGrids.pop_back();
+  {
+    SmartLock lock(this);
+
+    // Divide work
+    unsigned targetJobCount = pow(2, ceil(log(threads) / log(2)) + 2);
+
+    vector<GridTreeRef> jobGrids;
+    tree.partition(jobGrids, bbox, targetJobCount);
+    unsigned totalJobCount = jobGrids.size();
+
+    LOG_DEBUG(1, "Partitioned in to " << totalJobCount << " jobs");
+    LOG_INFO(1, "Computing surface bounded by " << tree.getBounds() << " at "
+             << tree.getResolution() << " grid resolution");
+
+    // Run jobs
+    double lastUpdate = 0;
+    while (!task->shouldQuit() && !(jobGrids.empty() && jobs.empty())) {
+      // Start new jobs
+      while (!jobGrids.empty() && jobs.size() < threads) {
+        SmartPointer<RenderJob> job =
+          new RenderJob(*this, cutWorkpiece, mode, jobGrids.back());
+        job->start();
+        jobs.push_back(job);
+        jobGrids.pop_back();
+      }
+
+
+      // Reap completed jobs
+      jobs_t::iterator it;
+      for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit();)
+        if ((*it)->getState() == Thread::THREAD_DONE) {
+          (*it)->join();
+          it = jobs.erase(it);
+        } else it++;
+
+
+      // Update Progress
+      double progress = 0;
+
+      // Add running jobs
+      for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit(); it++)
+        progress += (*it)->getProgress();
+
+      // Add completed jobs
+      progress += totalJobCount - jobGrids.size() - jobs.size();
+      progress /= totalJobCount;
+
+      task->update(progress, "Rendering surface");
+
+      // Log progress
+      double now = Timer::now();
+      if (lastUpdate + 1 < now) {
+        lastUpdate = now;
+        LOG_INFO(2, String::printf("Progress: %0.2f%%", progress * 100)
+                 << " Time: " << TimeInterval(task->getTime())
+                 << " ETA: " << TimeInterval(task->getETA()));
+      }
+
+      // Wait
+      timedWait(0.1);
     }
-
-
-    // Reap completed jobs
-    jobs_t::iterator it;
-    for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit();)
-      if ((*it)->getState() == Thread::THREAD_DONE) {
-        (*it)->join();
-        it = jobs.erase(it);
-      } else it++;
-
-
-    // Update Progress
-    double progress = 0;
-
-    // Add running jobs
-    for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit(); it++)
-      progress += (*it)->getProgress();
-
-    // Add completed jobs
-    progress += totalJobCount - jobGrids.size() - jobs.size();
-    progress /= totalJobCount;
-
-    task->update(progress, "Rendering surface");
-
-    // Log progress
-    double now = Timer::now();
-    if (lastUpdate + 1 < now) {
-      lastUpdate = now;
-      LOG_INFO(2, String::printf("Progress: %0.2f%%", progress * 100)
-               << " Time: " << TimeInterval(task->getTime())
-               << " ETA: " << TimeInterval(task->getETA()));
-    }
-
-    // Sleep
-    Timer::sleep(0.1);
   }
-
 
   // Clean up remaining jobs in case of an early exit
   for (jobs_t::iterator it = jobs.begin(); it != jobs.end(); it++)

@@ -27,19 +27,20 @@
 #include <camotics/contour/GridTreeRef.h>
 
 #include <cbang/os/Thread.h>
-#include <cbang/os/Mutex.h>
-#include <cbang/util/SmartLock.h>
+#include <cbang/os/Condition.h>
+
 
 namespace CAMotics {
   class RenderJob : public cb::Thread {
-
+    cb::Condition &condition;
     cb::SmartPointer<ContourGenerator> generator;
 
     FieldFunction &func;
     GridTreeRef &tree;
 
   public:
-    RenderJob(FieldFunction &func, RenderMode mode, GridTreeRef &tree);
+    RenderJob(cb::Condition &condition, FieldFunction &func, RenderMode mode,
+              GridTreeRef &tree);
 
     double getProgress() {return generator->getProgress();}
 
