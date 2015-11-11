@@ -18,46 +18,24 @@
 
 \******************************************************************************/
 
-#include "SampleSlice.h"
+#include "Triangle.h"
 
-#include <limits>
-
-using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-SampleSlice::SampleSlice(FieldFunction &func, const Rectangle2R &bbox,
-                         real z, real step) :
-  func(func), bbox(bbox), z(z), step(step) {
-
-  // Compute steps
-  steps = (bbox.getDimensions() + Vector2R(1)) / step;
+void Triangle::updateNormal() {
+  normal = computeNormal();
 }
 
 
-void SampleSlice::compute() {
-  // Allocate space
-  resize((steps[0] + 2) * (steps[1] + 2), -std::numeric_limits<real>::max());
+Vector3F Triangle::computeNormal() const {
+  // Compute face normal
+  Vector3F n = (data[1] - data[0]).cross(data[2] - data[0]);
 
-  // Compute offsets
-  const Vector2R &rmin = bbox.getMin();
-  Vector2R scale = Vector2R(bbox.getWidth() / steps.x(),
-                            bbox.getLength() / steps.y());
-  Vector3R p = Vector3R(0, 0, z);
+  // Normalize
+  real length = n.length();
+  n /= length;
 
-  // TODO Culling?
-
-  // Sample
-  //real *array = (*this)[0];
-  for (unsigned y = 0; y < steps.y() + 2; y++) {
-    p.y() = rmin.y() + y * scale.y();
-
-    for (unsigned x = 0; x < steps.x() + 2; x++) {
-      p.x() = rmin.x() + x * scale.x();
-
-      // TODO func.getSample() was removed
-      //*array++ = func.getSample(p);
-    }
-  }
+  return n;
 }

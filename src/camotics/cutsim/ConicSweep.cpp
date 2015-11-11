@@ -53,7 +53,7 @@ real ConicSweep::depth(const Vector3R &start, const Vector3R &end,
   real y = p.y();
   real z = p.z();
 
-  // Z height range
+  // Check z-height range
   real minZ = z1 < z2 ? z1 : z2;
   real maxZ = z1 < z2 ? z2 : z1;
   if (z < minZ || maxZ + length < z) return -numeric_limits<real>::max();
@@ -72,16 +72,15 @@ real ConicSweep::depth(const Vector3R &start, const Vector3R &end,
 
   real conicSlope = conical ? (radius1 - radius2) / length : 0;
 
-  // Simple cases for horizontal and vertical moves
+  // Compute tool radius at z-height
   real r2;
   if (conical) {
-    if (z <= minZ) r2 = radius2;
-    else if (maxZ + length <= z) r2 = radius1;
-    else r2 = (z - minZ) * conicSlope + radius2;
+    r2 = (z - minZ) * conicSlope + radius2;
     r2 *= r2;
 
   } else r2 = radius1 * radius1;
 
+  // Simple cases for horizontal and vertical moves
   if (vertical) return r2 - p1.distanceSquared(q);
 
   Vector2R c = Segment2R(p1, p2).closest(q);
@@ -93,7 +92,7 @@ real ConicSweep::depth(const Vector3R &start, const Vector3R &end,
   int count = 0;
   Vector2R s[2];
 
-  // First check the verticals
+  // First check the vertical lines of the parallelogram
   if (z1 <= z && z <= z1 + length) s[count++] = p1;
   if (z2 <= z && z <= z2 + length) s[count++] = p2;
 

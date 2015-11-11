@@ -25,23 +25,9 @@ using namespace cb;
 using namespace CAMotics;
 
 
-void GridTreeLeaf::add(const Triangle &t, const Vector3F &n) {
-  triangles.push_back(t);
-  normals.push_back(n);
-}
-
-
 void GridTreeLeaf::add(const Triangle &t) {
-  // Compute face normal
-  Vector3F n = (t[1] - t[0]).cross(t[2] - t[0]);
-
-  // Normalize
-  real length = n.length();
-  if (length == 0) return; // Degenerate element, skip
-  n /= length;
-
-  // Add it
-  add(t, n);
+  if (!t.normal.isReal()); // Degenerate, skip
+  triangles.push_back(t);
 }
 
 
@@ -51,6 +37,6 @@ void GridTreeLeaf::gather(vector<float> &vertices,
     for (unsigned j = 0; j < 3; j++)
       for (unsigned k = 0; k < 3; k++) {
         vertices.push_back(triangles[i][j][k]);
-        normals.push_back(this->normals[i][k]);
+        normals.push_back(triangles[i].normal[k]);
       }
 }

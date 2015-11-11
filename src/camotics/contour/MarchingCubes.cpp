@@ -47,6 +47,8 @@ void MarchingCubes::doCell(GridTreeRef &tree, const CubeSlice &slice,
     for (int i = 0; i < 3; i++)
       t[i] = edges[triangleConnectionTable[index][3 * j + i]].vertex;
 
+    t.updateNormal();
+
     leaf->add(t);
   }
 

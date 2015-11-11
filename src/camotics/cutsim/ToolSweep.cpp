@@ -95,9 +95,21 @@ bool ToolSweep::cull(const Rectangle3R &r) const {
 }
 
 
+namespace {
+  struct move_sort {
+    bool operator()(const Move *a, const Move *b) const {
+      return a->getStartTime() < b->getStartTime();
+    }
+  };
+}
+
+
 real ToolSweep::depth(const Vector3R &p) const {
   vector<const Move *> moves;
   collisions(p, moves);
+
+  // Eariler moves first
+  sort(moves.begin(), moves.end(), move_sort());
 
   real d2 = -numeric_limits<real>::max();
 

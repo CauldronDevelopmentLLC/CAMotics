@@ -24,19 +24,18 @@
 #include "GridTreeBase.h"
 #include "Triangle.h"
 
+#include <camotics/Geom.h>
+
 #include <vector>
 
 
 namespace CAMotics {
   class GridTreeLeaf : public GridTreeBase {
     std::vector<Triangle> triangles;
-    std::vector<cb::Vector3F> normals;
 
   public:
     const std::vector<Triangle> &getTriangles() const {return triangles;}
-    const std::vector<cb::Vector3F> &getNormals() const {return normals;}
 
-    void add(const Triangle &t, const cb::Vector3F &n);
     void add(const Triangle &t);
 
     // From GridTreeBase

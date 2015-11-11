@@ -25,12 +25,17 @@
 
 
 namespace CAMotics {
-  class Triangle {
-    cb::Vector3F vertices[3];
+  struct Triangle : public cb::Triangle3F {
+    cb::Vector3F normal;
+    float time;
 
-  public:
-    const cb::Vector3F &operator[](unsigned i) const {return vertices[i];}
-    cb::Vector3F &operator[](unsigned i) {return vertices[i];}
+    Triangle(const cb::Triangle3F &t = cb::Triangle3F(cb::Vector3F(0.0)),
+             const cb::Vector3F &n = cb::Vector3F(0.0 / 0.0),
+             float time = 0) :
+      cb::Triangle3F(t), normal(n), time(time) {}
+
+    void updateNormal();
+    cb::Vector3F computeNormal() const;
   };
 }
 
