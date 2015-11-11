@@ -21,10 +21,10 @@
 #ifndef CAMOTICS_TASK_H
 #define CAMOTICS_TASK_H
 
-#include <cbang/os/Mutex.h>
+#include <cbang/os/Condition.h>
 
 namespace CAMotics {
-  class Task : public cb::Mutex {
+  class Task : public cb::Condition {
     bool interrupted;
 
     double startTime;
