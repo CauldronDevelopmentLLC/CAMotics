@@ -20,6 +20,8 @@
 
 #include "ConicSweep.h"
 
+#include <cbang/log/Logger.h>
+
 #include <limits>
 
 using namespace std;
@@ -27,127 +29,67 @@ using namespace CAMotics;
 
 
 ConicSweep::ConicSweep(real length, real radius1, real radius2) :
-  length(length), radius1(radius1), radius2(radius2 == -1 ? radius1 : radius2) {
+  l(length), rt(radius1), rb(radius2 == -1 ? radius1 : radius2),
+  Tm((rt - rb) / l) {
 }
 
 
 void ConicSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
                            vector<Rectangle3R> &bboxes, real tolerance) const {
-  Sweep::getBBoxes(start, end, bboxes, radius1 < radius2 ? radius2 : radius1,
-                   length, tolerance);
+  Sweep::getBBoxes(start, end, bboxes, rt < rb ? rb : rt, l, tolerance);
 }
 
+
+namespace {
+  inline double sqr(double x) {return x * x;}
+}
 
 
 real ConicSweep::depth(const Vector3R &start, const Vector3R &end,
                        const Vector3R &p) const {
-  real x1 = start.x();
-  real y1 = start.y();
-  real z1 = start.z();
+  const double Ax = start.x(), Ay = start.y(), Az = start.z();
+  const double Bx = end.x(), By = end.y(), Bz = end.z();
+  const double Px = p.x(), Py = p.y(), Pz = p.z();
 
-  real x2 = end.x();
-  real y2 = end.y();
-  real z2 = end.z();
+  // Check z-height
+  const double minZ = Az < Bz ? Az : Bz, maxZ = Az < Bz ? Bz : Az;
+  if (Pz < minZ || maxZ + l < Pz) return -1;
 
-  real x = p.x();
-  real y = p.y();
-  real z = p.z();
+  const double a = Px - Ax, b = Py - Ay, c = (Pz - Az) * Tm;
+  const double d = Bx - Ax, e = By - Ay, f = (Bz - Az) * Tm;
+  const double a2 = a * a, b2 = b * b, c2 = c * c;
+  const double d2 = d * d, e2 = e * e, f2 = f * f;
+  const double rb2 = rb * rb;
 
-  // Check z-height range
-  real minZ = z1 < z2 ? z1 : z2;
-  real maxZ = z1 < z2 ? z2 : z1;
-  if (z < minZ || maxZ + length < z) return -numeric_limits<real>::max();
+  const double betaD = -d2 - e2 + f2;
+  const double betaR =
+    (d2 + e2) * rb2 +
+    (2 * c * d2 + 2 * c * e2 + (-2 * b * e - 2 * a * d) * f) * rb +
+    (a2 + b2) * f2 + (-2 * a * c * d - 2 * b * c * e) * f + (c2 - a2) * e2 +
+    2 * a * b * d * e + (c2 - b2) * d2;
 
-  real xLen = x2 - x1;
-  real yLen = y2 - y1;
-  real zLen = z2 - z1;
+  // Check if solution is valid
+  if (betaD == 0 || betaR < 0) return -1;
 
-  bool horizontal = z1 == z2;
-  bool vertical = x1 == x2 && y1 == y2;
-  bool conical = radius1 != radius2;
+  double beta = (sqrt(betaR) + f * rb + c * f - b * e - a * d) / betaD;
 
-  Vector2R q(x, y);
-  Vector2R p1(x1, y1);
-  Vector2R p2(x2, y2);
+  // Check if z-heights make sense
+  const double Qz = beta * (Bz - Az) + Az;
 
-  real conicSlope = conical ? (radius1 - radius2) / length : 0;
+  if (Pz < Qz || Qz + l < Pz) {
+    beta = Pz / (Bz - Az); // E is on to AB at z-height
 
-  // Compute tool radius at z-height
-  real r2;
-  if (conical) {
-    r2 = (z - minZ) * conicSlope + radius2;
-    r2 *= r2;
+    // Compute squared distance to E on XY plane
+    const double Ex = beta * (Bx - Ax) + Ax;
+    const double Ey = beta * (By - Ay) + Ay;
+    const double d2 = sqr(Ex - Px) + sqr(Ey - Py);
 
-  } else r2 = radius1 * radius1;
-
-  // Simple cases for horizontal and vertical moves
-  if (vertical) return r2 - p1.distanceSquared(q);
-
-  Vector2R c = Segment2R(p1, p2).closest(q);
-  if (horizontal) return r2 - q.distanceSquared(c);
-
-  // Slanting move
-  // Find the ends of the line segment which passes through the move's
-  // internal parallelogram at the z-height of p
-  int count = 0;
-  Vector2R s[2];
-
-  // First check the vertical lines of the parallelogram
-  if (z1 <= z && z <= z1 + length) s[count++] = p1;
-  if (z2 <= z && z <= z2 + length) s[count++] = p2;
-
-  // Check top & bottom lines of the parallelogram
-  if (count < 2) {
-    real delta;
-    if (minZ + length < z) delta = (z - minZ + length) / std::fabs(z2 - z1);
-    else delta = (z - minZ) / std::fabs(z2 - z1);
-    if (z1 < z2) s[count++] = p1 + (p2 - p1) * delta;
-    else s[count++] = p2 + (p1 - p2) * delta;
+    if (Pz < Qz && rb2 < d2) return -1;
+    if (Qz + l < Pz && rt * rt < d2) return -1;
   }
 
-  // Find the closest point to p on the z-line segment
-  c = Segment2R(s[0], s[1]).closest(q);
+  // Check that it's on the line segment
+  if (beta < 0 || 1 < beta) return -1;
 
-  // Check cone tool height for closest point
-  if (conical) {
-    // NOTE Slanting move so one or both of xLen and yLen is not zero
-    real h = 0;
-    if (xLen) h = z - (z1 + (c.x() - x1) / xLen * zLen);
-    else if (yLen) h = z - (z1 + (c.y() - y1) / yLen * zLen);
-
-    if (h < length) {
-      r2 = h * conicSlope + radius2;
-      r2 *= r2;
-    }
-  }
-
-  real cDistSq = q.distanceSquared(c);
-  if (!conical || cDistSq < r2) return r2 - cDistSq;
-
-  // Look up and down the z-line for a closer point on the cone
-  real maxRadius = radius1 < radius2 ? radius2 : radius1;
-  real l2 = maxRadius * maxRadius - cDistSq;
-  real l = sqrt(l2); // How far to look
-  Vector2R n = (s[1] - s[0]).normalize(); // Direction vector
-
-  Vector2R a = c.distanceSquared(s[1]) < l2 ? s[1] : (c + n * l);
-  Vector2R b = c.distanceSquared(s[0]) < l2 ? s[0] : (c - n * l);
-  real aH = 0;
-  real bH = 0;
-
-  if (xLen) {
-    aH = z - (z1 + (a.x() - x1) / xLen * zLen);
-    bH = z - (z1 + (b.x() - x1) / xLen * zLen);
-
-  } else if (yLen) {
-    aH = z - (z1 + (a.y() - y1) / yLen * zLen);
-    bH = z - (z1 + (b.y() - y1) / yLen * zLen);
-  }
-
-  real h = aH < bH ? bH : aH;
-  c = aH < bH ? b : a;
-  r2 = h * conicSlope + radius2;
-  r2 *= r2;
-
-  return r2 - q.distanceSquared(c);
+  return 1;
 }

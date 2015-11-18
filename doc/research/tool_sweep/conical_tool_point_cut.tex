@@ -1,0 +1,130 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{color}
+
+\title{
+  Determining the Time at which a Linear Tool Sweep Intersects an Arbitrary
+  Point in 3D
+}
+\date{November 16, 2015}
+\author{
+  Joseph Coffland\\
+  Cauldron Development LLC\\
+  joseph@cauldrondevelopment.com
+}
+
+\newcommand{\norm}[1]{\lvert #1 \rvert}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Let vectors $\vec{A}$ and $\vec{B}$ be points in $\mathbb{R}_3$ which define
+the linear path $\vec{AB}$ of a cutting tool.  Let $T(r_t,r_b,l)$ represent a
+conical tool with top and bottom radi $r_t$ and $r_b$ and length $l$, each in
+$\mathbb{R}$.  Let $S$ be the sweep of $T$ as the lowest point of it's center
+axis moves from $\vec{A}$ to $\vec{B}$ with the axis of $T$ parallel to the
+Z-axis.  Let $\vec{P}$ be an arbitrary point in $\mathbb{R}_3$ near $S$. Let
+$A_t$ and $B_t$ be the respective start and end times of $S$.  We wish to
+determine if $S$ cuts $\vec{P}$ and if so find $t$, the time at which $S$
+firsts cuts $\vec{P}$.
+
+\begin{figure}[!h]
+  \centering
+  \def\svgwidth{0.5\textwidth}
+  \input{conical_tool_point_cut_fig1.eps_tex}
+\end{figure}
+
+\section{Find the Point $\vec{Q}$}
+First we seek the point $\vec{Q}$ on $\vec{AB}$ where $T$, when centered over
+$\vec{Q}$, first cuts $\vec{P}$.  Since $\vec{Q}$ is a point on $\vec{AB}$ we
+only need to find the magnitude of $\vec{AQ}$ to fully determine $\vec{Q}$.
+
+Let $\alpha$ be the the magnitude of $\vec{AQ}$.  Then:
+
+\begin{equation*}
+\vec{Q} = \alpha \frac{\vec{AB}}{\norm{\vec{AB}}} + \vec{A}
+\end{equation*}
+
+Let $\beta = \frac{\alpha}{\norm{\vec{AB}}}$ then we have:
+
+\begin{equation}
+\vec{Q} =
+[\beta (B_x - A_x) + A_x, \beta (B_y - A_y) + A_y, \beta (B_z - A_z) + A_z]
+\end{equation}
+
+There are two ways in which $\vec{P}$ may be cut by $S$.  The first is by
+contact with the side of the tool and the second by contact with the upper
+or lower tool face.
+
+If $\vec{P}$ is first cut by the side of the tool, then given $\vec{E}$ the
+projection of $\vec{P}$ onto the tool axis, the distance between $\vec{P}$ and
+$\vec{E}$ is equal to the distance between $\vec{E}$ and $\vec{Q}$ times $T_m$
+plus $r_b$.  Where $T_m=\frac{(r_t - r_b)}{l}$ is the slope of $T$.
+
+\begin{equation*}
+\norm{\vec{PE}} = \norm{\vec{EQ}} T_m + r_b
+\end{equation*}
+
+Note that $\vec{E}$ is just:
+
+\begin{equation*}
+\vec{E} = [Qx, Qy, Pz]
+\end{equation*}
+
+And $Q_z$ is always less than or equal to $P_z$.  So we have:
+
+\begin{equation}\label{eq2}
+\sqrt{(P_x - Q_x)^2 + (P_y - Q_y)^2} = (P_z - Q_z) T_m + r_b
+\end{equation}
+
+Substituting equation 1 we get:
+
+\begin{equation*}
+\sqrt{(P_x - (\beta (B_x-A_x) + A_x))^2 + (P_y - (\beta (B_y-A_y) + A_y))^2} =
+(P_z - (\beta (B_z - A_z) + A_z)) T_m + r_b
+\end{equation*}
+
+Solving for $\beta$ we get a big ugly equation.
+
+\section{Spherical Tool}
+Consider a spherical tool with radius $r$.  Let $\vec{C}$ be the center of the
+sphere with the tool running along $\vec{AB}$ such that $C_z = Q_z + r$ where
+$\vec{Q}$ is a point on $\vec{AB}$.  $\vec{C}$ is then just:
+
+\begin{equation*}
+\vec{C} = [Q_x, Q_y, Q_z+r]
+\end{equation*}
+
+If $S$ cuts $\vec{P}$ then it must first do so when $\vec{P}$ is exactly $r$
+away from $\vec{C}$.  Therefore:
+
+\begin{equation*}
+\norm{\vec{PC}} = r
+\end{equation*}
+
+Substituting in the components of $\vec{C}$ we get:
+
+\begin{equation}
+\sqrt{(Px-Qx)^2 + (Py-Qy)^2 + (Pz-(Qz+r))^2} = r
+\end{equation}
+
+Substituting equation 1 we get:
+
+\begin{equation}
+\sqrt{
+  (Px-(\beta (B_x-A_x)+A_x))^2 +
+  (Py-(\beta (B_y-A_y)+A_y))^2 +
+  (Pz-(\beta (B_z-A_z)+A_z+r))^2} = r
+\end{equation}
+
+\section{Time of Cut}
+Now the time $t$ when $T$ first cuts $P$ is:
+
+\begin{equation}
+t = (B_t - A_t) \beta + A_t
+\end{equation}
+\end{document}

@@ -1,0 +1,81 @@
+\documentclass{report}
+\usepackage[toc,page]{appendix}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{color}
+
+\begin{document}
+
+\title{Camotics 3-axis CNC Simulation}
+\date{\today}
+\author{
+  Joseph Coffland\\
+  Cauldron Development LLC\\
+  \texttt{joseph@cauldrondevelopment.com}
+}
+\maketitle
+
+
+\tableofcontents
+
+\chapter{Introduction}
+\section{Simulation System Overview}
+
+\chapter{Tool Paths}
+\section{Representation}
+\section{Segmentation}
+\section{Finding Segments}
+\section{Animation}
+
+\chapter{Cutting Tools}
+\section{Tool Numbering}
+\section{Conical Tools}
+\section{Spherical Tools}
+\section{Composite Tools}
+
+\chapter{The Workpiece}
+AKA the {\tt stock}.
+\section{Cuboid Workpieces}
+\section{Cylindrical Workpieces}
+\section{Composite Workpieces}
+\section{Arbitrary Workpieces}
+\section{Automatic Workpiece}
+
+\chapter{The Cut Surface}
+\section{Evaluating Points in Space}
+\subsection{Hit Detection}
+
+\section{Marching Cubes}
+Vs. octree.
+\section{Cubical Marching Squares}
+\section{Finding Edge Intersections}
+\section{Sharp Features}
+\subsection{Surface Gradient}
+
+\chapter{Real-Time Playback}
+\section{Mesh Representation}
+\section{Mesh Update}
+
+\chapter{Performance}
+
+\begin{appendices}
+\chapter{Software Quality}
+\section{Open-Source}
+\section{Portability}
+\section{Coding Standards}
+
+\chapter{GUI Implementation}
+\section{Qt}
+\section{Tool Visualization}
+\section{Docks \& Toolbars}
+\section{Icons}
+\section{Qt Creator}
+
+\chapter{Slice Optimzation}
+\chapter{Triangle Reduction}
+
+\end{appendices}
+
+\end{document}

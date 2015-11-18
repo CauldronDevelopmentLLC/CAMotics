@@ -1,0 +1,22 @@
+/*
+a: Px - Ax;
+b: Py - Ay;
+c: Pz - Az - r;
+d: Bx - Ax;
+e: By - Ay;
+f: Bz - Az;
+*/
+
+eq1: w^2 = (a - beta * d)^2 + (b - beta * e)^2 + (c - beta * f)^2;
+
+eq2: w = r;
+
+(algebraic:true, tellrat(eq1));
+
+sol: solve(rat(solve(rat(eq2), w)^2), beta);
+
+fortran(sol);
+
+load(f90)$
+:lisp (setq *f90-output-line-length-max* 1000000000)
+with_stdout("out.f", for e in sol do f90(e));

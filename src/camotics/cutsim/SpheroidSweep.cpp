@@ -41,18 +41,54 @@ void SpheroidSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
 }
 
 
-real SpheroidSweep::depth(const Vector3R &start, const Vector3R &end,
-                          const Vector3R &p) const {
-  Vector3R s = start + Vector3R(0, 0, length / 2);
-  Vector3R e = end + Vector3R(0, 0, length / 2);
+namespace {
+  inline double sqr(double x) {return x * x;}
+}
 
-  if (2 * radius == length) {
-    Vector3R c = Segment3R(s, e).closest(p);
-    return radius2 - p.distanceSquared(c);
+
+real SpheroidSweep::depth(const Vector3R &_start, const Vector3R &_end,
+                          const Vector3R &_p) const {
+  const double r = radius;
+
+  Vector3R start = _start;
+  Vector3R end = _end;
+  Vector3R p = _p;
+
+  if (2 * radius != length) {
+    // TODO this is not quite right
+    start *= scale;
+    end *= scale;
+    p *= scale;
   }
 
-  // Scale z axis to make spheroids round
-  Vector3R pScaled = p * scale;
-  Vector3R c = Segment3R(s * scale, e * scale).closest(pScaled);
-  return radius2 - pScaled.distanceSquared(c);
+  const double Ax = start.x(), Ay = start.y(), Az = start.z();
+  const double Bx = end.x(), By = end.y(), Bz = end.z();
+  const double Px = p.x(), Py = p.y(), Pz = p.z();
+
+  // Check z-height
+  const double minZ = Az < Bz ? Az : Bz, maxZ = Az < Bz ? Bz : Az;
+  if (Pz < minZ || maxZ + 2 * r < Pz) return -1;
+
+  // Squares
+  const double r2 = r * r;
+
+  const double a = Px - Ax, b = Py - Ay, c = Pz - Az - r;
+  const double d = Bx - Ax, e = By - Ay, f = Bz - Az;
+  const double a2 = a * a, b2 = b * b, c2 = c * c;
+  const double d2 = d * d, e2 = e * e, f2 = f * f;
+
+  const double betaD = d2 + e2 + f2;
+  const double betaR =
+    betaD * r2 + (-a2 - b2) * f2 + (2 * a * c * d + 2 * b * c * e) * f +
+    (-a2 - c2) * e2 + 2 * a * b * d * e + (-b2 - c2) * d2;
+
+  // Check if solution is valid
+  if (betaD == 0 || betaR < 0) return -1;
+
+  double beta = (sqrt(betaR) + c * f + b * e + a * d) / betaD;
+
+  // Check that it's on the line segment
+  if (beta < 0 || 1 < beta) return -1;
+
+  return 1;
 }

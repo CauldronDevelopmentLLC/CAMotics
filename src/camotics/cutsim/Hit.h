@@ -18,28 +18,17 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONIC_SWEEP_H
-#define CAMOTICS_CONIC_SWEEP_H
-
-#include "Sweep.h"
+#ifndef CAMOTICS_HIT_H
+#define CAMOTICS_HIT_H
 
 namespace CAMotics {
-  class ConicSweep : public Sweep {
-    const double l;  // Length
-    const double rt; // Radius 1
-    const double rb; // Radius 1
-    const double Tm; // Tool slope
-
-  public:
-    ConicSweep(real length, real radius1, real radius2 = -1);
-
-    // From Sweep
-    void getBBoxes(const Vector3R &start, const Vector3R &end,
-                   std::vector<Rectangle3R> &bboxes, real tolerance) const;
-    real depth(const Vector3R &start, const Vector3R &end,
-               const Vector3R &p) const;
+  struct Hit {
+    float depth;
+    float time;
+    uint32_t segment;
+    uint8_t face;
   };
 }
 
-#endif // CAMOTICS_CONIC_SWEEP_H
+#endif // CAMOTICS_HIT_H
 
