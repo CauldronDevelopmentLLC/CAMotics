@@ -35,7 +35,7 @@ firsts cuts $\vec{P}$.
 \begin{figure}[!h]
   \centering
   \def\svgwidth{0.5\textwidth}
-  \input{conical_tool_point_cut_fig1.eps_tex}
+  \input{fig1.eps_tex}
 \end{figure}
 
 \section{Find the Point $\vec{Q}$}
@@ -89,6 +89,26 @@ Substituting equation 1 we get:
 \end{equation*}
 
 Solving for $\beta$ we get a big ugly equation.
+
+\begin{equation*}\resizebox{\hsize}{!}{$
+\frac{\begin{aligned}
+  & \sqrt{\begin{aligned}
+    & ((B_x-A_x)^2 + (B_y-A_y)^2) r_b r_b + (2 (P_z-A_z) (B_x-A_x)^2 + 2 (P_z-A_z)
+    (B_y-A_y)^2 + \\ & (-2 (P_y-A_y) (B_y-A_y) - 2 (P_x-A_x) (B_x-A_x)) x
+    (B_z-A_z)*T_m) r_b + \\ & ((P_x-A_x)^2 + (P_y-A_y)^2) ((B_z-A_z)*T_m)^2 + \\
+    & (-2 (P_x-A_x) (P_z-A_z) (B_x-A_x) - 2 (P_y-A_y) (P_z-A_z) (B_y-A_y))
+    (B_z-A_z)*T_m + \\ & ((P_z-A_z)*T_m - (P_x-A_x)^2) (B_y-A_y)^2 +
+    2 (P_x-A_x) (P_y-A_y) (B_x-A_x) (B_y-A_y) + \\
+    & ((P_z-A_z)*T_m - (P_y-A_y)^2) (B_x-A_x)^2
+    \end{aligned}
+  } \\ +
+  & (B_z-A_z)*T_m r_b + (P_z-A_z) (B_z-A_z)*T_m - (P_y-A_y) (B_y-A_y) -
+  (P_x-A_x) * (B_x-A_x)
+  \end{aligned}
+}{
+  -(B_x-A_x)^2 - (B_y-A_y)^2 + ((B_z-A_z)*T_m)^2
+}
+$}\end{equation*}
 
 \section{Spherical Tool}
 Consider a spherical tool with radius $r$.  Let $\vec{C}$ be the center of the

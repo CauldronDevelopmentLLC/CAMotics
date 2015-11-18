@@ -1,5 +1,5 @@
 DOCS=conical_tool_point_cut.pdf camotics_3_axis_cnc_simulation.pdf
-FIGS=fig1.eps fig2.eps fig3.eps fig4.eps
+FIGS=fig1.eps
 EQS=spherical_tool_point_cut.c conical_tool_point_cut.c
 
 EXTS=.toc .aux .log .dvi .eps .eps_tex -eps-converted-to.pdf .svg
