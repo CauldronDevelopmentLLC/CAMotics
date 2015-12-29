@@ -43,6 +43,8 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real startTime,
     swap(this->startTime, this->endTime);
   }
 
+  if (path->empty()) return;
+
   int firstMove = path->find(startTime);
   int lastMove = path->find(endTime);
 
