@@ -56,7 +56,7 @@ you can try.
 
 Clone the C! git repository, build the software using scons and set the
 environment variable CBANG_HOME so the CAMotics build system can find it
-later:
+later.  **You must install libv8 before this step.**
 
     git clone https://github.com/CauldronDevelopmentLLC/cbang.git
     scons -C cbang
