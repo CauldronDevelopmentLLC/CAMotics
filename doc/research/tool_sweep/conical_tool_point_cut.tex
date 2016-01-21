@@ -93,20 +93,20 @@ Solving for $\beta$ we get a big ugly equation.
 \begin{equation*}\resizebox{\hsize}{!}{$
 \frac{\begin{aligned}
   & \sqrt{\begin{aligned}
-    & ((B_x-A_x)^2 + (B_y-A_y)^2) r_b r_b + (2 (P_z-A_z) (B_x-A_x)^2 + 2 (P_z-A_z)
-    (B_y-A_y)^2 + \\ & (-2 (P_y-A_y) (B_y-A_y) - 2 (P_x-A_x) (B_x-A_x)) x
-    (B_z-A_z)*T_m) r_b + \\ & ((P_x-A_x)^2 + (P_y-A_y)^2) ((B_z-A_z)*T_m)^2 + \\
+    & ((B_x-A_x)^2 + (B_y-A_y)^2) r_b^2 + (2 (P_z-A_z) (B_x-A_x)^2 + 2 (P_z-A_z)
+    (B_y-A_y)^2 + \\ & (-2 (P_y-A_y) (B_y-A_y) - 2 (P_x-A_x) (B_x-A_x))
+    (B_z-A_z)T_m) r_b + \\ & ((P_x-A_x)^2 + (P_y-A_y)^2) ((B_z-A_z)T_m)^2 + \\
     & (-2 (P_x-A_x) (P_z-A_z) (B_x-A_x) - 2 (P_y-A_y) (P_z-A_z) (B_y-A_y))
-    (B_z-A_z)*T_m + \\ & ((P_z-A_z)*T_m - (P_x-A_x)^2) (B_y-A_y)^2 +
+    (B_z-A_z)T_m + \\ & ((P_z-A_z)T_m - (P_x-A_x)^2) (B_y-A_y)^2 +
     2 (P_x-A_x) (P_y-A_y) (B_x-A_x) (B_y-A_y) + \\
-    & ((P_z-A_z)*T_m - (P_y-A_y)^2) (B_x-A_x)^2
+    & ((P_z-A_z)T_m - (P_y-A_y)^2) (B_x-A_x)^2
     \end{aligned}
   } \\ +
-  & (B_z-A_z)*T_m r_b + (P_z-A_z) (B_z-A_z)*T_m - (P_y-A_y) (B_y-A_y) -
-  (P_x-A_x) * (B_x-A_x)
+  & (B_z-A_z)T_m r_b + (P_z-A_z) (B_z-A_z)T_m^2 - (P_y-A_y) (B_y-A_y) -
+  (P_x-A_x)(B_x-A_x)
   \end{aligned}
 }{
-  -(B_x-A_x)^2 - (B_y-A_y)^2 + ((B_z-A_z)*T_m)^2
+  -((A_x - B_x)^2 + (A_y - B_y)^2 - T_m^2(B_z - A_z)^2)
 }
 $}\end{equation*}
 

@@ -22,6 +22,8 @@
 
 #include "Move.h"
 
+#include <algorithm>
+
 using namespace std;
 using namespace CAMotics;
 
@@ -46,46 +48,38 @@ namespace {
 }
 
 
-real SpheroidSweep::depth(const Vector3R &_start, const Vector3R &_end,
-                          const Vector3R &_p) const {
+real SpheroidSweep::depth(const Vector3R &_A, const Vector3R &_B,
+                          const Vector3R &_P) const {
   const double r = radius;
 
-  Vector3R start = _start;
-  Vector3R end = _end;
-  Vector3R p = _p;
+  Vector3R A = _A;
+  Vector3R B = _B;
+  Vector3R P = _P;
 
   if (2 * radius != length) {
     // TODO this is not quite right
-    start *= scale;
-    end *= scale;
-    p *= scale;
+    A *= scale;
+    B *= scale;
+    P *= scale;
   }
 
-  const double Ax = start.x(), Ay = start.y(), Az = start.z();
-  const double Bx = end.x(), By = end.y(), Bz = end.z();
-  const double Px = p.x(), Py = p.y(), Pz = p.z();
-
   // Check z-height
-  const double minZ = Az < Bz ? Az : Bz, maxZ = Az < Bz ? Bz : Az;
-  if (Pz < minZ || maxZ + 2 * r < Pz) return -1;
+  if (P.z() < min(A.z(), B.z()) || max(A.z(), B.z()) + 2 * r < P.z())
+    return -1;
 
-  // Squares
-  const double r2 = r * r;
+  const Vector3R AB = B - A;
+  const Vector3R PA = A - P;
 
-  const double a = Px - Ax, b = Py - Ay, c = Pz - Az - r;
-  const double d = Bx - Ax, e = By - Ay, f = Bz - Az;
-  const double a2 = a * a, b2 = b * b, c2 = c * c;
-  const double d2 = d * d, e2 = e * e, f2 = f * f;
-
-  const double betaD = d2 + e2 + f2;
-  const double betaR =
-    betaD * r2 + (-a2 - b2) * f2 + (2 * a * c * d + 2 * b * c * e) * f +
-    (-a2 - c2) * e2 + 2 * a * b * d * e + (-b2 - c2) * d2;
+  // epsilon * beta^2 + gamma * beta + rho = 0
+  const double epsilon = AB.dot(AB);
+  const double gamma = AB.dot(PA + Vector3R(0, 0, r));
+  const double rho = PA.dot(PA) + 2 * r * (A.z() - P.z());
+  const double sigma = sqr(gamma) - epsilon * rho;
 
   // Check if solution is valid
-  if (betaD == 0 || betaR < 0) return -1;
+  if (epsilon == 0 || sigma < 0) return -1;
 
-  double beta = (sqrt(betaR) + c * f + b * e + a * d) / betaD;
+  double beta = (-gamma - sqrt(sigma)) / epsilon; // Quadradic equation
 
   // Check that it's on the line segment
   if (beta < 0 || 1 < beta) return -1;

@@ -1,0 +1,193 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{color}
+
+\title{
+  Math
+}
+\date{January 17, 2016}
+\author{
+  Joseph Coffland\\
+  Cauldron Development LLC\\
+  joseph@cauldrondevelopment.com
+}
+
+\newcommand{\norm}[1]{\lvert #1 \rvert}
+
+\begin{document}
+\maketitle
+
+
+\begin{equation}
+T_m = \frac{r_t-r_b}{l}
+\end{equation}
+
+\begin{equation}
+\vec{Q} =
+\vec{AB}\beta + \vec{A} =
+\begin{pmatrix}
+  B_x\beta - A_x\beta + A_x \\
+  B_y\beta - A_y\beta + A_y \\
+  B_z\beta - A_z\beta + A_z
+\end{pmatrix}
+\end{equation}
+
+\begin{equation}
+(P_x - Q_x)^2 + (P_y - Q_y)^2 - (T_mP_z - T_mQ_z + r_b)^2 = 0
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\rule{\textwidth}{1pt}
+
+\begin{equation*}
+(P_x - Q_x)^2 = P_x^2 - 2P_xQ_x + Q_x^2
+\end{equation*}
+
+\begin{equation*}
+  =P_x^2 +
+  (-2P_xB_x\beta
+  +2P_xA_x\beta
+  -2P_xA_x) +
+  (B_x^2\beta^2
+  +A_x^2\beta^2
+  +A_x^2
+  -2A_xB_x\beta^2
+  -2A_x^2\beta
+  +2A_xB_x\beta)
+\end{equation*}
+
+\begin{equation*}
+  =A_x^2\beta^2
+  -2A_xB_x\beta^2
+  +B_x^2\beta^2
+  -2P_xB_x\beta
+  +2P_xA_x\beta
+  -2A_x^2\beta
+  +2A_xB_x\beta
+  +A_x^2
+  -2P_xA_x
+  +P_x^2
+\end{equation*}
+
+\begin{equation*}
+= (A_x - B_x)^2\beta^2 +
+  (-2A_x^2 + 2P_xA_x - 2P_xB_x + 2A_xB_x)\beta +
+  (A_x - P_x)^2
+\end{equation*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\rule{\textwidth}{1pt}
+
+\begin{equation*}
+(P_y - Q_y)^2 = P_y^2 - 2P_yQ_y + Q_y^2
+\end{equation*}
+
+\begin{equation*}
+= (A_y - B_y)^2\beta^2 +
+  (-2A_y^2 + 2P_yA_y - 2P_yB_y + 2A_yB_y)\beta +
+  (A_y - P_y)^2
+\end{equation*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\rule{\textwidth}{1pt}
+
+\begin{equation*}
+-(T_mP_z - T_mQ_z + r_b)^2
+\end{equation*}
+
+\begin{equation*}
+= -T_m^2P_z^2 - r_b^2 - 2T_mr_bP_z - T_m^2Q_z^2 + 2T_m^2P_zQ_z + 2T_mr_bQ_z
+\end{equation*}
+
+\begin{equation*}
+= -T_m^2P_z^2 - r_b^2 - 2T_mr_bP_z +
+\end{equation*}
+
+\begin{equation*}
+  -T_m^2B_z^2\beta^2
+  -T_m^2A_z^2\beta^2
+  -T_m^2A_z^2
+  +2T_m^2A_zB_z\beta^2
+  +2T_m^2A_z^2\beta
+  -2T_m^2A_zB_z\beta +
+\end{equation*}
+
+\begin{equation*}
+  2T_m^2P_zB_z\beta
+  -2T_m^2P_zA_z\beta
+  +2T_m^2P_zA_z +
+\end{equation*}
+
+\begin{equation*}
+  2T_mr_bB_z\beta
+  -2T_mr_bA_z\beta
+  +2T_mr_bA_z
+\end{equation*}
+
+\begin{equation*}
+=(
+ -T_m^2B_z^2
+ -T_m^2A_z^2
+ +2T_m^2A_zB_z
+)\beta^2 +
+\end{equation*}
+
+\begin{equation*}
+(
+  2T_m^2A_z^2
+  -2T_m^2A_zB_z
+  +2T_m^2P_zB_z
+  -2T_m^2P_zA_z
+  +2T_mr_bB_z
+  -2T_mr_bA_z
+)\beta +
+\end{equation*}
+
+\begin{equation*}
+(
+  -T_m^2A_z^2
+  -T_m^2P_z^2
+  -2T_mr_bP_z
+  +2T_m^2P_zA_z
+  +2T_mr_bA_z
+  -r_b^2
+)
+\end{equation*}
+
+\begin{equation*}
+=-T_m^2(A_z - B_z)^2\beta^2 +
+(2T_m^2(A_z - P_z)(A_z - B_z) - 2T_mr_b(A_z - B_z))\beta
+-(T_m(A_z - P_z) - rb)^2
+\end{equation*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+
+After collecting terms we have:
+
+\begin{equation}
+\epsilon\beta^2 + 2\gamma\beta + \rho = 0
+\end{equation}
+
+Where:
+
+\begin{equation*}
+\begin{split}
+\epsilon & = (A_x - B_x)^2 + (A_y - B_y)^2 - T_m^2(A_z - B_z)^2 \\
+\gamma & =
+(A_x - P_y)(B_x - A_x) + (A_y - P_y)(B_y - A_y) +
+(T_m^2(A_z - P_z) - T_mr_b)(A_z - B_z) \\
+\rho & = (A_x - P_x)^2 + (A_y - P_y)^2 - (T_m(A_z - P_z) - rb)^2
+\end{split}
+\end{equation*}
+
+Finally we can solve for $\beta$ with the quadradic equation:
+
+\begin{equation}
+\beta = \frac{-\gamma \pm \sqrt{\gamma^2 - \epsilon\rho}}{\epsilon}
+\end{equation}
+
+\end{document}

@@ -1,0 +1,5 @@
+eq: -Tm^2 * (Az^2 + Pz^2) + 2 * Tm * rb * (Az - Pz) + 2 * Tm^2 * Pz * Az - rb^2;
+
+sol: rat(eq);
+
+fortran(sol);

@@ -45,46 +45,40 @@ namespace {
 }
 
 
-real ConicSweep::depth(const Vector3R &start, const Vector3R &end,
-                       const Vector3R &p) const {
-  const double Ax = start.x(), Ay = start.y(), Az = start.z();
-  const double Bx = end.x(), By = end.y(), Bz = end.z();
-  const double Px = p.x(), Py = p.y(), Pz = p.z();
+real ConicSweep::depth(const Vector3R &A, const Vector3R &B,
+                       const Vector3R &P) const {
+  const double Ax = A.x(), Ay = A.y(), Az = A.z();
+  const double Bx = B.x(), By = B.y(), Bz = B.z();
+  const double Px = P.x(), Py = P.y(), Pz = P.z();
 
   // Check z-height
-  const double minZ = Az < Bz ? Az : Bz, maxZ = Az < Bz ? Bz : Az;
-  if (Pz < minZ || maxZ + l < Pz) return -1;
+  if (Pz < min(Az, Bz) || max(Az, Bz) + l < Pz) return -1;
 
-  const double a = Px - Ax, b = Py - Ay, c = (Pz - Az) * Tm;
-  const double d = Bx - Ax, e = By - Ay, f = (Bz - Az) * Tm;
-  const double a2 = a * a, b2 = b * b, c2 = c * c;
-  const double d2 = d * d, e2 = e * e, f2 = f * f;
-  const double rb2 = rb * rb;
-
-  const double betaD = -d2 - e2 + f2;
-  const double betaR =
-    (d2 + e2) * rb2 +
-    (2 * c * d2 + 2 * c * e2 + (-2 * b * e - 2 * a * d) * f) * rb +
-    (a2 + b2) * f2 + (-2 * a * c * d - 2 * b * c * e) * f + (c2 - a2) * e2 +
-    2 * a * b * d * e + (c2 - b2) * d2;
+  // epsilon * beta^2 + gamma * beta + rho = 0
+  const double epsilon = sqr(Bx - Ax) + sqr(By - Ay) - sqr(Tm * (Bz - Az));
+  const double gamma = (Ax - Px) * (Bx - Ax) + (Ay - Py) * (By - Ay) +
+    (sqr(Tm) * (Az - Pz) - Tm * rb) * (Az - Bz);
+  const double rho = sqr(Ax - Px) + sqr(Ay - Py) - sqr(Tm * (Az - Pz) - rb);
+  const double sigma = sqr(gamma) - epsilon * rho;
 
   // Check if solution is valid
-  if (betaD == 0 || betaR < 0) return -1;
+  if (epsilon == 0 || sigma < 0) return -1;
 
-  double beta = (sqrt(betaR) + f * rb + c * f - b * e - a * d) / betaD;
+  double beta = (-gamma - sqrt(sigma)) / epsilon; // Quadradic equation
 
   // Check if z-heights make sense
-  const double Qz = beta * (Bz - Az) + Az;
+  const double Qz = (Bz - Az) * beta + Az;
 
+  // Check if the point is cut by the flat top or bottom
   if (Pz < Qz || Qz + l < Pz) {
-    beta = Pz / (Bz - Az); // E is on to AB at z-height
+    beta = Pz / (Bz - Az); // E is on AB at z-height
 
     // Compute squared distance to E on XY plane
     const double Ex = beta * (Bx - Ax) + Ax;
     const double Ey = beta * (By - Ay) + Ay;
     const double d2 = sqr(Ex - Px) + sqr(Ey - Py);
 
-    if (Pz < Qz && rb2 < d2) return -1;
+    if (Pz < Qz && rb * rb < d2) return -1;
     if (Qz + l < Pz && rt * rt < d2) return -1;
   }
 
