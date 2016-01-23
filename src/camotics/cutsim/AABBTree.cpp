@@ -27,36 +27,43 @@ using namespace cb;
 using namespace CAMotics;
 
 
-AABBTree::AABBTree(AABB *nodes) : root(nodes ? new AABB(nodes) : 0) {}
-
-
 AABBTree::~AABBTree() {
   zap(root);
 }
 
 
-void AABBTree::partition(AABB *nodes) {
-  zap(root);
-  root = new AABB(nodes);
-}
-
-
 Rectangle3R AABBTree::getBounds() const {
+  if (!finalized) THROWS("AABBTree not yet finalized");
   return root ? root->getBounds() : Rectangle3R();
 }
 
 
+void AABBTree::insert(const Move *move, const Rectangle3R &bbox) {
+  if (finalized) THROWS("Cannot insert into AABBTree after partitioning");
+  root = (new AABB(move, bbox))->prepend(root);
+}
+
+
 bool AABBTree::intersects(const Rectangle3R &r) const {
+  if (!finalized) THROWS("AABBTree not yet finalized");
   return root && root->intersects(r);
 }
 
 
 void AABBTree::collisions(const Vector3R &p,
                           vector<const Move *> &moves) const {
+  if (!finalized) THROWS("AABBTree not yet finalized");
   if (root) root->collisions(p, moves);
 }
 
 
 void AABBTree::draw(bool leavesOnly) {
   if (root) root->draw(leavesOnly, root->getTreeHeight());
+}
+
+
+void AABBTree::finalize() {
+  if (finalized) return;
+  finalized = true;
+  root = new AABB(root);
 }

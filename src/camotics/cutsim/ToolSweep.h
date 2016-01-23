@@ -22,6 +22,7 @@
 #define CAMOTICS_TOOL_SWEEP_H
 
 #include "AABBTree.h"
+#include "OctTree.h"
 #include "ToolPath.h"
 
 #include <camotics/contour/FieldFunction.h>
@@ -44,7 +45,7 @@ namespace CAMotics {
     real startTime;
     real endTime;
 
-    cb::SmartPointer<AABBTree> change;
+    cb::SmartPointer<MoveLookup> change;
 
   public:
     ToolSweep(const cb::SmartPointer<ToolPath> &path, real startTime = 0,
@@ -53,8 +54,8 @@ namespace CAMotics {
     void setStartTime(real startTime) {this->startTime = startTime;}
     void setEndTime(real endTime) {this->endTime = endTime;}
 
-    const cb::SmartPointer<AABBTree> &getChange() const {return change;}
-    void setChange(const cb::SmartPointer<AABBTree> &change)
+    const cb::SmartPointer<MoveLookup> &getChange() const {return change;}
+    void setChange(const cb::SmartPointer<MoveLookup> &change)
     {this->change = change;}
 
     // From FieldFunction

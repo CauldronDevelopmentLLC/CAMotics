@@ -21,7 +21,7 @@
 #include "View.h"
 #include "GL.h"
 
-#include <camotics/cutsim/AABBTree.h>
+#include <camotics/cutsim/MoveLookup.h>
 
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
@@ -75,8 +75,8 @@ void View::setSurface(const SmartPointer<Surface> &surface) {
 }
 
 
-void View::setAABBTree(const SmartPointer<AABBTree> &aabbTree) {
-  this->aabbTree = aabbTree;
+void View::setMoveLookup(const SmartPointer<MoveLookup> &moveLookup) {
+  this->moveLookup = moveLookup;
 }
 
 
@@ -116,6 +116,6 @@ void View::clear() {
   setToolPath(0);
   setWorkpiece(Rectangle3R());
   setSurface(0);
-  setAABBTree(0);
+  setMoveLookup(0);
   resetView();
 }

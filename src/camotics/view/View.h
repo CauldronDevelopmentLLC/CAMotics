@@ -35,7 +35,7 @@
 #include <vector>
 
 namespace CAMotics {
-  class AABBTree;
+  class MoveLookup;
 
 
   class View : public ViewPort {
@@ -53,7 +53,7 @@ namespace CAMotics {
     cb::SmartPointer<ToolPathView> path;
     cb::SmartPointer<CuboidView> workpiece;
     cb::SmartPointer<Surface> surface;
-    cb::SmartPointer<AABBTree> aabbTree;
+    cb::SmartPointer<MoveLookup> moveLookup;
 
     enum {
       WIRE_FLAG                  = 1 << 0,
@@ -87,7 +87,7 @@ namespace CAMotics {
     void setToolPath(const cb::SmartPointer<ToolPath> &toolPath);
     void setWorkpiece(const Rectangle3R &bounds);
     void setSurface(const cb::SmartPointer<Surface> &surface);
-    void setAABBTree(const cb::SmartPointer<AABBTree> &aabbTree);
+    void setMoveLookup(const cb::SmartPointer<MoveLookup> &moveLookup);
     double getTime() const {return path.isNull() ? 0 : path->getTime();}
 
     bool update();

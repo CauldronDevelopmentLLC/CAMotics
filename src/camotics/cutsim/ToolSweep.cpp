@@ -60,7 +60,6 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real startTime,
 
   ToolTable &tools = path->getTools();
   vector<Rectangle3R> bboxes;
-  AABB *nodes = 0;
   unsigned boxes = 0;
 
   // Gather nodes in a list
@@ -77,14 +76,13 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real startTime,
     sweeps[tool]->getBBoxes(startPt, endPt, bboxes);
 
     for (unsigned j = 0; j < bboxes.size(); j++)
-      nodes = (new AABB(&move, bboxes[j]))->prepend(nodes);
+      insert(&move, bboxes[j]);
 
     boxes += bboxes.size();
     bboxes.clear();
   }
 
-  // Partition nodes
-  partition(nodes);
+  finalize(); // Finalize MoveLookup
 
   LOG_DEBUG(1, "AABBTree boxes=" << boxes << " height=" << getHeight());
 }

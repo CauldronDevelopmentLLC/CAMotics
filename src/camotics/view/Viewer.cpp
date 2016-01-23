@@ -25,7 +25,7 @@
 #include "BoundsView.h"
 
 #include <camotics/sim/ToolTable.h>
-#include <camotics/cutsim/AABBTree.h>
+#include <camotics/cutsim/MoveLookup.h>
 
 #include <cbang/String.h>
 #include <cbang/Math.h>
@@ -114,8 +114,8 @@ void Viewer::draw(const View &view) {
   }
 
   // Bounding box tree
-  if (view.isFlagSet(View::SHOW_BBTREE_FLAG) && !view.aabbTree.isNull())
-    view.aabbTree->draw(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
+  if (view.isFlagSet(View::SHOW_BBTREE_FLAG) && !view.moveLookup.isNull())
+    view.moveLookup->draw(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
   // Tool
   if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->isEmpty()) {

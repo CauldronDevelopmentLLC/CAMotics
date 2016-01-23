@@ -503,7 +503,7 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   // Load surface
   surface.release();
   view->setSurface(0);
-  view->setAABBTree(0);
+  view->setMoveLookup(0);
   taskMan.addTask(new SurfaceTask(sim));
 }
 
@@ -529,7 +529,7 @@ void QtWin::surfaceComplete(SurfaceTask &task) {
   if (surface.isNull()) simRun.release();
 
   view->setSurface(surface);
-  view->setAABBTree(simRun->getAABBTree());
+  view->setMoveLookup(simRun->getMoveLookup());
   view->setFlag(View::SURFACE_VBOS_FLAG,
                 Settings().get("Settings/VBO/Surface", true).toBool());
 

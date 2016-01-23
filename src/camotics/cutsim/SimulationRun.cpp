@@ -40,7 +40,7 @@ SimulationRun::SimulationRun(const SmartPointer<Simulation> &sim) :
 SimulationRun::~SimulationRun() {}
 
 
-SmartPointer<AABBTree> SimulationRun::getAABBTree() const {
+SmartPointer<MoveLookup> SimulationRun::getMoveLookup() const {
   if (!sweep.isNull() && !sweep->getChange().isNull())
     return sweep->getChange();
   return sweep;
@@ -70,7 +70,7 @@ void SimulationRun::compute(const SmartPointer<Task> &task) {
   } else {
     if (sim->time == lastTime) return;
 
-    SmartPointer<AABBTree> change =
+    SmartPointer<MoveLookup> change =
       new ToolSweep(sim->path, sim->time, lastTime);
 
     sweep->setChange(change);

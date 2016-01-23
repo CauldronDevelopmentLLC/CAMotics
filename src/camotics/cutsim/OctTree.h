@@ -18,40 +18,47 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_AABBTREE_H
-#define CAMOTICS_AABBTREE_H
+#ifndef CAMOTICS_OCT_TREE_H
+#define CAMOTICS_OCT_TREE_H
 
 #include "MoveLookup.h"
-#include "AABB.h"
-
-#include <camotics/Geom.h>
-#include <camotics/cutsim/Move.h>
 
 #include <vector>
 
-namespace CAMotics {
-  class ToolPath;
 
-  class AABBTree : public MoveLookup {
-  protected:
-    AABB *root;
-    bool finalized;
+namespace CAMotics {
+  class OctTree : public MoveLookup {
+    Rectangle3R bbox;
+
+    class OctNode {
+      Rectangle3R bounds;
+      unsigned depth;
+
+      OctNode *children[8];
+      std::vector<const Move *> moves;
+
+    public:
+      OctNode(const Rectangle3R &bounds, unsigned depth);
+      ~OctNode();
+
+      void insert(const Move *move, const Rectangle3R &bbox);
+      bool intersects(const Rectangle3R &r) const;
+      void collisions(const Vector3R &p,
+                      std::vector<const Move *> &moves) const;
+    };
+
+    OctNode root;
 
   public:
-    AABBTree() : root(0), finalized(false) {}
-    virtual ~AABBTree();
-
-    unsigned getHeight() const {return root ? root->getTreeHeight() : 0;}
+    OctTree(const Rectangle3R &bounds, unsigned depth);
 
     // From MoveLookup
-    Rectangle3R getBounds() const;
+    Rectangle3R getBounds() const {return bbox;}
     void insert(const Move *move, const Rectangle3R &bbox);
     bool intersects(const Rectangle3R &r) const;
     void collisions(const Vector3R &p, std::vector<const Move *> &moves) const;
-    void finalize();
-    void draw(bool leavesOnly = false);
   };
 }
 
-#endif // CAMOTICS_AABBTREE_H
+#endif // CAMOTICS_OCT_TREE_H
 

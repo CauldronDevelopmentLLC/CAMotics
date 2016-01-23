@@ -18,40 +18,26 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_AABBTREE_H
-#define CAMOTICS_AABBTREE_H
-
-#include "MoveLookup.h"
-#include "AABB.h"
+#ifndef CAMOTICS_MOVE_LOOKUP_H
+#define CAMOTICS_MOVE_LOOKUP_H
 
 #include <camotics/Geom.h>
 #include <camotics/cutsim/Move.h>
 
-#include <vector>
-
 namespace CAMotics {
-  class ToolPath;
-
-  class AABBTree : public MoveLookup {
-  protected:
-    AABB *root;
-    bool finalized;
-
+  class MoveLookup {
   public:
-    AABBTree() : root(0), finalized(false) {}
-    virtual ~AABBTree();
+    virtual ~MoveLookup() {}
 
-    unsigned getHeight() const {return root ? root->getTreeHeight() : 0;}
-
-    // From MoveLookup
-    Rectangle3R getBounds() const;
-    void insert(const Move *move, const Rectangle3R &bbox);
-    bool intersects(const Rectangle3R &r) const;
-    void collisions(const Vector3R &p, std::vector<const Move *> &moves) const;
-    void finalize();
-    void draw(bool leavesOnly = false);
+    virtual Rectangle3R getBounds() const = 0;
+    virtual void insert(const Move *move, const Rectangle3R &bbox) = 0;
+    virtual bool intersects(const Rectangle3R &r) const = 0;
+    virtual void collisions(const Vector3R &p,
+                            std::vector<const Move *> &moves) const = 0;
+    virtual void finalize() {}
+    virtual void draw(bool leavesOnly = false) {}
   };
 }
 
-#endif // CAMOTICS_AABBTREE_H
+#endif // CAMOTICS_MOVE_LOOKUP_H
 

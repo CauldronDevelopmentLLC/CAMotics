@@ -29,7 +29,7 @@ namespace CAMotics {
   class ToolSweep;
   class GridTree;
   class Surface;
-  class AABBTree;
+  class MoveLookup;
   class Task;
 
 
@@ -46,7 +46,7 @@ namespace CAMotics {
     ~SimulationRun();
 
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
-    cb::SmartPointer<AABBTree> getAABBTree() const;
+    cb::SmartPointer<MoveLookup> getMoveLookup() const;
 
     void setEndTime(double endTime);
 
