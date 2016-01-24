@@ -265,10 +265,6 @@ namespace CAMotics {
   protected slots:
     void animate();
 
-    void on_addTool() {addTool();}
-    void on_editTool(unsigned tool) {editTool(tool);}
-    void on_removeTool(unsigned tool) {removeTool(tool);}
-
     void on_fileTabManager_currentChanged(int index);
     void on_positionSlider_valueChanged(int position);
     void on_positionSlider_sliderPressed();
