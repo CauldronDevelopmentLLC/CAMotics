@@ -48,18 +48,17 @@ void GridTree::partition(vector<GridTreeRef> &grids, const Rectangle3R &bbox,
 
     Rectangle3R intersection = bbox.intersection(bounds);
     if (intersection != bounds) {
-      LOG_DEBUG(3, "bbox=" << bbox << " intersection=" << intersection
-                << " bounds=" << bounds);
-
       intersection = (intersection - getOffset()) / getResolution();
 
       Rectangle3U iBounds(intersection.rmin.floor(),
                           intersection.rmax.ceil());
       offset = iBounds.rmin;
-      steps = iBounds.getDimensions();
+      Vector3U dims = iBounds.getDimensions();
 
-      LOG_DEBUG(3, "iBounds=" << iBounds << " steps=" << steps
-                << " orig steps=" << getSteps());
+      // Don't let new steps exceed old
+      for (unsigned i = 0; i < 3; i++)
+        if (steps[i] < offset[i] + dims[i]) steps[i] -= offset[i];
+        else steps[i] = dims[i];
     }
 
     grids.push_back(GridTreeRef(this, offset, steps));

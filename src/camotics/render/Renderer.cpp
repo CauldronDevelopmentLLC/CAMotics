@@ -70,7 +70,6 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
         jobGrids.pop_back();
       }
 
-
       // Reap completed jobs
       jobs_t::iterator it;
       for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit();)
