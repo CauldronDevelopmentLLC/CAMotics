@@ -38,10 +38,12 @@ AABB::AABB(AABB *nodes) : left(0), right(0), move(0) {
 
   // Compute bounds
   unsigned count = 0;
+  Vector3R cutV;
   for (AABB *it = nodes; it; it = it->left) {
     if (it->right) THROW("Unexpected right-hand AABB node");
     add(*it);
     count++;
+    cutV += it->getMax() + it->getMin();
   }
 
   // Degenerate cases
@@ -53,7 +55,7 @@ AABB::AABB(AABB *nodes) : left(0), right(0), move(0) {
 
   // Decide split
   unsigned axis = getDimensions().findLargest();
-  real cut = getMax()[axis] + getMin()[axis];
+  real cut = cutV[axis] / count;
 
   // Partition nodes
   AABB *lessThan = 0;
