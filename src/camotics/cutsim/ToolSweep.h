@@ -22,7 +22,6 @@
 #define CAMOTICS_TOOL_SWEEP_H
 
 #include "AABBTree.h"
-#include "OctTree.h"
 #include "ToolPath.h"
 
 #include <camotics/contour/FieldFunction.h>

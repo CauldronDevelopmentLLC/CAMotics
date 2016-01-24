@@ -23,7 +23,7 @@
 
 #include "MoveLookup.h"
 
-#include <vector>
+#include <set>
 
 
 namespace CAMotics {
@@ -35,7 +35,7 @@ namespace CAMotics {
       unsigned depth;
 
       OctNode *children[8];
-      std::vector<const Move *> moves;
+      std::set<const Move *> moves;
 
     public:
       OctNode(const Rectangle3R &bounds, unsigned depth);
@@ -47,10 +47,11 @@ namespace CAMotics {
                       std::vector<const Move *> &moves) const;
     };
 
-    OctNode root;
+    OctNode *root;
 
   public:
     OctTree(const Rectangle3R &bounds, unsigned depth);
+    ~OctTree();
 
     // From MoveLookup
     Rectangle3R getBounds() const {return bbox;}

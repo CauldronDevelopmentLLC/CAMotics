@@ -42,7 +42,7 @@ void OctTree::OctNode::insert(const Move *move, const Rectangle3R &bbox) {
   if (!bounds.intersects(bbox)) return;
 
   if (!depth || bbox.contains(bounds)) {
-    moves.push_back(move);
+    moves.insert(move);
     return;
   }
 
@@ -97,21 +97,30 @@ void OctTree::OctNode::collisions(const Vector3R &p,
 }
 
 
-OctTree::OctTree(const Rectangle3R &bounds, unsigned depth) :
-  root(OctNode(bounds, depth)) {}
+OctTree::OctTree(const Rectangle3R &bounds, unsigned depth) {
+  real m = bounds.getDimensions().max();
+
+  root = new OctNode(Rectangle3R(bounds.getMin(), bounds.getMin() +
+                                 Vector3R(m, m, m)), depth);
+}
+
+
+OctTree::~OctTree() {
+  zap(root);
+}
 
 
 void OctTree::insert(const Move *move, const Rectangle3R &bbox) {
   this->bbox.add(bbox);
-  root.insert(move, bbox);
+  root->insert(move, bbox);
 }
 
 
 bool OctTree::intersects(const Rectangle3R &r) const {
-  return root.intersects(r);
+  return root->intersects(r);
 }
 
 
 void OctTree::collisions(const Vector3R &p, vector<const Move *> &moves) const {
-  root.collisions(p, moves);
+  root->collisions(p, moves);
 }
