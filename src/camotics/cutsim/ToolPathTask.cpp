@@ -113,7 +113,7 @@ void ToolPathTask::run() {
       args.push_back(cmd);
 
       // Add units
-      args.push_back(string("--units=") + units.toString());
+      args.push_back(string("--") + String::toLower(units.toString()));
 
       // Add file
       args.push_back(filename);
