@@ -1299,8 +1299,7 @@ void QtWin::hideConsole() {
 
 
 void QtWin::updatePlaySpeed(const string &name, unsigned value) {
-  // TODO
-  //ui->playbackSpeedLabel->setText(QString().sprintf("%dx", view->speed));
+  showMessage(String::printf("Playback speed %dx", view->getSpeed()));
 }
 
 
