@@ -30,8 +30,7 @@ using namespace CAMotics;
 
 ConicSweep::ConicSweep(real length, real radius1, real radius2) :
   l(length), rt(radius1), rb(radius2 == -1 ? radius1 : radius2),
-  Tm((rt - rb) / l) {
-}
+  Tm((rt - rb) / l) {}
 
 
 void ConicSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
@@ -55,7 +54,12 @@ real ConicSweep::depth(const Vector3R &A, const Vector3R &B,
   if (Pz < min(Az, Bz) || max(Az, Bz) + l < Pz) return -1;
 
   // epsilon * beta^2 + gamma * beta + rho = 0
-  const double epsilon = sqr(Bx - Ax) + sqr(By - Ay) - sqr(Tm * (Bz - Az));
+  double epsilon = sqr(Bx - Ax) + sqr(By - Ay) - sqr(Tm * (Bz - Az));
+
+  // If this is a straight up and down move of a cylindrical tool choose
+  // a fake arbitrarily small epsilon.
+  if (epsilon == 0 && Bz != Az && Tm == 0) epsilon = 0.000000001;
+
   const double gamma = (Ax - Px) * (Bx - Ax) + (Ay - Py) * (By - Ay) +
     (sqr(Tm) * (Az - Pz) - Tm * rb) * (Az - Bz);
   const double rho = sqr(Ax - Px) + sqr(Ay - Py) - sqr(Tm * (Az - Pz) - rb);
