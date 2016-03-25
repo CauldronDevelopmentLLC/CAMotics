@@ -78,6 +78,7 @@ namespace CAMotics {
     void clearFlag(unsigned flag) {flags &= ~flag; values.updated();}
     void toggleFlag(unsigned flag) {flags ^= flag; values.updated();}
 
+    unsigned getSpeed() const {return speed;}
     void setSpeed(unsigned speed) {this->speed = speed;}
     void incSpeed();
     void decSpeed();

@@ -84,27 +84,25 @@ bool View::update() {
   // Animate
   if (isFlagSet(PLAY_FLAG)) {
     double now = Timer::now();
+    double delta = (now - lastTime) * speed;
 
-    if (lastTime) {
-      double delta = (now - lastTime) * speed;
+    if (!reverse && path->atEnd()) path->setByRatio(0);
+    if (reverse && path->atStart()) path->setByRatio(1);
 
+    if (lastTime && delta) {
       if (reverse) path->decTime(delta);
       else path->incTime(delta);
 
-      if ((reverse && path->atStart()) || (!reverse && path->atEnd()))
+      if ((reverse && path->atStart()) || (!reverse && path->atEnd())) {
+        if (!reverse && path->atEnd()) path->setByRatio(0);
+        else path->setByRatio(1);
+
         clearFlag(PLAY_FLAG);
+      }
+    }
 
-      return true;
-
-    } else if (!reverse && path->atEnd()) {
-      path->setByRatio(0);
-      return true;
-
-    } else if (reverse && path->atStart()) {
-      path->setByRatio(1);
-      return true;
-
-    } else lastTime = now;
+    lastTime = now;
+    return true;
 
   } else lastTime = 0;
 

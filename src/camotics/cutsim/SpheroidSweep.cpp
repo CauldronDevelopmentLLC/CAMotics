@@ -56,8 +56,8 @@ real SpheroidSweep::depth(const Vector3R &_A, const Vector3R &_B,
   Vector3R B = _B;
   Vector3R P = _P;
 
+  // Handle oblong spheroids by scaling the z-axis
   if (2 * radius != length) {
-    // TODO this is not quite right
     A *= scale;
     B *= scale;
     P *= scale;
@@ -79,7 +79,7 @@ real SpheroidSweep::depth(const Vector3R &_A, const Vector3R &_B,
   // Check if solution is valid
   if (epsilon == 0 || sigma < 0) return -1;
 
-  double beta = (-gamma - sqrt(sigma)) / epsilon; // Quadradic equation
+  const double beta = (-gamma - sqrt(sigma)) / epsilon; // Quadradic equation
 
   // Check that it's on the line segment
   if (beta < 0 || 1 < beta) return -1;
