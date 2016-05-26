@@ -32,53 +32,32 @@ using namespace cb;
 using namespace std;
 
 
-FileDialog::FileDialog(QtWin &win) : QFileDialog(&win), win(win) {
-  setResolveSymlinks(false);
-}
-
-
-static bool is_writable(const string &path) {
-  return QFileInfo(path.c_str()).isWritable();
-}
+FileDialog::FileDialog(QtWin &win) : win(win) {}
 
 
 string FileDialog::open(const string &title, const string &filters,
                         const string &filename, bool save) {
-  setWindowTitle(QString::fromUtf8(title.c_str()));
-  setNameFilter(QString::fromUtf8(filters.c_str()));
-  setAcceptMode(save ? AcceptSave : AcceptOpen);
-  setConfirmOverwrite(save);
+  // Find a resonable directory & file to start from
+  QString qPath = QString::fromUtf8(filename.c_str());
 
-  string cwd = SystemUtilities::getcwd();
-  string dir;
-
-  if (filename.empty()) {
-    selectFile(QString());
-    dir = cwd;
-
-  } else if (SystemUtilities::isDirectory(filename)) {
-    selectFile(QString());
-    dir = filename;
-
-  } else {
-    selectFile(SystemUtilities::basename(filename).c_str());
-    dir = SystemUtilities::dirname(filename);
+  if (qPath.isEmpty()) {
+    if (QFileInfo(QDir::currentPath()).isWritable())
+      qPath = QDir::currentPath();
+    else qPath = QDir::homePath();
   }
 
-  if (is_writable(dir)) setDirectory(dir.c_str());
-  else if (is_writable(cwd)) setDirectory(cwd.c_str());
-  else setDirectory(QDir::homePath());
+  QString qTitle(QString::fromUtf8(title.c_str()));
+  QString qFilters(QString::fromUtf8(filters.c_str()));
+  QFlags<QFileDialog::Option> qOptions(QFileDialog::DontResolveSymlinks);
+  if (!save) qOptions |= QFileDialog::DontConfirmOverwrite;
 
-  if (exec() != Accepted) return "";
+  qPath = (save ? QFileDialog::getSaveFileName : QFileDialog::getOpenFileName)
+    (&win, qTitle, qPath, qFilters, 0, qOptions);
 
-  QStringList names = selectedFiles();
-  if (!names.size()) return "";
-  string path = names.at(0).toUtf8().data();
-
-  if (SystemUtilities::isDirectory(path)) {
+  if (QFileInfo(qPath).isDir()) {
     win.warning("Cannot open directory");
     return "";
   }
 
-  return path;
+  return qPath.isEmpty() ? "" : qPath.toUtf8().data();
 }

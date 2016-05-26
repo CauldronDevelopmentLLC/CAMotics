@@ -29,7 +29,7 @@
 namespace CAMotics {
   class QtWin;
 
-  class FileDialog : public QFileDialog {
+  class FileDialog {
     QtWin &win;
 
   public:
