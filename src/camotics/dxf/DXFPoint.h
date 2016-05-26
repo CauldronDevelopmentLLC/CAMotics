@@ -35,4 +35,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_DXFPOINT_H
-

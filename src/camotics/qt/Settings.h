@@ -37,4 +37,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_SETTINGS_H
-

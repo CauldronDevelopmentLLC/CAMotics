@@ -49,4 +49,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_QTEXT_DEVICE_H
-

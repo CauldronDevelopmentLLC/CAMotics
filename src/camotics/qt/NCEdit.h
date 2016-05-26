@@ -160,4 +160,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_NCEDIT_H
-

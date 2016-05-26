@@ -81,4 +81,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PROBE_H
-

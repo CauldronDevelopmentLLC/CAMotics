@@ -95,4 +95,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_GCODEHIGHLIGHTER_H
-

@@ -53,4 +53,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_EVALUATOR_H
-

@@ -64,4 +64,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CONNECTION_H
-

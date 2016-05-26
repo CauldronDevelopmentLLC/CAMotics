@@ -102,4 +102,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MACHINE_ADAPTER_H
-

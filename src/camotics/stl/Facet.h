@@ -42,4 +42,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_FACET_H
-

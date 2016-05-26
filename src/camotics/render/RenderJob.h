@@ -51,4 +51,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_RENDER_JOB_H
-

@@ -58,4 +58,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_OBSERVER_H
-

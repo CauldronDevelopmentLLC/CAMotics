@@ -39,4 +39,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_NAMED_REFERENCE_H
-

@@ -30,7 +30,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -348,7 +348,7 @@ struct DL_TraceData {
             z[i] = 0.0;
         }
     }
-    
+
     /**
      * Constructor.
      * Parameters: see member variables.
@@ -368,11 +368,11 @@ struct DL_TraceData {
         x[1] = sx2;
         y[1] = sy2;
         z[1] = sz2;
-        
+
         x[2] = sx3;
         y[2] = sy3;
         z[2] = sz3;
-        
+
         x[3] = sx4;
         y[3] = sy4;
         z[3] = sz4;
@@ -380,7 +380,7 @@ struct DL_TraceData {
 
     /*! Thickness */
     double thickness;
-    
+
     /*! Points */
     double x[4];
     double y[4];
@@ -656,7 +656,7 @@ struct DL_MTextData {
      */
     int lineSpacingStyle;
     /**
-     * Line spacing factor. 0.25 .. 4.0  
+     * Line spacing factor. 0.25 .. 4.0
      */
     double lineSpacingFactor;
     /*! Text string. */
@@ -728,14 +728,14 @@ struct DL_TextData {
     int textGenerationFlags;
     /**
      * Horizontal justification.
-     * 
+     *
      * 0 = Left (default), 1 = Center, 2 = Right,
      * 3 = Aligned, 4 = Middle, 5 = Fit
      * For 3, 4, 5 the vertical alignment has to be 0.
      */
     int hJustification;
     /**
-     * Vertical justification. 
+     * Vertical justification.
      *
      * 0 = Baseline (default), 1 = Bottom, 2 = Middle, 3= Top
      */
@@ -803,20 +803,20 @@ struct DL_DimensionData {
     /**
      * Dimension type.
      *
-     * 0   Rotated, horizontal, or vertical            
-     * 1   Aligned                                     
-     * 2   Angular                                     
-     * 3   Diametric                                    
-     * 4   Radius                                      
-     * 5   Angular 3-point                             
-     * 6   Ordinate                                    
-     * 64  Ordinate type. This is a bit value (bit 7)  
-     *     used only with integer value 6. If set,     
-     *     ordinate is X-type; if not set, ordinate is 
-     *     Y-type                                      
-     * 128 This is a bit value (bit 8) added to the    
-     *     other group 70 values if the dimension text 
-     *     has been positioned at a user-defined       
+     * 0   Rotated, horizontal, or vertical
+     * 1   Aligned
+     * 2   Angular
+     * 3   Diametric
+     * 4   Radius
+     * 5   Angular 3-point
+     * 6   Ordinate
+     * 64  Ordinate type. This is a bit value (bit 7)
+     *     used only with integer value 6. If set,
+     *     ordinate is X-type; if not set, ordinate is
+     *     Y-type
+     * 128 This is a bit value (bit 8) added to the
+     *     other group 70 values if the dimension text
+     *     has been positioned at a user-defined
      *    location rather than at the default location
      */
     int type;
@@ -835,11 +835,11 @@ struct DL_DimensionData {
      */
     int lineSpacingStyle;
     /**
-     * Line spacing factor. 0.25 .. 4.0  
+     * Line spacing factor. 0.25 .. 4.0
      */
     double lineSpacingFactor;
     /**
-     * Text string. 
+     * Text string.
      *
      * Text string entered explicitly by user or null
      * or "<>" for the actual measurement or " " (one blank space).
@@ -1410,7 +1410,7 @@ struct DL_ImageData {
 		fade = ifade;
     }
 
-    /*! Reference to the image file 
+    /*! Reference to the image file
 	    (unique, used to refer to the image def object). */
     string ref;
     /*! X Coordinate of insertion point. */
@@ -1461,7 +1461,7 @@ struct DL_ImageDefData {
 		file = ifile;
     }
 
-    /*! Reference to the image file 
+    /*! Reference to the image file
 	    (unique, used to refer to the image def object). */
     string ref;
 
@@ -1472,4 +1472,3 @@ struct DL_ImageDefData {
 #endif
 
 // EOF
-

@@ -53,4 +53,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PCB_ARC_H
-

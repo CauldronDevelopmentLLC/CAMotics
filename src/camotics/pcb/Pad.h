@@ -56,4 +56,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PCB_PAD_H
-

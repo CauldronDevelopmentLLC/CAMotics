@@ -44,4 +44,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CUBOID_VIEW_H
-

@@ -32,4 +32,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_REAL_H
-

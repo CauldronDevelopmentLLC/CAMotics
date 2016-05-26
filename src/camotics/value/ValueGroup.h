@@ -57,4 +57,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_VALUE_GROUP_H
-

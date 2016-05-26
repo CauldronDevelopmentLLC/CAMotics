@@ -49,7 +49,7 @@ void Printer::operator()(const SmartPointer<Block> &block) {
           if (number) {
             double value = number->getValue();
             const Code *code = Codes::find(type, value);
-            
+
             if (code) comments += SSTR(" (" << code->description << ')');
           }
         }
@@ -58,10 +58,10 @@ void Printer::operator()(const SmartPointer<Block> &block) {
       if (!comments.empty()) {
         string line = SSTR(*block);
         stream << line;
-        
+
         int pad = 80 - (line.length() + comments.length());
         if (0 < pad) stream << string(pad, ' ');
-        
+
         stream << comments << '\n';
 
         return;

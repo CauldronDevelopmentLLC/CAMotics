@@ -46,4 +46,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CONTOUR_GENERATOR_H
-

@@ -39,4 +39,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PATH_H
-

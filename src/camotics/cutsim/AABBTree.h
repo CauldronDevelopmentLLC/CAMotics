@@ -54,4 +54,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_AABBTREE_H
-

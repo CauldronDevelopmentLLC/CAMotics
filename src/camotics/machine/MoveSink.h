@@ -49,4 +49,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MOVE_SINK_H
-

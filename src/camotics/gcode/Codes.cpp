@@ -93,7 +93,7 @@ const Code Codes::gcodes[] = {
 
   {'G', 28, 19, MG::MG_ZERO, VT::VT_NONE,
    "Go to Predefined Position 1"},
-  {'G', 28.1, 19, MG::MG_ZERO, VT::VT_NONE, 
+  {'G', 28.1, 19, MG::MG_ZERO, VT::VT_NONE,
   "Set Predefined Position 1"},
   {'G', 30, 19, MG::MG_ZERO, VT::VT_NONE,
    "Go to Predefined Position 2"},

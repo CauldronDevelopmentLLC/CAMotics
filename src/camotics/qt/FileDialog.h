@@ -41,4 +41,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_FILE_DIALOG_H
-

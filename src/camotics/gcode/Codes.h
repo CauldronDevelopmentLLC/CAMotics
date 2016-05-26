@@ -51,4 +51,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CODES_H
-

@@ -130,7 +130,7 @@ double Evaluator::eval(NamedReference &e) {
 
 double Evaluator::eval(Reference &e) {
   double num = e.getExpression()->eval(*this);
-  
+
   if (num < 1 || MAX_ADDRESS < num || ((unsigned)num) != num)
     THROWS(e.getLocation() << " Invalid reference number " << num);
 

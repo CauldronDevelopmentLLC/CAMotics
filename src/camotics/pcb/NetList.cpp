@@ -57,7 +57,7 @@ void NetList::merge(const NetList &netList) {
 
     for (; it != netList.objects.end(); it++)
       objects.push_back(*it);
-    
+
     suffix = netList.suffix;
   }
 }

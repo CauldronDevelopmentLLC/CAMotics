@@ -39,4 +39,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_VAR_VALUE_H
-

@@ -50,4 +50,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_TRANS_MATRIX_H
-

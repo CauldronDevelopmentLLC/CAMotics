@@ -42,4 +42,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_QUOTED_EXPR_H
-

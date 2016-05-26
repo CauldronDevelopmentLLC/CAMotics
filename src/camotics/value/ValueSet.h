@@ -69,4 +69,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_VALUE_SET_H
-

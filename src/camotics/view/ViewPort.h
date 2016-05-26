@@ -80,4 +80,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_VIEW_PORT_H
-

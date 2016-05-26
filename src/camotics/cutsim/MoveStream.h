@@ -34,4 +34,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MOVE_STREAM_H
-

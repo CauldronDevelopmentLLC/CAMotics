@@ -62,4 +62,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOOL_VIEW_H
-

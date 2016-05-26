@@ -35,13 +35,13 @@ namespace CAMotics {
     std::vector<unsigned> index;
     std::vector<bool> flip;
     double cost;
-    
+
     AnnealState(const paths_t &paths);
-    
+
     AnnealState &operator=(const AnnealState &o);
-    
+
     void flipIndex(unsigned i);
-    
+
     double computeCost(unsigned first, unsigned second) const;
     double computeCost() const;
 
@@ -55,4 +55,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_ANNEAL_STATE_H
-

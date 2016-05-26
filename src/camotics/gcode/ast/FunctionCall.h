@@ -50,4 +50,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_FUNCTION_CALL_H
-

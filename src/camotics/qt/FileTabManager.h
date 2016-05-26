@@ -87,4 +87,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_FILE_TAB_MANAGER_H
-

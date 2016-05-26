@@ -89,4 +89,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_SIDEBAR_WIDGET_H
-

@@ -69,4 +69,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CONCURRENT_TASK_MANAGER_H
-

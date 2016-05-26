@@ -79,4 +79,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_DXFREADER_H
-

@@ -48,4 +48,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOOL_GRAPHICS_ITEM_H
-

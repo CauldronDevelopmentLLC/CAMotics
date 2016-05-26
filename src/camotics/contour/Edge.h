@@ -36,4 +36,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_EDGE_H
-

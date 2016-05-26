@@ -59,4 +59,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CONSOLE_WRITER_H
-

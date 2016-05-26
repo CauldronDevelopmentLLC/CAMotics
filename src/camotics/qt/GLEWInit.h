@@ -27,4 +27,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_GLEWINIT_H
-

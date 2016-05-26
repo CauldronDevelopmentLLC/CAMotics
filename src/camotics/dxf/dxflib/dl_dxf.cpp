@@ -30,7 +30,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -175,7 +175,7 @@ bool DL_Dxf::in(const string& file, DL_CreationInterface* creationInterface) {
  */
 bool DL_Dxf::in(std::istream& stream,
                 DL_CreationInterface* creationInterface) {
-    
+
     int errorCounter = 0;
 
     if (stream.good()) {
@@ -204,7 +204,7 @@ bool DL_Dxf::in(std::istream& stream,
  * This function reads a couplet, determines the type of data, and
  * passes the value to the the appropriate handler function of
  * \p creationInterface.\n
- * 
+ *
  * \p fp is advanced so that the next call to \p readDXFGroups() reads
  * the next couplet in the file.
  *
@@ -287,7 +287,7 @@ bool DL_Dxf::readDxfGroups(std::istream& stream,
 
 
 /**
- * @brief Reads line from file & strips whitespace at start and newline 
+ * @brief Reads line from file & strips whitespace at start and newline
  * at end.
  *
  * @param s Output\n
@@ -387,7 +387,7 @@ bool DL_Dxf::stripWhiteSpace(char** s) {
     while ((*s)[0]==' ' || (*s)[0]=='\t') {
         ++(*s);
     }
-    
+
     return ((*s) ? true : false);
 }
 
@@ -423,7 +423,7 @@ bool DL_Dxf::processDXFGroup(DL_CreationInterface* creationInterface,
             if (!strncmp(groupValue, "dxflib", 6)) {
                 libVersion = getLibVersion(&groupValue[7]);
             }
-            
+
             addComment(creationInterface, groupValue);
         }
     }
@@ -570,7 +570,7 @@ bool DL_Dxf::processDXFGroup(DL_CreationInterface* creationInterface,
                 case 5:
                     addDimAngular3P(creationInterface);
                     break;
-                
+
                 case 6:
                     addDimOrdinate(creationInterface);
                     break;
@@ -600,7 +600,7 @@ bool DL_Dxf::processDXFGroup(DL_CreationInterface* creationInterface,
         case DL_ENTITY_TRACE:
             addTrace(creationInterface);
             break;
-        
+
         case DL_ENTITY_3DFACE:
             add3dFace(creationInterface);
             break;
@@ -612,7 +612,7 @@ bool DL_Dxf::processDXFGroup(DL_CreationInterface* creationInterface,
         case DL_ENTITY_SEQEND:
             endSequence(creationInterface);
             break;
-        
+
         default:
             break;
         }
@@ -915,7 +915,7 @@ void DL_Dxf::addPolyline(DL_CreationInterface* creationInterface) {
 
 
 /**
- * Adds a polyline vertex entity that was read from the file 
+ * Adds a polyline vertex entity that was read from the file
  * via the creation interface.
  */
 void DL_Dxf::addVertex(DL_CreationInterface* creationInterface) {
@@ -936,9 +936,9 @@ void DL_Dxf::addVertex(DL_CreationInterface* creationInterface) {
  * Adds a spline entity that was read from the file via the creation interface.
  */
 void DL_Dxf::addSpline(DL_CreationInterface* creationInterface) {
-    DL_SplineData sd(toInt(values[71], 3), 
-                     maxKnots, 
-                     maxControlPoints, 
+    DL_SplineData sd(toInt(values[71], 3),
+                     maxKnots,
+                     maxControlPoints,
                      toInt(values[70], 4));
     /*DL_SplineData sd(toInt(values[71], 3), toInt(values[72], 0),
                      toInt(values[73], 0), toInt(values[70], 4));*/
@@ -1047,7 +1047,7 @@ void DL_Dxf::addInsert(DL_CreationInterface* creationInterface) {
  */
 void DL_Dxf::addTrace(DL_CreationInterface* creationInterface) {
     DL_TraceData td;
-    
+
     for (int k = 0; k < 4; k++) {
        td.x[k] = toReal(values[10 + k]);
        td.y[k] = toReal(values[20 + k]);
@@ -1063,7 +1063,7 @@ void DL_Dxf::addTrace(DL_CreationInterface* creationInterface) {
  */
 void DL_Dxf::add3dFace(DL_CreationInterface* creationInterface) {
     DL_3dFaceData td;
-    
+
     for (int k = 0; k < 4; k++) {
        td.x[k] = toReal(values[10 + k]);
        td.y[k] = toReal(values[20 + k]);
@@ -1076,12 +1076,12 @@ void DL_Dxf::add3dFace(DL_CreationInterface* creationInterface) {
 
 /**
  * Adds a solid entity (filled trace) that was read from the file via the creation interface.
- * 
+ *
  * @author AHM
  */
 void DL_Dxf::addSolid(DL_CreationInterface* creationInterface) {
     DL_SolidData sd;
-    
+
     for (int k = 0; k < 4; k++) {
        sd.x[k] = toReal(values[10 + k]);
        sd.y[k] = toReal(values[20 + k]);
@@ -2100,7 +2100,7 @@ DL_WriterA* DL_Dxf::out(const char* file, DL_Codes::version version) {
 
 
 /**
- * @brief Writes a DXF header to the file currently opened 
+ * @brief Writes a DXF header to the file currently opened
  * by the given DXF writer object.
  */
 void DL_Dxf::writeHeader(DL_WriterA& dw) {
@@ -2236,8 +2236,8 @@ void DL_Dxf::writeVertex(DL_WriterA& dw,
     }
 }
 
-    
-	
+
+
 /**
  * Writes the polyline end. Only needed for DXF R12.
  */
@@ -2384,8 +2384,8 @@ void DL_Dxf::writeEllipse(DL_WriterA& dw,
         dw.dxfReal(42, data.angle2);
     }
 }
-    
-    
+
+
 
 /**
  * Writes a solid entity to the file.
@@ -3294,7 +3294,7 @@ void DL_Dxf::writeImageDef(DL_WriterA& dw,
 
 
 /**
- * Writes a layer to the file. Layers are stored in the 
+ * Writes a layer to the file. Layers are stored in the
  * tables section of a DXF file.
  *
  * @param dw DXF writer
@@ -3349,7 +3349,7 @@ void DL_Dxf::writeLayer(DL_WriterA& dw,
 
 
 /**
- * Writes a line type to the file. Line types are stored in the 
+ * Writes a line type to the file. Line types are stored in the
  * tables section of a DXF file.
  */
 void DL_Dxf::writeLineType(DL_WriterA& dw,
@@ -4020,7 +4020,7 @@ void DL_Dxf::writeUcs(DL_WriterA& dw) {
  * Note that this method currently only writes a faked DIMSTYLE section
  * to make the file readable by Aut*cad.
  */
-void DL_Dxf::writeDimStyle(DL_WriterA& dw, 
+void DL_Dxf::writeDimStyle(DL_WriterA& dw,
 					double dimasz, double dimexe, double dimexo,
                        double dimgap, double dimtxt) {
 
@@ -4537,7 +4537,7 @@ void DL_Dxf::writeObjectsEnd(DL_WriterA& dw) {
     dw.dxfString(  0, "ENDSEC");
 }
 
-    
+
 
 /**
  * Writes a comment to the DXF file.
@@ -5083,5 +5083,3 @@ void DL_Dxf::test() {
     std::cout << "2 buf6: '" << buf6 << "'\n";
 
 }
-
-

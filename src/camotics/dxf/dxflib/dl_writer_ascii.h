@@ -31,7 +31,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -60,7 +60,7 @@ using std::string;
 /**
  * Implements functions defined in DL_Writer for writing low
  *   level DXF constructs to an ASCII format DXF file.
- * 
+ *
  * @para fname File name of the file to be created.
  * @para version DXF version. Defaults to VER_2002.
  *
@@ -92,4 +92,3 @@ private:
 };
 
 #endif
-

@@ -33,4 +33,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_COORDINATE_SYSTEM_H
-

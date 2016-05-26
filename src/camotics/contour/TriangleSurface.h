@@ -69,4 +69,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TRIANGLE_SURFACE_H
-

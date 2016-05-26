@@ -30,7 +30,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -108,13 +108,13 @@ class DL_WriterA;
 /**
  * Reading and writing of DXF files.
  *
- * This class can read in a DXF file and calls methods from the 
+ * This class can read in a DXF file and calls methods from the
  * interface DL_EntityContainer to add the entities to the
  * contianer provided by the user of the library.
  *
  * It can also be used to write DXF files to a certain extent.
  *
- * When saving entities, special values for colors and linetypes 
+ * When saving entities, special values for colors and linetypes
  * can be used:
  *
  * Special colors are 0 (=BYBLOCK) and 256 (=BYLAYER).
@@ -134,7 +134,7 @@ public:
 					   int* errorCounter = NULL);
     static bool getChoppedLine(char* s, unsigned int size,
                                FILE *stream);
-    
+
     bool readDxfGroups(std::istream &stream,
                        DL_CreationInterface* creationInterface,
 					   int* errorCounter = NULL);
@@ -154,19 +154,19 @@ public:
 
     void addPoint(DL_CreationInterface* creationInterface);
     void addLine(DL_CreationInterface* creationInterface);
-	
+
     void addPolyline(DL_CreationInterface* creationInterface);
     void addVertex(DL_CreationInterface* creationInterface);
-	
+
     void addSpline(DL_CreationInterface* creationInterface);
     //void addKnot(DL_CreationInterface* creationInterface);
     //void addControlPoint(DL_CreationInterface* creationInterface);
-	
+
     void addArc(DL_CreationInterface* creationInterface);
     void addCircle(DL_CreationInterface* creationInterface);
     void addEllipse(DL_CreationInterface* creationInterface);
     void addInsert(DL_CreationInterface* creationInterface);
-    
+
     void addTrace(DL_CreationInterface* creationInterface);
     void add3dFace(DL_CreationInterface* creationInterface);
     void addSolid(DL_CreationInterface* creationInterface);
@@ -177,7 +177,7 @@ public:
 	bool handleSplineData(DL_CreationInterface* creationInterface);
 	bool handleLeaderData(DL_CreationInterface* creationInterface);
 	bool handleHatchData(DL_CreationInterface* creationInterface);
-	
+
     void addText(DL_CreationInterface* creationInterface);
     void addAttrib(DL_CreationInterface* creationInterface);
     DL_DimensionData getDimData();
@@ -192,14 +192,14 @@ public:
     void addHatch(DL_CreationInterface* creationInterface);
     void addImage(DL_CreationInterface* creationInterface);
     void addImageDef(DL_CreationInterface* creationInterface);
-    
+
     void addComment(DL_CreationInterface* creationInterface, const char* comment);
 
 	void endEntity(DL_CreationInterface* creationInterface);
-	
+
     void endSequence(DL_CreationInterface* creationInterface);
-	
-	int  stringToInt(const char* s, bool* ok=NULL);	
+
+	int  stringToInt(const char* s, bool* ok=NULL);
 
     DL_WriterA* out(const char* file,
                     DL_Codes::version version=VER_2000);
@@ -319,18 +319,18 @@ public:
     void writeStyle(DL_WriterA& dw);
     void writeView(DL_WriterA& dw);
     void writeUcs(DL_WriterA& dw);
-    void writeDimStyle(DL_WriterA& dw, 
+    void writeDimStyle(DL_WriterA& dw,
 	                   double dimasz, double dimexe, double dimexo,
 					   double dimgap, double dimtxt);
     void writeBlockRecord(DL_WriterA& dw);
     void writeBlockRecord(DL_WriterA& dw, const string& name);
     void writeObjects(DL_WriterA& dw);
     void writeObjectsEnd(DL_WriterA& dw);
-    
+
     void writeComment(DL_WriterA& dw, const string& comment);
 
     /**
-     * Converts the given string into a double or returns the given 
+     * Converts the given string into a double or returns the given
      * default valud (def) if value is NULL or empty.
      */
     static double toReal(const char* value, double def=0.0) {
@@ -352,7 +352,7 @@ public:
         }
     }
     /**
-     * Converts the given string into an int or returns the given 
+     * Converts the given string into an int or returns the given
      * default valud (def) if value is NULL or empty.
      */
     static int toInt(const char* value, int def=0) {
@@ -363,7 +363,7 @@ public:
         }
     }
     /**
-     * Converts the given string into a string or returns the given 
+     * Converts the given string into a string or returns the given
      * default valud (def) if value is NULL or empty.
      */
     static const char* toString(const char* value, const char* def="") {
@@ -392,11 +392,11 @@ private:
     double* vertices;
     int maxVertices;
     int vertexIndex;
-	
+
     double* knots;
     int maxKnots;
     int knotIndex;
-	
+
     double* controlPoints;
     int maxControlPoints;
     int controlPointIndex;

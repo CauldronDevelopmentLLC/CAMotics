@@ -35,4 +35,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_STLBINARY_TRIANGLE_H
-

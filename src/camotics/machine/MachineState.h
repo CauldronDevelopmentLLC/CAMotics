@@ -93,4 +93,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MACHINE_STATE_H
-

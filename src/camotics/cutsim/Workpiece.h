@@ -44,4 +44,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_WORKPIECE_H
-

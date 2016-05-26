@@ -45,4 +45,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_REFERENCE_H
-

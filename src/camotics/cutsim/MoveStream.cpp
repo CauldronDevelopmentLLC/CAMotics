@@ -21,4 +21,3 @@
 #include "MoveStream.h"
 
 using namespace CAMotics;
-

@@ -43,4 +43,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_SPHEROID_SWEEP_H
-

@@ -76,7 +76,7 @@ void Element::read(istream &stream) {
   value = readString(stream);
   stream >> m >> t >> tdir >> tscale;
   tflags = readString(stream);
-    
+
   readWS(stream);
   int c = stream.get();
   if (c != ']')  THROW("missing ']' on Element");

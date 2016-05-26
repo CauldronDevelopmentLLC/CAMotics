@@ -113,7 +113,7 @@ void Layout::multiply(double m) {
 
 void Layout::round(int x) {
   for (const_iterator it = objects.begin(); it != objects.end(); it++)
-    (*it)->round(x); 
+    (*it)->round(x);
 }
 
 

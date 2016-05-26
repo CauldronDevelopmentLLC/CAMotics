@@ -41,4 +41,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_MEMBER_FUNCTOR_VALUE_H
-

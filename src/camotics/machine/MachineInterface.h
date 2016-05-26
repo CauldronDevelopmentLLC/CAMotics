@@ -253,4 +253,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MACHINE_INTERFACE_H
-

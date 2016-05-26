@@ -35,7 +35,7 @@ ProbeGrid::ProbeGrid(const Rectangle2D &bbox, const Vector2D &divisions) :
   // Resize vectors
   resize(divisions.y() + 1, Column_t(divisions.x() + 1));
 
-  // Fill in coords  
+  // Fill in coords
   double y = bbox.getMin().y();
   for (ProbeGrid::row_iterator row = begin(); row != end(); row++) {
     double x = bbox.getMin().x();

@@ -46,4 +46,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_STL_WRITER_H
-

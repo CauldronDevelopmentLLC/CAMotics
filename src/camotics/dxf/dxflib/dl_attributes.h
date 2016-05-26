@@ -30,7 +30,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -80,7 +80,7 @@ public:
      * @param layer Layer name for this entity or NULL for no layer
      *              (every entity should be on a named layer!).
      * @param color Color number (0..256). 0 = BYBLOCK, 256 = BYLAYER.
-     * @param width Line thickness. Defaults to zero. -1 = BYLAYER, 
+     * @param width Line thickness. Defaults to zero. -1 = BYLAYER,
      *               -2 = BYBLOCK, -3 = default width
      * @param lineType Line type name or "BYLAYER" or "BYBLOCK". Defaults
      *              to "BYLAYER"
@@ -157,7 +157,7 @@ public:
 
     /**
      * Sets the line type. This can be any string and is not
-     *  checked to be a valid line type. 
+     *  checked to be a valid line type.
      */
     void setLineType(const string& lineType) {
         this->lineType = lineType;

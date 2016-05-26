@@ -49,4 +49,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_FIELD_FUNCTION_H
-

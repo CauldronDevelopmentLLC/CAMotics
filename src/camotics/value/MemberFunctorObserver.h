@@ -44,4 +44,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_MEMBER_FUNCTOR_OBSERVER_H
-

@@ -50,4 +50,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_COMMAND_LINE_APP_H
-

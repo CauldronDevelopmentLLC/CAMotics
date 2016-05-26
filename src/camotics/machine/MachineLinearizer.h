@@ -37,4 +37,3 @@ namespace CAMotics {
 }
 
 #endif // MACHINE_LINEARIZER_H
-

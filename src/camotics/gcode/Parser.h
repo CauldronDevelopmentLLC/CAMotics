@@ -88,4 +88,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PARSER_H
-

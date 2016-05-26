@@ -22,7 +22,7 @@
 // http://www.oocities.org/tzukkers/isosurf/isosurfaces.html
 // By Ronen Tzur
 // ThreeD Quadric Error Function
-// 
+//
 // This file is in the public domain.
 
 #include "QEF.h"

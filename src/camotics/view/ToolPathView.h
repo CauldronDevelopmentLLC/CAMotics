@@ -110,4 +110,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOOL_PATH_VIEW_H
-

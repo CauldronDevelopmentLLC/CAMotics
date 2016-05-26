@@ -40,4 +40,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_SLICE_CONTOUR_GENERATOR_H
-

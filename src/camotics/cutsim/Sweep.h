@@ -48,4 +48,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_SWEEP_H
-

@@ -43,4 +43,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_REDUCE_TASK_H
-

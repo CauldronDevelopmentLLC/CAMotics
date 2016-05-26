@@ -71,8 +71,8 @@ std::ostream& operator <<(std::ostream &s, Polygons &p);
 class PolyNode;
 typedef std::vector< PolyNode* > PolyNodes;
 
-class PolyNode 
-{ 
+class PolyNode
+{
 public:
     PolyNode();
     Polygon Contour;
@@ -89,7 +89,7 @@ private:
 };
 
 class PolyTree: public PolyNode
-{ 
+{
 public:
     ~PolyTree(){Clear();};
     PolyNode* GetFirst() const;
@@ -99,7 +99,7 @@ private:
     PolyNodes AllNodes;
     friend class Clipper; //to access AllNodes
 };
-        
+
 enum JoinType { jtSquare, jtRound, jtMiter };
 enum EndType { etClosed, etButt, etSquare, etRound};
 
@@ -271,7 +271,7 @@ private:
   PolyFillType     m_ClipFillType;
   PolyFillType     m_SubjFillType;
   bool             m_ReverseOutput;
-  bool             m_UsingPolyTree; 
+  bool             m_UsingPolyTree;
   bool             m_ForceSimple;
   void DisposeScanbeamList();
   void SetWindingCount(TEdge& edge);
@@ -345,5 +345,3 @@ class clipperException : public std::exception
 } //ClipperLib namespace
 
 #endif //clipper_hpp
-
-

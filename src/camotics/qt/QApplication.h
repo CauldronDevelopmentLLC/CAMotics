@@ -34,4 +34,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_QAPPLICATION_H
-

@@ -31,7 +31,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -559,4 +559,3 @@ const double dxfColors[][3] = {
 #define PCS_TRANS_CODE      3
 
 #endif
-

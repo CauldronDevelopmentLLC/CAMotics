@@ -30,4 +30,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOKEN_H
-

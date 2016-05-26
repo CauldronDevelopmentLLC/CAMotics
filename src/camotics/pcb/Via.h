@@ -55,4 +55,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PCB_VIA_H
-

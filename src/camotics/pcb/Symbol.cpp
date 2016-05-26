@@ -43,7 +43,7 @@ void Symbol::read(istream &stream) {
   if (x != '\'')  THROW("missing ')' on Symbol");
 
   stream >> delta;
-    
+
   readWS(stream);
   int c = stream.get();
   if (c != ')')  THROW("missing ')' on Symbol");

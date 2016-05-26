@@ -105,4 +105,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_OCODE_INTERPRETER_H
-

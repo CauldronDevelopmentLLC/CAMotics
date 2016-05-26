@@ -60,4 +60,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_EXPORT_DIALOG_H
-

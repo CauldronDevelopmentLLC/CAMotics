@@ -39,4 +39,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_COLOR_H
-

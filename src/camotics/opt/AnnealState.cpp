@@ -102,7 +102,7 @@ double AnnealState::swapDelta(unsigned first, unsigned second) {
       delta -= computeCost(second - 1, second);
       delta += computeCost(second - 1, first);
     }
-        
+
   } else {
     delta -= computeCost(first, second);
     delta += computeCost(second, first);

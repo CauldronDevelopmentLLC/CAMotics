@@ -74,4 +74,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PCB_OBJECT_H
-

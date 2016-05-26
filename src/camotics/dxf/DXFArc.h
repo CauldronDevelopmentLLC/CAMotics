@@ -50,4 +50,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_DXFARC_H
-

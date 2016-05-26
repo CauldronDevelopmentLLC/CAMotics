@@ -97,4 +97,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_VIEW_H
-

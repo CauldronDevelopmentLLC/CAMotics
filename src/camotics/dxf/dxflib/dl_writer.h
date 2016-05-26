@@ -31,7 +31,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -73,7 +73,7 @@
  * Defines interface for writing low level DXF constructs to
  * a file. Implementation is defined in derived classes that write
  * to binary or ASCII files.
- * 
+ *
  * Implements functions that write higher level constructs in terms of
  * the low level ones.
  *
@@ -346,20 +346,20 @@ public:
      * </pre>
      */
     void entityAttributes(const DL_Attributes& attrib) const {
-	
+
 		// layer name:
         dxfString(8, attrib.getLayer());
-		
+
 		// R12 doesn't accept BYLAYER values. The value has to be missing
 		//   in that case.
-        if (version>=VER_2000 || 
+        if (version>=VER_2000 ||
 			attrib.getColor()!=256) {
         	dxfInt(62, attrib.getColor());
 		}
         if (version>=VER_2000) {
             dxfInt(370, attrib.getWidth());
         }
-        if (version>=VER_2000 || 
+        if (version>=VER_2000 ||
 			strcasecmp(attrib.getLineType().c_str(), "BYLAYER")) {
 	        dxfString(6, attrib.getLineType());
 		}
@@ -535,7 +535,7 @@ public:
     unsigned long getNextHandle() const {
         return m_handle;
     }
-	
+
     /**
      * Increases handle, so that the handle returned remains available.
      */
@@ -544,7 +544,7 @@ public:
     }
 
     /**
-     * Sets the handle of the model space. Entities refer to 
+     * Sets the handle of the model space. Entities refer to
      * this handle.
      */
     void setModelSpaceHandle(unsigned long h) {
@@ -556,7 +556,7 @@ public:
     }
 
     /**
-     * Sets the handle of the paper space. Some special blocks refer to 
+     * Sets the handle of the paper space. Some special blocks refer to
      * this handle.
      */
     void setPaperSpaceHandle(unsigned long h) {
@@ -568,7 +568,7 @@ public:
     }
 
     /**
-     * Sets the handle of the paper space 0. Some special blocks refer to 
+     * Sets the handle of the paper space 0. Some special blocks refer to
      * this handle.
      */
     void setPaperSpace0Handle(unsigned long h) {

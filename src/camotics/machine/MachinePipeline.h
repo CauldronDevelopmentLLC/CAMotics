@@ -40,4 +40,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MACHINE_PIPELINE_H
-

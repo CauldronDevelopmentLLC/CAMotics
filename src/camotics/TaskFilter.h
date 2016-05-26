@@ -72,4 +72,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TASK_FILTER_H
-

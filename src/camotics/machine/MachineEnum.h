@@ -37,4 +37,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MACHINE_ENUM_H
-

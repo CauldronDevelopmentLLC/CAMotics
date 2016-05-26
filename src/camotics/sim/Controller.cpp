@@ -658,7 +658,7 @@ void Controller::drill(int vars, bool dwell, bool feedOut, bool spindleStop) {
   unsigned zVar = getPlaneZVarType();
   double r = getVar('R');
   unsigned L = (vars & VT_L) ? (unsigned)getVar('L') : 1;
-  
+
   double zClear = 0;
   switch (returnMode) {
   case RETURN_TO_R: zClear = r; break;

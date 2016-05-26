@@ -118,7 +118,7 @@ namespace CAMotics {
       }
     }
 
-    
+
     inline static char toVar(unsigned i) {
       switch (i) {
       case 9: return 'R';
@@ -137,4 +137,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOOL_H
-

@@ -55,4 +55,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TASK_H
-

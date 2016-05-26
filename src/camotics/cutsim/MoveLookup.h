@@ -40,4 +40,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_MOVE_LOOKUP_H
-

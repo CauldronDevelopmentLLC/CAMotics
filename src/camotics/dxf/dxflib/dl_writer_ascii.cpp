@@ -31,7 +31,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -83,7 +83,7 @@ bool DL_WriterA::openFailed() const {
 void DL_WriterA::dxfReal(int gc, double value) const {
     char str[256];
     sprintf(str, "%.16lf", value);
-	
+
 	// fix for german locale:
 	strReplace(str, ',', '.');
 
@@ -171,4 +171,3 @@ void DL_WriterA::strReplace(char* str, char src, char dest) {
 		}
 	}
 }
-

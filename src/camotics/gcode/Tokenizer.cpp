@@ -134,7 +134,7 @@ void Tokenizer::next() {
   case '%': break; // Ignore program delimiter
   case ';': comment(); needAdvance = false; break;
   case '(': parenComment(); needAdvance = false; break;
-    
+
   case '.':
   case '0': case '1': case '2': case '3': case '4':
   case '5': case '6': case '7': case '8': case '9':
@@ -161,7 +161,7 @@ void Tokenizer::next() {
   case '=': current.set(ASSIGN_TOKEN, c); break;
   case '#': current.set(POUND_TOKEN, c); break;
   case '\n': current.set(EOL_TOKEN, c); break;
-  
+
   default:
     if (isalpha(c) || c == '_') {
       id();
@@ -172,6 +172,6 @@ void Tokenizer::next() {
   }
 
   if (needAdvance) scanner.advance();
-  
+
   current.getLocation() = cb::LocationRange(start, scanner.getLocation());
 }

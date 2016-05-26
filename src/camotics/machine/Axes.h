@@ -105,7 +105,7 @@ namespace CAMotics {
       default: THROWS("Invalid axis " << axis);
       }
     }
-    
+
     inline static char toAxis(unsigned i) {
       switch (i) {
       case 0: return 'X';
@@ -124,4 +124,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_AXES_H
-

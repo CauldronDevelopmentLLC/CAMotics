@@ -42,4 +42,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PCB_LAYER_H
-

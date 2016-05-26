@@ -99,4 +99,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TRIANGLE_MESH_H
-

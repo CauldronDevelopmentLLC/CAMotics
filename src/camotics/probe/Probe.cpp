@@ -99,17 +99,17 @@ void Probe::read(const InputSource &source) {
 void Probe::outputProbe(ProbePoint &pt, unsigned address, unsigned count) {
   if (maxMem <= address)
     THROW("Too many probes, ran out of address space in controller");
-  
+
   pt.address = address;
-  
+
   stream
     << "G0 X" << pt.x() << " Y" << pt.y() << " Z"
     << clearHeight << '\n'
     << "G38.2 Z" << probeDepth << " F" << probeFeed << '\n';
-  
+
   if (liftOff)
     stream << "G38.4 Z" << clearHeight << " F" << liftOffFeed << '\n';
-  
+
   stream << '#' << address << "=#5063\n";
   stream << "G0 Z" << clearHeight << '\n';
 }
@@ -178,7 +178,7 @@ void Probe::operator()(const SmartPointer<Block> &block) {
       outputProbe();
       didOutputProbe = true;
     }
-    
+
     if (didOutputProbe && block->findWord('G', 1) &&
         getAxisPosition('Z') < clearHeight) {
       double x = getAxisPosition('X');

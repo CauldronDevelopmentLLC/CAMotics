@@ -393,5 +393,3 @@ bool TriangleMesh::moreThan2InCommon(VertexSet &vs1, VertexSet &vs2) {
 
   return false;
 }
-
-

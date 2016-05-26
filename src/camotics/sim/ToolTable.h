@@ -71,4 +71,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOOL_TABLE_H
-

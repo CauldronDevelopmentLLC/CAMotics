@@ -63,4 +63,3 @@ namespace CAMotics {
 }
 
 #endif // TPLANG_MACHINE_MATRIX_H
-

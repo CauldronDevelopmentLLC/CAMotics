@@ -57,4 +57,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_FIND_DIALOG_H
-

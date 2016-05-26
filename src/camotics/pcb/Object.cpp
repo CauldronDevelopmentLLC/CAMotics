@@ -54,7 +54,7 @@ string Object::readString(istream &stream) {
 
   int c = stream.get();
   if (c != '"') THROW("Expected '\"'");
-    
+
   string s;
   do {
     c = stream.get();
@@ -74,7 +74,7 @@ int Object::readInt(istream &stream) {
 
   if (c == '-') sign = -1;
   else if (!isdigit(c)) THROW("Expected number");
-    
+
   int x = 0;
   do {
     x = 10 * x + c - '0';

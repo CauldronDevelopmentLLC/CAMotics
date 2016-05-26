@@ -49,4 +49,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PROBE_GRID_H
-

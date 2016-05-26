@@ -37,4 +37,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CUBICAL_MARCHING_SQUARES_H
-

@@ -54,4 +54,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_AABB_H
-

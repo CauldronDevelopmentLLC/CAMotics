@@ -30,7 +30,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -95,7 +95,7 @@ public:
 
 
     /**
-     * Sets the direction vector. 
+     * Sets the direction vector.
      */
     void setDirection(double dx, double dy, double dz) {
 		direction[0]=dx;
@@ -161,4 +161,3 @@ private:
 };
 
 #endif
-

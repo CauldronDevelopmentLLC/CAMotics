@@ -101,16 +101,16 @@ double Opt::optimize() {
 
     // Greedy run
     round(0, iterations, current, best);
- 
+
     double T = 1;
     double average;
     double target = best.cost * heatTarget;
 
-    // Increase temperature up to target 
+    // Increase temperature up to target
     LOG_INFO(1, "Heating up");
     do {
       T *= heatRate;
-      average = round(T, iterations, current, best); 
+      average = round(T, iterations, current, best);
     } while (average < target && !shouldQuit());
 
     // Run until cold
@@ -148,7 +148,7 @@ double Opt::optimize() {
       paths.push_back(tmp[best.index[i]]);
     }
   }
-  
+
   return best.cost;
 }
 

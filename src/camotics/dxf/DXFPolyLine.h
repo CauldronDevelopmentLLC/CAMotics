@@ -42,4 +42,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_DXFPOLY_LINE_H
-

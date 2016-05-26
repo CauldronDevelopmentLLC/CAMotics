@@ -78,4 +78,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PCB_POINT_H
-

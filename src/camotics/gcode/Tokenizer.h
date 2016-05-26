@@ -48,4 +48,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOKENIZER_H
-

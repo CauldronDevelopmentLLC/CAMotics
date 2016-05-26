@@ -48,4 +48,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_STL_READER_H
-

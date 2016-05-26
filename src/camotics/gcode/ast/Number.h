@@ -40,4 +40,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_NUMBER_H
-

@@ -65,4 +65,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TOOL_PATH_TASK_H
-

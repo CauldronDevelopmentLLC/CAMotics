@@ -49,4 +49,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CUT_SIM_H
-

@@ -42,4 +42,3 @@ namespace tplang {
 }
 
 #endif // TPLANG_INTERPRETER_H
-

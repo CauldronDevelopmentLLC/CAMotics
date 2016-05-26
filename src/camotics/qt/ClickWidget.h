@@ -35,4 +35,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CLICK_WIDGET_H
-

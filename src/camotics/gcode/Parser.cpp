@@ -254,7 +254,7 @@ SmartPointer<Entity> Parser::compareOp(CAMotics::Tokenizer &tokenizer) {
     break;
   }
 
-  return entity;  
+  return entity;
 }
 
 
@@ -276,7 +276,7 @@ SmartPointer<Entity> Parser::addOp(CAMotics::Tokenizer &tokenizer) {
     } else break;
   }
 
-  return entity;  
+  return entity;
 }
 
 
@@ -302,7 +302,7 @@ SmartPointer<Entity> Parser::mulOp(CAMotics::Tokenizer &tokenizer) {
     } else break;
   }
 
-  return entity;  
+  return entity;
 }
 
 

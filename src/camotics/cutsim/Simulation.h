@@ -59,4 +59,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_SIMULATION_H
-

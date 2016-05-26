@@ -66,4 +66,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_TPLHIGHLIGHTER_H
-

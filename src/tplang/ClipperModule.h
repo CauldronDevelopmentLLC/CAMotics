@@ -39,4 +39,3 @@ namespace tplang {
 }
 
 #endif // TPLANG_CLIPPER_MODULE_H
-

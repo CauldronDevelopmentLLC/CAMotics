@@ -49,4 +49,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_SURFACE_TASK_H
-

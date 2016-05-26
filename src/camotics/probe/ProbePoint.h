@@ -28,10 +28,9 @@ namespace CAMotics {
   public:
     bool probe;
     unsigned address;
-    
+
     ProbePoint() : probe(false), address(0) {}
   };
 }
 
 #endif // CAMOTICS_PROBE_POINT_H
-

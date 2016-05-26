@@ -56,4 +56,3 @@ namespace tplang {
 }
 
 #endif // TPLANG_TPLCONTEXT_H
-

@@ -60,4 +60,3 @@ namespace tplang {
 }
 
 #endif // TPLANG_MATRIX_MODULE_H
-

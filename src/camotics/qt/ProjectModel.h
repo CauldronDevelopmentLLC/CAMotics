@@ -79,4 +79,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_PROJECT_MODEL_H
-

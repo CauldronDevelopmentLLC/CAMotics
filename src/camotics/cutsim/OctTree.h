@@ -62,4 +62,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_OCT_TREE_H
-

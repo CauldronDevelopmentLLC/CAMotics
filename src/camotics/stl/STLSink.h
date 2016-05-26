@@ -47,4 +47,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_STLSINK_H
-

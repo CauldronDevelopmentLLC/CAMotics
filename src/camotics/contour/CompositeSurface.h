@@ -52,4 +52,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_COMPOSITE_SURFACE_H
-

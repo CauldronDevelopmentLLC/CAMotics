@@ -48,4 +48,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_GEOM_H
-

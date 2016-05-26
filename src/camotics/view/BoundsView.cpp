@@ -48,7 +48,7 @@ void BoundsView::draw() {
   glVertex3f(rmin.x(), rmax.y(), rmax.z());
   glVertex3f(rmin.x(), rmax.y(), rmax.z());
   glVertex3f(rmin.x(), rmax.y(), rmin.z());
-    
+
   // Sides
   glVertex3f(rmin.x(), rmin.y(), rmin.z());
   glVertex3f(rmin.x(), rmax.y(), rmin.z());
@@ -58,6 +58,6 @@ void BoundsView::draw() {
   glVertex3f(rmax.x(), rmax.y(), rmax.z());
   glVertex3f(rmin.x(), rmin.y(), rmax.z());
   glVertex3f(rmin.x(), rmax.y(), rmax.z());
-    
+
   glEnd();
 }

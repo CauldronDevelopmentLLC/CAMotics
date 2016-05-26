@@ -36,7 +36,7 @@ void Layer::write(ostream &stream) const {
 void Layer::read(istream &stream) {
   stream >> number;
   name = readString(stream);
-    
+
   readWS(stream);
   int c = stream.get();
   if (c != ')')  THROW("missing ')' on Layer");

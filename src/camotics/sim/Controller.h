@@ -223,4 +223,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_CONTROLLER_H
-

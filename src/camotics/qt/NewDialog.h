@@ -42,4 +42,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_NEW_DIALOG_H
-

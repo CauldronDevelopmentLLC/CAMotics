@@ -56,4 +56,3 @@ namespace CAMotics {
 }
 
 #endif // CAMOTICS_BLOCK_H
-
