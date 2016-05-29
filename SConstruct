@@ -218,8 +218,8 @@ if 'package' in COMMAND_LINE_TARGETS:
         dlls = find_dlls(str(execs[0][0]))
         extra_files = 'File ' + '\nFile '.join(dlls)
 
-        extra_files += '\n\nSetOutPath "$INSTDIR\\imageformats"\n'
-        extra_files += '"$%%QTDIR%%\\plugins\\platforms\\qwindows.dll'
+        extra_files += '\n\nSetOutPath "$INSTDIR\\platforms"\n'
+        extra_files += '"$%%QTDIR%%\\plugins\\platforms\\qwindows.dll"'
 
     pkg = env.Packager(
         'CAMotics',
