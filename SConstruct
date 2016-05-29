@@ -145,7 +145,7 @@ execs = []
 for prog in progs.split():
     if prog == 'camotics' and int(env.get('cross_mingw', 0)):
         _env = env.Clone()
-        _env.AppendUnique(LINKERFLAGS = ['-Wl,--subsystem,windows'])
+        _env.AppendUnique(LINKFLAGS = ['-Wl,--subsystem,windows'])
     else: _env = env
 
     p = _env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
