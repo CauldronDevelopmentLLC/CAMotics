@@ -62,31 +62,7 @@ Section -Install
   File "README.md"
   File "CHANGELOG.md"
 
-  ; Cairo DLLs
-  File "$%%GTK_HOME%%\bin\FREETYPE6.DLL"
-  File "$%%GTK_HOME%%\bin\LIBCAIRO-2.DLL"
-  File "$%%GTK_HOME%%\bin\LIBEXPAT-1.DLL"
-  File "$%%GTK_HOME%%\bin\LIBFONTCONFIG-1.DLL"
-  File "$%%GTK_HOME%%\bin\LIBPNG14-14.DLL"
-  File "$%%GTK_HOME%%\bin\ZLIB1.DLL"
-
-  ; Expat DLL
-  File "c:\strawberry\c\bin\LIBEXPAT.DLL"
-
-  ; Qt DLLs
-  File "$%%QT4DIR%%\bin\QtCore4.dll"
-  File "$%%QT4DIR%%\bin\QtGui4.dll"
-  File "$%%QT4DIR%%\bin\QtOpenGL4.dll"
-
-  ; Qt Plugins
-  SetOutPath "$INSTDIR\imageformats"
-  File "$%%QT4DIR%%\plugins\imageformats\qgif4.dll"
-  File "$%%QT4DIR%%\plugins\imageformats\qico4.dll"
-  File "$%%QT4DIR%%\plugins\imageformats\qjpeg4.dll"
-  File "$%%QT4DIR%%\plugins\imageformats\qmng4.dll"
-  File "$%%QT4DIR%%\plugins\imageformats\qsvg4.dll"
-  File "$%%QT4DIR%%\plugins\imageformats\qtga4.dll"
-  File "$%%QT4DIR%%\plugins\imageformats\qtiff4.dll"
+  %(extra_files)s
 
   ; TPL Libs
   SetOverwrite on

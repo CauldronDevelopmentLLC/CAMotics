@@ -206,6 +206,14 @@ if 'package' in COMMAND_LINE_TARGETS:
         else: qt_pkgs = ', libqtcore4, libqtgui4, libqt4-opengl'
     else: qt_pkgs = ''
 
+    # Find DLLs
+    extra_files = ''
+    if env['PLATFORM'] == 'win32' or int(env.get('cross_mingw', 0)):
+        from find-dlls import find_dlls
+        dlls = find_dlls(str(execs[0])):
+        extra_files = 'File ' + '\nFile '.join(dlls)
+
+
     pkg = env.Packager(
         'CAMotics',
         version = version,
@@ -226,6 +234,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         changelog = 'CHANGELOG.md',
 
         nsi = 'camotics.nsi',
+        extra_files = extra_files,
         timestamp_url = 'http://timestamp.comodoca.com/authenticode',
         code_sign_key = os.environ.get('CODE_SIGN_KEY', None),
         code_sign_key_pass = code_sign_key_pass,
