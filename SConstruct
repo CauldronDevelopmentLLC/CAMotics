@@ -195,7 +195,8 @@ msvc_redist_url = 'http://download.microsoft.com/download/d/d/9/' + \
     'dd9a82d0-52ef-40db-8dab-795376989c03/' + msvc_redist
 if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
         not os.path.exists('build/' + msvc_redist):
-    redist = env.CBDownload('build/' + msvc_redist, msvc_redist_url)
+    env.CBDownload('build/' + msvc_redist, msvc_redist_url)
+else: msvc_redist = None
 
 
 # Package
