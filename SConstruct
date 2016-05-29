@@ -143,8 +143,13 @@ docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
 progs = 'camotics gcodetool tplang camsim'
 execs = []
 for prog in progs.split():
-    p = env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
-    env.Install(env.get('install_prefix') + '/bin/', p)
+    if prog == 'camotics' and int(env.get('cross_mingw', 0)):
+        _env = env.Clone()
+        _env.AppendUnique(LINKERFLAGS = ['-Wl,--subsystem,windows'])
+    else: _env = env
+
+    p = _env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
+    _env.Install(env.get('install_prefix') + '/bin/', p)
     Default(p)
     execs.append(p)
 
@@ -208,11 +213,13 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     # Find DLLs
     extra_files = ''
-    if env['PLATFORM'] == 'win32' or int(env.get('cross_mingw', 0)):
+    if int(env.get('cross_mingw', 0)):
         from finddlls import find_dlls
         dlls = find_dlls(str(execs[0][0]))
         extra_files = 'File ' + '\nFile '.join(dlls)
 
+        extra_files += '\n\nSetOutPath "$INSTDIR\\imageformats"\n'
+        extra_files += '"$%%QTDIR%%\\plugins\\platforms\\qwindows.dll'
 
     pkg = env.Packager(
         'CAMotics',
