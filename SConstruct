@@ -220,7 +220,7 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         extra_files += '\n\nSetOutPath "$INSTDIR\\platforms"\n'
         extra_files += \
-            'File "$%%QTDIR%%\\share\\plugins\\platforms\\qwindows.dll"'
+            'File "\\mingw64\\share\\qt5plugins\\platforms\\qwindows.dll"'
 
     pkg = env.Packager(
         'CAMotics',
