@@ -24,7 +24,7 @@ def find_in_path(filename):
                 return os.path.join(path, name)
 
 
-def find_dlls(path, exclude = set()):
+def find_dlls(path, exclude = exclude):
     cmd = ['objdump', '-p', path]
     p = subprocess.Popen(cmd, stdout = subprocess.PIPE)
     out, err = p.communicate()
@@ -49,5 +49,5 @@ def find_dlls(path, exclude = set()):
 
 if __name__ == "__main__":
     for arg in sys.argv[1:]:
-        for dll in find_dlls(arg):
+        for dll in find_dlls(arg, exclude):
             print dll
