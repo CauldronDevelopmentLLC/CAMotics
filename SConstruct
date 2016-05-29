@@ -189,16 +189,6 @@ if 'package' in COMMAND_LINE_TARGETS:
     examples = map(lambda x: [x, x], examples.split())
 
 
-# Get MSVC redist
-msvc_redist = 'vcredist_x86.exe'
-msvc_redist_url = 'http://download.microsoft.com/download/d/d/9/' + \
-    'dd9a82d0-52ef-40db-8dab-795376989c03/' + msvc_redist
-if 'package' in COMMAND_LINE_TARGETS and env['PLATFORM'] == 'win32' and \
-        not os.path.exists('build/' + msvc_redist):
-    env.CBDownload('build/' + msvc_redist, msvc_redist_url)
-else: msvc_redist = None
-
-
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
     # Code sign key password
@@ -236,7 +226,6 @@ if 'package' in COMMAND_LINE_TARGETS:
         changelog = 'CHANGELOG.md',
 
         nsi = 'camotics.nsi',
-        msvc_redist = msvc_redist,
         timestamp_url = 'http://timestamp.comodoca.com/authenticode',
         code_sign_key = os.environ.get('CODE_SIGN_KEY', None),
         code_sign_key_pass = code_sign_key_pass,

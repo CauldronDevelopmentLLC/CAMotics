@@ -14,7 +14,6 @@
     "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_DIR_REGKEY \
     "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_NAME}"
-!define MSVCREDIST              "%(msvc_redist)s"
 
 !define MUI_ABORTWARNING
 !define MUI_ICON "images\${PRODUCT_ICON}"
@@ -62,7 +61,6 @@ Section -Install
   File ${PRODUCT_LICENSE}
   File "README.md"
   File "CHANGELOG.md"
-  File "build\${MSVCREDIST}"
 
   ; Cairo DLLs
   File "$%%GTK_HOME%%\bin\FREETYPE6.DLL"
@@ -136,9 +134,6 @@ write_uninstaller:
     "Publisher" "${PRODUCT_VENDOR}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
     "DisplayVersion" "${PRODUCT_VERSION}"
-
-  # Install MSVC redist
-  ExecWait '"$INSTDIR\${MSVCREDIST}" /q:a /c:"VCREDI~1.EXE /q:a /c:""msiexec /i vcredist.msi /qb!"" "'
 
   # Uninstall OpenSCAM
   IfFileExists "$PROGRAMFILES32\OpenSCAM\${UNINSTALLER}" 0 done
