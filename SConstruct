@@ -219,7 +219,8 @@ if 'package' in COMMAND_LINE_TARGETS:
         extra_files = 'File ' + '\nFile '.join(dlls)
 
         extra_files += '\n\nSetOutPath "$INSTDIR\\platforms"\n'
-        extra_files += 'File "$%%QTDIR%%\\plugins\\platforms\\qwindows.dll"'
+        extra_files += \
+            'File "$%%QTDIR%%\\share\\plugins\\platforms\\qwindows.dll"'
 
     pkg = env.Packager(
         'CAMotics',
