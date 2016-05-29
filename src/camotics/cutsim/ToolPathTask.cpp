@@ -124,7 +124,7 @@ void ToolPathTask::run() {
       // Add pipe
       unsigned pipe = proc->createPipe(false);
       args.push_back("--pipe");
-      args.push_back(String((unsigned)proc->getPipeHandle(pipe)));
+      args.push_back(String((uint64_t)proc->getPipeHandle(pipe)));
 
       // Execute
       proc->exec(args, Subprocess::REDIR_STDOUT |
