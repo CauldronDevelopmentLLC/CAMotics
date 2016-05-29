@@ -210,7 +210,7 @@ if 'package' in COMMAND_LINE_TARGETS:
     extra_files = ''
     if env['PLATFORM'] == 'win32' or int(env.get('cross_mingw', 0)):
         from finddlls import find_dlls
-        dlls = find_dlls(str(execs[0]))
+        dlls = find_dlls(execs[0][0])
         extra_files = 'File ' + '\nFile '.join(dlls)
 
 
