@@ -307,7 +307,7 @@ module.exports = extend({
       y: a.center.y - p.y,
     }
 
-    arc({x: offset.x, y: offset.y, angle: arc_angle(a)});
+    arc({x: offset.x, y: offset.y, angle: this.arc_angle(a)});
   },
 
 
