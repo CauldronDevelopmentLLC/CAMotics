@@ -52,6 +52,14 @@ it is much easier to simply install prebuilt packages which can be found
 at http://camotics.org/downloads  There are also prebuilt Debian packages
 you can try.
 
+## The Quick and Easy Method
+Cut and paste the following command in to a terminal:
+
+    curl http://camotics.org/build.sh | sh
+
+You will have to enter your password, possibly a few times.  When it's done
+it should print ``Success``.  Then you can run ``camotics``.
+
 ## Building C!
 
 Clone the C! git repository, build the software using scons and set the
