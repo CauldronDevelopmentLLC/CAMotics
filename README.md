@@ -31,20 +31,6 @@ See http://camotics.org/
 # License
 GNU General Public License version 2+.  See the file COPYING.
 
-# Prerequisites
-  - C!     - http://cbang.org/
-  - Qt4    - http://qt-project.org/
-  - Cairo2 - http://cairographics.org/
-  - SCons  - http://www.scons.org/
-
-On Debian based systems all the prerequisites, including thoese needed
-by C!, can be installed with the following command line:
-
-    sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
-      libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
-      libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
-      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
-
 # Building from Source
 This section describes how to build CAMotics from source on Debian based
 systems such as Ubuntu and Mint Linux.  If you are running Windows or OSX
@@ -60,6 +46,20 @@ following command in to a terminal:
 
 You will have to enter your password, possibly a few times.  When it's done
 it should print ``Success``.  Then you can run ``camotics``.
+
+# Prerequisites
+  - C!     - http://cbang.org/
+  - Qt4    - http://qt-project.org/
+  - Cairo2 - http://cairographics.org/
+  - SCons  - http://www.scons.org/
+
+On Debian based systems all the prerequisites, including thoese needed
+by C!, can be installed with the following command line:
+
+    sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
+      libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
+      libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
+      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
 
 ## Building C!
 
