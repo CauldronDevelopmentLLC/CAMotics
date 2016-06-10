@@ -29,7 +29,11 @@ improve upon designs with out wasting material or breaking tools.
 See http://camotics.org/
 
 # License
-GNU General Public License version 2+.  See the file COPYING.
+GNU General Public License version 2+.  See the file ``COPYING``.
+
+# Downloads
+Packages for Windows, Linux and OSX can be found on the
+[CAMotics Web site](http://camotics.org/downloads).
 
 # Building from Source
 This section describes how to build CAMotics from source on Debian based
