@@ -53,7 +53,8 @@ at http://camotics.org/downloads  There are also prebuilt Debian packages
 you can try.
 
 ## The Quick and Easy Method
-Cut and paste the following command in to a terminal:
+*Note, this currently only works for Debian based systems.*  Cut and paste the
+following command in to a terminal:
 
     curl http://camotics.org/build.sh | sh
 
