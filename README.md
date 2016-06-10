@@ -33,13 +33,13 @@ GNU General Public License version 2+.  See the file ``COPYING``.
 
 # Downloads
 Packages for Windows, Linux and OSX can be found on the
-[CAMotics Web site](http://camotics.org/downloads).
+[CAMotics Web site](http://camotics.org/download.html).
 
 # Building from Source
 This section describes how to build CAMotics from source on Debian based
 systems such as Ubuntu and Mint Linux.  If you are running Windows or OSX
 it is much easier to simply install prebuilt packages which can be found
-at http://camotics.org/downloads  There are also prebuilt Debian packages
+at http://camotics.org/download.html  There are also prebuilt Debian packages
 you can try.
 
 ## The Quick and Easy Method
