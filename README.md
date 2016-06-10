@@ -33,7 +33,7 @@ GNU General Public License version 2+.  See the file ``COPYING``.
 
 # Downloads
 Packages for Windows, Linux and OSX can be found on the
-[CAMotics Web site](http://camotics.org/download.html).
+[CAMotics Website](http://camotics.org/download.html).
 
 # Building from Source
 This section describes how to build CAMotics from source on Debian based
