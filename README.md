@@ -47,7 +47,7 @@ following command in to a terminal:
 You will have to enter your password, possibly a few times.  When it's done
 it should print ``Success``.  Then you can run ``camotics``.
 
-# Prerequisites
+## Prerequisites
   - C!     - http://cbang.org/
   - Qt4    - http://qt-project.org/
   - Cairo2 - http://cairographics.org/
