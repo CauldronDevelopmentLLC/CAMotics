@@ -220,7 +220,8 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         extra_files += '\n\nSetOutPath "$INSTDIR\\platforms"\n'
         extra_files += \
-            'File "\\mingw64\\share\\qt5\\plugins\\platforms\\qwindows.dll"'
+            'File "%s\\share\\qt%s\\plugins\\platforms\\qwindows.dll"' % (
+            os.environ.get('QTDIR', '\\usr'), qt_version)
 
     pkg = env.Packager(
         'CAMotics',

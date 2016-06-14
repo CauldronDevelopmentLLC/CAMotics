@@ -1,4 +1,3 @@
-
 """SCons.Tool.qt4
 
 Tool-specific initialization for Qt4.
@@ -128,12 +127,12 @@ class _Automoc:
         self.cxxcomment = re.compile(r'//.*$',re.M)
         # we also allow Q_OBJECT in a literal string
         self.literal_qobject = re.compile(r'"[^\n]*Q_OBJECT[^\n]*"')
-        
+
     def create_automoc_options(self, env):
         """
         Create a dictionary with variables related to Automocing,
         based on the current environment.
-        Is executed once in the __call__ routine.  
+        Is executed once in the __call__ routine.
         """
         moc_options = {'auto_scan' : True,
                        'auto_scan_strategy' : 0,
@@ -168,10 +167,10 @@ class _Automoc:
             if not paths:
                 paths = env.get('CPPPATH', [])
             moc_options['cpppaths'].extend(paths)
-        
+
         return moc_options
 
-    def __automoc_strategy_simple(self, env, moc_options, 
+    def __automoc_strategy_simple(self, env, moc_options,
                                   cpp, cpp_contents, out_sources):
         """
         Default Automoc strategy (Q_OBJECT driven): detect a header file
@@ -180,7 +179,7 @@ class _Automoc:
         If a Q_OBJECT macro is also found in the cpp/cxx itself,
         it gets MOCed too.
         """
-        
+
         h=None
         for h_ext in header_extensions:
             # try to find the header file in the corresponding source
@@ -203,7 +202,7 @@ class _Automoc:
             moc_cpp = env.Moc4(h)
             if moc_options['debug']:
                 print "scons: qt4: found Q_OBJECT macro in '%s', moc'ing to '%s'" % (str(h), str(moc_cpp))
-            
+
             # Now, check whether the corresponding CPP file
             # includes the moc'ed output directly...
             inc_moc_cpp = r'^\s*#\s*include\s+"%s"' % str(moc_cpp[0])
@@ -242,12 +241,12 @@ class _Automoc:
                                   env.subst('$QT4_XMOCCXXSUFFIX'))
             inc_h_moc = r'#include\s+"%s"' % h_moc
             inc_cxx_moc = r'#include\s+"%s"' % cxx_moc
-            
+
             # Search for special includes in qtsolutions style
             if cpp and re.search(inc_h_moc, cpp_contents):
                 # cpp file with #include directive for a MOCed header found -> add moc
-                
-                # Try to find header file                    
+
+                # Try to find header file
                 h=None
                 hname=""
                 for h_ext in header_extensions:
@@ -300,14 +299,14 @@ class _Automoc:
                 # Fallback to default Automoc strategy (Q_OBJECT driven)
                self.__automoc_strategy_simple(env, moc_options, cpp,
                                               cpp_contents, out_sources)
-        
+
     def __call__(self, target, source, env):
         """
         Smart autoscan function. Gets the list of objects for the Program
         or Lib. Adds objects and builders for the special qt4 files.
         """
         moc_options = self.create_automoc_options(env)
-        
+
         # some shortcuts used in the scanner
         self.splitext = SCons.Util.splitext
         self.objBuilder = getattr(env, self.objBuilderName)
@@ -319,7 +318,7 @@ class _Automoc:
         env.Moc4.env = env
         xMocBuilderEnv = env.XMoc4.env
         env.XMoc4.env = env
-        
+
         # make a deep copy for the result; MocH objects will be appended
         out_sources = source[:]
 
@@ -347,7 +346,7 @@ class _Automoc:
                     cpp_contents = self.cxxcomment.sub('', cpp_contents)
                 cpp_contents = self.literal_qobject.sub('""', cpp_contents)
             except: continue # may be an still not generated source
-            
+
             if moc_options['auto_scan_strategy'] == 0:
                 # Default Automoc strategy (Q_OBJECT driven)
                 self.__automoc_strategy_simple(env, moc_options,
@@ -366,7 +365,7 @@ class _Automoc:
         # the order might accidentally change from one build to another
         # and trigger unwanted rebuilds. For proper sorting, a key function
         # has to be specified...FS.Entry (and Base nodes in general) do not
-        # provide a __cmp__, for performance reasons. 
+        # provide a __cmp__, for performance reasons.
         return (target, sorted(set(out_sources), key=lambda entry : str(entry)))
 
 AutomocShared = _Automoc('SharedObject')
@@ -465,7 +464,7 @@ def __moc_generator_from_h(source, target, env, for_signature):
             pass_defines = True
     except ValueError:
         pass
-    
+
     if pass_defines:
         return '$QT4_MOC $QT4_MOCDEFINES $QT4_MOCFROMHFLAGS $QT4_MOCINCFLAGS -o $TARGET $SOURCE'
     else:
@@ -478,7 +477,7 @@ def __moc_generator_from_cxx(source, target, env, for_signature):
             pass_defines = True
     except ValueError:
         pass
-    
+
     if pass_defines:
         return ['$QT4_MOC $QT4_MOCDEFINES $QT4_MOCFROMCXXFLAGS $QT4_MOCINCFLAGS -o $TARGET $SOURCE',
                 SCons.Action.Action(checkMocIncluded,None)]
@@ -493,7 +492,7 @@ def __mocx_generator_from_h(source, target, env, for_signature):
             pass_defines = True
     except ValueError:
         pass
-    
+
     if pass_defines:
         return '$QT4_MOC $QT4_MOCDEFINES $QT4_MOCFROMHFLAGS $QT4_MOCINCFLAGS -o $TARGET $SOURCE'
     else:
@@ -506,7 +505,7 @@ def __mocx_generator_from_cxx(source, target, env, for_signature):
             pass_defines = True
     except ValueError:
         pass
-    
+
     if pass_defines:
         return ['$QT4_MOC $QT4_MOCDEFINES $QT4_MOCFROMCXXFLAGS $QT4_MOCINCFLAGS -o $TARGET $SOURCE',
                 SCons.Action.Action(checkMocIncluded,None)]
@@ -521,7 +520,7 @@ def __qrc_generator(source, target, env, for_signature):
             name_defined = True
     except ValueError:
         pass
-    
+
     if name_defined:
         return '$QT4_RCC $QT4_QRCFLAGS $SOURCE -o $TARGET'
     else:
@@ -540,7 +539,7 @@ def __qrc_generator(source, target, env, for_signature):
 #
 # Builders
 #
-__ts_builder = SCons.Builder.Builder(        
+__ts_builder = SCons.Builder.Builder(
         action = SCons.Action.Action('$QT4_LUPDATECOM','$QT4_LUPDATECOMSTR'),
         suffix = '.ts',
         source_factory = SCons.Node.FS.Entry)
@@ -586,7 +585,7 @@ def Ts4(env, target, source=None, *args, **kw):
             clean_ts = True
     except ValueError:
         pass
-    
+
     result = []
     for t in target:
         obj = __ts_builder.__call__(env, t, source, **kw)
@@ -596,7 +595,7 @@ def Ts4(env, target, source=None, *args, **kw):
         # Always make our target "precious", such that it is not deleted
         # prior to a rebuild
         env.Precious(obj)
-        # Add to resulting target list        
+        # Add to resulting target list
         result.extend(obj)
 
     return result
@@ -613,7 +612,7 @@ def Qm4(env, target, source=None, *args, **kw):
     if not SCons.Util.is_List(source):
         source = [source]
 
-    result = []    
+    result = []
     for t in target:
         result.extend(__qm_builder.__call__(env, t, source, **kw))
 
@@ -750,14 +749,14 @@ def generate(env):
         QT4_UICCOM = '$QT4_UIC $QT4_UICFLAGS -o $TARGET $SOURCE',
         QT4_LUPDATECOM = '$QT4_LUPDATE $QT4_LUPDATEFLAGS $SOURCES -ts $TARGET',
         QT4_LRELEASECOM = '$QT4_LRELEASE $QT4_LRELEASEFLAGS -qm $TARGET $SOURCES',
-        
+
         # Specialized variables for the Extended Automoc support
         # (Strategy #1 for qtsolutions)
         QT4_XMOCHPREFIX = 'moc_',
         QT4_XMOCHSUFFIX = '.cpp',
         QT4_XMOCCXXPREFIX = '',
         QT4_XMOCCXXSUFFIX = '.moc',
-                
+
         )
 
     try:
@@ -802,7 +801,7 @@ def generate(env):
         mocBld.suffix[cxx] = '$QT4_MOCCXXSUFFIX'
     env['BUILDERS']['Moc4'] = mocBld
 
-    # Metaobject builder for the extended auto scan feature 
+    # Metaobject builder for the extended auto scan feature
     # (Strategy #1 for qtsolutions)
     xMocBld = Builder(action={}, prefix={}, suffix={})
     for h in header_extensions:
@@ -820,12 +819,12 @@ def generate(env):
     env['BUILDERS']['XMoc4'] = xMocBld
 
     # Add the Qrc4 action to the CXX file builder (registers the
-    # *.qrc extension with the Environment)     
+    # *.qrc extension with the Environment)
     cfile_builder, cxxfile_builder = SCons.Tool.createCFileBuilders(env)
     qrc_act = SCons.Action.CommandGeneratorAction(__qrc_generator,
                                                   {"cmdstr":"$QT4_QRCCOMSTR"})
-    cxxfile_builder.add_action('$QT4_QRCSUFFIX', qrc_act)    
-    cxxfile_builder.add_emitter('$QT4_QRCSUFFIX', __qrc_emitter)    
+    cxxfile_builder.add_action('$QT4_QRCSUFFIX', qrc_act)
+    cxxfile_builder.add_emitter('$QT4_QRCSUFFIX', __qrc_emitter)
     env.Append(SCANNERS=__qrcscanner)
 
     # We use the emitters of Program / StaticLibrary / SharedLibrary
