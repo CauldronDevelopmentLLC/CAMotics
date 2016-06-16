@@ -23,7 +23,7 @@
 #include <cbang/ApplicationMain.h>
 
 // This causes Windows to not automatically create a console
-#if defined(_WIN32) && !defined(DEBUG)
+#if defined(_WIN32) && !defined(__MINGW32__) && !defined(DEBUG)
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #endif
 
