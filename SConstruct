@@ -99,7 +99,7 @@ conf.Finish()
 # Source
 src = ['src/glew/glew.c']
 for subdir in [
-    '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'pcb', 'stl',
+    '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'stl',
     'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'machine', 'dxf',
     'dxf/dxflib']:
     src += Glob('src/camotics/%s/*.cpp' % subdir)
