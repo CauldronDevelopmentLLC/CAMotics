@@ -119,11 +119,12 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
     beginLine();
 
     switch (mode) {
-    case REVOLUTIONS_PER_MINUTE: stream << "G97\n";
+    case REVOLUTIONS_PER_MINUTE: stream << "G97\n"; break;
     case CONSTANT_SURFACE_SPEED:
       stream << "G96 S" << dtos(fabs(speed));
       if (max) stream << " D" << dtos(max);
       stream << '\n';
+      break;
     }
 
   if (oldSpeed != speed) {
