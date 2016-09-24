@@ -671,7 +671,7 @@ void QtWin::exportData() {
 
   } else if (exportDialog.gcodeSelected()) {
     title += "GCode";
-    fileTypes = "GCode Files (*.gcode, *.nc, *.ngc)";
+    fileTypes = "GCode Files (*.gcode, *.nc, *.ngc *.tap)";
     ext = "gcode";
 
   } else {
@@ -797,7 +797,7 @@ void QtWin::openProject(const string &_filename) {
 
   if (filename.empty()) {
     filename = openFile("Open File", "Supported Files (*.xml *.nc *.ngc "
-                        "*.gcode *.tpl);;All Files (*.*)", "", false);
+                        "*.gcode *.tap *.tpl);;All Files (*.*)", "", false);
     if (filename.empty()) return;
   }
 
@@ -923,7 +923,8 @@ void QtWin::newFile(bool tpl) {
 
   filename = openFile(tpl ? "New TPL file" : "New GCode file",
                       tpl ? "TPL (*.tpl);;All files (*.*)" :
-                      "GCode (*.nc *.ngc *.gcode);;All files", filename, false);
+                      "GCode (*.nc *.ngc *.gcode *.tap);;All files", filename,
+                      false);
   if (filename.empty()) return;
 
   string ext = SystemUtilities::extension(filename);
@@ -944,8 +945,9 @@ void QtWin::newFile(bool tpl) {
 
 
 void QtWin::addFile() {
-  string filename = openFile("Add file", "Supported Files (*.nc *.ngc "
-                             "*.gcode *.tpl);;All Files (*.*)", "", false);
+  string filename =
+    openFile("Add file", "Supported Files (*.nc *.ngc "
+             "*.gcode *.tap *.tpl);;All Files (*.*)", "", false);
   if (filename.empty()) return;
 
   project->addFile(filename);
