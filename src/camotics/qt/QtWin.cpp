@@ -68,9 +68,10 @@ QtWin::QtWin(Application &app) :
   findAndReplaceDialog(true), fileDialog(*this),
   taskCompleteEvent(0), app(app), options(app.getOptions()),
   connectionManager(new ConnectionManager(options)),
-  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0), dirty(false),
-  simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
-  autoPlay(false), autoClose(false), sliderMoving(false) {
+  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0),
+  dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
+  lastStatusActive(false), autoPlay(false), autoClose(false),
+  sliderMoving(false) {
 
   ui->setupUi(this);
 
@@ -568,12 +569,11 @@ void QtWin::stop() {
 
 
 void QtWin::reload(bool now) {
-  LOG_DEBUG(3, "reload(now = " << now << ")");
-
   if (!now) {
     simDirty = true;
     return;
   }
+
   simDirty = false;
 
   // Reset console
@@ -1483,31 +1483,33 @@ void QtWin::animate() {
     dirty = view->update() || dirty;
 
     // Auto close after auto play
-    if (!autoPlay &&autoClose &&
-        !view->isFlagSet(View::PLAY_FLAG)) app.requestExit();
+    if (!autoPlay && autoClose && !view->isFlagSet(View::PLAY_FLAG))
+      app.requestExit();
 
     if (dirty) redraw(true);
     if (simDirty) reload(true);
 
     // Update progress
-    double progress = taskMan.getProgress();
-    string status = taskMan.getStatus();
-    if (lastProgress != progress || lastStatus != status) {
-      lastProgress = progress;
-      lastStatus = status;
+    if (!view->isFlagSet(View::PLAY_FLAG)) {
+      double progress = taskMan.getProgress();
+      string status = taskMan.getStatus();
+      if (lastProgress != progress || lastStatus != status) {
+        lastProgress = progress;
+        lastStatus = status;
 
-      if (progress) {
-        double eta = taskMan.getETA();
-        ui->progressBar->setValue(10000 * progress);
-        string s = String::printf("%.2f%% ", progress * 100);
-        if (eta) s += TimeInterval(eta).toString();
-        ui->progressBar->setFormat(s.c_str());
+        if (progress) {
+          double eta = taskMan.getETA();
+          ui->progressBar->setValue(10000 * progress);
+          string s = String::printf("%.2f%% ", progress * 100);
+          if (eta) s += TimeInterval(eta).toString();
+          ui->progressBar->setFormat(s.c_str());
 
-        showMessage("Progress: " + s);
+          showMessage("Progress: " + s);
 
-      } else {
-        ui->progressBar->setValue(0);
-        ui->progressBar->setFormat(status.c_str());
+        } else {
+          ui->progressBar->setValue(0);
+          ui->progressBar->setFormat(status.c_str());
+        }
       }
     }
 
@@ -1541,9 +1543,11 @@ void QtWin::on_positionSlider_valueChanged(int position) {
   redraw();
 
   if (simRun.isNull() || sliderMoving) return;
+  if (view->isFlagSet(View::PLAY_FLAG) && lastStatusActive) return;
 
   simRun->setEndTime(ratio * view->path->getTotalTime());
 
+  setStatusActive(true);
   taskMan.addTask(new SurfaceTask(simRun));
 }
 
