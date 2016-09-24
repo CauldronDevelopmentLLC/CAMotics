@@ -22,6 +22,7 @@
 #define CAMOTICS_QT_WIN_H
 
 #include "NewDialog.h"
+#include "NewProjectDialog.h"
 #include "ExportDialog.h"
 #include "AboutDialog.h"
 #include "SettingsDialog.h"
@@ -74,6 +75,7 @@ namespace CAMotics {
 
     cb::SmartPointer<Ui::CAMoticsWindow> ui;
     NewDialog newDialog;
+    NewProjectDialog newProjectDialog;
     ExportDialog exportDialog;
     AboutDialog aboutDialog;
     SettingsDialog settingsDialog;

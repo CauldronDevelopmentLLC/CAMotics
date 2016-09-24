@@ -43,43 +43,44 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real startTime,
     swap(this->startTime, this->endTime);
   }
 
-  if (path->empty()) return;
-
-  int firstMove = path->find(startTime);
-  int lastMove = path->find(endTime);
-
-  if (lastMove == -1) lastMove = path->size() - 1;
-  if (firstMove == -1) firstMove = lastMove + 1;
-
-  real duration = path->at(lastMove).getEndTime() - startTime;
-
-  LOG_DEBUG(1, "Times: start=" << TimeInterval(startTime) << " end="
-            << TimeInterval(startTime + duration) << " duration="
-            << TimeInterval(duration));
-  LOG_DEBUG(1, "Moves: first=" << firstMove << " last=" << lastMove);
-
-  ToolTable &tools = path->getTools();
-  vector<Rectangle3R> bboxes;
   unsigned boxes = 0;
 
-  // Gather nodes in a list
-  for (int i = firstMove; i <= lastMove; i++) {
-    const Move &move = path->at(i);
-    unsigned tool = move.getTool();
+  if (!path->empty()) {
+    int firstMove = path->find(startTime);
+    int lastMove = path->find(endTime);
 
-    if (sweeps.size() <= tool) sweeps.resize(tool + 1);
-    if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
+    if (lastMove == -1) lastMove = path->size() - 1;
+    if (firstMove == -1) firstMove = lastMove + 1;
 
-    Vector3R startPt = move.getPtAtTime(startTime);
-    Vector3R endPt = move.getPtAtTime(endTime);
+    real duration = path->at(lastMove).getEndTime() - startTime;
 
-    sweeps[tool]->getBBoxes(startPt, endPt, bboxes);
+    LOG_DEBUG(1, "Times: start=" << TimeInterval(startTime) << " end="
+              << TimeInterval(startTime + duration) << " duration="
+              << TimeInterval(duration));
+    LOG_DEBUG(1, "Moves: first=" << firstMove << " last=" << lastMove);
 
-    for (unsigned j = 0; j < bboxes.size(); j++)
-      insert(&move, bboxes[j]);
+    ToolTable &tools = path->getTools();
+    vector<Rectangle3R> bboxes;
 
-    boxes += bboxes.size();
-    bboxes.clear();
+    // Gather nodes in a list
+    for (int i = firstMove; i <= lastMove; i++) {
+      const Move &move = path->at(i);
+      unsigned tool = move.getTool();
+
+      if (sweeps.size() <= tool) sweeps.resize(tool + 1);
+      if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
+
+      Vector3R startPt = move.getPtAtTime(startTime);
+      Vector3R endPt = move.getPtAtTime(endTime);
+
+      sweeps[tool]->getBBoxes(startPt, endPt, bboxes);
+
+      for (unsigned j = 0; j < bboxes.size(); j++)
+        insert(&move, bboxes[j]);
+
+      boxes += bboxes.size();
+      bboxes.clear();
+    }
   }
 
   finalize(); // Finalize MoveLookup

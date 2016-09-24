@@ -94,8 +94,10 @@ void Viewer::draw(const View &view) {
 
   // Model
   if (view.isFlagSet(View::SHOW_WORKPIECE_FLAG | View::SHOW_SURFACE_FLAG)) {
-    const float ambient[] = {12.0 / 255, 45.0 / 255,  83.0 / 255, 1.00};
-    const float diffuse[] = {16.0 / 255, 59.0 / 255, 108.0 / 255, 1.00};
+    const float alpha =
+      view.isFlagSet(View::TRANSLUCENT_SURFACE_FLAG) ? 0.8 : 1;
+    const float ambient[] = {12.0 / 255, 45.0 / 255,  83.0 / 255, alpha};
+    const float diffuse[] = {16.0 / 255, 59.0 / 255, 108.0 / 255, alpha};
 
     glDisable(GL_COLOR_MATERIAL);
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);

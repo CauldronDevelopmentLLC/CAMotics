@@ -1,0 +1,35 @@
+{
+  "project": "CAMotics",
+  "url": "http://camotics.org/",
+  "namespace": "camotics",
+  "admin": "Joseph Coffland <jcoffland@cauldrondevelopment.com>",
+  "ip": "127.0.0.1",
+  "http-port": 8111,
+  "github-port": 8112,
+
+  "modes": {
+    "debug": {"scons": {"debug": 1}},
+    "release": {}
+  },
+
+  "projects": {
+    "_default_": {
+      "compile": ["scons", "-k"],
+      "repo": {
+        "type": "git",
+        "branch": "master"
+      }
+    },
+
+    "cbang": {
+      "repo": {"url": "http://github.com/CauldronDevelopmentLLC/cbang"},
+      "test": true
+    },
+
+    "camotics": {
+      "repo": {"url": "http://github.com/CauldronDevelopmentLLC/camotics"},
+      "deps": ["cbang"],
+      "packages": ["package"]
+    }
+  }
+}

@@ -568,6 +568,8 @@ void QtWin::stop() {
 
 
 void QtWin::reload(bool now) {
+  LOG_DEBUG(3, "reload(now = " << now << ")");
+
   if (!now) {
     simDirty = true;
     return;
@@ -715,6 +717,7 @@ string QtWin::openFile(const string &title, const string &filters,
 
 
 void QtWin::loadProject() {
+  toolsChanged();
   updateFiles();
   project->markClean();
 }
@@ -734,10 +737,34 @@ void QtWin::newProject() {
 
   LOG_INFO(1, "New project");
 
+  // Save current tool table
+  ToolTable currentToolTable =
+    project.isNull() ? ToolTable() : project->getToolTable();
+
+  // Get defaults
+  ToolUnits units =
+    (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
+  QByteArray toolTable =
+    QSettings().value("ToolTable/Default").toString().toUtf8();
+
+  // Initialize dialog
+  newProjectDialog.setUnits(units);
+
+  // Run dialog
+  if (newProjectDialog.exec() != QDialog::Accepted) return;
+
+  // Create new project
   resetProject();
   project = new Project(options);
 
-  loadProjectDefaults();
+  // Initialize project
+  project->setUnits(newProjectDialog.getUnits());
+
+  if (newProjectDialog.defaultToolTableSelected()) loadDefaultToolTable();
+  else if (newProjectDialog.currentToolTableSelected())
+    project->getToolTable() = currentToolTable;
+  else project->getToolTable().clear();
+
   reload();
   loadProject();
 }
@@ -813,9 +840,9 @@ void QtWin::openProject(const string &_filename) {
     }
   } CATCH_ERROR;
 
-  reload();
   view->path->setByRatio(1);
   loadProject();
+  reload();
 }
 
 
@@ -1134,11 +1161,12 @@ void QtWin::loadDefaultToolTable() {
   QSettings settings;
   QByteArray data = settings.value("ToolTable/Default").toString().toUtf8();
 
-  if (data.isEmpty()) return;
-
-  istringstream str(data.data());
   ToolTable tools;
-  str >> tools;
+
+  if (!data.isEmpty()) {
+    istringstream str(data.data());
+    str >> tools;
+  }
 
   project->getToolTable() = tools;
   toolsChanged();
@@ -1503,6 +1531,8 @@ void QtWin::on_fileTabManager_currentChanged(int index) {
 
 
 void QtWin::on_positionSlider_valueChanged(int position) {
+  if (Math::isnan(view->path->getTimeRatio())) return;
+
   double ratio = position / 10000.0;
 
   view->path->setByRatio(ratio);
@@ -1518,11 +1548,13 @@ void QtWin::on_positionSlider_valueChanged(int position) {
 
 void QtWin::on_positionSlider_sliderPressed() {
   sliderMoving = true;
+  view->setFlag(View::TRANSLUCENT_SURFACE_FLAG);
 }
 
 
 void QtWin::on_positionSlider_sliderReleased() {
   sliderMoving = false;
+  view->clearFlag(View::TRANSLUCENT_SURFACE_FLAG);
   on_positionSlider_valueChanged(ui->positionSlider->value());
 }
 
