@@ -710,6 +710,29 @@ void QtWin::exportData() {
 }
 
 
+bool QtWin::runNewProjectDialog() {
+  // Initialize dialog
+  newProjectDialog.setUnits(getDefaultUnits());
+
+  // Run dialog
+  return newProjectDialog.exec() == QDialog::Accepted;
+}
+
+
+ToolTable QtWin::getNewToolTable() {
+  if (newProjectDialog.defaultToolTableSelected())
+    return loadDefaultToolTable();
+
+  if (newProjectDialog.currentToolTableSelected())
+    return project.isNull() ? ToolTable() : project->getToolTable();
+
+  return ToolTable();
+}
+
+
+ToolUnits QtWin::getNewUnits() {return newProjectDialog.getUnits();}
+
+
 string QtWin::openFile(const string &title, const string &filters,
                        const string &_filename, bool save) {
   string filename = _filename;
@@ -741,33 +764,17 @@ void QtWin::newProject() {
 
   LOG_INFO(1, "New project");
 
-  // Save current tool table
-  ToolTable currentToolTable =
-    project.isNull() ? ToolTable() : project->getToolTable();
+  if (!runNewProjectDialog()) return;
 
-  // Get defaults
-  ToolUnits units =
-    (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
-  QByteArray toolTable =
-    QSettings().value("ToolTable/Default").toString().toUtf8();
-
-  // Initialize dialog
-  newProjectDialog.setUnits(units);
-
-  // Run dialog
-  if (newProjectDialog.exec() != QDialog::Accepted) return;
+  // Save tool table before resetting project
+  ToolTable toolTable = getNewToolTable();
+  ToolUnits units = getNewUnits();
 
   // Create new project
   resetProject();
   project = new Project(options);
-
-  // Initialize project
-  project->setUnits(newProjectDialog.getUnits());
-
-  if (newProjectDialog.defaultToolTableSelected()) loadDefaultToolTable();
-  else if (newProjectDialog.currentToolTableSelected())
-    project->getToolTable() = currentToolTable;
-  else project->getToolTable().clear();
+  project->setUnits(units);
+  project->getToolTable() = toolTable;
 
   reload();
   loadProject();
@@ -837,16 +844,23 @@ void QtWin::openProject(const string &_filename) {
     if (xml) project = new Project(options, filename);
     else {
       // Assume TPL or G-Code and create a new project with the file
+
+      if (!runNewProjectDialog()) return;
+
+      // Save tool table before resetting project
+      ToolTable toolTable = getNewToolTable();
+      ToolUnits units = getNewUnits();
+
       project = new Project(options);
       project->addFile(filename);
-
-      loadProjectDefaults();
+      project->setUnits(units);
+      project->getToolTable() = toolTable;
     }
   } CATCH_ERROR;
 
   view->path->setByRatio(1);
-  loadProject();
   reload();
+  loadProject();
 }
 
 
@@ -895,19 +909,13 @@ void QtWin::revertProject() {
 }
 
 
-void QtWin::loadProjectDefaults() {
-  // Units
-  ToolUnits units =
-    (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
-  project->setUnits(units);
-
-  // Tool table
-  loadDefaultToolTable();
+bool QtWin::isMetric() const {
+  return project.isNull() || project->isMetric();
 }
 
 
-bool QtWin::isMetric() const {
-  return project.isNull() || project->isMetric();
+ToolUnits QtWin::getDefaultUnits() const {
+  return (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
 }
 
 
@@ -1148,23 +1156,18 @@ void QtWin::importToolTable() {
 }
 
 
-void QtWin::saveDefaultToolTable() {
-  if (project.isNull()) return;
-
+void QtWin::saveDefaultToolTable(const ToolTable &tools) {
   ostringstream str;
-  str << project->getToolTable() << flush;
-  string tools = str.str();
+  str << tools << flush;
 
   QSettings settings;
-  settings.setValue("ToolTable/Default", QString::fromUtf8(tools.c_str()));
+  settings.setValue("ToolTable/Default", QString::fromUtf8(str.str().c_str()));
 
   showMessage("Default tool table saved");
 }
 
 
-void QtWin::loadDefaultToolTable() {
-  if (project.isNull()) return;
-
+ToolTable QtWin::loadDefaultToolTable() {
   QSettings settings;
   QByteArray data = settings.value("ToolTable/Default").toString().toUtf8();
 
@@ -1175,8 +1178,7 @@ void QtWin::loadDefaultToolTable() {
     str >> tools;
   }
 
-  project->getToolTable() = tools;
-  toolsChanged();
+  return tools;
 }
 
 
@@ -1787,6 +1789,16 @@ void QtWin::on_actionSaveFileAs_triggered() {
 
 void QtWin::on_actionRevertFile_triggered() {
   ui->fileTabManager->revert();
+}
+
+
+void QtWin::on_actionSaveDefaultToolTable_triggered() {
+  if (!project.isNull()) saveDefaultToolTable(project->getToolTable());
+}
+
+
+void QtWin::on_actionLoadDefaultToolTable_triggered() {
+  if (!project.isNull()) project->getToolTable() = loadDefaultToolTable();
 }
 
 

@@ -2,7 +2,7 @@
   "project": "CAMotics",
   "url": "http://camotics.org/",
   "namespace": "camotics",
-  "admin": "Joseph Coffland <jcoffland@cauldrondevelopment.com>",
+  "admin": "Joseph Coffland <joseph@camotics.org>",
   "ip": "127.0.0.1",
   "http-port": 8111,
   "github-port": 8112,

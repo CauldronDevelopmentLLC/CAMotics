@@ -157,15 +157,6 @@ void Tool::read(const XMLAttributes &attrs) {
 
   if (attrs.has("snub_diameter"))
     setSnubDiameter(String::parseDouble(attrs["snub_diameter"]) * scale);
-
-  if (attrs.has("front_angle"))
-    setFrontAngle(String::parseDouble(attrs["front_angle"]));
-
-  if (attrs.has("back_angle"))
-    setBackAngle(String::parseDouble(attrs["back_angle"]));
-
-  if (attrs.has("orientation"))
-    setOrientation(String::parseDouble(attrs["orientation"]));
 }
 
 
@@ -181,10 +172,6 @@ void Tool::write(XMLWriter &writer) const {
   attrs["radius"] = String(getRadius() * scale);
   if (getShape() == ToolShape::TS_SNUBNOSE && small < getSnubDiameter())
     attrs["snub_diameter"] = String(getSnubDiameter() * scale);
-
-  if (small < getFrontAngle()) attrs["front_angle"] = String(getFrontAngle());
-  if (small < getBackAngle()) attrs["back_angle"] = String(getBackAngle());
-  if (small < getOrientation()) attrs["orientation"] = String(getOrientation());
 
   writer.simpleElement("tool", getDescription(), attrs);
 }
@@ -202,9 +189,6 @@ void Tool::write(JSON::Sink &sink, bool withNumber) const {
   sink.insert("diameter", getDiameter() * scale);
   if (getShape() == ToolShape::TS_SNUBNOSE)
     sink.insert("snub_diameter", getSnubDiameter() * scale);
-  if (getFrontAngle()) sink.insert("font_angle", getFrontAngle());
-  if (getBackAngle()) sink.insert("back_angle", getBackAngle());
-  if (getOrientation()) sink.insert("orientation", getOrientation());
   sink.insert("description", getDescription());
 
   sink.endDict();
@@ -230,15 +214,6 @@ void Tool::read(const JSON::Value &value) {
 
   if (value.hasNumber("snub_diameter"))
     setSnubDiameter(value.getNumber("snub_diameter") * scale);
-
-  if (value.hasNumber("front_angle"))
-    setFrontAngle(value.getNumber("front_angle"));
-
-  if (value.hasNumber("back_angle"))
-    setBackAngle(value.getNumber("back_angle"));
-
-  if (value.hasNumber("orientation"))
-    setOrientation(value.getNumber("orientation"));
 
   setDescription(value.getString("description", ""));
 }

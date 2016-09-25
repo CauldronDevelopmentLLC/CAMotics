@@ -84,18 +84,12 @@ namespace CAMotics {
     double getRadius() const {return vars[0];}
     double getDiameter() const {return vars[0] * 2;}
     double getSnubDiameter() const {return snubDiameter;}
-    double getFrontAngle() const {return vars[1];}
-    double getBackAngle() const {return vars[2];}
-    double getOrientation() const {return vars[3];}
 
     void setLength(double value) {setZ(value);}
     void setLengthFromAngle(double angle);
     void setRadius(double value) {vars[0] = value;}
     void setDiameter(double value) {vars[0] = value / 2;}
     void setSnubDiameter(double value) {snubDiameter = value;}
-    void setFrontAngle(double value) {vars[1] = value;}
-    void setBackAngle(double value) {vars[2] = value;}
-    void setOrientation(double value) {vars[3] = value;}
 
     cb::SmartPointer<Sweep> getSweep() const;
 
