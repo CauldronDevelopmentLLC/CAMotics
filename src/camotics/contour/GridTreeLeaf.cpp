@@ -26,7 +26,7 @@ using namespace CAMotics;
 
 
 void GridTreeLeaf::add(const Triangle &t) {
-  if (!t.normal.isReal()); // Degenerate, skip
+  if (!t.normal.isReal()) return; // Degenerate, skip
   triangles.push_back(t);
 }
 

@@ -89,7 +89,8 @@ void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
     connect(editor, SIGNAL(findNext()), SIGNAL(findNext()));
     connect(editor, SIGNAL(findResult(bool)), SIGNAL(findResult(bool)));
 
-    QString title(SystemUtilities::basename(file->getAbsolutePath()).c_str());
+    QString title = QString::fromUtf8
+      (SystemUtilities::basename(file->getAbsolutePath()).c_str());
     tab = (unsigned)QTabWidget::addTab(editor, title);
     QApplication::restoreOverrideCursor();
   }

@@ -911,7 +911,8 @@ void QtWin::updateFiles() {
   QStringList list;
 
   for (unsigned i = 0; i < project->getFileCount(); i++)
-    list.append(QString(project->getFile(i)->getRelativePath().c_str()));
+    list.append(QString::fromUtf8
+                (project->getFile(i)->getRelativePath().c_str()));
 
   ui->filesListView->setModel(new QStringListModel(list));
 }
@@ -1006,7 +1007,7 @@ void QtWin::updateActions() {
   } else {
     SmartPointer<NCFile> file = ui->fileTabManager->getFile(tab);
     string basename = SystemUtilities::basename(file->getAbsolutePath());
-    QString title = QString(basename.c_str());
+    QString title = QString::fromUtf8(basename.c_str());
 
     bool modified = ui->fileTabManager->isModified(tab);
     bool exists = file->exists();

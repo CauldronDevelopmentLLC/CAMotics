@@ -105,6 +105,8 @@ namespace CAMotics {
     void write(cb::JSON::Sink &sink, bool withNumber) const;
 
     // From cb::JSON::Serializable
+    using cb::JSON::Serializable::read;
+    using cb::JSON::Serializable::write;
     void read(const cb::JSON::Value &value);
     void write(cb::JSON::Sink &sink) const {write(sink, true);}
 

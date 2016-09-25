@@ -42,7 +42,6 @@ namespace CAMotics {
     ValueGroup values;
 
     unsigned flags;
-    bool visible;
 
     unsigned speed;
     bool reverse;

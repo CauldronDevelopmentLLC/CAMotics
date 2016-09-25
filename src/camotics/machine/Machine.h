@@ -39,6 +39,8 @@ namespace CAMotics {
   public:
     Machine(MoveStream &stream, double rapidFeed = 1000);
 
+    using MachineAdapter::move;
+
     // From MoveStream
     void move(Move &move);
   };

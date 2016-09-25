@@ -41,6 +41,7 @@ namespace CAMotics {
 
     void updateProgress(double progress);
 
+    using Task::run;
     virtual void run(FieldFunction &func, GridTreeRef &tree) = 0;
   };
 }
