@@ -79,6 +79,7 @@ namespace CAMotics {
     std::string getSizeText() const;
     std::string getText() const;
 
+    double getAngle() const;
     double getLength() const {return getZ();}
     double getRadius() const {return vars[0];}
     double getDiameter() const {return vars[0] * 2;}
@@ -88,6 +89,7 @@ namespace CAMotics {
     double getOrientation() const {return vars[3];}
 
     void setLength(double value) {setZ(value);}
+    void setLengthFromAngle(double angle);
     void setRadius(double value) {vars[0] = value;}
     void setDiameter(double value) {vars[0] = value / 2;}
     void setSnubDiameter(double value) {snubDiameter = value;}

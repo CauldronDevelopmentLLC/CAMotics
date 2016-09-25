@@ -38,6 +38,7 @@ int ToolDialog::edit() {
   ui->numberSpinBox->setValue(tool.getNumber());
   ui->unitsComboBox->setCurrentIndex(tool.getUnits());
   ui->shapeComboBox->setCurrentIndex(tool.getShape());
+  ui->angleDoubleSpinBox->setValue(tool.getAngle());
   ui->lengthDoubleSpinBox->setValue(tool.getLength() * scale);
   ui->diameterDoubleSpinBox->setValue(tool.getDiameter() * scale);
   ui->snubDiameterDoubleSpinBox->setValue(tool.getSnubDiameter() * scale);
@@ -103,9 +104,14 @@ void ToolDialog::on_shapeComboBox_currentIndexChanged(int value) {
   double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
   double length = tool.getLength();
   double radius = tool.getRadius();
+
   if (shape == ToolShape::TS_BALLNOSE && length < radius)
     ui->lengthDoubleSpinBox->setValue(radius / scale);
+  if (shape == ToolShape::TS_CONICAL)
+    ui->angleDoubleSpinBox->setValue(tool.getAngle());
 
+  ui->angleDoubleSpinBox->setVisible(shape == ToolShape::TS_CONICAL);
+  ui->angleLabel->setVisible(shape == ToolShape::TS_CONICAL);
   ui->snubDiameterDoubleSpinBox->setVisible(shape == ToolShape::TS_SNUBNOSE);
   ui->snubDiameterLabel->setVisible(shape == ToolShape::TS_SNUBNOSE);
 
@@ -116,34 +122,50 @@ void ToolDialog::on_shapeComboBox_currentIndexChanged(int value) {
 }
 
 
-void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double value) {
-  double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
-  value *= scale;
+void ToolDialog::on_angleDoubleSpinBox_valueChanged(double angle) {
+  tool.setLengthFromAngle(angle);
+  ui->lengthDoubleSpinBox->setValue(tool.getLength());
 
-  double radius = tool.getRadius();
-  if (tool.getShape() == ToolShape::TS_BALLNOSE && value < radius) {
-    value = radius;
-    ui->lengthDoubleSpinBox->setValue(value / scale);
-  }
-
-  if (value == tool.getLength()) return;
-
-  tool.setLength(value);
   update();
 }
 
 
-void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double value) {
+void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double length) {
   double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
-  value *= scale;
+  length *= scale;
+
+  double radius = tool.getRadius();
+  if (tool.getShape() == ToolShape::TS_BALLNOSE && length < radius) {
+    length = radius;
+    ui->lengthDoubleSpinBox->setValue(length / scale);
+  }
+
+  if (length == tool.getLength()) return;
+  tool.setLength(length);
+
+  if (tool.getShape() == ToolShape::TS_CONICAL)
+    ui->angleDoubleSpinBox->setValue(tool.getAngle());
+
+  update();
+}
+
+
+void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double diameter) {
+  double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  diameter *= scale;
 
   double length = tool.getLength();
-  if (tool.getShape() == ToolShape::TS_BALLNOSE && length < value / 2)
-    ui->lengthDoubleSpinBox->setValue(value / 2 / scale);
+  if (tool.getShape() == ToolShape::TS_BALLNOSE && length < diameter / 2)
+    ui->lengthDoubleSpinBox->setValue(diameter / 2 / scale);
 
-  if (value == tool.getDiameter()) return;
+  if (diameter == tool.getDiameter()) return;
+  tool.setDiameter(diameter);
 
-  tool.setDiameter(value);
+  if (tool.getShape() == ToolShape::TS_CONICAL) {
+    tool.setLengthFromAngle(ui->angleDoubleSpinBox->value());
+    ui->lengthDoubleSpinBox->setValue(tool.getLength());
+  }
+
   update();
 }
 

@@ -73,8 +73,12 @@ string Tool::getSizeText() const {
     length /= 25.4;
   }
 
-  return String::printf("%gx%g", diameter, length) +
-    String::toLower(getUnits().toString());
+  string s;
+  if (getShape() == ToolShape::TS_CONICAL)
+    s = String::printf("%gdeg %g", getAngle(), diameter);
+  else s = String::printf("%gx%g", diameter, length);
+
+  return s + String::toLower(getUnits().toString());
 }
 
 
@@ -83,6 +87,17 @@ string Tool::getText() const {
 
   return getSizeText() + " " +
     String::capitalize(String::toLower(getShape().toString()));
+}
+
+
+double Tool::getAngle() const {
+  double angle = 180.0 - 360.0 * atan(getLength() / getRadius()) / M_PI;
+  return round(angle * 100) / 100;
+}
+
+
+void Tool::setLengthFromAngle(double angle) {
+  setLength(getRadius() * tan((1 - angle / 180.0) * M_PI / 2.0));
 }
 
 
