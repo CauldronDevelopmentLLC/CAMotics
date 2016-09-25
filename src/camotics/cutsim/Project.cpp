@@ -193,7 +193,7 @@ void Project::save(const string &_filename) {
   // Set nc-files option
   options["nc-files"].reset();
   for (files_t::iterator it = files.begin(); it != files.end(); it++)
-    options["nc-files"].append((*it)->getRelativePath());
+    options["nc-files"].append(encodeFilename((*it)->getRelativePath()));
 
   SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::out);
   XMLWriter writer(*stream, true);
