@@ -92,7 +92,7 @@ void ConsoleWriter::writeToConsole() {
     if (String::endsWith(line, "\033[0m"))
       line = line.substr(0, line.size() - 4);
 
-    QTextEdit::append(QByteArray(line.c_str()));
+    QTextEdit::append(QString::fromUtf8(line.c_str()));
     QTextEdit::setTextColor(saveColor);
   }
 

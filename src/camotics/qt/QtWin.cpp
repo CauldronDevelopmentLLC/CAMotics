@@ -306,8 +306,8 @@ void QtWin::loadExamples() {
           string name = it->first;
           string path = it->second;
 
-          QAction *action = menu->addAction(name.c_str());
-          action->setToolTip(path.c_str());
+          QAction *action = menu->addAction(QString::fromUtf8(name.c_str()));
+          action->setToolTip(QString::fromUtf8(path.c_str()));
           connect(action, SIGNAL(triggered()), this,
                   SLOT(on_actionExamples_triggered()));
         }
@@ -455,12 +455,14 @@ void QtWin::showMessage(const string &msg, double timeout) {
 
 
 void QtWin::message(const string &msg) {
-  QMessageBox::information(this, "CAMotics", msg.c_str(), QMessageBox::Ok);
+  QMessageBox::information
+    (this, "CAMotics", QString::fromUtf8(msg.c_str()), QMessageBox::Ok);
 }
 
 
 void QtWin::warning(const string &msg) {
-  QMessageBox::warning(this, "CAMotics", msg.c_str(), QMessageBox::Ok);
+  QMessageBox::warning
+    (this, "CAMotics", QString::fromUtf8(msg.c_str()), QMessageBox::Ok);
 }
 
 
@@ -640,7 +642,8 @@ void QtWin::snapshot() {
   filename = openFile("Save snapshot", fileTypes, filename, true);
   if (filename.empty()) return;
 
-  if (!pixmap.save(filename.c_str())) warning("Failed to save snapshot.");
+  if (!pixmap.save(QString::fromUtf8(filename.c_str())))
+    warning("Failed to save snapshot.");
   else showMessage("Snapshot saved.");
 }
 
@@ -1152,7 +1155,7 @@ void QtWin::saveDefaultToolTable() {
   string tools = str.str();
 
   QSettings settings;
-  settings.setValue("ToolTable/Default", tools.c_str());
+  settings.setValue("ToolTable/Default", QString::fromUtf8(tools.c_str()));
 
   showMessage("Default tool table saved");
 }
@@ -1503,13 +1506,13 @@ void QtWin::animate() {
           ui->progressBar->setValue(10000 * progress);
           string s = String::printf("%.2f%% ", progress * 100);
           if (eta) s += TimeInterval(eta).toString();
-          ui->progressBar->setFormat(s.c_str());
+          ui->progressBar->setFormat(QString::fromUtf8(s.c_str()));
 
           showMessage("Progress: " + s);
 
         } else {
           ui->progressBar->setValue(0);
-          ui->progressBar->setFormat(status.c_str());
+          ui->progressBar->setFormat(QString::fromUtf8(status.c_str()));
         }
       }
     }

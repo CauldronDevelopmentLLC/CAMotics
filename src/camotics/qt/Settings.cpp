@@ -25,15 +25,15 @@ using namespace CAMotics;
 
 
 bool Settings::has(const string &name) const {
-  return contains(name.c_str());
+  return contains(QString::fromUtf8(name.c_str()));
 }
 
 
 QVariant Settings::get(const string &name, const QVariant &defaultValue) const {
-  return value(name.c_str(), defaultValue);
+  return value(QString::fromUtf8(name.c_str()), defaultValue);
 }
 
 
 void Settings::set(const string &name, const QVariant &value) {
-  setValue(name.c_str(), value);
+  setValue(QString::fromUtf8(name.c_str()), value);
 }
