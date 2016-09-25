@@ -39,3 +39,6 @@
 *.deb
 *.rpm
 *.exe
+
+/dockbot/run
+/dockbot/passwd

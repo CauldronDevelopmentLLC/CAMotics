@@ -1,6 +1,18 @@
 # CAMotics Changelog
 
-## v1.0.7:
+## v1.1.0:
+ - Ask about units and tool table when creating new projects.
+ - Real-time simulation. #2
+ - Handle UTF8 file names correctly. #190
+ - Handle file names with spaces correctly. #167
+ - Support .tap file extension. #189
+ - Generate M6 when tool 1 is first used. #188
+ - Fixed jagged arcs caused by foreign locale setting. #180
+ - Fixed simulation playback speed. #179
+ - Fixed conical tool (v-bit) simulation. #173
+ - Allow entering conical tool in degrees + length. #65
+ - Return all tool details in with TPL tool() function. #127
+ - Surface is made translucent when moving position slider.
 
 ## v1.0.6:
  - 4.5x simulation speed up.
