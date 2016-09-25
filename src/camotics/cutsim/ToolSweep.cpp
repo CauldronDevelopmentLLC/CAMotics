@@ -67,7 +67,7 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real startTime,
       const Move &move = path->at(i);
       int tool = move.getTool();
 
-      if (!tools.has(tool)) continue;
+      if (tool < 0) continue;
 
       if (sweeps.size() <= (unsigned)tool) sweeps.resize(tool + 1);
       if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
