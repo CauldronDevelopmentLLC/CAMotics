@@ -733,7 +733,7 @@ void Controller::setCoordSystem(int vars, bool relative) {
 
 
 void Controller::toolChange(bool manual) {
-  unsigned tool = get(TOOL_NUMBER);
+  int tool = get(TOOL_NUMBER);
 
   if (machine.getTool() != tool) machine.setTool(tool);
 

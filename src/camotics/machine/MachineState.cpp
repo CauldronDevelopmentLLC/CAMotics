@@ -33,7 +33,7 @@ void MachineState::reset() {
   speed = 0;
   spinMode = REVOLUTIONS_PER_MINUTE;
   maxSpeed = 0;
-  tool = 1;
+  tool = -1;
   position = Axes();
 
   for (unsigned i = 0; i < AXES_COUNT; i++)

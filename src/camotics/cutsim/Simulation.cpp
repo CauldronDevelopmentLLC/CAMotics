@@ -53,20 +53,41 @@ string Simulation::computeHash() const {
 }
 
 
-void Simulation::write(JSON::Sink &sink) const {
+void Simulation::read(const JSON::Value &value) {
+  resolution = value.getNumber("resolution", 0);
+  time = value.getNumber("time", 0);
+
+  if (value.has("tools")) tools.read(*value.get("tools"));
+  else tools.clear();
+
+  if (value.has("workpiece")) workpiece.read(*value.get("workpiece"));
+  else workpiece = Rectangle3R();
+
+  path = new ToolPath(tools);
+  if (value.has("path")) path->read(*value.get("path"));
+}
+
+
+void Simulation::write(JSON::Sink &sink, bool withPath) const {
   sink.beginDict();
-
-  sink.beginInsert("tools");
-  tools.write(sink);
-
-  sink.beginInsert("path");
-  path->write(sink);
-
-  sink.beginInsert("workpiece");
-  workpiece.write(sink);
 
   sink.insert("resolution", resolution);
   sink.insert("time", time);
+
+  if (!tools.empty()) {
+    sink.beginInsert("tools");
+    tools.write(sink);
+  }
+
+  if (workpiece != Rectangle3R()) {
+    sink.beginInsert("workpiece");
+    workpiece.write(sink);
+  }
+
+  if (withPath && !path.isNull()) {
+    sink.beginInsert("path");
+    path->write(sink);
+  }
 
   sink.endDict();
 }

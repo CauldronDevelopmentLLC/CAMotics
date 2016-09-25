@@ -36,7 +36,7 @@ namespace CAMotics {
     MoveType type;
     Axes start;
     Axes end;
-    unsigned tool;
+    int tool;
     real feed;
     real speed;
     unsigned line;
@@ -49,14 +49,14 @@ namespace CAMotics {
     Move() : type(MoveType::MOVE_RAPID), tool(0), feed(0), speed(0), line(0),
              dist(0), time(0), startTime(0) {}
     Move(MoveType type, const Axes &start, const Axes &end,
-         real startTime, unsigned tool, real feed, real speed, unsigned line);
+         real startTime, int tool, real feed, real speed, unsigned line);
 
     MoveType getType() const {return type;}
     const Axes &getStart() const {return start;}
     const Axes &getEnd() const {return end;}
     const Vector3R &getStartPt() const {return Segment3R::getStart();}
     const Vector3R &getEndPt() const {return Segment3R::getEnd();}
-    unsigned getTool() const {return tool;}
+    int getTool() const {return tool;}
     real getFeed() const {return feed;}
     void setFeed(real feed) {this->feed = feed;}
     real getSpeed() const {return speed;}

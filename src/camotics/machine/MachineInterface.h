@@ -92,7 +92,7 @@ namespace CAMotics {
                           double max = 0) = 0;
 
     /// @return the currently programed tool number.
-    virtual unsigned getTool() const = 0;
+    virtual int getTool() const = 0;
 
     /***
      * Select the active tool.

@@ -65,9 +65,11 @@ ToolSweep::ToolSweep(const SmartPointer<ToolPath> &path, real startTime,
     // Gather nodes in a list
     for (int i = firstMove; i <= lastMove; i++) {
       const Move &move = path->at(i);
-      unsigned tool = move.getTool();
+      int tool = move.getTool();
 
-      if (sweeps.size() <= tool) sweeps.resize(tool + 1);
+      if (!tools.has(tool)) continue;
+
+      if (sweeps.size() <= (unsigned)tool) sweeps.resize(tool + 1);
       if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
 
       Vector3R startPt = move.getPtAtTime(startTime);

@@ -32,7 +32,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SurfaceTask::SurfaceTask(const SmartPointer<Simulation> &sim) :
+SurfaceTask::SurfaceTask(const Simulation &sim) :
   simRun(new SimulationRun(sim)) {}
 
 

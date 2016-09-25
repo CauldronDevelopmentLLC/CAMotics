@@ -98,7 +98,7 @@ namespace CAMotics {
     unsigned getProgramLine() const {return currentLine;}
     const Move &getMove() const {return currentMove;}
 
-    unsigned getTool() const {return getMove().getTool();}
+    int getTool() const {return getMove().getTool();}
     double getFeed() const {return getMove().getFeed();}
     double getSpeed() const {return getMove().getSpeed();}
     const char *getDirection() const;

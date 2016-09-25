@@ -101,7 +101,6 @@ namespace CAMotics {
 
     ValueSet valueSet;
     cb::SmartPointer<Project> project;
-    cb::SmartPointer<Simulation> sim;
     cb::SmartPointer<SimulationRun> simRun;
     cb::SmartPointer<ConnectionManager> connectionManager;
     cb::SmartPointer<View> view;

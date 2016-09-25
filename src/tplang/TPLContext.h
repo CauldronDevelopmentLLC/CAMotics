@@ -22,7 +22,7 @@
 #define TPLANG_TPLCONTEXT_H
 
 #include <camotics/machine/MachineAdapter.h>
-#include <camotics/sim/ToolTable.h>
+#include <camotics/cutsim/Simulation.h>
 
 #include <cbang/js/Environment.h>
 #include <cbang/config/Options.h>
@@ -33,10 +33,10 @@ namespace tplang {
 
   public:
     CAMotics::MachineInterface &machine;
-    CAMotics::ToolTable tools;
+    CAMotics::Simulation sim;
 
     TPLContext(std::ostream &out, CAMotics::MachineInterface &machine,
-               const CAMotics::ToolTable &tools);
+               const CAMotics::Simulation &sim);
 
     using cb::js::Environment::addModule;
     cb::js::Module &addModule(const cb::SmartPointer<cb::js::Module> &module);

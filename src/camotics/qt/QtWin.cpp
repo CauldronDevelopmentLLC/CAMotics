@@ -26,7 +26,6 @@
 #include <camotics/Geom.h>
 #include <camotics/view/Viewer.h>
 #include <camotics/cutsim/Project.h>
-#include <camotics/cutsim/Simulation.h>
 #include <camotics/cutsim/SimulationRun.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 #include <camotics/remote/ConnectionManager.h>
@@ -500,14 +499,16 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   }
 
   // Simulation
-  sim =
-    project->makeSim(toolPath, view->getTime(), options["threads"].toInteger());
+  project->path = toolPath;
+  project->time = view->getTime();
+  project->threads = options["threads"].toInteger();
+  project->workpiece = project->getWorkpieceBounds();
 
   // Load surface
   surface.release();
   view->setSurface(0);
   view->setMoveLookup(0);
-  taskMan.addTask(new SurfaceTask(sim));
+  taskMan.addTask(new SurfaceTask(*project));
 }
 
 
@@ -650,14 +651,14 @@ void QtWin::snapshot() {
 
 void QtWin::exportData() {
   // Check what we have to export
-  if (surface.isNull() && gcode.isNull() && sim.isNull()) {
+  if (surface.isNull() && gcode.isNull() && project.isNull()) {
     warning("Nothing to export.\nRun a simulation first.");
     return;
   }
 
   exportDialog.enableSurface(!surface.isNull());
   exportDialog.enableGCode(!gcode.isNull());
-  exportDialog.enableSimData(!sim.isNull());
+  exportDialog.enableSimData(!project.isNull());
 
   // Run dialog
   if (exportDialog.exec() != QDialog::Accepted) return;
@@ -694,7 +695,7 @@ void QtWin::exportData() {
 
   // Export
   if (exportDialog.surfaceSelected()) {
-    string hash = sim.isNull() ? "" : sim->computeHash();
+    string hash = project.isNull() ? "" : project->computeHash();
     bool binary = exportDialog.binarySTLSelected();
     surface->writeSTL(*stream, binary, "CAMotics Surface", hash);
 
@@ -703,7 +704,7 @@ void QtWin::exportData() {
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());
-    sim->write(writer);
+    project->write(writer, true);
     writer.close();
   }
 }

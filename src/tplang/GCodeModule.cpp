@@ -228,7 +228,7 @@ js::Value GCodeModule::toolCB(const js::Arguments &args) {
   if (!args.getCount()) return ctx.machine.getTool();
 
   uint32_t number = args["number"].toUint32();
-  ctx.tools.get(number); // Make sure it exists
+  ctx.sim.tools.get(number); // Make sure it exists
   ctx.machine.setTool(number);
 
   return ctx.machine.getTool();
@@ -261,7 +261,7 @@ js::Value GCodeModule::pauseCB(const js::Arguments &args) {
 
 
 js::Value GCodeModule::toolSetCB(const js::Arguments &args) {
-  CAMotics::Tool &tool = ctx.tools.get(args["number"].toUint32());
+  CAMotics::Tool &tool = ctx.sim.tools.get(args["number"].toUint32());
 
   uint32_t units;
   double scale = 1;

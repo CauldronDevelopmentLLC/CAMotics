@@ -19,8 +19,7 @@
 \******************************************************************************/
 
 #include <camotics/CommandLineApp.h>
-#include <camotics/cutsim/ToolPath.h>
-#include <camotics/sim/ToolTable.h>
+#include <camotics/cutsim/Simulation.h>
 
 #include <camotics/machine/Machine.h>
 #include <camotics/machine/MachinePipeline.h>
@@ -36,6 +35,8 @@
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
 #include <cbang/js/Javascript.h>
+#include <cbang/io/StringInputSource.h>
+#include <cbang/json/Reader.h>
 
 #include <vector>
 
@@ -47,12 +48,15 @@ using namespace CAMotics;
 
 namespace CAMotics {
   class TPLangApp : public CommandLineApp {
-    ToolTable tools;
+    Simulation sim;
     MachinePipeline pipeline;
+    string simJSON;
 
   public:
-    TPLangApp() :
-      CommandLineApp("Tool Path Language Interpreter") {}
+    TPLangApp() : CommandLineApp("Tool Path Language Interpreter") {
+      cmdLine.addTarget("sim-json", simJSON,
+                        "Simulation information in JSON format");
+    }
 
     // From CommandLineApp
     int init(int argc, char *argv[]) {
@@ -66,6 +70,8 @@ namespace CAMotics {
       pipeline.add(new GCodeMachine(*stream, outputUnits));
       pipeline.add(new MachineState);
 
+      if (!simJSON.empty()) sim.parse(simJSON);
+
       return ret;
     }
 
@@ -77,7 +83,7 @@ namespace CAMotics {
 
     // From cb::Reader
     void read(const cb::InputSource &source) {
-      tplang::TPLContext ctx(cout, pipeline, tools);
+      tplang::TPLContext ctx(cout, pipeline, sim);
       tplang::Interpreter(ctx).read(source);
       stream->flush();
       cout.flush();

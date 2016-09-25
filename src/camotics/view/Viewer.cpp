@@ -123,7 +123,7 @@ void Viewer::draw(const View &view) {
   if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->isEmpty()) {
     const ToolTable &tools = view.path->getPath()->getTools();
     const Move &move = view.path->getMove();
-    unsigned toolID = move.getTool();
+    int toolID = move.getTool();
 
     if (tools.has(toolID)) {
       const Tool &tool = tools.get(toolID);

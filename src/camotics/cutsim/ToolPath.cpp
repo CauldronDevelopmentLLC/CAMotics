@@ -21,6 +21,7 @@
 #include "ToolPath.h"
 
 #include <cbang/json/Sink.h>
+#include <cbang/json/Dict.h>
 
 #include <string>
 #include <limits>
@@ -54,6 +55,37 @@ int ToolPath::find(real time, unsigned first, unsigned last) const {
 
 int ToolPath::find(real time) const {
   return find(time, 0, size());
+}
+
+
+void ToolPath::read(const JSON::Value &value) {
+  Axes start;
+  MoveType type = MoveType::MOVE_RAPID;
+  int line = 0;
+  int tool = 1;
+  double feed = 0;
+  double speed = 0;
+  double time = 0;
+
+  for (unsigned i = 0; i < value.size(); i++) {
+    const JSON::Dict &dict = value.getDict(i);
+
+    Axes end;
+    for (int j = 0; j < 9; j++)
+      end[j] = dict.getNumber(string(1, Axes::toAxis(j)), start[j]);
+
+    if (dict.hasString("type")) type = MoveType::parse(dict.getString("type"));
+    line = dict.getNumber("line", line);
+    tool = dict.getNumber("tool", tool);
+    feed = dict.getNumber("feed", feed);
+    speed = dict.getNumber("speed", speed);
+
+    Move m(type, start, end, time, tool, feed, speed, line);
+    move(m);
+
+    time += m.getTime();
+    start = end;
+  }
 }
 
 

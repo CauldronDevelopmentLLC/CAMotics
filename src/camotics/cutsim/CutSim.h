@@ -40,8 +40,7 @@ namespace CAMotics {
     ~CutSim();
 
     cb::SmartPointer<ToolPath> computeToolPath(const Project &project);
-    cb::SmartPointer<Surface> computeSurface
-    (const cb::SmartPointer<Simulation> &sim);
+    cb::SmartPointer<Surface> computeSurface(const Simulation &sim);
     void reduceSurface(Surface &surface);
 
     void interrupt();

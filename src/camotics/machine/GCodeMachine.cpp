@@ -138,11 +138,11 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
 
 
 void GCodeMachine::setTool(unsigned tool) {
-  unsigned oldTool = getTool();
+  int oldTool = getTool();
 
   MachineAdapter::setTool(tool);
 
-  if (oldTool != tool) {
+  if (oldTool != (int)tool) {
     beginLine();
     stream << "M6 T" << tool << '\n';
   }

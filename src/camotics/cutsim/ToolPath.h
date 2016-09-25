@@ -26,6 +26,8 @@
 #include <camotics/Geom.h>
 #include <camotics/sim/ToolTable.h>
 
+#include <cbang/json/Serializable.h>
+
 #include <vector>
 #include <ostream>
 
@@ -36,7 +38,8 @@ namespace CAMotics {
   class STL;
 
   class ToolPath :
-    public std::vector<Move>, public Rectangle3R, public MoveStream {
+    public std::vector<Move>, public Rectangle3R, public MoveStream,
+    public cb::JSON::Serializable {
     ToolTable tools;
 
   public:
@@ -51,6 +54,11 @@ namespace CAMotics {
     int find(real time) const;
 
     void print() const {}
+
+    // From cb::JSON::Serializable
+    using cb::JSON::Serializable::read;
+    using cb::JSON::Serializable::write;
+    void read(const cb::JSON::Value &value);
     void write(cb::JSON::Sink &sink) const;
 
     using std::vector<Move>::operator[];
