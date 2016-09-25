@@ -8,4 +8,5 @@ RUN mv /bin/uname /bin/uname.orig && \
   echo '#!/bin/sh\n/usr/bin/linux32 /bin/uname.orig "$@"' > /bin/uname && \
   chmod +x /bin/uname
 
-include(gcc-4.9.m4)
+ENV GCC_VERSION 4.9.4
+include(gcc.m4)
