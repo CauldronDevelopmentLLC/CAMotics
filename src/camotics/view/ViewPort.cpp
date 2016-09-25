@@ -93,6 +93,8 @@ void ViewPort::updateRotation(int x, int y) {
   rotationQuat =
     QuaternionD(delta.normalize()).multiply(rotationStart).normalize();
 
+  if (!rotationQuat.isReal()) resetView();
+
   rotationQuat.toAxisAngle().toGLRotation(rotation);
 }
 
