@@ -42,6 +42,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::ToolDialog> ui;
     ToolScene scene;
     Tool tool;
+    bool updating;
 
   public:
     ToolDialog();
