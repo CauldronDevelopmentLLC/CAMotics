@@ -33,7 +33,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SimulationRun::SimulationRun(const Simulation &sim) : sim(sim), lastTime(-1) {}
+SimulationRun::SimulationRun(const Simulation &sim) :
+  sim(sim), minTime(-1), maxTime(-1) {}
 
 
 SimulationRun::~SimulationRun() {}
@@ -67,9 +68,10 @@ SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
     tree = new GridTree(Grid(bbox, sim.resolution));
 
   } else {
-    SmartPointer<MoveLookup> change =
-      new ToolSweep(sim.path, sim.time, lastTime);
+    if (sim.time < minTime) minTime = sim.time;
+    if (maxTime < sim.time) maxTime = sim.time;
 
+    SmartPointer<MoveLookup> change = new ToolSweep(sim.path, minTime, maxTime);
     sweep->setChange(change);
     bbox = change->getBounds().grow(sim.resolution * 1.1);
   }
@@ -88,7 +90,7 @@ SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
 
   // Extract surface
   if (!task->shouldQuit()) {
-    lastTime = sim.time;
+    minTime = maxTime = sim.time;
     return new TriangleSurface(*tree);
   }
 

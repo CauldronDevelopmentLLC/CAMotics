@@ -1549,8 +1549,12 @@ void QtWin::on_positionSlider_valueChanged(int position) {
   view->path->setByRatio(ratio);
   redraw();
 
-  if (simRun.isNull() || sliderMoving) return;
+  if (sliderMoving) return;
   if (view->isFlagSet(View::PLAY_FLAG) && lastStatusActive) return;
+  if (simRun.isNull()) {
+    reload();
+    return;
+  }
 
   simRun->setEndTime(ratio * view->path->getTotalTime());
 
