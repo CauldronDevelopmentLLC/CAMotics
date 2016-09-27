@@ -51,7 +51,7 @@ void SimulationRun::setEndTime(double endTime) {
 }
 
 
-void SimulationRun::compute(const SmartPointer<Task> &task) {
+SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
   Rectangle3R bbox;
 
   double start = task->getTime();
@@ -67,8 +67,6 @@ void SimulationRun::compute(const SmartPointer<Task> &task) {
     tree = new GridTree(Grid(bbox, sim.resolution));
 
   } else {
-    if (sim.time == lastTime) return;
-
     SmartPointer<MoveLookup> change =
       new ToolSweep(sim.path, sim.time, lastTime);
 
@@ -90,8 +88,9 @@ void SimulationRun::compute(const SmartPointer<Task> &task) {
 
   // Extract surface
   if (!task->shouldQuit()) {
-    surface = new TriangleSurface(*tree);
     lastTime = sim.time;
+    return new TriangleSurface(*tree);
+  }
 
-  } else surface.release();
+  return 0;
 }

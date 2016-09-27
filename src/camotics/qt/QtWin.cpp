@@ -506,6 +506,7 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
 
   // Load surface
   surface.release();
+  simRun.release();
   view->setSurface(0);
   view->setMoveLookup(0);
   taskMan.addTask(new SurfaceTask(*project));
@@ -529,7 +530,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 
 void QtWin::surfaceComplete(SurfaceTask &task) {
   simRun = task.getSimRun();
-  surface = simRun->getSurface();
+  surface = task.getSurface();
   if (surface.isNull()) simRun.release();
 
   view->setSurface(surface);
