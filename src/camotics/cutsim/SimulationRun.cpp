@@ -90,7 +90,6 @@ void SimulationRun::compute(const SmartPointer<Task> &task) {
 
   // Extract surface
   if (!task->shouldQuit()) {
-    // TODO race condition on surface SmartPointer
     surface = new TriangleSurface(*tree);
     lastTime = sim.time;
 

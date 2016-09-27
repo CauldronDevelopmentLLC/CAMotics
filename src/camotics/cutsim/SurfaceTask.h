@@ -41,7 +41,7 @@ namespace CAMotics {
     ~SurfaceTask();
 
     const cb::SmartPointer<SimulationRun> &getSimRun() const {return simRun;}
-    const cb::SmartPointer<Surface> &getSurface() const;
+    cb::SmartPointer<Surface> getSurface() const;
 
     // From Task
     void run();

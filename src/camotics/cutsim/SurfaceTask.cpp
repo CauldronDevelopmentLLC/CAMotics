@@ -43,7 +43,7 @@ SurfaceTask::SurfaceTask(const SmartPointer<SimulationRun> &simRun) :
 SurfaceTask::~SurfaceTask() {}
 
 
-const SmartPointer<Surface> &SurfaceTask::getSurface() const {
+SmartPointer<Surface> SurfaceTask::getSurface() const {
   return simRun->getSurface();
 }
 
