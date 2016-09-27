@@ -3,9 +3,10 @@
   "url": "http://camotics.org/",
   "namespace": "camotics",
   "admin": "Joseph Coffland <joseph@camotics.org>",
-  "ip": "127.0.0.1",
+  "ip": "192.168.10.15",
   "http-port": 8111,
   "github-port": 8112,
+  "buildbot-port": 8113,
 
   "modes": {
     "debug": {"scons": {"debug": 1}},

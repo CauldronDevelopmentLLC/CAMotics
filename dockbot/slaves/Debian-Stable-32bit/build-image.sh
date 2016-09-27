@@ -3,12 +3,13 @@
 
 # settings
 arch=i386
-suite=${1:-testing}
+suite=${1:-stable}
 chroot_dir="/var/chroot/$suite"
 apt_mirror="http://http.debian.net/debian"
 docker_image="32bit/debian:$suite"
 
 # make sure that the required tools are installed
+apt-get update
 apt-get install -y docker.io debootstrap dchroot
 
 # install a minbase system with debootstrap

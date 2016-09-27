@@ -1,5 +1,6 @@
 {
   "remote": true,
+  "root": "/Users/buildbot/camotics",
 
   "images": {
     "camotics": {"projects": ["camotics"]}
