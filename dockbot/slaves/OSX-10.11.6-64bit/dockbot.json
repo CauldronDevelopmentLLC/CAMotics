@@ -1,0 +1,7 @@
+{
+  "remote": true,
+
+  "images": {
+    "camotics": {"projects": ["camotics"]}
+  }
+}
