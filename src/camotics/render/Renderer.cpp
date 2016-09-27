@@ -30,6 +30,7 @@
 #include <cbang/time/TimeInterval.h>
 #include <cbang/time/Timer.h>
 #include <cbang/util/SmartLock.h>
+#include <cbang/util/DefaultCatch.h>
 
 #include <cmath>
 
@@ -43,14 +44,14 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
                       RenderMode mode) {
   typedef list<SmartPointer<RenderJob> > jobs_t;
   jobs_t jobs;
+  vector<GridTreeRef> jobGrids;
 
-  {
+  try {
     SmartLock lock(this);
 
     // Divide work
     unsigned targetJobCount = pow(2, ceil(log(threads) / log(2)) + 2);
 
-    vector<GridTreeRef> jobGrids;
     tree.partition(jobGrids, bbox, targetJobCount);
     unsigned totalJobCount = jobGrids.size();
 
@@ -104,7 +105,7 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
       // Wait
       timedWait(0.1);
     }
-  }
+  } CATCH_ERROR;
 
   // Clean up remaining jobs in case of an early exit
   for (jobs_t::iterator it = jobs.begin(); it != jobs.end(); it++)
