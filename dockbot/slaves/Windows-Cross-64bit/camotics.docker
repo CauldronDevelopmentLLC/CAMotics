@@ -1,4 +1,6 @@
 include(base.m4)
 include(cross.m4)
+include(wine64.m4)
+include(qt5.m4)
 include(v8.m4)
 include(slave.m4)

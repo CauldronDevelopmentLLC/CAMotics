@@ -1,8 +1,19 @@
-ENV V8_REL=3.14.5
-RUN git clone -b $V8_REL https://chromium.googlesource.com/v8/v8.git
-RUN export CCFLAGS=-fpermissive && cd v8 && \
-  sed -i "s/'-Werror',//" SConstruct && \
-  scons --warn=no-all mode=release arch=x64 toolchain=gcc library=static \
-    os=win32 I_know_I_should_build_with_GYP=yes
+ENV V8_VERSION=5.6.149
+RUN mkdir v8
+RUN cd v8 && git clone --depth=1 \
+  https://chromium.googlesource.com/chromium/tools/depot_tools.git
+RUN cd v8 && \
+  git clone --depth=1 -b $V8_VERSION https://chromium.googlesource.com/v8/v8.git
+RUN cd v8 && export PATH=$PWD/depot_tools:$PATH && \
+  gclient config https://chromium.googlesource.com/v8/v8.git --unmanaged && \
+  gclient sync --no-history --shallow
+RUN cd v8 && export PATH=$PWD/depot_tools:$PATH && \
+  cd v8 && \
+  ln -sf /usr/bin/clang third_party/llvm-build/Release+Asserts/bin/clang && \
+  gn gen out --args='is_debug=false target_cpu="x64" is_component_build=false treat_warnings_as_errors=false v8_use_snapshot=false v8_enable_i18n_support=false enable_basic_printing=false use_sysroot=false is_desktop_linux=false linux_use_bundled_binutils=false clang_use_chrome_plugins=false' && \
+  ninja -C out && \
+  for i in $(find out -name \*.a | grep -v /test); do \
+    ar t $i; \
+  done | xargs ar rcs libv8.a
 
-ENV V8_HOME=/v8 V8_LIBPATH=/v8 V8_INCLUDE=/v8/include
+ENV V8_HOME=/v8/v8 V8_LIBPATH=/v8/v8 V8_INCLUDE=/v8/v8/include

@@ -1,5 +1,6 @@
 {
   "args": ["--privileged"],
+  "context": ["slaves/Windows-Cross-64bit/v8-mingw.patch"],
 
   "scons": {
     "cross_mingw": 1,

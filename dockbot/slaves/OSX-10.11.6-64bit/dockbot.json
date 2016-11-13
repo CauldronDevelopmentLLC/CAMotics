@@ -2,6 +2,11 @@
   "remote": true,
   "root": "/Users/buildbot/camotics",
 
+  "scons": {
+    "ccflags": "-Wno-unused-local-typedef",
+    "disable_local": "libevent"
+  },
+
   "images": {
     "camotics": {"projects": ["camotics"]}
   }
