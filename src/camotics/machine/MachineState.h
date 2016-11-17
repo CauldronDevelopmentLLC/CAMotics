@@ -35,7 +35,7 @@ namespace CAMotics {
     spin_mode_t spinMode;
     double maxSpeed;
 
-    unsigned tool;
+    int tool;
 
     Axes position;
 
@@ -61,7 +61,7 @@ namespace CAMotics {
     void setSpeed(double speed, spin_mode_t mode, double max)
     {this->speed = speed; spinMode = mode; maxSpeed = max;}
 
-    unsigned getTool() const {return tool;}
+    int getTool() const {return tool;}
     void setTool(unsigned tool) {this->tool = tool;}
 
     int findPort(port_t type, unsigned index) {return -1;}

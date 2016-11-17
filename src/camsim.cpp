@@ -138,24 +138,25 @@ namespace CAMotics {
       }
 
       // Generate tool path
-      SmartPointer<ToolPath> path = cutSim.computeToolPath(project);
+      project.time = time ? time : numeric_limits<double>::max();
+      project.threads = threads;
+      project.workpiece = project.getWorkpieceBounds();
+      project.path = cutSim.computeToolPath(project);
 
       // Configure simulation
-      project.updateAutomaticWorkpiece(*path);
+      project.updateAutomaticWorkpiece(*project.path);
 
       // Simulate
-      if (!time) time = numeric_limits<double>::max();
-      SmartPointer<Simulation> sim = project.makeSim(path, time, threads);
       SmartPointer<Surface> surface;
-      if (!shouldQuit()) surface = cutSim.computeSurface(sim);
+      if (!shouldQuit()) surface = cutSim.computeSurface(project);
 
       // Reduce
       if (reduce && !shouldQuit()) cutSim.reduceSurface(*surface);
 
       // Export surface
       if (shouldQuit())
-        surface->writeSTL(*output, binary, "CAMotics Surface",
-                          sim->computeHash());
+        surface->writeSTL
+          (*output, binary, "CAMotics Surface", project.computeHash());
     }
 
 

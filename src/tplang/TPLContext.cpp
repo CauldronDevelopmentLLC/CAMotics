@@ -36,8 +36,8 @@ using namespace tplang;
 
 
 TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
-                       const CAMotics::ToolTable &tools) :
-  js::Environment(out), machine(machine), tools(tools) {
+                       const CAMotics::Simulation &sim) :
+  js::Environment(out), machine(machine), sim(sim) {
 
   // Add modules
   SmartPointer<GCodeModule> gcodeMod = new GCodeModule(*this);

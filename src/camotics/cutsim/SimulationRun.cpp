@@ -33,8 +33,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SimulationRun::SimulationRun(const SmartPointer<Simulation> &sim) :
-  sim(sim), lastTime(-1) {}
+SimulationRun::SimulationRun(const Simulation &sim) :
+  sim(sim), minTime(-1), maxTime(-1) {}
 
 
 SimulationRun::~SimulationRun() {}
@@ -48,52 +48,51 @@ SmartPointer<MoveLookup> SimulationRun::getMoveLookup() const {
 
 
 void SimulationRun::setEndTime(double endTime) {
-  sim->time = endTime;
+  sim.time = endTime;
 }
 
 
-void SimulationRun::compute(const SmartPointer<Task> &task) {
+SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
   Rectangle3R bbox;
 
   double start = task->getTime();
 
   if (sweep.isNull()) {
     // Tool sweep
-    sweep = new ToolSweep(sim->path); // Build sweep for entire time period
+    sweep = new ToolSweep(sim.path); // Build sweep for entire time period
 
     // Bounds, increased a little
-    bbox = sim->workpiece.getBounds().grow(sim->resolution * 0.9);
+    bbox = sim.workpiece.getBounds().grow(sim.resolution * 0.9);
 
     // Grid
-    tree = new GridTree(Grid(bbox, sim->resolution));
+    tree = new GridTree(Grid(bbox, sim.resolution));
 
   } else {
-    if (sim->time == lastTime) return;
+    if (sim.time < minTime) minTime = sim.time;
+    if (maxTime < sim.time) maxTime = sim.time;
 
-    SmartPointer<MoveLookup> change =
-      new ToolSweep(sim->path, sim->time, lastTime);
-
+    SmartPointer<MoveLookup> change = new ToolSweep(sim.path, minTime, maxTime);
     sweep->setChange(change);
-    bbox = change->getBounds().grow(sim->resolution * 1.1);
+    bbox = change->getBounds().grow(sim.resolution * 1.1);
   }
 
   // Set target time
-  sweep->setEndTime(sim->time);
+  sweep->setEndTime(sim.time);
 
   // Setup cut simulation
-  CutWorkpiece cutWP(sweep, sim->workpiece);
+  CutWorkpiece cutWP(sweep, sim.workpiece);
 
   // Render
   Renderer renderer(task);
-  renderer.render(cutWP, *tree, bbox, sim->threads, sim->mode);
+  renderer.render(cutWP, *tree, bbox, sim.threads, sim.mode);
 
   LOG_DEBUG(1, "Render time " << TimeInterval(task->getTime() - start));
 
   // Extract surface
   if (!task->shouldQuit()) {
-    // TODO race condition on surface SmartPointer
-    surface = new TriangleSurface(*tree);
-    lastTime = sim->time;
+    minTime = maxTime = sim.time;
+    return new TriangleSurface(*tree);
+  }
 
-  } else surface.release();
+  return 0;
 }

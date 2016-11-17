@@ -33,6 +33,7 @@ namespace CAMotics {
     GridTreeRef(GridTree *ref, const cb::Vector3U &offset,
                 const cb::Vector3U &steps);
 
+    using GridTreeBase::insertLeaf;
     void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset);
 
     // From GridTreeBase

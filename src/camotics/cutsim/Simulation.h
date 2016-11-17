@@ -24,9 +24,11 @@
 #include "Workpiece.h"
 
 #include <camotics/sim/ToolTable.h>
+#include <camotics/cutsim/ToolPath.h>
 #include <camotics/render/RenderMode.h>
 
 #include <cbang/SmartPointer.h>
+#include <cbang/json/Serializable.h>
 
 #include <string>
 
@@ -34,10 +36,9 @@ namespace cb {namespace JSON {class Sink;}}
 
 
 namespace CAMotics {
-  class ToolPath;
   class Workpiece;
 
-  class Simulation {
+  class Simulation : public cb::JSON::Serializable {
   public:
     ToolTable tools;
     cb::SmartPointer<ToolPath> path;
@@ -47,6 +48,8 @@ namespace CAMotics {
     RenderMode mode;
     unsigned threads;
 
+    Simulation() :
+      resolution(1), time(0), mode(RenderMode::MCUBES_MODE), threads(0) {}
     Simulation(const ToolTable &tools, const cb::SmartPointer<ToolPath> &path,
                const Workpiece &workpiece, double resolution, double time,
                RenderMode mode, unsigned threads) :
@@ -54,7 +57,14 @@ namespace CAMotics {
       time(time), mode(mode), threads(threads) {}
 
     std::string computeHash() const;
-    void write(cb::JSON::Sink &sink) const;
+
+    void write(cb::JSON::Sink &sink, bool withPath) const;
+
+    // From JSON::Serializable
+    using cb::JSON::Serializable::read;
+    using cb::JSON::Serializable::write;
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const {write(sink, false);}
   };
 }
 

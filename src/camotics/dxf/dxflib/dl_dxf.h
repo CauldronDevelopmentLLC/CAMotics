@@ -131,13 +131,13 @@ public:
             DL_CreationInterface* creationInterface);
     bool readDxfGroups(FILE* fp,
                        DL_CreationInterface* creationInterface,
-					   int* errorCounter = NULL);
+                       int* errorCounter = NULL);
     static bool getChoppedLine(char* s, unsigned int size,
                                FILE *stream);
 
     bool readDxfGroups(std::istream &stream,
                        DL_CreationInterface* creationInterface,
-					   int* errorCounter = NULL);
+                       int* errorCounter = NULL);
     bool in(std::istream &stream,
             DL_CreationInterface* creationInterface);
     static bool getChoppedLine(char *s, unsigned int size,
@@ -172,11 +172,11 @@ public:
     void addSolid(DL_CreationInterface* creationInterface);
 
     void addMText(DL_CreationInterface* creationInterface);
-	bool handleMTextData(DL_CreationInterface* creationInterface);
-	bool handleLWPolylineData(DL_CreationInterface* creationInterface);
-	bool handleSplineData(DL_CreationInterface* creationInterface);
-	bool handleLeaderData(DL_CreationInterface* creationInterface);
-	bool handleHatchData(DL_CreationInterface* creationInterface);
+    bool handleMTextData(DL_CreationInterface* creationInterface);
+    bool handleLWPolylineData(DL_CreationInterface* creationInterface);
+    bool handleSplineData(DL_CreationInterface* creationInterface);
+    bool handleLeaderData(DL_CreationInterface* creationInterface);
+    bool handleHatchData(DL_CreationInterface* creationInterface);
 
     void addText(DL_CreationInterface* creationInterface);
     void addAttrib(DL_CreationInterface* creationInterface);
@@ -193,13 +193,14 @@ public:
     void addImage(DL_CreationInterface* creationInterface);
     void addImageDef(DL_CreationInterface* creationInterface);
 
-    void addComment(DL_CreationInterface* creationInterface, const char* comment);
+    void addComment(DL_CreationInterface* creationInterface,
+                    const char* comment);
 
-	void endEntity(DL_CreationInterface* creationInterface);
+    void endEntity(DL_CreationInterface* creationInterface);
 
     void endSequence(DL_CreationInterface* creationInterface);
 
-	int  stringToInt(const char* s, bool* ok=NULL);
+    int  stringToInt(const char* s, bool* ok=NULL);
 
     DL_WriterA* out(const char* file,
                     DL_Codes::version version=VER_2000);
@@ -320,8 +321,8 @@ public:
     void writeView(DL_WriterA& dw);
     void writeUcs(DL_WriterA& dw);
     void writeDimStyle(DL_WriterA& dw,
-	                   double dimasz, double dimexe, double dimexo,
-					   double dimgap, double dimtxt);
+                       double dimasz, double dimexe, double dimexo,
+                       double dimgap, double dimtxt);
     void writeBlockRecord(DL_WriterA& dw);
     void writeBlockRecord(DL_WriterA& dw, const string& name);
     void writeObjects(DL_WriterA& dw);
@@ -341,12 +342,12 @@ public:
                strcpy(tmp, value);
                DL_WriterA::strReplace(tmp, ',', '.');
                ret = atof(tmp);
-      		   delete[] tmp;
+               delete[] tmp;
             }
             else {
                ret = atof(value);
             }
-			return ret;
+            return ret;
         } else {
             return def;
         }
@@ -374,21 +375,21 @@ public:
         }
     }
 
-	static bool checkVariable(const char* var, DL_Codes::version version);
+    static bool checkVariable(const char* var, DL_Codes::version version);
 
-	DL_Codes::version getVersion() {
-		return version;
-	}
+    DL_Codes::version getVersion() {
+        return version;
+    }
 
-	int getLibVersion(const char* str);
+    int getLibVersion(const char* str);
 
-	static void test();
+    static void test();
 
 private:
     DL_Codes::version version;
     unsigned long styleHandleStd;
 
-	string polylineLayer;
+    string polylineLayer;
     double* vertices;
     int maxVertices;
     int vertexIndex;
@@ -415,9 +416,6 @@ private:
     int* hatchEdgeIndex;
     bool dropEdges;
 
-    // Bulge for the next vertex.
-    double bulge;
-
     // Only the useful part of the group code
     char groupCodeTmp[DL_DXF_MAXLINE+1];
     // ...same as integer
@@ -437,8 +435,8 @@ private:
     bool firstCall;
     // Attributes of the current entity (layer, color, width, line type)
     DL_Attributes attrib;
-	// library version. hex: 0x20003001 = 2.0.3.1
-	int libVersion;
+    // library version. hex: 0x20003001 = 2.0.3.1
+    int libVersion;
 };
 
 #endif

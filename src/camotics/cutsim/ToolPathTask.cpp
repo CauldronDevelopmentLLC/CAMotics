@@ -22,6 +22,7 @@
 
 #include <camotics/TaskFilter.h>
 #include <camotics/cutsim/Project.h>
+#include <camotics/cutsim/Simulation.h>
 #include <camotics/sim/Controller.h>
 #include <camotics/gcode/Interpreter.h>
 #include <camotics/machine/Machine.h>
@@ -50,7 +51,7 @@ using namespace CAMotics;
 ToolPathTask::ToolPathTask(const Project &project) :
   tools(project.getToolTable()),
   units(project.getUnits() == ToolUnits::UNITS_MM ? Units::METRIC :
-        Units::IMPERIAL), errors(0) {
+        Units::IMPERIAL), simJSON(project.toString()), errors(0) {
 
   for (Project::iterator it = project.begin(); it != project.end(); it++)
     files.push_back((*it)->getAbsolutePath());
@@ -114,6 +115,9 @@ void ToolPathTask::run() {
 
       // Add units
       args.push_back(string("--") + String::toLower(units.toString()));
+
+      // Add simulation JSON
+      args.push_back("--sim-json=" + simJSON);
 
       // Add file
       args.push_back(filename);

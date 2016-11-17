@@ -63,7 +63,7 @@ namespace CAMotics {
     void setSpeed(double speed, spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
                   double max = 0) {parent->setSpeed(speed, mode, max);}
 
-    unsigned getTool() const {return parent->getTool();}
+    int getTool() const {return parent->getTool();}
     void setTool(unsigned tool) {parent->setTool(tool);}
 
     int findPort(port_t type, unsigned index = 0)

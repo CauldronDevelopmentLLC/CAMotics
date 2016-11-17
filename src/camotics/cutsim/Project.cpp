@@ -41,8 +41,7 @@ using namespace CAMotics;
 
 
 Project::Project(Options &_options, const std::string &filename) :
-  options(_options), filename(filename), resolution(1),
-  mode(RenderMode::MCUBES_MODE), workpieceMargin(5), watch(true),
+  options(_options), filename(filename), workpieceMargin(5), watch(true),
   lastWatch(0), dirty(false) {
 
   options.setAllowReset(true);
@@ -87,13 +86,6 @@ Project::~Project() {}
 
 void Project::markDirty() {
   dirty = true;
-}
-
-
-SmartPointer<Simulation> Project::makeSim(const SmartPointer<ToolPath> &path,
-                                          double time, unsigned threads) const {
-  return new Simulation(tools, path, getWorkpieceBounds(), resolution, time,
-                        mode, threads);
 }
 
 
@@ -201,7 +193,7 @@ void Project::save(const string &_filename) {
   // Set nc-files option
   options["nc-files"].reset();
   for (files_t::iterator it = files.begin(); it != files.end(); it++)
-    options["nc-files"].append((*it)->getRelativePath());
+    options["nc-files"].append(encodeFilename((*it)->getRelativePath()));
 
   SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::out);
   XMLWriter writer(*stream, true);
@@ -283,14 +275,15 @@ void Project::updateAutomaticWorkpiece(ToolPath &path) {
   for (unsigned i = 0; i < path.size(); i++) {
     const Move &move = path.at(i);
 
-    if (move.getType() != MoveType::MOVE_RAPID) {
-      unsigned tool = move.getTool();
+    if (move.getType() == MoveType::MOVE_RAPID) continue;
 
-      if (sweeps.size() <= tool) sweeps.resize(tool + 1);
-      if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
+    int tool = move.getTool();
+    if (tool < 0) continue;
 
-      sweeps[tool]->getBBoxes(move.getStartPt(), move.getEndPt(), bboxes, 0);
-    }
+    if (sweeps.size() <= (unsigned)tool) sweeps.resize(tool + 1);
+    if (sweeps[tool].isNull()) sweeps[tool] = tools.get(tool).getSweep();
+
+    sweeps[tool]->getBBoxes(move.getStartPt(), move.getEndPt(), bboxes, 0);
   }
 
   for (unsigned i = 0; i < bboxes.size(); i++) wpBounds.add(bboxes[i]);

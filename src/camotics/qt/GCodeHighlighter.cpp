@@ -206,7 +206,8 @@ void GCodeHighlighter::ocode(CAMotics::Tokenizer &tokenizer) {
   // Keyword
   if (!tokenizer.isType(TokenType::ID_TOKEN)) return;
   Token token = tokenizer.advance();
-  if (ocodes.contains(String::toUpper(token.getValue()).c_str()))
+  if (ocodes.contains
+      (QString::fromUtf8(String::toUpper(token.getValue()).c_str())))
     setFormat(token, ColorComponent::Keyword);
 
   // Expressions
@@ -233,7 +234,7 @@ void GCodeHighlighter::expression(CAMotics::Tokenizer &tokenizer) {
   switch (tokenizer.getType()) {
   case TokenType::ID_TOKEN: {
     string id = String::toUpper(tokenizer.getValue());
-    if (!ops.contains(id.c_str())) break;
+    if (!ops.contains(QString::fromUtf8(id.c_str()))) break;
     setFormat(tokenizer.peek(), ColorComponent::Keyword);
   }
 
@@ -274,7 +275,7 @@ void GCodeHighlighter::quotedExpr(CAMotics::Tokenizer &tokenizer) {
 void GCodeHighlighter::functionCall(CAMotics::Tokenizer &tokenizer) {
   Token func = tokenizer.advance();
   string name = String::toUpper(func.getValue());
-  if (functions.contains(name.c_str()))
+  if (functions.contains(QString::fromUtf8(name.c_str())))
     setFormat(func, ColorComponent::Function);
 
   quotedExpr(tokenizer);

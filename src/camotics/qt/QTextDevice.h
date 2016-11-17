@@ -26,7 +26,6 @@
 #include <boost/iostreams/stream.hpp>
 
 #include <QPlainTextEdit>
-#include <QString>
 
 
 namespace CAMotics {

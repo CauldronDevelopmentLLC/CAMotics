@@ -55,20 +55,15 @@
 /**
  * Used for exception handling.
  */
-class DL_Exception {}
-;
+class DL_Exception {};
 
 /**
  * Used for exception handling.
  */
-class DL_NullStrExc : public DL_Exception {}
-;
+class DL_NullStrExc : public DL_Exception {};
 
 /**
  * Used for exception handling.
  */
-class DL_GroupCodeExc : public DL_Exception {
-    DL_GroupCodeExc(int gc=0) : groupCode(gc) {}
-    int groupCode;
-};
+class DL_GroupCodeExc : public DL_Exception {};
 #endif

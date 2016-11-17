@@ -36,7 +36,7 @@ AboutDialog::AboutDialog() : ui(new Ui::AboutDialog) {
 
   // Set version
   string version = "Version " + Info::instance().get("Build", "Version");
-  ui->versionLabel->setText(version.c_str());
+  ui->versionLabel->setText(QString::fromUtf8(version.c_str()));
 }
 
 
@@ -47,7 +47,8 @@ void AboutDialog::on_creditsPushButton_clicked() {
 
 
   QMessageBox::information
-    (this, "CAMotics - Credits", credits.c_str(), QMessageBox::Ok);
+    (this, "CAMotics - Credits", QString::fromUtf8(credits.c_str()),
+     QMessageBox::Ok);
 }
 
 

@@ -34,14 +34,15 @@ namespace CAMotics {
 
   class SurfaceTask : public Task {
     cb::SmartPointer<SimulationRun> simRun;
+    cb::SmartPointer<Surface> surface;
 
   public:
-    SurfaceTask(const cb::SmartPointer<Simulation> &sim);
+    SurfaceTask(const Simulation &sim);
     SurfaceTask(const cb::SmartPointer<SimulationRun> &simRun);
     ~SurfaceTask();
 
     const cb::SmartPointer<SimulationRun> &getSimRun() const {return simRun;}
-    const cb::SmartPointer<Surface> &getSurface() const;
+    const cb::SmartPointer<Surface> &getSurface() const {return surface;}
 
     // From Task
     void run();

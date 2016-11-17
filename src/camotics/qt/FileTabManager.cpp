@@ -73,7 +73,7 @@ void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
     QApplication::setOverrideCursor(Qt::WaitCursor);
     NCEdit *editor = new NCEdit(file, highlighter, parentWidget());
 
-    QFile qFile(absPath.c_str());
+    QFile qFile(QString::fromUtf8(absPath.c_str()));
     qFile.open(QFile::ReadOnly);
     QString contents = qFile.readAll();
     qFile.close();
@@ -89,7 +89,8 @@ void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
     connect(editor, SIGNAL(findNext()), SIGNAL(findNext()));
     connect(editor, SIGNAL(findResult(bool)), SIGNAL(findResult(bool)));
 
-    QString title(SystemUtilities::basename(file->getAbsolutePath()).c_str());
+    QString title = QString::fromUtf8
+      (SystemUtilities::basename(file->getAbsolutePath()).c_str());
     tab = (unsigned)QTabWidget::addTab(editor, title);
     QApplication::restoreOverrideCursor();
   }
@@ -220,7 +221,7 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
 
   // Save data
   QString content = editor->toPlainText();
-  QFile qFile(filename.c_str());
+  QFile qFile(QString::fromUtf8(filename.c_str()));
   qFile.open(QFile::WriteOnly | QIODevice::Truncate);
   qFile.write(content.toUtf8());
   qFile.close();
@@ -231,7 +232,8 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
     file.setFilename(filename);
 
     // Update tab title
-    QString title(SystemUtilities::basename(filename).c_str());
+    QString
+      title(QString::fromUtf8(SystemUtilities::basename(filename).c_str()));
     QTabWidget::setTabText(tab, title);
   }
 

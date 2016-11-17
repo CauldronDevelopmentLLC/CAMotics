@@ -1,0 +1,8 @@
+include(base.m4)
+
+RUN pacman --noconfirm -S mingw-w64-i686-qt5
+ENV PKG_CONFIG_PATH=/mingw32/lib/pkgconfig QTDIR=/mingw32
+
+include(cross.m4)
+include(v8.m4)
+include(slave.m4)

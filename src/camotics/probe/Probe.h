@@ -73,6 +73,7 @@ namespace CAMotics {
     void outputProbe();
 
     // From Controller
+    using Controller::execute;
     void execute(Word *word, int vars);
 
     // From Processor

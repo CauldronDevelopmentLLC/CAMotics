@@ -32,7 +32,7 @@ namespace CAMotics {
     Vector3R halfDim2;
 
   public:
-    Workpiece(const Rectangle3R &r);
+    Workpiece(const Rectangle3R &r = Rectangle3R());
 
     Rectangle3R getBounds() const {return *this;}
     bool isValid() const {return getVolume();}

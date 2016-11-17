@@ -32,7 +32,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SurfaceTask::SurfaceTask(const SmartPointer<Simulation> &sim) :
+SurfaceTask::SurfaceTask(const Simulation &sim) :
   simRun(new SimulationRun(sim)) {}
 
 
@@ -43,15 +43,10 @@ SurfaceTask::SurfaceTask(const SmartPointer<SimulationRun> &simRun) :
 SurfaceTask::~SurfaceTask() {}
 
 
-const SmartPointer<Surface> &SurfaceTask::getSurface() const {
-  return simRun->getSurface();
-}
-
-
 void SurfaceTask::run() {
   Task::begin();
 
-  simRun->compute(SmartPointer<Task>::Phony(this));
+  surface = simRun->compute(SmartPointer<Task>::Phony(this));
 
   // Time
   if (shouldQuit()) {
@@ -61,7 +56,6 @@ void SurfaceTask::run() {
   }
 
   // Done
-  SmartPointer<Surface> surface = simRun->getSurface();
   double delta = Task::end();
   LOG_INFO(1, "Time: " << TimeInterval(delta)
            << " Triangles: " << surface->getCount()

@@ -41,8 +41,7 @@ SmartPointer<ToolPath> CutSim::computeToolPath(const Project &project) {
 }
 
 
-SmartPointer<Surface> CutSim::computeSurface
-(const SmartPointer<Simulation> &sim) {
+SmartPointer<Surface> CutSim::computeSurface(const Simulation &sim) {
   task = new SurfaceTask(sim);
   task->run();
   return task.cast<SurfaceTask>()->getSurface();

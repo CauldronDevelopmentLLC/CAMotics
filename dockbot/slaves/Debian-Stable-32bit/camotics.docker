@@ -1,0 +1,6 @@
+include(base.m4)
+
+RUN apt-get update && \
+  apt-get install -y libv8-dev qt5-default libqt5opengl5-dev libcairo2-dev
+
+include(slave.m4)

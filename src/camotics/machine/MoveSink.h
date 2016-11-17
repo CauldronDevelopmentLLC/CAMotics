@@ -33,7 +33,6 @@ namespace CAMotics {
     MoveStream &stream;
 
     bool probePending;
-    double rapidFeed;
     double time;
 
   public:

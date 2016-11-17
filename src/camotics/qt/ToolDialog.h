@@ -42,6 +42,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::ToolDialog> ui;
     ToolScene scene;
     Tool tool;
+    bool updating;
 
   public:
     ToolDialog();
@@ -60,11 +61,11 @@ namespace CAMotics {
     void on_numberSpinBox_valueChanged(int value);
     void on_unitsComboBox_currentIndexChanged(int value);
     void on_shapeComboBox_currentIndexChanged(int value);
+    void on_angleDoubleSpinBox_valueChanged(double value);
     void on_lengthDoubleSpinBox_valueChanged(double value);
     void on_diameterDoubleSpinBox_valueChanged(double value);
     void on_snubDiameterDoubleSpinBox_valueChanged(double value);
     void on_descriptionLineEdit_textChanged(const QString &value);
-
   };
 }
 

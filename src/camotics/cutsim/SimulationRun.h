@@ -21,11 +21,12 @@
 #ifndef CAMOTICS_SIMULATION_RUN_H
 #define CAMOTICS_SIMULATION_RUN_H
 
+#include "Simulation.h"
+
 #include <cbang/SmartPointer.h>
 
 
 namespace CAMotics {
-  class Simulation;
   class ToolSweep;
   class GridTree;
   class Surface;
@@ -34,23 +35,22 @@ namespace CAMotics {
 
 
   class SimulationRun {
-    cb::SmartPointer<Simulation> sim;
+    Simulation sim;
     cb::SmartPointer<ToolSweep> sweep;
     cb::SmartPointer<GridTree> tree;
-    cb::SmartPointer<Surface> surface;
 
-    double lastTime;
+    double minTime;
+    double maxTime;
 
   public:
-    SimulationRun(const cb::SmartPointer<Simulation> &sim);
+    SimulationRun(const Simulation &sim);
     ~SimulationRun();
 
-    const cb::SmartPointer<Surface> &getSurface() const {return surface;}
     cb::SmartPointer<MoveLookup> getMoveLookup() const;
 
     void setEndTime(double endTime);
 
-    void compute(const cb::SmartPointer<Task> &task);
+    cb::SmartPointer<Surface> compute(const cb::SmartPointer<Task> &task);
   };
 }
 

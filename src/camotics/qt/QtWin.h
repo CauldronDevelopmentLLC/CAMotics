@@ -22,6 +22,7 @@
 #define CAMOTICS_QT_WIN_H
 
 #include "NewDialog.h"
+#include "NewProjectDialog.h"
 #include "ExportDialog.h"
 #include "AboutDialog.h"
 #include "SettingsDialog.h"
@@ -74,6 +75,7 @@ namespace CAMotics {
 
     cb::SmartPointer<Ui::CAMoticsWindow> ui;
     NewDialog newDialog;
+    NewProjectDialog newProjectDialog;
     ExportDialog exportDialog;
     AboutDialog aboutDialog;
     SettingsDialog settingsDialog;
@@ -99,7 +101,6 @@ namespace CAMotics {
 
     ValueSet valueSet;
     cb::SmartPointer<Project> project;
-    cb::SmartPointer<Simulation> sim;
     cb::SmartPointer<SimulationRun> simRun;
     cb::SmartPointer<ConnectionManager> connectionManager;
     cb::SmartPointer<View> view;
@@ -179,6 +180,10 @@ namespace CAMotics {
     void snapshot();
     void exportData();
 
+    bool runNewProjectDialog();
+    ToolTable getNewToolTable();
+    ToolUnits getNewUnits();
+
     std::string openFile(const std::string &title,
                          const std::string &filters,
                          const std::string &filename, bool save);
@@ -189,8 +194,8 @@ namespace CAMotics {
     void openProject(const std::string &filename = std::string());
     bool saveProject(bool saveas = false);
     void revertProject();
-    void loadProjectDefaults();
     bool isMetric() const;
+    ToolUnits getDefaultUnits() const;
 
     void updateFiles();
     void newFile(bool tpl);
@@ -210,8 +215,8 @@ namespace CAMotics {
     void removeTool(unsigned number);
     void exportToolTable();
     void importToolTable();
-    void saveDefaultToolTable();
-    void loadDefaultToolTable();
+    void saveDefaultToolTable(const ToolTable &tools);
+    ToolTable loadDefaultToolTable();
 
     void updateWorkpiece();
     void loadWorkpiece();
@@ -307,8 +312,8 @@ namespace CAMotics {
 
     void on_actionExportToolTable_triggered() {exportToolTable();}
     void on_actionImportToolTable_triggered() {importToolTable();}
-    void on_actionSaveDefaultToolTable_triggered() {saveDefaultToolTable();}
-    void on_actionLoadDefaultToolTable_triggered() {loadDefaultToolTable();}
+    void on_actionSaveDefaultToolTable_triggered();
+    void on_actionLoadDefaultToolTable_triggered();
 
     void on_actionSettings_triggered();
     void on_actionExport_triggered() {exportData();}

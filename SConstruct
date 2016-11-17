@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.0.7'
+version = '1.1.0'
 major, minor, revision = version.split('.')
 
 # Setup
@@ -116,7 +116,7 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 # Qt
 uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
-for dialog in 'export about donate find new tool settings'.split():
+for dialog in 'export about donate find new tool settings new_project'.split():
     uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
                        'qt/%s_dialog.ui' % dialog))
 

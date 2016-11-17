@@ -59,9 +59,8 @@ void GCodeModule::define(js::ObjectTemplate &exports) {
   exports.set("tool(number)", this, &GCodeModule::toolCB);
   exports.set("units(type)", this, &GCodeModule::unitsCB);
   exports.set("pause(optional=false)", this, &GCodeModule::pauseCB);
-  exports.set("tool_set(number, length, diameter, units, shape, snub=0, "
-           "front_angle=0, back_angle=0, orientation=0)", this,
-           &GCodeModule::toolSetCB);
+  exports.set("tool_set(number, length, diameter, units, shape, snub=0)", this,
+              &GCodeModule::toolSetCB);
   exports.set("position()", this, &GCodeModule::positionCB);
 
   exports.set("FEED_INVERSE_TIME", INVERSE_TIME);
@@ -224,14 +223,31 @@ js::Value GCodeModule::speedCB(const js::Arguments &args) {
 
 
 js::Value GCodeModule::toolCB(const js::Arguments &args) {
-  // Return tool number if no arguments were given
-  if (!args.getCount()) return ctx.machine.getTool();
+  int number;
 
-  uint32_t number = args["number"].toUint32();
-  ctx.tools.get(number); // Make sure it exists
-  ctx.machine.setTool(number);
+  if (args.getCount()) {
+    number = args["number"].toUint32();
+    ctx.sim.tools.get(number); // Make sure it exists
+    ctx.machine.setTool(number);
 
-  return ctx.machine.getTool();
+  } else number = ctx.machine.getTool();
+
+  if (number < 0) return js::Value();
+
+  const Tool &tool = ctx.sim.tools.get(number);
+
+  double scale = unitAdapter.getUnits() == CAMotics::Units::METRIC ? 1 : 25.4;
+
+  js::Value o = js::Value::createObject();
+  o.set("number", number);
+  o.set("shape", (uint32_t)tool.getShape());
+  if (tool.getShape() == ToolShape::TS_CONICAL) o.set("angle", tool.getAngle());
+  o.set("length", tool.getLength() / scale);
+  o.set("diameter", tool.getDiameter() / scale);
+  if (tool.getShape() == ToolShape::TS_SNUBNOSE)
+    o.set("snub_diameter", tool.getSnubDiameter() / scale);
+
+  return o;
 }
 
 
@@ -261,7 +277,7 @@ js::Value GCodeModule::pauseCB(const js::Arguments &args) {
 
 
 js::Value GCodeModule::toolSetCB(const js::Arguments &args) {
-  CAMotics::Tool &tool = ctx.tools.get(args["number"].toUint32());
+  CAMotics::Tool &tool = ctx.sim.tools.get(args["number"].toUint32());
 
   uint32_t units;
   double scale = 1;
@@ -280,9 +296,6 @@ js::Value GCodeModule::toolSetCB(const js::Arguments &args) {
   tool.setLength(scale * args.getNumber("length"));
   tool.setDiameter(scale * args.getNumber("diameter"));
   tool.setSnubDiameter(scale * args.getNumber("snub"));
-  tool.setFrontAngle(args.getNumber("front_angle"));
-  tool.setBackAngle(args.getNumber("back_angle"));
-  tool.setOrientation(args.getNumber("orientation"));
 
   return js::Value();
 }

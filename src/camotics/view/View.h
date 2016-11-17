@@ -42,7 +42,6 @@ namespace CAMotics {
     ValueGroup values;
 
     unsigned flags;
-    bool visible;
 
     unsigned speed;
     bool reverse;
@@ -67,6 +66,7 @@ namespace CAMotics {
       PLAY_FLAG                  = 1 << 9,
       PATH_VBOS_FLAG             = 1 << 10,
       SURFACE_VBOS_FLAG          = 1 << 11,
+      TRANSLUCENT_SURFACE_FLAG   = 1 << 12,
     };
 
     View(ValueSet &valueSet);

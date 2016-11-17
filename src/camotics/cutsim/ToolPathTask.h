@@ -42,6 +42,7 @@ namespace CAMotics {
     ToolTable tools;
     Units units;
     std::vector<std::string> files;
+    std::string simJSON;
 
     unsigned errors;
     cb::SmartPointer<ToolPath> path;

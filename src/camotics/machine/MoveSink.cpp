@@ -20,6 +20,8 @@
 
 #include "MoveSink.h"
 
+#include <cbang/log/Logger.h>
+
 using namespace cb;
 using namespace CAMotics;
 using namespace CAMotics;
@@ -46,6 +48,11 @@ void MoveSink::move(const Axes &axes, bool rapid) {
   if (getPosition() != axes) {
     MoveType type = rapid ? Move::MOVE_RAPID :
       (probePending ? Move::MOVE_PROBE : Move::MOVE_CUTTING);
+
+    if (getTool() < 0 && !rapid) {
+      LOG_WARNING("Cutting move but no tool selected, selecting tool 1");
+      setTool(1);
+    }
 
     Move move(type, getPosition(), axes, time, getTool(),
               getFeed(), getSpeed(), getLocation().getStart().getLine());

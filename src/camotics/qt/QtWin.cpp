@@ -26,7 +26,6 @@
 #include <camotics/Geom.h>
 #include <camotics/view/Viewer.h>
 #include <camotics/cutsim/Project.h>
-#include <camotics/cutsim/Simulation.h>
 #include <camotics/cutsim/SimulationRun.h>
 #include <camotics/cutsim/CutWorkpiece.h>
 #include <camotics/remote/ConnectionManager.h>
@@ -68,9 +67,10 @@ QtWin::QtWin(Application &app) :
   findAndReplaceDialog(true), fileDialog(*this),
   taskCompleteEvent(0), app(app), options(app.getOptions()),
   connectionManager(new ConnectionManager(options)),
-  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0), dirty(false),
-  simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
-  autoPlay(false), autoClose(false), sliderMoving(false) {
+  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0),
+  dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
+  lastStatusActive(false), autoPlay(false), autoClose(false),
+  sliderMoving(false) {
 
   ui->setupUi(this);
 
@@ -305,8 +305,8 @@ void QtWin::loadExamples() {
           string name = it->first;
           string path = it->second;
 
-          QAction *action = menu->addAction(name.c_str());
-          action->setToolTip(path.c_str());
+          QAction *action = menu->addAction(QString::fromUtf8(name.c_str()));
+          action->setToolTip(QString::fromUtf8(path.c_str()));
           connect(action, SIGNAL(triggered()), this,
                   SLOT(on_actionExamples_triggered()));
         }
@@ -454,12 +454,14 @@ void QtWin::showMessage(const string &msg, double timeout) {
 
 
 void QtWin::message(const string &msg) {
-  QMessageBox::information(this, "CAMotics", msg.c_str(), QMessageBox::Ok);
+  QMessageBox::information
+    (this, "CAMotics", QString::fromUtf8(msg.c_str()), QMessageBox::Ok);
 }
 
 
 void QtWin::warning(const string &msg) {
-  QMessageBox::warning(this, "CAMotics", msg.c_str(), QMessageBox::Ok);
+  QMessageBox::warning
+    (this, "CAMotics", QString::fromUtf8(msg.c_str()), QMessageBox::Ok);
 }
 
 
@@ -497,14 +499,16 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   }
 
   // Simulation
-  sim =
-    project->makeSim(toolPath, view->getTime(), options["threads"].toInteger());
+  project->path = toolPath;
+  project->time = view->getTime();
+  project->threads = options["threads"].toInteger();
+  project->workpiece = project->getWorkpieceBounds();
 
   // Load surface
   surface.release();
   view->setSurface(0);
   view->setMoveLookup(0);
-  taskMan.addTask(new SurfaceTask(sim));
+  taskMan.addTask(new SurfaceTask(*project));
 }
 
 
@@ -525,7 +529,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 
 void QtWin::surfaceComplete(SurfaceTask &task) {
   simRun = task.getSimRun();
-  surface = simRun->getSurface();
+  surface = task.getSurface();
   if (surface.isNull()) simRun.release();
 
   view->setSurface(surface);
@@ -572,6 +576,7 @@ void QtWin::reload(bool now) {
     simDirty = true;
     return;
   }
+
   simDirty = false;
 
   // Reset console
@@ -638,21 +643,22 @@ void QtWin::snapshot() {
   filename = openFile("Save snapshot", fileTypes, filename, true);
   if (filename.empty()) return;
 
-  if (!pixmap.save(filename.c_str())) warning("Failed to save snapshot.");
+  if (!pixmap.save(QString::fromUtf8(filename.c_str())))
+    warning("Failed to save snapshot.");
   else showMessage("Snapshot saved.");
 }
 
 
 void QtWin::exportData() {
   // Check what we have to export
-  if (surface.isNull() && gcode.isNull() && sim.isNull()) {
+  if (surface.isNull() && gcode.isNull() && project.isNull()) {
     warning("Nothing to export.\nRun a simulation first.");
     return;
   }
 
   exportDialog.enableSurface(!surface.isNull());
   exportDialog.enableGCode(!gcode.isNull());
-  exportDialog.enableSimData(!sim.isNull());
+  exportDialog.enableSimData(!project.isNull());
 
   // Run dialog
   if (exportDialog.exec() != QDialog::Accepted) return;
@@ -669,7 +675,7 @@ void QtWin::exportData() {
 
   } else if (exportDialog.gcodeSelected()) {
     title += "GCode";
-    fileTypes = "GCode Files (*.gcode, *.nc, *.ngc)";
+    fileTypes = "GCode Files (*.gcode, *.nc, *.ngc *.tap)";
     ext = "gcode";
 
   } else {
@@ -689,7 +695,7 @@ void QtWin::exportData() {
 
   // Export
   if (exportDialog.surfaceSelected()) {
-    string hash = sim.isNull() ? "" : sim->computeHash();
+    string hash = project.isNull() ? "" : project->computeHash();
     bool binary = exportDialog.binarySTLSelected();
     surface->writeSTL(*stream, binary, "CAMotics Surface", hash);
 
@@ -698,10 +704,33 @@ void QtWin::exportData() {
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());
-    sim->write(writer);
+    project->write(writer, true);
     writer.close();
   }
 }
+
+
+bool QtWin::runNewProjectDialog() {
+  // Initialize dialog
+  newProjectDialog.setUnits(getDefaultUnits());
+
+  // Run dialog
+  return newProjectDialog.exec() == QDialog::Accepted;
+}
+
+
+ToolTable QtWin::getNewToolTable() {
+  if (newProjectDialog.defaultToolTableSelected())
+    return loadDefaultToolTable();
+
+  if (newProjectDialog.currentToolTableSelected())
+    return project.isNull() ? ToolTable() : project->getToolTable();
+
+  return ToolTable();
+}
+
+
+ToolUnits QtWin::getNewUnits() {return newProjectDialog.getUnits();}
 
 
 string QtWin::openFile(const string &title, const string &filters,
@@ -715,6 +744,7 @@ string QtWin::openFile(const string &title, const string &filters,
 
 
 void QtWin::loadProject() {
+  toolsChanged();
   updateFiles();
   project->markClean();
 }
@@ -734,10 +764,18 @@ void QtWin::newProject() {
 
   LOG_INFO(1, "New project");
 
+  if (!runNewProjectDialog()) return;
+
+  // Save tool table before resetting project
+  ToolTable toolTable = getNewToolTable();
+  ToolUnits units = getNewUnits();
+
+  // Create new project
   resetProject();
   project = new Project(options);
+  project->setUnits(units);
+  project->getToolTable() = toolTable;
 
-  loadProjectDefaults();
   reload();
   loadProject();
 }
@@ -770,7 +808,7 @@ void QtWin::openProject(const string &_filename) {
 
   if (filename.empty()) {
     filename = openFile("Open File", "Supported Files (*.xml *.nc *.ngc "
-                        "*.gcode *.tpl);;All Files (*.*)", "", false);
+                        "*.gcode *.tap *.tpl);;All Files (*.*)", "", false);
     if (filename.empty()) return;
   }
 
@@ -806,15 +844,22 @@ void QtWin::openProject(const string &_filename) {
     if (xml) project = new Project(options, filename);
     else {
       // Assume TPL or G-Code and create a new project with the file
+
+      if (!runNewProjectDialog()) return;
+
+      // Save tool table before resetting project
+      ToolTable toolTable = getNewToolTable();
+      ToolUnits units = getNewUnits();
+
       project = new Project(options);
       project->addFile(filename);
-
-      loadProjectDefaults();
+      project->setUnits(units);
+      project->getToolTable() = toolTable;
     }
   } CATCH_ERROR;
 
-  reload();
   view->path->setByRatio(1);
+  reload();
   loadProject();
 }
 
@@ -864,19 +909,13 @@ void QtWin::revertProject() {
 }
 
 
-void QtWin::loadProjectDefaults() {
-  // Units
-  ToolUnits units =
-    (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
-  project->setUnits(units);
-
-  // Tool table
-  loadDefaultToolTable();
+bool QtWin::isMetric() const {
+  return project.isNull() || project->isMetric();
 }
 
 
-bool QtWin::isMetric() const {
-  return project.isNull() || project->isMetric();
+ToolUnits QtWin::getDefaultUnits() const {
+  return (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
 }
 
 
@@ -884,7 +923,8 @@ void QtWin::updateFiles() {
   QStringList list;
 
   for (unsigned i = 0; i < project->getFileCount(); i++)
-    list.append(QString(project->getFile(i)->getRelativePath().c_str()));
+    list.append(QString::fromUtf8
+                (project->getFile(i)->getRelativePath().c_str()));
 
   ui->filesListView->setModel(new QStringListModel(list));
 }
@@ -896,7 +936,8 @@ void QtWin::newFile(bool tpl) {
 
   filename = openFile(tpl ? "New TPL file" : "New GCode file",
                       tpl ? "TPL (*.tpl);;All files (*.*)" :
-                      "GCode (*.nc *.ngc *.gcode);;All files", filename, false);
+                      "GCode (*.nc *.ngc *.gcode *.tap);;All files", filename,
+                      false);
   if (filename.empty()) return;
 
   string ext = SystemUtilities::extension(filename);
@@ -917,8 +958,9 @@ void QtWin::newFile(bool tpl) {
 
 
 void QtWin::addFile() {
-  string filename = openFile("Add file", "Supported Files (*.nc *.ngc "
-                             "*.gcode *.tpl);;All Files (*.*)", "", false);
+  string filename =
+    openFile("Add file", "Supported Files (*.nc *.ngc "
+             "*.gcode *.tap *.tpl);;All Files (*.*)", "", false);
   if (filename.empty()) return;
 
   project->addFile(filename);
@@ -977,7 +1019,7 @@ void QtWin::updateActions() {
   } else {
     SmartPointer<NCFile> file = ui->fileTabManager->getFile(tab);
     string basename = SystemUtilities::basename(file->getAbsolutePath());
-    QString title = QString(basename.c_str());
+    QString title = QString::fromUtf8(basename.c_str());
 
     bool modified = ui->fileTabManager->isModified(tab);
     bool exists = file->exists();
@@ -1114,34 +1156,29 @@ void QtWin::importToolTable() {
 }
 
 
-void QtWin::saveDefaultToolTable() {
-  if (project.isNull()) return;
-
+void QtWin::saveDefaultToolTable(const ToolTable &tools) {
   ostringstream str;
-  str << project->getToolTable() << flush;
-  string tools = str.str();
+  str << tools << flush;
 
   QSettings settings;
-  settings.setValue("ToolTable/Default", tools.c_str());
+  settings.setValue("ToolTable/Default", QString::fromUtf8(str.str().c_str()));
 
   showMessage("Default tool table saved");
 }
 
 
-void QtWin::loadDefaultToolTable() {
-  if (project.isNull()) return;
-
+ToolTable QtWin::loadDefaultToolTable() {
   QSettings settings;
   QByteArray data = settings.value("ToolTable/Default").toString().toUtf8();
 
-  if (data.isEmpty()) return;
-
-  istringstream str(data.data());
   ToolTable tools;
-  str >> tools;
 
-  project->getToolTable() = tools;
-  toolsChanged();
+  if (!data.isEmpty()) {
+    istringstream str(data.data());
+    str >> tools;
+  }
+
+  return tools;
 }
 
 
@@ -1453,31 +1490,33 @@ void QtWin::animate() {
     dirty = view->update() || dirty;
 
     // Auto close after auto play
-    if (!autoPlay &&autoClose &&
-        !view->isFlagSet(View::PLAY_FLAG)) app.requestExit();
+    if (!autoPlay && autoClose && !view->isFlagSet(View::PLAY_FLAG))
+      app.requestExit();
 
     if (dirty) redraw(true);
     if (simDirty) reload(true);
 
     // Update progress
-    double progress = taskMan.getProgress();
-    string status = taskMan.getStatus();
-    if (lastProgress != progress || lastStatus != status) {
-      lastProgress = progress;
-      lastStatus = status;
+    if (!view->isFlagSet(View::PLAY_FLAG)) {
+      double progress = taskMan.getProgress();
+      string status = taskMan.getStatus();
+      if (lastProgress != progress || lastStatus != status) {
+        lastProgress = progress;
+        lastStatus = status;
 
-      if (progress) {
-        double eta = taskMan.getETA();
-        ui->progressBar->setValue(10000 * progress);
-        string s = String::printf("%.2f%% ", progress * 100);
-        if (eta) s += TimeInterval(eta).toString();
-        ui->progressBar->setFormat(s.c_str());
+        if (progress) {
+          double eta = taskMan.getETA();
+          ui->progressBar->setValue(10000 * progress);
+          string s = String::printf("%.2f%% ", progress * 100);
+          if (eta) s += TimeInterval(eta).toString();
+          ui->progressBar->setFormat(QString::fromUtf8(s.c_str()));
 
-        showMessage("Progress: " + s);
+          showMessage("Progress: " + s);
 
-      } else {
-        ui->progressBar->setValue(0);
-        ui->progressBar->setFormat(status.c_str());
+        } else {
+          ui->progressBar->setValue(0);
+          ui->progressBar->setFormat(QString::fromUtf8(status.c_str()));
+        }
       }
     }
 
@@ -1503,26 +1542,36 @@ void QtWin::on_fileTabManager_currentChanged(int index) {
 
 
 void QtWin::on_positionSlider_valueChanged(int position) {
+  if (Math::isnan(view->path->getTimeRatio())) return;
+
   double ratio = position / 10000.0;
 
   view->path->setByRatio(ratio);
   redraw();
 
-  if (simRun.isNull() || sliderMoving) return;
+  if (sliderMoving) return;
+  if (view->isFlagSet(View::PLAY_FLAG) && lastStatusActive) return;
+  if (simRun.isNull()) {
+    reload();
+    return;
+  }
 
   simRun->setEndTime(ratio * view->path->getTotalTime());
 
+  setStatusActive(true);
   taskMan.addTask(new SurfaceTask(simRun));
 }
 
 
 void QtWin::on_positionSlider_sliderPressed() {
   sliderMoving = true;
+  view->setFlag(View::TRANSLUCENT_SURFACE_FLAG);
 }
 
 
 void QtWin::on_positionSlider_sliderReleased() {
   sliderMoving = false;
+  view->clearFlag(View::TRANSLUCENT_SURFACE_FLAG);
   on_positionSlider_valueChanged(ui->positionSlider->value());
 }
 
@@ -1744,6 +1793,16 @@ void QtWin::on_actionSaveFileAs_triggered() {
 
 void QtWin::on_actionRevertFile_triggered() {
   ui->fileTabManager->revert();
+}
+
+
+void QtWin::on_actionSaveDefaultToolTable_triggered() {
+  if (!project.isNull()) saveDefaultToolTable(project->getToolTable());
+}
+
+
+void QtWin::on_actionLoadDefaultToolTable_triggered() {
+  if (!project.isNull()) project->getToolTable() = loadDefaultToolTable();
 }
 
 
