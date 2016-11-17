@@ -21,8 +21,6 @@
 #ifndef TPLANG_MATRIX_MODULE_H
 #define TPLANG_MATRIX_MODULE_H
 
-#include "TPLContext.h"
-
 #include <camotics/machine/MachineMatrix.h>
 #include <camotics/machine/MachineEnum.h>
 
@@ -30,32 +28,38 @@
 
 
 namespace tplang {
+  class TPLContext;
+
   class MatrixModule : public cb::js::Module, public CAMotics::MachineEnum {
     TPLContext &ctx;
-    CAMotics::MachineMatrix &matrix;
+    CAMotics::MachineMatrix *matrix;
 
   public:
     MatrixModule(TPLContext &ctx);
 
-    void define(cb::js::ObjectTemplate &exports);
+    // From cb::js::Module
+    const char *getName() const {return "matrix";}
+    void define(cb::js::Sink &exports);
+
+    CAMotics::MachineMatrix &getMatrix();
 
     // Javascript call backs
-    cb::js::Value pushMatrixCB(const cb::js::Arguments &args);
-    cb::js::Value popMatrixCB(const cb::js::Arguments &args);
-    cb::js::Value loadIdentityCB(const cb::js::Arguments &args);
-    cb::js::Value scaleCB(const cb::js::Arguments &args);
-    cb::js::Value translateCB(const cb::js::Arguments &args);
-    cb::js::Value rotateCB(const cb::js::Arguments &args);
-    cb::js::Value setMatrixCB(const cb::js::Arguments &args);
-    cb::js::Value getMatrixCB(const cb::js::Arguments &args);
+    void pushMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void popMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void loadIdentityCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void scaleCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void translateCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void rotateCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void setMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void getMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
 
-    cb::js::Value getXYZ(const cb::js::Arguments &args);
-    cb::js::Value getX(const cb::js::Arguments &args);
-    cb::js::Value getY(const cb::js::Arguments &args);
-    cb::js::Value getZ(const cb::js::Arguments &args);
+    void getXYZ(const cb::js::Value &args, cb::js::Sink &sink);
+    void getX(const cb::js::Value &args, cb::js::Sink &sink);
+    void getY(const cb::js::Value &args, cb::js::Sink &sink);
+    void getZ(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
-    axes_t parseMatrix(const cb::js::Arguments &args);
+    axes_t parseMatrix(const cb::js::Value &args);
   };
 }
 

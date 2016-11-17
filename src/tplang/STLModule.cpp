@@ -1,120 +1,342 @@
+/******************************************************************************\
+
+    CAMotics is an Open-Source simulation and CAM software.
+    Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+\******************************************************************************/
+
 #include "STLModule.h"
+#include "TPLContext.h"
 
-using namespace cb;
+#include <camotics/stl/STLReader.h>
+#include <camotics/stl/Facet.h>
+
+#include <cbang/io/InputSource.h>
+#include <cbang/os/SystemUtilities.h>
+#include <cbang/geom/Segment.h>
+#include <cbang/geom/Rectangle.h>
+#include <cbang/log/Logger.h>
+
+#include <limits>
+#include <list>
+#include <vector>
+#include <cmath>
+
 using namespace tplang;
-using namespace CAMotics;
+using namespace cb;
+using namespace std;
 
-void STLModule::define(js::ObjectTemplate &exports) {
-  exports.set("makeContour(level,fileName)", this, &STLModule::makeContourCB);
-}
 
-bool isBetween(float level,float z1,float z2) {
-  if (((z1 >= level) && (level >= z2)) || ((z2 >= level) && (level >= z1))) return true;
-  return false;
-}
-
-float distanceBetweenPoints(cb::Vector2F &p1,cb::Vector2F &p2) {
-  float distance;
-  distance = std::sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) +
-                       (p1[1] - p2[1]) * (p1[1] - p2[1]));
-  if (distance < 0.001) return(0.0);
-  return(distance);
-};
-
-bool getSegment(float level,
-                cb::Vector3F &normal,
-                cb::Vector3F &v1,cb::Vector3F &v2,cb::Vector3F &v3,
-                cb::Vector2F &p1,cb::Vector2F &p2) {
-  float ratio;
-  bool p1Taken, p2Taken;
-  //skip facets that lay on the "level" plane
-  if (v1[2] == level && v2[2] == level && v3[2] == level) return(false);
-  //skip faces with and edge on the "level" plane and hang down
-  if (((v1[2] == level) && (v2[2] == level) && (v3[2] < level)) ||
-      ((v1[2] == level) && (v3[2] == level) && (v2[2] < level)) ||
-      ((v2[2] == level) && (v3[2] == level) && (v1[2] < level))) return(false);
-  p1Taken = false;
-  p2Taken = false;
-  if (isBetween(level,v1[2],v2[2])) {
-    if(v1[2] == v2[2]) { //edge is on the plane
-      if(v3[1] > level) return(false);
-      p1[0] = v1[0];
-      p1[1] = v1[1];
-      p2[0] = v2[0];
-      p2[1] = v2[1];
-      return(true);
-    };
-    ratio = (level - v2[2])/(v1[2] - v2[2]);
-    p1[0] = v2[0] + ratio * (v1[0] - v2[0]);
-    p1[1] = v2[1] + ratio * (v1[1] - v2[1]);
-    p1Taken = true;
+namespace {
+  bool isBetween(float level, float z1, float z2) {
+    return (z1 <= level && level <= z2) || (z2 <= level && level <= z1);
   }
-  if (isBetween(level,v2[2],v3[2])) {
-    if(v2[2] == v3[2]) { //edge is on the plane
-      if(v1[1] > level) return(false);
-      p1[0] = v2[0];
-      p1[1] = v2[1];
-      p2[0] = v3[0];
-      p2[1] = v3[1];
-      return(true);
-    };
-    ratio = (level - v3[2])/(v2[2] - v3[2]);
-    if(!p1Taken) {
-      p1[0] = v3[0] + ratio * (v2[0] - v3[0]);
-      p1[1] = v3[1] + ratio * (v2[1] - v3[1]);
+
+
+  float distanceBetweenPoints(const Vector2F &p1, const Vector2F &p2) {
+    float distance = p1.distance(p2);
+    return distance < 0.001 ? 0 : distance;
+  }
+
+
+  bool findSegment(float level, const CAMotics::Facet &f, Vector2F &p1,
+                   Vector2F &p2) {
+    // skip facets that lay on the "level" plane
+    if (f[0].z() == level && f[1].z() == level && f[2].z() == level)
+      return false;
+
+    // skip faces with an edge on the "level" plane and hang down
+    if ((f[0].z() == level && f[1].z() == level && f[2].z() < level) ||
+        (f[0].z() == level && f[2].z() == level && f[1].z() < level) ||
+        (f[1].z() == level && f[2].z() == level && f[0].z() < level))
+      return false;
+
+    bool p1Taken = false;
+    bool p2Taken = false;
+
+    if (isBetween(level, f[0].z(), f[1].z())) {
+      if (f[0].z() == f[1].z()) { // edge is on the plane
+        if (f[2].y() > level) return false;
+
+        p1 = f[0].slice<2>();
+        p2 = f[1].slice<2>();
+
+        return true;
+      }
+
+      float ratio = (level - f[1].z()) / (f[0].z() - f[1].z());
+      p1 = (f[1] + (f[0] - f[1]) * ratio).slice<2>();
       p1Taken = true;
-    } else {
-      p2[0] = v3[0] + ratio * (v2[0] - v3[0]);
-      p2[1] = v3[1] + ratio * (v2[1] - v3[1]);
-      p2Taken = true;
+    }
+
+    if (isBetween(level, f[1].z(), f[2].z())) {
+      if (f[1].z() == f[2].z()) { // edge is on the plane
+        if (f[0].y() > level) return false;
+
+        p1 = f[1].slice<2>();
+        p2 = f[2].slice<2>();
+
+        return true;
+      }
+
+      float ratio = (level - f[2].z()) / (f[1].z() - f[2].z());
+
+      if (!p1Taken) {
+        p1 = (f[2] + (f[1] - f[2]) * ratio).slice<2>();
+        p1Taken = true;
+
+      } else {
+        p2 = (f[2] + (f[1] - f[2]) * ratio).slice<2>();
+        p2Taken = true;
+      }
+    }
+
+    if (!p1Taken) return false;
+
+    if (isBetween(level, f[2].z(), f[0].z())) {
+      float ratio = (level - f[0].z()) / (f[2].z() - f[0].z());
+
+      if (!p2Taken) {
+        p2 = (f[0] + (f[2] - f[0]) * ratio).slice<2>();
+        p2Taken = true;
+      }
+    }
+
+    if (!p2Taken) return false;
+    return distanceBetweenPoints(p1, p2); // don't return single point segs
+  }
+
+
+  void swap(Vector2F &p1, Vector2F &p2) {
+    Vector2F temp = p1;
+    p1 = p2;
+    p2 = temp;
+  }
+
+
+  bool isEqual(float x, float y) {
+    if (y) return fabs((x - y) / y) < 0.00001;
+    return fabs(x) < 0.00001;
+  }
+
+
+  void append(js::Sink &sink, const Vector2F &v) {
+    sink.appendDict();
+    sink.insert("X", v.x());
+    sink.insert("Y", v.y());
+    sink.endDict();
+  }
+
+
+  void append(js::Sink &sink, const Vector3F &v) {
+    sink.appendList();
+    for (int i = 0; i < 3; i++) sink.append(v[i]);
+    sink.endList();
+  }
+
+
+  Vector3F toVector3F(const js::Value &value) {
+    return Vector3F(value.getNumber(0), value.getNumber(1), value.getNumber(2));
+  }
+
+
+  void readFacets(vector<CAMotics::Facet> &out, const js::Value &in) {
+    unsigned length = in.length();
+    CAMotics::Facet f;
+
+    for (unsigned i = 0; i < length; i++) {
+      SmartPointer<js::Value> facet = in.get(i);
+
+      for (unsigned j = 0; j < 3; j++)
+        f[j] = toVector3F(*facet->get(j));
+
+      f.getNormal() = toVector3F(*facet->get(3));
+
+      out.push_back(f);
     }
   }
-  if(!p1Taken) return(false);
-  if (isBetween(level,v3[2],v1[2])) {
-    ratio = (level - v1[2])/(v3[2] - v1[2]);
-    if(!p2Taken) {
-      p2[0] = v1[0] + ratio * (v3[0] - v1[0]);
-      p2[1] = v1[1] + ratio * (v3[1] - v1[1]);
-      p2Taken = true;
-    };
-  };
-  if (!p2Taken) {
-    return(false);
-  };
-  if(distanceBetweenPoints(p1,p2) == 0.0) return(false); //don't return single point segs
-  return(true);
-};
 
-void swap(cb::Vector2F &p1,cb::Vector2F &p2) {
-  float temp[2];
-  temp[0] = p1[0], temp[1] = p1[1];
-  p1[0] = p2[0], p1[1] = p2[1];
-  p2[0] = temp[0], p2[1] = temp[1];
-};
 
-bool IsEqual(float x, float y) {
-  if (y == 0.0) {
-    if (fabs(x) < 0.00001) return true;
-    else return false;
-  };
-  if (fabs((x-y)/y) < .00001) return true;
-  return false;
-};
+  void contourLevel(js::Sink &sink, const vector<CAMotics::Facet> &facets,
+                    float level) {
+    // Find segments
+    typedef list<Segment2F> segments_t;
+    segments_t segments;
 
-struct SEG {
-  cb::Vector2F p1;
-  cb::Vector2F p2;
-};
-  
+    for (unsigned i = 0; i < facets.size(); i++) {
+      const CAMotics::Facet &f = facets[i];
+      Vector2F p1, p2;
 
-/* makeContourCB creates a list of all contours at the level given by "level".
- * 
+      if ((level < f[0].z() && level < f[1].z() && level < f[2].z()) ||
+          (f[0].z() < level && f[1].z() < level && f[2].z() < level))
+        continue;
+
+      if (findSegment(level, f, p1, p2)) {
+        if (isEqual(p1.x(), p2.x())) {
+          if (p1.y() < p2.y()) {
+            if (f.getNormal().x() < 0) swap(p1, p2);
+          } else if (0 < f.getNormal().x()) swap(p1, p2);
+
+        } else if (isEqual(p1.y(), p2.y())) {
+          if (p1.x() < p2.x()) {
+            if (0 < f.getNormal().y()) swap(p1, p2);
+          } else if (f.getNormal().y() < 0) swap(p1, p2);
+
+        } else if (p1.x() < p2.x() && p1.y() < p2.y()) {
+          if (f.getNormal().x() < 0) swap(p1, p2);
+
+        } else if (p2.x() < p1.x() && p2.y() < p1.y()) {
+          if (0 < f.getNormal().x()) swap(p1, p2);
+
+        } else if (p1.x() < p2.x() && p2.y() < p1.y()) {
+          if (0 < f.getNormal().x()) swap(p1, p2);
+
+        } else if (f.getNormal().x() < 0) swap(p1, p2);
+
+        Segment2F seg(p1, p2);
+        segments.push_back(seg);
+      }
+    }
+
+    // Link segments
+    bool inLoop = false;
+    Vector2F first;
+    Vector2F last;
+
+    sink.beginList();
+
+    while (!segments.empty()) {
+      // Start new loop
+      if (!inLoop) {
+        inLoop = true;
+        first = segments.begin()->getStart();
+        last = segments.begin()->getEnd();
+
+        sink.appendList();
+
+        append(sink, first);
+        append(sink, last);
+
+        segments.erase(segments.begin());
+      }
+
+      // Find next closest segment
+      float best = numeric_limits<float>::max();
+      segments_t::iterator closestIt = segments.end();
+
+      segments_t::iterator it;
+      for (it = segments.begin(); it != segments.end(); it++) {
+        float dist = distanceBetweenPoints(last, it->getStart());
+
+        if (dist < best) {
+          closestIt = it;
+          best = dist;
+        }
+      }
+
+      // Add it
+      if (closestIt != segments.end()) {
+        last = closestIt->getEnd();
+        append(sink, last);
+        segments.erase(closestIt);
+      }
+
+      // Detect end of loop
+      if (segments.empty() || !distanceBetweenPoints(last, first)) {
+        sink.endList();
+        inLoop = false;
+      }
+    }
+
+    sink.endList();
+  }
+}
+
+
+STLModule::STLModule(TPLContext &ctx) : ctx(ctx) {}
+
+
+void STLModule::define(js::Sink &exports) {
+  exports.insert("open(path)", this, &STLModule::open);
+  exports.insert("bounds(stl)", this, &STLModule::bounds);
+  exports.insert("contour(stl, level, start, end, steps)", this,
+                 &STLModule::contour);
+}
+
+
+void STLModule::open(const js::Value &args, js::Sink &sink) {
+  // Read STL
+  CAMotics::STLReader reader(ctx.relativePath(args.getString("path")));
+
+  // Header
+  string name;
+  string hash;
+  reader.readHeader(name, hash);
+
+  sink.beginDict();
+  sink.insert("name", name);
+  sink.insert("hash", hash);
+
+  // Facets
+  sink.insertList("facets");
+
+  while (reader.hasMore()) {
+    Vector3F v[3];
+    Vector3F normal;
+    reader.readFacet(v[0], v[1], v[2], normal);
+
+    sink.appendList();
+    for (int i = 0; i < 3; i++) append(sink, v[i]);
+    append(sink, normal);
+    sink.endList();
+  }
+
+  sink.endList();
+  sink.endDict();
+}
+
+
+void STLModule::bounds(const js::Value &args, js::Sink &sink) {
+  SmartPointer<js::Value> facets = args.get("stl")->get("facets");
+  Rectangle3F bounds;
+
+  unsigned length = facets->length();
+  for (unsigned i = 0; i < length; i++) {
+    SmartPointer<js::Value> facet = facets->get(i);
+
+    for (unsigned j = 0; j < 3; j++)
+      bounds.add(toVector3F(*facet->get(j)));
+  }
+
+  sink.beginList();
+  append(sink, bounds.getMin());
+  append(sink, bounds.getMax());
+  sink.endList();
+}
+
+
+/***
+ * Creates a list of all contours at the level given by "level".
+ *
  * It starts by loading each facet and looking at each edge of the triangle
  * to determine whether the facet crosses "level".
- * 
+ *
  * If so, it determines the line segment that is formed by the intersection
  * of z = level and the facet.
- * 
+ *
  * It uses normal to determine the direction of the line segment (i.e. which
  * is x1,y1 and which is x2,y2).  When traveling from x1,y1 to x2,y2, the normal
  * vector must always lean to the right to ensure that the polygon progresses
@@ -128,106 +350,44 @@ struct SEG {
  *
  * If any polygons fail to close (within tolerance), an error is generated.
  *
- * The returned string is of the form [[{X: x1, Y: y1},...{X: xn, Y: yn}],
- * ...[{X: x1, Y: y1},...{X: xn, Y: yn}]]
- */  
-js::Value STLModule::makeContourCB(const js::Arguments &args) {
-  SEG seg;
-  std::vector<SEG> segments;
-  std::vector<SEG>::iterator itr;
-  float level = args.getNumber("level");
-  cb::Vector3F v1, v2, v3, normal;
-  cb::Vector2F p1, p2, first, last;
-  std::ostringstream returnString;
-  std::string name;
-  std::string hash;
-  try {
-    InputSource s = InputSource((const std::string &) args.getString("fileName"));
-    reader = new STLReader(s);
-    reader->readHeader(name,hash);
-  } catch (...) {
-    delete reader;
-    reader = NULL;
-    return("Error, can't open file");
-  }  
-  returnString << "";
-  while(reader->hasMore()) {
-    reader->readFacet(v1,v2,v3,normal);
-    if(((v1[2] > level) && (v2[2] > level) && (v3[2] > level)) ||
-       ((v1[2] < level) && (v2[2] < level) && (v3[2] < level))) { continue;};
+ * The returned data is of the form:
+ *
+ *  [
+ *    [{X: x1, Y: y1}, . . ., {X: xn, Y: yn}],
+ *    . . .
+ *    [{X: x1, Y: y1}, . . ., {X: xn, Y: yn}]
+ *  ]
+ */
+void STLModule::contour(const js::Value &args, js::Sink &sink) {
+  // Read facets
+  vector<CAMotics::Facet> facets;
+  readFacets(facets, *args.get("stl")->get("facets"));
 
-    if(getSegment(level,normal,v1,v2,v3,p1,p2)) {
-      if (IsEqual(p1[0],p2[0])) {
-        if (p1[1] < p2[1]) {
-          if (normal[0] < 0) swap(p1,p2);
-        } else {
-          if (normal[0] > 0) swap(p1,p2);
-        }
-      } else if (IsEqual(p1[1],p2[1])) {
-        if (p1[0] < p2[0]) {
-          if (normal[1] > 0) swap(p1,p2);
-        } else {
-          if (normal[1] < 0) swap(p1,p2);        
-        }       
-      } else if (p1[0] < p2[0] && p1[1] < p2[1]) {
-        if(normal[0] < 0) swap(p1,p2);
-      } else if (p1[0] > p2[0] && p1[1] > p2[1]) {
-        if (normal[0] > 0) swap(p1,p2);
-      } else if (p1[0] < p2[0] && p1[1] > p2[1]) {
-        if (normal[0] > 0) swap(p1,p2);
-      } else {
-        if (normal[0] < 0) swap(p1,p2);
-      }
-      seg.p1[0] = p1[0],seg.p1[1] = p1[1],seg.p2[0] = p2[0],seg.p2[1] = p2[1];
-      if (segments.capacity() < segments.size() + 10) segments.reserve(segments.capacity() + 100);
-      segments.push_back(seg);
-    };
-  };
-  delete reader;
-  reader = NULL;
-  returnString << "[";
-  if (segments.size() == 0) {
-    returnString << "]";
-    return (returnString.str());
-  };
-  returnString << "[";
-  first = segments.begin()->p1;
-  last = segments.begin()->p2;
-  returnString << "{\"X\": " << first[0] << ",\"Y\": " << first[1] << "}, ";
-  returnString << "{\"X\": " << last[0] << ",\"Y\": " << last[1] << "}";
-  segments.erase(segments.begin());
-  float d1, d2;
-  std::vector<SEG>::iterator tempItr, closestItr;
-  while(segments.size() > 0) {
-    if (returnString.str().size() > (returnString.str().capacity() - 100))
-      returnString.str().reserve(returnString.str().size() + 100);
-    tempItr = segments.begin();
-    d1 = distanceBetweenPoints(last,tempItr->p1);
-    closestItr = tempItr;
-    while(!(tempItr == segments.end())) {
-      tempItr++;
-      d2 = distanceBetweenPoints(last, tempItr->p1);
-      if (d2 < d1) {
-        closestItr = tempItr;
-        d1 = d2;
-      };
-    };
-    last[0] = closestItr->p2[0], last[1] = closestItr->p2[1];
-    returnString << ", {\"X\": " << last[0] << ",\"Y\": " << last[1] << "}";
-    segments.erase(closestItr);
-    if(distanceBetweenPoints(last,first) == 0) {
-      returnString << "]";
-      if (segments.size() > 0) {
-        first = segments.begin()->p1;
-        last = segments.begin()->p2;
-        returnString << ", [";
-        returnString << "{\"X\": " << first[0] << ",\"Y\": " << first[1] << "}, ";
-        returnString << "{\"X\": " << last[0] << ",\"Y\": " << last[1] << "}";
-        segments.erase(segments.begin());
-      };
-    };
+  // Process one level
+  if (args.get("level")->isNumber())
+    contourLevel(sink, facets, args.getNumber("level"));
 
-  };
-  returnString << "]";
-  return(returnString.str());
+  // Process multiple levels
+  if (args.get("start")->isNumber() && args.get("end")->isNumber() &&
+      args.get("steps")->isNumber()) {
+    float start = args.getNumber("start");
+    float end = args.getNumber("end");
+    int steps = args.getInteger("steps");
+
+    if (start == end || steps <= 1) return;
+
+    float delta = (end - start) / (steps - 1);
+
+    sink.beginList();
+    for (int i = 0; i < steps; i++) {
+      float level = start + delta * i;
+
+      sink.appendDict();
+      sink.insert("Z", level);
+      sink.beginInsert("contours");
+      contourLevel(sink, facets, level);
+      sink.endDict();
+    }
+    sink.endList();
+  }
 }

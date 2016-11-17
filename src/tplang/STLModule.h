@@ -18,37 +18,30 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_CONTOUR_MODULE_H
-#define TPLANG_CONTOUR_MODULE_H
-
-#include "TPLContext.h"
+#ifndef TPLANG_STL_MODULE_H
+#define TPLANG_STL_MODULE_H
 
 #include <cbang/js/Module.h>
-#include <cbang/io/InputSource.h>
-#include <camotics/stl/STLReader.h>
-#include <cbang/os/SystemUtilities.h>
-#include <iostream>
-#include <exception>
-#include <sstream>
-#include <vector>
-#include <cmath>
 
 
 namespace tplang {
-  class STLModule : public cb::js::Module {
-  
-  public:
-    STLModule() {
-      define(*this);
-      reader = NULL;
-    }
-    void define(cb::js::ObjectTemplate &exports);
-    // Javascript call backs
-    cb::js::Value makeContourCB(const cb::js::Arguments &args);
-    
-    CAMotics::STLReader * reader;
+  class TPLContext;
 
+  class STLModule : public cb::js::Module {
+    TPLContext &ctx;
+
+  public:
+    STLModule(TPLContext &ctx);
+
+    // From cb::js::Module
+    const char *getName() const {return "stl";}
+    void define(cb::js::Sink &exports);
+
+    // Javascript callbacks
+    void open(const cb::js::Value &args, cb::js::Sink &sink);
+    void bounds(const cb::js::Value &args, cb::js::Sink &sink);
+    void contour(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }
 
-#endif // TPLANG_CONTOUR_MODULE_H
+#endif // TPLANG_STL_MODULE_H

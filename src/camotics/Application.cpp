@@ -45,8 +45,8 @@ bool Application::_hasFeature(int feature) {
 }
 
 
-Application::Application(const string &name) :
-  cb::Application(name, _hasFeature) {
+Application::Application(const string &name, hasFeature_t hasFeature) :
+  cb::Application(name, hasFeature) {
 
   // Force 'C' locale, otherwise double parsing is messed up.
   cb::SystemUtilities::setenv("LC_NUMERIC", "C");

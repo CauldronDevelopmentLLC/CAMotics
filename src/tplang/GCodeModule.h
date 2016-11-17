@@ -21,8 +21,6 @@
 #ifndef TPLANG_GCODE_MODULE_H
 #define TPLANG_GCODE_MODULE_H
 
-#include "TPLContext.h"
-
 #include <camotics/machine/MachineUnitAdapter.h>
 #include <camotics/machine/MachineEnum.h>
 
@@ -30,34 +28,38 @@
 
 
 namespace tplang {
+  class TPLContext;
+
   class GCodeModule : public cb::js::Module, public CAMotics::MachineEnum {
     TPLContext &ctx;
-    CAMotics::MachineUnitAdapter &unitAdapter;
+    CAMotics::MachineUnitAdapter *unitAdapter;
 
   public:
-    GCodeModule(TPLContext &ctx) :
-    ctx(ctx), unitAdapter(ctx.find<CAMotics::MachineUnitAdapter>())
-    {define(*this);}
+    GCodeModule(TPLContext &ctx);
 
-    void define(cb::js::ObjectTemplate &exports);
+    // From cb::js::Module
+    const char *getName() const {return "gcode";}
+    void define(cb::js::Sink &exports);
+
+    CAMotics::MachineUnitAdapter &getUnitAdapter();
 
     // Javascript call backs
-    cb::js::Value gcodeCB(const cb::js::Arguments &args);
-    cb::js::Value rapidCB(const cb::js::Arguments &args);
-    cb::js::Value cutCB(const cb::js::Arguments &args);
-    cb::js::Value arcCB(const cb::js::Arguments &args);
-    cb::js::Value probeCB(const cb::js::Arguments &args);
-    cb::js::Value dwellCB(const cb::js::Arguments &args);
-    cb::js::Value feedCB(const cb::js::Arguments &args);
-    cb::js::Value speedCB(const cb::js::Arguments &args);
-    cb::js::Value toolCB(const cb::js::Arguments &args);
-    cb::js::Value unitsCB(const cb::js::Arguments &args);
-    cb::js::Value pauseCB(const cb::js::Arguments &args);
-    cb::js::Value toolSetCB(const cb::js::Arguments &args);
-    cb::js::Value positionCB(const cb::js::Arguments &args);
+    void gcodeCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void rapidCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void cutCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void arcCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void probeCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void dwellCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void feedCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void speedCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void toolCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void unitsCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void pauseCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void toolSetCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void positionCB(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
-    void parseAxes(const cb::js::Arguments &args, CAMotics::Axes &axes,
+    void parseAxes(const cb::js::Value &args, CAMotics::Axes &axes,
                    bool incremental = false);
   };
 }

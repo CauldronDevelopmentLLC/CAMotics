@@ -4,20 +4,26 @@ compiler: gcc
 env:
   global:
     - CBANG_HOME=$PWD/cbang
+    - CHAKRA_CORE_HOME=$PWD/ChakraCore
 
   matrix:
     - DEBUG_BUILD=1
     - DEBUG_BUILD=0
 
 install:
-  - sudo apt-get install -y libv8-dev qt4-dev-tools
+  - sudo apt-get install -y libv8-dev qt4-dev-tools libunwind-dev libicu-dev
 
 before_script:
-  - git clone https://github.com/CauldronDevelopmentLLC/cbang.git
+  - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/ChakraCore.git
+  - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
 
 script:
-  - scons -C cbang debug=$DEBUG_BUILD -j 4
-  - scons debug=$DEBUG_BUILD -j 4
+  - cd ChakraCore; ./build.sh --static -j 8
+  - mkdir tmp
+  - cd tmp; for i in $(find ../ChakraCore/Build* -name \*.a); do ar x $i; done
+  - ar rcs ChakraCore/libChakraCore.a tmp/*.o
+  - scons -C cbang debug=$DEBUG_BUILD -j 8
+  - scons debug=$DEBUG_BUILD -j 8
 
 addons:
   apt:

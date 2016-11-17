@@ -19,11 +19,6 @@
 \******************************************************************************/
 
 #include "TPLContext.h"
-#include "GCodeModule.h"
-#include "MatrixModule.h"
-#include "DXFModule.h"
-#include "ClipperModule.h"
-#include "STLModule.h"
 
 #include <cbang/Exception.h>
 #include <cbang/os/SystemUtilities.h>
@@ -35,26 +30,19 @@ using namespace tplang;
 
 TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
                        const CAMotics::Simulation &sim) :
-  js::Environment(out), machine(machine), sim(sim) {
+  gcodeMod(*this), matrixMod(*this), dxfMod(*this), stlMod(*this),
+  machine(machine), sim(sim) {
 
   // Add modules
-  SmartPointer<GCodeModule> gcodeMod = new GCodeModule(*this);
-  addModule(gcodeMod);
-  gcodeMod->define(*this);
+  define(gcodeMod);
+  define(matrixMod);
+  define(clipperMod);
+  define(dxfMod);
+  define(stlMod);
 
-  SmartPointer<MatrixModule> matrixMod = new MatrixModule(*this);
-  addModule(matrixMod);
-  matrixMod->define(*this);
-
-  SmartPointer<ClipperModule> clipperMod = new ClipperModule;
-  addModule(clipperMod);
-  clipperMod->define(*this);
-  
-  SmartPointer<STLModule> STLMod = new STLModule;
-  addModule(STLMod);
-  STLMod->define(*this);
-
-  set("_dxf", addModule(new DXFModule(*this)));
+  import("gcode", ".");
+  import("matrix", ".");
+  import("clipper", ".");
 
   // Add TPL_PATH search paths
   const char *paths = SystemUtilities::getenv("TPL_PATH");
@@ -65,10 +53,10 @@ TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
   if (home) addSearchPaths(string(home) + "/.tpl_lib");
 
   // Add system search paths
-  addSearchPaths("/usr/share/camotics/tpl_lib");
   string exeDir =
     SystemUtilities::dirname(SystemUtilities::getExecutablePath());
   addSearchPaths(exeDir + "/tpl_lib");
+  addSearchPaths("/usr/share/camotics/tpl_lib");
 #ifdef __APPLE__
   addSearchPaths(exeDir + "/../Resources/tpl_lib");
 #endif
@@ -79,19 +67,13 @@ TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
 }
 
 
-js::Module &TPLContext::addModule(const SmartPointer<js::Module> &module) {
-  modules.push_back(module);
-  return *module;
-}
-
-
 void TPLContext::pushPath(const std::string &path) {
-  Environment::pushPath(path);
+  Javascript::pushPath(path);
   machine.setLocation(FileLocation(path));
 }
 
 
 void TPLContext::popPath() {
-  Environment::popPath();
+  Javascript::popPath();
   machine.setLocation(FileLocation(getCurrentPath()));
 }

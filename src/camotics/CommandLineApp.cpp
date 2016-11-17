@@ -39,9 +39,9 @@ using namespace cb;
 using namespace CAMotics;
 
 
-CommandLineApp::CommandLineApp(const string &name) :
-  Application(name), out("-"), force(false), outputUnits(Units::METRIC),
-  defaultUnits(Units::METRIC) {
+CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
+  Application(name, hasFeature), out("-"), force(false),
+  outputUnits(Units::METRIC), defaultUnits(Units::METRIC) {
   cmdLine.addTarget("out", out, "Output filename or '-' to write "
                     "to the standard output stream");
   cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
@@ -59,6 +59,14 @@ CommandLineApp::CommandLineApp(const string &name) :
                              "overrides the 'out' option");
   opt.setType(Option::INTEGER_TYPE);
   opt.setConstraint(new MinConstraint<int>(0));
+}
+
+
+bool CommandLineApp::_hasFeature(int feature) {
+  switch (feature) {
+  case FEATURE_SIGNAL_HANDLER: return false;
+  default: return Application::_hasFeature(feature);
+  }
 }
 
 

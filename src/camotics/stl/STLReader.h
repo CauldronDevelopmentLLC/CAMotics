@@ -41,8 +41,8 @@ namespace CAMotics {
     uint32_t readHeader(std::string &name, std::string &hash);
     uint32_t getFacetCount() const {return count;}
     bool hasMore();
-    void readFacet(cb::Vector3F &v1, cb::Vector3F &v2,
-                   cb::Vector3F &v3, cb::Vector3F &normal);
+    void readFacet(cb::Vector3F &v1, cb::Vector3F &v2, cb::Vector3F &v3,
+                   cb::Vector3F &normal);
     void readFooter();
   };
 }

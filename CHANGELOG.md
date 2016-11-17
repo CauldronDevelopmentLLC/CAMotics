@@ -13,6 +13,8 @@
  - Allow entering conical tool in degrees + length. #65
  - Return all tool details in with TPL tool() function. #127
  - Surface is made translucent when moving position slider.
+ - Switched from v8 to Chakra Javascript engine due to build difficulties.
+ - Disabled signal handler on command line tools for better CTRL-C handling.
 
 ## v1.0.6:
  - 4.5x simulation speed up.

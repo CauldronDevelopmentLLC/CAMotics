@@ -21,15 +21,26 @@
 #ifndef TPLANG_TPLCONTEXT_H
 #define TPLANG_TPLCONTEXT_H
 
+#include "GCodeModule.h"
+#include "MatrixModule.h"
+#include "DXFModule.h"
+#include "ClipperModule.h"
+#include "STLModule.h"
+
 #include <camotics/machine/MachineAdapter.h>
 #include <camotics/cutsim/Simulation.h>
 
-#include <cbang/js/Environment.h>
+#include <cbang/js/Javascript.h>
 #include <cbang/config/Options.h>
 
+
 namespace tplang {
-  class TPLContext : public cb::js::Environment {
-    std::vector<cb::SmartPointer<cb::js::Module> > modules;
+  class TPLContext : public cb::js::Javascript {
+    GCodeModule gcodeMod;
+    MatrixModule matrixMod;
+    ClipperModule clipperMod;
+    DXFModule dxfMod;
+    STLModule stlMod;
 
   public:
     CAMotics::MachineInterface &machine;
@@ -37,9 +48,6 @@ namespace tplang {
 
     TPLContext(std::ostream &out, CAMotics::MachineInterface &machine,
                const CAMotics::Simulation &sim);
-
-    using cb::js::Environment::addModule;
-    cb::js::Module &addModule(const cb::SmartPointer<cb::js::Module> &module);
 
     template <typename T>
     T &find() {
@@ -49,7 +57,7 @@ namespace tplang {
       return adapter->find<T>();
     }
 
-    // From cb::js::Environment
+    // From cb::js::Javascript
     void pushPath(const std::string &path);
     void popPath();
   };

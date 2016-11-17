@@ -52,24 +52,28 @@ You will have to enter your password, possibly a few times.  When it's done
 it should print ``Success``.  Then you can run ``camotics``.
 
 ## Prerequisites
-  - C!     - http://cbang.org/
-  - Qt4    - http://qt-project.org/
-  - Cairo2 - http://cairographics.org/
-  - SCons  - http://www.scons.org/
+  - C!         - http://cbang.org/
+  - Qt4        - http://qt-project.org/
+  - Cairo2     - http://cairographics.org/
+  - SCons      - http://www.scons.org/
+  - ChakraCore - https://github.com/Microsoft/ChakraCore/
 
 On Debian based systems all the prerequisites, including thoese needed
 by C!, can be installed with the following command line:
 
     sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
       libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
-      libboost-filesystem-dev libboost-regex-dev libsqlite3-dev libv8-dev \
+      libboost-filesystem-dev libboost-regex-dev libsqlite3-dev \
       qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
+
+## Building ChakraCore
+See https://github.com/CauldronDevelopmentLLC/cbang#buliding-chakracore
 
 ## Building C!
 
 Clone the C! git repository, build the software using scons and set the
 environment variable CBANG_HOME so the CAMotics build system can find it
-later.  **You must install libv8 before this step.**
+later.  **You must install ChakraCore before this step.**
 
     git clone https://github.com/CauldronDevelopmentLLC/cbang.git
     scons -C cbang

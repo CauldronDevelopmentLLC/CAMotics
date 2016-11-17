@@ -28,7 +28,8 @@
 namespace CAMotics {
   class Application : public cb::Application, public cb::Reader {
   public:
-    Application(const std::string &name);
+    Application(const std::string &name,
+                hasFeature_t hasFeature = Application::_hasFeature);
 
     // From cb::Application
     static bool _hasFeature(int feature);
