@@ -23,8 +23,6 @@
 #include "MatrixModule.h"
 #include "DXFModule.h"
 #include "ClipperModule.h"
-
-//added by doug
 #include "STLModule.h"
 
 #include <cbang/Exception.h>
@@ -52,7 +50,6 @@ TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
   addModule(clipperMod);
   clipperMod->define(*this);
   
-  //added by doug
   SmartPointer<STLModule> STLMod = new STLModule;
   addModule(STLMod);
   STLMod->define(*this);
