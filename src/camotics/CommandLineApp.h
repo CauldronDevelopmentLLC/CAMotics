@@ -39,9 +39,11 @@ namespace CAMotics {
     cb::SmartPointer<std::ostream> stream;
 
   public:
-    CommandLineApp(const std::string &name);
+    CommandLineApp(const std::string &name,
+                   hasFeature_t hasFeature = CommandLineApp::_hasFeature);
 
     // From cb::Application
+    static bool _hasFeature(int feature);
     int init(int argc, char *argv[]);
 
     int metricAction(cb::Option &opt);
