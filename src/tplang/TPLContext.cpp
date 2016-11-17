@@ -24,6 +24,9 @@
 #include "DXFModule.h"
 #include "ClipperModule.h"
 
+//added by doug
+#include "STLModule.h"
+
 #include <cbang/Exception.h>
 #include <cbang/os/SystemUtilities.h>
 
@@ -48,6 +51,11 @@ TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
   SmartPointer<ClipperModule> clipperMod = new ClipperModule;
   addModule(clipperMod);
   clipperMod->define(*this);
+  
+  //added by doug
+  SmartPointer<STLModule> STLMod = new STLModule;
+  addModule(STLMod);
+  STLMod->define(*this);
 
   set("_dxf", addModule(new DXFModule(*this)));
 
