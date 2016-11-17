@@ -34,7 +34,7 @@ namespace tplang {
     void define(cb::js::Sink &exports);
 
     // Javascript call backs
-    void offsetCB(const cb::JSON::Value &args, cb::js::Sink &sink);
+    void offsetCB(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }
 

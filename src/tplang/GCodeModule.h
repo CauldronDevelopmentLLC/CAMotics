@@ -44,22 +44,22 @@ namespace tplang {
     CAMotics::MachineUnitAdapter &getUnitAdapter();
 
     // Javascript call backs
-    void gcodeCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void rapidCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void cutCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void arcCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void probeCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void dwellCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void feedCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void speedCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void toolCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void unitsCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void pauseCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void toolSetCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void positionCB(const cb::JSON::Value &args, cb::js::Sink &sink);
+    void gcodeCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void rapidCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void cutCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void arcCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void probeCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void dwellCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void feedCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void speedCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void toolCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void unitsCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void pauseCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void toolSetCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void positionCB(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
-    void parseAxes(const cb::JSON::Value &args, CAMotics::Axes &axes,
+    void parseAxes(const cb::js::Value &args, CAMotics::Axes &axes,
                    bool incremental = false);
   };
 }

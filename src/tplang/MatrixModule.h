@@ -44,22 +44,22 @@ namespace tplang {
     CAMotics::MachineMatrix &getMatrix();
 
     // Javascript call backs
-    void pushMatrixCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void popMatrixCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void loadIdentityCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void scaleCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void translateCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void rotateCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void setMatrixCB(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void getMatrixCB(const cb::JSON::Value &args, cb::js::Sink &sink);
+    void pushMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void popMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void loadIdentityCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void scaleCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void translateCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void rotateCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void setMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void getMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
 
-    void getXYZ(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void getX(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void getY(const cb::JSON::Value &args, cb::js::Sink &sink);
-    void getZ(const cb::JSON::Value &args, cb::js::Sink &sink);
+    void getXYZ(const cb::js::Value &args, cb::js::Sink &sink);
+    void getX(const cb::js::Value &args, cb::js::Sink &sink);
+    void getY(const cb::js::Value &args, cb::js::Sink &sink);
+    void getZ(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
-    axes_t parseMatrix(const cb::JSON::Value &args);
+    axes_t parseMatrix(const cb::js::Value &args);
   };
 }
 

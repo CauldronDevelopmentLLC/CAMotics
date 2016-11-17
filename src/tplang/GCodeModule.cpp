@@ -48,23 +48,23 @@ void GCodeModule::define(js::Sink &exports) {
 
   exports.insert("gcode(path)", this, &GCodeModule::gcodeCB);
   exports.insert("rapid(" AXES ", incremental=false)", this,
-              &GCodeModule::rapidCB);
+                 &GCodeModule::rapidCB);
   exports.insert("irapid(" AXES ", incremental=true)", this,
-              &GCodeModule::rapidCB);
+                 &GCodeModule::rapidCB);
   exports.insert("cut(" AXES ", incremental=false)", this, &GCodeModule::cutCB);
   exports.insert("icut(" AXES ", incremental=true)", this, &GCodeModule::cutCB);
   exports.insert("arc(x=0, y=0, z=0, angle, plane, incremental=true)", this,
-              &GCodeModule::arcCB);
+                 &GCodeModule::arcCB);
   exports.insert("probe(" AXES ", toward=true, error=true, index=0, port=-1, "
-          "invert=false)", this, &GCodeModule::probeCB);
+                 "invert=false)", this, &GCodeModule::probeCB);
   exports.insert("dwell(seconds)", this, &GCodeModule::dwellCB);
   exports.insert("feed(rate, mode)", this, &GCodeModule::feedCB);
   exports.insert("speed(rate, surface, max)", this, &GCodeModule::speedCB);
   exports.insert("tool(number)", this, &GCodeModule::toolCB);
   exports.insert("units(type)", this, &GCodeModule::unitsCB);
   exports.insert("pause(optional=false)", this, &GCodeModule::pauseCB);
-  exports.insert("tool_set(number, length, diameter, units, shape, snub=0)", this,
-              &GCodeModule::toolSetCB);
+  exports.insert("tool_set(number, length, diameter, units, shape, snub=0)",
+                 this, &GCodeModule::toolSetCB);
   exports.insert("position()", this, &GCodeModule::positionCB);
 
   exports.insert("FEED_INVERSE_TIME", INVERSE_TIME);
@@ -101,7 +101,7 @@ CAMotics::MachineUnitAdapter &GCodeModule::getUnitAdapter() {
 }
 
 
-void GCodeModule::gcodeCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
   string path =
     SystemUtilities::absolute(ctx.getCurrentPath(), args.getString("path"));
 
@@ -114,37 +114,37 @@ void GCodeModule::gcodeCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::rapidCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::rapidCB(const js::Value &args, js::Sink &sink) {
   Axes axes = ctx.machine.getPosition();
   parseAxes(args, axes, args.getBoolean("incremental"));
   ctx.machine.move(axes, true);
 }
 
 
-void GCodeModule::cutCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
   Axes axes = ctx.machine.getPosition();
   parseAxes(args, axes, args.getBoolean("incremental"));
   ctx.machine.move(axes);
 }
 
 
-void GCodeModule::arcCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
   // TODO Handle 'incremental=false'
 
   Vector3D
     offset(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
   double angle = args.getNumber("angle");
-  plane_t plane = args.has("plane") ? (plane_t)args.getU32("plane") : XY;
+  plane_t plane = args.has("plane") ? (plane_t)args.getInteger("plane") : XY;
 
   ctx.machine.arc(offset, angle, plane);
 }
 
 
-void GCodeModule::probeCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::probeCB(const js::Value &args, js::Sink &sink) {
   bool toward = args.getBoolean("toward");
   bool error = args.getBoolean("error");
-  uint32_t index = args.getU32("index");
-  int port = args.getU32("port");
+  uint32_t index = args.getInteger("index");
+  int port = args.getInteger("port");
   bool invert = args.getBoolean("invert");
 
   if (port == -1) port = ctx.machine.findPort(PROBE, index);
@@ -158,12 +158,12 @@ void GCodeModule::probeCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::dwellCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::dwellCB(const js::Value &args, js::Sink &sink) {
   ctx.machine.dwell(args.getNumber("seconds"));
 }
 
 
-void GCodeModule::feedCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::feedCB(const js::Value &args, js::Sink &sink) {
   // Return feed info if no arguments were given
   if (!args.has("rate")) {
     feed_mode_t mode;
@@ -179,7 +179,7 @@ void GCodeModule::feedCB(const JSON::Value &args, js::Sink &sink) {
   // Otherwise set feed
   feed_mode_t mode = MM_PER_MINUTE;
   if (args.has("mode")) {
-    mode = (feed_mode_t)args.getU32("mode");
+    mode = (feed_mode_t)args.getInteger("mode");
     switch (mode) {
     case INVERSE_TIME: case MM_PER_MINUTE: case MM_PER_REVOLUTION: break;
     default: THROW("Feed mode must be FEED_INVERSE_TIME, FEED_UNITS_PER_MIN or "
@@ -193,7 +193,7 @@ void GCodeModule::feedCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::speedCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::speedCB(const js::Value &args, js::Sink &sink) {
   // Return spindle info if no arguments were given
   if (!args.has("rate")) {
     spin_mode_t mode;
@@ -223,11 +223,11 @@ void GCodeModule::speedCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::toolCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::toolCB(const js::Value &args, js::Sink &sink) {
   int number;
 
   if (args.has("number")) {
-    number = args.getU32("number");
+    number = args.getInteger("number");
     ctx.sim.tools.get(number); // Make sure it exists
     ctx.machine.setTool(number);
 
@@ -253,11 +253,11 @@ void GCodeModule::toolCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::unitsCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::unitsCB(const js::Value &args, js::Sink &sink) {
   CAMotics::Units units = getUnitAdapter().getUnits();
 
   if (args.has("type")) {
-    switch (args.getU32("type")) {
+    switch (args.getInteger("type")) {
     case CAMotics::Units::IMPERIAL:
       getUnitAdapter().setUnits(CAMotics::Units::IMPERIAL);
       break;
@@ -271,17 +271,17 @@ void GCodeModule::unitsCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::pauseCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::pauseCB(const js::Value &args, js::Sink &sink) {
   ctx.machine.pause(args.getBoolean("optional"));
 }
 
 
-void GCodeModule::toolSetCB(const JSON::Value &args, js::Sink &sink) {
-  CAMotics::Tool &tool = ctx.sim.tools.get(args.getU32("number"));
+void GCodeModule::toolSetCB(const js::Value &args, js::Sink &sink) {
+  CAMotics::Tool &tool = ctx.sim.tools.get(args.getInteger("number"));
 
   uint32_t units;
   double scale = 1;
-  if (args.has("units")) units = args.getU32("units");
+  if (args.has("units")) units = args.getInteger("units");
   else units = getUnitAdapter().getUnits();
   if (units == CAMotics::Units::METRIC)
     tool.setUnits(CAMotics::ToolUnits::UNITS_MM);
@@ -291,7 +291,7 @@ void GCodeModule::toolSetCB(const JSON::Value &args, js::Sink &sink) {
   }
 
   if (args.has("shape"))
-    tool.setShape((CAMotics::ToolShape::enum_t)args.getU32("shape"));
+    tool.setShape((CAMotics::ToolShape::enum_t)args.getInteger("shape"));
 
   tool.setLength(scale * args.getNumber("length"));
   tool.setDiameter(scale * args.getNumber("diameter"));
@@ -299,7 +299,7 @@ void GCodeModule::toolSetCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::positionCB(const JSON::Value &args, js::Sink &sink) {
+void GCodeModule::positionCB(const js::Value &args, js::Sink &sink) {
   Axes axes = ctx.machine.getPosition();
 
   sink.beginDict();
@@ -311,7 +311,7 @@ void GCodeModule::positionCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::parseAxes(const JSON::Value &args, Axes &axes,
+void GCodeModule::parseAxes(const js::Value &args, Axes &axes,
                             bool incremental) {
   for (const char *axis ="xyzabcuvw"; *axis; axis++) {
     string name = string(1, *axis);

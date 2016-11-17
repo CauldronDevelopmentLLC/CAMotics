@@ -18,6 +18,9 @@
 
 \******************************************************************************/
 
+var _dxf = require('_dxf');
+
+
 function lpad(s, width, delim) {
   if (typeof delim == 'undefined') delim = ' ';
   while (s.length < width) s = delim + s;

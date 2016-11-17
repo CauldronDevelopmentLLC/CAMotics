@@ -54,34 +54,34 @@ CAMotics::MachineMatrix &MatrixModule::getMatrix() {
 }
 
 
-void MatrixModule::pushMatrixCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::pushMatrixCB(const js::Value &args, js::Sink &sink) {
   getMatrix().pushMatrix(parseMatrix(args));
 }
 
 
-void MatrixModule::popMatrixCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::popMatrixCB(const js::Value &args, js::Sink &sink) {
   getMatrix().popMatrix(parseMatrix(args));
 }
 
 
-void MatrixModule::loadIdentityCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::loadIdentityCB(const js::Value &args, js::Sink &sink) {
   getMatrix().loadIdentity(parseMatrix(args));
 }
 
 
-void MatrixModule::scaleCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::scaleCB(const js::Value &args, js::Sink &sink) {
   getMatrix().scale(args.getNumber("x"), args.getNumber("y"),
                     args.getNumber("z"), parseMatrix(args));
 }
 
 
-void MatrixModule::translateCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::translateCB(const js::Value &args, js::Sink &sink) {
   getMatrix().translate(args.getNumber("x"), args.getNumber("y"),
                         args.getNumber("z"), parseMatrix(args));
 }
 
 
-void MatrixModule::rotateCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::rotateCB(const js::Value &args, js::Sink &sink) {
   getMatrix().rotate(args.getNumber("angle"), args.getNumber("x"),
                      args.getNumber("y"), args.getNumber("z"),
                      args.getNumber("a"), args.getNumber("b"),
@@ -89,27 +89,27 @@ void MatrixModule::rotateCB(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void MatrixModule::setMatrixCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::setMatrixCB(const js::Value &args, js::Sink &sink) {
   THROW("Not yet implemented");
 }
 
 
-void MatrixModule::getMatrixCB(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::getMatrixCB(const js::Value &args, js::Sink &sink) {
   THROW("Not yet implemented");
 }
 
 
-MatrixModule::axes_t MatrixModule::parseMatrix(const JSON::Value &args) {
+MatrixModule::axes_t MatrixModule::parseMatrix(const js::Value &args) {
   if (!args.has("matrix")) return XYZ;
 
-  axes_t matrix = (axes_t)args.getU32("matrix");
+  axes_t matrix = (axes_t)args.getInteger("matrix");
   if (AXES_COUNT <= matrix) THROWS("Invalid matrix number " << matrix);
 
   return matrix;
 }
 
 
-void MatrixModule::getXYZ(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::getXYZ(const js::Value &args, js::Sink &sink) {
   Vector3D v = ctx.machine.getPosition(XYZ);
 
   sink.beginList();
@@ -120,16 +120,16 @@ void MatrixModule::getXYZ(const JSON::Value &args, js::Sink &sink) {
 }
 
 
-void MatrixModule::getX(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::getX(const js::Value &args, js::Sink &sink) {
   sink.write(ctx.machine.getPosition(XYZ).x());
 }
 
 
-void MatrixModule::getY(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::getY(const js::Value &args, js::Sink &sink) {
   sink.write(ctx.machine.getPosition(XYZ).y());
 }
 
 
-void MatrixModule::getZ(const JSON::Value &args, js::Sink &sink) {
+void MatrixModule::getZ(const js::Value &args, js::Sink &sink) {
   sink.write(ctx.machine.getPosition(XYZ).z());
 }

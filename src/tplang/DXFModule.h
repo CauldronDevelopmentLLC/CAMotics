@@ -38,7 +38,7 @@ namespace tplang {
     void define(cb::js::Sink &exports);
 
     // Javascript call backs
-    void openCB(const cb::JSON::Value &args, cb::js::Sink &sink);
+    void openCB(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }
 

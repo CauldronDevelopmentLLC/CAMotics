@@ -50,7 +50,7 @@ void DXFModule::define(js::Sink &exports) {
 }
 
 
-void DXFModule::openCB(const JSON::Value &args, js::Sink &sink) {
+void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
   string path =
     SystemUtilities::absolute(ctx.getCurrentPath(), args.getString("path"));
 

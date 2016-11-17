@@ -51,10 +51,10 @@ TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
   if (home) addSearchPaths(string(home) + "/.tpl_lib");
 
   // Add system search paths
-  addSearchPaths("/usr/share/camotics/tpl_lib");
   string exeDir =
     SystemUtilities::dirname(SystemUtilities::getExecutablePath());
   addSearchPaths(exeDir + "/tpl_lib");
+  addSearchPaths("/usr/share/camotics/tpl_lib");
 #ifdef __APPLE__
   addSearchPaths(exeDir + "/../Resources/tpl_lib");
 #endif

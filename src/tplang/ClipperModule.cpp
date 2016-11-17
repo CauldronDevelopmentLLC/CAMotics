@@ -39,29 +39,30 @@ void ClipperModule::define(js::Sink &exports) {
 }
 
 
-void ClipperModule::offsetCB(const JSON::Value &args, js::Sink &sink) {
-  uint32_t scale = args.getU32("scale");
+void ClipperModule::offsetCB(const js::Value &args, js::Sink &sink) {
+  int scale = args.getInteger("scale");
 
   // Convert JavaScript polys to Clipper polys
   Polygons polys;
-  const JSON::Value &jsPolys = args.getList("polys");
+  SmartPointer<js::Value> jsPolys = args.get("polys");
 
-  for (unsigned i = 0; i < jsPolys.size(); i++) {
+  for (unsigned i = 0; i < jsPolys->length(); i++) {
     polys.push_back(Polygon());
     Polygon &poly = polys.back();
-    const JSON::Value &jsPoly = jsPolys.getList(i);
+    SmartPointer<js::Value> jsPoly = jsPolys->get(i);
 
-    for (unsigned j = 0; j < jsPoly.size(); j++) {
-      const JSON::Value &jsPoint = jsPoly.getList(j);
+    for (unsigned j = 0; j < jsPoly->length(); j++) {
+      SmartPointer<js::Value> jsPoint = jsPoly->get(j);
 
-      if (jsPoint.size() != 2) THROWS("Expected 2D point");
-      poly.push_back(IntPoint(jsPoint.getNumber(0) * scale,
-                              jsPoint.getNumber(1) * scale));
+      if (jsPoint->length() != 2) THROWS("Expected 2D point");
+      poly.push_back(IntPoint(jsPoint->getNumber(0) * scale,
+                              jsPoint->getNumber(1) * scale));
     }
   }
 
   double delta = args.getNumber("delta") * scale;
-  JoinType join = args.has("join") ? jtRound : (JoinType)args.getU32("join");
+  JoinType join =
+    args.has("join") ? jtRound : (JoinType)args.getInteger("join");
   double limit = args.getNumber("limit") * scale;
   bool autoFix = args.getBoolean("autoFix");
 
