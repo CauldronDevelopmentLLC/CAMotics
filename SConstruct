@@ -68,6 +68,10 @@ if not env.GetOption('clean'):
     conf.CBConfig('cbang')
     env.CBDefine('USING_CBANG') # Using CBANG macro namespace
 
+    if not env.CBConfigEnabled('chakra'):
+        raise Exception('Chakra support is required, please rebuild C! '
+                        'and/or set CHAKRA_CORE_HOME.')
+
     env.CBDefine('GLEW_STATIC')
 
     # Qt
