@@ -34,9 +34,9 @@
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
-#include <cbang/js/Javascript.h>
 #include <cbang/io/StringInputSource.h>
 #include <cbang/json/Reader.h>
+#include <cbang/util/DefaultCatch.h>
 
 #include <vector>
 
@@ -78,7 +78,7 @@ namespace CAMotics {
 
     void requestExit() {
       Application::requestExit();
-      cb::js::Javascript::terminate();
+      // TODO terminate Javascript execution
     }
 
     // From cb::Reader
@@ -93,23 +93,5 @@ namespace CAMotics {
 
 
 int main(int argc, char *argv[]) {
-  // Look for v8 args after --
-  bool foundV8Args = false;
-
-  for (int i = 1; i < argc; i++)
-    if (string("--") == argv[i]) {
-      vector<char *> args;
-
-      args.push_back(argv[0]);
-      for (int j = i + 1; j < argc; j++) args.push_back(argv[j]);
-
-      int v8Argc = argc - i + 1;
-      cb::js::Javascript::init(&v8Argc, &args[0]);
-
-      argc = i;
-    }
-
-  if (!foundV8Args) cb::js::Javascript::init(0, 0);
-
   return cb::doApplication<CAMotics::TPLangApp>(argc, argv);
 }

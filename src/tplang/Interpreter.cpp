@@ -27,6 +27,6 @@ using namespace std;
 
 void Interpreter::read(const InputSource &source) {
   ctx.machine.start();
-  ctx.eval(source);
+  ctx.exec(source);
   ctx.machine.end();
 }

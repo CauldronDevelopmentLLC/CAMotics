@@ -21,20 +21,20 @@
 #ifndef TPLANG_CLIPPER_MODULE_H
 #define TPLANG_CLIPPER_MODULE_H
 
-#include "TPLContext.h"
-
 #include <cbang/js/Module.h>
 
 
 namespace tplang {
   class ClipperModule : public cb::js::Module {
   public:
-    ClipperModule() {define(*this);}
+    ClipperModule() {}
 
-    void define(cb::js::ObjectTemplate &exports);
+    // From cb::js::Module
+    const char *getName() const {return "clipper";}
+    void define(cb::js::Sink &exports);
 
     // Javascript call backs
-    cb::js::Value offsetCB(const cb::js::Arguments &args);
+    void offsetCB(const cb::JSON::Value &args, cb::js::Sink &sink);
   };
 }
 

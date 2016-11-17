@@ -21,25 +21,24 @@
 #ifndef TPLANG_DXFMODULE_H
 #define TPLANG_DXFMODULE_H
 
-#include "TPLContext.h"
-
 #include <cbang/js/Module.h>
 
 
 namespace tplang {
+  class TPLContext;
+
   class DXFModule : public cb::js::Module {
     TPLContext &ctx;
-    cb::js::ObjectTemplate layersTmpl;
-    cb::js::ObjectTemplate entityTmpl;
 
   public:
     DXFModule(TPLContext &ctx);
 
-    // Javascript call backs
-    cb::js::Value openCB(const cb::js::Arguments &args);
+    // From cb::js::Module
+    const char *getName() const {return "_dxf";}
+    void define(cb::js::Sink &exports);
 
-    // Entity call backs
-    cb::js::Value cutCB(const cb::js::Arguments &args);
+    // Javascript call backs
+    void openCB(const cb::JSON::Value &args, cb::js::Sink &sink);
   };
 }
 

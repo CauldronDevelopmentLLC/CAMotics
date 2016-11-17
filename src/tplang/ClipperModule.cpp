@@ -20,6 +20,8 @@
 
 #include "ClipperModule.h"
 
+#include <cbang/json/JSON.h>
+
 #include <clipper/clipper.hpp>
 
 using namespace cb;
@@ -27,61 +29,61 @@ using namespace ClipperLib;
 using namespace tplang;
 
 
-void ClipperModule::define(js::ObjectTemplate &exports) {
-  exports.set("offset(polys, delta, join, limit=1000, autoFix=true, "
-              "scale=1000000)", this, &ClipperModule::offsetCB);
+void ClipperModule::define(js::Sink &exports) {
+  exports.insert("offset(polys, delta, join, limit=1000, autoFix=true, "
+                 "scale=1000000)", this, &ClipperModule::offsetCB);
 
-  exports.set("JOIN_SQUARE", jtSquare);
-  exports.set("JOIN_ROUND", jtRound);
-  exports.set("JOIN_MITER", jtMiter);
+  exports.insert("JOIN_SQUARE", jtSquare);
+  exports.insert("JOIN_ROUND", jtRound);
+  exports.insert("JOIN_MITER", jtMiter);
 }
 
 
-js::Value ClipperModule::offsetCB(const js::Arguments &args) {
-  uint32_t scale = args.getUint32("scale");
+void ClipperModule::offsetCB(const JSON::Value &args, js::Sink &sink) {
+  uint32_t scale = args.getU32("scale");
 
   // Convert JavaScript polys to Clipper polys
   Polygons polys;
-  js::Value jsPolys = args.get("polys");
+  const JSON::Value &jsPolys = args.getList("polys");
 
-  for (int i = 0; i < jsPolys.length(); i++) {
+  for (unsigned i = 0; i < jsPolys.size(); i++) {
     polys.push_back(Polygon());
     Polygon &poly = polys.back();
-    js::Value jsPoly = jsPolys.get(i);
+    const JSON::Value &jsPoly = jsPolys.getList(i);
 
-    for (int j = 0; j < jsPoly.length(); j++) {
-      js::Value jsPoint = jsPoly.get(j);
+    for (unsigned j = 0; j < jsPoly.size(); j++) {
+      const JSON::Value &jsPoint = jsPoly.getList(j);
 
-      if (jsPoint.length() != 2) THROWS("Expected 2D point");
-      poly.push_back(IntPoint(jsPoint.get(0).toNumber() * scale,
-                              jsPoint.get(1).toNumber() * scale));
+      if (jsPoint.size() != 2) THROWS("Expected 2D point");
+      poly.push_back(IntPoint(jsPoint.getNumber(0) * scale,
+                              jsPoint.getNumber(1) * scale));
     }
   }
 
   double delta = args.getNumber("delta") * scale;
-  JoinType join = args.has("join") ? (JoinType)args.getUint32("join") : jtRound;
+  JoinType join = args.has("join") ? jtRound : (JoinType)args.getU32("join");
   double limit = args.getNumber("limit") * scale;
   bool autoFix = args.getBoolean("autoFix");
 
   OffsetPolygons(polys, polys, delta, join, limit, autoFix);
 
   // Convert Clipper result back to JavaScript
-  jsPolys = js::Value::createArray(polys.size());
+  sink.beginList();
   for (unsigned i = 0; i < polys.size(); i++) {
     Polygon &poly = polys[i];
-    js::Value jsPoly = js::Value::createArray(poly.size());
+    sink.appendList();
 
     for (unsigned j = 0; j < poly.size(); j++) {
       IntPoint &point = poly[j];
-      js::Value jsPoint = js::Value::createArray(2);
 
-      jsPoint.set(0, (double)point.X / scale);
-      jsPoint.set(1, (double)point.Y / scale);
-      jsPoly.set(j, jsPoint);
+      sink.appendList();
+      sink.append((double)point.X / scale);
+      sink.append((double)point.Y / scale);
+      sink.endList();
     }
 
-    jsPolys.set(i, jsPoly);
+    sink.endList();
   }
 
-  return jsPolys;
+  sink.endList();
 }

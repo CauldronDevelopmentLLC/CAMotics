@@ -19,118 +19,117 @@
 \******************************************************************************/
 
 #include "MatrixModule.h"
+#include "TPLContext.h"
 
 using namespace cb;
 using namespace tplang;
 
-MatrixModule::MatrixModule(TPLContext &ctx) :
-  ctx(ctx), matrix(ctx.find<CAMotics::MachineMatrix>()) {define(*this);}
+
+MatrixModule::MatrixModule(TPLContext &ctx) : ctx(ctx), matrix(0) {}
 
 
-void MatrixModule::define(js::ObjectTemplate &exports) {
-  exports.set("pushMatrix(matrix)", this, &MatrixModule::pushMatrixCB);
-  exports.set("popMatrix(matrix)", this, &MatrixModule::popMatrixCB);
-  exports.set("loadIdentity(matrix)", this, &MatrixModule::loadIdentityCB);
-  exports.set("scale(x=1, y=1, z=1, matrix)", this, &MatrixModule::scaleCB);
-  exports.set("translate(x=0, y=0, z=0, matrix)", this,
+void MatrixModule::define(js::Sink &exports) {
+  exports.insert("pushMatrix(matrix)", this, &MatrixModule::pushMatrixCB);
+  exports.insert("popMatrix(matrix)", this, &MatrixModule::popMatrixCB);
+  exports.insert("loadIdentity(matrix)", this, &MatrixModule::loadIdentityCB);
+  exports.insert("scale(x=1, y=1, z=1, matrix)", this, &MatrixModule::scaleCB);
+  exports.insert("translate(x=0, y=0, z=0, matrix)", this,
               &MatrixModule::translateCB);
-  exports.set("rotate(angle, x=0, y=0, z=1, a=0, b=0, c=0, matrix)", this,
+  exports.insert("rotate(angle, x=0, y=0, z=1, a=0, b=0, c=0, matrix)", this,
               &MatrixModule::rotateCB);
-  exports.set("setMatrix(m, matrix)", this, &MatrixModule::setMatrixCB);
-  exports.set("getMatrix(m)", this, &MatrixModule::getMatrixCB);
+  exports.insert("setMatrix(m, matrix)", this, &MatrixModule::setMatrixCB);
+  exports.insert("getMatrix(m)", this, &MatrixModule::getMatrixCB);
 
   // TODO Consider replacing these with get(X), get(Y), etc.
-  exports.set("getXYZ()", this, &MatrixModule::getXYZ);
-  exports.set("getX()", this, &MatrixModule::getX);
-  exports.set("getY()", this, &MatrixModule::getY);
-  exports.set("getZ()", this, &MatrixModule::getZ);
+  exports.insert("getXYZ()", this, &MatrixModule::getXYZ);
+  exports.insert("getX()", this, &MatrixModule::getX);
+  exports.insert("getY()", this, &MatrixModule::getY);
+  exports.insert("getZ()", this, &MatrixModule::getZ);
 }
 
 
-js::Value MatrixModule::pushMatrixCB(const js::Arguments &args) {
-  matrix.pushMatrix(parseMatrix(args));
-  return js::Value();
+CAMotics::MachineMatrix &MatrixModule::getMatrix() {
+  if (!matrix) matrix = &ctx.find<CAMotics::MachineMatrix>();
+  return *matrix;
 }
 
 
-js::Value MatrixModule::popMatrixCB(const js::Arguments &args) {
-  matrix.popMatrix(parseMatrix(args));
-  return js::Value();
+void MatrixModule::pushMatrixCB(const JSON::Value &args, js::Sink &sink) {
+  getMatrix().pushMatrix(parseMatrix(args));
 }
 
 
-js::Value MatrixModule::loadIdentityCB(const js::Arguments &args) {
-  matrix.loadIdentity(parseMatrix(args));
-  return js::Value();
+void MatrixModule::popMatrixCB(const JSON::Value &args, js::Sink &sink) {
+  getMatrix().popMatrix(parseMatrix(args));
 }
 
 
-js::Value MatrixModule::scaleCB(const js::Arguments &args) {
-  matrix.scale(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"),
-               parseMatrix(args));
-  return js::Value();
+void MatrixModule::loadIdentityCB(const JSON::Value &args, js::Sink &sink) {
+  getMatrix().loadIdentity(parseMatrix(args));
 }
 
 
-js::Value MatrixModule::translateCB(const js::Arguments &args) {
-  matrix.translate(args.getNumber("x"), args.getNumber("y"),
-                   args.getNumber("z"), parseMatrix(args));
-  return js::Value();
+void MatrixModule::scaleCB(const JSON::Value &args, js::Sink &sink) {
+  getMatrix().scale(args.getNumber("x"), args.getNumber("y"),
+                    args.getNumber("z"), parseMatrix(args));
 }
 
 
-js::Value MatrixModule::rotateCB(const js::Arguments &args) {
-  matrix.rotate(args.getNumber("angle"), args.getNumber("x"),
-                args.getNumber("y"), args.getNumber("z"), args.getNumber("a"),
-                args.getNumber("b"), args.getNumber("c"), parseMatrix(args));
-  return js::Value();
+void MatrixModule::translateCB(const JSON::Value &args, js::Sink &sink) {
+  getMatrix().translate(args.getNumber("x"), args.getNumber("y"),
+                        args.getNumber("z"), parseMatrix(args));
 }
 
 
-js::Value MatrixModule::setMatrixCB(const js::Arguments &args) {
+void MatrixModule::rotateCB(const JSON::Value &args, js::Sink &sink) {
+  getMatrix().rotate(args.getNumber("angle"), args.getNumber("x"),
+                     args.getNumber("y"), args.getNumber("z"),
+                     args.getNumber("a"), args.getNumber("b"),
+                     args.getNumber("c"), parseMatrix(args));
+}
+
+
+void MatrixModule::setMatrixCB(const JSON::Value &args, js::Sink &sink) {
   THROW("Not yet implemented");
-  return js::Value();
 }
 
 
-js::Value MatrixModule::getMatrixCB(const js::Arguments &args) {
+void MatrixModule::getMatrixCB(const JSON::Value &args, js::Sink &sink) {
   THROW("Not yet implemented");
-  return js::Value();
 }
 
 
-MatrixModule::axes_t MatrixModule::parseMatrix(const js::Arguments &args) {
+MatrixModule::axes_t MatrixModule::parseMatrix(const JSON::Value &args) {
   if (!args.has("matrix")) return XYZ;
 
-  axes_t matrix = (axes_t)args["matrix"].toUint32();
+  axes_t matrix = (axes_t)args.getU32("matrix");
   if (AXES_COUNT <= matrix) THROWS("Invalid matrix number " << matrix);
 
   return matrix;
 }
 
 
-js::Value MatrixModule::getXYZ(const js::Arguments &args) {
+void MatrixModule::getXYZ(const JSON::Value &args, js::Sink &sink) {
   Vector3D v = ctx.machine.getPosition(XYZ);
-  js::Value array = js::Value::createArray();
 
-  array.set(0, v.x());
-  array.set(1, v.y());
-  array.set(2, v.z());
-
-  return array;
+  sink.beginList();
+  sink.append(v.x());
+  sink.append(v.y());
+  sink.append(v.z());
+  sink.endList();
 }
 
 
-js::Value MatrixModule::getX(const js::Arguments &args) {
-  return ctx.machine.getPosition(XYZ).x();
+void MatrixModule::getX(const JSON::Value &args, js::Sink &sink) {
+  sink.write(ctx.machine.getPosition(XYZ).x());
 }
 
 
-js::Value MatrixModule::getY(const js::Arguments &args) {
-  return ctx.machine.getPosition(XYZ).y();
+void MatrixModule::getY(const JSON::Value &args, js::Sink &sink) {
+  sink.write(ctx.machine.getPosition(XYZ).y());
 }
 
 
-js::Value MatrixModule::getZ(const js::Arguments &args) {
-  return ctx.machine.getPosition(XYZ).z();
+void MatrixModule::getZ(const JSON::Value &args, js::Sink &sink) {
+  sink.write(ctx.machine.getPosition(XYZ).z());
 }

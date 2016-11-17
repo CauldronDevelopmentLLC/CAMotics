@@ -76,7 +76,6 @@ if not env.GetOption('clean'):
 
     conf.CBConfig('freetype2')
     conf.CBConfig('opengl')
-    conf.CBConfig('v8', True)
 
     # Cairo
     conf.CBCheckHome('cairo')
