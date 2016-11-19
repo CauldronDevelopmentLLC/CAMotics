@@ -1,7 +1,7 @@
 language: cpp
 compiler: gcc
 dist: trusty
-sudo: false
+sudo: required
 
 env:
   global:
@@ -14,7 +14,7 @@ env:
 
 install:
   - sudo apt-get update
-  - sudo apt-get install -y qt4-dev-tools libunwind8-dev
+  - sudo apt-get install -y qt4-dev-tools libunwind8-dev clang
 
 before_script:
   - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/ChakraCore.git
@@ -32,7 +32,6 @@ addons:
   apt:
     packages:
       - git
-      - clang
       - scons
       - libbz2-dev
       - zlib1g-dev
