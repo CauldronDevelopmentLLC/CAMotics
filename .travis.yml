@@ -1,7 +1,7 @@
 language: cpp
 compiler: gcc
 dist: trusty
-sudo: required
+sudo: false
 
 env:
   global:
