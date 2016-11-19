@@ -12,6 +12,10 @@ env:
     - DEBUG_BUILD=1
     - DEBUG_BUILD=0
 
+install:
+  - sudo apt-get update
+  - sudo apt-get install -y qt4-dev-tools libunwind8-dev
+
 before_script:
   - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/ChakraCore.git
   - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
@@ -28,6 +32,7 @@ addons:
   apt:
     packages:
       - git
+      - clang
       - scons
       - libbz2-dev
       - zlib1g-dev
@@ -37,9 +42,7 @@ addons:
       - libboost-filesystem-dev
       - libboost-regex-dev
       - libsqlite3-dev
-      - libunwind8-dev
       - libicu-dev
-      - qt4-dev-tools
       - libqt4-dev
       - libqt4-opengl-dev
       - libcairo2-dev
