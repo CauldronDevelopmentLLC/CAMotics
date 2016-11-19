@@ -10,8 +10,13 @@ env:
     - DEBUG_BUILD=1
     - DEBUG_BUILD=0
 
+before_install:
+  - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com EC4926EA
+  - echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/havana main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+
 install:
-  - sudo apt-get install -y qt4-dev-tools
+  - sudo apt-get install -y libunwind8-dev
 
 before_script:
   - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/ChakraCore.git
@@ -38,7 +43,6 @@ addons:
       - libboost-filesystem-dev
       - libboost-regex-dev
       - libsqlite3-dev
-      - libunwind8-dev
       - libicu-dev
       - qt4-dev-tools
       - libqt4-dev
