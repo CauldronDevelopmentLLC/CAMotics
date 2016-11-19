@@ -12,7 +12,7 @@ env:
 
 before_install:
   - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com EC4926EA
-  - echo echo "deb http://archive.ubuntu.com/ubuntu/ precise-updates multiverse" | sudo tee -a /etc/apt/sources.list
+  - echo "deb http://archive.ubuntu.com/ubuntu/ precise-updates multiverse" | sudo tee -a /etc/apt/sources.list
   - sudo apt-get update -qq
 
 install:
