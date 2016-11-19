@@ -11,7 +11,7 @@ env:
     - DEBUG_BUILD=0
 
 install:
-  - sudo apt-get install -y libv8-dev qt4-dev-tools libunwind-dev libicu-dev
+  - sudo apt-get install -y qt4-dev-tools
 
 before_script:
   - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/ChakraCore.git
@@ -38,7 +38,8 @@ addons:
       - libboost-filesystem-dev
       - libboost-regex-dev
       - libsqlite3-dev
-      - libv8-dev
+      - libunwind-dev
+      - libicu-dev
       - qt4-dev-tools
       - libqt4-dev
       - libqt4-opengl-dev
