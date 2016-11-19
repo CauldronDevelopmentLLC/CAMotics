@@ -38,7 +38,7 @@ addons:
       - libboost-filesystem-dev
       - libboost-regex-dev
       - libsqlite3-dev
-      - libunwind-dev
+      - libunwind8-dev
       - libicu-dev
       - qt4-dev-tools
       - libqt4-dev
