@@ -25,10 +25,13 @@ before_script:
   - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
 
 script:
-  - cd ChakraCore; ./build.sh --static -j 8
+  - cd ChakraCore
+  - ./build.sh --static -j 8
   - mkdir tmp
-  - cd tmp; for i in $(find ../ChakraCore/Build* -name \*.a); do ar x $i; done
-  - ar rcs ChakraCore/libChakraCore.a tmp/*.o
+  - cd tmp
+  - for i in $(find ../Build* -name \*.a); do ar x $i; done
+  - ar rcs ../libChakraCore.a *.o
+  - cd ..
   - scons -C cbang debug=$DEBUG_BUILD -j 8
   - scons debug=$DEBUG_BUILD -j 8
 
