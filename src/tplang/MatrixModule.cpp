@@ -25,7 +25,8 @@ using namespace cb;
 using namespace tplang;
 
 
-MatrixModule::MatrixModule(TPLContext &ctx) : ctx(ctx), matrix(0) {}
+MatrixModule::MatrixModule(TPLContext &ctx) :
+  js::NativeModule("matrix"), ctx(ctx), matrix(0) {}
 
 
 void MatrixModule::define(js::Sink &exports) {

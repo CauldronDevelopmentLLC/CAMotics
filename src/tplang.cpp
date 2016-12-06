@@ -51,11 +51,16 @@ namespace CAMotics {
     Simulation sim;
     MachinePipeline pipeline;
     string simJSON;
+    string jsImpl;
 
   public:
     TPLangApp() : CommandLineApp("Tool Path Language Interpreter") {
       cmdLine.addTarget("sim-json", simJSON,
                         "Simulation information in JSON format");
+      cmdLine.addTarget("js", jsImpl,
+                        "Specify which Javascript implementation to use.  "
+                        "Possible values are 'v8' or 'chakra' but which are "
+                        "actually available depends on the build.");
     }
 
     // From CommandLineApp
@@ -83,7 +88,7 @@ namespace CAMotics {
 
     // From cb::Reader
     void read(const cb::InputSource &source) {
-      tplang::TPLContext ctx(cout, pipeline, sim);
+      tplang::TPLContext ctx(cout, pipeline, sim, jsImpl);
       tplang::Interpreter(ctx).read(source);
       stream->flush();
       cout.flush();
@@ -92,6 +97,31 @@ namespace CAMotics {
 }
 
 
+#ifdef HAVE_V8
+#include <cbang/v8/JSImpl.h>
+#endif
+
+
 int main(int argc, char *argv[]) {
+#ifdef HAVE_V8
+  // Look for v8 args after --
+  bool foundV8Args = false;
+
+  for (int i = 1; i < argc; i++)
+    if (string("--") == argv[i]) {
+      vector<char *> args;
+
+      args.push_back(argv[0]);
+      for (int j = i + 1; j < argc; j++) args.push_back(argv[j]);
+
+      int v8Argc = argc - i + 1;
+      gv8::JSImpl::init(&v8Argc, &args[0]);
+
+      argc = i;
+    }
+
+  if (!foundV8Args) gv8::JSImpl::init(0, 0);
+#endif
+
   return cb::doApplication<CAMotics::TPLangApp>(argc, argv);
 }

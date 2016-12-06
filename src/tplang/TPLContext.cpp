@@ -29,9 +29,10 @@ using namespace tplang;
 
 
 TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
-                       const CAMotics::Simulation &sim) :
-  gcodeMod(*this), matrixMod(*this), dxfMod(*this), stlMod(*this),
-  machine(machine), sim(sim) {
+                       const CAMotics::Simulation &sim,
+                       const string &jsImpl) :
+  js::Javascript(jsImpl), gcodeMod(*this), matrixMod(*this), dxfMod(*this),
+  stlMod(*this), machine(machine), sim(sim) {
 
   // Add modules
   define(gcodeMod);

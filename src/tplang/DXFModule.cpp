@@ -36,7 +36,7 @@ using namespace cb;
 using namespace std;
 
 
-DXFModule::DXFModule(TPLContext &ctx) : ctx(ctx) {}
+DXFModule::DXFModule(TPLContext &ctx) : js::NativeModule("_dxf"), ctx(ctx) {}
 
 
 void DXFModule::define(js::Sink &exports) {

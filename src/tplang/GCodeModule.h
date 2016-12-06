@@ -24,21 +24,21 @@
 #include <camotics/machine/MachineUnitAdapter.h>
 #include <camotics/machine/MachineEnum.h>
 
-#include <cbang/js/Module.h>
+#include <cbang/js/NativeModule.h>
 
 
 namespace tplang {
   class TPLContext;
 
-  class GCodeModule : public cb::js::Module, public CAMotics::MachineEnum {
+  class GCodeModule :
+    public cb::js::NativeModule, public CAMotics::MachineEnum {
     TPLContext &ctx;
     CAMotics::MachineUnitAdapter *unitAdapter;
 
   public:
     GCodeModule(TPLContext &ctx);
 
-    // From cb::js::Module
-    const char *getName() const {return "gcode";}
+    // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
     CAMotics::MachineUnitAdapter &getUnitAdapter();

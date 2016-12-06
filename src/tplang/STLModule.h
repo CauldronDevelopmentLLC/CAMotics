@@ -21,20 +21,19 @@
 #ifndef TPLANG_STL_MODULE_H
 #define TPLANG_STL_MODULE_H
 
-#include <cbang/js/Module.h>
+#include <cbang/js/NativeModule.h>
 
 
 namespace tplang {
   class TPLContext;
 
-  class STLModule : public cb::js::Module {
+  class STLModule : public cb::js::NativeModule {
     TPLContext &ctx;
 
   public:
     STLModule(TPLContext &ctx);
 
-    // From cb::js::Module
-    const char *getName() const {return "stl";}
+    // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
     // Javascript callbacks

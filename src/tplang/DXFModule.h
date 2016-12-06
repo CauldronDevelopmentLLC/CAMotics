@@ -21,20 +21,19 @@
 #ifndef TPLANG_DXFMODULE_H
 #define TPLANG_DXFMODULE_H
 
-#include <cbang/js/Module.h>
+#include <cbang/js/NativeModule.h>
 
 
 namespace tplang {
   class TPLContext;
 
-  class DXFModule : public cb::js::Module {
+  class DXFModule : public cb::js::NativeModule {
     TPLContext &ctx;
 
   public:
     DXFModule(TPLContext &ctx);
 
-    // From cb::js::Module
-    const char *getName() const {return "_dxf";}
+    // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
     // Javascript call backs

@@ -266,7 +266,7 @@ namespace {
 }
 
 
-STLModule::STLModule(TPLContext &ctx) : ctx(ctx) {}
+STLModule::STLModule(TPLContext &ctx) : js::NativeModule("stl"), ctx(ctx) {}
 
 
 void STLModule::define(js::Sink &exports) {

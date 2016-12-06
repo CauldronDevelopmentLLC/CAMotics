@@ -24,21 +24,21 @@
 #include <camotics/machine/MachineMatrix.h>
 #include <camotics/machine/MachineEnum.h>
 
-#include <cbang/js/Module.h>
+#include <cbang/js/NativeModule.h>
 
 
 namespace tplang {
   class TPLContext;
 
-  class MatrixModule : public cb::js::Module, public CAMotics::MachineEnum {
+  class MatrixModule :
+    public cb::js::NativeModule, public CAMotics::MachineEnum {
     TPLContext &ctx;
     CAMotics::MachineMatrix *matrix;
 
   public:
     MatrixModule(TPLContext &ctx);
 
-    // From cb::js::Module
-    const char *getName() const {return "matrix";}
+    // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
     CAMotics::MachineMatrix &getMatrix();

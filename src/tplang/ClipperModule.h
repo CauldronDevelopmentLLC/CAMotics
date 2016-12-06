@@ -21,16 +21,15 @@
 #ifndef TPLANG_CLIPPER_MODULE_H
 #define TPLANG_CLIPPER_MODULE_H
 
-#include <cbang/js/Module.h>
+#include <cbang/js/NativeModule.h>
 
 
 namespace tplang {
-  class ClipperModule : public cb::js::Module {
+  class ClipperModule : public cb::js::NativeModule {
   public:
-    ClipperModule() {}
+    ClipperModule() : cb::js::NativeModule("clipper") {}
 
-    // From cb::js::Module
-    const char *getName() const {return "clipper";}
+    // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
     // Javascript call backs

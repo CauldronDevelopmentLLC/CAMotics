@@ -36,7 +36,8 @@ using namespace std;
 using namespace cb;
 
 
-GCodeModule::GCodeModule(TPLContext &ctx) : ctx(ctx), unitAdapter(0) {}
+GCodeModule::GCodeModule(TPLContext &ctx) :
+  js::NativeModule("gcode"), ctx(ctx), unitAdapter(0) {}
 
 
 void GCodeModule::define(js::Sink &exports) {
