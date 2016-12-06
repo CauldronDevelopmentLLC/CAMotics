@@ -1,6 +1,8 @@
-include(base.m4)
+FROM debian:stable
 
-RUN apt-get update && \
-  apt-get install -y libv8-dev qt5-default libqt5opengl5-dev libcairo2-dev
-
+include(debian.m4)
+include(boost.m4)
+APT(qt5-default libqt5opengl5-dev libcairo2-dev)
+include(cmake.m4)
+include(chakra.m4)
 include(slave.m4)

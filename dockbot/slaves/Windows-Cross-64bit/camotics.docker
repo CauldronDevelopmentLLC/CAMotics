@@ -1,6 +1,11 @@
-include(base.m4)
-include(cross.m4)
-include(wine64.m4)
-include(qt5.m4)
-include(v8.m4)
+define(`ARCH_BITS', 64)
+include(win-cross.m4)
+include(boost.m4)
+include(mingw-cross.m4)
+define(`CHAKRA_VERSION', v2.0.0.1)
+include(chakra-release.m4)
+
+PACMAN(PACMAN_PREFIX-qt5)
+ENV QTDIR=MINGW_ROOT
+
 include(slave.m4)
