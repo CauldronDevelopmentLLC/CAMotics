@@ -50,6 +50,7 @@
 #include <QImageWriter>
 #include <QMovie>
 #include <QDesktopWidget>
+#include <QDir>
 #include <QStringListModel>
 
 #include <vector>
@@ -805,11 +806,17 @@ void QtWin::openProject(const string &_filename) {
   if (!checkSave()) return;
 
   string filename = _filename;
-
+  QSettings settings;
+  QString lastDir = settings.value("Projects/lastDir", QDir::homePath()).toString();
   if (filename.empty()) {
-    filename = openFile("Open File", "Supported Files (*.xml *.nc *.ngc "
-                        "*.gcode *.tap *.tpl);;All Files (*.*)", "", false);
+    filename = QFileDialog::getOpenFileName(
+          this,
+          tr("Open File"),
+          lastDir,
+          tr("Supported Files (*.xml *.nc *.ngc "
+             "*.gcode *.tap *.tpl);;All Files (*.*)")).toStdString();
     if (filename.empty()) return;
+    settings.setValue("Projects/lastDir", QString::fromStdString(filename));
   }
 
   showMessage("Opening " + filename);
