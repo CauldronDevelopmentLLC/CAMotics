@@ -50,6 +50,8 @@
 #include <QtWidgets>
 #endif
 
+#include <QSignalMapper>
+
 namespace cb {class Application;}
 namespace Ui {class CAMoticsWindow;}
 class QMdiSubWindow;
@@ -109,6 +111,8 @@ namespace CAMotics {
     cb::SmartPointer<std::vector<char> > gcode;
     cb::SmartPointer<Surface> surface;
 
+    QSignalMapper recentProjectsMapper;
+
     double lastRedraw;
     bool dirty;
     bool simDirty;
@@ -122,6 +126,8 @@ namespace CAMotics {
     bool sliderMoving;
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
+
+    void loadRecentProjects();
 
   public:
     QtWin(cb::Application &app);
@@ -269,6 +275,7 @@ namespace CAMotics {
 
   protected slots:
     void animate();
+    void openRecentProjectsSlot(const QString path);
 
     void on_fileTabManager_currentChanged(int index);
     void on_positionSlider_valueChanged(int position);

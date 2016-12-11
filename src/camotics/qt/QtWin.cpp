@@ -63,6 +63,8 @@ using namespace CAMotics;
 #define PROTECT_UI_UPDATE if (inUIUpdate) return; LOCK_UI_UPDATES
 
 
+
+
 QtWin::QtWin(Application &app) :
   QMainWindow(0), ui(new Ui::CAMoticsWindow), findDialog(false),
   findAndReplaceDialog(true), fileDialog(*this),
@@ -88,6 +90,9 @@ QtWin::QtWin(Application &app) :
           ui->fileTabManager, SLOT(on_actionPaste_triggered()));
   connect(ui->actionSelectAll, SIGNAL(triggered()),
           ui->fileTabManager, SLOT(on_actionSelectAll_triggered()));
+
+  connect(&recentProjectsMapper, SIGNAL(mapped(QString)),
+          this, SLOT(openRecentProjectsSlot(QString)));
 
   // Find
   connect(ui->console, SIGNAL(find()), &findDialog, SLOT(show()));
@@ -134,6 +139,9 @@ QtWin::QtWin(Application &app) :
 
   // Load examples
   loadExamples();
+
+  // Load recent projects
+  loadRecentProjects();
 
   // Add docks to View menu
   QMenu *menu = new QMenu;
@@ -817,6 +825,55 @@ void QtWin::openProject(const string &_filename) {
              "*.gcode *.tap *.tpl);;All Files (*.*)")).toStdString();
     if (filename.empty()) return;
     settings.setValue("Projects/lastDir", QString::fromStdString(filename));
+  }
+  // loop through the recently opened files to see if the opened project
+  // is in the recent list or not
+  bool alreadyInRecent = false;
+  int size = settings.beginReadArray("recentProjects");
+  QStringList recents;
+  for (int i = 0; i < size; i++) {
+    settings.setArrayIndex(i);
+    QString recent = settings.value("fileName").toString();
+    if (recent == QString::fromStdString(filename)) {
+      alreadyInRecent = true;
+    } else {
+      recents.append(recent);
+    }
+  }
+  settings.endArray();
+
+  if (alreadyInRecent) {
+    // reload the actions in the recent menu too to move the opened file to the last position
+    foreach (QAction *action, ui->menuRecent_projects->actions()) {
+      ui->menuRecent_projects->removeAction(action);
+      delete action;
+    }
+
+    // there is no way to remove an array item from QSettings
+    // rewrite the whole array if the order changed
+    int i = 0;
+    recents.append(QString::fromStdString(filename));
+
+    settings.beginWriteArray("recentProjects");
+    foreach (QString recent, recents) {
+      QAction *action = ui->menuRecent_projects->addAction(recent, &recentProjectsMapper, SLOT(map()));
+      recentProjectsMapper.setMapping(action, recent);
+
+      settings.setArrayIndex(i);
+      settings.setValue("fileName", recent);
+      i++;
+    }
+    settings.endArray();
+  } else {
+    // add the new menu item
+    QAction *action = ui->menuRecent_projects->addAction(QString::fromStdString(filename), &recentProjectsMapper, SLOT(map()));
+    recentProjectsMapper.setMapping(action, QString::fromStdString(filename));
+
+    // and add the new settings item
+    settings.beginWriteArray("recentProjects", size + 1);
+    settings.setArrayIndex(size);
+    settings.setValue("fileName", QString::fromStdString(filename));
+    settings.endArray();
   }
 
   showMessage("Opening " + filename);
@@ -1541,6 +1598,11 @@ void QtWin::animate() {
   }
 }
 
+void QtWin::openRecentProjectsSlot(const QString path)
+{
+  openProject(path.toStdString());
+}
+
 
 void QtWin::on_fileTabManager_currentChanged(int index) {
   redraw();
@@ -2009,4 +2071,22 @@ void QtWin::on_hideConsolePushButton_clicked() {
 
 void QtWin::on_clearConsolePushButton_clicked() {
   ui->console->clear();
+}
+
+void QtWin::loadRecentProjects() {
+  QSettings settings;
+  int size = settings.beginReadArray("recentProjects");
+  for (int i = 0; i < size; i++) {
+    settings.setArrayIndex(i);
+    QString recent = settings.value("fileName").toString();
+    if (QFileInfo::exists(recent)) {
+      QAction *action = ui->menuRecent_projects->addAction(recent, &recentProjectsMapper, SLOT(map()));
+      recentProjectsMapper.setMapping(action, recent);
+    } else {
+      // if file not exists remove from recent
+      settings.remove(recent);
+    }
+  }
+  settings.endArray();
+  settings.sync();
 }

@@ -320,6 +320,11 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuRecent_projects">
+     <property name="title">
+      <string>Recent projects</string>
+     </property>
+    </widget>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionAddFile"/>
@@ -331,6 +336,8 @@
     <addaction name="actionRevertFile"/>
     <addaction name="separator"/>
     <addaction name="actionExamples"/>
+    <addaction name="separator"/>
+    <addaction name="menuRecent_projects"/>
     <addaction name="separator"/>
     <addaction name="actionExport"/>
     <addaction name="actionSnapshot"/>
@@ -3040,6 +3047,11 @@
    </property>
    <property name="toolTip">
     <string>Reload this file</string>
+   </property>
+  </action>
+  <action name="actionFoobar">
+   <property name="text">
+    <string>Foobar</string>
    </property>
   </action>
  </widget>
