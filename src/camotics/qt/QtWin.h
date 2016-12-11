@@ -346,6 +346,7 @@ namespace CAMotics {
     void on_actionToolPath_triggered(bool checked);
 
     void on_actionAddFile_triggered();
+    void on_actionReloadFile_triggered();
     void on_actionEditFile_triggered();
     void on_actionRemoveFile_triggered();
     void on_actionAddTool_triggered();

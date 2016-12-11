@@ -66,5 +66,6 @@
         <file>icons/tool-export.png</file>
         <file>icons/tool-import.png</file>
         <file>icons/settings.png</file>
+        <file>icons/view-refresh.png</file>
     </qresource>
 </RCC>

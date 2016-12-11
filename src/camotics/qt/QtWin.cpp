@@ -1599,6 +1599,7 @@ void QtWin::on_filesListView_customContextMenuRequested(QPoint point) {
 
   menu.addAction(ui->actionAddFile);
   menu.addAction(ui->actionEditFile);
+  menu.addAction(ui->actionReloadFile);
   menu.addAction(ui->actionRemoveFile);
 
   menu.exec(ui->filesListView->mapToGlobal(point));
@@ -1953,6 +1954,10 @@ void QtWin::on_actionAddFile_triggered() {
   newFile(newDialog.tplSelected());
 }
 
+void QtWin::on_actionReloadFile_triggered()
+{
+  openProject(project->getFile(ui->filesListView->currentIndex().row())->getRelativePath());
+}
 
 void QtWin::on_actionEditFile_triggered() {
   editFile(ui->filesListView->currentIndex().row());
