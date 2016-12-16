@@ -128,6 +128,7 @@ namespace CAMotics {
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
     void loadRecentProjects();
+    static const int maxRecentsSize;
 
   public:
     QtWin(cb::Application &app);
@@ -263,7 +264,7 @@ namespace CAMotics {
     void updateSpeed(const std::string &name, double value);
     void updateDirection(const std::string &name, const char *value);
     void updateProgramLine(const std::string &name, unsigned value);
-
+    
   protected:
     // From TaskObserver
     void taskCompleted();
