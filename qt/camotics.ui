@@ -3049,11 +3049,6 @@
     <string>Reload this file</string>
    </property>
   </action>
-  <action name="actionFoobar">
-   <property name="text">
-    <string>Foobar</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
