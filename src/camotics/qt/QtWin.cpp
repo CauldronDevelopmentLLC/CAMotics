@@ -2064,7 +2064,7 @@ void QtWin::loadRecentProjects() {
     settings.setArrayIndex(i);
     QString recent = settings.value("fileName").toString();
     QFileInfo fi(recent);
-    if (fi.exists(recent) && fi.isReadable()) {
+    if (fi.exists() && fi.isReadable()) {
       QAction *action = ui->menuRecent_projects->addAction(recent, &recentProjectsMapper, SLOT(map()));
       recentProjectsMapper.setMapping(action, recent);
       recents.append(recent);
