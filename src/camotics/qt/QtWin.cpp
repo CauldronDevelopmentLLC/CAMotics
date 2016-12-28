@@ -62,7 +62,6 @@ using namespace CAMotics;
 #define LOCK_UI_UPDATES SmartInc<unsigned> inc(inUIUpdate)
 #define PROTECT_UI_UPDATE if (inUIUpdate) return; LOCK_UI_UPDATES
 
-const int QtWin::maxRecentsSize = 20;
 
 QtWin::QtWin(Application &app) :
   QMainWindow(0), ui(new Ui::CAMoticsWindow), findDialog(false),
@@ -166,7 +165,7 @@ QtWin::QtWin(Application &app) :
   // Setup console stream
   consoleStream = new LineBufferStream<ConsoleWriter>(*ui->console);
   Logger::instance().setScreenStream(*consoleStream);
-}
+  }
 
 
 QtWin::~QtWin() {
@@ -323,6 +322,46 @@ void QtWin::loadExamples() {
     }
 
   } CATCH_ERROR;
+}
+
+
+void QtWin::loadRecentProjects() {
+  QSettings settings;
+  int size = settings.beginReadArray("recentProjects");
+  bool hasRemoved = false;
+  QStringList recents;
+
+  for (int i = 0; i < size; i++) {
+    settings.setArrayIndex(i);
+    QString recent = settings.value("fileName").toString();
+    QFileInfo fi(recent);
+
+    if (fi.exists() && fi.isReadable()) {
+      QAction *action = ui->menuRecent_projects->
+        addAction(recent, &recentProjectsMapper, SLOT(map()));
+      recentProjectsMapper.setMapping(action, recent);
+      recents.append(recent);
+
+    } else hasRemoved = true; // file removed/inaccessible -> set the flag
+  }
+
+  settings.endArray();
+
+  // if any of the recent projects are inaccessible rewrite the whole list
+  if (hasRemoved) {
+    settings.beginWriteArray("recentProjects", recents.size());
+    int i = 0;
+
+    foreach (QString recent, recents) {
+      settings.setArrayIndex(i);
+      settings.setValue("fileName", recent);
+      i++;
+    }
+
+    settings.endArray();
+  }
+
+  settings.sync();
 }
 
 
@@ -813,23 +852,25 @@ void QtWin::openProject(const string &_filename) {
 
   string filename = _filename;
   QSettings settings;
-  QString lastDir = settings.value("Projects/lastDir", QDir::homePath()).toString();
+  QString lastDir =
+    settings.value("Projects/lastDir", QDir::homePath()).toString();
+
   if (filename.empty()) {
-    filename = QFileDialog::getOpenFileName(
-          this,
-          tr("Open File"),
-          lastDir,
-          tr("Supported Files (*.xml *.nc *.ngc "
-             "*.gcode *.tap *.tpl);;All Files (*.*)")).toStdString();
+    filename = QFileDialog::getOpenFileName
+      (this, tr("Open File"), lastDir,
+       tr("Supported Files (*.xml *.nc *.ngc *.gcode *.tap *.tpl);;All Files "
+          "(*.*)")).toStdString();
     if (filename.empty()) return;
     settings.setValue("Projects/lastDir", QString::fromStdString(filename));
   }
 
   int size = settings.beginReadArray("recentProjects");
   QStringList recents;
+
   for (int i = 0; i < size; i++) {
     settings.setArrayIndex(i);
     QString recent = settings.value("fileName").toString();
+
     // skip the currently opened project from the recents
     // if it was already present in the recents projects list
     if (recent != QString::fromStdString(filename))
@@ -837,7 +878,8 @@ void QtWin::openProject(const string &_filename) {
   }
   settings.endArray();
 
-  // reload the actions in the recent menu too to move the opened file to the last position
+  // reload the actions in the recent menu too to move the opened file to the
+  // first position
   foreach (QAction *action, ui->menuRecent_projects->actions()) {
     ui->menuRecent_projects->removeAction(action);
     delete action;
@@ -845,19 +887,23 @@ void QtWin::openProject(const string &_filename) {
 
   // there is no way to remove an array item from QSettings
   // rewrite the whole array if the order changed
-  recents.append(QString::fromStdString(filename));
+  recents.prepend(QString::fromStdString(filename));
 
   settings.beginWriteArray("recentProjects");
+  const int maxRecentsSize = 20;
+  int skipIndex =
+    recents.size() < maxRecentsSize ? 0 : recents.size() - maxRecentsSize;
   int i = 0;
-  int skipIndex = (recents.size() - maxRecentsSize);
+
   foreach (QString recent, recents.mid(skipIndex)) {
-    QAction *action = ui->menuRecent_projects->addAction(recent, &recentProjectsMapper, SLOT(map()));
+    QAction *action = ui->menuRecent_projects->
+      addAction(recent, &recentProjectsMapper, SLOT(map()));
     recentProjectsMapper.setMapping(action, recent);
 
-    settings.setArrayIndex(i);
+    settings.setArrayIndex(i++);
     settings.setValue("fileName", recent);
-    i++;
   }
+
   settings.endArray();
 
   showMessage("Opening " + filename);
@@ -1491,6 +1537,7 @@ void QtWin::updateProgramLine(const string &name, unsigned value) {
   ui->programLineLabel->setText(QString().sprintf("%d", value));
 }
 
+
 void QtWin::taskCompleted() {
   QCoreApplication::postEvent
     (this, new QEvent((QEvent::Type)taskCompleteEvent));
@@ -1580,6 +1627,7 @@ void QtWin::animate() {
     quit();
   }
 }
+
 
 void QtWin::openRecentProjectsSlot(const QString path) {
   openProject(path.toStdString());
@@ -1998,10 +2046,12 @@ void QtWin::on_actionAddFile_triggered() {
   newFile(newDialog.tplSelected());
 }
 
-void QtWin::on_actionReloadFile_triggered()
-{
-  openProject(project->getFile(ui->filesListView->currentIndex().row())->getRelativePath());
+
+void QtWin::on_actionReloadFile_triggered() {
+  openProject(project->getFile(ui->filesListView->currentIndex().row())->
+              getRelativePath());
 }
+
 
 void QtWin::on_actionEditFile_triggered() {
   editFile(ui->filesListView->currentIndex().row());
@@ -2053,38 +2103,4 @@ void QtWin::on_hideConsolePushButton_clicked() {
 
 void QtWin::on_clearConsolePushButton_clicked() {
   ui->console->clear();
-}
-
-void QtWin::loadRecentProjects() {
-  QSettings settings;
-  int size = settings.beginReadArray("recentProjects");
-  bool hasRemoved = false;
-  QStringList recents;
-  for (int i = 0; i < size; i++) {
-    settings.setArrayIndex(i);
-    QString recent = settings.value("fileName").toString();
-    QFileInfo fi(recent);
-    if (fi.exists() && fi.isReadable()) {
-      QAction *action = ui->menuRecent_projects->addAction(recent, &recentProjectsMapper, SLOT(map()));
-      recentProjectsMapper.setMapping(action, recent);
-      recents.append(recent);
-    } else {
-      // file removed/inaccessible -> set the flag
-      hasRemoved = true;
-    }
-  }
-  settings.endArray();
-
-  // if any of the recent projects are inaccessible rewrite the whole list
-  if (hasRemoved) {
-    settings.beginWriteArray("recentProjects", recents.size());
-    int i = 0;
-    foreach (QString recent, recents) {
-      settings.setArrayIndex(i);
-      settings.setValue("fileName", recent);
-      i++;
-    }
-    settings.endArray();
-  }
-  settings.sync();
 }
