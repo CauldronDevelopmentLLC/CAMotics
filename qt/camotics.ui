@@ -313,13 +313,18 @@
      <x>0</x>
      <y>0</y>
      <width>1004</width>
-     <height>19</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuRecent_projects">
+     <property name="title">
+      <string>Recent projects</string>
+     </property>
+    </widget>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionAddFile"/>
@@ -331,6 +336,8 @@
     <addaction name="actionRevertFile"/>
     <addaction name="separator"/>
     <addaction name="actionExamples"/>
+    <addaction name="separator"/>
+    <addaction name="menuRecent_projects"/>
     <addaction name="separator"/>
     <addaction name="actionExport"/>
     <addaction name="actionSnapshot"/>
@@ -3028,6 +3035,18 @@
    </property>
    <property name="toolTip">
     <string>Edit selected file</string>
+   </property>
+  </action>
+  <action name="actionReloadFile">
+   <property name="icon">
+    <iconset resource="camotics.qrc">
+     <normaloff>:/icons/view-refresh.png</normaloff>:/icons/view-refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reload File</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload this file</string>
    </property>
   </action>
  </widget>
