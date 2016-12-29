@@ -52,9 +52,11 @@ namespace CAMotics {
     MachinePipeline pipeline;
     string simJSON;
     string jsImpl;
+    tplang::TPLContext ctx;
 
   public:
-    TPLangApp() : CommandLineApp("Tool Path Language Interpreter") {
+    TPLangApp() : CommandLineApp("Tool Path Language Interpreter"),
+                  ctx(cout, pipeline, sim, jsImpl) {
       cmdLine.addTarget("sim-json", simJSON,
                         "Simulation information in JSON format");
       cmdLine.addTarget("js", jsImpl,
@@ -83,12 +85,11 @@ namespace CAMotics {
 
     void requestExit() {
       Application::requestExit();
-      // TODO terminate Javascript execution
+      ctx.interrupt(); // Terminate Javascript execution
     }
 
     // From cb::Reader
     void read(const cb::InputSource &source) {
-      tplang::TPLContext ctx(cout, pipeline, sim, jsImpl);
       tplang::Interpreter(ctx).read(source);
       stream->flush();
       cout.flush();
