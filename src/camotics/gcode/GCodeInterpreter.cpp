@@ -105,9 +105,9 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
         else {
           // Check modal groups
           if (groups & code->group) {
-            LOG_ERROR(word->getCol()
-                      << ":Cannot have more than one word from modal group "
-                      << ModalGroup(code->group) << ", Ignoring " << *code);
+            LOG_WARNING(word->getCol()
+                        << ":Cannot have more than one word from modal group "
+                        << ModalGroup(code->group) << ", Ignoring " << *code);
             continue;
           }
 
