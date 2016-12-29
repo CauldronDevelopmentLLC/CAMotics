@@ -62,7 +62,7 @@ void ClipperModule::offsetCB(const js::Value &args, js::Sink &sink) {
 
   double delta = args.getNumber("delta") * scale;
   JoinType join =
-    args.has("join") ? jtRound : (JoinType)args.getInteger("join");
+    args.has("join") ? (JoinType)args.getInteger("join") : jtRound;
   double limit = args.getNumber("limit") * scale;
   bool autoFix = args.getBoolean("autoFix");
 
