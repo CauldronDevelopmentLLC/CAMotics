@@ -154,28 +154,35 @@ bool FileTabManager::checkSave(unsigned tab) {
 bool FileTabManager::checkSaveAll() {
   bool all = false;
 
-  for (int tab = offset; tab < QTabWidget::count(); tab++)
-    if (isModified(tab)) {
-      if (!all) {
-        // Select tab
-        QTabWidget::setCurrentIndex(tab);
+  try {
+    for (int tab = offset; tab < QTabWidget::count(); tab++)
+      if (isModified(tab)) {
+        if (!all) {
+          // Select tab
+          QTabWidget::setCurrentIndex(tab);
 
-        int response =
-          QMessageBox::question(this, "File Modified", "The current file has "
-                                "been modifed.  Would you like to save?",
-                                QMessageBox::Cancel | QMessageBox::No |
-                                QMessageBox::Save | QMessageBox::SaveAll,
-                                QMessageBox::SaveAll);
+          int response =
+            QMessageBox::question(this, "File Modified", "The current file has "
+                                  "been modifed.  Would you like to save?",
+                                  QMessageBox::Cancel | QMessageBox::No |
+                                  QMessageBox::Save | QMessageBox::SaveAll,
+                                  QMessageBox::SaveAll);
 
-        if (response == QMessageBox::SaveAll) all = true;
-        if (response == QMessageBox::No) continue;
-        if (response == QMessageBox::Cancel) return false;
+          if (response == QMessageBox::SaveAll) all = true;
+          if (response == QMessageBox::No) continue;
+          if (response == QMessageBox::Cancel) return false;
+        }
+
+        save(tab);
       }
 
-      save(tab);
-    }
+    return true;
 
-  return true;
+  } catch (const Exception &e) {
+    win->warning("Failed to save: " + e.getMessage());
+  }
+
+  return false;
 }
 
 
@@ -222,7 +229,8 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
   // Save data
   QString content = editor->toPlainText();
   QFile qFile(QString::fromUtf8(filename.c_str()));
-  qFile.open(QFile::WriteOnly | QIODevice::Truncate);
+  if (!qFile.open(QFile::WriteOnly | QIODevice::Truncate))
+    THROWS("Could not save '" << filename << "'");
   qFile.write(content.toUtf8());
   qFile.close();
 

@@ -531,6 +531,11 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
 
   redraw();
 
+  // Clear old surface
+  surface.release();
+  view->setSurface(0);
+  view->setMoveLookup(0);
+
   if (!simulate) {
     setStatusActive(false);
     return;
@@ -550,10 +555,7 @@ void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
   project->threads = options["threads"].toInteger();
   project->workpiece = project->getWorkpieceBounds();
 
-  // Load surface
-  surface.release();
-  view->setSurface(0);
-  view->setMoveLookup(0);
+  // Load new surface
   taskMan.addTask(new SurfaceTask(*project));
 }
 
@@ -981,9 +983,10 @@ bool QtWin::saveProject(bool saveAs) {
     ui->fileTabManager->saveAll();
     showMessage("Saved " + filename);
     return true;
-  } CATCH_ERROR;
 
-  warning("Could not save project to " + filename);
+  } catch (const Exception &e) {
+    warning("Could not save project: " + e.getMessage());
+  }
 
   return false;
 }
