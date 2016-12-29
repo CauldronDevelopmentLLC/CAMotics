@@ -1446,7 +1446,7 @@ void QtWin::updatePlayDirection(const string &name, bool reverse) {
 
 
 void QtWin::updateTimeRatio(const string &name, double ratio) {
-  ui->positionSlider->setValue(10000 * ratio);
+  if (!Math::isnan(ratio)) ui->positionSlider->setValue(10000 * ratio);
 }
 
 
@@ -1650,10 +1650,7 @@ void QtWin::on_positionSlider_valueChanged(int position) {
 
   if (sliderMoving) return;
   if (view->isFlagSet(View::PLAY_FLAG) && lastStatusActive) return;
-  if (simRun.isNull()) {
-    reload();
-    return;
-  }
+  if (simRun.isNull()) return;
 
   simRun->setEndTime(ratio * view->path->getTotalTime());
 
