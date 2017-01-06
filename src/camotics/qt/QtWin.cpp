@@ -723,7 +723,7 @@ void QtWin::exportData() {
 
   } else if (exportDialog.gcodeSelected()) {
     title += "GCode";
-    fileTypes = "GCode Files (*.gcode, *.nc, *.ngc *.tap)";
+    fileTypes = "GCode Files (*.gcode *.nc *.ngc *.tap)";
     ext = "gcode";
 
   } else {
@@ -1033,8 +1033,8 @@ void QtWin::newFile(bool tpl) {
 
   filename = openFile(tpl ? "New TPL file" : "New GCode file",
                       tpl ? "TPL (*.tpl);;All files (*.*)" :
-                      "GCode (*.nc *.ngc *.gcode *.tap);;All files", filename,
-                      false);
+                      "GCode (*.nc *.ngc *.gcode *.tap);;All files (*.*)",
+                      filename, false);
   if (filename.empty()) return;
 
   string ext = SystemUtilities::extension(filename);
