@@ -23,6 +23,8 @@
 
 #include <camotics/Geom.h>
 
+#include <limits>
+
 
 namespace CAMotics {
   struct Triangle : public cb::Triangle3F {
@@ -30,7 +32,8 @@ namespace CAMotics {
     float time;
 
     Triangle(const cb::Triangle3F &t = cb::Triangle3F(cb::Vector3F(0.0)),
-             const cb::Vector3F &n = cb::Vector3F(0.0 / 0.0),
+             const cb::Vector3F &n =
+               cb::Vector3F(std::numeric_limits<double>::quiet_NaN()),
              float time = 0) :
       cb::Triangle3F(t), normal(n), time(time) {}
 

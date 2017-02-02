@@ -21,7 +21,8 @@
 #ifndef CAMOTICS_GLVIEW_H
 #define CAMOTICS_GLVIEW_H
 
-#ifdef _WIN32
+#include <QtGlobal>
+#if defined(_WIN32) && QT_VERSION < 0x050000
 #include <winsock2.h> // Must come before below
 #endif
 

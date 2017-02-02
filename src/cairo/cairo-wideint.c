@@ -335,9 +335,9 @@ _cairo_int64_divrem (cairo_int64_t num, cairo_int64_t den)
     else
 	qr.rem = uqr.rem;
     if (num_neg != den_neg)
-	qr.quo = (cairo_int64_t) _cairo_int64_negate (uqr.quo);
+    qr.quo = _cairo_int64_negate (uqr.quo);
     else
-	qr.quo = (cairo_int64_t) uqr.quo;
+    qr.quo = uqr.quo;
     return qr;
 }
 

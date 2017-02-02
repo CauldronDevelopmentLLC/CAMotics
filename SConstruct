@@ -79,7 +79,7 @@ if not env.GetOption('clean'):
     env.CBDefine('GLEW_STATIC')
 
     # Qt
-    env.EnableQtModules('QtCore QtGui QtOpenGL'.split())
+    env.EnableQtModules('QtCore QtGui QtWidgets QtOpenGL'.split())
     if env['PLATFORM'] != 'win32': env.Append(CCFLAGS = ['-fPIC'])
 
     conf.CBConfig('opengl')
