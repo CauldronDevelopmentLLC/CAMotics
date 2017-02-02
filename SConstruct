@@ -17,8 +17,7 @@ env.CBAddVariables(
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     EnumVariable('qt_version', 'Version of Qt to use', 'auto',
                  allowed_values = ('auto', '4', '5')))
-env.CBLoadTools(
-    'compiler cbang dist freetype2 opengl build_info packager')
+env.CBLoadTools('compiler cbang dist opengl build_info packager')
 conf = env.CBConfigure()
 
 # Config vars
@@ -62,15 +61,20 @@ if 'dist' in COMMAND_LINE_TARGETS:
 
 
 if not env.GetOption('clean'):
+    if qt_version == '5': env.Replace(cxxstd = 'c++11')
+
     # Configure compiler
     conf.CBConfig('compiler')
+
+    if env['compiler_mode'] == 'gnu':
+        env.AppendUnique(CXXFLAGS = ['-Wno-deprecated-declarations'])
 
     conf.CBConfig('cbang')
     env.CBDefine('USING_CBANG') # Using CBANG macro namespace
 
-    #if not env.CBConfigEnabled('chakra'):
-    #    raise Exception('Chakra support is required, please rebuild C! '
-    #                    'and/or set CHAKRA_CORE_HOME.')
+    if not (env.CBConfigEnabled('chakra') or env.CBConfigEnabled('v8')):
+        raise Exception('Chakra or V8 support is required, please rebuild C! '
+                        'You may need to set CHAKRA_CORE_HOME or V8_HOME.')
 
     env.CBDefine('GLEW_STATIC')
 
@@ -78,14 +82,7 @@ if not env.GetOption('clean'):
     env.EnableQtModules('QtCore QtGui QtOpenGL'.split())
     if env['PLATFORM'] != 'win32': env.Append(CCFLAGS = ['-fPIC'])
 
-    conf.CBConfig('freetype2')
     conf.CBConfig('opengl')
-
-    # Cairo
-    conf.CBCheckHome('cairo')
-    conf.CBRequireLib('cairo')
-    if env['PLATFORM'] == 'darwin':
-        conf.RequireOSXFramework('ApplicationServices')
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
@@ -95,9 +92,9 @@ if not env.GetOption('clean'):
     # Extra static libs
     if env.get('static') or env.get('mostly_static'):
         conf.CBCheckLib('selinux')
-        env.ParseConfig('pkg-config --libs --static cairo')
 
 conf.Finish()
+
 
 # Source
 src = ['src/glew/glew.c']
@@ -109,6 +106,7 @@ for subdir in [
 
 for subdir in ['']:
     src += Glob('src/tplang/%s/*.cpp' % subdir)
+
 
 # Build in 'build'
 import re
@@ -126,13 +124,14 @@ for dialog in 'export about donate find new tool settings new_project'.split():
 qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
 src += qrc
 
+
 # Build Info
 info = env.BuildInfo('build/build_info.cpp', [])
 AlwaysBuild(info)
 src += info
 
 
-# Build
+# Build lib
 lib = env.Library('libCAMotics', src)
 libs = [lib]
 Depends(lib, uic)
@@ -142,6 +141,14 @@ Depends(lib, uic)
 libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
 
 
+# Cairo
+Export('env')
+cairo = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
+Depends(lib, cairo)
+env.Append(_LIBFLAGS = [cairo]) # Force to end
+
+
+# Build programs
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
 progs = 'camotics gcodetool tplang camsim'
 execs = []
@@ -153,6 +160,7 @@ for prog in progs.split():
 
     p = _env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
     _env.Install(env.get('install_prefix') + '/bin/', p)
+    Depends(p, cairo)
     Default(p)
     execs.append(p)
 
@@ -253,14 +261,13 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
-        deb_depends = 'debconf | debconf-2.0, libc6, libbz2-1.0, zlib1g, ' +\
-            'libcairo2, libssl1.0.0, libglu1' + qt_pkgs,
+        deb_depends = 'debconf | debconf-2.0, libc6, libglu1 ' + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
         rpm_license = 'GPLv2+',
         rpm_group = 'Applications/Engineering',
-        rpm_requires = 'expat, bzip2-libs, libcairo2' + qt_pkgs,
+        rpm_requires = 'expat' + qt_pkgs,
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics',

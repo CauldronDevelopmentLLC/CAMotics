@@ -1,0 +1,19 @@
+Import('*')
+env = env.Clone()
+
+
+# Ignore warnings
+flags = env.subst('${CCFLAGS}')
+flags = flags.replace('-Wall', '').replace('-Werror', '')
+env.Replace(CCFLAGS = flags)
+
+
+# Configure
+env.AppendUnique(CPPDEFINES = [
+        'CAIRO_NO_MUTEX', 'HAVE_INTTYPES_H', 'CAIRO_HAS_IMAGE_SURFACE'])
+env.Append(CPPPATH = ['#/src/cairo'])
+
+
+# Bulid library
+lib = env.Library('cairo', Glob('*.c'))
+Return('lib')
