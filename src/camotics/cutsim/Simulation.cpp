@@ -22,10 +22,13 @@
 #include "ToolPath.h"
 #include "Workpiece.h"
 
+#include <camotics/SHA256.h>
+
 #include <camotics/sim/ToolTable.h>
 
 #include <cbang/json/JSON.h>
-#include <cbang/openssl/DigestStreamFilter.h>
+#include <cbang/iostream/UpdateStreamFilter.h>
+#include <cbang/net/Base64.h>
 
 #include <boost/ref.hpp>
 #include <boost/iostreams/device/null.hpp>
@@ -38,7 +41,8 @@ using namespace CAMotics;
 
 
 string Simulation::computeHash() const {
-  DigestStreamFilter digest("sha256");
+  SHA256 sha256;
+  UpdateStreamFilter<SHA256> digest(sha256);
 
   io::filtering_ostream stream;
   stream.push(boost::ref(digest));
@@ -49,7 +53,7 @@ string Simulation::computeHash() const {
 
   stream.reset();
 
-  return digest.toBase64();
+  return Base64().encode(sha256.finalize());
 }
 
 
