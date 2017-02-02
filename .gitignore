@@ -13,8 +13,13 @@
 *.la
 *.a
 *.lib
+
+# Build results
 *.pdb
 *.exe
+*.map
+*.ilk
+*.exp
 
 # Compiled Python
 *.pyc
@@ -27,6 +32,7 @@
 /build
 /config.log
 /package.txt
+moc_*.cc
 
 # Backup files
 *~
