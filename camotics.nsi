@@ -61,8 +61,10 @@ Section -Install
   File ${PRODUCT_LICENSE}
   File "README.md"
   File "CHANGELOG.md"
+  %(NSIS_INSTALL_FILES)s
 
-  %(extra_files)s
+  SetOutPath "$INSTDIR\platforms"
+  File "%(QTDIR)s\plugins\platforms\qwindows.dll"
 
   ; TPL Libs
   SetOverwrite on

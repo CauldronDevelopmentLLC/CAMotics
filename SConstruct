@@ -224,23 +224,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         else: qt_pkgs = ', libqtcore4, libqtgui4, libqt4-opengl'
     else: qt_pkgs = ''
 
-    # Find DLLs
-    extra_files = ''
-    if int(env.get('cross_mingw', 0)) or env['PLATFORM'] == 'win32':
-        dlls = env.FindDLLs(str(execs[0][0]))
-        extra_files = 'File ' + '\nFile '.join(dlls)
-
-        qt_dir = os.environ.get('QTDIR', '\\usr')
-        extra_files += '\n\nSetOutPath "$INSTDIR\\platforms"\n'
-
-        if int(env.get('cross_mingw', 0)):
-            extra_files += \
-                'File "%s\\share\\qt%s\\plugins\\platforms\\qwindows.dll"' % (
-                qt_dir, qt_version)
-        else:
-            extra_files += \
-                'File "%s\\plugins\\platforms\\qwindows.dll"' % (
-                qt_dir, qt_version)
+    if 'QTDIR' in os.environ: env['QTDIR'] = os.environ['QTDIR']
 
     pkg = env.Packager(
         'CAMotics',
@@ -262,7 +246,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         changelog = 'CHANGELOG.md',
 
         nsi = 'camotics.nsi',
-        extra_files = extra_files,
+        nsi_dll_deps = map(lambda x: str(x[0]), execs),
         timestamp_url = 'http://timestamp.comodoca.com/authenticode',
         code_sign_key = os.environ.get('CODE_SIGN_KEY', None),
         code_sign_key_pass = code_sign_key_pass,
