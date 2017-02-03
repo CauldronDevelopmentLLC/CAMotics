@@ -863,7 +863,7 @@ void QtWin::openProject(const string &_filename) {
        tr("Supported Files (*.xml *.nc *.ngc *.gcode *.tap *.tpl);;All Files "
           "(*.*)")).toStdString();
     if (filename.empty()) return;
-    settings.setValue("Projects/lastDir", QString::fromStdString(filename));
+    settings.setValue("Projects/lastDir", QString::fromUtf8(filename.c_str()));
   }
 
   int size = settings.beginReadArray("recentProjects");
@@ -875,7 +875,7 @@ void QtWin::openProject(const string &_filename) {
 
     // skip the currently opened project from the recents
     // if it was already present in the recents projects list
-    if (recent != QString::fromStdString(filename))
+    if (recent != QString::fromUtf8(filename.c_str()))
       recents.append(recent);
   }
   settings.endArray();
@@ -889,7 +889,7 @@ void QtWin::openProject(const string &_filename) {
 
   // there is no way to remove an array item from QSettings
   // rewrite the whole array if the order changed
-  recents.prepend(QString::fromStdString(filename));
+  recents.prepend(QString::fromUtf8(filename.c_str()));
 
   settings.beginWriteArray("recentProjects");
   const int maxRecentsSize = 20;

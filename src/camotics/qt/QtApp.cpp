@@ -34,8 +34,10 @@ using namespace cb;
 using namespace CAMotics;
 
 
-QtApp::QtApp(QWidget *parent) : CAMotics::Application("CAMotics"),
-                                threads(SystemInfo::instance().getCPUCount()) {
+QtApp::QtApp(QWidget *parent) :
+  // NOTE MSVC requires the explicit _hasFeature reference
+  CAMotics::Application("CAMotics", CAMotics::Application::_hasFeature),
+  threads(SystemInfo::instance().getCPUCount()) {
   options.add("qt-style", "Set Qt style");
   options.add("fullscreen", "Start in fullscreen mode.")->setDefault(false);
   options.add("auto-play", "Automatically start tool path playback.")
