@@ -59,8 +59,11 @@ void GLView::initializeGL() {
   try {
     GLEWInit();
   } catch (const cb::Exception &e) {
-    getQtWin().warning(SSTR("Failed to load OpenGL.  You may need to upgrade "
-                            "your graphics driver.\n" << e));
+    static bool warned = false;
+    if (!warned)
+      getQtWin().warning(SSTR("Failed to load OpenGL.  You may need to upgrade "
+                              "your graphics driver.\n" << e));
+    warned = true;
   }
 
   getQtWin().initializeGL();
