@@ -17,7 +17,7 @@ env.CBAddVariables(
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     EnumVariable('qt_version', 'Version of Qt to use', 'auto',
                  allowed_values = ('auto', '4', '5')))
-env.CBLoadTools('compiler cbang dist opengl build_info packager')
+env.CBLoadTools('compiler cbang dist opengl build_info packager find_dlls')
 conf = env.CBConfigure()
 
 # Config vars
@@ -226,15 +226,21 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     # Find DLLs
     extra_files = ''
-    if int(env.get('cross_mingw', 0)):
-        from finddlls import find_dlls
-        dlls = find_dlls(str(execs[0][0]))
+    if int(env.get('cross_mingw', 0)) or env['PLATFORM'] == 'win32':
+        dlls = env.FindDLLs(str(execs[0][0]))
         extra_files = 'File ' + '\nFile '.join(dlls)
 
+        qt_dir = os.environ.get('QTDIR', '\\usr')
         extra_files += '\n\nSetOutPath "$INSTDIR\\platforms"\n'
-        extra_files += \
-            'File "%s\\share\\qt%s\\plugins\\platforms\\qwindows.dll"' % (
-            os.environ.get('QTDIR', '\\usr'), qt_version)
+
+        if int(env.get('cross_mingw', 0)):
+            extra_files += \
+                'File "%s\\share\\qt%s\\plugins\\platforms\\qwindows.dll"' % (
+                qt_dir, qt_version)
+        else:
+            extra_files += \
+                'File "%s\\plugins\\platforms\\qwindows.dll"' % (
+                qt_dir, qt_version)
 
     pkg = env.Packager(
         'CAMotics',
