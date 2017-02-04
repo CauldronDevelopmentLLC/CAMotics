@@ -23,6 +23,8 @@
 #include "QtWin.h"
 #include "GLEWInit.h"
 
+#include <cbang/log/Logger.h>
+
 #include <QGLFormat>
 
 using namespace CAMotics;
@@ -59,11 +61,9 @@ void GLView::initializeGL() {
   try {
     GLEWInit();
   } catch (const cb::Exception &e) {
-    static bool warned = false;
-    if (!warned)
-      getQtWin().warning(SSTR("Failed to load OpenGL.  You may need to upgrade "
-                              "your graphics driver.\n" << e));
-    warned = true;
+    LOG_ERROR("Failed to load OpenGL.  You may need to upgrade "
+              "your graphics driver.\n" << e);
+    getQtWin().showConsole();
   }
 
   getQtWin().initializeGL();
