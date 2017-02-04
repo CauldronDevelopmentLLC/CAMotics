@@ -4,7 +4,7 @@
 
   "scons": {
     "ccflags": "-Wno-unused-local-typedef",
-    "disable_local": "libevent"
+    "disable_local": "libevent re2"
   },
 
   "images": {

@@ -163,8 +163,8 @@
 
 # define CAIRO_MUTEX_IMPL_NO 1
 # define CAIRO_MUTEX_IMPL_INITIALIZE() CAIRO_MUTEX_IMPL_NOOP
-# define CAIRO_MUTEX_IMPL_LOCK(mutex) CAIRO_MUTEX_IMPL_NOOP1(mutex)
-# define CAIRO_MUTEX_IMPL_UNLOCK(mutex) CAIRO_MUTEX_IMPL_NOOP1(mutex)
+# define CAIRO_MUTEX_IMPL_LOCK(mutex) CAIRO_MUTEX_IMPL_NOOP //1(mutex)
+# define CAIRO_MUTEX_IMPL_UNLOCK(mutex) CAIRO_MUTEX_IMPL_NOOP //1(mutex)
 # define CAIRO_MUTEX_IMPL_NIL_INITIALIZER 0
 
 #elif HAVE_PTHREAD_H /*******************************************************/

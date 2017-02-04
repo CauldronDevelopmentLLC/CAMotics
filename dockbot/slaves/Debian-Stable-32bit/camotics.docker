@@ -3,5 +3,5 @@ FROM 32bit/debian:stable
 include(debian.m4)
 include(32bit-uname.m4)
 include(boost.m4)
-APT(qt5-default libqt5opengl5-dev libcairo2-dev libv8-dev)
+APT(qt5-default libqt5opengl5-dev libv8-dev)
 include(slave.m4)
