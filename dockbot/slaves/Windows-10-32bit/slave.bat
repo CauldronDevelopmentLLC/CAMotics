@@ -1,0 +1,1 @@
+twistd -oy slave.tac
