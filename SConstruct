@@ -17,7 +17,7 @@ env.CBAddVariables(
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     EnumVariable('qt_version', 'Version of Qt to use', 'auto',
                  allowed_values = ('auto', '4', '5')))
-env.CBLoadTools('compiler cbang dist opengl build_info packager find_dlls')
+env.CBLoadTools('compiler cbang dist opengl build_info packager')
 conf = env.CBConfigure()
 
 # Config vars
@@ -218,13 +218,21 @@ if 'package' in COMMAND_LINE_TARGETS:
     if 'SIGNTOOL' in os.environ: env['SIGNTOOL'] = os.environ['SIGNTOOL']
 
     # Qt dependencies
+    if 'QTDIR' in os.environ: env['QTDIR'] = os.environ['QTDIR']
+
     if env.get('qt_deps'):
+        qt_dlls = 'Core Gui Widgets OpenGL'.split()
+
         if qt_version == '5':
             qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5'
         else: qt_pkgs = ', libqtcore4, libqtgui4, libqt4-opengl'
-    else: qt_pkgs = ''
 
-    if 'QTDIR' in os.environ: env['QTDIR'] = os.environ['QTDIR']
+        qt_dlls = map(lambda dll: env['QTDIR'] + '\\bin\\Qt%s%s.dll' % (
+                qt_version, dll), qt_dlls)
+
+    else:
+        qt_pkgs = ''
+        qt_dlls = []
 
     pkg = env.Packager(
         'CAMotics',
@@ -246,7 +254,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         changelog = 'CHANGELOG.md',
 
         nsi = 'camotics.nsi',
-        nsi_dll_deps = map(lambda x: str(x[0]), execs),
+        nsis_install_files = qt_dlls,
         timestamp_url = 'http://timestamp.comodoca.com/authenticode',
         code_sign_key = os.environ.get('CODE_SIGN_KEY', None),
         code_sign_key_pass = code_sign_key_pass,
