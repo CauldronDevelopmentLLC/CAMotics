@@ -4,9 +4,8 @@
 
   "env": {
     "TARGET_ARCH": "x86_64",
-    "BOOST_SOURCE": "c:\\build\\boost_1_62_0",
     "V8_HOME": "c:\\build\\v8-3.14.5",
-    "QTDIR": "c:\\Qt\\5.8\\msvc2015_64"
+    "QTDIR": "c:\\Qt\\5.6\\msvc2015_64"
   },
 
   "scons": {
@@ -16,6 +15,10 @@
   "modes": {
     "debug": {"env": {"V8_LIBPATH": "c:\\build\\v8-3.14.5\\obj\\debug"}},
     "release": {"env": {"V8_LIBPATH": "c:\\build\\v8-3.14.5\\obj\\release"}}
+  },
+
+  "projects": {
+    "camotics": {"sign": true}
   },
 
   "images": {

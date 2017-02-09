@@ -1,6 +1,5 @@
 define(`ARCH_BITS', 32)
 include(win-cross.m4)
-include(boost.m4)
 include(mingw-cross.m4)
 include(v8.m4)
 

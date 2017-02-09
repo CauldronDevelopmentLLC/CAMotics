@@ -30,7 +30,8 @@
     "camotics": {
       "repo": {"url": "http://github.com/CauldronDevelopmentLLC/camotics"},
       "deps": ["cbang"],
-      "packages": ["package"]
+      "packages": ["package"],
+      "summary": "CAMotics Open-Source Simulation & Computer Aided Machining"
     }
   }
 }
