@@ -228,6 +228,9 @@ if 'package' in COMMAND_LINE_TARGETS:
         else: qt_pkgs = ', libqtcore4, libqtgui4, libqt4-opengl'
 
         if env['PLATFORM'] == 'win32':
+            import shutil
+            shutil.rmtree('build/win32')
+
             cmd = [env['QTDIR'] + '\\bin\\windeployqt.exe', '--dir',
                    'build\\win32', '--no-system-d3d-compiler', '--release',
                    'camotics.exe']
