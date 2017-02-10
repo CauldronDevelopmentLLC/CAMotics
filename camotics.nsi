@@ -63,6 +63,8 @@ Section -Install
   File "CHANGELOG.md"
   %(NSIS_INSTALL_FILES)s
 
+  ExecWait '"$INSTDIR\%(VCREDIST)s"  /passive /norestart'
+
   ; TPL Libs
   SetOverwrite on
   SetOutPath "$INSTDIR\tpl_lib"

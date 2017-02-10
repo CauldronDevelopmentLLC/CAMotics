@@ -232,13 +232,14 @@ if 'package' in COMMAND_LINE_TARGETS:
             shutil.rmtree('build/win32')
 
             cmd = [env['QTDIR'] + '\\bin\\windeployqt.exe', '--dir',
-                   'build\\win32', '--no-system-d3d-compiler', '--release',
-                   'camotics.exe']
+                   'build\\win32', '--no-system-d3d-compiler', '--no-opengl-sw',
+                   '--release', '--no-translations', 'camotics.exe']
 
             if subprocess.call(cmd):
                 raise Exception, 'Call to windeployqt failed'
 
             for name in os.listdir('build/win32'):
+                if 'vcredist' in name: env['VCREDIST'] = name
                 install_files.append('build\\win32\\' + name)
 
     else:
