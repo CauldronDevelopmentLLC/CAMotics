@@ -161,6 +161,7 @@ for prog in progs.split():
     else: _env = env
 
     p = _env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
+    _env.Precious(p)
     _env.Install(env.get('install_prefix') + '/bin/', p)
     Depends(p, cairo)
     Default(p)
