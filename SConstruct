@@ -229,12 +229,8 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         if env['PLATFORM'] == 'win32':
             cmd = [env['QTDIR'] + '\\bin\\windeployqt.exe', '--dir',
-                   'build\\win32', '--no-system-d3d-compiler']
-
-            if env.get('debug'): cmd.append('--debug')
-            else: cmd.append('--release')
-
-            cmd.append('camotics.exe')
+                   'build\\win32', '--no-system-d3d-compiler', '--release',
+                   'camotics.exe']
 
             if subprocess.call(cmd):
                 raise Exception, 'Call to windeployqt failed'
