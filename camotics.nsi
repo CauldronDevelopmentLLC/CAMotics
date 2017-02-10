@@ -63,9 +63,6 @@ Section -Install
   File "CHANGELOG.md"
   %(NSIS_INSTALL_FILES)s
 
-  SetOutPath "$INSTDIR\platforms"
-  File "%(QTDIR)s\plugins\platforms\qwindows.dll"
-
   ; TPL Libs
   SetOverwrite on
   SetOutPath "$INSTDIR\tpl_lib"

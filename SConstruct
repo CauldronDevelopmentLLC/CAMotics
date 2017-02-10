@@ -220,19 +220,29 @@ if 'package' in COMMAND_LINE_TARGETS:
     # Qt dependencies
     if 'QTDIR' in os.environ: env['QTDIR'] = os.environ['QTDIR']
 
+    install_files = []
     if env.get('qt_deps'):
-        qt_dlls = 'Core Gui Widgets OpenGL'.split()
-
         if qt_version == '5':
             qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5'
         else: qt_pkgs = ', libqtcore4, libqtgui4, libqt4-opengl'
 
-        qt_dlls = map(lambda dll: env['QTDIR'] + '\\bin\\Qt%s%s.dll' % (
-                qt_version, dll), qt_dlls)
+        if env['PLATFORM'] == 'win32':
+            cmd = [env['QTDIR'] + '\\bin\\windeployqt.exe', '--dir',
+                   'build\\win32', '--no-system-d3d-compiler']
+
+            if env.get('debug'): cmd.append('--debug')
+            else: cmd.append('--release')
+
+            cmd.append('camotics.exe')
+
+            if subprocess.call(cmd):
+                raise Exception, 'Call to windeployqt failed'
+
+            for name in os.listdir('build/win32'):
+                install_files.append('build\\win32\\' + name)
 
     else:
         qt_pkgs = ''
-        qt_dlls = []
 
     pkg = env.Packager(
         'CAMotics',
@@ -254,7 +264,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         changelog = 'CHANGELOG.md',
 
         nsi = 'camotics.nsi',
-        nsis_install_files = qt_dlls,
+        nsis_install_files = install_files,
         timestamp_url = 'http://timestamp.comodoca.com/authenticode',
         code_sign_key = os.environ.get('CODE_SIGN_KEY', None),
         code_sign_key_pass = code_sign_key_pass,
