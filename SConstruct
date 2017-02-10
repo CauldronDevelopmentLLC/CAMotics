@@ -229,7 +229,9 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         if env['PLATFORM'] == 'win32':
             import shutil
-            shutil.rmtree('build/win32')
+            try:
+                shutil.rmtree('build/win32')
+            except: pass
 
             cmd = [env['QTDIR'] + '\\bin\\windeployqt.exe', '--dir',
                    'build\\win32', '--no-system-d3d-compiler', '--no-opengl-sw',
