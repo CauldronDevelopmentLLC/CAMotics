@@ -29,7 +29,7 @@
          <string>Create a new TPL file by selecting a non-existing filename or select an exsiting TPL file and add it to the current project.</string>
         </property>
         <property name="text">
-         <string>TPL File (Tool Path Lanague)</string>
+         <string>TPL File (Tool Path Language)</string>
         </property>
         <property name="checked">
          <bool>true</bool>
