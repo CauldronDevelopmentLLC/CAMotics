@@ -154,7 +154,7 @@ namespace CAMotics {
       if (reduce && !shouldQuit()) cutSim.reduceSurface(*surface);
 
       // Export surface
-      if (shouldQuit())
+      if (!shouldQuit())
         surface->writeSTL
           (*output, binary, "CAMotics Surface", project.computeHash());
     }
