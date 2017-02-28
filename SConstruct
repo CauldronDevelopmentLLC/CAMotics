@@ -86,6 +86,9 @@ if not env.GetOption('clean'):
 
     conf.CBConfig('opengl')
 
+    # Cairo
+    have_cairo = conf.CBCheckLib('cairo')
+
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
 
@@ -118,8 +121,11 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 
 # Qt
+dialogs = '''
+  export about donate find new tool settings new_project cam cam_layer
+'''.split()
 uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
-for dialog in 'export about donate find new tool settings new_project'.split():
+for dialog in dialogs:
     uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
                        'qt/%s_dialog.ui' % dialog))
 
@@ -145,9 +151,10 @@ libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
 
 # Cairo
 Export('env')
-cairo = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
-Depends(lib, cairo)
-env.Append(_LIBFLAGS = [cairo]) # Force to end
+if not have_cairo:
+    cairo = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
+    Depends(lib, cairo)
+    env.Append(_LIBFLAGS = [cairo]) # Force to end
 
 
 # Build programs
@@ -163,7 +170,7 @@ for prog in progs.split():
     p = _env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
     _env.Precious(p)
     _env.Install(env.get('install_prefix') + '/bin/', p)
-    Depends(p, cairo)
+    if not have_cairo: Depends(p, cairo)
     Default(p)
     execs.append(p)
 
