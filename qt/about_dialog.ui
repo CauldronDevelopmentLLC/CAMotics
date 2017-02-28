@@ -77,7 +77,7 @@
    <item>
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Copyright (c) 2011-2015 Joseph Coffland</string>
+      <string>Copyright (c) 2011-2017 Joseph Coffland</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

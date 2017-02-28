@@ -13,8 +13,8 @@ dockbot publish --key <key> -v
 
 rsync -av releases/alpha/* root@camotics.org:/var/www/camotics.org/http/releases/public/
 
-github-release upload -c -v <version> -m release -u jcoffland -o CauldronDevelopmentLLC -r CAMotics $(find releases/alpha/release/camotics/ -name camotics\*.\*)
-github-release upload -c -v <version> -m debug -u jcoffland -o CauldronDevelopmentLLC -r CAMotics $(find releases/alpha/debug/camotics/ -name camotics\*.\*)
+github-release upload -c -v <version> -m release -u jcoffland -o CauldronDevelopmentLLC -r CAMotics $(find releases/alpha/release/camotics/ -name 'camotics*<version>*.*')
+github-release upload -c -v <version> -m debug -u jcoffland -o CauldronDevelopmentLLC -r CAMotics $(find releases/alpha/debug/camotics/ -name 'camotics*<version>*.*')
 ```
 
 Replace ``<key>`` and ``<version>`` above.  Then update version in camotics/web,

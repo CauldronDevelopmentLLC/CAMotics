@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.1.1'
+version = '1.2.0'
 major, minor, revision = version.split('.')
 
 # Setup
@@ -285,7 +285,7 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         app_id = 'org.camotics',
         app_resources = [['osx/Resources', '.'], ['tpl_lib', 'tpl_lib']],
-        app_copyright = 'Copyright 2011-2015, Cauldron Development LLC',
+        app_copyright = 'Copyright 2011-2017, Cauldron Development LLC',
         app_signature = 'camo',
         app_other_info = {
             'CFBundleExecutable': 'camotics', # Overrides 'programs'
