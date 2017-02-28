@@ -87,7 +87,8 @@ if not env.GetOption('clean'):
     conf.CBConfig('opengl')
 
     # Cairo
-    have_cairo = conf.CBCheckLib('cairo')
+    have_cairo = \
+        conf.CBCheckCHeader('cairo/cairo.h') and conf.CBCheckLib('cairo')
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
