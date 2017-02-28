@@ -45,8 +45,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_EXCEPTION_H
-#define DL_EXCEPTION_H
+#pragma once
+
 
 #if _MSC_VER > 1000
 #pragma once
@@ -66,4 +66,3 @@ class DL_NullStrExc : public DL_Exception {};
  * Used for exception handling.
  */
 class DL_GroupCodeExc : public DL_Exception {};
-#endif

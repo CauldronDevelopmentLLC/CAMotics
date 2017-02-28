@@ -44,8 +44,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_ENTITIES_H
-#define DL_ENTITIES_H
+#pragma once
+
 
 
 #include <string>
@@ -1468,7 +1468,3 @@ struct DL_ImageDefData {
 	/*! Image file */
 	string file;
 };
-
-#endif
-
-// EOF

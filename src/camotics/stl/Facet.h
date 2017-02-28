@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_FACET_H
-#define CAMOTICS_FACET_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -40,5 +40,3 @@ namespace CAMotics {
     void setNormal(const cb::Vector3F &normal) {this->normal = normal;}
   };
 }
-
-#endif // CAMOTICS_FACET_H

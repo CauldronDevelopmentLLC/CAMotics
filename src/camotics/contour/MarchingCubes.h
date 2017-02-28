@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_MARCHING_CUBES_H
-#define CAMOTICS_MARCHING_CUBES_H
+#pragma once
+
 
 #include "SliceContourGenerator.h"
 
@@ -34,5 +34,3 @@ namespace CAMotics {
                 unsigned y);
   };
 }
-
-#endif // CAMOTICS_MARCHING_CUBES_H

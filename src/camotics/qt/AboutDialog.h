@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_ABOUT_DIALOG_H
-#define CAMOTICS_ABOUT_DIALOG_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -43,5 +43,3 @@ namespace CAMotics {
     void on_licensePushButton_clicked();
   };
 }
-
-#endif // CAMOTICS_ABOUT_DIALOG_H

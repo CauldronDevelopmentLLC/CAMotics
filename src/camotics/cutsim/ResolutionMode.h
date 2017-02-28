@@ -19,8 +19,8 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef CBANG_RESOLUTION_MODE_H
-#define CBANG_RESOLUTION_MODE_H
+#ifndef CAMOTICS_RESOLUTION_MODE_H
+#define CAMOTICS_RESOLUTION_MODE_H
 
 #define CBANG_ENUM_NAME ResolutionMode
 #define CBANG_ENUM_NAMESPACE CAMotics
@@ -28,7 +28,7 @@
 #define CBANG_ENUM_PREFIX 11
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // CBANG_RESOLUTION_MODE_H
+#endif // CAMOTICS_RESOLUTION_MODE_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(RESOLUTION_MANUAL,    0)

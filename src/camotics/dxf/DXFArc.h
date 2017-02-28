@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_DXFARC_H
-#define CAMOTICS_DXFARC_H
+#pragma once
+
 
 #include "DXFEntity.h"
 
@@ -48,5 +48,3 @@ namespace CAMotics {
     type_t getType() const {return DXF_ARC;}
   };
 }
-
-#endif // CAMOTICS_DXFARC_H

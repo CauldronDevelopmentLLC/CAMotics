@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONTOUR_GENERATOR_H
-#define CAMOTICS_CONTOUR_GENERATOR_H
+#pragma once
+
 
 #include "Surface.h"
 #include "FieldFunction.h"
@@ -45,5 +45,3 @@ namespace CAMotics {
     virtual void run(FieldFunction &func, GridTreeRef &tree) = 0;
   };
 }
-
-#endif // CAMOTICS_CONTOUR_GENERATOR_H

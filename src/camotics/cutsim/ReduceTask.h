@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_REDUCE_TASK_H
-#define CAMOTICS_REDUCE_TASK_H
+#pragma once
+
 
 #include <camotics/Task.h>
 
@@ -41,5 +41,3 @@ namespace CAMotics {
     void run();
   };
 }
-
-#endif // CAMOTICS_REDUCE_TASK_H

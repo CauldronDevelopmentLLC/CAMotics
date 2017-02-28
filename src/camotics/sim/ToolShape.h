@@ -19,8 +19,8 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef CBANG_TOOL_SHAPE_H
-#define CBANG_TOOL_SHAPE_H
+#ifndef CAMOTICS_TOOL_SHAPE_H
+#define CAMOTICS_TOOL_SHAPE_H
 
 #define CBANG_ENUM_NAME ToolShape
 #define CBANG_ENUM_NAMESPACE CAMotics
@@ -28,7 +28,7 @@
 #define CBANG_ENUM_PREFIX 3
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // CBANG_TOOL_SHAPE_H
+#endif // CAMOTICS_TOOL_SHAPE_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(TS_CYLINDRICAL,   0)

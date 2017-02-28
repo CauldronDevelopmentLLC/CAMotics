@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_NUMBER_H
-#define CAMOTICS_NUMBER_H
+#pragma once
+
 
 #include "Entity.h"
 
@@ -38,5 +38,3 @@ namespace CAMotics {
     void print(std::ostream &stream) const;
   };
 }
-
-#endif // CAMOTICS_NUMBER_H

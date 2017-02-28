@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PROJECT_MODEL_H
-#define CAMOTICS_PROJECT_MODEL_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -77,5 +77,3 @@ namespace CAMotics {
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
   };
 }
-
-#endif // CAMOTICS_PROJECT_MODEL_H

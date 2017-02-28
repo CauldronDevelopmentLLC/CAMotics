@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOKEN_H
-#define CAMOTICS_TOKEN_H
+#pragma once
+
 
 #include "TokenType.h"
 
@@ -28,5 +28,3 @@
 namespace CAMotics {
   typedef cb::Token<TokenType> Token;
 }
-
-#endif // CAMOTICS_TOKEN_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_PATH_H
-#define CAMOTICS_TOOL_PATH_H
+#pragma once
+
 
 #include "MoveStream.h"
 
@@ -67,5 +67,3 @@ namespace CAMotics {
     void move(Move &move);
   };
 }
-
-#endif // CAMOTICS_TOOL_PATH_H

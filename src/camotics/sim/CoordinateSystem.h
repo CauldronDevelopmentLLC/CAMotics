@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_COORDINATE_SYSTEM_H
-#define CAMOTICS_COORDINATE_SYSTEM_H
+#pragma once
+
 
 namespace CAMotics {
   class CoordinateSystem {
@@ -31,5 +31,3 @@ namespace CAMotics {
     void reset() {rotation = 0;}
   };
 }
-
-#endif // CAMOTICS_COORDINATE_SYSTEM_H

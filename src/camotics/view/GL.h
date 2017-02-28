@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GL_H
-#define CAMOTICS_GL_H
+#pragma once
+
 
 #include <glew/glew.h> // Must be first
 
@@ -44,5 +44,3 @@ namespace CAMotics {
 #else
 #define CHECK_GL_ERROR(msg)
 #endif
-
-#endif // CAMOTICS_GL_H

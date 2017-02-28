@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_GCODE_MODULE_H
-#define TPLANG_GCODE_MODULE_H
+#pragma once
+
 
 #include <camotics/machine/MachineUnitAdapter.h>
 #include <camotics/machine/MachineEnum.h>
@@ -63,5 +63,3 @@ namespace tplang {
                    bool incremental = false);
   };
 }
-
-#endif // TPLANG_GCODE_MODULE_H

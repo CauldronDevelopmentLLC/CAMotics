@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_FILE_DIALOG_H
-#define CAMOTICS_FILE_DIALOG_H
+#pragma once
+
 
 #include <QFileDialog>
 
@@ -39,5 +39,3 @@ namespace CAMotics {
                      const std::string &filename, bool save);
   };
 }
-
-#endif // CAMOTICS_FILE_DIALOG_H

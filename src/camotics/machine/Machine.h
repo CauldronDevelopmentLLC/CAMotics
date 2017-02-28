@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_MACHINE_H
-#define CAMOTICS_MACHINE_H
+#pragma once
+
 
 #include "MachinePipeline.h"
 
@@ -45,5 +45,3 @@ namespace CAMotics {
     void move(Move &move);
   };
 }
-
-#endif // CAMOTICS_MACHINE_H

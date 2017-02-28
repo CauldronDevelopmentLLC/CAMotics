@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GEOM_H
-#define CAMOTICS_GEOM_H
+#pragma once
+
 
 #include "Real.h"
 
@@ -46,5 +46,3 @@ namespace CAMotics {
   typedef cb::Quaternion<real> Quaternion;
   typedef cb::AxisAngle<real> AxisAngle;
 }
-
-#endif // CAMOTICS_GEOM_H

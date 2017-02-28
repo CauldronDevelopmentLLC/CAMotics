@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONCURRENT_TASK_MANAGER_H
-#define CAMOTICS_CONCURRENT_TASK_MANAGER_H
+#pragma once
+
 
 #include "Task.h"
 #include "TaskObserver.h"
@@ -67,5 +67,3 @@ namespace CAMotics {
     void complete(const cb::SmartPointer<Task> &task);
   };
 }
-
-#endif // CAMOTICS_CONCURRENT_TASK_MANAGER_H

@@ -44,8 +44,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_ATTRIBUTES_H
-#define DL_ATTRIBUTES_H
+#pragma once
+
 
 #include <string>
 using std::string;
@@ -196,7 +196,3 @@ private:
     int width;
     string lineType;
 };
-
-#endif
-
-// EOF

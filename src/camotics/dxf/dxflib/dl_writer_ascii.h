@@ -45,8 +45,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_WRITER_ASCII_H
-#define DL_WRITER_ASCII_H
+#pragma once
+
 
 #if _MSC_VER > 1000
 #pragma once
@@ -90,5 +90,3 @@ private:
     mutable std::ofstream m_ofile;
 
 };
-
-#endif

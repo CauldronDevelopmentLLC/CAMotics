@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_QEF_H
-#define CAMOTICS_QEF_H
+#pragma once
+
 
 // Original code from
 // http://www.oocities.org/tzukkers/isosurf/isosurfaces.html
@@ -69,5 +69,3 @@ namespace CAMotics {
                          real x[3], int rows);
   };
 }
-
-#endif // CAMOTICS_QEF_H

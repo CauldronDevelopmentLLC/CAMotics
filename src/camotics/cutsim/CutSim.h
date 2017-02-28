@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CUT_SIM_H
-#define CAMOTICS_CUT_SIM_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -46,5 +46,3 @@ namespace CAMotics {
     void interrupt();
   };
 }
-
-#endif // CAMOTICS_CUT_SIM_H

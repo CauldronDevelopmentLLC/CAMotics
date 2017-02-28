@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_APPLICATION_H
-#define CAMOTICS_APPLICATION_H
+#pragma once
+
 
 #include <cbang/Application.h>
 #include <cbang/io/Reader.h>
@@ -40,5 +40,3 @@ namespace CAMotics {
     {CBANG_THROW("read() not implemented");}
   };
 }
-
-#endif // CAMOTICS_APPLICATION_H

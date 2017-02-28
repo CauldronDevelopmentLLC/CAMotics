@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PROBE_POINT_H
-#define CAMOTICS_PROBE_POINT_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -32,5 +32,3 @@ namespace CAMotics {
     ProbePoint() : probe(false), address(0) {}
   };
 }
-
-#endif // CAMOTICS_PROBE_POINT_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SETTINGS_H
-#define CAMOTICS_SETTINGS_H
+#pragma once
+
 
 #include <QSettings>
 
@@ -35,5 +35,3 @@ namespace CAMotics {
     void set(const std::string &name, const QVariant &value);
   };
 }
-
-#endif // CAMOTICS_SETTINGS_H

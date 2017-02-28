@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_ENTITY_H
-#define CAMOTICS_ENTITY_H
+#pragma once
+
 
 #include <camotics/gcode/Token.h>
 #include <camotics/gcode/Evaluator.h>
@@ -58,5 +58,3 @@ namespace CAMotics {
     return stream;
   }
 }
-
-#endif // CAMOTICS_ENTITY_H

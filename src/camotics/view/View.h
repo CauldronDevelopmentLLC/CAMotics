@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_VIEW_H
-#define CAMOTICS_VIEW_H
+#pragma once
+
 
 #include "ViewPort.h"
 #include "ToolPathView.h"
@@ -95,5 +95,3 @@ namespace CAMotics {
     void clear();
   };
 }
-
-#endif // CAMOTICS_VIEW_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SURFACE_H
-#define CAMOTICS_SURFACE_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -45,5 +45,3 @@ namespace CAMotics {
                   const std::string &name, const std::string &hash) const;
   };
 }
-
-#endif // CAMOTICS_SURFACE_H

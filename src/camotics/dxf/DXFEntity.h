@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_DXFENTITY_H
-#define CAMOTICS_DXFENTITY_H
+#pragma once
+
 
 #include <cbang/Exception.h>
 #include <cbang/geom/Vector.h>
@@ -44,5 +44,3 @@ namespace CAMotics {
     virtual void addKnot(double k) {THROW("Cannot add knot");}
   };
 }
-
-#endif // CAMOTICS_DXFENTITY_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_VIEW_PORT_H
-#define CAMOTICS_VIEW_PORT_H
+#pragma once
+
 
 
 #include <camotics/Geom.h>
@@ -78,5 +78,3 @@ namespace CAMotics {
     void setWire(bool x) const;
   };
 }
-
-#endif // CAMOTICS_VIEW_PORT_H

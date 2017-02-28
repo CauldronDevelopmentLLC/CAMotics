@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_OPT_H
-#define CAMOTICS_OPT_H
+#pragma once
+
 
 #include "Path.h"
 
@@ -76,5 +76,3 @@ namespace CAMotics {
                  AnnealState &best);
   };
 }
-
-#endif // CAMOTICS_OPT_H

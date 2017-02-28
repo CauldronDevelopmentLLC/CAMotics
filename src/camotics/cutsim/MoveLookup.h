@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_MOVE_LOOKUP_H
-#define CAMOTICS_MOVE_LOOKUP_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 #include <camotics/cutsim/Move.h>
@@ -38,5 +38,3 @@ namespace CAMotics {
     virtual void draw(bool leavesOnly = false) {}
   };
 }
-
-#endif // CAMOTICS_MOVE_LOOKUP_H

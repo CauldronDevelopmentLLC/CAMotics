@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_INTERPRETER_H
-#define CAMOTICS_INTERPRETER_H
+#pragma once
+
 
 #include "OCodeInterpreter.h"
 
@@ -46,5 +46,3 @@ namespace CAMotics {
     void operator()(const cb::SmartPointer<Block> &block);
   };
 }
-
-#endif // CAMOTICS_INTERPRETER_H

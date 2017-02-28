@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GRID_TREE_BASE_H
-#define CAMOTICS_GRID_TREE_BASE_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -41,5 +41,3 @@ namespace CAMotics {
                         std::vector<float> &normals) const = 0;
   };
 }
-
-#endif // CAMOTICS_GRID_TREE_BASE_H

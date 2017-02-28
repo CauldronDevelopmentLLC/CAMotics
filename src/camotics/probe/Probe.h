@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PROBE_H
-#define CAMOTICS_PROBE_H
+#pragma once
+
 
 #include "ProbeGrid.h"
 
@@ -80,5 +80,3 @@ namespace CAMotics {
     void operator()(const cb::SmartPointer<Block> &block);
   };
 }
-
-#endif // CAMOTICS_PROBE_H

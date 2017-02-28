@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_GRAPHICS_ITEM_H
-#define CAMOTICS_TOOL_GRAPHICS_ITEM_H
+#pragma once
+
 
 #include <camotics/sim/Tool.h>
 #include <camotics/view/ToolView.h>
@@ -46,5 +46,3 @@ namespace CAMotics {
     void update(const Tool &tool, const QSize &size);
   };
 }
-
-#endif // CAMOTICS_TOOL_GRAPHICS_ITEM_H

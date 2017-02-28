@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_SWEEP_H
-#define CAMOTICS_TOOL_SWEEP_H
+#pragma once
+
 
 #include "AABBTree.h"
 #include "ToolPath.h"
@@ -62,5 +62,3 @@ namespace CAMotics {
     real depth(const Vector3R &p) const;
   };
 }
-
-#endif // CAMOTICS_TOOL_SWEEP_H

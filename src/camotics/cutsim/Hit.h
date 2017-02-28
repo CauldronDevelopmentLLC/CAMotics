@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_HIT_H
-#define CAMOTICS_HIT_H
+#pragma once
+
 
 namespace CAMotics {
   struct Hit {
@@ -29,5 +29,3 @@ namespace CAMotics {
     uint8_t face;
   };
 }
-
-#endif // CAMOTICS_HIT_H

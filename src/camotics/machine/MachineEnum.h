@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MACHINE_ENUM_H
-#define TPLANG_MACHINE_ENUM_H
+#pragma once
+
 
 namespace CAMotics {
   class MachineEnum {
@@ -36,4 +36,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_MACHINE_ENUM_H
+

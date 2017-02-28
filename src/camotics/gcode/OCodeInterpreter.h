@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_OCODE_INTERPRETER_H
-#define CAMOTICS_OCODE_INTERPRETER_H
+#pragma once
+
 
 #include "GCodeInterpreter.h"
 
@@ -103,5 +103,3 @@ namespace CAMotics {
     double lookupReference(const std::string &name);
   };
 }
-
-#endif // CAMOTICS_OCODE_INTERPRETER_H

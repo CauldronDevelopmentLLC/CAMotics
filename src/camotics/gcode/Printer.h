@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PRINTER_H
-#define CAMOTICS_PRINTER_H
+#pragma once
+
 
 #include "Processor.h"
 
@@ -44,5 +44,3 @@ namespace CAMotics {
     void operator()(const cb::SmartPointer<Block> &block);
   };
 }
-
-#endif // CAMOTICS_PRINTER_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_STL_MODULE_H
-#define TPLANG_STL_MODULE_H
+#pragma once
+
 
 #include <cbang/js/NativeModule.h>
 
@@ -42,5 +42,3 @@ namespace tplang {
     void contour(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }
-
-#endif // TPLANG_STL_MODULE_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONSOLE_WRITER_H
-#define CAMOTICS_CONSOLE_WRITER_H
+#pragma once
+
 
 #include <QTextEdit>
 #include <QMenu>
@@ -57,5 +57,3 @@ namespace CAMotics {
     void on_find(QString text, bool regex, int options);
   };
 }
-
-#endif // CAMOTICS_CONSOLE_WRITER_H

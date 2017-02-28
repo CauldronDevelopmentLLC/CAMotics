@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_VIEWER_H
-#define CAMOTICS_VIEWER_H
+#pragma once
+
 
 namespace CAMotics {
   class View;
@@ -34,5 +34,3 @@ namespace CAMotics {
     void draw(const View &view);
   };
 }
-
-#endif // CAMOTICS_VIEWER_H

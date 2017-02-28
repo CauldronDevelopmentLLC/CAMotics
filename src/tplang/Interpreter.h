@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_INTERPRETER_H
-#define TPLANG_INTERPRETER_H
+#pragma once
+
 
 #include "TPLContext.h"
 
@@ -40,5 +40,3 @@ namespace tplang {
     void read(const cb::InputSource &source);
   };
 }
-
-#endif // TPLANG_INTERPRETER_H

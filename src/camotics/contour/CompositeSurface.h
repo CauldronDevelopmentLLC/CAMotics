@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_COMPOSITE_SURFACE_H
-#define CAMOTICS_COMPOSITE_SURFACE_H
+#pragma once
+
 
 #include "Surface.h"
 
@@ -50,5 +50,3 @@ namespace CAMotics {
     void reduce(Task &task);
   };
 }
-
-#endif // CAMOTICS_COMPOSITE_SURFACE_H

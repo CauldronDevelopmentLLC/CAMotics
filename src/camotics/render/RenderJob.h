@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_RENDER_JOB_H
-#define CAMOTICS_RENDER_JOB_H
+#pragma once
+
 
 #include "RenderMode.h"
 
@@ -49,5 +49,3 @@ namespace CAMotics {
     void stop();
   };
 }
-
-#endif // CAMOTICS_RENDER_JOB_H

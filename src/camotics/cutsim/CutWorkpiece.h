@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CUT_WORKPIECE_H
-#define CAMOTICS_CUT_WORKPIECE_H
+#pragma once
+
 
 #include "Workpiece.h"
 #include "ToolSweep.h"
@@ -50,5 +50,3 @@ namespace CAMotics {
     real depth(const Vector3R &p) const;
   };
 }
-
-#endif // CAMOTICS_CUT_WORKPIECE_H

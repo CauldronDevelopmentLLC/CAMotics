@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_PATH_VIEW_H
-#define CAMOTICS_TOOL_PATH_VIEW_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 #include <camotics/cutsim/ToolPath.h>
@@ -108,5 +108,3 @@ namespace CAMotics {
     void draw();
   };
 }
-
-#endif // CAMOTICS_TOOL_PATH_VIEW_H

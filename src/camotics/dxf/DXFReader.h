@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_DXFREADER_H
-#define CAMOTICS_DXFREADER_H
+#pragma once
+
 
 #include "DXFEntity.h"
 
@@ -77,5 +77,3 @@ namespace CAMotics {
     void addSolid(const DL_SolidData &solid);
   };
 }
-
-#endif // CAMOTICS_DXFREADER_H

@@ -49,8 +49,8 @@
 */
 
 
-#ifndef CAMOTICS_NCEDIT_H
-#define CAMOTICS_NCEDIT_H
+#pragma once
+
 
 #include "ColorComponent.h"
 
@@ -158,5 +158,3 @@ namespace CAMotics {
     void updateSidebar(const QRect &rect, int d);
   };
 }
-
-#endif // CAMOTICS_NCEDIT_H

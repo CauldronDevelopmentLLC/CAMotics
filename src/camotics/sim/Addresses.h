@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_ADDRESSES_H
-#define CAMOTICS_ADDRESSES_H
+#pragma once
+
 
 namespace CAMotics {
   enum {
@@ -182,5 +182,3 @@ namespace CAMotics {
     MAX_ADDRESS = 5602, // Max address in EMC2 code
   };
 }
-
-#endif // CAMOTICS_ADDRESSES_H

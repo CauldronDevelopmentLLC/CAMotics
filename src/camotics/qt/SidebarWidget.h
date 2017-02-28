@@ -48,8 +48,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CAMOTICS_SIDEBAR_WIDGET_H
-#define CAMOTICS_SIDEBAR_WIDGET_H
+#pragma once
+
 
 #include <QtGlobal>
 #if QT_VERSION < 0x050000
@@ -87,5 +87,3 @@ namespace CAMotics {
     void paintEvent(QPaintEvent *event);
   };
 }
-
-#endif // CAMOTICS_SIDEBAR_WIDGET_H

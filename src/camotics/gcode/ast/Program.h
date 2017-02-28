@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PROGRAM_H
-#define CAMOTICS_PROGRAM_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -44,5 +44,3 @@ namespace CAMotics {
     void operator()(const cb::SmartPointer<Block> &block);
   };
 }
-
-#endif // CAMOTICS_PROGRAM_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONIC_SWEEP_H
-#define CAMOTICS_CONIC_SWEEP_H
+#pragma once
+
 
 #include "Sweep.h"
 
@@ -40,5 +40,3 @@ namespace CAMotics {
                const Vector3R &p) const;
   };
 }
-
-#endif // CAMOTICS_CONIC_SWEEP_H

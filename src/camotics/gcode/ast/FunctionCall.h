@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_FUNCTION_CALL_H
-#define CAMOTICS_FUNCTION_CALL_H
+#pragma once
+
 
 #include "Entity.h"
 
@@ -48,5 +48,3 @@ namespace CAMotics {
     void print(std::ostream &stream) const;
   };
 }
-
-#endif // CAMOTICS_FUNCTION_CALL_H

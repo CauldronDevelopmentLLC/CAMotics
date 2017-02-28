@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SETTINGS_DIALOG_H
-#define CAMOTICS_SETTINGS_DIALOG_H
+#pragma once
+
 
 #include <camotics/cutsim/Project.h>
 #include <camotics/view/View.h>
@@ -52,5 +52,3 @@ namespace CAMotics {
     void on_resolutionDoubleSpinBox_valueChanged(double value);
   };
 }
-
-#endif // CAMOTICS_SETTINGS_DIALOG_H

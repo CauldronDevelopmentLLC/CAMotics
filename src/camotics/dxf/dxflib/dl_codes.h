@@ -49,8 +49,7 @@
  * Defines common DXF codes and constants.
  */
 
-#ifndef DXF_CODES_H
-#define DXF_CODES_H
+#pragma once
 
 #if _MSC_VER > 1000
 #pragma once
@@ -557,5 +556,3 @@ const double dxfColors[][3] = {
 #define UCS_TRANS_CODE      1
 #define DCS_TRANS_CODE      2
 #define PCS_TRANS_CODE      3
-
-#endif

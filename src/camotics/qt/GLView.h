@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GLVIEW_H
-#define CAMOTICS_GLVIEW_H
+#pragma once
+
 
 #include <QtGlobal>
 #if defined(_WIN32) && QT_VERSION < 0x050000
@@ -52,5 +52,3 @@ namespace CAMotics {
     void paintGL();
   };
 }
-
-#endif // CAMOTICS_GLVIEW_H

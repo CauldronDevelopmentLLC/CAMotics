@@ -18,12 +18,10 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GLEWINIT_H
-#define CAMOTICS_GLEWINIT_H
+#pragma once
+
 
 namespace CAMotics {
   /// Must keep GLEW away from Qt, or they'll fight
   void GLEWInit();
 }
-
-#endif // CAMOTICS_GLEWINIT_H

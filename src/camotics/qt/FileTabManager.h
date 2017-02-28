@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_FILE_TAB_MANAGER_H
-#define CAMOTICS_FILE_TAB_MANAGER_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -85,5 +85,3 @@ namespace CAMotics {
                     bool all);
   };
 }
-
-#endif // CAMOTICS_FILE_TAB_MANAGER_H

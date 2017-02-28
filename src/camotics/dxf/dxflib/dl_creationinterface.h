@@ -44,8 +44,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_CREATIONINTERFACE_H
-#define DL_CREATIONINTERFACE_H
+#pragma once
+
 
 #include <string.h>
 
@@ -282,5 +282,3 @@ protected:
     DL_Attributes attributes;
     DL_Extrusion *extrusion;
 };
-
-#endif

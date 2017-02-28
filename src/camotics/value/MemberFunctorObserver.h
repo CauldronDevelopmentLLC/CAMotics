@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_MEMBER_FUNCTOR_OBSERVER_H
-#define CAMOTICS_MEMBER_FUNCTOR_OBSERVER_H
+#pragma once
+
 
 #include "Observer.h"
 
@@ -42,5 +42,3 @@ namespace CAMotics {
     {(*object.*member)(name, value);}
   };
 }
-
-#endif // CAMOTICS_MEMBER_FUNCTOR_OBSERVER_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MACHINE_ADAPTER_H
-#define TPLANG_MACHINE_ADAPTER_H
+#pragma once
+
 
 #include "MachineInterface.h"
 
@@ -101,4 +101,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_MACHINE_ADAPTER_H
+

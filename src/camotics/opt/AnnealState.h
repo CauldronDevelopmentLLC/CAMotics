@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_ANNEAL_STATE_H
-#define CAMOTICS_ANNEAL_STATE_H
+#pragma once
+
 
 #include <vector>
 
@@ -53,5 +53,3 @@ namespace CAMotics {
     void acceptFlip(unsigned i);
   };
 }
-
-#endif // CAMOTICS_ANNEAL_STATE_H

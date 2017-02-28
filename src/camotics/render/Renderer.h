@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_RENDERER_H
-#define CAMOTICS_RENDERER_H
+#pragma once
+
 
 #include "RenderMode.h"
 
@@ -45,5 +45,3 @@ namespace CAMotics {
                 RenderMode mode = RenderMode::MCUBES_MODE);
   };
 }
-
-#endif // CAMOTICS_RENDERER_H

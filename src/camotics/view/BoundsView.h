@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_BOUNDS_VIEW_H
-#define CAMOTICS_BOUNDS_VIEW_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -32,5 +32,3 @@ namespace CAMotics {
     void draw();
   };
 }
-
-#endif // CAMOTICS_BOUNDS_VIEW_H

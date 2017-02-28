@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GRID_H
-#define CAMOTICS_GRID_H
+#pragma once
+
 
 #include "Geom.h"
 
@@ -63,5 +63,3 @@ namespace CAMotics {
     std::pair<Grid, Grid> split(unsigned axis) const;
   };
 }
-
-#endif // CAMOTICS_GRID_H

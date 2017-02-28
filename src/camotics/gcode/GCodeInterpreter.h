@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GCODE_INTERPRETER_H
-#define CAMOTICS_GCODE_INTERPRETER_H
+#pragma once
+
 
 #include "Processor.h"
 
@@ -53,5 +53,3 @@ namespace CAMotics {
     double lookupReference(const std::string &name);
   };
 }
-
-#endif // CAMOTICS_GCODE_INTERPRETER_H

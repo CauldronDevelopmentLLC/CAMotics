@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_WORKPIECE_H
-#define CAMOTICS_WORKPIECE_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -42,5 +42,3 @@ namespace CAMotics {
     real depth(const Vector3R &p) const;
   };
 }
-
-#endif // CAMOTICS_WORKPIECE_H

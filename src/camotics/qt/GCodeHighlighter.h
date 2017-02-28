@@ -48,8 +48,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CAMOTICS_GCODEHIGHLIGHTER_H
-#define CAMOTICS_GCODEHIGHLIGHTER_H
+#pragma once
+
 
 #include "Highlighter.h"
 
@@ -93,5 +93,3 @@ namespace CAMotics {
     void reference(Tokenizer &tokenizer);
   };
 }
-
-#endif // CAMOTICS_GCODEHIGHLIGHTER_H

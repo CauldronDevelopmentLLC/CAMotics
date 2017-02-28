@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_REAL_H
-#define CAMOTICS_REAL_H
+#pragma once
+
 
 namespace CAMotics {
   //#define REAL_IS_FLOAT
@@ -30,5 +30,3 @@ namespace CAMotics {
   typedef double real;
 #endif
 }
-
-#endif // CAMOTICS_REAL_H

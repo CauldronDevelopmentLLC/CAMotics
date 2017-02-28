@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_OBSERVER_H
-#define CAMOTICS_OBSERVER_H
+#pragma once
+
 
 #include <cbang/String.h>
 #include <cbang/StdTypes.h>
@@ -56,5 +56,3 @@ namespace CAMotics {
     {updated(name, cb::String(value));}
   };
 }
-
-#endif // CAMOTICS_OBSERVER_H

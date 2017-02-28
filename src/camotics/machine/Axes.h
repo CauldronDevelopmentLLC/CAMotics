@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_AXES_H
-#define TPLANG_AXES_H
+#pragma once
+
 
 #include <cbang/Exception.h>
 #include <cbang/geom/Vector.h>
@@ -123,4 +123,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_AXES_H
+

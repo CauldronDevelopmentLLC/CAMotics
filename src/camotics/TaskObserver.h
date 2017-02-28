@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TASK_OBSERVER_H
-#define CAMOTICS_TASK_OBSERVER_H
+#pragma once
+
 
 namespace CAMotics {
   class TaskObserver {
@@ -29,5 +29,3 @@ namespace CAMotics {
     virtual void taskCompleted() = 0;
   };
 }
-
-#endif // CAMOTICS_TASK_OBSERVER_H

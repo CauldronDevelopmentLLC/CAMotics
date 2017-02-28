@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_HIGHLIGHTER_H
-#define CAMOTICS_HIGHLIGHTER_H
+#pragma once
+
 
 #include "ColorComponent.h"
 
@@ -60,5 +60,3 @@ namespace CAMotics {
     void highlightBlock(const QString &text);
   };
 }
-
-#endif // CAMOTICS_HIGHLIGHTER_H

@@ -860,8 +860,8 @@ void QtWin::openProject(const string &_filename) {
   if (filename.empty()) {
     filename = QFileDialog::getOpenFileName
       (this, tr("Open File"), lastDir,
-       tr("Supported Files (*.xml *.nc *.ngc *.gcode *.tap *.tpl);;All Files "
-          "(*.*)")).toStdString();
+       tr("Supported Files (*.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;"
+          "All Files (*.*)")).toStdString();
     if (filename.empty()) return;
     settings.setValue("Projects/lastDir", QString::fromUtf8(filename.c_str()));
   }

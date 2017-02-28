@@ -48,8 +48,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CAMOTICS_COLOR_COMPONENT_H
-#define CAMOTICS_COLOR_COMPONENT_H
+#pragma once
+
 
 namespace CAMotics {
   class ColorComponent {
@@ -84,5 +84,3 @@ namespace CAMotics {
     operator enum_t() const {return cc;}
   };
 }
-
-#endif // CAMOTICS_COLOR_COMPONENT_H

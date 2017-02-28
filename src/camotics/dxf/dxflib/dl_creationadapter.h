@@ -44,8 +44,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_CREATIONADAPTER_H
-#define DL_CREATIONADAPTER_H
+#pragma once
+
 
 #include "dl_creationinterface.h"
 
@@ -118,5 +118,3 @@ public:
     virtual void setVariableDouble(const char*, double, int) {}
     virtual void endSequence() {}
 };
-
-#endif

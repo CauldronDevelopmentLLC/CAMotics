@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TASK_H
-#define CAMOTICS_TASK_H
+#pragma once
+
 
 #include <cbang/os/Condition.h>
 
@@ -53,5 +53,3 @@ namespace CAMotics {
     virtual void run() {};
   };
 }
-
-#endif // CAMOTICS_TASK_H

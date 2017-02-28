@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_VALUE_GROUP_H
-#define CAMOTICS_VALUE_GROUP_H
+#pragma once
+
 
 #include "ValueSet.h"
 
@@ -55,5 +55,3 @@ namespace CAMotics {
     void updated();
   };
 }
-
-#endif // CAMOTICS_VALUE_GROUP_H

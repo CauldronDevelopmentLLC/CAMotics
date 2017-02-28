@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_PATH_TASK_H
-#define CAMOTICS_TOOL_PATH_TASK_H
+#pragma once
+
 
 #include <camotics/Task.h>
 #include <camotics/Units.h>
@@ -64,5 +64,3 @@ namespace CAMotics {
     void interrupt();
   };
 }
-
-#endif // CAMOTICS_TOOL_PATH_TASK_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_GCODE_MACHINE_H
-#define TPLANG_GCODE_MACHINE_H
+#pragma once
+
 
 #include "MachineAdapter.h"
 
@@ -63,4 +63,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_GCODE_MACHINE_H
+

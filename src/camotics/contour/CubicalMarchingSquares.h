@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CUBICAL_MARCHING_SQUARES_H
-#define CAMOTICS_CUBICAL_MARCHING_SQUARES_H
+#pragma once
+
 
 #include "SliceContourGenerator.h"
 
@@ -35,5 +35,3 @@ namespace CAMotics {
                 unsigned y);
   };
 }
-
-#endif // CAMOTICS_CUBICAL_MARCHING_SQUARES_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_BINARY_OP_H
-#define CAMOTICS_BINARY_OP_H
+#pragma once
+
 
 #include "Entity.h"
 #include "Operator.h"
@@ -46,5 +46,3 @@ namespace CAMotics {
     void print(std::ostream &stream) const;
   };
 }
-
-#endif // CAMOTICS_BINARY_OP_H

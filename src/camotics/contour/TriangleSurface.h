@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TRIANGLE_SURFACE_H
-#define CAMOTICS_TRIANGLE_SURFACE_H
+#pragma once
+
 
 #include "Surface.h"
 #include "TriangleMesh.h"
@@ -67,5 +67,3 @@ namespace CAMotics {
     void reduce(Task &task);
   };
 }
-
-#endif // CAMOTICS_TRIANGLE_SURFACE_H

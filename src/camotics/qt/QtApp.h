@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_QT_APP_H
-#define CAMOTICS_QT_APP_H
+#pragma once
+
 
 #include <camotics/Application.h>
 
@@ -52,5 +52,3 @@ namespace CAMotics {
     void requestExit();
   };
 }
-
-#endif // CAMOTICS_QT_APP_H

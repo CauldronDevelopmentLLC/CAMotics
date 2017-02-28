@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SURFACE_TASK_H
-#define CAMOTICS_SURFACE_TASK_H
+#pragma once
+
 
 #include <camotics/Task.h>
 
@@ -48,5 +48,3 @@ namespace CAMotics {
     void run();
   };
 }
-
-#endif // CAMOTICS_SURFACE_TASK_H

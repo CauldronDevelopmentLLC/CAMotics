@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_CLIPPER_MODULE_H
-#define TPLANG_CLIPPER_MODULE_H
+#pragma once
+
 
 #include <cbang/js/NativeModule.h>
 
@@ -36,5 +36,3 @@ namespace tplang {
     void offsetCB(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }
-
-#endif // TPLANG_CLIPPER_MODULE_H

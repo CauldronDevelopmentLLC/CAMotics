@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SPHEROID_SWEEP_H
-#define CAMOTICS_SPHEROID_SWEEP_H
+#pragma once
+
 
 #include "Sweep.h"
 
@@ -41,5 +41,3 @@ namespace CAMotics {
                const Vector3R &p) const;
   };
 }
-
-#endif // CAMOTICS_SPHEROID_SWEEP_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_AABB_H
-#define CAMOTICS_AABB_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 #include <camotics/cutsim/Move.h>
@@ -52,5 +52,3 @@ namespace CAMotics {
     void draw(bool leavesOnly = true, unsigned height = 1, unsigned depth = 0);
   };
 }
-
-#endif // CAMOTICS_AABB_H

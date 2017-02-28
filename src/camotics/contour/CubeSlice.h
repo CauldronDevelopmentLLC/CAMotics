@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CUBE_SLICE_H
-#define CAMOTICS_CUBE_SLICE_H
+#pragma once
+
 
 #include "VertexSlice.h"
 #include "FieldFunction.h"
@@ -54,5 +54,3 @@ namespace CAMotics {
     real depth(int x, int y, const cb::Vector3U &offset) const;
   };
 }
-
-#endif // CAMOTICS_CUBE_SLICE_H

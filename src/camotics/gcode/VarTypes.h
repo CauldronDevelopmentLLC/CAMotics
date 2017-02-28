@@ -19,8 +19,8 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef VAR_TYPES_H
-#define VAR_TYPES_H
+#ifndef CAMOTICS_VAR_TYPES_H
+#define CAMOTICS_VAR_TYPES_H
 
 #define CBANG_ENUM_NAME VarTypes
 #define CBANG_ENUM_NAMESPACE CAMotics
@@ -28,7 +28,7 @@
 #define CBANG_ENUM_PREFIX 3
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // VAR_TYPES_H
+#endif // CAMOTICS_VAR_TYPES_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(VT_NONE,   0)

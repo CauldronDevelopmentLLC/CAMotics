@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PATH_H
-#define CAMOTICS_PATH_H
+#pragma once
+
 
 #include <camotics/cutsim/Move.h>
 
@@ -37,5 +37,3 @@ namespace CAMotics {
     {return endPoint().distance(o.startPoint());}
   };
 }
-
-#endif // CAMOTICS_PATH_H

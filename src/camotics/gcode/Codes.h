@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CODES_H
-#define CAMOTICS_CODES_H
+#pragma once
+
 
 #include "ModalGroup.h"
 #include "VarTypes.h"
@@ -49,5 +49,3 @@ namespace CAMotics {
     static const Code *find(char type, float number, float L = 0);
   };
 }
-
-#endif // CAMOTICS_CODES_H

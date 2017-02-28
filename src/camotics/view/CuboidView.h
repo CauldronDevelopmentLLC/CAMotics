@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CUBOID_VIEW_H
-#define CAMOTICS_CUBOID_VIEW_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -42,5 +42,3 @@ namespace CAMotics {
     void draw();
   };
 }
-
-#endif // CAMOTICS_CUBOID_VIEW_H

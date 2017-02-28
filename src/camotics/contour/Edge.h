@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_EDGE_H
-#define CAMOTICS_EDGE_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -34,5 +34,3 @@ namespace CAMotics {
       vertex(vertex), normal(normal) {}
   };
 }
-
-#endif // CAMOTICS_EDGE_H

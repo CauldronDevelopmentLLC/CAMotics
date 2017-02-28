@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PROBE_GRID_H
-#define CAMOTICS_PROBE_GRID_H
+#pragma once
+
 
 #include "ProbePoint.h"
 
@@ -47,5 +47,3 @@ namespace CAMotics {
     std::vector<ProbePoint *> find(const cb::Vector2D &p);
   };
 }
-
-#endif // CAMOTICS_PROBE_GRID_H

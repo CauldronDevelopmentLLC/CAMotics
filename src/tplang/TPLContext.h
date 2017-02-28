@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_TPLCONTEXT_H
-#define TPLANG_TPLCONTEXT_H
+#pragma once
+
 
 #include "GCodeModule.h"
 #include "MatrixModule.h"
@@ -63,5 +63,3 @@ namespace tplang {
     void popPath();
   };
 }
-
-#endif // TPLANG_TPLCONTEXT_H

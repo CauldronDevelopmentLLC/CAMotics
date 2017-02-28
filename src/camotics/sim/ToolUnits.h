@@ -19,8 +19,8 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef CBANG_TOOL_UNITS_H
-#define CBANG_TOOL_UNITS_H
+#ifndef CAMOTICS_TOOL_UNITS_H
+#define CAMOTICS_TOOL_UNITS_H
 
 #define CBANG_ENUM_NAME ToolUnits
 #define CBANG_ENUM_NAMESPACE CAMotics
@@ -28,7 +28,7 @@
 #define CBANG_ENUM_PREFIX 6
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // CBANG_TOOL_UNITS_H
+#endif // CAMOTICS_TOOL_UNITS_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(UNITS_MM,   0)

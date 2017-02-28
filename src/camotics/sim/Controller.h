@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONTROLLER_H
-#define CAMOTICS_CONTROLLER_H
+#pragma once
+
 
 #include "ToolTable.h"
 #include "Addresses.h"
@@ -221,5 +221,3 @@ namespace CAMotics {
     void end();
   };
 }
-
-#endif // CAMOTICS_CONTROLLER_H

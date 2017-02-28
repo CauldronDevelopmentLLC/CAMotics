@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PROCESSOR_H
-#define CAMOTICS_PROCESSOR_H
+#pragma once
+
 
 #include "ast/Block.h"
 
@@ -31,5 +31,3 @@ namespace CAMotics {
     virtual void operator()(const cb::SmartPointer<Block> &block) = 0;
   };
 }
-
-#endif // CAMOTICS_PROCESSOR_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TASK_FILTER_H
-#define CAMOTICS_TASK_FILTER_H
+#pragma once
+
 
 #include "Task.h"
 
@@ -70,5 +70,3 @@ namespace CAMotics {
     template<typename Sink> bool flush(Sink &snk) {return true;}
   };
 }
-
-#endif // CAMOTICS_TASK_FILTER_H

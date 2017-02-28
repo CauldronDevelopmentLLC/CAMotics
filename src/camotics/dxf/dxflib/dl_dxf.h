@@ -44,8 +44,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_DXF_H
-#define DL_DXF_H
+#pragma once
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -438,7 +438,3 @@ private:
     // library version. hex: 0x20003001 = 2.0.3.1
     int libVersion;
 };
-
-#endif
-
-// EOF

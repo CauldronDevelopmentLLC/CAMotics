@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_VALUE_H
-#define CAMOTICS_VALUE_H
+#pragma once
+
 
 #include "Observer.h"
 #include "MemberFunctorObserver.h"
@@ -56,5 +56,3 @@ namespace CAMotics {
     virtual void updated() = 0;
   };
 }
-
-#endif // CAMOTICS_VALUE_H

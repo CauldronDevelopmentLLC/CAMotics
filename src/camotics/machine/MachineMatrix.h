@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MACHINE_MATRIX_H
-#define TPLANG_MACHINE_MATRIX_H
+#pragma once
+
 
 #include "MachineAdapter.h"
 #include "TransMatrix.h"
@@ -62,4 +62,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_MACHINE_MATRIX_H
+

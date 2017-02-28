@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PARSER_H
-#define CAMOTICS_PARSER_H
+#pragma once
+
 
 #include "Processor.h"
 
@@ -86,5 +86,3 @@ namespace CAMotics {
     cb::SmartPointer<Entity> reference(Tokenizer &tokenizer);
   };
 }
-
-#endif // CAMOTICS_PARSER_H

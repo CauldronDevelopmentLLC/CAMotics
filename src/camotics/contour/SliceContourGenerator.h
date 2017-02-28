@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SLICE_CONTOUR_GENERATOR_H
-#define CAMOTICS_SLICE_CONTOUR_GENERATOR_H
+#pragma once
+
 
 #include "ContourGenerator.h"
 #include "CubeSlice.h"
@@ -38,5 +38,3 @@ namespace CAMotics {
     void run(FieldFunction &func, GridTreeRef &tree);
   };
 }
-
-#endif // CAMOTICS_SLICE_CONTOUR_GENERATOR_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONNECTION_MANAGER_H
-#define CAMOTICS_CONNECTION_MANAGER_H
+#pragma once
+
 
 #include "Connection.h"
 
@@ -67,5 +67,3 @@ namespace CAMotics {
     bool update();
   };
 }
-
-#endif // CAMOTICS_CONNECTION_MANAGER_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TRIANGLE_MESH_H
-#define CAMOTICS_TRIANGLE_MESH_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -97,5 +97,3 @@ namespace CAMotics {
     static bool moreThan2InCommon(VertexSet &vs1, VertexSet &vs2);
   };
 }
-
-#endif // CAMOTICS_TRIANGLE_MESH_H

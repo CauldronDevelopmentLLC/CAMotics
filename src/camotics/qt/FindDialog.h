@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_FIND_DIALOG_H
-#define CAMOTICS_FIND_DIALOG_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -55,5 +55,3 @@ namespace CAMotics {
     void replaceAll();
   };
 }
-
-#endif // CAMOTICS_FIND_DIALOG_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GRID_TREE_LEAF_H
-#define CAMOTICS_GRID_TREE_LEAF_H
+#pragma once
+
 
 #include "GridTreeBase.h"
 #include "Triangle.h"
@@ -45,5 +45,3 @@ namespace CAMotics {
                 std::vector<float> &normals) const;
   };
 }
-
-#endif // CAMOTICS_GRID_TREE_LEAF_H

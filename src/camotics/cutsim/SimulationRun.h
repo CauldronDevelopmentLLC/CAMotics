@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SIMULATION_RUN_H
-#define CAMOTICS_SIMULATION_RUN_H
+#pragma once
+
 
 #include "Simulation.h"
 
@@ -53,5 +53,3 @@ namespace CAMotics {
     cb::SmartPointer<Surface> compute(const cb::SmartPointer<Task> &task);
   };
 }
-
-#endif // CAMOTICS_SIMULATION_RUN_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MOVE_SINK_H
-#define TPLANG_MOVE_SINK_H
+#pragma once
+
 
 #include "MachineAdapter.h"
 
@@ -47,4 +47,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_MOVE_SINK_H
+

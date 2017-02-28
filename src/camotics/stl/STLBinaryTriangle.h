@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_STLBINARY_TRIANGLE_H
-#define CAMOTICS_STLBINARY_TRIANGLE_H
+#pragma once
+
 
 #include <cbang/Packed.h>
 
@@ -33,5 +33,3 @@ namespace CAMotics {
     uint16_t attrib;
   });
 }
-
-#endif // CAMOTICS_STLBINARY_TRIANGLE_H

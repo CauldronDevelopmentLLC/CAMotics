@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MACHINE_INTERFACE_H
-#define TPLANG_MACHINE_INTERFACE_H
+#pragma once
+
 
 #include "Axes.h"
 #include "MachineEnum.h"
@@ -252,4 +252,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_MACHINE_INTERFACE_H
+

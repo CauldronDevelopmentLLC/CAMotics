@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_QAPPLICATION_H
-#define CAMOTICS_QAPPLICATION_H
+#pragma once
+
 
 #include <QApplication>
 
@@ -32,5 +32,3 @@ namespace CAMotics {
     bool notify(QObject *receiver, QEvent *e);
   };
 }
-
-#endif // CAMOTICS_QAPPLICATION_H

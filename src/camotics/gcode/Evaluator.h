@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_EVALUATOR_H
-#define CAMOTICS_EVALUATOR_H
+#pragma once
+
 
 #include <string>
 
@@ -51,5 +51,3 @@ namespace CAMotics {
     cb::SmartPointer<Entity> reduce(const cb::SmartPointer<Entity> &entity);
   };
 }
-
-#endif // CAMOTICS_EVALUATOR_H

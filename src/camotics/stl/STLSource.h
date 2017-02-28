@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_STLSOURCE_H
-#define CAMOTICS_STLSOURCE_H
+#pragma once
+
 
 #include <cbang/geom/Vector.h>
 #include <cbang/StdTypes.h>
@@ -45,5 +45,3 @@ namespace CAMotics {
     Facet readFacet();
   };
 }
-
-#endif // CAMOTICS_STLSOURCE_H

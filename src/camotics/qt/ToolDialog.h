@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_DIALOG_H
-#define CAMOTICS_TOOL_DIALOG_H
+#pragma once
+
 
 #include "ToolScene.h"
 
@@ -68,5 +68,3 @@ namespace CAMotics {
     void on_descriptionLineEdit_textChanged(const QString &value);
   };
 }
-
-#endif // CAMOTICS_TOOL_DIALOG_H

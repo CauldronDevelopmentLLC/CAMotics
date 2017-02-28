@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_TRANS_MATRIX_H
-#define TPLANG_TRANS_MATRIX_H
+#pragma once
+
 
 #include <cbang/geom/Matrix.h>
 
@@ -49,4 +49,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_TRANS_MATRIX_H
+

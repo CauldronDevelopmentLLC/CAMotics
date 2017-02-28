@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_STL_READER_H
-#define CAMOTICS_STL_READER_H
+#pragma once
+
 
 #include "STLSource.h"
 
@@ -46,5 +46,3 @@ namespace CAMotics {
     void readFooter();
   };
 }
-
-#endif // CAMOTICS_STL_READER_H

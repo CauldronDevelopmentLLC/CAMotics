@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_DONATE_DIALOG_H
-#define CAMOTICS_DONATE_DIALOG_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -41,5 +41,3 @@ namespace CAMotics {
   protected slots:
   };
 }
-
-#endif // CAMOTICS_DONATE_DIALOG_H

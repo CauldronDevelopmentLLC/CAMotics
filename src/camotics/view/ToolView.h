@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_VIEW_H
-#define CAMOTICS_TOOL_VIEW_H
+#pragma once
+
 
 #include <camotics/sim/Tool.h>
 
@@ -60,5 +60,3 @@ namespace CAMotics {
     void draw();
   };
 }
-
-#endif // CAMOTICS_TOOL_VIEW_H

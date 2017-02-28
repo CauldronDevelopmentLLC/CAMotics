@@ -18,8 +18,7 @@
 
 \******************************************************************************/
 
-#ifndef MACHINE_LINEARIZER_H
-#define MACHINE_LINEARIZER_H
+#pragma once
 
 #include "MachineAdapter.h"
 
@@ -35,5 +34,3 @@ namespace CAMotics {
     void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
   };
 }
-
-#endif // MACHINE_LINEARIZER_H

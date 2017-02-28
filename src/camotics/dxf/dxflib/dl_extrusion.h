@@ -44,8 +44,8 @@
 **
 **********************************************************************/
 
-#ifndef DL_EXTRUSION_H
-#define DL_EXTRUSION_H
+#pragma once
+
 
 #include <math.h>
 
@@ -159,5 +159,3 @@ private:
 	double *direction;
 	double elevation;
 };
-
-#endif

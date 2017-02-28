@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MOVE_STREAM_H
-#define TPLANG_MOVE_STREAM_H
+#pragma once
+
 
 #include "Move.h"
 
@@ -33,4 +33,4 @@ namespace CAMotics {
   };
 }
 
-#endif // TPLANG_MOVE_STREAM_H
+

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOKENIZER_H
-#define CAMOTICS_TOKENIZER_H
+#pragma once
+
 
 #include "Token.h"
 
@@ -46,5 +46,3 @@ namespace CAMotics {
     void next();
   };
 }
-
-#endif // CAMOTICS_TOKENIZER_H

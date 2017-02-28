@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_DXFPOINT_H
-#define CAMOTICS_DXFPOINT_H
+#pragma once
+
 
 #include "DXFEntity.h"
 
@@ -33,5 +33,3 @@ namespace CAMotics {
     type_t getType() const {return DXF_POINT;}
   };
 }
-
-#endif // CAMOTICS_DXFPOINT_H

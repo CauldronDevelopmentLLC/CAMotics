@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_EXPORT_DIALOG_H
-#define CAMOTICS_EXPORT_DIALOG_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -58,5 +58,3 @@ namespace CAMotics {
     void on_simDataRadioButton_clicked();
   };
 }
-
-#endif // CAMOTICS_EXPORT_DIALOG_H

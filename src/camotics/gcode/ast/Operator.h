@@ -19,15 +19,15 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef OPERATOR_H
-#define OPERATOR_H
+#ifndef CAMOTICS_OPERATOR_H
+#define CAMOTICS_OPERATOR_H
 
 #define CBANG_ENUM_NAME Operator
 #define CBANG_ENUM_NAMESPACE CAMotics
 #define CBANG_ENUM_PATH camotics/gcode/ast
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // OPERATOR_H
+#endif // CAMOTICS_OPERATOR_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(NO_OP,       0)

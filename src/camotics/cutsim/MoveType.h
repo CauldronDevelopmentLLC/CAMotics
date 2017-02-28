@@ -19,8 +19,8 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef CBANG_MOVE_TYPE_H
-#define CBANG_MOVE_TYPE_H
+#ifndef CAMOTICS_MOVE_TYPE_H
+#define CAMOTICS_MOVE_TYPE_H
 
 #define CBANG_ENUM_NAME MoveType
 #define CBANG_ENUM_NAMESPACE CAMotics
@@ -28,7 +28,7 @@
 #define CBANG_ENUM_PREFIX 5
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // CBANG_MOVE_TYPE_H
+#endif // CAMOTICS_MOVE_TYPE_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(MOVE_RAPID,      0)

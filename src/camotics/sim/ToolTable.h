@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_TABLE_H
-#define CAMOTICS_TOOL_TABLE_H
+#pragma once
+
 
 #include "Tool.h"
 
@@ -71,5 +71,3 @@ namespace CAMotics {
     void write(cb::JSON::Sink &sink) const;
   };
 }
-
-#endif // CAMOTICS_TOOL_TABLE_H

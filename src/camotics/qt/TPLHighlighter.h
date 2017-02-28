@@ -48,8 +48,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef CAMOTICS_TPLHIGHLIGHTER_H
-#define CAMOTICS_TPLHIGHLIGHTER_H
+#pragma once
+
 
 #include "Highlighter.h"
 
@@ -64,5 +64,3 @@ namespace CAMotics {
     void highlightBlock(const QString &text);
   };
 }
-
-#endif // CAMOTICS_TPLHIGHLIGHTER_H

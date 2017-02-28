@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_VALUE_SET_H
-#define CAMOTICS_VALUE_SET_H
+#pragma once
+
 
 #include "Value.h"
 #include "VarValue.h"
@@ -67,5 +67,3 @@ namespace CAMotics {
     void updated();
   };
 }
-
-#endif // CAMOTICS_VALUE_SET_H

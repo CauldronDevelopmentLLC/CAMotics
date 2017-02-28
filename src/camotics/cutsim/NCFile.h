@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_NCFILE_H
-#define CAMOTICS_NCFILE_H
+#pragma once
+
 
 #include <cbang/StdTypes.h>
 #include <cbang/SmartPointer.h>
@@ -48,5 +48,3 @@ namespace CAMotics {
     void update() {modTime = getTime();}
   };
 }
-
-#endif // CAMOTICS_NCFILE_H

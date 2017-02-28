@@ -18,8 +18,7 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_NEW_PROJECT_DIALOG_H
-#define CAMOTICS_NEW_PROJECT_DIALOG_H
+#pragma once
 
 #include <camotics/sim/ToolUnits.h>
 
@@ -45,5 +44,3 @@ namespace CAMotics {
     bool currentToolTableSelected() const;
   };
 }
-
-#endif // CAMOTICS_NEW_PROJECT_DIALOG_H

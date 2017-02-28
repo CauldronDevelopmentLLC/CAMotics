@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CLICK_WIDGET_H
-#define CAMOTICS_CLICK_WIDGET_H
+#pragma once
+
 
 #include <QWidget>
 
@@ -33,5 +33,3 @@ namespace CAMotics {
     void mousePressEvent(QMouseEvent *event);
   };
 }
-
-#endif // CAMOTICS_CLICK_WIDGET_H

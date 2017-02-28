@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_MOVE_H
-#define CAMOTICS_MOVE_H
+#pragma once
+
 
 #include "MoveType.h"
 
@@ -82,5 +82,3 @@ namespace CAMotics {
     return stream;
   }
 }
-
-#endif // CAMOTICS_MOVE_H

@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_QTEXT_DEVICE_H
-#define CAMOTICS_QTEXT_DEVICE_H
+#pragma once
+
 
 #include <boost/iostreams/categories.hpp>   // sink_tag
 #include <boost/iostreams/positioning.hpp>  // stream_offset
@@ -46,5 +46,3 @@ namespace CAMotics {
 
   typedef boost::iostreams::stream<QTextDevice> QTextStream;
 }
-
-#endif // CAMOTICS_QTEXT_DEVICE_H

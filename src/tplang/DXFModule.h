@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_DXFMODULE_H
-#define TPLANG_DXFMODULE_H
+#pragma once
+
 
 #include <cbang/js/NativeModule.h>
 
@@ -40,5 +40,3 @@ namespace tplang {
     void openCB(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }
-
-#endif // TPLANG_DXFMODULE_H

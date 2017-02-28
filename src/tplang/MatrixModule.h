@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef TPLANG_MATRIX_MODULE_H
-#define TPLANG_MATRIX_MODULE_H
+#pragma once
+
 
 #include <camotics/machine/MachineMatrix.h>
 #include <camotics/machine/MachineEnum.h>
@@ -62,5 +62,3 @@ namespace tplang {
     axes_t parseMatrix(const cb::js::Value &args);
   };
 }
-
-#endif // TPLANG_MATRIX_MODULE_H

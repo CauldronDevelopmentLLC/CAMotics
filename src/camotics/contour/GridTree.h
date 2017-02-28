@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_GRID_TREE_H
-#define CAMOTICS_GRID_TREE_H
+#pragma once
+
 
 #include "GridTreeNode.h"
 
@@ -41,5 +41,3 @@ namespace CAMotics {
     void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset);
   };
 }
-
-#endif // CAMOTICS_GRID_TREE_H

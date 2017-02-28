@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_CONNECTION_H
-#define CAMOTICS_CONNECTION_H
+#pragma once
+
 
 #include <cbang/StdTypes.h>
 #include <cbang/os/Thread.h>
@@ -62,5 +62,3 @@ namespace CAMotics {
     void run();
   };
 }
-
-#endif // CAMOTICS_CONNECTION_H

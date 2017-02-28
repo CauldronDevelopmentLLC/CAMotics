@@ -20,26 +20,8 @@
 
 #pragma once
 
-
-#include "FieldFunction.h"
-#include "GridTreeRef.h"
-
-#include <vector>
-
-
 namespace CAMotics {
-  class VertexSlice : public std::vector<std::vector<real> > {
-    const GridTreeRef &grid;
-    unsigned z;
-
+  class LayerCAMDialog {
   public:
-    VertexSlice(const GridTreeRef &grid, unsigned z);
-
-    real depth(unsigned x, unsigned y) const {return at(x).at(y);}
-
-    void compute(FieldFunction &func);
-
-    const GridTreeRef &getGrid() const {return grid;}
-    unsigned getZ() const {return z;}
   };
 }

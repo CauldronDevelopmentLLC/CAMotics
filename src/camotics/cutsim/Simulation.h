@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_SIMULATION_H
-#define CAMOTICS_SIMULATION_H
+#pragma once
+
 
 #include "Workpiece.h"
 
@@ -67,5 +67,3 @@ namespace CAMotics {
     void write(cb::JSON::Sink &sink) const {write(sink, false);}
   };
 }
-
-#endif // CAMOTICS_SIMULATION_H

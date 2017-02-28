@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TOOL_H
-#define CAMOTICS_TOOL_H
+#pragma once
+
 
 #include "ToolShape.h"
 #include "ToolUnits.h"
@@ -133,5 +133,3 @@ namespace CAMotics {
     return t.print(stream);
   }
 }
-
-#endif // CAMOTICS_TOOL_H

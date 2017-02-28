@@ -19,8 +19,8 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef CBANG_UNITS_H
-#define CBANG_UNITS_H
+#ifndef CAMOTICS_UNITS_H
+#define CAMOTICS_UNITS_H
 
 #define CBANG_ENUM_NAME Units
 #define CBANG_ENUM_NAMESPACE CAMotics
@@ -28,7 +28,7 @@
 #define CBANG_ENUM_PREFIX 0
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // CBANG_UNITS_H
+#endif // CAMOTICS_UNITS_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(IMPERIAL, 0)

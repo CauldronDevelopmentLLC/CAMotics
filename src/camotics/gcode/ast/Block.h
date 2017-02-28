@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_BLOCK_H
-#define CAMOTICS_BLOCK_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -54,5 +54,3 @@ namespace CAMotics {
     void print(std::ostream &stream) const;
   };
 }
-
-#endif // CAMOTICS_BLOCK_H

@@ -19,15 +19,15 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef TOKEN_TYPE_H
-#define TOKEN_TYPE_H
+#ifndef CAMOTICS_TOKEN_TYPE_H
+#define CAMOTICS_TOKEN_TYPE_H
 
 #define CBANG_ENUM_NAME TokenType
 #define CBANG_ENUM_NAMESPACE CAMotics
 #define CBANG_ENUM_PATH camotics/gcode
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // TOKEN_TYPE_H
+#endif // CAMOTICS_TOKEN_TYPE_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(EOF_TOKEN,            0)

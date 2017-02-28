@@ -19,8 +19,8 @@
 \******************************************************************************/
 
 #ifndef CBANG_ENUM_EXPAND
-#ifndef MODAL_GROUP_H
-#define MODAL_GROUP_H
+#ifndef CAMOTICS_MODAL_GROUP_H
+#define CAMOTICS_MODAL_GROUP_H
 
 #define CBANG_ENUM_NAME ModalGroup
 #define CBANG_ENUM_NAMESPACE CAMotics
@@ -28,7 +28,7 @@
 #define CBANG_ENUM_PREFIX 3
 #include <cbang/enum/MakeEnumeration.def>
 
-#endif // MODAL_GROUP_H
+#endif // CAMOTICS_MODAL_GROUP_H
 #else // CBANG_ENUM_EXPAND
 
 CBANG_ENUM_EXPAND(MG_ZERO,               0)

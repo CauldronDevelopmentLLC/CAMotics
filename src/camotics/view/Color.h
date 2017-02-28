@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_COLOR_H
-#define CAMOTICS_COLOR_H
+#pragma once
+
 
 #include <cbang/geom/Vector.h>
 
@@ -37,5 +37,3 @@ namespace CAMotics {
     static const Color PURPLE;
  };
 }
-
-#endif // CAMOTICS_COLOR_H

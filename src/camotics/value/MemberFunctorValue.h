@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_MEMBER_FUNCTOR_VALUE_H
-#define CAMOTICS_MEMBER_FUNCTOR_VALUE_H
+#pragma once
+
 
 #include "Value.h"
 
@@ -39,5 +39,3 @@ namespace CAMotics {
     void updated() {set((*object.*member)());}
   };
 }
-
-#endif // CAMOTICS_MEMBER_FUNCTOR_VALUE_H

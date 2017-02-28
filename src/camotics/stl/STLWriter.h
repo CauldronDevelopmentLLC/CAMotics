@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_STL_WRITER_H
-#define CAMOTICS_STL_WRITER_H
+#pragma once
+
 
 #include "STLSink.h"
 
@@ -44,5 +44,3 @@ namespace CAMotics {
                      const std::string &hash = std::string());
   };
 }
-
-#endif // CAMOTICS_STL_WRITER_H

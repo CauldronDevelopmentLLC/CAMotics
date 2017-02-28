@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_QT_WIN_H
-#define CAMOTICS_QT_WIN_H
+#pragma once
+
 
 #include "NewDialog.h"
 #include "NewProjectDialog.h"
@@ -30,6 +30,8 @@
 #include "FindDialog.h"
 #include "FileDialog.h"
 #include "ToolDialog.h"
+#include "CAMDialog.h"
+#include "LayerCAMDialog.h"
 
 #include <camotics/Real.h>
 #include <camotics/ConcurrentTaskManager.h>
@@ -85,6 +87,8 @@ namespace CAMotics {
     FindDialog findDialog;
     FindDialog findAndReplaceDialog;
     ToolDialog toolDialog;
+    CAMDialog camDialog;
+    LayerCAMDialog layerCAMDialog;
     FileDialog fileDialog;
     QTimer animationTimer;
     QByteArray fullLayoutState;
@@ -366,5 +370,3 @@ namespace CAMotics {
     void on_clearConsolePushButton_clicked();
   };
 }
-
-#endif // CAMOTICS_QT_WIN_H

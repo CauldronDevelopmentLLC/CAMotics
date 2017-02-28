@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_NEW_DIALOG_H
-#define CAMOTICS_NEW_DIALOG_H
+#pragma once
+
 
 #include <cbang/SmartPointer.h>
 
@@ -40,5 +40,3 @@ namespace CAMotics {
     bool gcodeSelected() const;
   };
 }
-
-#endif // CAMOTICS_NEW_DIALOG_H

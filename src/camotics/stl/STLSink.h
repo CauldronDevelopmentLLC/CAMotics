@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_STLSINK_H
-#define CAMOTICS_STLSINK_H
+#pragma once
+
 
 #include <cbang/StdTypes.h>
 #include <cbang/geom/Vector.h>
@@ -45,5 +45,3 @@ namespace CAMotics {
     void writeFacet(const Facet &facet);
   };
 }
-
-#endif // CAMOTICS_STLSINK_H

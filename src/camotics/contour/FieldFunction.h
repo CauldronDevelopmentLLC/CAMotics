@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_FIELD_FUNCTION_H
-#define CAMOTICS_FIELD_FUNCTION_H
+#pragma once
+
 
 #include "Edge.h"
 
@@ -47,5 +47,3 @@ namespace CAMotics {
                  const Vector3R &v2, bool inside2);
   };
 }
-
-#endif // CAMOTICS_FIELD_FUNCTION_H

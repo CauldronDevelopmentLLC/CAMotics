@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_COMMAND_LINE_APP_H
-#define CAMOTICS_COMMAND_LINE_APP_H
+#pragma once
+
 
 #include "Application.h"
 #include "Units.h"
@@ -50,5 +50,3 @@ namespace CAMotics {
     int imperialAction(cb::Option &opt);
   };
 }
-
-#endif // CAMOTICS_COMMAND_LINE_APP_H

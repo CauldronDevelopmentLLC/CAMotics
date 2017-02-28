@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_AABBTREE_H
-#define CAMOTICS_AABBTREE_H
+#pragma once
+
 
 #include "MoveLookup.h"
 #include "AABB.h"
@@ -52,5 +52,3 @@ namespace CAMotics {
     void draw(bool leavesOnly = false);
   };
 }
-
-#endif // CAMOTICS_AABBTREE_H

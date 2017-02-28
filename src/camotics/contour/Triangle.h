@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_TRIANGLE_H
-#define CAMOTICS_TRIANGLE_H
+#pragma once
+
 
 #include <camotics/Geom.h>
 
@@ -41,5 +41,3 @@ namespace CAMotics {
     cb::Vector3F computeNormal() const;
   };
 }
-
-#endif // CAMOTICS_TRIANGLE_H

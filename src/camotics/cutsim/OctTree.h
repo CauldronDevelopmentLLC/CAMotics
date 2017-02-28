@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_OCT_TREE_H
-#define CAMOTICS_OCT_TREE_H
+#pragma once
+
 
 #include "MoveLookup.h"
 
@@ -60,5 +60,3 @@ namespace CAMotics {
     void collisions(const Vector3R &p, std::vector<const Move *> &moves) const;
   };
 }
-
-#endif // CAMOTICS_OCT_TREE_H

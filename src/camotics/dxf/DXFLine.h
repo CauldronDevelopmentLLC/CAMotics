@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_DXFLINE_H
-#define CAMOTICS_DXFLINE_H
+#pragma once
+
 
 #include "DXFEntity.h"
 
@@ -40,5 +40,3 @@ namespace CAMotics {
     type_t getType() const {return DXF_LINE;}
   };
 }
-
-#endif // CAMOTICS_DXFLINE_H

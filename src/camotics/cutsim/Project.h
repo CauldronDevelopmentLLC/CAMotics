@@ -18,8 +18,8 @@
 
 \******************************************************************************/
 
-#ifndef CAMOTICS_PROJECT_H
-#define CAMOTICS_PROJECT_H
+#pragma once
+
 
 #include "ResolutionMode.h"
 #include "NCFile.h"
@@ -110,5 +110,3 @@ namespace CAMotics {
     static std::string decodeFilename(const std::string &filename);
   };
 }
-
-#endif // CAMOTICS_PROJECT_H
