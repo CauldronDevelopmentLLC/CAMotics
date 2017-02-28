@@ -1,7 +1,7 @@
 /******************************************************************************\
 
     CAMotics is an Open-Source simulation and CAM software.
-    Copyright (C) 2011-2015 Joseph Coffland <joseph@cauldrondevelopment.com>
+    Copyright (C) 2011-2017 Joseph Coffland <joseph@cauldrondevelopment.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ Application::Application(const string &name, hasFeature_t hasFeature) :
     // TODO move this stuff out to the build system
     cb::Info &info = cb::Info::instance();
     info.add(name, "Website", "http://camotics.org/", true);
-    info.add(name, "Copyright", "(c) 2011-2015");
+    info.add(name, "Copyright", "(c) 2011-2017");
     info.add(name, "Author", "Joseph Coffland <joseph@camotics.org>");
     info.add(name, "Organization", "Cauldron Development LLC");
   }
