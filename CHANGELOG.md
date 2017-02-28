@@ -1,5 +1,8 @@
 # CAMotics Changelog
 
+## v1.1.1:
+ - Fixed bug preventing ``camsim`` from writing STL data.
+
 ## v1.1.0:
  - Ask about units and tool table when creating new projects.
  - Real-time simulation. #2

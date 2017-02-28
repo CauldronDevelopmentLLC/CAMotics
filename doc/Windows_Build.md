@@ -20,15 +20,9 @@ The versions used when writing this document are noted above.
 Git can be installed as part of the MSVS 2015 install.  Install Python, SCons
 and 32-bit or 64-bit Qt using their installers.
 
-# Install NSIS & plugins
+# Install NSIS
     wget http://prdownloads.sourceforge.net/nsis/nsis-3.01-setup.exe
     nsis-3.01-setup.exe
-
-    wget http://nsis.sourceforge.net/mediawiki/images/c/c9/Inetc.zip
-    wget http://nsis.sourceforge.net/mediawiki/images/4/4a/AccessControl.zip
-
-    unzip -p Inetc.zip Plugins/x86-unicode/INetC.dll > '/Program Files/NSIS/Plugins/INetC.dll'
-    unzip -p AccessControl.zip Plugins/AccessControl.dll > '/Program Files/NSIS/Plugins/AccessControl.dll'
 
 # Create env.bat
 Create the directory ``c:\build`` then in that directory create the file
