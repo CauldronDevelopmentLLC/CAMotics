@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Type=Application
 Name=CAMotics
-Exec=camotics
+Exec=camotics %f
 Terminal=false
 Categories=Science
 Comment=Open-Source Simulation & Computer Aided Machining
