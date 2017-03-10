@@ -1,0 +1,20 @@
+<camotics>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
+  <!-- NC Files -->
+  <nc-files>
+    warrior.nc
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.2'/>
+  <resolution-mode v='MANUAL'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(125,218,0)'/>
+  <workpiece-min v='(0,0,-7)'/>
+
+  <tool_table>
+    <tool length='10' number='1' radius='1.5' shape='CYLINDRICAL' units='MM'/>
+  </tool_table>
+</camotics>
