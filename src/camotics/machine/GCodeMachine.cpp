@@ -115,7 +115,7 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
 
   MachineAdapter::setSpeed(speed, mode, max);
 
-  if (oldMode != mode)
+  if (oldMode != mode) {
     beginLine();
 
     switch (mode) {
@@ -126,6 +126,7 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
       stream << '\n';
       break;
     }
+  }
 
   if (oldSpeed != speed) {
     beginLine();
