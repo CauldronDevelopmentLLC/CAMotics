@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-camotics-nc">
+    <sub-class-of type="text/plain"/>
+    <comment>CAMotics Numerical Control</comment>
+    <glob pattern="*.gcode"/>
+    <glob pattern="*.nc"/>
+    <glob pattern="*.ngc"/>
+    <glob pattern="*.tap"/>
+    <glob pattern="*.tpl"/>
+  </mime-type>
+  <mime-type type="application/x-camotics-project">
+    <sub-class-of type="text/plain"/>
+    <comment>CAMotics project</comment>
+    <magic priority="80">
+      <match type="string" offset="0:60" value="&lt;camotics"/>
+    </magic>
+    <glob weight="30" pattern="*.xml" />
+  </mime-type>
+</mime-info>

@@ -267,6 +267,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         description = description,
         prefix = '/usr',
         icons = ('osx/camotics.icns', 'images/camotics.png'),
+        mime = [['mime.xml', 'camotics.xml']],
         platform_independent = ('tpl_lib'),
 
         documents = ['README.md', 'CHANGELOG.md'] + examples,
