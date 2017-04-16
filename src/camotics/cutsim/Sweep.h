@@ -35,7 +35,7 @@ namespace CAMotics {
 
     void getBBoxes(const Vector3R &start, const Vector3R &end,
                    std::vector<Rectangle3R> &bboxes, real radius,
-                   real length, real tolerance = 0.01) const;
+                   real length, real zOffset, real tolerance = 0.01) const;
 
     virtual void getBBoxes(const Vector3R &start, const Vector3R &end,
                            std::vector<Rectangle3R> &bboxes,

@@ -29,7 +29,7 @@ using namespace CAMotics;
 
 void Sweep::getBBoxes(const Vector3R &start, const Vector3R &end,
                       vector<Rectangle3R> &bboxes, real radius,
-                      real length, real tolerance) const {
+                      real length, real zOffset, real tolerance) const {
   const unsigned maxLen = radius * 16;
   real len = start.distance(end);
   unsigned steps = (len <= maxLen) ? 1 : (len / maxLen);
@@ -43,7 +43,7 @@ void Sweep::getBBoxes(const Vector3R &start, const Vector3R &end,
 
     real minX = std::min(p1.x(), p2.x()) - radius - tolerance;
     real minY = std::min(p1.y(), p2.y()) - radius - tolerance;
-    real minZ = std::min(p1.z(), p2.z()) - tolerance;
+    real minZ = std::min(p1.z(), p2.z()) + zOffset - tolerance;
     real maxX = std::max(p1.x(), p2.x()) + radius + tolerance;
     real maxY = std::max(p1.y(), p2.y()) + radius + tolerance;
     real maxZ = std::max(p1.z(), p2.z()) + length + tolerance;

@@ -35,7 +35,7 @@ ConicSweep::ConicSweep(real length, real radius1, real radius2) :
 
 void ConicSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
                            vector<Rectangle3R> &bboxes, real tolerance) const {
-  Sweep::getBBoxes(start, end, bboxes, rt < rb ? rb : rt, l, tolerance);
+  Sweep::getBBoxes(start, end, bboxes, rt < rb ? rb : rt, l, 0, tolerance);
 }
 
 

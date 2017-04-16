@@ -39,7 +39,7 @@ SpheroidSweep::SpheroidSweep(real radius, real length) :
 void SpheroidSweep::getBBoxes(const Vector3R &start, const Vector3R &end,
                               vector<Rectangle3R> &bboxes,
                               real tolerance) const {
-  Sweep::getBBoxes(start, end, bboxes, radius, length, tolerance);
+  Sweep::getBBoxes(start, end, bboxes, radius, length, -radius, tolerance);
 }
 
 
