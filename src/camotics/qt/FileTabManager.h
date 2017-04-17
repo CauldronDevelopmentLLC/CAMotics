@@ -62,16 +62,18 @@ namespace CAMotics {
     void validateTabIndex(unsigned tab) const;
     NCEdit *getEditor(unsigned tab) const;
     NCEdit *getCurrentEditor() const;
+    int getEditorIndex(NCEdit *editor) const;
 
   signals:
     void find();
     void findNext();
     void findResult(bool);
 
+  public slots:
+    void on_modificationChanged(NCEdit *editor, bool changed);
+
   protected slots:
     void on_tabCloseRequested(int index);
-
-    void on_modificationChanged(bool changed);
 
     void on_actionUndo_triggered();
     void on_actionRedo_triggered();

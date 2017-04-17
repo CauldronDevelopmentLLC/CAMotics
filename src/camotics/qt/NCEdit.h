@@ -69,6 +69,7 @@ namespace CAMotics {
   class NCDocLayout;
   class Highlighter;
   class SidebarWidget;
+  class FileTabManager;
 
   class NCEdit: public QPlainTextEdit {
     Q_OBJECT;
@@ -80,6 +81,8 @@ namespace CAMotics {
                WRITE setLineNumbersVisible);
     Q_PROPERTY(bool textWrapEnabled READ isTextWrapEnabled
                WRITE setTextWrapEnabled);
+
+    FileTabManager *parent;
 
     cb::SmartPointer<NCFile> file;
     cb::SmartPointer<NCDocLayout> layout;
@@ -101,7 +104,7 @@ namespace CAMotics {
   public:
     NCEdit(const cb::SmartPointer<NCFile> &file,
            const cb::SmartPointer<Highlighter> &highlighter,
-           QWidget *parent = 0);
+           FileTabManager *parent = 0);
     ~NCEdit();
 
     const cb::SmartPointer<NCFile> &getFile() const {return file;}
@@ -156,5 +159,6 @@ namespace CAMotics {
   protected slots:
     void updateCursor();
     void updateSidebar(const QRect &rect, int d);
+    void modificationChanged(bool changed);
   };
 }

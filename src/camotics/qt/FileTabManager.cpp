@@ -71,7 +71,7 @@ void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
     else highlighter = new GCodeHighlighter;
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    NCEdit *editor = new NCEdit(file, highlighter, parentWidget());
+    NCEdit *editor = new NCEdit(file, highlighter, this);
 
     QFile qFile(QString::fromUtf8(absPath.c_str()));
     qFile.open(QFile::ReadOnly);
@@ -83,8 +83,6 @@ void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
     editor->setWordWrapMode(QTextOption::NoWrap);
     editor->setPlainText(contents);
 
-    connect(editor, SIGNAL(modificationChanged(bool)),
-            SLOT(on_modificationChanged(bool)));
     connect(editor, SIGNAL(find()), SIGNAL(find()));
     connect(editor, SIGNAL(findNext()), SIGNAL(findNext()));
     connect(editor, SIGNAL(findResult(bool)), SIGNAL(findResult(bool)));
@@ -327,14 +325,17 @@ NCEdit *FileTabManager::getCurrentEditor() const {
 }
 
 
-void FileTabManager::on_tabCloseRequested(int index) {
-  close(index, true, false);
+int FileTabManager::getEditorIndex(NCEdit *editor) const {
+  for (int i = offset; i < QTabWidget::count(); i++)
+    if (QTabWidget::widget(i) == editor) return i;
+
+  return -1;
 }
 
 
-void FileTabManager::on_modificationChanged(bool changed) {
-  unsigned tab = QTabWidget::currentIndex();
-  validateTabIndex(tab);
+void FileTabManager::on_modificationChanged(NCEdit *editor, bool changed) {
+  int tab = getEditorIndex(editor);
+  if (tab == -1) return;
   QString title = QTabWidget::tabText(tab);
 
   if (changed && !title.endsWith(" *"))
@@ -347,29 +348,16 @@ void FileTabManager::on_modificationChanged(bool changed) {
 }
 
 
-void FileTabManager::on_actionUndo_triggered() {
-  getCurrentEditor()->undo();
+void FileTabManager::on_tabCloseRequested(int index) {
+  close(index, true, false);
 }
 
 
-void FileTabManager::on_actionRedo_triggered() {
-  getCurrentEditor()->redo();
-}
-
-
-void FileTabManager::on_actionCut_triggered() {
-  getCurrentEditor()->cut();
-}
-
-
-void FileTabManager::on_actionCopy_triggered() {
-  getCurrentEditor()->copy();
-}
-
-
-void FileTabManager::on_actionPaste_triggered() {
-  getCurrentEditor()->paste();
-}
+void FileTabManager::on_actionUndo_triggered() {getCurrentEditor()->undo();}
+void FileTabManager::on_actionRedo_triggered() {getCurrentEditor()->redo();}
+void FileTabManager::on_actionCut_triggered() {getCurrentEditor()->cut();}
+void FileTabManager::on_actionCopy_triggered() {getCurrentEditor()->copy();}
+void FileTabManager::on_actionPaste_triggered() {getCurrentEditor()->paste();}
 
 
 void FileTabManager::on_actionSelectAll_triggered() {

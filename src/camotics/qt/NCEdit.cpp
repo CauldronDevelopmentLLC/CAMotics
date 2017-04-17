@@ -52,6 +52,7 @@
 
 #include "TPLHighlighter.h"
 #include "SidebarWidget.h"
+#include "FileTabManager.h"
 
 #include <cbang/SmartPointer.h>
 #include <cbang/log/Logger.h>
@@ -138,11 +139,13 @@ namespace CAMotics {
 
 
 NCEdit::NCEdit(const SmartPointer<NCFile> &file,
-               const SmartPointer<Highlighter> &highlighter, QWidget *parent) :
-  QPlainTextEdit(parent), file(file), layout(new NCDocLayout(document())),
-  highlighter(highlighter), sidebar(new SidebarWidget(this)),
-  showLineNumbers(true), textWrap(true), bracketsMatching(true),
-  cursorColor(QColor(255, 255, 192)), bracketMatchColor(QColor(180, 238, 180)),
+               const SmartPointer<Highlighter> &highlighter,
+               FileTabManager *parent) :
+  QPlainTextEdit(parent), parent(parent), file(file),
+  layout(new NCDocLayout(document())), highlighter(highlighter),
+  sidebar(new SidebarWidget(this)), showLineNumbers(true), textWrap(true),
+  bracketsMatching(true), cursorColor(QColor(255, 255, 192)),
+  bracketMatchColor(QColor(180, 238, 180)),
   bracketErrorColor(QColor(224, 128, 128)), codeFolding(true) {
 
   highlighter->setDocument(document());
@@ -152,6 +155,8 @@ NCEdit::NCEdit(const SmartPointer<NCFile> &file,
   connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateSidebar()));
   connect(this, SIGNAL(updateRequest(QRect, int)), this,
           SLOT(updateSidebar(QRect, int)));
+  connect(this, SIGNAL(modificationChanged(bool)),
+          SLOT(modificationChanged(bool)));
 
 #if defined(Q_OS_MAC)
   QFont textFont = font();
@@ -641,4 +646,9 @@ void NCEdit::updateCursor() {
 void NCEdit::updateSidebar(const QRect &rect, int d) {
   Q_UNUSED(rect);
   if (d != 0) updateSidebar();
+}
+
+
+void NCEdit::modificationChanged(bool changed) {
+  parent->on_modificationChanged(this, changed);
 }
