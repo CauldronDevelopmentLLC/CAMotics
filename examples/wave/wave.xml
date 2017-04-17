@@ -1,0 +1,29 @@
+<camotics>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
+  <!-- NC Files -->
+  <nc-files>
+    wave.tpl
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.228943'/>
+  <resolution-mode v='HIGH'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-margin v='0'/>
+  <workpiece-max v='(97.5,97.5,0)'/>
+  <workpiece-min v='(-2.5,-2.5,-6)'/>
+
+  <tool_table>
+    <tool length='15.088835' number='1' radius='6.25' shape='CONICAL' units='MM'>
+      1/2" 90 conical
+    </tool>
+    <tool length='25.4' number='2' radius='1.5625' shape='CYLINDRICAL' units='MM'>
+      1/8" cylindrical
+    </tool>
+    <tool length='30.125' number='3' radius='3.125' shape='BALLNOSE' units='MM'>
+      1/4" ball
+    </tool>
+  </tool_table>
+</camotics>
