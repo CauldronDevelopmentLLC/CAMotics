@@ -69,16 +69,20 @@ void ToolDialog::update() {
   ui->snubDiameterDoubleSpinBox->setVisible(shape == ToolShape::TS_SNUBNOSE);
   ui->snubDiameterLabel->setVisible(shape == ToolShape::TS_SNUBNOSE);
 
+#define UPDATE(UI, GET, SET, VALUE)                 \
+  if (ui->UI->GET() != (VALUE)) ui->UI->SET(VALUE);
+
   // Values
-  ui->numberSpinBox->setValue(tool.getNumber());
-  ui->unitsComboBox->setCurrentIndex(tool.getUnits());
-  ui->shapeComboBox->setCurrentIndex(tool.getShape());
-  ui->angleDoubleSpinBox->setValue(tool.getAngle());
-  ui->lengthDoubleSpinBox->setValue(tool.getLength() * scale);
-  ui->diameterDoubleSpinBox->setValue(tool.getDiameter() * scale);
-  ui->snubDiameterDoubleSpinBox->setValue(tool.getSnubDiameter() * scale);
-  ui->descriptionLineEdit->
-    setText(QString::fromUtf8(tool.getDescription().c_str()));
+  UPDATE(numberSpinBox, value, setValue, (int)tool.getNumber());
+  UPDATE(unitsComboBox, currentIndex, setCurrentIndex, tool.getUnits());
+  UPDATE(shapeComboBox, currentIndex, setCurrentIndex, tool.getShape());
+  UPDATE(angleDoubleSpinBox, value, setValue, tool.getAngle());
+  UPDATE(lengthDoubleSpinBox, value, setValue, tool.getLength() * scale);
+  UPDATE(diameterDoubleSpinBox, value, setValue, tool.getDiameter() * scale);
+  UPDATE(snubDiameterDoubleSpinBox, value, setValue,
+         tool.getSnubDiameter() * scale);
+  UPDATE(descriptionLineEdit, text, setText,
+         QString::fromUtf8(tool.getDescription().c_str()));
 
   scene.update(tool, ui->toolView->frameSize());
   updating = false;
