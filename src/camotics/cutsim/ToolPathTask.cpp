@@ -70,7 +70,7 @@ void ToolPathTask::run() {
 
   // Setup
   path = new ToolPath(tools);
-  // TODO load machine configuration
+  // TODO load machine configuration, including rapidFeed
   Machine machine(*path);
   machine.reset();
   Controller controller(machine, tools);
