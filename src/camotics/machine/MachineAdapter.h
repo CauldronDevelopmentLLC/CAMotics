@@ -98,7 +98,7 @@ namespace CAMotics {
     const cb::LocationRange &getLocation() const {return parent->getLocation();}
     void setLocation(const cb::LocationRange &location)
     {parent->setLocation(location);}
+
+    void comment(const std::string &s) const {parent->comment(s);}
   };
 }
-
-

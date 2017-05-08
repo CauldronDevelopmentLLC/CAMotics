@@ -70,5 +70,3 @@ namespace CAMotics {
     double meterFootOut() const;
   };
 }
-
-

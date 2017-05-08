@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include "Axes.h"
 #include "MachineEnum.h"
 
@@ -249,7 +248,8 @@ namespace CAMotics {
 
     /// Get program location
     virtual void setLocation(const cb::LocationRange &location) = 0;
+
+    /// Output comment
+    virtual void comment(const std::string &s) const = 0;
   };
 }
-
-

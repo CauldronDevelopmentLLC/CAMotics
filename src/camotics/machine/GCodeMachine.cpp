@@ -35,7 +35,9 @@ using namespace CAMotics;
 namespace {
   struct dtos {
     double x;
-    dtos(double x) : x(x) {
+    bool imperial;
+
+    dtos(double x, bool imperial) : x(x), imperial(imperial) {
       if (Math::isnan(x))
         THROW("Numerical error in GCode stream:  NaN, caused by a divide by "
               "zero or other math error.");
@@ -47,7 +49,7 @@ namespace {
 
 
   inline ostream &operator<<(ostream &stream, const dtos &d) {
-    return stream << String(d.x);
+    return stream << String(d.x, d.imperial ? 3 : 2);
   }
 }
 
@@ -104,7 +106,7 @@ void GCodeMachine::setFeed(double feed, feed_mode_t mode) {
 
   if (feed != oldFeed) {
     beginLine();
-    stream << "F" << dtos(feed) << '\n';
+    stream << "F" << dtos(feed, false) << '\n';
   }
 }
 
@@ -121,8 +123,8 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
     switch (mode) {
     case REVOLUTIONS_PER_MINUTE: stream << "G97\n"; break;
     case CONSTANT_SURFACE_SPEED:
-      stream << "G96 S" << dtos(fabs(speed));
-      if (max) stream << " D" << dtos(max);
+      stream << "G96 S" << dtos(fabs(speed), false);
+      if (max) stream << " D" << dtos(max, false);
       stream << '\n';
       break;
     }
@@ -131,8 +133,8 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
   if (oldSpeed != speed) {
     beginLine();
 
-    if (0 < speed) stream << "M3 S" << dtos(speed) << '\n';
-    else if (speed < 0) stream << "M4 S" << dtos(-speed) << '\n';
+    if (0 < speed) stream << "M3 S" << dtos(speed, false) << '\n';
+    else if (speed < 0) stream << "M4 S" << dtos(-speed, false) << '\n';
     else stream << "M5\n";
   }
 }
@@ -192,14 +194,14 @@ void GCodeMachine::output(unsigned port, double value, bool sync) {
 
 void GCodeMachine::dwell(double seconds) {
   beginLine();
-  stream << "G4 P" << dtos(seconds) << '\n';
+  stream << "G4 P" << dtos(seconds, false) << '\n';
   MachineAdapter::dwell(seconds);
 }
 
 
 bool is_near(double x, double y) {
-  return y - numeric_limits<double>::epsilon() <= x &&
-    x <= y + numeric_limits<double>::epsilon();
+  return y - 2 * numeric_limits<double>::epsilon() <= x &&
+    x <= y + numeric_limits<double>::epsilon() * 2;
 }
 
 
@@ -213,7 +215,7 @@ void GCodeMachine::move(const Axes &axes, bool rapid) {
         first = false;
       }
 
-      stream << ' ' << *axis << dtos(axes.get(*axis));
+      stream << ' ' << *axis << dtos(axes.get(*axis), units == Units::IMPERIAL);
     }
 
   if (!first) {
@@ -229,4 +231,13 @@ void GCodeMachine::pause(bool optional) {
   beginLine();
   stream << (optional ? "M1" : "M0") << '\n';
   MachineAdapter::pause(optional);
+}
+
+
+void GCodeMachine::comment(const string &s) const {
+  vector<string> lines;
+  String::tokenize(s, lines, "\n\r", true);
+
+  for (unsigned i = 0; i < lines.size(); i++)
+    stream << "(" << lines[i] << ")\n";
 }

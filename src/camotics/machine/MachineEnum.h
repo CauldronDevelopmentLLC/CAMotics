@@ -35,5 +35,3 @@ namespace CAMotics {
     typedef enum {MIST_COOLANT, FLOOD_COOLANT, PROBE, ANALOG, DIGITAL} port_t;
   };
 }
-
-

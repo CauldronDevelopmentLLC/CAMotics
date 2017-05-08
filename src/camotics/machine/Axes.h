@@ -20,8 +20,8 @@
 
 #pragma once
 
-
 #include <cbang/Exception.h>
+#include <cbang/Math.h>
 #include <cbang/geom/Vector.h>
 #include <cbang/geom/Matrix.h>
 
@@ -42,7 +42,11 @@ namespace CAMotics {
     double get(char c) const {return getIndex(toIndex(c));}
     void set(char c, double value) {setIndex(toIndex(c), value);}
     double getIndex(unsigned i) const {return data[i];}
-    void setIndex(unsigned i, double value) {data[i] = value;}
+    void setIndex(unsigned i, double value) {
+      if (!cb::Math::isfinite(value))
+        THROWS(toAxis(i) << " position is invalid");
+      data[i] = value;
+    }
 
     double getX() const {return data[0];}
     double getY() const {return data[1];}
@@ -122,5 +126,3 @@ namespace CAMotics {
     }
   };
 }
-
-
