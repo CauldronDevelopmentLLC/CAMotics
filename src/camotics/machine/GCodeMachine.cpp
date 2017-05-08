@@ -45,11 +45,14 @@ namespace {
       if (Math::isinf(x))
         THROW("Numerical error in GCode stream: Infiniate value");
     }
+
+
+    string toString() const {return String(x, imperial ? 3 : 2);}
   };
 
 
   inline ostream &operator<<(ostream &stream, const dtos &d) {
-    return stream << String(d.x, d.imperial ? 3 : 2);
+    return stream << d.toString();
   }
 }
 
@@ -207,15 +210,22 @@ bool is_near(double x, double y) {
 
 void GCodeMachine::move(const Axes &axes, bool rapid) {
   bool first = true;
+  bool imperial = units == Units::IMPERIAL;
+
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (!is_near(position.get(*axis), axes.get(*axis))) {
+      string last = dtos(position.get(*axis), imperial).toString();
+      string value = dtos(axes.get(*axis), imperial).toString();
+
+      if (last == value) continue;
+
       if (first) {
         beginLine();
         stream << 'G' << (rapid ? '0' : '1');
         first = false;
       }
 
-      stream << ' ' << *axis << dtos(axes.get(*axis), units == Units::IMPERIAL);
+      stream << ' ' << *axis << value;
     }
 
   if (!first) {
