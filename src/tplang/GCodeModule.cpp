@@ -67,6 +67,7 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("tool_set(number, length, diameter, units, shape, snub=0)",
                  this, &GCodeModule::toolSetCB);
   exports.insert("position()", this, &GCodeModule::positionCB);
+  exports.insert("comment(...)", this, &GCodeModule::commentCB);
 
   exports.insert("FEED_INVERSE_TIME", INVERSE_TIME);
   exports.insert("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
@@ -312,11 +313,21 @@ void GCodeModule::positionCB(const js::Value &args, js::Sink &sink) {
 }
 
 
+void GCodeModule::commentCB(const js::Value &args, js::Sink &sink) {
+  for (unsigned i = 0; i < args.length(); i++)
+    ctx.machine.comment(args.getString(i)); // TODO Call JSON.stringify()
+}
+
+
 void GCodeModule::parseAxes(const js::Value &args, Axes &axes,
                             bool incremental) {
-  for (const char *axis ="xyzabcuvw"; *axis; axis++) {
+  for (const char *axis = "xyzabcuvw"; *axis; axis++) {
     string name = string(1, *axis);
-    if (args.has(name)) axes.set(*axis, args.getNumber(name) +
-                                 (incremental ? axes.get(*axis) : 0));
+    if (!args.has(name)) continue;
+
+    double value = args.getNumber(name) + (incremental ? axes.get(*axis) : 0);
+    if (!Math::isfinite(value)) THROWS(*axis << " position is invalid");
+
+    axes.set(*axis, value);
   }
 }
