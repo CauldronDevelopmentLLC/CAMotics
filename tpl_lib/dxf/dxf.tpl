@@ -294,9 +294,9 @@ module.exports = extend({
 
 
   arc_angle: function(a) {
-    var angle = (a.endAngle - a.startAngle) * (a.clockwise ? 1 : -1)
+    var angle = (a.endAngle - a.startAngle) * (a.clockwise ? -1 : 1)
 
-    if (angle <= 0) angle += 360;
+    //if (angle <= 0) angle += 360;
 
     return angle * Math.PI / 180;
   },
