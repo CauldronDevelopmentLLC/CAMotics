@@ -58,6 +58,7 @@ real ConicSweep::depth(const Vector3R &A, const Vector3R &B,
 
   // If this is a straight up and down move of a cylindrical tool choose
   // a fake arbitrarily small epsilon.
+  // TODO improve cylindrical computation speed by computing special case
   if (epsilon == 0 && Bz != Az && Tm == 0) epsilon = 0.000000001;
 
   const double gamma = (Ax - Px) * (Bx - Ax) + (Ay - Py) * (By - Ay) +
@@ -75,7 +76,7 @@ real ConicSweep::depth(const Vector3R &A, const Vector3R &B,
 
   // Check if the point is cut by the flat top or bottom
   if (Pz < Qz || Qz + l < Pz) {
-    beta = Pz / (Bz - Az); // E is on AB at z-height
+    beta = (Pz - Az) / (Bz - Az); // E is on AB at z-height
 
     // Compute squared distance to E on XY plane
     const double Ex = beta * (Bx - Ax) + Ax;
