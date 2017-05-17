@@ -4,12 +4,12 @@ tool(3);
 var maxFeed = 500;
 var minFeed = 250;
 var maxDepth = -2.5;
-var minDepth = 0;
+var minDepth = 0; 
 var width = 96;
-var height = 96;
-var zSafe = 3; 
+var height = 96; 
+var zSafe = 3;
 var scale = 2;
-var period = 0.25;
+var period = 0.25; 
 
 rapid({z: zSafe});
 rapid(0, 0);

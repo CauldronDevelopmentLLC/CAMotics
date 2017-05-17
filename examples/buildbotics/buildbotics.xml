@@ -6,16 +6,16 @@
   </nc-files>
 
   <!-- Project -->
-  <units v='INCH'/>
+  <units v='MM'/>
 
   <!-- Renderer -->
-  <resolution v='0.169708'/>
+  <resolution v='0.16971'/>
   <resolution-mode v='HIGH'/>
 
   <!-- Workpiece -->
   <automatic-workpiece v='true'/>
-  <workpiece-max v='(80.942,80.8622,0)'/>
-  <workpiece-min v='(-7.181,-7.1772,-3.14999)'/>
+  <workpiece-max v='(80.9405,80.867,0)'/>
+  <workpiece-min v='(-7.1805,-7.177,-3.15)'/>
 
   <tool_table>
     <tool length='1' number='1' radius='0.04685' shape='CYLINDRICAL' units='INCH'/>

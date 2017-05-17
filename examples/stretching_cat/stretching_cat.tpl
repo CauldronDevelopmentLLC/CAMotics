@@ -2,31 +2,40 @@ var dxf = require('dxf');
 
 var layer = dxf.open('stretching_cat.dxf')[0];
 var zSafe = 5;             // Safe height
-var cutDepth = -10.4;      // Total cut depth
+var cutDepth = -11.5;      // Total cut depth
 var maxZStep = 3;          // Max depth of cut per pass
-var toolDia = 1/16 * 25.4; // Metric diameter of the tool
 var offset = 100;          // Array X & Y offset
-var rows = 2;
-var cols = 4;
 
-// Compute steps and step down
+// Compute steps
 var steps = Math.abs(Math.ceil(cutDepth / maxZStep));
-var zStepDown = cutDepth / steps;
 
 units(METRIC); // This must match the units of the DXF file
-feed(40);      // Depends on what the machine and the material can handle
+feed(200);     // Depends on what the machine and the material can handle
+speed(10000);
+tool(1)
 
 translate(3, 3); // Offset a little
-scale(0.5, 0.5); // Quarter size
+scale(0.4, 0.4);
 
 // Cut an array
-for (var row = 0; row < rows; row++)
-  for (var col = 0; col < cols; col++) {
-    pushMatrix();
-    translate(row * offset, col * offset);
+for (var x = 0; x < 2; x++) {
+  for (var y = 0; y < 4; y++) {
+    dxf.cut_layer(layer, {
+      delta: tool(1).diameter / 2 / 0.4,
+      zSafe: zSafe,
+      zStart: 0,
+      zEnd: cutDepth,
+      zMax: maxZStep,
+      zSlope: 0.125,
+      tabSlope: 0.8,
+      tabHeight: 4.5,
+      tabs: [{ratio: 0}, {ratio: 0.35}]
+    });
 
-    for (var i = 0; i < steps; i++)
-      dxf.layer_cut(layer, zSafe, zStepDown * (i + 1));
-
-    popMatrix();
+    translate(0, x == 0 ? offset : -offset);
   }
+
+  translate(offset, -offset);
+}
+
+rapid({z: zSafe});

@@ -21,6 +21,33 @@
 var _dxf = require('_dxf');
 
 
+// Object.assign polyfill
+if (typeof Object.assign != 'function') {
+  Object.assign = function(target, varArgs) { // .length of function is 2
+    'use strict';
+    if (target == null) { // TypeError if undefined or null
+      throw new TypeError('Cannot convert undefined or null to object');
+    }
+
+    var to = Object(target);
+
+    for (var index = 1; index < arguments.length; index++) {
+      var nextSource = arguments[index];
+
+      if (nextSource != null) { // Skip over if undefined or null
+        for (var nextKey in nextSource) {
+          // Avoid bugs when hasOwnProperty is shadowed
+          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+    }
+    return to;
+  };
+}
+
+
 function lpad(s, width, delim) {
   if (typeof delim == 'undefined') delim = ' ';
   while (s.length < width) s = delim + s;
@@ -45,28 +72,22 @@ function str(x) {
 }
 
 
-function sqr(x) {
-  return x * x;
-}
-
-
-function cube(x) {
-  return x * x * x;
-}
-
-
-function first(a) {
-  return a[0];
-}
-
-
-function last(a) {
-  return a[a.length - 1];
-}
+function sqr(x) {return x * x;}
+function cube(x) {return x * x * x;}
+function first(a) {return a[0];}
+function last(a) {return a[a.length - 1];}
 
 
 function distance2D(p1, p2) {
   return Math.sqrt(sqr(p2.x - p1.x) + sqr(p2.y - p1.y))
+}
+
+
+function split_seg_2d(start, end, ratio) {
+  return {
+    x: start.x + ratio * (end.x - start.x),
+    y: start.y + ratio * (end.y - start.y)
+  };
 }
 
 
@@ -247,24 +268,6 @@ module.exports = extend({
 
 
   // CAM ***********************************************************************
-  tabs: {},
-
-
-  tabbed_cut: function(x, y) {
-    /*
-      var p = position();
-
-      if (p.z < tabs.depth + tabs.height) {
-      if (tabs.xAxis)
-      for (var i = 0; i < tabs.xAxis; i++)
-      if (x <= tabs.xAxis[i]) ;
-      }
-    */
-
-    cut(x, y);
-  },
-
-
   find_closest: function(p, layer) {
     // Dumb linear search
     var best = 0;
@@ -288,9 +291,7 @@ module.exports = extend({
   },
 
 
-  line_cut: function(l) {
-    this.tabbed_cut(l.end.x, l.end.y);
-  },
+  line_cut: function(l) {cut(l.end.x, l.end.y);},
 
 
   arc_angle: function(a) {
@@ -316,10 +317,9 @@ module.exports = extend({
 
   polyline_cut: function(pl) {
     for (var i = 1; i < pl.vertices.length; i++)
-      this.tabbed_cut(pl.vertices[i].x, pl.vertices[i].y);
+      cut(pl.vertices[i].x, pl.vertices[i].y);
 
-    if (pl.vertices.length)
-      this.tabbed_cut(pl.vertices[0].x, pl.vertices[0].y);
+    if (pl.vertices.length) cut(pl.vertices[0].x, pl.vertices[0].y);
   },
 
 
@@ -332,7 +332,7 @@ module.exports = extend({
 
       for (var i = 0; i < steps; i++) {
         v = quad_bezier(s.ctrlPts, delta * (i + 1));
-        this.tabbed_cut(v.x, v.y);
+        cut(v.x, v.y);
       }
 
 
@@ -342,12 +342,12 @@ module.exports = extend({
 
       for (var i = 0; i < steps; i++) {
         var v = cubic_bezier(s.ctrlPts, delta * (i + 1));
-        this.tabbed_cut(v.x, v.y);
+        cut(v.x, v.y);
       }
 
     } else
       for (var i = 1; i < s.ctrlPts.length; i++)
-        this.tabbed_cut(s.ctrlPts[i].x, s.ctrlPts[i].y);
+        cut(s.ctrlPts[i].x, s.ctrlPts[i].y);
   },
 
 
@@ -383,7 +383,7 @@ module.exports = extend({
       }
 
       cut({z: zCut});
-      this.tabbed_cut(v.x, v.y);
+      cut(v.x, v.y);
 
       this.element_cut(e, res);
 
@@ -404,13 +404,13 @@ module.exports = extend({
 
 
   // Polygons ******************************************************************
-  poly_com: function(poly) {
+  poly_com: function(poly) { // Center Of Mass
     // TODO broken?
     var c = {x: 0, y: 0};
 
     for (var i = 0; i < poly.length; i++) {
-      c.x += poly[i][0];
-      c.y += poly[i][1];
+      c.x += poly[i].x;
+      c.y += poly[i].y;
     }
 
     c.x /= poly.length;
@@ -428,8 +428,8 @@ module.exports = extend({
       if (!polys[i].length) continue;
 
       var pc = this.poly_com(polys[i]);
-      c.x += pc[0];
-      c.y += pc[1];
+      c.x += pc.x;
+      c.y += pc.y;
     }
 
     c.x /= polys.length;
@@ -467,7 +467,7 @@ module.exports = extend({
       }
 
       for (var i = 0; i < v.length; i++)
-        poly.push([v[i].x, v[i].y]);
+        poly.push(v[i]);
 
       p = last(v);
 
@@ -485,11 +485,11 @@ module.exports = extend({
       var poly = polys[i];
       var p = position();
       var v = first(poly);
-      var d = distance2D({x: v[0], y: v[1]}, p);
+      var d = distance2D(v, p);
 
       if (0.01 < d) {
         rapid({z: zSafe});
-        rapid(v[0], v[1]);
+        rapid(v);
       }
 
       var f = feed()[0];
@@ -498,10 +498,27 @@ module.exports = extend({
       feed(f);
 
       for (var j = 0; j < poly.length; j++)
-        this.tabbed_cut(poly[j][0], poly[j][1]);
+        cut(poly[j].x, poly[j].y);
 
-      this.tabbed_cut(v[0], v[1]);
+      cut(v.x, v.y);
     }
+  },
+
+
+  poly_length: function(poly) {
+    if (!poly.length) return 0;
+
+    var length = 0;
+    var last;
+
+    for (var i = 0; i < poly.length; i++) {
+      if (i) length += distance2D(poly[i], last);
+      last = poly[i];
+    }
+
+    length += distance2D(last, poly[0]);
+
+    return length;
   },
 
 
@@ -594,9 +611,6 @@ module.exports = extend({
   },
 
 
-  set_tabs: function (data) {tabs = data},
-
-
   cut_layer_offset: function (layer, delta, zSafe, zCut, steps, zFeed) {
     if (typeof steps == 'undefined') steps = 1;
 
@@ -606,6 +620,203 @@ module.exports = extend({
       var polys = this.layer_to_polys(layer);
       if (delta) polys = this.offset_polys(polys, delta);
       this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed);
+    }
+  },
+
+
+  compute_tab_points: function (length, config) {
+    var points = [];
+
+    for (var i = 0; i < config.tabs.length; i++) {
+      var tab = config.tabs[i];
+      var slope = tab.slope || config.tabSlope || config.zSlope;
+      var center = tab.position || tab.ratio * length;
+      var height = tab.height || config.tabHeight || 1;
+
+      tab.position = center;
+      tab.start = center - height / slope;
+      tab.end = center + height / slope;
+      tab.slope = slope;
+      tab.height = height;
+
+      while (tab.start < 0) tab.start += length;
+      while (length <= tab.end) tab.end -= length;
+
+      points.push(tab.start);
+      points.push(tab.position);
+      points.push(tab.end);
+    }
+
+    // Sort tab points
+    points.sort(function (a, b) {return a - b});
+
+    return points;
+  },
+
+
+  split_poly_at_tab_points: function (poly, points, config) {
+    var output = [];
+    var j = 0;
+    var d = 0;
+
+    for (var i = 0; i < poly.length; i++) {
+      output.push(poly[i]);
+
+      var next = (i == poly.length - 1) ? 0 : i + 1;
+      var dist = distance2D(poly[i], poly[next]);
+      var dNext = d + dist;
+
+      while (points[j] == d) j++;
+
+      while (points[j] < dNext) {
+        output.push(split_seg_2d(poly[i], poly[next], (points[j] - d) / dist));
+        j++;
+      }
+
+      d = dNext;
+    }
+
+    return output;
+  },
+
+
+  set_tab_heights: function (path, length, config) {
+    var dist = 0;
+
+    for (var i = 0; i < path.length; i++) {
+      if (i) {
+        dist += distance2D(path[i - 1], path[i]);
+        if (length <= dist) dist -= length;
+      }
+
+      for (var j = 0; j < config.tabs.length; j++) {
+        var tab = config.tabs[j];
+
+        // Check height
+        if (config.zEnd + tab.height <= path[i].z) continue;
+
+        var tStart = tab.start;
+        var tEnd = tab.end;
+        var tMid = tab.position;
+
+        // Adjust values for wrap around tabs
+        if (tEnd < tStart) {
+          if (tStart < dist) {
+            tEnd += length;
+            if (tMid < tStart) tMid += length;
+
+          } else {
+            tStart -= length;
+            if (tEnd < tMid) tMid -= length;
+          }
+        }
+
+        // Check range
+        if (dist <= tStart) continue;
+
+        if (dist <= tMid) {
+          var tabZ = config.zEnd + tab.slope * (dist - tStart);
+          if (path[i].z < tabZ) path[i].z = tabZ;
+
+        } else if (dist <= tEnd) {
+          var tabZ = config.zEnd + tab.slope * (tEnd - dist);
+          if (path[i].z < tabZ) path[i].z = tabZ;
+        }
+      }
+    }
+  },
+
+
+  profile_segment: function (start, end, config) {
+    var zTarget = end.z - config.zMax;
+    if (zTarget < config.zEnd) zTarget = config.zEnd;
+
+    if (zTarget - 0.01 < start.z && start.z < zTarget + 0.01)
+      return [{x: end.x, y: end.y, z: zTarget}];
+
+    var len = distance2D(start, end);
+    var rise = Math.abs(zTarget - start.z);
+    var run = rise / config.zSlope;
+
+    if (len < run)
+      // Not enough length to achieve target depth
+      return [{x: end.x, y: end.y, z: start.z - config.zSlope * len}];
+
+    // Split segment
+    var split = split_seg_2d(start, end, run / len);
+    split.z = zTarget;
+
+    return [split, {x: end.x, y: end.y, z: zTarget}];
+  },
+
+
+  profile_poly: function (poly, config) {
+    var self = this;
+    if (!poly.length) return [];
+
+    var length = this.poly_length(poly);
+    var tab_points = this.compute_tab_points(length, config);
+    poly = this.split_poly_at_tab_points(poly, tab_points, config);
+
+    var prev = [];
+    for (var i = 0; i < poly.length; i++)
+      prev.push({x: poly[i].x, y: poly[i].y, z: config.zStart});
+
+    var path = [Object.assign({}, prev[0])]; // Must copy object, updated later
+    var done = false;
+    var last = prev[0];
+
+    function add_seg(target, start, end) {
+      var seg = self.profile_segment(start, end, config);
+      Array.prototype.push.apply(target, seg);
+      last = seg[seg.length - 1];
+    }
+
+    while (!done) {
+      for (var i = 1; i < prev.length && !done; i++) {
+        done = prev[i].z == config.zEnd;
+        add_seg(path, last, prev[i]);
+        prev[i].z = last.z;
+      }
+
+      // Close poly
+      if (!done) {
+        add_seg(path, last, prev[0]);
+        prev[0].z = last.z;
+      }
+    }
+
+    this.set_tab_heights(path, length, config);
+
+    return path;
+  },
+
+
+  cut_layer: function (layer, _config) {
+    var config = Object.assign({
+      delta: 0,
+      zSafe: 5,
+      zStart: 0,
+      zEnd: 0,
+      zMax: 3,
+      zSlope: 1.0 / 3,
+      tabs: []
+    }, _config);
+
+    var polys = this.layer_to_polys(layer);
+    if (config.delta) polys = this.offset_polys(polys, config.delta);
+
+    if (typeof polys.length == 'undefined') return;
+
+    for (var i = 0; i < polys.length; i++) {
+      var path = this.profile_poly(polys[i], config);
+      if (!path.length) continue;
+
+      cut({z: config.zSafe});
+      rapid({x: path[0].x, y: path[0].y});
+
+      for (var j = 0; j < path.length; j++)
+        cut(path[j]);
     }
   }
 

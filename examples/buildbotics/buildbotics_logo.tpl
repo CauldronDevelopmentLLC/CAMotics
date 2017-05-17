@@ -5,10 +5,12 @@ var zSafe = 3;
 var cutDepth = -1.5;
 
 units(METRIC); // This must match the units of the DXF file
-tool(2);
-feed(400);
+
+rapid({z: zSafe});
+
+feed(1600);
 speed(10000);
-dwell(1);     // Wait for spindle to spin up
+tool(2);
 
 scale(40, 40)
 
@@ -22,5 +24,8 @@ dxf.cut_layer_offset(layers.Pupils, -0.03, zSafe, cutDepth * 0.66);
 
 dxf.cut_layer_offset(layers.Outline, 0.00001, zSafe, cutDepth * 2, 2);
 
+loadIdentity();
+
 rapid({z: zSafe});
 speed(0);
+rapid(40, 100);
