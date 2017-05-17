@@ -20,45 +20,31 @@
 
 #pragma once
 
+#include "OffsetType.h"
 
-#include <cbang/StdTypes.h>
-#include <cbang/os/Thread.h>
-#include <cbang/net/IPAddress.h>
-#include <cbang/socket/Socket.h>
+#include <string>
 
-#include <map>
-#include <set>
 
 namespace CAMotics {
-  class Connection : public cb::Socket, public cb::Thread, public cb::Mutex {
-    const cb::IPAddress addr;
-    std::string password;
-    std::string enablePass;
-
-    uint64_t lastConnectAttempt;
-    double lastUpdate;
-    bool authenticated;
-    bool updated;
-
-    typedef std::map<std::string, std::string> vars_t;
-    vars_t vars;
-    typedef std::set<std::string> updates_t;
-    updates_t updates;
-
+  class CAMLayer : public OffsetType {
   public:
-    Connection(const cb::IPAddress &addr, const std::string &password,
-               const std::string &enablePass);
+    std::string name;
+    unsigned tool;
+    unsigned feed;
+    unsigned speed;
+    OffsetType offsetType;
+    double offset;
+    double startDepth;
+    double endDepth;
+    double maxStep;
 
-    bool isConnected() const;
-    bool wasUpdated();
+    CAMLayer(const std::string &name, unsigned tool, unsigned feed,
+             unsigned speed, OffsetType offsetType, double offset,
+             double startDepth, double endDepth, double maxStep) :
+      name(name), tool(tool), feed(feed), speed(speed), offsetType(offsetType),
+      offset(offset), startDepth(startDepth), endDepth(endDepth),
+      maxStep(maxStep) {}
 
-    void addUpdate(const std::string &name);
-    const std::string &get(const std::string &name) const;
-
-    using Socket::get;
-
-  protected:
-    // From Thread
-    void run();
+    std::string getOffsetString() const;
   };
 }

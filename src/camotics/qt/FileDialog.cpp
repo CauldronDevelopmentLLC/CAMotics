@@ -36,7 +36,7 @@ FileDialog::FileDialog(QtWin &win) : win(win) {}
 
 
 string FileDialog::open(const string &title, const string &filters,
-                        const string &filename, bool save) {
+                        const string &filename, bool save, bool anyFile) {
   // Find a resonable directory & file to start from
   QString qPath = QString::fromUtf8(filename.c_str());
 
@@ -46,13 +46,28 @@ string FileDialog::open(const string &title, const string &filters,
     else qPath = QDir::homePath();
   }
 
-  QString qTitle(QString::fromUtf8(title.c_str()));
-  QString qFilters(QString::fromUtf8(filters.c_str()));
-  QFlags<QFileDialog::Option> qOptions(QFileDialog::DontResolveSymlinks);
-  if (!save) qOptions |= QFileDialog::DontConfirmOverwrite;
+  QFileDialog dialog(&win, QString::fromUtf8(title.c_str()), qPath,
+                     QString::fromUtf8(filters.c_str()));
 
-  qPath = (save ? QFileDialog::getSaveFileName : QFileDialog::getOpenFileName)
-    (&win, qTitle, qPath, qFilters, 0, qOptions);
+  if (save || anyFile) dialog.setFileMode(QFileDialog::AnyFile);
+  else dialog.setFileMode(QFileDialog::ExistingFile);
+
+  dialog.setOption(QFileDialog::DontResolveSymlinks);
+  if (!save) dialog.setOption(QFileDialog::DontConfirmOverwrite);
+
+  if (save) dialog.setAcceptMode(QFileDialog::AcceptSave);
+
+  if (!save && anyFile) {
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setLabelText(QFileDialog::Accept, "Open");
+  }
+
+  if (!dialog.exec()) return "";
+
+  QStringList files = dialog.selectedFiles();
+  if (files.empty()) return "";
+
+  qPath = files.first();
 
   if (QFileInfo(qPath).isDir()) {
     win.warning("Cannot open directory");

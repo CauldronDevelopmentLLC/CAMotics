@@ -20,39 +20,39 @@
 
 #pragma once
 
-#include "CAMLayerDialog.h"
+#include <camotics/sim/ToolUnits.h>
+#include <camotics/cam/CAMLayer.h>
 
 #include <cbang/SmartPointer.h>
 
 #include <QDialog>
+#include <QTableWidget>
 
 
-namespace Ui {class CAMDialog;}
+namespace Ui {class CAMLayerDialog;}
 
 
 namespace CAMotics {
-  class CAMDialog : public QDialog {
+  class CAMLayerDialog : public QDialog {
     Q_OBJECT;
 
-    cb::SmartPointer<Ui::CAMDialog> ui;
-
-    CAMLayerDialog layerDialog;
-    std::vector<CAMLayer> layers;
-    int editRow;
+    cb::SmartPointer<Ui::CAMLayerDialog> ui;
 
   public:
-    CAMDialog(QWidget *parent);
+    CAMLayerDialog(QWidget *parent);
 
-    void loadDXFLayers(const std::string &filename);
+    void setLayers(const std::vector<std::string> &layers);
     void setUnits(ToolUnits units);
 
-    int getSelectedRow() const;
+    CAMLayer getLayer() const;
+    void setLayer(const CAMLayer &layer);
+
+    void update();
+    int exec();
 
   protected slots:
-    void on_addLayerPushButton_clicked();
-    void on_upPushButton_clicked();
-    void on_downPushButton_clicked();
-    void on_camTableWidget_activated(QModelIndex index);
-    void layerDialogAccepted();
+    void on_offsetComboBox_currentIndexChanged(int) {update();}
+    void on_startDepthDoubleSpinBox_valueChanged(double x);
+    void on_endDepthDoubleSpinBox_valueChanged(double x);
   };
 }

@@ -20,39 +20,49 @@
 
 #pragma once
 
-#include "CAMLayerDialog.h"
+#include <cbang/json/JSON.h>
 
-#include <cbang/SmartPointer.h>
+#include <QObject>
 
-#include <QDialog>
+#if 0x50000 <= QT_VERSION
+#include <QtWebSockets/QtWebSockets>
+#endif
 
-
-namespace Ui {class CAMDialog;}
+class QNetworkAccessManager;
 
 
 namespace CAMotics {
-  class CAMDialog : public QDialog {
+  class QtWin;
+
+  class BBCtrlAPI : public QObject {
     Q_OBJECT;
 
-    cb::SmartPointer<Ui::CAMDialog> ui;
+    QtWin *parent;
+    QNetworkAccessManager *netManager;
 
-    CAMLayerDialog layerDialog;
-    std::vector<CAMLayer> layers;
-    int editRow;
+    bool active;
+    uint64_t lastMessage;
+    QTimer updateTimer;
+
+    QWebSocket webSocket;
+    QUrl url;
+
+    cb::JSON::Dict vars;
 
   public:
-    CAMDialog(QWidget *parent);
+    BBCtrlAPI(QtWin *parent);
 
-    void loadDXFLayers(const std::string &filename);
-    void setUnits(ToolUnits units);
-
-    int getSelectedRow() const;
+    void connectCNC(const QString &address);
+    void disconnectCNC();
+    void reconnect();
+    void uploadGCode(const std::string &filename, const char *data,
+                     unsigned length);
 
   protected slots:
-    void on_addLayerPushButton_clicked();
-    void on_upPushButton_clicked();
-    void on_downPushButton_clicked();
-    void on_camTableWidget_activated(QModelIndex index);
-    void layerDialogAccepted();
+    void onError(QAbstractSocket::SocketError error);
+    void onConnected();
+    void onDisconnected();
+    void onTextMessageReceived(const QString &message);
+    void onUpdate();
   };
 }

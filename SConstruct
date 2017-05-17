@@ -60,6 +60,7 @@ if 'dist' in COMMAND_LINE_TARGETS:
     Return()
 
 
+have_cairo = False
 if not env.GetOption('clean'):
     if qt_version == '5': env.Replace(cxxstd = 'c++11')
 
@@ -79,8 +80,8 @@ if not env.GetOption('clean'):
     env.CBDefine('GLEW_STATIC')
 
     # Qt
-    qtmods = 'QtCore QtGui QtOpenGL'
-    if qt_version == '5': qtmods += ' QtWidgets'
+    qtmods = 'QtCore QtGui QtOpenGL QtNetwork'
+    if qt_version == '5': qtmods += ' QtWidgets QtWebSockets'
     env.EnableQtModules(qtmods.split())
     if env['PLATFORM'] != 'win32': env.Append(CCFLAGS = ['-fPIC'])
 
@@ -105,7 +106,7 @@ conf.Finish()
 # Source
 src = ['src/glew/glew.c']
 for subdir in [
-    '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'stl',
+    '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'stl', 'cam',
     'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'machine', 'dxf',
     'dxf/dxflib']:
     src += Glob('src/camotics/%s/*.cpp' % subdir)
@@ -123,7 +124,7 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 # Qt
 dialogs = '''
-  export about donate find new tool settings new_project cam cam_layer
+  export about donate find new tool settings new_project cam cam_layer connect
 '''.split()
 uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
 for dialog in dialogs:

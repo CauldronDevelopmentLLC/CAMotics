@@ -140,7 +140,7 @@ void ToolPathView::update() {
 
   currentTime = 0;
   currentDistance = 0;
-  currentPosition = Vector3R();
+  currentPosition = byRemote ? position : Vector3R();
   currentLine = 0;
   currentMove = Move();
 
@@ -162,7 +162,7 @@ void ToolPathView::update() {
       bool partial = false;
 
       if (byRemote) {
-        if (line < moveLine) break; // Too far
+        if (line < moveLine && !(byRemote && line < 1)) break; // Too far
         if (line == moveLine) {
           double distance = move.distance(position, end);
 
@@ -184,7 +184,7 @@ void ToolPathView::update() {
           partial = true;
         }
       }
-      currentPosition = (byRemote && partial) ? position : end;
+      currentPosition = byRemote ? position : end;
       currentLine = moveLine;
       currentTime += moveTime;
       currentDistance += moveDistance;

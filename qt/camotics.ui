@@ -313,7 +313,7 @@
      <x>0</x>
      <y>0</y>
      <width>1004</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -339,8 +339,6 @@
     <addaction name="separator"/>
     <addaction name="menuRecent_projects"/>
     <addaction name="separator"/>
-    <addaction name="actionExport"/>
-    <addaction name="actionSnapshot"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -414,18 +412,21 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tool Table</string>
+     <string>Tools</string>
     </property>
+    <addaction name="actionConnect"/>
+    <addaction name="actionExport"/>
+    <addaction name="actionSnapshot"/>
+    <addaction name="separator"/>
     <addaction name="actionExportToolTable"/>
     <addaction name="actionImportToolTable"/>
-    <addaction name="separator"/>
     <addaction name="actionSaveDefaultToolTable"/>
     <addaction name="actionLoadDefaultToolTable"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuSimulate"/>
    <addaction name="menuTools"/>
+   <addaction name="menuSimulate"/>
    <addaction name="menuView_2"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -444,6 +445,7 @@
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
+   <addaction name="actionConnect"/>
    <addaction name="actionExport"/>
    <addaction name="actionSnapshot"/>
   </widget>
@@ -2297,7 +2299,7 @@
      <normaloff>:/icons/snapshot.png</normaloff>:/icons/snapshot.png</iconset>
    </property>
    <property name="text">
-    <string>Snapshot</string>
+    <string>Screenshot</string>
    </property>
    <property name="toolTip">
     <string>Save a snapshot of the current view</string>
@@ -2971,7 +2973,7 @@
      <normaloff>:/icons/tool-export.png</normaloff>:/icons/tool-export.png</iconset>
    </property>
    <property name="text">
-    <string>Export table</string>
+    <string>Export Tool Table</string>
    </property>
    <property name="toolTip">
     <string>Export tool table</string>
@@ -2983,7 +2985,7 @@
      <normaloff>:/icons/tool-import.png</normaloff>:/icons/tool-import.png</iconset>
    </property>
    <property name="text">
-    <string>Import table</string>
+    <string>Import Tool Table</string>
    </property>
    <property name="toolTip">
     <string>Import tool table</string>
@@ -2995,7 +2997,7 @@
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save As Default</string>
+    <string>Save Tool Table As Default</string>
    </property>
    <property name="toolTip">
     <string>Save curent tool table as default</string>
@@ -3007,7 +3009,7 @@
      <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
    </property>
    <property name="text">
-    <string>Load Default</string>
+    <string>Load Default Tool Table</string>
    </property>
    <property name="toolTip">
     <string>Load default tool table</string>
@@ -3047,6 +3049,21 @@
    </property>
    <property name="toolTip">
     <string>Reload this file</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="camotics.qrc">
+     <normaloff>:/icons/buildbotics.png</normaloff>:/icons/buildbotics.png</iconset>
+   </property>
+   <property name="text">
+    <string>Connect</string>
+   </property>
+   <property name="toolTip">
+    <string>Connect to a Buildbotics CNC Controller</string>
    </property>
   </action>
  </widget>

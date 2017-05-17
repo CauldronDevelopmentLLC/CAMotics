@@ -20,39 +20,33 @@
 
 #pragma once
 
-#include "CAMLayerDialog.h"
 
 #include <cbang/SmartPointer.h>
 
 #include <QDialog>
 
 
-namespace Ui {class CAMDialog;}
+namespace Ui {class ConnectDialog;}
 
 
 namespace CAMotics {
-  class CAMDialog : public QDialog {
+  class ConnectDialog : public QDialog {
     Q_OBJECT;
 
-    cb::SmartPointer<Ui::CAMDialog> ui;
-
-    CAMLayerDialog layerDialog;
-    std::vector<CAMLayer> layers;
-    int editRow;
+    cb::SmartPointer<Ui::ConnectDialog> ui;
 
   public:
-    CAMDialog(QWidget *parent);
+    ConnectDialog();
 
-    void loadDXFLayers(const std::string &filename);
-    void setUnits(ToolUnits units);
+    QString getAddress() const;
 
-    int getSelectedRow() const;
+    void setFilename(const QString &filename);
+    QString getFilename() const;
+
+    int exec();
 
   protected slots:
-    void on_addLayerPushButton_clicked();
-    void on_upPushButton_clicked();
-    void on_downPushButton_clicked();
-    void on_camTableWidget_activated(QModelIndex index);
-    void layerDialogAccepted();
+    void on_cancelPushButton_clicked();
+    void on_connectPushButton_clicked();
   };
 }

@@ -18,6 +18,22 @@
 
 \******************************************************************************/
 
-#include "LayerCAMDialog.h"
+#ifndef CBANG_ENUM_EXPAND
+#ifndef CAMOTICS_OFFSET_TYPE_H
+#define CAMOTICS_OFFSET_TYPE_H
 
-using namespace CAMotics;
+#define CBANG_ENUM_NAME OffsetType
+#define CBANG_ENUM_NAMESPACE CAMotics
+#define CBANG_ENUM_PATH camotics/cam
+#define CBANG_ENUM_PREFIX 7
+#include <cbang/enum/MakeEnumeration.def>
+
+#endif // CAMOTICS_OFFSET_TYPE_H
+#else // CBANG_ENUM_EXPAND
+
+CBANG_ENUM_EXPAND(OFFSET_IN,      0)
+CBANG_ENUM_EXPAND(OFFSET_ON,      1)
+CBANG_ENUM_EXPAND(OFFSET_OUT,     2)
+CBANG_ENUM_EXPAND(OFFSET_MANUAL,  3)
+
+#endif // CBANG_ENUM_EXPAND

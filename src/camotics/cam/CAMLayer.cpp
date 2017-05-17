@@ -18,41 +18,16 @@
 
 \******************************************************************************/
 
-#pragma once
+#include "CAMLayer.h"
 
-#include "CAMLayerDialog.h"
+#include <cbang/String.h>
 
-#include <cbang/SmartPointer.h>
-
-#include <QDialog>
-
-
-namespace Ui {class CAMDialog;}
+using namespace CAMotics;
+using namespace cb;
+using namespace std;
 
 
-namespace CAMotics {
-  class CAMDialog : public QDialog {
-    Q_OBJECT;
-
-    cb::SmartPointer<Ui::CAMDialog> ui;
-
-    CAMLayerDialog layerDialog;
-    std::vector<CAMLayer> layers;
-    int editRow;
-
-  public:
-    CAMDialog(QWidget *parent);
-
-    void loadDXFLayers(const std::string &filename);
-    void setUnits(ToolUnits units);
-
-    int getSelectedRow() const;
-
-  protected slots:
-    void on_addLayerPushButton_clicked();
-    void on_upPushButton_clicked();
-    void on_downPushButton_clicked();
-    void on_camTableWidget_activated(QModelIndex index);
-    void layerDialogAccepted();
-  };
+string CAMLayer::getOffsetString() const {
+  if (offsetType == OFFSET_MANUAL) return String::printf("%0.5g", offset);
+  return String::toLower(offsetType.toString());
 }

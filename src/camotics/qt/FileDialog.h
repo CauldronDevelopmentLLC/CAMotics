@@ -36,6 +36,7 @@ namespace CAMotics {
     FileDialog(QtWin &win);
 
     std::string open(const std::string &title, const std::string &filters,
-                     const std::string &filename, bool save);
+                     const std::string &filename, bool save,
+                     bool anyFile = false);
   };
 }

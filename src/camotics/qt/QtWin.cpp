@@ -28,7 +28,6 @@
 #include <camotics/cutsim/Project.h>
 #include <camotics/cutsim/SimulationRun.h>
 #include <camotics/cutsim/CutWorkpiece.h>
-#include <camotics/remote/ConnectionManager.h>
 #include <camotics/stl/STLWriter.h>
 #include <camotics/cutsim/ToolPathTask.h>
 #include <camotics/cutsim/SurfaceTask.h>
@@ -65,13 +64,12 @@ using namespace CAMotics;
 
 QtWin::QtWin(Application &app) :
   QMainWindow(0), ui(new Ui::CAMoticsWindow), findDialog(false),
-  findAndReplaceDialog(true), fileDialog(*this),
+  findAndReplaceDialog(true), camDialog(this), fileDialog(*this),
   taskCompleteEvent(0), app(app), options(app.getOptions()),
-  connectionManager(new ConnectionManager(options)),
   view(new View(valueSet)), viewer(new Viewer), lastRedraw(0),
   dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
   lastStatusActive(false), autoPlay(false), autoClose(false),
-  sliderMoving(false) {
+  sliderMoving(false), positionChanged(false) {
 
   ui->setupUi(this);
 
@@ -165,10 +163,11 @@ QtWin::QtWin(Application &app) :
   // Setup console stream
   consoleStream = new LineBufferStream<ConsoleWriter>(*ui->console);
   Logger::instance().setScreenStream(*consoleStream);
-  }
+}
 
 
 QtWin::~QtWin() {
+  if (!bbCtrlAPI.isNull()) bbCtrlAPI->disconnectCNC(); // Avoid crash
   saveAllState();
   Logger::instance().setScreenStream(cout);
 }
@@ -204,8 +203,6 @@ void QtWin::init() {
   // Update fullscreen menu item
   if (windowState() & Qt::WindowFullScreen)
     ui->actionFullscreen->setChecked(true);
-
-  connectionManager->init();
 
   // Observe values
   valueSet["play_speed"]->add(this, &QtWin::updatePlaySpeed);
@@ -669,8 +666,10 @@ void QtWin::redraw(bool now) {
     ui->simulationView->updateGL();
 
     dirty = false;
+    return;
+  }
 
-  } else dirty = true;
+  dirty = true;
 }
 
 
@@ -694,6 +693,41 @@ void QtWin::snapshot() {
   if (!pixmap.save(QString::fromUtf8(filename.c_str())))
     warning("Failed to save snapshot.");
   else showMessage("Snapshot saved.");
+}
+
+
+void QtWin::connectCNC() {
+  // Get GCode filename
+  string filename;
+
+  if (project.isNull() || gcode.isNull()) warning("No GCode to send");
+  else {
+    filename = SystemUtilities::basename(project->getFilename());
+    filename = SystemUtilities::swapExtension(filename, "gc");
+  }
+  connectDialog.setFilename(filename.c_str());
+
+  if (connectDialog.exec() == QDialog::Accepted) {
+    if (!bbCtrlAPI) bbCtrlAPI = new BBCtrlAPI(this);
+    bbCtrlAPI->connectCNC(connectDialog.getAddress());
+
+    // Upload GCode
+    filename = connectDialog.getFilename().toUtf8().data();
+    if (!filename.empty())
+      bbCtrlAPI->uploadGCode(filename, &gcode->front(), gcode->size());
+
+  } else ui->actionConnect->setChecked(false);
+}
+
+
+void QtWin::disconnectCNC() {
+  int response =
+    QMessageBox::question(this, "Disconnect from CNC?", "Would you like to "
+                          "disconnect from the current CNC?",
+                          QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+  if (response == QMessageBox::Yes) bbCtrlAPI->disconnectCNC();
+  else ui->actionConnect->setChecked(true);
 }
 
 
@@ -781,13 +815,22 @@ ToolTable QtWin::getNewToolTable() {
 ToolUnits QtWin::getNewUnits() {return newProjectDialog.getUnits();}
 
 
+bool QtWin::runCAMDialog(const string &filename) {
+  camDialog.loadDXFLayers(filename);
+  camDialog.setUnits(getNewUnits());
+
+  // Run dialog
+  return camDialog.exec() == QDialog::Accepted;
+}
+
+
 string QtWin::openFile(const string &title, const string &filters,
-                       const string &_filename, bool save) {
+                       const string &_filename, bool save, bool anyFile) {
   string filename = _filename;
   if (filename.empty() && !project.isNull())
     filename = SystemUtilities::dirname(project->getFilename());
 
-  return fileDialog.open(title, filters, filename, save);
+  return fileDialog.open(title, filters, filename, save, anyFile);
 }
 
 
@@ -861,7 +904,7 @@ void QtWin::openProject(const string &_filename) {
     filename = QFileDialog::getOpenFileName
       (this, tr("Open File"), lastDir,
        tr("Supported Files (*.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;"
-          "All Files (*.*)")).toStdString();
+          "All Files (*.*)")).toUtf8().data();
     if (filename.empty()) return;
     settings.setValue("Projects/lastDir", QString::fromUtf8(filename.c_str()));
   }
@@ -939,9 +982,12 @@ void QtWin::openProject(const string &_filename) {
 
     if (xml) project = new Project(options, filename);
     else {
-      // Assume TPL or G-Code and create a new project with the file
+      // Otherwise, create a new project with the file
 
       if (!runNewProjectDialog()) return;
+
+      if (String::toLower(SystemUtilities::extension(filename)) == "dxf")
+        if (!runCAMDialog(filename)) return;
 
       // Save tool table before resetting project
       ToolTable toolTable = getNewToolTable();
@@ -1034,7 +1080,7 @@ void QtWin::newFile(bool tpl) {
   filename = openFile(tpl ? "New TPL file" : "New GCode file",
                       tpl ? "TPL (*.tpl);;All files (*.*)" :
                       "GCode (*.nc *.ngc *.gcode *.tap);;All files (*.*)",
-                      filename, false);
+                      filename, false, true);
   if (filename.empty()) return;
 
   string ext = SystemUtilities::extension(filename);
@@ -1583,7 +1629,6 @@ void QtWin::resizeEvent(QResizeEvent *event) {
 
 void QtWin::animate() {
   try {
-    dirty = connectionManager->update() || dirty;
     dirty = view->update() || dirty;
 
     // Auto close after auto play
@@ -1592,6 +1637,13 @@ void QtWin::animate() {
 
     if (dirty) redraw(true);
     if (simDirty) reload(true);
+
+    if (positionChanged && !lastStatusActive &&
+        view->isFlagSet(View::SHOW_SURFACE_FLAG)) {
+      positionChanged = false;
+      setStatusActive(true);
+      taskMan.addTask(new SurfaceTask(simRun));
+    }
 
     // Update progress
     if (!view->isFlagSet(View::PLAY_FLAG)) {
@@ -1633,7 +1685,7 @@ void QtWin::animate() {
 
 
 void QtWin::openRecentProjectsSlot(const QString path) {
-  openProject(path.toStdString());
+  openProject(path.toUtf8().data());
 }
 
 
@@ -1652,13 +1704,9 @@ void QtWin::on_positionSlider_valueChanged(int position) {
   redraw();
 
   if (sliderMoving) return;
-  if (view->isFlagSet(View::PLAY_FLAG) && lastStatusActive) return;
-  if (simRun.isNull()) return;
+  if (!simRun.isNull()) simRun->setEndTime(ratio * view->path->getTotalTime());
 
-  simRun->setEndTime(ratio * view->path->getTotalTime());
-
-  setStatusActive(true);
-  taskMan.addTask(new SurfaceTask(simRun));
+  positionChanged = true;
 }
 
 
@@ -1807,60 +1855,23 @@ void QtWin::on_zOffsetDoubleSpinBox_valueChanged(double value) {
 }
 
 
-void QtWin::on_actionQuit_triggered() {
-  if (checkSave()) quit();
-}
-
-
-void QtWin::on_actionNew_triggered() {
-  newProject();
-}
-
-
-void QtWin::on_actionOpen_triggered() {
-  openProject();
-}
-
-
-void QtWin::on_actionStop_triggered() {
-  stop();
-}
+void QtWin::on_actionQuit_triggered() {if (checkSave()) quit();}
+void QtWin::on_actionNew_triggered() {newProject();}
+void QtWin::on_actionOpen_triggered() {openProject();}
+void QtWin::on_actionStop_triggered() {stop();}
 
 
 void QtWin::on_actionRun_triggered() {
-  ui->fileTabManager->checkSaveAll();
-  reload(true);
+  if (ui->fileTabManager->checkSaveAll()) reload(true);
 }
 
 
-void QtWin::on_actionReduce_triggered() {
-  reduce();
-}
-
-
-void QtWin::on_actionOptimize_triggered() {
-  optimize();
-}
-
-
-void QtWin::on_actionSlower_triggered() {
-  view->decSpeed();
-}
-
-
-void QtWin::on_actionPlay_triggered() {
-  view->toggleFlag(View::PLAY_FLAG);
-}
-
-
-void QtWin::on_actionFaster_triggered() {
-  view->incSpeed();
-}
-
-
-void QtWin::on_actionDirection_triggered() {
-  view->changeDirection();
-}
+void QtWin::on_actionReduce_triggered() {reduce();}
+void QtWin::on_actionOptimize_triggered() {optimize();}
+void QtWin::on_actionSlower_triggered() {view->decSpeed();}
+void QtWin::on_actionPlay_triggered() {view->toggleFlag(View::PLAY_FLAG);}
+void QtWin::on_actionFaster_triggered() {view->incSpeed();}
+void QtWin::on_actionDirection_triggered() {view->changeDirection();}
 
 
 void QtWin::on_actionExamples_triggered() {
@@ -1870,19 +1881,9 @@ void QtWin::on_actionExamples_triggered() {
 }
 
 
-void QtWin::on_actionSave_triggered() {
-  saveProject();
-}
-
-
-void QtWin::on_actionSaveAs_triggered() {
-  saveProject(true);
-}
-
-
-void QtWin::on_actionSaveFile_triggered() {
-  ui->fileTabManager->save();
-}
+void QtWin::on_actionSave_triggered() {saveProject();}
+void QtWin::on_actionSaveAs_triggered() {saveProject(true);}
+void QtWin::on_actionSaveFile_triggered() {ui->fileTabManager->save();}
 
 
 void QtWin::on_actionSaveFileAs_triggered() {
@@ -1891,9 +1892,7 @@ void QtWin::on_actionSaveFileAs_triggered() {
 }
 
 
-void QtWin::on_actionRevertFile_triggered() {
-  ui->fileTabManager->revert();
-}
+void QtWin::on_actionRevertFile_triggered() {ui->fileTabManager->revert();}
 
 
 void QtWin::on_actionSaveDefaultToolTable_triggered() {
@@ -1912,35 +1911,23 @@ void QtWin::on_actionSettings_triggered() {
 }
 
 
+void QtWin::on_actionConnect_triggered(bool checked) {
+  if (checked) connectCNC();
+  else disconnectCNC();
+}
+
+
 void QtWin::on_actionFullscreen_triggered(bool checked) {
   if (checked) showFullScreen();
   else showNormal();
 }
 
 
-void QtWin::on_actionDefaultLayout_triggered() {
-  defaultLayout();
-}
-
-
-void QtWin::on_actionFullLayout_triggered() {
-  fullLayout();
-}
-
-
-void QtWin::on_actionMinimalLayout_triggered() {
-  minimalLayout();
-}
-
-
-void QtWin::on_actionAbout_triggered() {
-  aboutDialog.exec();
-}
-
-
-void QtWin::on_actionDonate_triggered() {
-  donateDialog.exec();
-}
+void QtWin::on_actionDefaultLayout_triggered() {defaultLayout();}
+void QtWin::on_actionFullLayout_triggered() {fullLayout();}
+void QtWin::on_actionMinimalLayout_triggered() {minimalLayout();}
+void QtWin::on_actionAbout_triggered() {aboutDialog.exec();}
+void QtWin::on_actionDonate_triggered() {donateDialog.exec();}
 
 
 void QtWin::on_actionHelp_triggered() {
@@ -2063,9 +2050,7 @@ void QtWin::on_actionRemoveFile_triggered() {
 }
 
 
-void QtWin::on_actionAddTool_triggered() {
-  addTool();
-}
+void QtWin::on_actionAddTool_triggered() {addTool();}
 
 
 void QtWin::on_actionEditTool_triggered() {
@@ -2101,6 +2086,4 @@ void QtWin::on_hideConsolePushButton_clicked() {
 }
 
 
-void QtWin::on_clearConsolePushButton_clicked() {
-  ui->console->clear();
-}
+void QtWin::on_clearConsolePushButton_clicked() {ui->console->clear();}

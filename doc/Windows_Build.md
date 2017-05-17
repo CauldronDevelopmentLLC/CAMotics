@@ -10,7 +10,7 @@ To build CAMotics you must install the following software:
   - Git (built-in)   - http://git-scm.com/
   - Python (2.7.12)  - http://python.org/
   - SCons (2.5.1)    - http://www.scons.org/
-  - Qt (5.6)         - http://qt-project.org/
+  - Qt (5.8)         - http://qt-project.org/
   - NSIS (3.0.1)     - http://nsis.sourceforge.net/
   - V8 (3.14.5)      - http://github.com/CauldronDevelopmentLLC/v8-3.14.5/
   - C!               - http://github.com/CauldronDevelopmentLLC/cbang/
@@ -36,12 +36,12 @@ Create the directory ``c:\build`` then in that directory create the file
 For 32-bit builds add:
 
     set TARGET_ARCH=x86
-    set QTDIR=c:\Qt\5.6\msvc2015
+    set QTDIR=c:\Qt\5.8\msvc2015
 
 For 64-bit builds add:
 
     set TARGET_ARCH=x86_64
-    set QTDIR=c:\Qt\5.6\msvc2015_64
+    set QTDIR=c:\Qt\5.8\msvc2015_64
 
 # Build
 Open a ``VS2015 x86 Native Tools Command Prompt`` from the start menu and run:

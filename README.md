@@ -42,32 +42,17 @@ it is much easier to simply install prebuilt packages which can be found
 at http://camotics.org/download.html  There are also prebuilt Debian packages
 you can try.
 
-## The Quick and Easy Method
-*Note, this currently only works for Debian based systems.*  Cut and paste the
-following command in to a terminal:
-
-    curl http://camotics.org/build.sh | sh
-
-You will have to enter your password, possibly a few times.  When it's done
-it should print ``Success``.  Then you can run ``camotics``.
-
 ## Prerequisites
   - C!         - http://cbang.org/
-  - Qt4        - http://qt-project.org/
-  - Cairo2     - http://cairographics.org/
+  - Qt5        - http://qt-project.org/
   - SCons      - http://www.scons.org/
-  - ChakraCore - https://github.com/Microsoft/ChakraCore/
+  - v8         - https://developers.google.com/v8/
 
 On Debian based systems all the prerequisites, including thoese needed
 by C!, can be installed with the following command line:
 
-    sudo apt-get install scons build-essential libbz2-dev zlib1g-dev \
-      libexpat1-dev libssl-dev libboost-iostreams-dev libboost-system-dev \
-      libboost-filesystem-dev libboost-regex-dev libsqlite3-dev \
-      qt4-dev-tools libqt4-dev libqt4-opengl-dev libcairo2-dev git
-
-## Building ChakraCore
-See https://github.com/CauldronDevelopmentLLC/cbang#buliding-chakracore
+    sudo apt-get install scons build-essential libssl-dev qt5-default \
+      libqt5websockets5-dev libqt5opengl-dev libv8-dev git
 
 ## Building C!
 
@@ -105,7 +90,6 @@ can ignore these warnings by building cbang and/or CAMotics with
     scons strict=0
 
 # Using CAMotics
-
 If you've installed the Debian package you should find CAMotics in your menu
 under Other.  Also you can simply run `camotics` on the command line.
 
@@ -113,7 +97,6 @@ If you did not install the package, open a command line, go to the directory
 where you built CAMotics and run `./camotics`
 
 # Try the Examples
-
 Try out some of the examples in CAMotics's File -> Examples menu.
 
 ## No Icons in Menus in Linux

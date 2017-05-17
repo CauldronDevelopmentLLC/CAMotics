@@ -1,5 +1,16 @@
 # CAMotics Changelog
 
+## v1.1.2:
+ - Fixed ``Could not save project: Invalid file tab index 0``. #225
+ - Fixed tool dialog editing problems.  #79
+ - Moved ``Length`` after ``Diameter`` in tool dialog.
+ - Fix bounding box calculation for spheroid tools.
+ - Stop simulation if file save is canceled.
+ - Added more examples
+ - Fixed error in calculating cuts with bottom of cylinder / snub.
+ - Added support for tabs in 2D profile cuts in dfx TPL lib.
+ - Added Buildbotics controller connectivity.
+
 ## v1.1.1:
  - Fixed bug preventing ``camsim`` from writing STL data.
 

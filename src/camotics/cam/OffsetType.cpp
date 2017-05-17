@@ -18,10 +18,6 @@
 
 \******************************************************************************/
 
-#pragma once
-
-namespace CAMotics {
-  class LayerCAMDialog {
-  public:
-  };
-}
+#define CBANG_ENUM_IMPL
+#include "OffsetType.h"
+#include <cbang/enum/MakeEnumerationImpl.def>

@@ -67,5 +67,8 @@
         <file>icons/tool-import.png</file>
         <file>icons/settings.png</file>
         <file>icons/view-refresh.png</file>
+        <file>icons/down.png</file>
+        <file>icons/up.png</file>
+        <file>icons/buildbotics.png</file>
     </qresource>
 </RCC>

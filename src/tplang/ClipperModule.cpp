@@ -45,6 +45,7 @@ void ClipperModule::offsetCB(const js::Value &args, js::Sink &sink) {
   // Convert JavaScript polys to Clipper polys
   Polygons polys;
   SmartPointer<js::Value> jsPolys = args.get("polys");
+  bool dict = false;
 
   for (unsigned i = 0; i < jsPolys->length(); i++) {
     polys.push_back(Polygon());
@@ -54,9 +55,16 @@ void ClipperModule::offsetCB(const js::Value &args, js::Sink &sink) {
     for (unsigned j = 0; j < jsPoly->length(); j++) {
       SmartPointer<js::Value> jsPoint = jsPoly->get(j);
 
-      if (jsPoint->length() != 2) THROWS("Expected 2D point");
-      poly.push_back(IntPoint(jsPoint->getNumber(0) * scale,
-                              jsPoint->getNumber(1) * scale));
+      if (jsPoint->has("x") && jsPoint->has("y")) {
+        poly.push_back(IntPoint(jsPoint->getNumber("x") * scale,
+                                jsPoint->getNumber("y") * scale));
+        dict = true;
+
+      } else if (jsPoint->length() == 2)
+        poly.push_back(IntPoint(jsPoint->getNumber(0) * scale,
+                                jsPoint->getNumber(1) * scale));
+
+      else THROWS("Expected 2D point");
     }
   }
 
@@ -77,10 +85,18 @@ void ClipperModule::offsetCB(const js::Value &args, js::Sink &sink) {
     for (unsigned j = 0; j < poly.size(); j++) {
       IntPoint &point = poly[j];
 
-      sink.appendList();
-      sink.append((double)point.X / scale);
-      sink.append((double)point.Y / scale);
-      sink.endList();
+      if (dict) {
+        sink.appendDict();
+        sink.insert("x", (double)point.X / scale);
+        sink.insert("y", (double)point.Y / scale);
+        sink.endDict();
+
+      } else {
+        sink.appendList();
+        sink.append((double)point.X / scale);
+        sink.append((double)point.Y / scale);
+        sink.endList();
+      }
     }
 
     sink.endList();

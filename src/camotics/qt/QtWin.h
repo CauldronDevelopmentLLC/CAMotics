@@ -31,7 +31,8 @@
 #include "FileDialog.h"
 #include "ToolDialog.h"
 #include "CAMDialog.h"
-#include "LayerCAMDialog.h"
+#include "ConnectDialog.h"
+#include "BBCtrlAPI.h"
 
 #include <camotics/Real.h>
 #include <camotics/ConcurrentTaskManager.h>
@@ -60,7 +61,6 @@ class QMdiSubWindow;
 
 
 namespace CAMotics {
-  class ConnectionManager;
   class Viewer;
   class Project;
   class Simulation;
@@ -88,7 +88,7 @@ namespace CAMotics {
     FindDialog findAndReplaceDialog;
     ToolDialog toolDialog;
     CAMDialog camDialog;
-    LayerCAMDialog layerCAMDialog;
+    ConnectDialog connectDialog;
     FileDialog fileDialog;
     QTimer animationTimer;
     QByteArray fullLayoutState;
@@ -108,7 +108,6 @@ namespace CAMotics {
     ValueSet valueSet;
     cb::SmartPointer<Project> project;
     cb::SmartPointer<SimulationRun> simRun;
-    cb::SmartPointer<ConnectionManager> connectionManager;
     cb::SmartPointer<View> view;
     cb::SmartPointer<Viewer> viewer;
     cb::SmartPointer<ToolPath> toolPath;
@@ -116,6 +115,7 @@ namespace CAMotics {
     cb::SmartPointer<Surface> surface;
 
     QSignalMapper recentProjectsMapper;
+    cb::SmartPointer<BBCtrlAPI> bbCtrlAPI;
 
     double lastRedraw;
     bool dirty;
@@ -128,6 +128,7 @@ namespace CAMotics {
     bool autoClose;
     std::string defaultExample;
     bool sliderMoving;
+    bool positionChanged;
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
@@ -135,8 +136,6 @@ namespace CAMotics {
     QtWin(cb::Application &app);
     ~QtWin();
 
-    const cb::SmartPointer<ConnectionManager> &getConnectionManager() const
-    {return connectionManager;}
     const cb::SmartPointer<View> &getView() const {return view;}
 
     void setAutoPlay(bool x = true) {autoPlay = x;}
@@ -187,15 +186,20 @@ namespace CAMotics {
     void optimize();
     void redraw(bool now = false);
     void snapshot();
+    void connectCNC();
+    void disconnectCNC();
     void exportData();
 
     bool runNewProjectDialog();
     ToolTable getNewToolTable();
     ToolUnits getNewUnits();
 
+    bool runCAMDialog(const std::string &filename);
+
     std::string openFile(const std::string &title,
                          const std::string &filters,
-                         const std::string &filename, bool save);
+                         const std::string &filename, bool save,
+                         bool anyFile = false);
     const cb::SmartPointer<Project> &getProject() const {return project;}
     void loadProject();
     void resetProject();
@@ -328,6 +332,7 @@ namespace CAMotics {
     void on_actionSettings_triggered();
     void on_actionExport_triggered() {exportData();}
     void on_actionSnapshot_triggered() {snapshot();}
+    void on_actionConnect_triggered(bool checked);
 
     void on_actionFullscreen_triggered(bool checked);
     void on_actionDefaultLayout_triggered();
