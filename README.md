@@ -51,8 +51,9 @@ you can try.
 On Debian based systems all the prerequisites, including thoese needed
 by C!, can be installed with the following command line:
 
-    sudo apt-get install scons build-essential libssl-dev qt5-default \
-      libqt5websockets5-dev libqt5opengl-dev libv8-dev git
+    sudo apt-get update
+    sudo apt-get -y install scons build-essential libssl-dev qt5-default \
+      libqt5websockets5-dev libqt5opengl5-dev libv8-dev git
 
 ## Building C!
 
