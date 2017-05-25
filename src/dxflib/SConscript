@@ -15,5 +15,5 @@ env.Append(CPPPATH = ['#/src'])
 
 
 # Bulid library
-lib = env.Library('dxflib', Glob('*.c'))
+lib = env.Library('dxflib', Glob('*.cpp'))
 Return('lib')
