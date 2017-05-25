@@ -21,7 +21,7 @@
 #pragma once
 
 
-#include <glew/glew.h> // Must be first
+#include <GL/glew.h> // Must be first
 
 #include <cbang/SStream.h>
 

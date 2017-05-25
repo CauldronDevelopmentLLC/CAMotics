@@ -11,13 +11,14 @@ major, minor, revision = version.split('.')
 # Setup
 env = Environment(ENV = os.environ,
                   TARGET_ARCH = os.environ.get('TARGET_ARCH', 'x86'))
+Export('env')
 env.Tool('config', toolpath = [cbang])
 env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     EnumVariable('qt_version', 'Version of Qt to use', 'auto',
                  allowed_values = ('auto', '4', '5')))
-env.CBLoadTools('compiler cbang dist opengl dxflib build_info packager')
+env.CBLoadTools('compiler cbang dist opengl dxflib glew build_info packager')
 conf = env.CBConfigure()
 
 # Config vars
@@ -60,6 +61,7 @@ if 'dist' in COMMAND_LINE_TARGETS:
     Return()
 
 
+have_glew = False
 have_cairo = False
 have_dxflib = False
 if not env.GetOption('clean'):
@@ -78,7 +80,9 @@ if not env.GetOption('clean'):
         raise Exception('Chakra or V8 support is required, please rebuild C! '
                         'You may need to set CHAKRA_CORE_HOME or V8_HOME.')
 
-    env.CBDefine('GLEW_STATIC')
+    # GLEW
+    have_glew = conf.CBConfig('glew', False)
+    if not have_glew: env.AppendUnique(CPPDEFINES = ['GLEW_STATIC'])
 
     # Qt
     qtmods = 'QtCore QtGui QtOpenGL QtNetwork'
@@ -108,7 +112,7 @@ conf.Finish()
 
 
 # Source
-src = ['src/glew/glew.c']
+src = []
 for subdir in [
     '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'stl', 'cam',
     'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'machine', 'dxf']:
@@ -154,8 +158,14 @@ Depends(lib, uic)
 libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
 
 
+# GLEW
+if not have_glew:
+    glew = SConscript('src/glew/SConscript', variant_dir = 'build/glew')
+    Depends(lib, glew)
+    env.Append(_LIBFLAGS = [glew]) # Force to end
+
+
 # Cairo
-Export('env')
 if not have_cairo:
     cairo = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
     Depends(lib, cairo)

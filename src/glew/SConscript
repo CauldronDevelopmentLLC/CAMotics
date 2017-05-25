@@ -1,0 +1,18 @@
+Import('*')
+env = env.Clone()
+
+
+# Ignore warnings
+import re
+flags = env.subst('${CCFLAGS}')
+flags = re.sub(r'-W((all)|(error))(\s|$)', '', flags)
+env.Replace(CCFLAGS = flags)
+
+
+# Configure
+env.Append(CPPPATH = ['#/src/glew'])
+
+
+# Bulid library
+lib = env.Library('GLEW', Glob('GL/*.c'))
+Return('lib')
