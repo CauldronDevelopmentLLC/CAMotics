@@ -17,7 +17,7 @@ env.CBAddVariables(
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     EnumVariable('qt_version', 'Version of Qt to use', 'auto',
                  allowed_values = ('auto', '4', '5')))
-env.CBLoadTools('compiler cbang dist opengl build_info packager')
+env.CBLoadTools('compiler cbang dist opengl dxflib build_info packager')
 conf = env.CBConfigure()
 
 # Config vars
@@ -93,9 +93,7 @@ if not env.GetOption('clean'):
         conf.CBCheckCHeader('cairo/cairo.h') and conf.CBCheckLib('cairo')
 
     # DXFlib
-    # Note, we cannot use the system dxflib until upstream changes are made.
-    #have_dxflib = \
-    #    conf.CBCheckCHeader('dxflib/dl_dxf.h') and conf.CBCheckLib('dxflib')
+    have_dxflib = conf.CBConfig('dxflib', False)
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
