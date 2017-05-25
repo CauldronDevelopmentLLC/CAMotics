@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>416</width>
-    <height>193</height>
+    <height>260</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -125,6 +125,9 @@
       <widget class="QPushButton" name="connectPushButton">
        <property name="text">
         <string>Connect</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

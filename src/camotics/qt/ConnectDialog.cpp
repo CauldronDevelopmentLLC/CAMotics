@@ -57,7 +57,12 @@ int ConnectDialog::exec() {
   QString addr = settings.value("Connect/Address", "bbctrl.local").toString();
   ui->addressLineEdit->setText(addr);
 
-  return QDialog::exec();
+  int ret = QDialog::exec();
+
+  if (ret == QDialog::Accepted)
+    settings.setValue("Connect/Address", ui->addressLineEdit->text());
+
+  return ret;
 }
 
 

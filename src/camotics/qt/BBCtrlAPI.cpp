@@ -100,7 +100,7 @@ void BBCtrlAPI::uploadGCode(const string &filename, const char *data,
   multiPart->append(part);
 
   // Upload
-  QUrl url("http://bbctrl.local/api/file");
+  QUrl url = QString("http://") + this->url.host() + QString("/api/file");
   QNetworkRequest request(url);
 
   if (!netManager) netManager = new QNetworkAccessManager(this);
