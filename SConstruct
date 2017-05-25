@@ -61,6 +61,7 @@ if 'dist' in COMMAND_LINE_TARGETS:
 
 
 have_cairo = False
+have_dxflib = False
 if not env.GetOption('clean'):
     if qt_version == '5': env.Replace(cxxstd = 'c++11')
 
@@ -91,6 +92,10 @@ if not env.GetOption('clean'):
     have_cairo = \
         conf.CBCheckCHeader('cairo/cairo.h') and conf.CBCheckLib('cairo')
 
+    # DXFlib
+    have_dxflib = \
+        conf.CBCheckCHeader('dxflib/dl_dxf.h') and conf.CBCheckLib('dxflib')
+
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
 
@@ -107,8 +112,7 @@ conf.Finish()
 src = ['src/glew/glew.c']
 for subdir in [
     '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'stl', 'cam',
-    'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'machine', 'dxf',
-    'dxf/dxflib']:
+    'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'machine', 'dxf']:
     src += Glob('src/camotics/%s/*.cpp' % subdir)
 
 for subdir in ['']:
@@ -159,6 +163,13 @@ if not have_cairo:
     env.Append(_LIBFLAGS = [cairo]) # Force to end
 
 
+# DXFlib
+if not have_dxflib:
+    dxflib = SConscript('src/dxflib/SConscript', variant_dir = 'build/dxflib')
+    Depends(lib, dxflib)
+    env.Append(_LIBFLAGS = [dxflib]) # Force to end
+
+
 # Build programs
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
 progs = 'camotics gcodetool tplang camsim'
@@ -173,6 +184,7 @@ for prog in progs.split():
     _env.Precious(p)
     _env.Install(env.get('install_prefix') + '/bin/', p)
     if not have_cairo: Depends(p, cairo)
+    if not have_dxflib: Depends(p, dxflib)
     Default(p)
     execs.append(p)
 

@@ -25,7 +25,7 @@
 #include "DXFPolyLine.h"
 #include "DXFSpline.h"
 
-#include "dxflib/dl_dxf.h"
+#include <dxflib/dl_dxf.h>
 
 #include <cbang/log/Logger.h>
 

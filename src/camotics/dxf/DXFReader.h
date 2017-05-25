@@ -23,7 +23,7 @@
 
 #include "DXFEntity.h"
 
-#include "dxflib/dl_creationadapter.h"
+#include <dxflib/dl_creationadapter.h>
 
 #include <cbang/io/InputSource.h>
 

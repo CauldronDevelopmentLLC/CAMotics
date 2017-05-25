@@ -1,0 +1,19 @@
+Import('*')
+env = env.Clone()
+
+
+# Ignore warnings
+import re
+flags = env.subst('${CCFLAGS}')
+flags = re.sub(r'-W((all)|(error))(\s|$)', '', flags)
+env.Replace(CCFLAGS = flags)
+
+
+# Configure
+#env.AppendUnique(CPPDEFINES = [])
+env.Append(CPPPATH = ['#/src'])
+
+
+# Bulid library
+lib = env.Library('dxflib', Glob('*.c'))
+Return('lib')
