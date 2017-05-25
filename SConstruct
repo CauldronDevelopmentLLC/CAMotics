@@ -93,8 +93,9 @@ if not env.GetOption('clean'):
         conf.CBCheckCHeader('cairo/cairo.h') and conf.CBCheckLib('cairo')
 
     # DXFlib
-    have_dxflib = \
-        conf.CBCheckCHeader('dxflib/dl_dxf.h') and conf.CBCheckLib('dxflib')
+    # Note, we cannot use the system dxflib until upstream changes are made.
+    #have_dxflib = \
+    #    conf.CBCheckCHeader('dxflib/dl_dxf.h') and conf.CBCheckLib('dxflib')
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
