@@ -5,7 +5,7 @@ env = env.Clone()
 # Ignore warnings
 import re
 flags = env.subst('${CCFLAGS}')
-flags = re.sub(r'-W((all)|(error))(\s|$)', '', flags)
+flags = re.sub(r'-W((all)|(error))(=[^\s$]+)?(\s|$)', '', flags)
 env.Replace(CCFLAGS = flags)
 
 
