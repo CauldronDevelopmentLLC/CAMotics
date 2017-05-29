@@ -14,10 +14,6 @@ int main(int argc, char *argv[]) {
   // Test for acceptance of std::istream in API
   dxf.in(std::cin, adapter);
 
-  // Test for clockwise in DL_ArcData
-  DL_ArcData arc(0, 0, 0, 0, 0, 0, true);
-  std::cout << arc.clockwise;
-
   return 0;
 }
 """
