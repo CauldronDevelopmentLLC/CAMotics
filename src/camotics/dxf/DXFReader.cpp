@@ -70,7 +70,7 @@ void DXFReader::addLine(const DL_LineData &line) {
 
 void DXFReader::addArc(const DL_ArcData &arc) {
   addEntity(new DXFArc(Vector3D(arc.cx, arc.cy, arc.cz), arc.radius, arc.angle1,
-                       arc.angle2, arc.clockwise));
+                       arc.angle2, 0 < getExtrusion()->getDirection()[2]));
 }
 
 

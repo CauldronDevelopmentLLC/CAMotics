@@ -1113,8 +1113,7 @@ void DL_Dxf::addArc(DL_CreationInterface* creationInterface) {
                  getRealValue(30, 0.0),
                  getRealValue(40, 0.0),
                  getRealValue(50, 0.0),
-                 getRealValue(51, 0.0),
-                 values[230].empty() || 0 < toReal(values[230]));
+                 getRealValue(51, 0.0));
 
     creationInterface->addArc(d);
 }
