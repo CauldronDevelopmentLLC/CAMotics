@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>CAMotics.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>CAMotics</name>
+  <summary>Open-Source Simulation &amp; Computer Aided Machining - A 3-axis CNC GCode simulator</summary>
+  <description>
+    <p>
+      CAMotics is an Open-Source software which can simulate
+      3-axis NC machining. It is a fast, flexible and user friendly simulation
+      software for the DIY and Open-Source community.
+    </p>
+    <p>
+      At home manufacturing is one of the next big technology revolutions. Much like
+      the PC was 30 years ago. There have been major advances in desktop 3D printing
+      (e.g.  Maker Bot) yet uptake of desktop CNCs has lagged despite the
+      availability of cheap CNC machines. One of the major reasons for this is a
+      lack of Open-Source simulation and CAM (model to tool path conversion)
+      software. CAM and NC machine simulation present some very difficult
+      programming problems as evidenced by 30+ years of academic papers on these
+      topics. Whereas 3D printing simulation and tool path generation is much
+      easier. However, such software is essential to using a CNC.
+    </p>
+      Being able to simulate is a critical part of creating usable CNC tool paths.
+      Programming a CNC with out a simulator is cutting with out measuring; it's
+      both dangerous and expensive. With CAMotics you can preview the results of
+      your cutting operations before you fire up your machine. This will
+      save you time and money and open up a world of creative possibilities by
+      allowing you to rapidly visualize and improve upon designs without wasting
+      material or breaking tools.
+    <p>
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>http://camotics.org/images/screenshots/camotics.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://camotics.org/images/screenshots/simulation_view.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://camotics.org/images/screenshots/tool_view.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://camotics.org/images/screenshots/tool_path_view.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://camotics.org/images/screenshots/workpiece_view.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://camotics.org/images/screenshots/full_layout.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">http://camotics.org/</url>
+</component>
