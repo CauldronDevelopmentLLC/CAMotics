@@ -170,6 +170,7 @@ if not have_cairo:
     cairo = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
     Depends(lib, cairo)
     env.Append(_LIBFLAGS = [cairo]) # Force to end
+    env.Append(CPPPATH = ['#/src/glew'])
 
 
 # DXFlib
