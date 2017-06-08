@@ -47,7 +47,6 @@ namespace tplang {
     CAMotics::Simulation sim;
 
     TPLContext(std::ostream &out, CAMotics::MachineInterface &machine,
-               const CAMotics::Simulation &sim,
                const std::string &jsImpl = std::string());
 
     template <typename T>

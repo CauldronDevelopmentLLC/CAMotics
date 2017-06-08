@@ -58,7 +58,7 @@ namespace CAMotics {
 
     std::string computeHash() const;
 
-    void write(cb::JSON::Sink &sink, bool withPath) const;
+    virtual void write(cb::JSON::Sink &sink, bool withPath) const;
 
     // From JSON::Serializable
     using cb::JSON::Serializable::read;

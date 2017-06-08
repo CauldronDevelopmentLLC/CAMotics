@@ -91,6 +91,55 @@ function split_seg_2d(start, end, ratio) {
 }
 
 
+function bounds_new() {
+  return {
+    min: {x: Infinity, y: Infinity, z: Infinity},
+    max: {x: -Infinity, y: -Infinity, z: -Infinity}
+  };
+}
+
+
+function bounds_add_point(bounds, p) {
+  return {
+    min: {
+      x: Math.min(bounds.min.x, p.x),
+      y: Math.min(bounds.min.y, p.y),
+      z: Math.min(bounds.min.z, p.z)
+    },
+    max: {
+      x: Math.max(bounds.max.x, p.x),
+      y: Math.max(bounds.max.y, p.y),
+      z: Math.max(bounds.max.z, p.z)
+    }
+  };
+}
+
+
+function bounds_add(a, b) {
+  return {
+    min: {
+      x: Math.min(a.min.x, b.min.x),
+      y: Math.min(a.min.y, b.min.y),
+      z: Math.min(a.min.z, b.min.z)
+    },
+    max: {
+      x: Math.max(a.max.x, b.max.x),
+      y: Math.max(a.max.y, b.max.y),
+      z: Math.max(a.max.z, b.max.z)
+    }
+  };
+}
+
+
+function bounds_dims(bounds) {
+  return {
+    x: bounds.max.x - bounds.min.x,
+    y: bounds.max.y - bounds.min.y,
+    z: bounds.max.z - bounds.min.z
+  };
+}
+
+
 function quad_bezier(p, t) {
   var c = [sqr(1 - t), 2 * (1 - t) * t, sqr(t)];
 
@@ -166,7 +215,7 @@ module.exports = extend({
   arc_vertices: function(a) {
     var angle = (a.endAngle - a.startAngle) * (a.clockwise ? 1 : -1);
     if (angle <= 0) angle += 360;
-    var steps = Math.ceil(Math.abs(angle) / 360 * 100);
+    var steps = Math.ceil(Math.abs(angle) / 360 * 100 * a.radius);
     var delta = angle / steps;
 
     var v = [];
@@ -625,6 +674,8 @@ module.exports = extend({
 
 
   compute_tab_points: function (length, config) {
+    if (typeof config.tabs == 'undefined') return [];
+
     var points = [];
 
     for (var i = 0; i < config.tabs.length; i++) {
@@ -681,6 +732,8 @@ module.exports = extend({
 
 
   set_tab_heights: function (path, length, config) {
+    if (typeof config.tabs == 'undefined') return;
+
     var dist = 0;
 
     for (var i = 0; i < path.length; i++) {
@@ -729,7 +782,8 @@ module.exports = extend({
 
   profile_segment: function (start, end, config) {
     var zTarget = end.z - config.zMax;
-    if (zTarget < config.zEnd) zTarget = config.zEnd;
+    if (zTarget < config.zEnd || typeof config.zMax == 'undefined')
+      zTarget = config.zEnd;
 
     if (zTarget - 0.01 < start.z && start.z < zTarget + 0.01)
       return [{x: end.x, y: end.y, z: zTarget}];
@@ -792,6 +846,17 @@ module.exports = extend({
   },
 
 
+  cut_path: function (path, config) {
+    if (!path.length) return;
+
+    cut({z: config.zSafe});
+    rapid({x: path[0].x, y: path[0].y});
+
+    for (var j = 0; j < path.length; j++)
+      cut(path[j]);
+  },
+
+
   cut_layer: function (layer, _config) {
     var config = Object.assign({
       delta: 0,
@@ -808,16 +873,32 @@ module.exports = extend({
 
     if (typeof polys.length == 'undefined') return;
 
-    for (var i = 0; i < polys.length; i++) {
-      var path = this.profile_poly(polys[i], config);
-      if (!path.length) continue;
+    for (var i = 0; i < polys.length; i++)
+      this.cut_path(this.profile_poly(polys[i], config), config);
+  },
 
-      cut({z: config.zSafe});
-      rapid({x: path[0].x, y: path[0].y});
 
-      for (var j = 0; j < path.length; j++)
-        cut(path[j]);
-    }
-  }
+  poly_bounds: function (poly) {
+    var bounds = bounds_new();
+
+    for (var i = 0; i < poly.length; i++)
+      bounds = bounds_add_point(bounds, poly[i]);
+
+    return bounds;
+  },
+
+
+  layer_bounds: function (layer) {
+    var bounds = bounds_new();
+
+    var polys = this.layer_to_polys(layer);
+    for (var i = 0; i < polys.length; i++)
+      bounds = bounds_add(bounds, this.poly_bounds(polys[i]));
+
+    return bounds;
+  },
+
+
+  layer_dims: function (layer) {return bounds_dims(this.layer_bounds(layer));}
 
 }, _dxf);

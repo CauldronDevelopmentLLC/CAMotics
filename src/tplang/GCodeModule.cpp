@@ -23,6 +23,8 @@
 
 #include <camotics/sim/ToolTable.h>
 #include <camotics/sim/Controller.h>
+#include <camotics/cutsim/Simulation.h>
+#include <camotics/cutsim/Workpiece.h>
 #include <camotics/gcode/Interpreter.h>
 
 #include <cbang/os/SystemUtilities.h>
@@ -68,6 +70,7 @@ void GCodeModule::define(js::Sink &exports) {
                  this, &GCodeModule::toolSetCB);
   exports.insert("position()", this, &GCodeModule::positionCB);
   exports.insert("comment(...)", this, &GCodeModule::commentCB);
+  exports.insert("workpiece()", this, &GCodeModule::workpieceCB);
 
   exports.insert("FEED_INVERSE_TIME", INVERSE_TIME);
   exports.insert("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
@@ -316,6 +319,28 @@ void GCodeModule::positionCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::commentCB(const js::Value &args, js::Sink &sink) {
   for (unsigned i = 0; i < args.length(); i++)
     ctx.machine.comment(args.getString(i)); // TODO Call JSON.stringify()
+}
+
+
+void GCodeModule::workpieceCB(const js::Value &args, js::Sink &sink) {
+  Vector3R dims = ctx.sim.workpiece.getDimensions();
+  const Vector3R &offset = ctx.sim.workpiece.getMin();
+
+  sink.beginDict();
+
+  sink.insertDict("dims");
+  sink.insert("x", dims.x());
+  sink.insert("y", dims.y());
+  sink.insert("z", dims.z());
+  sink.endDict();
+
+  sink.insertDict("offset");
+  sink.insert("x", offset.x());
+  sink.insert("y", offset.y());
+  sink.insert("z", offset.z());
+  sink.endDict();
+
+  sink.endDict();
 }
 
 

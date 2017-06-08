@@ -48,7 +48,6 @@ using namespace CAMotics;
 
 namespace CAMotics {
   class TPLangApp : public CommandLineApp {
-    Simulation sim;
     MachinePipeline pipeline;
     string simJSON;
     string jsImpl;
@@ -56,7 +55,7 @@ namespace CAMotics {
 
   public:
     TPLangApp() : CommandLineApp("Tool Path Language Interpreter"),
-                  ctx(cout, pipeline, sim, jsImpl) {
+                  ctx(cout, pipeline, jsImpl) {
       cmdLine.addTarget("sim-json", simJSON,
                         "Simulation information in JSON format");
       cmdLine.addTarget("js", jsImpl,
@@ -77,7 +76,7 @@ namespace CAMotics {
       pipeline.add(new GCodeMachine(*stream, outputUnits));
       pipeline.add(new MachineState);
 
-      if (!simJSON.empty()) sim.parse(simJSON);
+      if (!simJSON.empty()) ctx.sim.parse(simJSON);
 
       return ret;
     }

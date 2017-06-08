@@ -183,6 +183,8 @@ void Project::load(const string &_filename) {
     }
   }
 
+  workpiece = getWorkpieceBounds();
+
   markClean();
 }
 
@@ -336,6 +338,7 @@ void Project::setWorkpieceBounds(const Rectangle3R &bounds) {
   options["workpiece-max"].set(bounds.getMax().toString());
   updateResolution();
   if (!getAutomaticWorkpiece()) markDirty();
+  workpiece = bounds;
 }
 
 
