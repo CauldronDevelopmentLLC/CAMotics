@@ -163,6 +163,7 @@ if not have_glew:
     glew = SConscript('src/glew/SConscript', variant_dir = 'build/glew')
     Depends(lib, glew)
     env.Append(_LIBFLAGS = [glew]) # Force to end
+    env.Append(CPPPATH = ['#/src/glew'])
 
 
 # Cairo
