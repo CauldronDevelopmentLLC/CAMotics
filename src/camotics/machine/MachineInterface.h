@@ -105,7 +105,7 @@ namespace CAMotics {
 
     /***
      * Query port by type.
-     * @return The nuber of the @param index'th with @param type if it exists
+     * @return The number of the @param index'th with @param type if it exists
      * or -1 otherwise.
      */
     virtual int findPort(port_t type, unsigned index = 0) = 0;
@@ -243,10 +243,10 @@ namespace CAMotics {
     /// Clear any pending errors.
     virtual void clearAsyncErrors() = 0;
 
-    /// Set program location
+    /// Get program location
     virtual const cb::LocationRange &getLocation() const = 0;
 
-    /// Get program location
+    /// Set program location
     virtual void setLocation(const cb::LocationRange &location) = 0;
 
     /// Output comment
