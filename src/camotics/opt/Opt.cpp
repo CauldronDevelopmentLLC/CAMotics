@@ -22,9 +22,8 @@
 
 #include "AnnealState.h"
 
-#include <camotics/cutsim/ToolPath.h>
-#include <camotics/machine/MachineState.h>
-#include <camotics/machine/MoveSink.h>
+#include <gcode/machine/MachineState.h>
+#include <gcode/machine/MoveSink.h>
 
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
@@ -35,7 +34,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-Opt::Opt(const ToolPath &path) :
+Opt::Opt(const GCode::ToolPath &path) :
   cutCount(0), iterations(10000), runs(1), heatTarget(1.5),
   minTemp(0.01), heatRate(1.5), coolRate(0.95), reheatRate(2), timeout(10),
   zSafe(5), tools(path.getTools()) {
@@ -58,7 +57,7 @@ void Opt::run() {
            << 100 - cost / initialCost * 100 << "% or " << initialCost / cost
            << 'x');
 
-  path = new ToolPath(tools);
+  path = new GCode::ToolPath(tools);
   extract(*path);
 }
 
@@ -76,10 +75,10 @@ double Opt::computeCost() const {
 }
 
 
-void Opt::add(const Move &move) {
+void Opt::add(const GCode::Move &move) {
   if (paths.empty()) paths.push_back(Path());
 
-  bool cutting = move.getType() == MoveType::MOVE_CUTTING;
+  bool cutting = move.getType() == GCode::MoveType::MOVE_CUTTING;
 
   if (cutting) {
     paths.back().push_back(move);
@@ -153,18 +152,18 @@ double Opt::optimize() {
 }
 
 
-void Opt::extract(ToolPath &path) const {
-  MoveSink sink(path);
-  sink.setParent(new MachineState);
+void Opt::extract(GCode::ToolPath &path) const {
+  GCode::MoveSink sink(path);
+  sink.setParent(new GCode::MachineState);
   sink.reset();
 
-  Axes axes = sink.getPosition();
+  GCode::Axes axes = sink.getPosition();
   sink.move(axes, true);
 
   for (paths_t::const_iterator it = paths.begin(); it != paths.end() &&
          !shouldQuit(); it++) {
-    Vector3R last = sink.getPosition().getXYZ();
-    Vector3R next = it->startPoint();
+    cb::Vector3D last = sink.getPosition().getXYZ();
+    cb::Vector3D next = it->startPoint();
 
     sink.setTool(it->begin()->getTool());
     sink.setFeed(it->begin()->getFeed());
@@ -184,7 +183,7 @@ void Opt::extract(ToolPath &path) const {
     }
 
     for (unsigned i = 0; i < it->size(); i++) {
-      const Move &move = it->at(i);
+      const GCode::Move &move = it->at(i);
 
       sink.setTool(move.getTool());
       sink.setFeed(move.getFeed());
@@ -235,7 +234,7 @@ double Opt::round(double T, unsigned iterations, AnnealState &current,
       double realDelta = current.computeCost() - current.cost;
       if (realDelta != delta) {
         LOG_DEBUG(1, "first=" << first << " second=" << second
-                  << " delta=" << delta << " real delta=" << realDelta);
+                  << " delta=" << delta << " double delta=" << realDelta);
         delta = realDelta;
       }
 #endif

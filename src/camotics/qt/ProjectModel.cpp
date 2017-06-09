@@ -20,8 +20,8 @@
 
 #include "ProjectModel.h"
 
-#include <camotics/sim/ToolTable.h>
-#include <camotics/cutsim/Project.h>
+#include <gcode/ToolTable.h>
+#include <camotics/sim/Project.h>
 
 #include <cbang/SStream.h>
 
@@ -56,10 +56,10 @@ string ProjectModel::getFile(const QModelIndex &index) const {
 }
 
 
-Tool &ProjectModel::getTool(unsigned i) const {
-  ToolTable &tools = project->getToolTable();
+GCode::Tool &ProjectModel::getTool(unsigned i) const {
+  GCode::ToolTable &tools = project->getToolTable();
 
-  ToolTable::iterator it = tools.begin();
+  GCode::ToolTable::iterator it = tools.begin();
   for (; i && it != tools.end(); it++) i--;
 
   if (it == tools.end()) THROW("Invalid tool index");
@@ -68,22 +68,22 @@ Tool &ProjectModel::getTool(unsigned i) const {
 }
 
 
-Tool &ProjectModel::getTool(const QModelIndex &index) const {
+GCode::Tool &ProjectModel::getTool(const QModelIndex &index) const {
   return getTool(getOffset(index));
 }
 
 
 string ProjectModel::getToolString(unsigned i) const {
-  Tool &tool = getTool(i);
+  GCode::Tool &tool = getTool(i);
   return SSTR(tool.getNumber() << ": " << tool.getText());
 }
 
 
 QModelIndex ProjectModel::getToolIndex(unsigned number) const {
   // Find tool index
-  ToolTable &tools = project->getToolTable();
+  GCode::ToolTable &tools = project->getToolTable();
   int row = 0;
-  for (ToolTable::iterator it = tools.begin(); it != tools.end(); it++) {
+  for (GCode::ToolTable::iterator it = tools.begin(); it != tools.end(); it++) {
     if (it->first == number) break;
     row++;
   }
@@ -119,7 +119,7 @@ QVariant ProjectModel::data(const QModelIndex &index, int role) const {
   case PROJECT_ITEM: return QString("Project");
   case PATHS_ITEM: return QString("Paths");
   case FILE_ITEM: return QString::fromUtf8(getFile(offset).c_str());
-  case TOOLS_ITEM: return QString("Tools");
+  case TOOLS_ITEM: return QString("GCode::Tools");
   case TOOL_ITEM: return QString::fromUtf8(getToolString(offset).c_str());
   default: return QVariant();
   }

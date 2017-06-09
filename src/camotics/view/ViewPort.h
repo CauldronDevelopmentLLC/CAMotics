@@ -20,9 +20,8 @@
 
 #pragma once
 
-
-
-#include <camotics/Geom.h>
+#include <cbang/geom/Quaternion.h>
+#include <cbang/geom/Rectangle.h>
 
 
 namespace CAMotics {
@@ -71,7 +70,7 @@ namespace CAMotics {
     void resetView(char c = 'p');
 
     virtual void glInit() const;
-    virtual void glDraw(const Rectangle3R &bounds) const;
+    virtual void glDraw(const cb::Rectangle3D &bounds) const;
 
     void drawAxis(int axis, bool up, double length, double radius) const;
     void setLighting(bool x) const;

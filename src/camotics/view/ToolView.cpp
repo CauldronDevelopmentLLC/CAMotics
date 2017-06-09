@@ -50,9 +50,9 @@ void ToolView::drawGuide(cairo_t *cr, double width, double x, double y,
   cairo_show_text(cr, text);
 
   // Value
-  double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
   string s = "  " + String(value / scale) +
-    (tool.getUnits() == ToolUnits::UNITS_MM ? "mm" : "in");
+    (tool.getUnits() == GCode::ToolUnits::UNITS_MM ? "mm" : "in");
   cairo_show_text(cr, s.c_str());
 
   // Connector
@@ -105,12 +105,12 @@ void ToolView::draw() {
   cairo_set_source_rgba(cr, fg, fg, fg, 1);
 
   // Get tool info
-  ToolShape shape = tool.getShape();
+  GCode::ToolShape shape = tool.getShape();
   double length = tool.getLength();
   double diameter = tool.getDiameter();
   double snubDiameter =
-    shape == ToolShape::TS_SNUBNOSE ? tool.getSnubDiameter() : 0;
-  string title = String::printf("Tool #%d", tool.getNumber());
+    shape == GCode::ToolShape::TS_SNUBNOSE ? tool.getSnubDiameter() : 0;
+  string title = String::printf("GCode::Tool #%d", tool.getNumber());
   if (!simple) title = title + ": " + tool.getText();
 
   // Margin
@@ -131,7 +131,7 @@ void ToolView::draw() {
   }
 
   // Scale
-  double xDim = (shape == ToolShape::TS_SNUBNOSE && diameter < snubDiameter) ?
+  double xDim = (shape == GCode::ToolShape::TS_SNUBNOSE && diameter < snubDiameter) ?
     snubDiameter : diameter;
   double yDim = length;
   double xScale = w / xDim;
@@ -147,12 +147,12 @@ void ToolView::draw() {
   double x = (w - diameter) / 2.0;
   double y = (h - length) / 2.0;
   switch (shape) {
-  case ToolShape::TS_CYLINDRICAL:
+  case GCode::ToolShape::TS_CYLINDRICAL:
     cairo_rectangle(cr, x, y, diameter, length);
     break;
 
-  case ToolShape::TS_SNUBNOSE:
-  case ToolShape::TS_CONICAL:
+  case GCode::ToolShape::TS_SNUBNOSE:
+  case GCode::ToolShape::TS_CONICAL:
     cairo_move_to(cr, x, y);
     if (diameter) cairo_rel_line_to(cr, diameter, 0);
     cairo_rel_line_to(cr, (snubDiameter - diameter) / 2, length);
@@ -160,7 +160,7 @@ void ToolView::draw() {
     cairo_close_path(cr);
     break;
 
-  case ToolShape::TS_BALLNOSE: {
+  case GCode::ToolShape::TS_BALLNOSE: {
     double radius = diameter / 2.0;
     cairo_move_to(cr, x, y);
     cairo_rel_line_to(cr, diameter, 0);
@@ -169,7 +169,7 @@ void ToolView::draw() {
     break;
   }
 
-  case ToolShape::TS_SPHEROID:
+  case GCode::ToolShape::TS_SPHEROID:
     cairo_save(cr);
     cairo_translate(cr, w / 2.0, y + length / 2.0);
     cairo_scale(cr, diameter / 2.0, length / 2.0);
@@ -189,7 +189,7 @@ void ToolView::draw() {
     x = w / 2.0;
     y = h + 5;
     drawGuide(cr, diameter * scale, x, y, "Diameter", diameter);
-    if (shape == ToolShape::TS_SNUBNOSE)
+    if (shape == GCode::ToolShape::TS_SNUBNOSE)
       drawGuide(cr, snubDiameter * scale, x, y + 15, "Snub Diameter",
                 snubDiameter);
 

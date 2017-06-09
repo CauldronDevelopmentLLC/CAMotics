@@ -41,7 +41,7 @@ using namespace CAMotics;
 
 CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
   Application(name, hasFeature), out("-"), force(false),
-  outputUnits(Units::METRIC), defaultUnits(Units::METRIC) {
+  outputUnits(GCode::Units::METRIC), defaultUnits(GCode::Units::METRIC) {
   cmdLine.addTarget("out", out, "Output filename or '-' to write "
                     "to the standard output stream");
   cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
@@ -53,7 +53,7 @@ CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
 
   cmdLine.addTarget("units", outputUnits, "Set output units.");
   cmdLine.addTarget("default-units", defaultUnits,
-                    "Units assumed at the start.");
+                    "GCode::Units assumed at the start.");
 
   Option &opt = *cmdLine.add("pipe", "Specify a output file descriptor, "
                              "overrides the 'out' option");
@@ -96,12 +96,12 @@ int CommandLineApp::init(int argc, char *argv[]) {
 
 
 int CommandLineApp::metricAction(Option &opt) {
-  outputUnits = opt.toBoolean() ? Units::METRIC : Units::IMPERIAL;
+  outputUnits = opt.toBoolean() ? GCode::Units::METRIC : GCode::Units::IMPERIAL;
   return 0;
 }
 
 
 int CommandLineApp::imperialAction(Option &opt) {
-  outputUnits = opt.toBoolean() ? Units::IMPERIAL : Units::METRIC;
+  outputUnits = opt.toBoolean() ? GCode::Units::IMPERIAL : GCode::Units::METRIC;
   return 0;
 }

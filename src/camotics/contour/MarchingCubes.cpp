@@ -35,7 +35,7 @@ namespace {
 void MarchingCubes::doCell(GridTreeRef &tree, const CubeSlice &slice,
                            unsigned x, unsigned y) {
   uint8_t index = slice.getEdges(x, y, edges);
-  Vector3U offset(x, y, slice.getZ());
+  cb::Vector3U offset(x, y, slice.getZ());
 
   SmartPointer<GridTreeLeaf> leaf = new GridTreeLeaf;
 

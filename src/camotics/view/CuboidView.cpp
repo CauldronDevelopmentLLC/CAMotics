@@ -34,7 +34,7 @@ CuboidView::~CuboidView() {
 
 
 void CuboidView::draw() {
-  if (bounds == Rectangle3R()) return;
+  if (bounds == cb::Rectangle3D()) return;
 
   static float vertices[] = {
     1, 0, 0,  1, 0, 1,  1, 1, 1,  1, 1, 0,
@@ -88,8 +88,8 @@ void CuboidView::draw() {
 
   glPushMatrix();
 
-  Vector3R bMin = bounds.getMin();
-  Vector3R bDim = bounds.getDimensions();
+  cb::Vector3D bMin = bounds.getMin();
+  cb::Vector3D bDim = bounds.getDimensions();
   glTranslated(bMin.x(), bMin.y(), bMin.z());
   glScaled(bDim.x(), bDim.y(), bDim.z());
 

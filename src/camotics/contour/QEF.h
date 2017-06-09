@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <cbang/geom/Vector.h>
+
 
 // Original code from
 // http://www.oocities.org/tzukkers/isosurf/isosurfaces.html
@@ -27,8 +29,6 @@
 // ThreeD Quadric Error Function
 //
 // This file is in the public domain.
-
-#include <camotics/Geom.h>
 
 
 namespace CAMotics {
@@ -42,30 +42,32 @@ namespace CAMotics {
    */
   class QEF {
   public:
-    static Vector3R evaluate(real mat[12][3], real vec[12], int rows);
-    static void computeSVD(real mat[12][3], real u[12][3], real v[3][3],
-                           real d[3], int rows);
-    static void factorize(real mat[12][3], real tau_u[3], real tau_v[2],
+    static cb::Vector3D evaluate(double mat[12][3], double vec[12], int rows);
+    static void computeSVD(double mat[12][3], double u[12][3], double v[3][3],
+                           double d[3], int rows);
+    static void factorize(double mat[12][3], double tau_u[3], double tau_v[2],
                           int rows);
-    static real factorize_hh(real *ptrs[12], int n);
-    static void unpack(real u[12][3], real v[3][3], real tau_u[3],
-                       real tau_v[2], int rows);
-    static void diagonalize(real u[12][3], real v[3][3], real tau_u[3],
-                            real tau_v[2], int rows);
-    static void chop(real *a, real *b, int n);
-    static void qrstep(real u[12][3], real v[3][3], real tau_u[3],
-                       real tau_v[3], int rows, int cols);
-    static void qrstep_middle(real u[12][3], real tau_u[3], real tau_v[3],
+    static double factorize_hh(double *ptrs[12], int n);
+    static void unpack(double u[12][3], double v[3][3], double tau_u[3],
+                       double tau_v[2], int rows);
+    static void diagonalize(double u[12][3], double v[3][3], double tau_u[3],
+                            double tau_v[2], int rows);
+    static void chop(double *a, double *b, int n);
+    static void qrstep(double u[12][3], double v[3][3], double tau_u[3],
+                       double tau_v[3], int rows, int cols);
+    static void qrstep_middle(double u[12][3], double tau_u[3], double tau_v[3],
                               int rows, int cols, int col);
-    static void qrstep_end(real v[3][3], real tau_u[3], real tau_v[3],
+    static void qrstep_end(double v[3][3], double tau_u[3], double tau_v[3],
                            int cols);
-    static real qrstep_eigenvalue(real tau_u[3], real tau_v[3], int cols);
-    static void qrstep_cols2(real u[12][3], real v[3][3], real tau_u[3],
-                             real tau_v[3], int rows);
-    static void computeGivens(real a, real b, real *c, real *s);
-    static void computeSchur(real a1, real a2, real a3, real *c, real *s);
-    static void singularize(real u[12][3], real v[3][3], real d[3], int rows);
-    static void solveSVD(real u[12][3], real v[3][3], real d[3], real b[12],
-                         real x[3], int rows);
+    static double qrstep_eigenvalue(double tau_u[3], double tau_v[3], int cols);
+    static void qrstep_cols2(double u[12][3], double v[3][3], double tau_u[3],
+                             double tau_v[3], int rows);
+    static void computeGivens(double a, double b, double *c, double *s);
+    static void computeSchur(double a1, double a2, double a3, double *c,
+                             double *s);
+    static void singularize(double u[12][3], double v[3][3], double d[3],
+                            int rows);
+    static void solveSVD(double u[12][3], double v[3][3], double d[3],
+                         double b[12], double x[3], int rows);
   };
 }

@@ -20,17 +20,17 @@
 
 #pragma once
 
+#include <cbang/geom/Vector.h>
 
-#include <camotics/Geom.h>
 
 namespace CAMotics {
   class Edge {
   public:
-    Vector3R vertex;
-    Vector3R normal;
+    cb::Vector3D vertex;
+    cb::Vector3D normal;
 
     Edge() {}
-    Edge(const Vector3R &vertex, const Vector3R &normal) :
+    Edge(const cb::Vector3D &vertex, const cb::Vector3D &normal) :
       vertex(vertex), normal(normal) {}
   };
 }

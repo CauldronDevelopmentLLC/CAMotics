@@ -28,8 +28,8 @@
 
 #include <camotics/Task.h>
 #include <camotics/view/GL.h>
-#include <camotics/stl/STLSource.h>
-#include <camotics/stl/STLSink.h>
+#include <stl/Source.h>
+#include <stl/Sink.h>
 
 using namespace std;
 using namespace cb;
@@ -43,7 +43,7 @@ TriangleSurface::TriangleSurface(const GridTree &tree) :
 }
 
 
-TriangleSurface::TriangleSurface(STLSource &source, Task *task) :
+TriangleSurface::TriangleSurface(STL::Source &source, Task *task) :
   finalized(false), useVBOs(true) {
   vbufs[0] = 0;
   read(source, task);
@@ -113,7 +113,7 @@ void TriangleSurface::add(const Vector3F vertices[3]) {
     (vertices[1] - vertices[0]).cross(vertices[2] - vertices[0]);
 
   // Normalize
-  real length = normal.length();
+  double length = normal.length();
   if (length == 0) return; // Degenerate element, skip
   normal /= length;
 
@@ -184,11 +184,11 @@ void TriangleSurface::clear() {
   vertices.clear();
   normals.clear();
 
-  bounds = Rectangle3R();
+  bounds = cb::Rectangle3D();
 }
 
 
-void TriangleSurface::read(STLSource &source, Task *task) {
+void TriangleSurface::read(STL::Source &source, Task *task) {
   clear();
 
   uint32_t facets = source.getFacetCount(); // ASCII STL files return 0
@@ -225,7 +225,7 @@ void TriangleSurface::read(STLSource &source, Task *task) {
 }
 
 
-void TriangleSurface::write(STLSink &sink, Task *task) const {
+void TriangleSurface::write(STL::Sink &sink, Task *task) const {
   Vector3F p[3];
 
   for (unsigned i = 0; i < getCount() && (!task || !task->shouldQuit()); i++) {

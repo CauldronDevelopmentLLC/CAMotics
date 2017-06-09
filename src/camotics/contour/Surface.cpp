@@ -20,7 +20,7 @@
 
 #include "Surface.h"
 
-#include <camotics/stl/STLWriter.h>
+#include <stl/Writer.h>
 
 using namespace std;
 using namespace cb;
@@ -29,7 +29,7 @@ using namespace CAMotics;
 
 void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
                        const string &hash) const {
-  STLWriter writer(sink, binary);
+  STL::Writer writer(sink, binary);
 
   writer.writeHeader(name, getCount(), hash);
   write(writer);

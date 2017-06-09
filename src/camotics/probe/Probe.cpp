@@ -24,15 +24,15 @@
 #include <cbang/log/Logger.h>
 #include <cbang/config/Options.h>
 
-#include <camotics/gcode/Parser.h>
-#include <camotics/gcode/Interpreter.h>
-#include <camotics/gcode/Codes.h>
+#include <gcode/parse/Parser.h>
+#include <gcode/interp/Interpreter.h>
+#include <gcode/Codes.h>
 
-#include <camotics/gcode/ast/Program.h>
-#include <camotics/gcode/ast/BinaryOp.h>
-#include <camotics/gcode/ast/Number.h>
-#include <camotics/gcode/ast/Reference.h>
-#include <camotics/gcode/ast/QuotedExpr.h>
+#include <gcode/ast/Program.h>
+#include <gcode/ast/BinaryOp.h>
+#include <gcode/ast/Number.h>
+#include <gcode/ast/Reference.h>
+#include <gcode/ast/QuotedExpr.h>
 
 using namespace std;
 using namespace cb;
@@ -40,7 +40,7 @@ using namespace CAMotics;
 
 
 Probe::Probe(Options &options, std::ostream &stream) :
-  Controller((MachineState &)*this), Printer(stream),
+  GCode::Controller((GCode::MachineState &)*this), GCode::Printer(stream),
   interp(*this), gridSize(5), clearHeight(1), probeDepth(-1), probeFeed(5),
   liftOff(false), liftOffFeed(0.5), minMem(2000), maxMem(5400),
   useLastZExpression(true), pass(0), didOutputProbe(false) {
@@ -71,24 +71,24 @@ Probe::Probe(Options &options, std::ostream &stream) :
 
 void Probe::read(const InputSource &source) {
   // Parse program
-  Program program;
-  Parser().parse(source, program);
+  GCode::Program program;
+  GCode::Parser().parse(source, program);
 
   // Compute bounding box
   pass = 1;
   try {
     program.process(interp);
-  } catch (const EndProgram &) {}
+  } catch (const GCode::EndProgram &) {}
   LOG_DEBUG(1, "Bounding box: " << bbox);
 
   // Create probe grid
   pass = 2;
-  Vector2D divisions(ceil(bbox.getWidth() / gridSize),
+  cb::Vector2D divisions(ceil(bbox.getWidth() / gridSize),
                      ceil(bbox.getLength() / gridSize));
   grid = new ProbeGrid(bbox, divisions);
   try {
     program.process(interp);
-  } catch (const EndProgram &) {}
+  } catch (const GCode::EndProgram &) {}
 
   // Output program with probe
   didOutputProbe = false;
@@ -147,13 +147,13 @@ void Probe::outputProbe() {
 }
 
 
-void Probe::execute(Word *word, int vars) {
-  const Code &code = *word->getCode();
-  Controller::setLocation(word->getLocation());
-  Controller::execute(code, vars);
+void Probe::execute(GCode::Word *word, int vars) {
+  const GCode::Code &code = *word->getCode();
+  GCode::Controller::setLocation(word->getLocation());
+  GCode::Controller::execute(code, vars);
 
   // TODO This should be absolute position & we should account for offsets etc.
-  Vector2D pos(getAxisPosition('X'), getAxisPosition('Y'));
+  cb::Vector2D pos(getAxisPosition('X'), getAxisPosition('Y'));
 
   switch (pass) {
   case 1:
@@ -170,7 +170,7 @@ void Probe::execute(Word *word, int vars) {
 }
 
 
-void Probe::operator()(const SmartPointer<Block> &block) {
+void Probe::operator()(const SmartPointer<GCode::Block> &block) {
   interp(block);
 
   if (!block->isDeleted()) {
@@ -185,7 +185,7 @@ void Probe::operator()(const SmartPointer<Block> &block) {
       double y = getAxisPosition('Y');
       double z = getAxisPosition('Z');
 
-      vector<ProbePoint *> pt = grid->find(Vector2D(x, y));
+      vector<ProbePoint *> pt = grid->find(cb::Vector2D(x, y));
       double x1 = pt[0]->x();
       double x2 = pt[1]->x();
       double y1 = pt[0]->y();
@@ -198,31 +198,33 @@ void Probe::operator()(const SmartPointer<Block> &block) {
         ((x - x1) * (y - y1)) / denom,
       };
 
-      SmartPointer<Entity> expr;
-      Word *zWord = block->findWord('Z');
+      SmartPointer<GCode::Entity> expr;
+      GCode::Word *zWord = block->findWord('Z');
       if (useLastZExpression) expr = getVarExpr('Z');
       else if (zWord) expr = zWord->getExpression();
-      else expr = new Number(z);
+      else expr = new GCode::Number(z);
 
       for (int i = 0; i < 4; i++) {
         if (!pt[i]->address)
           THROWS("Point " << pt[i] << " does not have address");
 
-        SmartPointer<Entity> ref = new Reference(new Number(pt[i]->address));
-        SmartPointer<Entity> num = new Number(v[i]);
+        SmartPointer<GCode::Entity> ref =
+          new GCode::Reference(new GCode::Number(pt[i]->address));
+        SmartPointer<GCode::Entity> num = new GCode::Number(v[i]);
 
-        expr = new BinaryOp(Operator::ADD_OP, expr,
-                            new BinaryOp(Operator::MUL_OP, ref, num));
+        expr = new GCode::BinaryOp(GCode::Operator::ADD_OP, expr,
+                                   new GCode::BinaryOp
+                                   (GCode::Operator::MUL_OP, ref, num));
       }
-      expr = new QuotedExpr(expr);
+      expr = new GCode::QuotedExpr(expr);
 
       if (!zWord) {
-        zWord = new Word('Z', expr);
+        zWord = new GCode::Word('Z', expr);
         block->push_back(zWord);
 
       } else zWord->setExpression(expr);
     }
   }
 
-  Printer::operator()(block);
+  GCode::Printer::operator()(block);
 }

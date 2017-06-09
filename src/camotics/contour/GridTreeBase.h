@@ -20,8 +20,7 @@
 
 #pragma once
 
-
-#include <camotics/Geom.h>
+#include <cbang/geom/Vector.h>
 
 #include <vector>
 

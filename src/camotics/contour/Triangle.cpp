@@ -34,7 +34,7 @@ Vector3F Triangle::computeNormal() const {
   Vector3F n = (data[1] - data[0]).cross(data[2] - data[0]);
 
   // Normalize
-  real length = n.length();
+  double length = n.length();
   n /= length;
 
   return n;

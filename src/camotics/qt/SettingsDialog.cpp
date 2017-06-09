@@ -53,7 +53,7 @@ void SettingsDialog::exec(Project &project, View &view) {
 
   ui->defaultUnitsComboBox->
     setCurrentIndex(settings.get("Settings/Units",
-                                 ToolUnits::UNITS_MM).toInt());
+                                 GCode::ToolUnits::UNITS_MM).toInt());
 
   ui->renderModeComboBox->setCurrentIndex(project.getRenderMode());
   ui->aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
@@ -74,7 +74,7 @@ void SettingsDialog::exec(Project &project, View &view) {
   int index = ui->resolutionComboBox->currentIndex();
   project.setResolutionMode((ResolutionMode::enum_t)index);
 
-  ToolUnits units = (ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
+  GCode::ToolUnits units = (GCode::ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
   project.setUnits(units);
   settings.set("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
 

@@ -21,7 +21,7 @@
 #include "View.h"
 #include "GL.h"
 
-#include <camotics/cutsim/MoveLookup.h>
+#include <camotics/sim/MoveLookup.h>
 
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
@@ -60,12 +60,12 @@ void View::decSpeed() {
 }
 
 
-void View::setToolPath(const SmartPointer<ToolPath> &toolPath) {
+void View::setToolPath(const SmartPointer<GCode::ToolPath> &toolPath) {
   path->setPath(toolPath, flags & PATH_VBOS_FLAG);
 }
 
 
-void View::setWorkpiece(const Rectangle3R &bounds) {
+void View::setWorkpiece(const cb::Rectangle3D &bounds) {
   workpiece->setBounds(bounds);
 }
 
@@ -112,7 +112,7 @@ bool View::update() {
 
 void View::clear() {
   setToolPath(0);
-  setWorkpiece(Rectangle3R());
+  setWorkpiece(cb::Rectangle3D());
   setSurface(0);
   setMoveLookup(0);
   resetView();

@@ -21,18 +21,18 @@
 #pragma once
 
 
-#include <camotics/sim/Tool.h>
+#include <gcode/Tool.h>
 
 #include <cbang/SmartPointer.h>
 
 typedef struct _cairo cairo_t;
 
 
-namespace CAMotics {
-  class Tool;
+namespace GCode {class Tool;}
 
+namespace CAMotics {
   class ToolView {
-    Tool tool;
+    GCode::Tool tool;
     cb::SmartPointer<unsigned char>::Array buffer;
 
     int width;
@@ -43,7 +43,7 @@ namespace CAMotics {
     ToolView() : width(0), height(0), stride(0) {}
     ~ToolView();
 
-    void setTool(const Tool &tool) {this->tool = tool;}
+    void setTool(const GCode::Tool &tool) {this->tool = tool;}
 
     const cb::SmartPointer<unsigned char>::Array &getBuffer() const
     {return buffer;}

@@ -24,7 +24,6 @@
 #include "GridTreeBase.h"
 #include "Triangle.h"
 
-#include <camotics/Geom.h>
 
 #include <vector>
 

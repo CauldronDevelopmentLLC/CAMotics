@@ -31,6 +31,6 @@ namespace CAMotics {
   public:
     ToolScene();
 
-    void update(const Tool &tool, const QSize &size);
+    void update(const GCode::Tool &tool, const QSize &size);
   };
 }

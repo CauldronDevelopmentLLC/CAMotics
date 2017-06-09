@@ -20,14 +20,13 @@
 
 #pragma once
 
-
 #include "ProbePoint.h"
 
-#include <camotics/Geom.h>
-
 #include <cbang/SmartPointer.h>
+#include <cbang/geom/Rectangle.h>
 
 #include <vector>
+
 
 namespace CAMotics {
   class ProbeGrid : public std::vector<std::vector<ProbePoint> > {

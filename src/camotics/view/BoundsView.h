@@ -20,14 +20,15 @@
 
 #pragma once
 
+#include <cbang/geom/Rectangle.h>
 
-#include <camotics/Geom.h>
 
 namespace CAMotics {
-  class BoundsView : Rectangle3R {
+  class BoundsView : cb::Rectangle3D {
   public:
-    BoundsView(const Rectangle3R &r) : Rectangle3R(r) {}
-    BoundsView(const Vector3R &p1, const Vector3R &p2) : Rectangle3R(p1, p2) {}
+    BoundsView(const cb::Rectangle3D &r) : cb::Rectangle3D(r) {}
+    BoundsView(const cb::Vector3D &p1, const cb::Vector3D &p2) :
+      cb::Rectangle3D(p1, p2) {}
 
     void draw();
   };

@@ -21,7 +21,7 @@
 #pragma once
 
 
-#include <camotics/cutsim/Project.h>
+#include <camotics/sim/Project.h>
 #include <camotics/view/View.h>
 
 #include <cbang/SmartPointer.h>
@@ -38,7 +38,7 @@ namespace CAMotics {
 
     cb::SmartPointer<Ui::SettingsDialog> ui;
 
-    Rectangle3R bounds;
+    cb::Rectangle3D bounds;
 
     bool changing;
 

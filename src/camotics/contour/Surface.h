@@ -20,14 +20,13 @@
 
 #pragma once
 
-
-#include <camotics/Geom.h>
-
+#include <cbang/geom/Rectangle.h>
 #include <cbang/io/OutputSink.h>
 
 
+namespace STL {class Sink;}
+
 namespace CAMotics {
-  class STLSink;
   class Task;
 
   class Surface {
@@ -36,9 +35,9 @@ namespace CAMotics {
 
     virtual cb::SmartPointer<Surface> copy() const = 0;
     virtual uint64_t getCount() const = 0;
-    virtual Rectangle3R getBounds() const = 0;
+    virtual cb::Rectangle3D getBounds() const = 0;
     virtual void draw(bool withVBOs) = 0;
-    virtual void write(STLSink &sink, Task *task = 0) const = 0;
+    virtual void write(STL::Sink &sink, Task *task = 0) const = 0;
     virtual void reduce(Task &task) = 0;
 
     void writeSTL(const cb::OutputSink &sink, bool binary,

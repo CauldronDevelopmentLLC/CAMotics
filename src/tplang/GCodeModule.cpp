@@ -21,19 +21,18 @@
 #include "GCodeModule.h"
 #include "TPLContext.h"
 
-#include <camotics/sim/ToolTable.h>
-#include <camotics/sim/Controller.h>
-#include <camotics/cutsim/Simulation.h>
-#include <camotics/cutsim/Workpiece.h>
-#include <camotics/gcode/Interpreter.h>
+#include <gcode/ToolTable.h>
+#include <gcode/Controller.h>
+#include <gcode/interp/Interpreter.h>
 
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/util/SmartFunctor.h>
+#include <cbang/geom/Rectangle.h>
 
 #include <math.h>
 
 using namespace tplang;
-using namespace CAMotics;
+using namespace GCode;
 using namespace std;
 using namespace cb;
 
@@ -66,8 +65,6 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("tool(number)", this, &GCodeModule::toolCB);
   exports.insert("units(type)", this, &GCodeModule::unitsCB);
   exports.insert("pause(optional=false)", this, &GCodeModule::pauseCB);
-  exports.insert("tool_set(number, length, diameter, units, shape, snub=0)",
-                 this, &GCodeModule::toolSetCB);
   exports.insert("position()", this, &GCodeModule::positionCB);
   exports.insert("comment(...)", this, &GCodeModule::commentCB);
   exports.insert("workpiece()", this, &GCodeModule::workpieceCB);
@@ -76,8 +73,8 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
   exports.insert("FEED_UNITS_PER_REV", MM_PER_REVOLUTION);
 
-  exports.insert("IMPERIAL", CAMotics::Units::IMPERIAL);
-  exports.insert("METRIC", CAMotics::Units::METRIC);
+  exports.insert("IMPERIAL", Units::IMPERIAL);
+  exports.insert("METRIC", Units::METRIC);
 
   exports.insert("XY", XY);
   exports.insert("XZ", XZ);
@@ -86,11 +83,11 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("UV", UV);
   exports.insert("VW", VW);
 
-  exports.insert("CYLINDRICAL", CAMotics::ToolShape::TS_CYLINDRICAL);
-  exports.insert("CONICAL", CAMotics::ToolShape::TS_CONICAL);
-  exports.insert("BALLNOSE", CAMotics::ToolShape::TS_BALLNOSE);
-  exports.insert("SPHEROID", CAMotics::ToolShape::TS_SPHEROID);
-  exports.insert("SNUBNOSE", CAMotics::ToolShape::TS_SNUBNOSE);
+  exports.insert("CYLINDRICAL", ToolShape::TS_CYLINDRICAL);
+  exports.insert("CONICAL", ToolShape::TS_CONICAL);
+  exports.insert("BALLNOSE", ToolShape::TS_BALLNOSE);
+  exports.insert("SPHEROID", ToolShape::TS_SPHEROID);
+  exports.insert("SNUBNOSE", ToolShape::TS_SNUBNOSE);
 
 #undef XYZ
 #undef ABC
@@ -100,8 +97,8 @@ void GCodeModule::define(js::Sink &exports) {
 }
 
 
-CAMotics::MachineUnitAdapter &GCodeModule::getUnitAdapter() {
-  if (!unitAdapter) unitAdapter = &ctx.find<CAMotics::MachineUnitAdapter>();
+MachineUnitAdapter &GCodeModule::getUnitAdapter() {
+  if (!unitAdapter) unitAdapter = &ctx.find<MachineUnitAdapter>();
   return *unitAdapter;
 }
 
@@ -114,8 +111,8 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
   SmartFunctor<TPLContext> popPath(&ctx, &TPLContext::popPath);
 
   Options options;
-  CAMotics::Controller controller(ctx.machine);
-  CAMotics::Interpreter(controller).read(path);
+  Controller controller(ctx.machine);
+  Interpreter(controller).read(path);
 }
 
 
@@ -136,7 +133,7 @@ void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
   // TODO Handle 'incremental=false'
 
-  Vector3D
+  cb::Vector3D
     offset(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
   double angle = args.getNumber("angle");
   plane_t plane = args.has("plane") ? (plane_t)args.getInteger("plane") : XY;
@@ -233,17 +230,22 @@ void GCodeModule::toolCB(const js::Value &args, js::Sink &sink) {
 
   if (args.has("number")) {
     number = args.getInteger("number");
-    ctx.sim.tools.get(number); // Make sure it exists
     ctx.machine.setTool(number);
 
   } else number = ctx.machine.getTool();
 
   if (number < 0) return;
 
-  const Tool &tool = ctx.sim.tools.get(number);
+  if (!ctx.sim->hasDict("tools")) return;
 
-  double scale =
-    getUnitAdapter().getUnits() == CAMotics::Units::METRIC ? 1 : 25.4;
+  ToolTable tools;
+  tools.read(ctx.sim->getDict("tools"));
+
+  if (!tools.has(number)) return;
+
+  Tool tool = tools.get(number);
+
+  double scale = getUnitAdapter().getUnits() == Units::METRIC ? 1 : 25.4;
 
   sink.beginDict();
   sink.insert("number", number);
@@ -259,15 +261,15 @@ void GCodeModule::toolCB(const js::Value &args, js::Sink &sink) {
 
 
 void GCodeModule::unitsCB(const js::Value &args, js::Sink &sink) {
-  CAMotics::Units units = getUnitAdapter().getUnits();
+  Units units = getUnitAdapter().getUnits();
 
   if (args.has("type")) {
     switch (args.getInteger("type")) {
-    case CAMotics::Units::IMPERIAL:
-      getUnitAdapter().setUnits(CAMotics::Units::IMPERIAL);
+    case Units::IMPERIAL:
+      getUnitAdapter().setUnits(Units::IMPERIAL);
       break;
-    case CAMotics::Units::METRIC:
-      getUnitAdapter().setUnits(CAMotics::Units::METRIC);
+    case Units::METRIC:
+      getUnitAdapter().setUnits(Units::METRIC);
       break;
     default: THROWS("Units type must be one of IMPERIAL or METRIC");
     }
@@ -278,29 +280,6 @@ void GCodeModule::unitsCB(const js::Value &args, js::Sink &sink) {
 
 void GCodeModule::pauseCB(const js::Value &args, js::Sink &sink) {
   ctx.machine.pause(args.getBoolean("optional"));
-}
-
-
-void GCodeModule::toolSetCB(const js::Value &args, js::Sink &sink) {
-  CAMotics::Tool &tool = ctx.sim.tools.get(args.getInteger("number"));
-
-  uint32_t units;
-  double scale = 1;
-  if (args.has("units")) units = args.getInteger("units");
-  else units = getUnitAdapter().getUnits();
-  if (units == CAMotics::Units::METRIC)
-    tool.setUnits(CAMotics::ToolUnits::UNITS_MM);
-  else {
-    tool.setUnits(CAMotics::ToolUnits::UNITS_INCH);
-    scale = 25.4;
-  }
-
-  if (args.has("shape"))
-    tool.setShape((CAMotics::ToolShape::enum_t)args.getInteger("shape"));
-
-  tool.setLength(scale * args.getNumber("length"));
-  tool.setDiameter(scale * args.getNumber("diameter"));
-  tool.setSnubDiameter(scale * args.getNumber("snub"));
 }
 
 
@@ -323,8 +302,14 @@ void GCodeModule::commentCB(const js::Value &args, js::Sink &sink) {
 
 
 void GCodeModule::workpieceCB(const js::Value &args, js::Sink &sink) {
-  Vector3R dims = ctx.sim.workpiece.getDimensions();
-  const Vector3R &offset = ctx.sim.workpiece.getMin();
+  Rectangle3D workpiece;
+  workpiece.read(ctx.sim->getDict("workpiece"));
+
+  if (getUnitAdapter().getUnits() == Units::IMPERIAL)
+    workpiece = workpiece / 25.4;
+
+  cb::Vector3D dims = workpiece.getDimensions();
+  const cb::Vector3D &offset = workpiece.getMin();
 
   sink.beginDict();
 

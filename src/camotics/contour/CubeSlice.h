@@ -51,6 +51,6 @@ namespace CAMotics {
     uint8_t getEdges(unsigned x, unsigned y, Edge edges[12]) const;
 
   protected:
-    real depth(int x, int y, const cb::Vector3U &offset) const;
+    double depth(int x, int y, const cb::Vector3U &offset) const;
   };
 }

@@ -123,10 +123,10 @@ void GCodeHighlighter::highlightBlock(const QString &text) {
   try {
     QByteArray array = text.toUtf8();
     Scanner scanner(InputSource(array.data(), array.length()));
-    CAMotics::Tokenizer tokenizer(scanner);
+    GCode::Tokenizer tokenizer(scanner);
 
     // Deleted
-    if (tokenizer.consume(TokenType::DIV_TOKEN))
+    if (tokenizer.consume(DIV_TOKEN))
       setFormat(0, text.length(), colors[ColorComponent::Comment]);
 
     else {
@@ -135,7 +135,7 @@ void GCodeHighlighter::highlightBlock(const QString &text) {
         Token start = tokenizer.peek();
         tokenizer.advance();
         Token num = tokenizer.peek();
-        if (num.getType() == TokenType::NUMBER_TOKEN) {
+        if (num.getType() == NUMBER_TOKEN) {
           setFormat(start, num, ColorComponent::GCodeLineNumber);
           tokenizer.advance();
         }
@@ -146,19 +146,19 @@ void GCodeHighlighter::highlightBlock(const QString &text) {
 
       while (tokenizer.hasMore()) {
         switch (tokenizer.getType()) {
-        case TokenType::EOL_TOKEN: break; // End of block
+        case EOL_TOKEN: break; // End of block
 
-        case TokenType::COMMENT_TOKEN:
-        case TokenType::PAREN_COMMENT_TOKEN:
+        case COMMENT_TOKEN:
+        case PAREN_COMMENT_TOKEN:
           comment(tokenizer);
           break;
 
-        case TokenType::POUND_TOKEN:
+        case POUND_TOKEN:
           assign(tokenizer);
           break;
 
         default:
-          if (tokenizer.isType(TokenType::ID_TOKEN)) word(tokenizer);
+          if (tokenizer.isType(ID_TOKEN)) word(tokenizer);
           else tokenizer.advance();
           break;
         }
@@ -173,76 +173,76 @@ void GCodeHighlighter::highlightBlock(const QString &text) {
   }
 }
 
-void GCodeHighlighter::comment(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::comment(GCode::Tokenizer &tokenizer) {
   setFormat(tokenizer.advance(), ColorComponent::Comment);
 }
 
 
-void GCodeHighlighter::word(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::word(GCode::Tokenizer &tokenizer) {
   tokenizer.advance();
   numberRefOrExpr(tokenizer);
 }
 
 
-void GCodeHighlighter::assign(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::assign(GCode::Tokenizer &tokenizer) {
   reference(tokenizer);
-  tokenizer.consume(TokenType::ASSIGN_TOKEN);
+  tokenizer.consume(ASSIGN_TOKEN);
   expression(tokenizer);
 }
 
 
-void GCodeHighlighter::ocode(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::ocode(GCode::Tokenizer &tokenizer) {
   Token start = tokenizer.peek();
   tokenizer.advance();
 
-  if (tokenizer.isType(TokenType::OANGLE_TOKEN)) {
+  if (tokenizer.isType(OANGLE_TOKEN)) {
     // TODO Color
     tokenizer.advance();
-    tokenizer.consume(TokenType::ID_TOKEN);
-    tokenizer.consume(TokenType::CANGLE_TOKEN);
+    tokenizer.consume(ID_TOKEN);
+    tokenizer.consume(CANGLE_TOKEN);
 
   } else numberRefOrExpr(tokenizer);
 
   // Keyword
-  if (!tokenizer.isType(TokenType::ID_TOKEN)) return;
+  if (!tokenizer.isType(ID_TOKEN)) return;
   Token token = tokenizer.advance();
   if (ocodes.contains
       (QString::fromUtf8(String::toUpper(token.getValue()).c_str())))
     setFormat(token, ColorComponent::Keyword);
 
   // Expressions
-  while (tokenizer.isType(TokenType::OBRACKET_TOKEN))
+  while (tokenizer.isType(OBRACKET_TOKEN))
     quotedExpr(tokenizer);
 }
 
 
-void GCodeHighlighter::numberRefOrExpr(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::numberRefOrExpr(GCode::Tokenizer &tokenizer) {
   switch (tokenizer.getType()) {
-  case TokenType::POUND_TOKEN: return reference(tokenizer);
-  case TokenType::OBRACKET_TOKEN: return quotedExpr(tokenizer);
-  case TokenType::NUMBER_TOKEN: return number(tokenizer);
-  case TokenType::ADD_TOKEN:
-  case TokenType::SUB_TOKEN: return unaryOp(tokenizer);
+  case POUND_TOKEN: return reference(tokenizer);
+  case OBRACKET_TOKEN: return quotedExpr(tokenizer);
+  case NUMBER_TOKEN: return number(tokenizer);
+  case ADD_TOKEN:
+  case SUB_TOKEN: return unaryOp(tokenizer);
   default: break;
   }
 }
 
 
-void GCodeHighlighter::expression(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::expression(GCode::Tokenizer &tokenizer) {
   primary(tokenizer);
 
   switch (tokenizer.getType()) {
-  case TokenType::ID_TOKEN: {
+  case ID_TOKEN: {
     string id = String::toUpper(tokenizer.getValue());
     if (!ops.contains(QString::fromUtf8(id.c_str()))) break;
     setFormat(tokenizer.peek(), ColorComponent::Keyword);
   }
 
-  case TokenType::ADD_TOKEN:
-  case TokenType::SUB_TOKEN:
-  case TokenType::MUL_TOKEN:
-  case TokenType::DIV_TOKEN:
-  case TokenType::EXP_TOKEN:
+  case ADD_TOKEN:
+  case SUB_TOKEN:
+  case MUL_TOKEN:
+  case DIV_TOKEN:
+  case EXP_TOKEN:
     tokenizer.advance();
     expression(tokenizer);
 
@@ -251,28 +251,28 @@ void GCodeHighlighter::expression(CAMotics::Tokenizer &tokenizer) {
 }
 
 
-void GCodeHighlighter::unaryOp(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::unaryOp(GCode::Tokenizer &tokenizer) {
   tokenizer.advance();
   numberRefOrExpr(tokenizer);
 }
 
 
-void GCodeHighlighter::primary(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::primary(GCode::Tokenizer &tokenizer) {
   switch (tokenizer.getType()) {
-  case TokenType::ID_TOKEN: return functionCall(tokenizer);
+  case ID_TOKEN: return functionCall(tokenizer);
   default: return numberRefOrExpr(tokenizer);
   }
 }
 
 
-void GCodeHighlighter::quotedExpr(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::quotedExpr(GCode::Tokenizer &tokenizer) {
   tokenizer.advance();
   expression(tokenizer);
-  tokenizer.consume(TokenType::CBRACKET_TOKEN);
+  tokenizer.consume(CBRACKET_TOKEN);
 }
 
 
-void GCodeHighlighter::functionCall(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::functionCall(GCode::Tokenizer &tokenizer) {
   Token func = tokenizer.advance();
   string name = String::toUpper(func.getValue());
   if (functions.contains(QString::fromUtf8(name.c_str())))
@@ -281,26 +281,26 @@ void GCodeHighlighter::functionCall(CAMotics::Tokenizer &tokenizer) {
   quotedExpr(tokenizer);
 
   // Special case
-  if (name == "ATAN" && tokenizer.consume(TokenType::DIV_TOKEN))
+  if (name == "ATAN" && tokenizer.consume(DIV_TOKEN))
     quotedExpr(tokenizer);
 }
 
 
-void GCodeHighlighter::number(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::number(GCode::Tokenizer &tokenizer) {
   setFormat(tokenizer.advance(), ColorComponent::Number);
 }
 
 
-void GCodeHighlighter::reference(CAMotics::Tokenizer &tokenizer) {
+void GCodeHighlighter::reference(GCode::Tokenizer &tokenizer) {
   Token pound = tokenizer.advance();
 
-  if (tokenizer.consume(TokenType::OANGLE_TOKEN)) {
-    if (tokenizer.consume(TokenType::ID_TOKEN) &&
-        tokenizer.isType(TokenType::CANGLE_TOKEN)) {
+  if (tokenizer.consume(OANGLE_TOKEN)) {
+    if (tokenizer.consume(ID_TOKEN) &&
+        tokenizer.isType(CANGLE_TOKEN)) {
       setFormat(pound, tokenizer.advance(), ColorComponent::Reference);
     }
 
-  } else if (tokenizer.isType(TokenType::NUMBER_TOKEN))
+  } else if (tokenizer.isType(NUMBER_TOKEN))
     setFormat(pound, tokenizer.advance(), ColorComponent::Reference);
 
   else numberRefOrExpr(tokenizer);

@@ -41,33 +41,33 @@ int ToolDialog::edit() {
 void ToolDialog::update() {
   updating = true;
 
-  ToolUnits units = tool.getUnits();
-  double scale = units == ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
-  ToolShape shape = tool.getShape();
+  GCode::ToolUnits units = tool.getUnits();
+  double scale = units == GCode::ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
+  GCode::ToolShape shape = tool.getShape();
   double length = tool.getLength();
   double radius = tool.getRadius();
 
   // Limits
-  if (shape == ToolShape::TS_BALLNOSE && length < radius)
+  if (shape == GCode::ToolShape::TS_BALLNOSE && length < radius)
     tool.setLength(radius);
 
   // Step
-  double step = units == ToolUnits::UNITS_MM ? 1 : 0.125;
+  double step = units == GCode::ToolUnits::UNITS_MM ? 1 : 0.125;
   ui->lengthDoubleSpinBox->setSingleStep(step);
   ui->diameterDoubleSpinBox->setSingleStep(step);
   ui->snubDiameterDoubleSpinBox->setSingleStep(step);
 
   // Suffix
-  const char *suffix = units == ToolUnits::UNITS_MM ? "mm" : "in";
+  const char *suffix = units == GCode::ToolUnits::UNITS_MM ? "mm" : "in";
   ui->lengthDoubleSpinBox->setSuffix(suffix);
   ui->diameterDoubleSpinBox->setSuffix(suffix);
   ui->snubDiameterDoubleSpinBox->setSuffix(suffix);
 
   // Visibility
-  ui->angleDoubleSpinBox->setVisible(shape == ToolShape::TS_CONICAL);
-  ui->angleLabel->setVisible(shape == ToolShape::TS_CONICAL);
-  ui->snubDiameterDoubleSpinBox->setVisible(shape == ToolShape::TS_SNUBNOSE);
-  ui->snubDiameterLabel->setVisible(shape == ToolShape::TS_SNUBNOSE);
+  ui->angleDoubleSpinBox->setVisible(shape == GCode::ToolShape::TS_CONICAL);
+  ui->angleLabel->setVisible(shape == GCode::ToolShape::TS_CONICAL);
+  ui->snubDiameterDoubleSpinBox->setVisible(shape == GCode::ToolShape::TS_SNUBNOSE);
+  ui->snubDiameterLabel->setVisible(shape == GCode::ToolShape::TS_SNUBNOSE);
 
 #define UPDATE(UI, GET, SET, VALUE)                 \
   if (ui->UI->GET() != (VALUE)) ui->UI->SET(VALUE);
@@ -110,14 +110,14 @@ void ToolDialog::on_numberSpinBox_valueChanged(int value) {
 
 void ToolDialog::on_unitsComboBox_currentIndexChanged(int value) {
   if (updating) return;
-  tool.setUnits((ToolUnits::enum_t)value);
+  tool.setUnits((GCode::ToolUnits::enum_t)value);
   update();
 }
 
 
 void ToolDialog::on_shapeComboBox_currentIndexChanged(int value) {
   if (updating) return;
-  tool.setShape((ToolShape::enum_t)value);
+  tool.setShape((GCode::ToolShape::enum_t)value);
   update();
 }
 
@@ -132,7 +132,7 @@ void ToolDialog::on_angleDoubleSpinBox_valueChanged(double angle) {
 void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double length) {
   if (updating) return;
 
-  double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
   tool.setLength(length * scale);
 
   update();
@@ -142,11 +142,11 @@ void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double length) {
 void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double diameter) {
   if (updating) return;
 
-  double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
   double angle = tool.getAngle();
 
   tool.setDiameter(diameter * scale);
-  if (tool.getShape() == ToolShape::TS_CONICAL)
+  if (tool.getShape() == GCode::ToolShape::TS_CONICAL)
     tool.setLengthFromAngle(angle);
 
   update();
@@ -156,7 +156,7 @@ void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double diameter) {
 void ToolDialog::on_snubDiameterDoubleSpinBox_valueChanged(double value) {
   if (updating) return;
 
-  double scale = tool.getUnits() == ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
 
   tool.setSnubDiameter(value * scale);
   update();

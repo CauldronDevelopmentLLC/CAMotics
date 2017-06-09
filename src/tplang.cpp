@@ -19,15 +19,14 @@
 \******************************************************************************/
 
 #include <camotics/CommandLineApp.h>
-#include <camotics/cutsim/Simulation.h>
 
-#include <camotics/machine/Machine.h>
-#include <camotics/machine/MachinePipeline.h>
-#include <camotics/machine/MachineState.h>
-#include <camotics/machine/MachineMatrix.h>
-#include <camotics/machine/MachineLinearizer.h>
-#include <camotics/machine/MachineUnitAdapter.h>
-#include <camotics/machine/GCodeMachine.h>
+#include <gcode/machine/Machine.h>
+#include <gcode/machine/MachinePipeline.h>
+#include <gcode/machine/MachineState.h>
+#include <gcode/machine/MachineMatrix.h>
+#include <gcode/machine/MachineLinearizer.h>
+#include <gcode/machine/MachineUnitAdapter.h>
+#include <gcode/machine/GCodeMachine.h>
 
 #include <tplang/TPLContext.h>
 #include <tplang/Interpreter.h>
@@ -43,58 +42,57 @@
 using namespace std;
 using namespace cb;
 using namespace tplang;
-using namespace CAMotics;
+using namespace GCode;
 
 
-namespace CAMotics {
-  class TPLangApp : public CommandLineApp {
-    MachinePipeline pipeline;
-    string simJSON;
-    string jsImpl;
-    tplang::TPLContext ctx;
+class TPLangApp : public CAMotics::CommandLineApp {
+  MachinePipeline pipeline;
+  string simJSON;
+  string jsImpl;
+  tplang::TPLContext ctx;
 
-  public:
-    TPLangApp() : CommandLineApp("Tool Path Language Interpreter"),
-                  ctx(cout, pipeline, jsImpl) {
-      cmdLine.addTarget("sim-json", simJSON,
-                        "Simulation information in JSON format");
-      cmdLine.addTarget("js", jsImpl,
-                        "Specify which Javascript implementation to use.  "
-                        "Possible values are 'v8' or 'chakra' but which are "
-                        "actually available depends on the build.");
-    }
+public:
+  TPLangApp() : CommandLineApp("Tool Path Language Interpreter"),
+                ctx(cout, pipeline, jsImpl) {
+    cmdLine.addTarget("sim-json", simJSON,
+                      "Simulation information in JSON format");
+    cmdLine.addTarget("js", jsImpl,
+                      "Specify which Javascript implementation to use.  "
+                      "Possible values are 'v8' or 'chakra' but which are "
+                      "actually available depends on the build.");
+  }
 
-    // From CommandLineApp
-    int init(int argc, char *argv[]) {
-      int ret = CommandLineApp::init(argc, argv);
-      if (ret == -1) return ret;
+  // From CommandLineApp
+  int init(int argc, char *argv[]) {
+    int ret = CommandLineApp::init(argc, argv);
+    if (ret == -1) return ret;
 
-      // Build machine pipeline
-      pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
-      pipeline.add(new MachineLinearizer);
-      pipeline.add(new MachineMatrix);
-      pipeline.add(new GCodeMachine(*stream, outputUnits));
-      pipeline.add(new MachineState);
+    // Build machine pipeline
+    pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
+    pipeline.add(new MachineLinearizer);
+    pipeline.add(new MachineMatrix);
+    pipeline.add(new GCodeMachine(*stream, outputUnits));
+    pipeline.add(new MachineState);
 
-      if (!simJSON.empty()) ctx.sim.parse(simJSON);
+    if (!simJSON.empty())
+      ctx.sim = JSON::Reader::parse(StringInputSource(simJSON));
 
-      return ret;
-    }
+    return ret;
+  }
 
 
-    void requestExit() {
-      Application::requestExit();
-      ctx.interrupt(); // Terminate Javascript execution
-    }
+  void requestExit() {
+    Application::requestExit();
+    ctx.interrupt(); // Terminate Javascript execution
+  }
 
-    // From cb::Reader
-    void read(const cb::InputSource &source) {
-      tplang::Interpreter(ctx).read(source);
-      stream->flush();
-      cout.flush();
-    }
-  };
-}
+  // From cb::Reader
+  void read(const cb::InputSource &source) {
+    tplang::Interpreter(ctx).read(source);
+    stream->flush();
+    cout.flush();
+  }
+};
 
 
 #ifdef HAVE_V8
@@ -123,5 +121,5 @@ int main(int argc, char *argv[]) {
   if (!foundV8Args) gv8::JSImpl::init(0, 0);
 #endif
 
-  return cb::doApplication<CAMotics::TPLangApp>(argc, argv);
+  return cb::doApplication<TPLangApp>(argc, argv);
 }

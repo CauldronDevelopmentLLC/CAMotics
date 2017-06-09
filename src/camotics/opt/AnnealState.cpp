@@ -60,9 +60,9 @@ double AnnealState::computeCost(unsigned first, unsigned second) const {
   const Path &path1 = paths.at(index[first]);
   const Path &path2 = paths.at(index[second]);
 
-  const Vector3D &p1 =
+  const cb::Vector3D &p1 =
     flip[index[first]] ? path1.startPoint() : path1.endPoint();
-  const Vector3D &p2 =
+  const cb::Vector3D &p2 =
     flip[index[second]] ? path2.endPoint() : path2.startPoint();
 
   return p1.distance(p2);

@@ -41,14 +41,14 @@ namespace CAMotics {
 
     cb::SmartPointer<Ui::ToolDialog> ui;
     ToolScene scene;
-    Tool tool;
+    GCode::Tool tool;
     bool updating;
 
   public:
     ToolDialog();
 
-    void setTool(const Tool &tool) {this->tool = tool;}
-    Tool &getTool() {return tool;}
+    void setTool(const GCode::Tool &tool) {this->tool = tool;}
+    GCode::Tool &getTool() {return tool;}
 
     int edit();
     void update();

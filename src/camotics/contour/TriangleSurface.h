@@ -24,15 +24,15 @@
 #include "Surface.h"
 #include "TriangleMesh.h"
 
-#include <camotics/Real.h>
 
 #include <cbang/SmartPointer.h>
 
 #include <vector>
 
 
+namespace STL {class Source;}
+
 namespace CAMotics {
-  class STLSource;
   class GridTree;
 
   class TriangleSurface : public Surface, public TriangleMesh {
@@ -41,11 +41,11 @@ namespace CAMotics {
     unsigned vbufs[2];
     bool useVBOs;
 
-    Rectangle3R bounds;
+    cb::Rectangle3D bounds;
 
   public:
     TriangleSurface(const GridTree &tree);
-    TriangleSurface(STLSource &source, Task *task = 0);
+    TriangleSurface(STL::Source &source, Task *task = 0);
     TriangleSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
     TriangleSurface(const TriangleSurface &o);
     TriangleSurface();
@@ -59,11 +59,11 @@ namespace CAMotics {
     // From Surface
     cb::SmartPointer<Surface> copy() const;
     uint64_t getCount() const {return TriangleMesh::getCount();}
-    Rectangle3R getBounds() const {return bounds;}
+    cb::Rectangle3D getBounds() const {return bounds;}
     void draw(bool withVBOs);
     void clear();
-    void read(STLSource &source, Task *task = 0);
-    void write(STLSink &sink, Task *task = 0) const;
+    void read(STL::Source &source, Task *task = 0);
+    void write(STL::Sink &sink, Task *task = 0) const;
     void reduce(Task &task);
   };
 }

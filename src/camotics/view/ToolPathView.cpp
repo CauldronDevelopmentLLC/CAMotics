@@ -67,17 +67,17 @@ ToolPathView::~ToolPathView() {
 }
 
 
-void ToolPathView::setPath(const SmartPointer<const ToolPath> &path,
+void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path,
                            bool withVBOs) {
   this->path = path;
   useVBOs = haveVBOs() && withVBOs;
 
   totalTime = 0;
   totalDistance = 0;
-  currentMove = Move();
+  currentMove = GCode::Move();
 
   if (!path.isNull()) {
-    ToolPath::const_iterator it;
+    GCode::ToolPath::const_iterator it;
     for (it = path->begin(); it != path->end(); it++) {
       totalTime += it->getTime();
       totalDistance += it->getDistance();
@@ -90,9 +90,9 @@ void ToolPathView::setPath(const SmartPointer<const ToolPath> &path,
   if (path.isNull() || path->empty()) return;
 
   // Output stats
-  const Rectangle3R &bbox = getBounds();
-  Vector3D dims = bbox.getDimensions();
-  LOG_INFO(1, "Tool Path bounds " << bbox << " dimensions " << dims);
+  const cb::Rectangle3D &bbox = getBounds();
+  cb::Vector3D dims = bbox.getDimensions();
+  LOG_INFO(1, "GCode::Tool Path bounds " << bbox << " dimensions " << dims);
 }
 
 
@@ -105,7 +105,7 @@ void ToolPathView::setByRatio(double ratio) {
 }
 
 
-void ToolPathView::setByRemote(const Vector3R &position, unsigned line) {
+void ToolPathView::setByRemote(const cb::Vector3D &position, unsigned line) {
   if (!byRemote || this->position != position || this->line != line) {
     byRemote = true;
     this->position = position;
@@ -135,27 +135,38 @@ const char *ToolPathView::getDirection() const {
 }
 
 
+Color ToolPathView::getColor(GCode::MoveType type) {
+  switch (type) {
+  case GCode::MoveType::MOVE_RAPID:   return Color::RED;
+  case GCode::MoveType::MOVE_CUTTING: return Color::GREEN;
+  case GCode::MoveType::MOVE_PROBE:   return Color::BLUE;
+  case GCode::MoveType::MOVE_DRILL:   return Color::YELLOW;
+  }
+  THROWS("Invalid move type " << type);
+}
+
+
 void ToolPathView::update() {
   if (!dirty) return;
 
   currentTime = 0;
   currentDistance = 0;
-  currentPosition = byRemote ? position : Vector3R();
+  currentPosition = byRemote ? position : cb::Vector3D();
   currentLine = 0;
-  currentMove = Move();
+  currentMove = GCode::Move();
 
   vertices.clear();
   colors.clear();
 
   // Find position on path
-  ToolPath::const_iterator it;
+  GCode::ToolPath::const_iterator it;
   if (!path.isNull())
     for (it = path->begin(); it != path->end(); it++) {
-      Move move = *it;
+      GCode::Move move = *it;
       currentMove = move;
 
-      const Vector3R &start = move.getStartPt();
-      Vector3R end = move.getEndPt();
+      const cb::Vector3D &start = move.getStartPt();
+      cb::Vector3D end = move.getEndPt();
       double moveTime = move.getTime();
       double moveDistance = move.getDistance();
       uint32_t moveLine = move.getLine() + 1; // EMC2 counts from zero
@@ -190,7 +201,7 @@ void ToolPathView::update() {
       currentDistance += moveDistance;
 
       // Store GL data
-      Color color = move.getColor();
+      Color color = getColor(move.getType());
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
         vertices.push_back(start[i]);

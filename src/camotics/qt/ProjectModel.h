@@ -28,8 +28,9 @@
 #include <QVariant>
 
 
+namespace GCode {class Tool;}
+
 namespace CAMotics {
-  class Tool;
   class Project;
 
   class ProjectModel : public QAbstractItemModel {
@@ -56,8 +57,8 @@ namespace CAMotics {
     std::string getFile(unsigned i) const;
     std::string getFile(const QModelIndex &index) const;
 
-    Tool &getTool(unsigned i) const;
-    Tool &getTool(const QModelIndex &index) const;
+    GCode::Tool &getTool(unsigned i) const;
+    GCode::Tool &getTool(const QModelIndex &index) const;
     std::string getToolString(unsigned i) const;
     QModelIndex getToolIndex(unsigned number) const;
 

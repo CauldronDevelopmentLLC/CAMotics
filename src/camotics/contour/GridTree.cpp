@@ -21,7 +21,7 @@
 #include "GridTree.h"
 #include "GridTreeRef.h"
 
-#include <camotics/cutsim/AABBTree.h>
+#include <camotics/sim/AABBTree.h>
 
 #include <cbang/log/Logger.h>
 
@@ -37,23 +37,23 @@ GridTree::GridTree(const Grid &grid) :
 GridTree::~GridTree() {}
 
 
-void GridTree::partition(vector<GridTreeRef> &grids, const Rectangle3R &bbox,
+void GridTree::partition(vector<GridTreeRef> &grids, const cb::Rectangle3D &bbox,
                          unsigned count) {
-  Rectangle3R bounds = getBounds();
+  cb::Rectangle3D bounds = getBounds();
   if (isEmpty() || !bbox.intersects(bounds)) return;
 
   if (count < 2) {
-    Vector3U offset;
-    Vector3U steps(getSteps());
+    cb::Vector3U offset;
+    cb::Vector3U steps(getSteps());
 
-    Rectangle3R intersection = bbox.intersection(bounds);
+    cb::Rectangle3D intersection = bbox.intersection(bounds);
     if (intersection != bounds) {
       intersection = (intersection - getOffset()) / getResolution();
 
-      Rectangle3U iBounds(intersection.rmin.floor(),
+      cb::Rectangle3U iBounds(intersection.rmin.floor(),
                           intersection.rmax.ceil());
       offset = iBounds.rmin;
-      Vector3U dims = iBounds.getDimensions();
+      cb::Vector3U dims = iBounds.getDimensions();
 
       // Don't let new steps exceed old
       for (unsigned i = 0; i < 3; i++)
@@ -75,6 +75,6 @@ void GridTree::partition(vector<GridTreeRef> &grids, const Rectangle3R &bbox,
 }
 
 
-void GridTree::insertLeaf(GridTreeLeaf *leaf, const Vector3U &offset) {
+void GridTree::insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset) {
   GridTreeNode::insertLeaf(leaf, getSteps(), offset);
 }

@@ -31,10 +31,10 @@ void SliceContourGenerator::run(FieldFunction &func, GridTreeRef &grid) {
   unsigned totalCells = grid.getTotalCells();
 
   // Compute slices
-  const Vector3U &steps = grid.getSteps();
+  const cb::Vector3U &steps = grid.getSteps();
   CubeSlice slice(grid);
   double resolution = grid.getResolution();
-  Vector3R p;
+  cb::Vector3D p;
 
   for (unsigned z = 0; !shouldQuit() && z < steps.z(); z++) {
     p.z() = grid.getOffset().z() + resolution * z;

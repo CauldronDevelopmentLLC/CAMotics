@@ -19,16 +19,16 @@
 \******************************************************************************/
 
 #include <camotics/CommandLineApp.h>
-#include <camotics/cutsim/ToolPath.h>
-#include <camotics/gcode/Interpreter.h>
-#include <camotics/gcode/Printer.h>
-#include <camotics/gcode/Parser.h>
+#include <gcode/ToolPath.h>
+#include <gcode/interp/Interpreter.h>
+#include <gcode/Printer.h>
+#include <gcode/parse/Parser.h>
 
-#include <camotics/machine/MachinePipeline.h>
-#include <camotics/machine/MachineState.h>
-#include <camotics/machine/MachineLinearizer.h>
-#include <camotics/machine/MachineUnitAdapter.h>
-#include <camotics/machine/GCodeMachine.h>
+#include <gcode/machine/MachinePipeline.h>
+#include <gcode/machine/MachineState.h>
+#include <gcode/machine/MachineLinearizer.h>
+#include <gcode/machine/MachineUnitAdapter.h>
+#include <gcode/machine/GCodeMachine.h>
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
@@ -37,60 +37,59 @@
 
 using namespace std;
 using namespace cb;
-using namespace CAMotics;
+using namespace GCode;
 
 
-namespace CAMotics {
-  class GCodeTool : public CommandLineApp {
-    MachinePipeline pipeline;
-    SmartPointer<Controller> controller;
+class GCodeTool : public CAMotics::CommandLineApp {
+  MachinePipeline pipeline;
+  SmartPointer<Controller> controller;
 
-    bool linearize;
-    bool parseOnly;
+  bool linearize;
+  bool parseOnly;
 
-  public:
-    GCodeTool() :
-      CommandLineApp("CAMotics GCode Tool"), linearize(true), parseOnly(false) {
+public:
+  GCodeTool() :
+    CAMotics::CommandLineApp("CAMotics GCode Tool"), linearize(true),
+    parseOnly(false) {
 
-      cmdLine.addTarget("linearize", linearize,
-                        "Convert all moves to straight line movements.");
-      cmdLine.addTarget("parse", parseOnly,
-                        "Only parse the GCode, don't evaluate it.");
+    cmdLine.addTarget("linearize", linearize,
+                      "Convert all moves to straight line movements.");
+    cmdLine.addTarget("parse", parseOnly,
+                      "Only parse the GCode, don't evaluate it.");
+  }
+
+
+  // From Application
+  void run() {
+    if (!parseOnly) {
+      pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
+      if (linearize) pipeline.add(new MachineLinearizer);
+      pipeline.add(new GCodeMachine(*stream, outputUnits));
+      pipeline.add(new MachineState);
+
+      controller = new Controller(pipeline);
     }
 
+    Application::run();
+    cout << flush;
+  }
 
-    // From Application
-    void run() {
-      if (!parseOnly) {
-        pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
-        if (linearize) pipeline.add(new MachineLinearizer);
-        pipeline.add(new GCodeMachine(*stream, outputUnits));
-        pipeline.add(new MachineState);
 
-        controller = new Controller(pipeline);
-      }
+  // From cb::Reader
+  void read(const InputSource &source) {
+    if (parseOnly) {
+      Printer printer(*stream);
+      Parser().parse(source, printer);
 
-      Application::run();
-      cout << flush;
+    } else {
+      pipeline.start();
+      Interpreter(*controller).read(source);
+      pipeline.end();
     }
-
-
-    // From cb::Reader
-    void read(const InputSource &source) {
-      if (parseOnly) {
-        Printer printer(*stream);
-        Parser().parse(source, printer);
-
-      } else {
-        pipeline.start();
-        Interpreter(*controller).read(source);
-        pipeline.end();
-      }
-    }
-  };
-}
+  }
+};
 
 
 int main(int argc, char *argv[]) {
-  return doApplication<CAMotics::GCodeTool>(argc, argv);
+  return doApplication<GCodeTool>(argc, argv);
 }

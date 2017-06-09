@@ -28,7 +28,7 @@ ToolScene::ToolScene() {
 }
 
 
-void ToolScene::update(const Tool &tool, const QSize &size) {
+void ToolScene::update(const GCode::Tool &tool, const QSize &size) {
   QGraphicsScene::setSceneRect(0, 0, size.width(), size.height());
   item.update(tool, size);
   QGraphicsScene::update();

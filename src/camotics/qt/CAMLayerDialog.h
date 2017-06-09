@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <camotics/sim/ToolUnits.h>
+#include <gcode/ToolUnits.h>
 #include <camotics/cam/CAMLayer.h>
 
 #include <cbang/SmartPointer.h>
@@ -42,7 +42,7 @@ namespace CAMotics {
     CAMLayerDialog(QWidget *parent);
 
     void setLayers(const std::vector<std::string> &layers);
-    void setUnits(ToolUnits units);
+    void setUnits(GCode::ToolUnits units);
 
     CAMLayer getLayer() const;
     void setLayer(const CAMLayer &layer);

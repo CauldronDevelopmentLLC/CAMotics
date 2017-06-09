@@ -19,9 +19,9 @@
 \******************************************************************************/
 
 #include <camotics/Application.h>
-#include <camotics/cutsim/CutSim.h>
-#include <camotics/cutsim/Project.h>
-#include <camotics/stl/STLWriter.h>
+#include <camotics/sim/CutSim.h>
+#include <camotics/sim/Project.h>
+#include <stl/Writer.h>
 #include <camotics/contour/Surface.h>
 
 #include <cbang/Exception.h>

@@ -20,7 +20,7 @@
 
 #include "CAMDialog.h"
 
-#include <camotics/dxf/DXFReader.h>
+#include <dxf/Reader.h>
 
 #include <cbang/log/Logger.h>
 
@@ -42,15 +42,15 @@ CAMDialog::CAMDialog(QWidget *parent) :
 
 
 void CAMDialog::loadDXFLayers(const string &filename) {
-  DXFReader reader;
+  DXF::Reader reader;
   reader.read(filename);
 
-  const DXFReader::layers_t &layers = reader.getLayers();
+  const DXF::Reader::layers_t &layers = reader.getLayers();
 
   if (layers.empty()) THROW("DXF file has no layers");
 
   vector<string> names;
-  DXFReader::layers_t::const_iterator it;
+  DXF::Reader::layers_t::const_iterator it;
   for (it = layers.begin(); it != layers.end(); it++)
     names.push_back(it->first);
 
@@ -58,8 +58,8 @@ void CAMDialog::loadDXFLayers(const string &filename) {
 }
 
 
-void CAMDialog::setUnits(ToolUnits units) {
-  bool metric = units == ToolUnits::UNITS_MM;
+void CAMDialog::setUnits(GCode::ToolUnits units) {
+  bool metric = units == GCode::ToolUnits::UNITS_MM;
 
   ui->xTranslateDoubleSpinBox->setSuffix(metric ? " mm" : " in");
   ui->yTranslateDoubleSpinBox->setSuffix(metric ? " mm" : " in");

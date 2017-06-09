@@ -23,16 +23,16 @@
 
 #include "ui_camotics.h"
 
-#include <camotics/Geom.h>
 #include <camotics/view/Viewer.h>
-#include <camotics/cutsim/Project.h>
-#include <camotics/cutsim/SimulationRun.h>
-#include <camotics/cutsim/CutWorkpiece.h>
-#include <camotics/stl/STLWriter.h>
-#include <camotics/cutsim/ToolPathTask.h>
-#include <camotics/cutsim/SurfaceTask.h>
-#include <camotics/cutsim/ReduceTask.h>
+#include <camotics/sim/Project.h>
+#include <camotics/sim/SimulationRun.h>
+#include <camotics/sim/CutWorkpiece.h>
+#include <camotics/sim/ToolPathTask.h>
+#include <camotics/sim/SurfaceTask.h>
+#include <camotics/sim/ReduceTask.h>
 #include <camotics/opt/Opt.h>
+
+#include <stl/Writer.h>
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>
@@ -233,15 +233,15 @@ void QtWin::init() {
 }
 
 
-void QtWin::setUnitLabel(QLabel *label, real value, int precision,
+void QtWin::setUnitLabel(QLabel *label, double value, int precision,
                          bool withUnit) {
-  if (std::numeric_limits<real>::max() == abs(value) || Math::isinf(value) ||
+  if (std::numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
       Math::isnan(value)) {
     label->setText("nan");
     return;
   }
 
-  real scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
   label->setText(QString().sprintf("%.*f%s", precision, value * scale,
                                    withUnit ? (isMetric() ? "mm" : "in") : ""));
 }
@@ -508,7 +508,7 @@ void QtWin::warning(const string &msg) {
 }
 
 
-void QtWin::loadToolPath(const SmartPointer<ToolPath> &toolPath,
+void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
                          bool simulate) {
   this->toolPath = toolPath;
 
@@ -801,18 +801,18 @@ bool QtWin::runNewProjectDialog() {
 }
 
 
-ToolTable QtWin::getNewToolTable() {
+GCode::ToolTable QtWin::getNewToolTable() {
   if (newProjectDialog.defaultToolTableSelected())
     return loadDefaultToolTable();
 
   if (newProjectDialog.currentToolTableSelected())
-    return project.isNull() ? ToolTable() : project->getToolTable();
+    return project.isNull() ? GCode::ToolTable() : project->getToolTable();
 
-  return ToolTable();
+  return GCode::ToolTable();
 }
 
 
-ToolUnits QtWin::getNewUnits() {return newProjectDialog.getUnits();}
+GCode::ToolUnits QtWin::getNewUnits() {return newProjectDialog.getUnits();}
 
 
 bool QtWin::runCAMDialog(const string &filename) {
@@ -858,8 +858,8 @@ void QtWin::newProject() {
   if (!runNewProjectDialog()) return;
 
   // Save tool table before resetting project
-  ToolTable toolTable = getNewToolTable();
-  ToolUnits units = getNewUnits();
+  GCode::ToolTable toolTable = getNewToolTable();
+  GCode::ToolUnits units = getNewUnits();
 
   // Create new project
   resetProject();
@@ -990,8 +990,8 @@ void QtWin::openProject(const string &_filename) {
         if (!runCAMDialog(filename)) return;
 
       // Save tool table before resetting project
-      ToolTable toolTable = getNewToolTable();
-      ToolUnits units = getNewUnits();
+      GCode::ToolTable toolTable = getNewToolTable();
+      GCode::ToolUnits units = getNewUnits();
 
       project = new Project(options);
       project->addFile(filename);
@@ -1057,8 +1057,8 @@ bool QtWin::isMetric() const {
 }
 
 
-ToolUnits QtWin::getDefaultUnits() const {
-  return (ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
+GCode::ToolUnits QtWin::getDefaultUnits() const {
+  return (GCode::ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
 }
 
 
@@ -1193,11 +1193,11 @@ void QtWin::updateUnits() {
 
 
 void QtWin::updateToolTables() {
-  ToolTable tools;
+  GCode::ToolTable tools;
   if (!project.isNull()) tools = project->getToolTable();
 
   QStringList list;
-  for (ToolTable::iterator it = tools.begin(); it != tools.end(); it++)
+  for (GCode::ToolTable::iterator it = tools.begin(); it != tools.end(); it++)
     list.append
       (QString().sprintf("%d: %s", it->first, it->second.getText().c_str()));
 
@@ -1214,14 +1214,14 @@ void QtWin::toolsChanged() {
 void QtWin::editTool(unsigned number) {
   if (project.isNull()) return;
 
-  ToolTable &tools = project->getToolTable();
+  GCode::ToolTable &tools = project->getToolTable();
 
   if (tools.has(number)) toolDialog.setTool(tools.get(number));
   else toolDialog.getTool().setNumber(number);
 
   if (toolDialog.edit() != QDialog::Accepted) return;
 
-  Tool &tool = toolDialog.getTool();
+  GCode::Tool &tool = toolDialog.getTool();
 
   if (tool.getNumber() != number) {
     if (tools.has(tool.getNumber())) {
@@ -1244,7 +1244,7 @@ void QtWin::editTool(unsigned number) {
 
 void QtWin::addTool() {
   if (project.isNull()) return;
-  ToolTable &tools = project->getToolTable();
+  GCode::ToolTable &tools = project->getToolTable();
 
   for (unsigned i = 1; i < 1000; i++)
     if (!tools.has(i)) {
@@ -1264,13 +1264,13 @@ void QtWin::removeTool(unsigned number) {
 
 void QtWin::exportToolTable() {
   if (project.isNull()) return;
-  const ToolTable &tools = project->getToolTable();
+  const GCode::ToolTable &tools = project->getToolTable();
 
   string filename =
     SystemUtilities::dirname(project->getFilename()) + "/tools.json";
 
-  filename =
-    openFile("Export tool table", "Tool table files (*.json)", filename, true);
+  filename = openFile("Export tool table", "Tool table files (*.json)",
+                      filename, true);
 
   if (filename.empty()) return;
 
@@ -1286,7 +1286,7 @@ void QtWin::importToolTable() {
 
   if (filename.empty()) return;
 
-  ToolTable tools;
+  GCode::ToolTable tools;
   *SystemUtilities::iopen(filename) >> tools;
 
   if (tools.empty()) {
@@ -1299,7 +1299,7 @@ void QtWin::importToolTable() {
 }
 
 
-void QtWin::saveDefaultToolTable(const ToolTable &tools) {
+void QtWin::saveDefaultToolTable(const GCode::ToolTable &tools) {
   ostringstream str;
   str << tools << flush;
 
@@ -1310,11 +1310,11 @@ void QtWin::saveDefaultToolTable(const ToolTable &tools) {
 }
 
 
-ToolTable QtWin::loadDefaultToolTable() {
+GCode::ToolTable QtWin::loadDefaultToolTable() {
   QSettings settings;
   QByteArray data = settings.value("ToolTable/Default").toString().toUtf8();
 
-  ToolTable tools;
+  GCode::ToolTable tools;
 
   if (!data.isEmpty()) {
     istringstream str(data.data());
@@ -1339,8 +1339,8 @@ void QtWin::loadWorkpiece() {
   ui->marginDoubleSpinBox->setValue(project->getWorkpieceMargin());
 
   // Bounds
-  real scale = isMetric() ? 1 : 1 / 25.4;
-  Rectangle3R bounds = project->getWorkpieceBounds();
+  double scale = isMetric() ? 1 : 1 / 25.4;
+  cb::Rectangle3D bounds = project->getWorkpieceBounds();
   ui->xDimDoubleSpinBox->setValue(bounds.getDimensions().x() * scale);
   ui->yDimDoubleSpinBox->setValue(bounds.getDimensions().y() * scale);
   ui->zDimDoubleSpinBox->setValue(bounds.getDimensions().z() * scale);
@@ -1348,7 +1348,7 @@ void QtWin::loadWorkpiece() {
   ui->yOffsetDoubleSpinBox->setValue(bounds.getMin().y() * scale);
   ui->zOffsetDoubleSpinBox->setValue(bounds.getMin().z() * scale);
 
-  // Units
+  // GCode::Units
   const char *suffix = isMetric() ? "mm" : "in";
   ui->xDimDoubleSpinBox->setSuffix(suffix);
   ui->yDimDoubleSpinBox->setSuffix(suffix);
@@ -1358,7 +1358,7 @@ void QtWin::loadWorkpiece() {
   ui->zOffsetDoubleSpinBox->setSuffix(suffix);
 
   // Update Workpiece steps
-  real step = isMetric() ? 1 : 0.125;
+  double step = isMetric() ? 1 : 0.125;
   ui->xDimDoubleSpinBox->setSingleStep(step);
   ui->yDimDoubleSpinBox->setSingleStep(step);
   ui->zDimDoubleSpinBox->setSingleStep(step);
@@ -1370,9 +1370,9 @@ void QtWin::loadWorkpiece() {
 }
 
 
-void QtWin::setWorkpieceDim(unsigned dim, real value) {
-  real scale = isMetric() ? 1 : 25.4;
-  Rectangle3R bounds = project->getWorkpieceBounds();
+void QtWin::setWorkpieceDim(unsigned dim, double value) {
+  double scale = isMetric() ? 1 : 25.4;
+  cb::Rectangle3D bounds = project->getWorkpieceBounds();
   bounds.rmax[dim] = bounds.rmin[dim] + value * scale;
   project->setWorkpieceBounds(bounds);
 
@@ -1381,9 +1381,9 @@ void QtWin::setWorkpieceDim(unsigned dim, real value) {
 }
 
 
-void QtWin::setWorkpieceOffset(unsigned dim, real value) {
-  real scale = isMetric() ? 1 : 25.4;
-  Rectangle3R bounds = project->getWorkpieceBounds();
+void QtWin::setWorkpieceOffset(unsigned dim, double value) {
+  double scale = isMetric() ? 1 : 25.4;
+  cb::Rectangle3D bounds = project->getWorkpieceBounds();
   bounds.rmax[dim] = bounds.getDimension(dim) + value * scale;
   bounds.rmin[dim] = value * scale;
   project->setWorkpieceBounds(bounds);
@@ -1400,10 +1400,10 @@ void QtWin::updateBounds() {
 
 
 void QtWin::updateToolPathBounds() {
-  Rectangle3R bounds = *toolPath;
-  Vector3R bMin = bounds.getMin();
-  Vector3R bMax = bounds.getMax();
-  Vector3R bDim = bounds.getDimensions();
+  cb::Rectangle3D bounds = *toolPath;
+  cb::Vector3D bMin = bounds.getMin();
+  cb::Vector3D bMax = bounds.getMax();
+  cb::Vector3D bDim = bounds.getDimensions();
 
   setUnitLabel(ui->toolPathBoundsXMinLabel, bMin.x());
   setUnitLabel(ui->toolPathBoundsXMaxLabel, bMax.x());
@@ -1422,10 +1422,10 @@ void QtWin::updateToolPathBounds() {
 void QtWin::updateWorkpieceBounds() {
   if (project.isNull()) return;
 
-  Rectangle3R bounds = project->getWorkpieceBounds();
-  Vector3R bMin = bounds.getMin();
-  Vector3R bMax = bounds.getMax();
-  Vector3R bDim = bounds.getDimensions();
+  cb::Rectangle3D bounds = project->getWorkpieceBounds();
+  cb::Vector3D bMin = bounds.getMin();
+  cb::Vector3D bMax = bounds.getMax();
+  cb::Vector3D bDim = bounds.getDimensions();
 
   setUnitLabel(ui->workpieceBoundsXMinLabel, bMin.x());
   setUnitLabel(ui->workpieceBoundsXMaxLabel, bMax.x());
@@ -1499,17 +1499,17 @@ void QtWin::updateTimeRatio(const string &name, double ratio) {
 }
 
 
-void QtWin::updateX(const string &name, real value) {
+void QtWin::updateX(const string &name, double value) {
   setUnitLabel(ui->xLabel, value, isMetric() ? 4 : 5, true);
 }
 
 
-void QtWin::updateY(const string &name, real value) {
+void QtWin::updateY(const string &name, double value) {
   setUnitLabel(ui->yLabel, value, isMetric() ? 4 : 5, true);
 }
 
 
-void QtWin::updateZ(const string &name, real value) {
+void QtWin::updateZ(const string &name, double value) {
   setUnitLabel(ui->zLabel, value, isMetric() ? 4 : 5, true);
 }
 
@@ -1571,7 +1571,7 @@ void QtWin::updateFeed(const string &name, double value) {
 
 
 void QtWin::updateSpeed(const string &name, double value) {
-  if (std::numeric_limits<real>::max() == abs(value) || Math::isinf(value) ||
+  if (std::numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
       Math::isnan(value)) ui->speedLabel->setText("nan");
   else ui->speedLabel->setText(QString().sprintf("%.2f RPM", value));
 }

@@ -39,8 +39,8 @@ void CAMLayerDialog::setLayers(const vector<string> &layers) {
 }
 
 
-void CAMLayerDialog::setUnits(ToolUnits units) {
-  bool metric = units == ToolUnits::UNITS_MM;
+void CAMLayerDialog::setUnits(GCode::ToolUnits units) {
+  bool metric = units == GCode::ToolUnits::UNITS_MM;
 
   ui->feedSpinBox->setSuffix(metric ? " mm/min" : " in/min");
   ui->offsetDoubleSpinBox->setSuffix(metric ? " mm" : " in");

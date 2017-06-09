@@ -34,7 +34,7 @@ namespace CAMotics {
     GridTree(const Grid &grid);
     ~GridTree();
 
-    void partition(std::vector<GridTreeRef> &grids, const Rectangle3R &bbox,
+    void partition(std::vector<GridTreeRef> &grids, const cb::Rectangle3D &bbox,
                    unsigned count);
 
     using GridTreeNode::insertLeaf;

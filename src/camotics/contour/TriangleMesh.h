@@ -20,8 +20,7 @@
 
 #pragma once
 
-
-#include <camotics/Geom.h>
+#include <cbang/geom/Vector.h>
 
 #include <vector>
 #include <set>
@@ -38,15 +37,16 @@ namespace CAMotics {
     typedef std::set<Vertex *, VertexSort> VertexSet;
 
 
-    struct Vertex : Vector3R {
+    struct Vertex : cb::Vector3D {
       std::vector<Triangle *> triangles;
       bool deleted;
 
-      Vertex(const Vector3R &v) : Vector3R(v), deleted(false) {}
+      Vertex(const cb::Vector3D &v) : cb::Vector3D(v), deleted(false) {}
 
-      void set(const Vector3R &v);
+      void set(const cb::Vector3D &v);
       void findNeighbors(VertexSet &neighbors) const;
-      bool coplaner(const Vector3R &normal, double tolerance = 0.0001) const;
+      bool coplaner(const cb::Vector3D &normal,
+                    double tolerance = 0.0001) const;
       bool wouldFlip(Vertex &o);
     };
 
@@ -58,13 +58,13 @@ namespace CAMotics {
 
     struct Triangle {
       Vertex *vertices[3];
-      Vector3R normal;
+      cb::Vector3D normal;
       bool deleted;
 
       Triangle() : deleted(false) {vertices[0] = vertices[1] = vertices[2] = 0;}
 
 
-      Vector3R computeNormal() const;
+      cb::Vector3D computeNormal() const;
       void updateNormal();
 
       bool has(Vertex &v) const;

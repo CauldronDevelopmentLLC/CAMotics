@@ -20,30 +20,32 @@
 
 #pragma once
 
-
 #include "Edge.h"
 
-#include <camotics/Geom.h>
+#include <cbang/geom/Vector.h>
+#include <cbang/geom/Rectangle.h>
 
 #include <vector>
+
 
 namespace CAMotics {
   class FieldFunction {
   public:
     virtual ~FieldFunction() {} // Compiler needs this
 
-    Vector3R linearIntersect(Vector3R &a, real &aDepth, Vector3R &b,
-                             real &bDepth);
-    Vector3R findNormal(Vector3R &a, real aDepth, Vector3R &b, real bDepth);
-    bool contains(const Vector3R &p) const {return 0 <= depth(p);}
-    bool cull(const Vector3R &p, double offset) const;
+    cb::Vector3D linearIntersect(cb::Vector3D &a, double &aDepth,
+                                 cb::Vector3D &b, double &bDepth);
+    cb::Vector3D findNormal(cb::Vector3D &a, double aDepth, cb::Vector3D &b,
+                            double bDepth);
+    bool contains(const cb::Vector3D &p) const {return 0 <= depth(p);}
+    bool cull(const cb::Vector3D &p, double offset) const;
 
-    virtual bool cull(const Rectangle3R &r) const {return false;}
-    virtual real depth(const Vector3R &p) const = 0;
-    virtual Edge getEdge(const Vector3R &v1, real depth1,
-                         const Vector3R &v2, real depth2);
+    virtual bool cull(const cb::Rectangle3D &r) const {return false;}
+    virtual double depth(const cb::Vector3D &p) const = 0;
+    virtual Edge getEdge(const cb::Vector3D &v1, double depth1,
+                         const cb::Vector3D &v2, double depth2);
 
-    Edge getEdge(const Vector3R &v1, bool inside1,
-                 const Vector3R &v2, bool inside2);
+    Edge getEdge(const cb::Vector3D &v1, bool inside1,
+                 const cb::Vector3D &v2, bool inside2);
   };
 }

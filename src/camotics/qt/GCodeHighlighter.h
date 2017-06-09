@@ -53,13 +53,13 @@
 
 #include "Highlighter.h"
 
-#include <camotics/gcode/Tokenizer.h>
+#include <gcode/parse/Tokenizer.h>
 
+
+namespace GCode {class Tokenizer;}
 
 namespace CAMotics {
-  class Tokenizer;
-
-  class GCodeHighlighter : public Highlighter {
+  class GCodeHighlighter : public Highlighter, public GCode::TokenType  {
     QSet<QString> ops;
     QSet<QString> functions;
     QSet<QString> ocodes;
@@ -67,7 +67,7 @@ namespace CAMotics {
   public:
     GCodeHighlighter(QTextDocument *parent = 0);
 
-    typedef Tokenizer::Token_T Token;
+    typedef GCode::Tokenizer::Token_T Token;
     using Highlighter::setFormat;
     void setFormat(const Token &start, const Token &end, ColorComponent cc);
     void setFormat(const Token &token, ColorComponent cc);
@@ -76,20 +76,20 @@ namespace CAMotics {
     // From QSyntaxHighlighter
     void highlightBlock(const QString &text);
 
-    void comment(Tokenizer &tokenizer);
-    void word(Tokenizer &tokenizer);
-    void assign(Tokenizer &tokenizer);
-    void ocode(Tokenizer &tokenizer);
+    void comment(GCode::Tokenizer &tokenizer);
+    void word(GCode::Tokenizer &tokenizer);
+    void assign(GCode::Tokenizer &tokenizer);
+    void ocode(GCode::Tokenizer &tokenizer);
 
-    void numberRefOrExpr(Tokenizer &tokenizer);
-    void expression(Tokenizer &tokenizer);
-    void unaryOp(Tokenizer &tokenizer);
+    void numberRefOrExpr(GCode::Tokenizer &tokenizer);
+    void expression(GCode::Tokenizer &tokenizer);
+    void unaryOp(GCode::Tokenizer &tokenizer);
 
-    void primary(Tokenizer &tokenizer);
+    void primary(GCode::Tokenizer &tokenizer);
 
-    void quotedExpr(Tokenizer &tokenizer);
-    void functionCall(Tokenizer &tokenizer);
-    void number(Tokenizer &tokenizer);
-    void reference(Tokenizer &tokenizer);
+    void quotedExpr(GCode::Tokenizer &tokenizer);
+    void functionCall(GCode::Tokenizer &tokenizer);
+    void number(GCode::Tokenizer &tokenizer);
+    void reference(GCode::Tokenizer &tokenizer);
   };
 }

@@ -33,12 +33,12 @@ VertexSlice::VertexSlice(const GridTreeRef &grid, unsigned z) :
 
 void VertexSlice::compute(FieldFunction &func) {
   // Allocate space
-  const Vector3U &steps = grid.getSteps();
+  const cb::Vector3U &steps = grid.getSteps();
   resize(steps.x() + 1,
-         vector<real>(steps.y() + 1, -numeric_limits<real>::max()));
+         vector<double>(steps.y() + 1, -numeric_limits<double>::max()));
 
   double resolution = grid.getResolution();
-  Vector3R p = Vector3R(0, 0, grid.getOffset().z() + resolution * z);
+  cb::Vector3D p = cb::Vector3D(0, 0, grid.getOffset().z() + resolution * z);
 
   for (unsigned x = 0; x <= steps.x(); x++) {
     p.x() = grid.getOffset().x() + resolution * x;

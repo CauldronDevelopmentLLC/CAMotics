@@ -34,7 +34,6 @@
 #include "ConnectDialog.h"
 #include "BBCtrlAPI.h"
 
-#include <camotics/Real.h>
 #include <camotics/ConcurrentTaskManager.h>
 #include <camotics/view/View.h>
 #include <camotics/view/ToolView.h>
@@ -57,6 +56,7 @@
 
 namespace cb {class Application;}
 namespace Ui {class CAMoticsWindow;}
+namespace GCode {class ToolPath;}
 class QMdiSubWindow;
 
 
@@ -65,7 +65,6 @@ namespace CAMotics {
   class Project;
   class Simulation;
   class SimulationRun;
-  class ToolPath;
   class CutWorkpiece;
   class ConsoleWriter;
   class ToolPathTask;
@@ -110,7 +109,7 @@ namespace CAMotics {
     cb::SmartPointer<SimulationRun> simRun;
     cb::SmartPointer<View> view;
     cb::SmartPointer<Viewer> viewer;
-    cb::SmartPointer<ToolPath> toolPath;
+    cb::SmartPointer<GCode::ToolPath> toolPath;
     cb::SmartPointer<std::vector<char> > gcode;
     cb::SmartPointer<Surface> surface;
 
@@ -142,7 +141,7 @@ namespace CAMotics {
     void setAutoClose(bool x = true) {autoClose = x;}
 
     void init();
-    void setUnitLabel(QLabel *label, real value, int precision = 2,
+    void setUnitLabel(QLabel *label, double value, int precision = 2,
                       bool withUnit = false);
 
     void loadDefaultExample();
@@ -171,7 +170,7 @@ namespace CAMotics {
     void message(const std::string &msg);
     void warning(const std::string &msg);
 
-    void loadToolPath(const cb::SmartPointer<ToolPath> &toolPath,
+    void loadToolPath(const cb::SmartPointer<GCode::ToolPath> &toolPath,
                       bool simulate);
 
     void toolPathComplete(ToolPathTask &task);
@@ -191,8 +190,8 @@ namespace CAMotics {
     void exportData();
 
     bool runNewProjectDialog();
-    ToolTable getNewToolTable();
-    ToolUnits getNewUnits();
+    GCode::ToolTable getNewToolTable();
+    GCode::ToolUnits getNewUnits();
 
     bool runCAMDialog(const std::string &filename);
 
@@ -208,7 +207,7 @@ namespace CAMotics {
     bool saveProject(bool saveas = false);
     void revertProject();
     bool isMetric() const;
-    ToolUnits getDefaultUnits() const;
+    GCode::ToolUnits getDefaultUnits() const;
 
     void updateFiles();
     void newFile(bool tpl);
@@ -228,13 +227,13 @@ namespace CAMotics {
     void removeTool(unsigned number);
     void exportToolTable();
     void importToolTable();
-    void saveDefaultToolTable(const ToolTable &tools);
-    ToolTable loadDefaultToolTable();
+    void saveDefaultToolTable(const GCode::ToolTable &tools);
+    GCode::ToolTable loadDefaultToolTable();
 
     void updateWorkpiece();
     void loadWorkpiece();
-    void setWorkpieceDim(unsigned dim, real value);
-    void setWorkpieceOffset(unsigned dim, real value);
+    void setWorkpieceDim(unsigned dim, double value);
+    void setWorkpieceOffset(unsigned dim, double value);
 
     void updateBounds();
     void updateToolPathBounds();
@@ -252,9 +251,9 @@ namespace CAMotics {
     void updatePlayDirection(const std::string &name, bool reverse);
     void updateTimeRatio(const std::string &name, double ratio);
 
-    void updateX(const std::string &name, real value);
-    void updateY(const std::string &name, real value);
-    void updateZ(const std::string &name, real value);
+    void updateX(const std::string &name, double value);
+    void updateY(const std::string &name, double value);
+    void updateZ(const std::string &name, double value);
 
     void updateCurrentTime(const std::string &name, double value);
     void updateCurrentDistance(const std::string &name, double value);

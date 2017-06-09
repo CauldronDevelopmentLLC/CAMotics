@@ -46,7 +46,7 @@ QtApp::QtApp(QWidget *parent) :
   options.add("auto-close", "Automatically exit after tool path playback is "
               "complete.  Only valid with 'auto-play'")
     ->setDefault(false);
-  options.addTarget("threads", threads, "Number of simulation threads.");
+  options.addTarget("threads", threads, "GCode::Number of simulation threads.");
 
   // Configure Logger
   Logger &logger = Logger::instance();

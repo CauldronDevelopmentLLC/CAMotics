@@ -21,8 +21,8 @@
 #include "STLModule.h"
 #include "TPLContext.h"
 
-#include <camotics/stl/STLReader.h>
-#include <camotics/stl/Facet.h>
+#include <stl/Reader.h>
+#include <stl/Facet.h>
 
 #include <cbang/io/InputSource.h>
 #include <cbang/os/SystemUtilities.h>
@@ -52,7 +52,7 @@ namespace {
   }
 
 
-  bool findSegment(float level, const CAMotics::Facet &f, Vector2F &p1,
+  bool findSegment(float level, const STL::Facet &f, Vector2F &p1,
                    Vector2F &p2) {
     // skip facets that lay on the "level" plane
     if (f[0].z() == level && f[1].z() == level && f[2].z() == level)
@@ -153,9 +153,9 @@ namespace {
   }
 
 
-  void readFacets(vector<CAMotics::Facet> &out, const js::Value &in) {
+  void readFacets(vector<STL::Facet> &out, const js::Value &in) {
     unsigned length = in.length();
-    CAMotics::Facet f;
+    STL::Facet f;
 
     for (unsigned i = 0; i < length; i++) {
       SmartPointer<js::Value> facet = in.get(i);
@@ -170,14 +170,14 @@ namespace {
   }
 
 
-  void contourLevel(js::Sink &sink, const vector<CAMotics::Facet> &facets,
+  void contourLevel(js::Sink &sink, const vector<STL::Facet> &facets,
                     float level) {
     // Find segments
     typedef list<Segment2F> segments_t;
     segments_t segments;
 
     for (unsigned i = 0; i < facets.size(); i++) {
-      const CAMotics::Facet &f = facets[i];
+      const STL::Facet &f = facets[i];
       Vector2F p1, p2;
 
       if ((level < f[0].z() && level < f[1].z() && level < f[2].z()) ||
@@ -279,7 +279,7 @@ void STLModule::define(js::Sink &exports) {
 
 void STLModule::open(const js::Value &args, js::Sink &sink) {
   // Read STL
-  CAMotics::STLReader reader(ctx.relativePath(args.getString("path")));
+  STL::Reader reader(ctx.relativePath(args.getString("path")));
 
   // Header
   string name;
@@ -360,7 +360,7 @@ void STLModule::bounds(const js::Value &args, js::Sink &sink) {
  */
 void STLModule::contour(const js::Value &args, js::Sink &sink) {
   // Read facets
-  vector<CAMotics::Facet> facets;
+  vector<STL::Facet> facets;
   readFacets(facets, *args.get("stl")->get("facets"));
 
   // Process one level

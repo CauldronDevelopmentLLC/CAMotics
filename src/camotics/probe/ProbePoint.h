@@ -20,8 +20,8 @@
 
 #pragma once
 
+#include <cbang/geom/Vector.h>
 
-#include <camotics/Geom.h>
 
 namespace CAMotics {
   class ProbePoint : public cb::Vector2D {

@@ -23,15 +23,14 @@
 
 #include "Path.h"
 
-#include <camotics/Geom.h>
 #include <camotics/Task.h>
-#include <camotics/sim/ToolTable.h>
+#include <gcode/ToolTable.h>
+#include <gcode/ToolPath.h>
 
 #include <cbang/SmartPointer.h>
 
 
 namespace CAMotics {
-  class ToolPath;
   class AnnealState;
 
   class Opt : public Task {
@@ -41,7 +40,7 @@ namespace CAMotics {
     paths_t paths;
 
     unsigned iterations; ///< Iterations per annealing round
-    unsigned runs;       ///< Number of optimization runs
+    unsigned runs;       ///< GCode::Number of optimization runs
     double heatTarget;   ///< Stop heating the system when the average cost
                          ///< reaches this ratio of the starting cost, after a
                          ///< brief greedy optimization
@@ -54,22 +53,22 @@ namespace CAMotics {
     unsigned timeout;    ///< Stop opt if no improvement in this many seconds
     double zSafe;        ///< Safe Z height
 
-    ToolTable tools;
-    cb::SmartPointer<ToolPath> path;
+    GCode::ToolTable tools;
+    cb::SmartPointer<GCode::ToolPath> path;
 
   public:
-    Opt(const ToolPath &path);
+    Opt(const GCode::ToolPath &path);
 
-    const cb::SmartPointer<ToolPath> &getPath() const {return path;}
+    const cb::SmartPointer<GCode::ToolPath> &getPath() const {return path;}
 
     // From Task
     void run();
 
     double computeCost() const;
 
-    void add(const Move &move);
+    void add(const GCode::Move &move);
     double optimize();
-    void extract(ToolPath &path) const;
+    void extract(GCode::ToolPath &path) const;
 
   protected:
     double round(double T, unsigned iterations, AnnealState &current,

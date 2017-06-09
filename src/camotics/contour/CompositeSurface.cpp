@@ -57,8 +57,8 @@ uint64_t CompositeSurface::getCount() const {
 }
 
 
-Rectangle3R CompositeSurface::getBounds() const {
-  Rectangle3R bounds;
+cb::Rectangle3D CompositeSurface::getBounds() const {
+  cb::Rectangle3D bounds;
   for (unsigned i = 0; i < surfaces.size(); i++)
     bounds.add(surfaces[i]->getBounds());
   return bounds;
@@ -70,7 +70,7 @@ void CompositeSurface::draw(bool withVBOs) {
 }
 
 
-void CompositeSurface::write(STLSink &sink, Task *task) const {
+void CompositeSurface::write(STL::Sink &sink, Task *task) const {
   for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->write(sink, task);
 }
 

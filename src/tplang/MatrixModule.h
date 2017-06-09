@@ -21,8 +21,8 @@
 #pragma once
 
 
-#include <camotics/machine/MachineMatrix.h>
-#include <camotics/machine/MachineEnum.h>
+#include <gcode/machine/MachineMatrix.h>
+#include <gcode/machine/MachineEnum.h>
 
 #include <cbang/js/NativeModule.h>
 
@@ -31,9 +31,9 @@ namespace tplang {
   class TPLContext;
 
   class MatrixModule :
-    public cb::js::NativeModule, public CAMotics::MachineEnum {
+    public cb::js::NativeModule, public GCode::MachineEnum {
     TPLContext &ctx;
-    CAMotics::MachineMatrix *matrix;
+    GCode::MachineMatrix *matrix;
 
   public:
     MatrixModule(TPLContext &ctx);
@@ -41,7 +41,7 @@ namespace tplang {
     // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
-    CAMotics::MachineMatrix &getMatrix();
+    GCode::MachineMatrix &getMatrix();
 
     // Javascript call backs
     void pushMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);

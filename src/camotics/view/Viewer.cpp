@@ -24,8 +24,8 @@
 #include "GL.h"
 #include "BoundsView.h"
 
-#include <camotics/sim/ToolTable.h>
-#include <camotics/cutsim/MoveLookup.h>
+#include <gcode/ToolTable.h>
+#include <camotics/sim/MoveLookup.h>
 
 #include <cbang/String.h>
 #include <cbang/Math.h>
@@ -71,7 +71,7 @@ void Viewer::draw(const View &view) {
   SmartPointer<Surface> surface = view.surface;
 
   // Setup view port
-  Rectangle3R bounds = view.path->getBounds();
+  cb::Rectangle3D bounds = view.path->getBounds();
   if (!surface.isNull()) bounds.add(surface->getBounds());
   bounds.add(view.workpiece->getBounds());
   view.glDraw(bounds);
@@ -88,7 +88,7 @@ void Viewer::draw(const View &view) {
     BoundsView(view.workpiece->getBounds()).draw();
   }
 
-  // Tool path
+  // GCode::Tool path
   if (view.isFlagSet(View::SHOW_PATH_FLAG)) view.path->draw();
   else view.path->update();
 
@@ -119,27 +119,27 @@ void Viewer::draw(const View &view) {
   if (view.isFlagSet(View::SHOW_BBTREE_FLAG) && !view.moveLookup.isNull())
     view.moveLookup->draw(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
-  // Tool
+  // GCode::Tool
   if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->isEmpty()) {
-    const ToolTable &tools = view.path->getPath()->getTools();
-    const Move &move = view.path->getMove();
+    const GCode::ToolTable &tools = view.path->getPath()->getTools();
+    const GCode::Move &move = view.path->getMove();
     int toolID = move.getTool();
 
     if (tools.has(toolID)) {
-      const Tool &tool = tools.get(toolID);
+      const GCode::Tool &tool = tools.get(toolID);
       double diameter = tool.getDiameter();
       double radius = tool.getRadius();
       double length = tool.getLength();
-      ToolShape shape = tool.getShape();
+      GCode::ToolShape shape = tool.getShape();
 
-      Vector3R currentPosition = view.path->getPosition();
+      cb::Vector3D currentPosition = view.path->getPosition();
       glTranslatef(currentPosition.x(), currentPosition.y(),
                    currentPosition.z());
 
       if (radius <= 0) {
         // Default tool specs
         radius = 25.4 / 8;
-        shape = ToolShape::TS_CONICAL;
+        shape = GCode::ToolShape::TS_CONICAL;
 
         glColor4f(1, 0, 0, 1); // Red
 
@@ -148,7 +148,7 @@ void Viewer::draw(const View &view) {
       if (length <= 0) length = 50;
 
       switch (shape) {
-      case ToolShape::TS_SPHEROID: {
+      case GCode::ToolShape::TS_SPHEROID: {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glTranslatef(0, 0, length / 2);
@@ -158,7 +158,7 @@ void Viewer::draw(const View &view) {
         break;
       }
 
-      case ToolShape::TS_BALLNOSE:
+      case GCode::ToolShape::TS_BALLNOSE:
         glPushMatrix();
         glTranslatef(0, 0, radius);
         gluSphere((GLUquadric *)toolQuad, radius, 100, 100);
@@ -166,16 +166,16 @@ void Viewer::draw(const View &view) {
         glPopMatrix();
         break;
 
-      case ToolShape::TS_SNUBNOSE:
+      case GCode::ToolShape::TS_SNUBNOSE:
         drawCylinder((GLUquadric *)toolQuad, tool.getSnubDiameter() / 2, radius,
                      length);
         break;
 
-      case ToolShape::TS_CONICAL:
+      case GCode::ToolShape::TS_CONICAL:
         drawCylinder((GLUquadric *)toolQuad, 0, radius, length);
         break;
 
-      case ToolShape::TS_CYLINDRICAL:
+      case GCode::ToolShape::TS_CYLINDRICAL:
       default:
         drawCylinder((GLUquadric *)toolQuad, radius, radius, length);
         break;

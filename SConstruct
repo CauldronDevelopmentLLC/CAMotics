@@ -110,24 +110,44 @@ if not env.GetOption('clean'):
 
 conf.Finish()
 
+# Build in 'build'
+import re
+VariantDir('build', 'src', duplicate = False)
+env.AppendUnique(CPPPATH = ['#/build'])
+
+libs = []
+
+# libGCode
+src = []
+for subdir in ['', 'ast', 'parse', 'interp', 'machine']:
+    src += Glob('src/gcode/%s/*.cpp' % subdir)
+src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+lib = env.Library('libGCode', src)
+libs.append(lib)
+
+# libSTL
+src = Glob('src/stl/*.cpp')
+src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+lib = env.Library('libSTL', src)
+libs.append(lib)
+
+# libDXF
+src = Glob('src/dxf/*.cpp')
+src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+lib = env.Library('libDXF', src)
+libs.append(lib)
 
 # Source
 src = []
 for subdir in [
-    '', 'gcode/ast', 'sim', 'gcode', 'probe', 'view', 'opt', 'stl', 'cam',
-    'contour', 'qt', 'cutsim', 'remote', 'render', 'value', 'machine', 'dxf']:
+    '', 'sim', 'probe', 'view', 'opt', 'cam', 'contour', 'qt', 'render',
+    'value', 'dxf']:
     src += Glob('src/camotics/%s/*.cpp' % subdir)
 
 for subdir in ['']:
     src += Glob('src/tplang/%s/*.cpp' % subdir)
 
-
-# Build in 'build'
-import re
-VariantDir('build', 'src', duplicate = False)
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
-env.AppendUnique(CPPPATH = ['#/build'])
-
 
 # Qt
 dialogs = '''
@@ -150,7 +170,7 @@ src += info
 
 # Build lib
 lib = env.Library('libCAMotics', src)
-libs = [lib]
+libs.append(lib)
 Depends(lib, uic)
 
 

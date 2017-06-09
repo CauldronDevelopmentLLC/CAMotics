@@ -21,8 +21,8 @@
 #pragma once
 
 
-#include <camotics/machine/MachineUnitAdapter.h>
-#include <camotics/machine/MachineEnum.h>
+#include <gcode/machine/MachineUnitAdapter.h>
+#include <gcode/machine/MachineEnum.h>
 
 #include <cbang/js/NativeModule.h>
 
@@ -31,9 +31,9 @@ namespace tplang {
   class TPLContext;
 
   class GCodeModule :
-    public cb::js::NativeModule, public CAMotics::MachineEnum {
+    public cb::js::NativeModule, public GCode::MachineEnum {
     TPLContext &ctx;
-    CAMotics::MachineUnitAdapter *unitAdapter;
+    GCode::MachineUnitAdapter *unitAdapter;
 
   public:
     GCodeModule(TPLContext &ctx);
@@ -41,7 +41,7 @@ namespace tplang {
     // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
-    CAMotics::MachineUnitAdapter &getUnitAdapter();
+    GCode::MachineUnitAdapter &getUnitAdapter();
 
     // Javascript call backs
     void gcodeCB(const cb::js::Value &args, cb::js::Sink &sink);
@@ -55,13 +55,12 @@ namespace tplang {
     void toolCB(const cb::js::Value &args, cb::js::Sink &sink);
     void unitsCB(const cb::js::Value &args, cb::js::Sink &sink);
     void pauseCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void toolSetCB(const cb::js::Value &args, cb::js::Sink &sink);
     void positionCB(const cb::js::Value &args, cb::js::Sink &sink);
     void commentCB(const cb::js::Value &args, cb::js::Sink &sink);
     void workpieceCB(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
-    void parseAxes(const cb::js::Value &args, CAMotics::Axes &axes,
+    void parseAxes(const cb::js::Value &args, GCode::Axes &axes,
                    bool incremental = false);
   };
 }

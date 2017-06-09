@@ -49,8 +49,8 @@ void MatrixModule::define(js::Sink &exports) {
 }
 
 
-CAMotics::MachineMatrix &MatrixModule::getMatrix() {
-  if (!matrix) matrix = &ctx.find<CAMotics::MachineMatrix>();
+GCode::MachineMatrix &MatrixModule::getMatrix() {
+  if (!matrix) matrix = &ctx.find<GCode::MachineMatrix>();
   return *matrix;
 }
 
@@ -111,7 +111,7 @@ MatrixModule::axes_t MatrixModule::parseMatrix(const js::Value &args) {
 
 
 void MatrixModule::getXYZ(const js::Value &args, js::Sink &sink) {
-  Vector3D v = ctx.machine.getPosition(XYZ);
+  cb::Vector3D v = ctx.machine.getPosition(XYZ);
 
   sink.beginList();
   sink.append(v.x());

@@ -27,11 +27,11 @@
 #include "ClipperModule.h"
 #include "STLModule.h"
 
-#include <camotics/machine/MachineAdapter.h>
-#include <camotics/cutsim/Simulation.h>
+#include <gcode/machine/MachineAdapter.h>
 
 #include <cbang/js/Javascript.h>
 #include <cbang/config/Options.h>
+#include <cbang/json/Value.h>
 
 
 namespace tplang {
@@ -43,16 +43,16 @@ namespace tplang {
     STLModule stlMod;
 
   public:
-    CAMotics::MachineInterface &machine;
-    CAMotics::Simulation sim;
+    GCode::MachineInterface &machine;
+    cb::JSON::ValuePtr sim;
 
-    TPLContext(std::ostream &out, CAMotics::MachineInterface &machine,
+    TPLContext(std::ostream &out, GCode::MachineInterface &machine,
                const std::string &jsImpl = std::string());
 
     template <typename T>
     T &find() {
-      CAMotics::MachineAdapter *adapter =
-        dynamic_cast<CAMotics::MachineAdapter *>(&machine);
+      GCode::MachineAdapter *adapter =
+        dynamic_cast<GCode::MachineAdapter *>(&machine);
       if (!adapter) THROW("Not found");
       return adapter->find<T>();
     }

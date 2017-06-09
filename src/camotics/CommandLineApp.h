@@ -22,7 +22,7 @@
 
 
 #include "Application.h"
-#include "Units.h"
+#include <gcode/Units.h>
 
 #include <iostream>
 
@@ -33,8 +33,8 @@ namespace CAMotics {
     bool force;
 
   protected:
-    Units outputUnits;
-    Units defaultUnits;
+    GCode::Units outputUnits;
+    GCode::Units defaultUnits;
 
     cb::SmartPointer<std::ostream> stream;
 

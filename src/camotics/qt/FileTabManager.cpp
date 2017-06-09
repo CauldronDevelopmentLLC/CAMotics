@@ -25,7 +25,7 @@
 #include "GCodeHighlighter.h"
 #include "TPLHighlighter.h"
 
-#include <camotics/cutsim/NCFile.h>
+#include <camotics/sim/NCFile.h>
 
 #include <cbang/Exception.h>
 #include <cbang/os/SystemUtilities.h>

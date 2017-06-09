@@ -30,7 +30,7 @@ ToolGraphicsItem::ToolGraphicsItem(QGraphicsItem *parent) :
 }
 
 
-void ToolGraphicsItem::update(const Tool &tool, const QSize &size) {
+void ToolGraphicsItem::update(const GCode::Tool &tool, const QSize &size) {
   number = tool.getNumber();
 
   // Update tool view

@@ -23,7 +23,7 @@
 #include "RenderJob.h"
 
 #include <camotics/Grid.h>
-#include <camotics/cutsim/CutWorkpiece.h>
+#include <camotics/sim/CutWorkpiece.h>
 
 #include <cbang/String.h>
 #include <cbang/log/Logger.h>
@@ -33,6 +33,7 @@
 #include <cbang/util/DefaultCatch.h>
 
 #include <cmath>
+#include <list>
 
 using namespace std;
 using namespace cb;
@@ -40,7 +41,7 @@ using namespace CAMotics;
 
 
 void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
-                      const Rectangle3R &bbox, unsigned threads,
+                      const cb::Rectangle3D &bbox, unsigned threads,
                       RenderMode mode) {
   typedef list<SmartPointer<RenderJob> > jobs_t;
   jobs_t jobs;

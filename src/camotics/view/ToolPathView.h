@@ -20,9 +20,9 @@
 
 #pragma once
 
+#include "Color.h"
 
-#include <camotics/Geom.h>
-#include <camotics/cutsim/ToolPath.h>
+#include <gcode/ToolPath.h>
 #include <camotics/value/ValueGroup.h>
 
 #include <cbang/SmartPointer.h>
@@ -33,11 +33,11 @@
 namespace CAMotics {
   class ToolPathView {
     ValueGroup values;
-    cb::SmartPointer<const ToolPath> path;
+    cb::SmartPointer<const GCode::ToolPath> path;
 
     bool byRemote;
     double ratio;
-    Vector3R position;
+    cb::Vector3D position;
     unsigned line;
 
     double totalTime;
@@ -45,9 +45,9 @@ namespace CAMotics {
 
     double currentTime;
     double currentDistance;
-    Vector3R currentPosition;
+    cb::Vector3D currentPosition;
     unsigned currentLine;
-    Move currentMove;
+    GCode::Move currentMove;
 
     bool dirty;
 
@@ -67,14 +67,14 @@ namespace CAMotics {
 
     bool isEmpty() const {return path.isNull() || path->empty();}
 
-    cb::SmartPointer<const ToolPath> getPath() const {return path;}
-    void setPath(const cb::SmartPointer<const ToolPath> &path, bool withVBOs);
+    cb::SmartPointer<const GCode::ToolPath> getPath() const {return path;}
+    void setPath(const cb::SmartPointer<const GCode::ToolPath> &path, bool withVBOs);
 
-    Rectangle3R getBounds() const
-    {return path.isNull() ? Rectangle3R() : path->getBounds();}
+    cb::Rectangle3D getBounds() const
+    {return path.isNull() ? cb::Rectangle3D() : path->getBounds();}
 
     void setByRatio(double ratio);
-    void setByRemote(const Vector3R &position, unsigned line);
+    void setByRemote(const cb::Vector3D &position, unsigned line);
 
     void incTime(double amount = 1);
     void decTime(double amount = 1);
@@ -94,16 +94,17 @@ namespace CAMotics {
     double getPercentDistance() const
     {return currentDistance / totalDistance * 100;}
 
-    const Vector3R &getPosition() const {return currentPosition;}
+    const cb::Vector3D &getPosition() const {return currentPosition;}
     unsigned getProgramLine() const {return currentLine;}
-    const Move &getMove() const {return currentMove;}
+    const GCode::Move &getMove() const {return currentMove;}
 
     unsigned getTool() const {return getMove().getTool();}
     double getFeed() const {return getMove().getFeed();}
     double getSpeed() const {return getMove().getSpeed();}
     const char *getDirection() const;
 
-    void updateState();
+    Color getColor(GCode::MoveType type);
+
     void update();
     void draw();
   };

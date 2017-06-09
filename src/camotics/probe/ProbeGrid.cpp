@@ -28,7 +28,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ProbeGrid::ProbeGrid(const Rectangle2D &bbox, const Vector2D &divisions) :
+ProbeGrid::ProbeGrid(const cb::Rectangle2D &bbox, const cb::Vector2D &divisions) :
   bbox(bbox), divisions(divisions),
   cellSize(bbox.getWidth() / divisions.x(), bbox.getLength() / divisions.y()) {
 
@@ -51,7 +51,7 @@ ProbeGrid::ProbeGrid(const Rectangle2D &bbox, const Vector2D &divisions) :
 }
 
 
-vector<ProbePoint *> ProbeGrid::find(const Vector2D &p) {
+vector<ProbePoint *> ProbeGrid::find(const cb::Vector2D &p) {
   double xA = (p.x() - bbox.getMin().x()) / cellSize.x();
   double yA = (p.y() - bbox.getMin().y()) / cellSize.y();
   int x = floor(xA);

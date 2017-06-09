@@ -20,8 +20,7 @@
 
 #pragma once
 
-
-#include "Geom.h"
+#include <cbang/geom/Rectangle.h>
 
 #include <vector>
 #include <utility>
@@ -52,7 +51,7 @@ namespace CAMotics {
     const cb::Vector3U &getSteps() const {return steps;}
     void setSteps(const cb::Vector3U steps) {this->steps = steps;}
 
-    Rectangle3R getBounds() const;
+    cb::Rectangle3D getBounds() const;
     unsigned getTotalCells() const;
 
     Grid slice(const cb::Vector3U &start) const;

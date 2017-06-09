@@ -28,14 +28,14 @@
 
 
 namespace CAMotics {
-  class VertexSlice : public std::vector<std::vector<real> > {
+  class VertexSlice : public std::vector<std::vector<double> > {
     const GridTreeRef &grid;
     unsigned z;
 
   public:
     VertexSlice(const GridTreeRef &grid, unsigned z);
 
-    real depth(unsigned x, unsigned y) const {return at(x).at(y);}
+    double depth(unsigned x, unsigned y) const {return at(x).at(y);}
 
     void compute(FieldFunction &func);
 

@@ -20,14 +20,13 @@
 
 #pragma once
 
-
 #include "RenderMode.h"
 
 #include <camotics/Task.h>
-#include <camotics/Geom.h>
 
 #include <cbang/SmartPointer.h>
 #include <cbang/os/Condition.h>
+#include <cbang/geom/Rectangle.h>
 
 
 namespace CAMotics {
@@ -41,7 +40,7 @@ namespace CAMotics {
     Renderer(const cb::SmartPointer<Task> &task = new Task) : task(task) {}
 
     void render(CutWorkpiece &cutWorkpiece, GridTree &tree,
-                const Rectangle3R &bbox, unsigned threads,
+                const cb::Rectangle3D &bbox, unsigned threads,
                 RenderMode mode = RenderMode::MCUBES_MODE);
   };
 }

@@ -21,17 +21,17 @@
 #pragma once
 
 
-#include <camotics/cutsim/Move.h>
+#include <gcode/Move.h>
 
 #include <cbang/geom/Vector.h>
 
 #include <list>
 
 namespace CAMotics {
-  class Path : public std::vector<Move> {
+  class Path : public std::vector<GCode::Move> {
   public:
-    const Vector3R &startPoint() const {return front().getStartPt();}
-    const Vector3R &endPoint() const {return back().getEndPt();}
+    const cb::Vector3D &startPoint() const {return front().getStartPt();}
+    const cb::Vector3D &endPoint() const {return back().getEndPt();}
     void reverse();
     double costTo(const Path &o) const
     {return endPoint().distance(o.startPoint());}

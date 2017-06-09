@@ -28,7 +28,7 @@ using namespace cb;
 using namespace tplang;
 
 
-TPLContext::TPLContext(ostream &out, CAMotics::MachineInterface &machine,
+TPLContext::TPLContext(ostream &out, GCode::MachineInterface &machine,
                        const string &jsImpl) :
   js::Javascript(jsImpl), gcodeMod(*this), matrixMod(*this), dxfMod(*this),
   stlMod(*this), machine(machine) {

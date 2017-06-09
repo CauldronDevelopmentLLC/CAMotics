@@ -20,24 +20,23 @@
 
 #pragma once
 
-
-#include <camotics/Geom.h>
+#include <cbang/geom/Rectangle.h>
 
 
 namespace CAMotics {
   class CuboidView {
-    Rectangle3R bounds;
+    cb::Rectangle3D bounds;
 
     unsigned vertexVBuf;
     unsigned normalVBuf;
 
   public:
-    CuboidView(const Rectangle3R &bounds = Rectangle3R()) :
+    CuboidView(const cb::Rectangle3D &bounds = cb::Rectangle3D()) :
       bounds(bounds), vertexVBuf(0), normalVBuf(0) {}
     ~CuboidView();
 
-    const Rectangle3R &getBounds() const {return bounds;}
-    void setBounds(const Rectangle3R &bounds) {this->bounds = bounds;}
+    const cb::Rectangle3D &getBounds() const {return bounds;}
+    void setBounds(const cb::Rectangle3D &bounds) {this->bounds = bounds;}
 
     void draw();
   };

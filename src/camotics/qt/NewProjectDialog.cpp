@@ -30,14 +30,14 @@ NewProjectDialog::NewProjectDialog() : ui(new Ui::NewProjectDialog) {
 }
 
 
-void NewProjectDialog::setUnits(ToolUnits units) {
-  ui->unitsComboBox->setCurrentIndex(units == ToolUnits::UNITS_MM ? 0 : 1);
+void NewProjectDialog::setUnits(GCode::ToolUnits units) {
+  ui->unitsComboBox->setCurrentIndex(units == GCode::ToolUnits::UNITS_MM ? 0 : 1);
 }
 
 
-ToolUnits NewProjectDialog::getUnits() const {
+GCode::ToolUnits NewProjectDialog::getUnits() const {
   return ui->unitsComboBox->currentIndex() == 0 ?
-    ToolUnits::UNITS_MM : ToolUnits::UNITS_INCH;
+    GCode::ToolUnits::UNITS_MM : GCode::ToolUnits::UNITS_INCH;
 }
 
 

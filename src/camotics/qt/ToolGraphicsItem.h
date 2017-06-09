@@ -21,7 +21,7 @@
 #pragma once
 
 
-#include <camotics/sim/Tool.h>
+#include <gcode/Tool.h>
 #include <camotics/view/ToolView.h>
 
 #include <QtGlobal>
@@ -43,6 +43,6 @@ namespace CAMotics {
 
     unsigned getNumber() const {return number;}
 
-    void update(const Tool &tool, const QSize &size);
+    void update(const GCode::Tool &tool, const QSize &size);
   };
 }

@@ -44,7 +44,7 @@ namespace CAMotics {
     CAMDialog(QWidget *parent);
 
     void loadDXFLayers(const std::string &filename);
-    void setUnits(ToolUnits units);
+    void setUnits(GCode::ToolUnits units);
 
     int getSelectedRow() const;
 

@@ -25,7 +25,6 @@
 #include "ToolPathView.h"
 #include "CuboidView.h"
 
-#include <camotics/Geom.h>
 #include <camotics/contour/Surface.h>
 #include <camotics/value/ValueGroup.h>
 
@@ -85,8 +84,8 @@ namespace CAMotics {
     void setReverse(bool reverse) {this->reverse = reverse;}
     void changeDirection() {reverse = !reverse; values.updated();}
 
-    void setToolPath(const cb::SmartPointer<ToolPath> &toolPath);
-    void setWorkpiece(const Rectangle3R &bounds);
+    void setToolPath(const cb::SmartPointer<GCode::ToolPath> &toolPath);
+    void setWorkpiece(const cb::Rectangle3D &bounds);
     void setSurface(const cb::SmartPointer<Surface> &surface);
     void setMoveLookup(const cb::SmartPointer<MoveLookup> &moveLookup);
     double getTime() const {return path.isNull() ? 0 : path->getTime();}

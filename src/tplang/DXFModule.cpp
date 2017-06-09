@@ -21,17 +21,16 @@
 #include "DXFModule.h"
 #include "TPLContext.h"
 
-#include <camotics/dxf/DXFReader.h>
-#include <camotics/dxf/DXFPoint.h>
-#include <camotics/dxf/DXFLine.h>
-#include <camotics/dxf/DXFArc.h>
-#include <camotics/dxf/DXFPolyLine.h>
-#include <camotics/dxf/DXFSpline.h>
+#include <dxf/Reader.h>
+#include <dxf/Point.h>
+#include <dxf/Line.h>
+#include <dxf/Arc.h>
+#include <dxf/PolyLine.h>
+#include <dxf/Spline.h>
 
 #include <cbang/os/SystemUtilities.h>
 
 using namespace tplang;
-using namespace CAMotics;
 using namespace cb;
 using namespace std;
 
@@ -42,41 +41,41 @@ DXFModule::DXFModule(TPLContext &ctx) : js::NativeModule("_dxf"), ctx(ctx) {}
 void DXFModule::define(js::Sink &exports) {
   exports.insert("open(path)", this, &DXFModule::openCB);
 
-  exports.insert("POINT",    DXFEntity::DXF_POINT);
-  exports.insert("LINE",     DXFEntity::DXF_LINE);
-  exports.insert("ARC",      DXFEntity::DXF_ARC);
-  exports.insert("POLYLINE", DXFEntity::DXF_POLYLINE);
-  exports.insert("SPLINE",   DXFEntity::DXF_SPLINE);
+  exports.insert("POINT",    DXF::Entity::DXF_POINT);
+  exports.insert("LINE",     DXF::Entity::DXF_LINE);
+  exports.insert("ARC",      DXF::Entity::DXF_ARC);
+  exports.insert("POLYLINE", DXF::Entity::DXF_POLYLINE);
+  exports.insert("SPLINE",   DXF::Entity::DXF_SPLINE);
 }
 
 
 void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
-  DXFReader reader;
+  DXF::Reader reader;
   reader.read(ctx.relativePath(args.getString("path")));
 
-  const DXFReader::layers_t &layers = reader.getLayers();
+  const DXF::Reader::layers_t &layers = reader.getLayers();
   sink.beginDict();
 
-  DXFReader::layers_t::const_iterator it;
+  DXF::Reader::layers_t::const_iterator it;
   for (it = layers.begin(); it != layers.end(); it++) {
-    const DXFReader::layer_t &layer = it->second;
+    const DXF::Reader::layer_t &layer = it->second;
     sink.insertList(it->first);
 
     for (unsigned j = 0; j < layer.size(); j++) {
-      const DXFEntity &entity = *layer[j];
+      const DXF::Entity &entity = *layer[j];
       sink.appendDict();
 
       switch (entity.getType()) {
-      case DXFEntity::DXF_POINT: {
-        const DXFPoint &point = dynamic_cast<const DXFPoint &>(entity);
+      case DXF::Entity::DXF_POINT: {
+        const DXF::Point &point = dynamic_cast<const DXF::Point &>(entity);
         sink.insert("x", point.x());
         sink.insert("y", point.y());
         sink.insert("z", point.z());
         break;
       }
 
-      case DXFEntity::DXF_LINE: {
-        const DXFLine &line = dynamic_cast<const DXFLine &>(entity);
+      case DXF::Entity::DXF_LINE: {
+        const DXF::Line &line = dynamic_cast<const DXF::Line &>(entity);
 
         sink.insertDict("start");
         sink.insert("x", line.getStart().x());
@@ -92,8 +91,8 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         break;
       }
 
-      case DXFEntity::DXF_ARC: {
-        const DXFArc &arc = dynamic_cast<const DXFArc &>(entity);
+      case DXF::Entity::DXF_ARC: {
+        const DXF::Arc &arc = dynamic_cast<const DXF::Arc &>(entity);
 
         sink.insertDict("center");
         sink.insert("x", arc.getCenter().x());
@@ -108,9 +107,10 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         break;
       }
 
-      case DXFEntity::DXF_POLYLINE: {
-        const DXFPolyLine &polyLine = dynamic_cast<const DXFPolyLine &>(entity);
-        const vector<Vector3D> &vertices = polyLine.getVertices();
+      case DXF::Entity::DXF_POLYLINE: {
+        const DXF::PolyLine &polyLine =
+          dynamic_cast<const DXF::PolyLine &>(entity);
+        const vector<cb::Vector3D> &vertices = polyLine.getVertices();
         sink.insertList("vertices");
 
         for (unsigned k = 0; k < vertices.size(); k++) {
@@ -118,7 +118,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
           sink.insert("x", vertices[k].x());
           sink.insert("y", vertices[k].y());
           sink.insert("z", vertices[k].z());
-          sink.insert("type", DXFEntity::DXF_POINT);
+          sink.insert("type", DXF::Entity::DXF_POINT);
           sink.endDict();
         }
 
@@ -126,13 +126,13 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         break;
       }
 
-      case DXFEntity::DXF_SPLINE: {
-        const DXFSpline &spline = dynamic_cast<const DXFSpline &>(entity);
+      case DXF::Entity::DXF_SPLINE: {
+        const DXF::Spline &spline = dynamic_cast<const DXF::Spline &>(entity);
 
         sink.insert("degree", spline.getDegree());
 
         // Control points
-        const vector<Vector3D> &ctrlPts = spline.getControlPoints();
+        const vector<cb::Vector3D> &ctrlPts = spline.getControlPoints();
         sink.insertList("ctrlPts");
 
         for (unsigned k = 0; k < ctrlPts.size(); k++) {
@@ -140,7 +140,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
           sink.insert("x", ctrlPts[k].x());
           sink.insert("y", ctrlPts[k].y());
           sink.insert("z", ctrlPts[k].z());
-          sink.insert("type", DXFEntity::DXF_POINT);
+          sink.insert("type", DXF::Entity::DXF_POINT);
           sink.endDict();
         }
 

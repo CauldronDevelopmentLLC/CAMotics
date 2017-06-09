@@ -23,25 +23,26 @@
 
 #include "ProbeGrid.h"
 
-#include <camotics/gcode/Printer.h>
+#include <gcode/Printer.h>
 
-#include <camotics/machine/MachineState.h>
-#include <camotics/sim/Controller.h>
-#include <camotics/gcode/Interpreter.h>
+#include <gcode/machine/MachineState.h>
+#include <gcode/Controller.h>
+#include <gcode/interp/Interpreter.h>
 
 #include <cbang/SmartPointer.h>
 #include <cbang/io/Reader.h>
 
 #include <string>
 
+
 namespace cb {class Options;}
+namespace GCode {class Word;}
 
 namespace CAMotics {
-  class Word;
-
   class Probe :
-    public MachineState, public Controller, public Printer, public cb::Reader {
-    Interpreter interp;
+    public GCode::MachineState, public GCode::Controller,
+    public GCode::Printer, public cb::Reader {
+    GCode::Interpreter interp;
 
   public:
     double gridSize;
@@ -72,11 +73,11 @@ namespace CAMotics {
     void outputProbe(ProbePoint &pt, unsigned address, unsigned count);
     void outputProbe();
 
-    // From Controller
-    using Controller::execute;
-    void execute(Word *word, int vars);
+    // From GCode::Controller
+    using GCode::Controller::execute;
+    void execute(GCode::Word *word, int vars);
 
     // From Processor
-    void operator()(const cb::SmartPointer<Block> &block);
+    void operator()(const cb::SmartPointer<GCode::Block> &block);
   };
 }

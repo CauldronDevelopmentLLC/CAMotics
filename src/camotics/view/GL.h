@@ -25,7 +25,6 @@
 
 #include <cbang/SStream.h>
 
-#include <camotics/Real.h>
 
 #ifdef REAL_IS_FLOAT
 #define GL_REAL GL_FLOAT
