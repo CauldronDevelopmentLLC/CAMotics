@@ -36,7 +36,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::DonateDialog> ui;
 
   public:
-    DonateDialog();
+    DonateDialog(QWidget *parent);
 
   protected slots:
   };

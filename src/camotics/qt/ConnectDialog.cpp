@@ -27,7 +27,8 @@
 using namespace CAMotics;
 
 
-ConnectDialog::ConnectDialog() : ui(new Ui::ConnectDialog) {ui->setupUi(this);}
+ConnectDialog::ConnectDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::ConnectDialog) {ui->setupUi(this);}
 
 
 QString ConnectDialog::getAddress() const {return ui->addressLineEdit->text();}

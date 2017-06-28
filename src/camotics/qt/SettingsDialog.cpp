@@ -30,7 +30,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SettingsDialog::SettingsDialog() : ui(new Ui::SettingsDialog), changing(false) {
+SettingsDialog::SettingsDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::SettingsDialog), changing(false) {
   ui->setupUi(this);
 
 #ifndef DEBUG

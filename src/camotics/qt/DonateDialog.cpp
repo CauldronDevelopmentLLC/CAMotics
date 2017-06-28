@@ -25,6 +25,7 @@
 using namespace CAMotics;
 
 
-DonateDialog::DonateDialog() : ui(new Ui::DonateDialog) {
+DonateDialog::DonateDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::DonateDialog) {
   ui->setupUi(this);
 }

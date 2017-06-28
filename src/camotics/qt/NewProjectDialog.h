@@ -35,7 +35,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::NewProjectDialog> ui;
 
   public:
-    NewProjectDialog();
+    NewProjectDialog(QWidget *parent);
 
     void setUnits(GCode::ToolUnits units);
 

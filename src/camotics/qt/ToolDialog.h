@@ -45,7 +45,7 @@ namespace CAMotics {
     bool updating;
 
   public:
-    ToolDialog();
+    ToolDialog(QWidget *parent);
 
     void setTool(const GCode::Tool &tool) {this->tool = tool;}
     GCode::Tool &getTool() {return tool;}

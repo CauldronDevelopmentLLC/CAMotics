@@ -36,7 +36,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::AboutDialog> ui;
 
   public:
-    AboutDialog();
+    AboutDialog(QWidget *parent);
 
   protected slots:
     void on_creditsPushButton_clicked();

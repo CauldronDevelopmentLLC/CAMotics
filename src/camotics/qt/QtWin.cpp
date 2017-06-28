@@ -63,12 +63,14 @@ using namespace CAMotics;
 
 
 QtWin::QtWin(Application &app) :
-  QMainWindow(0), ui(new Ui::CAMoticsWindow), findDialog(false),
-  findAndReplaceDialog(true), camDialog(this), fileDialog(*this),
-  taskCompleteEvent(0), app(app), options(app.getOptions()),
-  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0),
-  dirty(false), simDirty(false), inUIUpdate(false), lastProgress(0),
-  lastStatusActive(false), autoPlay(false), autoClose(false),
+  QMainWindow(0), ui(new Ui::CAMoticsWindow), newDialog(this),
+  newProjectDialog(this), exportDialog(this), aboutDialog(this),
+  settingsDialog(this), donateDialog(this), findDialog(this, false),
+  findAndReplaceDialog(this, true), toolDialog(this), camDialog(this),
+  connectDialog(this), fileDialog(*this), taskCompleteEvent(0), app(app),
+  options(app.getOptions()), view(new View(valueSet)), viewer(new Viewer),
+  lastRedraw(0), dirty(false), simDirty(false), inUIUpdate(false),
+  lastProgress(0), lastStatusActive(false), autoPlay(false), autoClose(false),
   sliderMoving(false), positionChanged(false) {
 
   ui->setupUi(this);

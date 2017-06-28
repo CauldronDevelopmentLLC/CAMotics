@@ -36,7 +36,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::ExportDialog> ui;
 
   public:
-    ExportDialog();
+    ExportDialog(QWidget *parent);
 
     // From QDialog
     int exec();

@@ -25,13 +25,15 @@
 using namespace CAMotics;
 
 
-NewProjectDialog::NewProjectDialog() : ui(new Ui::NewProjectDialog) {
+NewProjectDialog::NewProjectDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::NewProjectDialog) {
   ui->setupUi(this);
 }
 
 
 void NewProjectDialog::setUnits(GCode::ToolUnits units) {
-  ui->unitsComboBox->setCurrentIndex(units == GCode::ToolUnits::UNITS_MM ? 0 : 1);
+  ui->unitsComboBox->setCurrentIndex
+    (units == GCode::ToolUnits::UNITS_MM ? 0 : 1);
 }
 
 

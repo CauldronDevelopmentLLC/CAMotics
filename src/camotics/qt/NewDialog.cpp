@@ -25,7 +25,8 @@
 using namespace CAMotics;
 
 
-NewDialog::NewDialog() : ui(new Ui::NewDialog) {
+NewDialog::NewDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::NewDialog) {
   ui->setupUi(this);
 }
 

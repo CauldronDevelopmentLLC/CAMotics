@@ -43,7 +43,7 @@ namespace CAMotics {
     bool changing;
 
   public:
-    SettingsDialog();
+    SettingsDialog(QWidget *parent);
 
     void exec(Project &project, View &view);
 

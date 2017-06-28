@@ -31,8 +31,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-FindDialog::FindDialog(bool replace) :
-  ui(new Ui::FindDialog), wasReplace(false) {
+FindDialog::FindDialog(QWidget *parent, bool replace) :
+  QDialog(parent), ui(new Ui::FindDialog), wasReplace(false) {
   ui->setupUi(this);
 
   if (!replace) {

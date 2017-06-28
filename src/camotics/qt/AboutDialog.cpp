@@ -31,7 +31,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-AboutDialog::AboutDialog() : ui(new Ui::AboutDialog) {
+AboutDialog::AboutDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::AboutDialog) {
   ui->setupUi(this);
 
   // Set version

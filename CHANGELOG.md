@@ -10,6 +10,7 @@
  - Fixed error in calculating cuts with bottom of cylinder / snub.
  - Added support for tabs in 2D profile cuts in dfx TPL lib.
  - Added Buildbotics controller connectivity.
+ - Fixed modal dialogs.
 
 ## v1.1.1:
  - Fixed bug preventing ``camsim`` from writing STL data.

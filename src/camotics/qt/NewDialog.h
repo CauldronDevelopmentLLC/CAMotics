@@ -34,7 +34,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::NewDialog> ui;
 
   public:
-    NewDialog();
+    NewDialog(QWidget *parent);
 
     bool tplSelected() const;
     bool gcodeSelected() const;

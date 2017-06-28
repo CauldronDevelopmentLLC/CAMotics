@@ -36,7 +36,7 @@ namespace CAMotics {
     cb::SmartPointer<Ui::ConnectDialog> ui;
 
   public:
-    ConnectDialog();
+    ConnectDialog(QWidget *parent);
 
     QString getAddress() const;
 

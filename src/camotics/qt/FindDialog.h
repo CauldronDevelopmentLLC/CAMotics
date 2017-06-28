@@ -38,7 +38,7 @@ namespace CAMotics {
     bool wasReplace;
 
   public:
-    FindDialog(bool replace);
+    FindDialog(QWidget *parent, bool replace);
 
     void findReplace(bool find, bool all);
 

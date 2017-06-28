@@ -25,7 +25,8 @@
 using namespace CAMotics;
 
 
-ExportDialog::ExportDialog() : ui(new Ui::ExportDialog) {
+ExportDialog::ExportDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::ExportDialog) {
   ui->setupUi(this);
 }
 

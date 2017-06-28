@@ -26,7 +26,8 @@ using namespace std;
 using namespace CAMotics;
 
 
-ToolDialog::ToolDialog() : ui(new Ui::ToolDialog), updating(false) {
+ToolDialog::ToolDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::ToolDialog), updating(false) {
   ui->setupUi(this);
   ui->toolView->setScene(&scene);
 }
