@@ -30,7 +30,8 @@ using namespace CAMotics;
 
 ConicSweep::ConicSweep(double length, double radius1, double radius2) :
   l(length), rt(radius1), rb(radius2 == -1 ? radius1 : radius2),
-  Tm((rt - rb) / l) {}
+  Tm((rt - rb) / l) {
+}
 
 
 void ConicSweep::getBBoxes(const cb::Vector3D &start, const cb::Vector3D &end,
@@ -70,22 +71,42 @@ double ConicSweep::depth(const cb::Vector3D &A, const cb::Vector3D &B,
   // Check if solution is valid
   if (epsilon == 0 || sigma < 0) return -1;
 
-  double beta = (-gamma - sqrt(sigma)) / epsilon; // Quadradic equation
+  const double beta = (-gamma - sqrt(sigma)) / epsilon; // Quadradic equation
 
   // Check if z-heights make sense
   const double Qz = (Bz - Az) * beta + Az;
 
-  // Check if the point is cut by the flat top or bottom
+  // Contact point is outside of z-height range.
   if (Pz < Qz || Qz + l < Pz) {
-    beta = (Pz - Az) / (Bz - Az); // E is on AB at z-height
+    // Check if point is cut by bottom disc
+    if (rb) {
+      const double beta = (Pz - Az) / (Bz - Az); // E is on AB at z-height
 
-    // Compute squared distance to E on XY plane
-    const double Ex = beta * (Bx - Ax) + Ax;
-    const double Ey = beta * (By - Ay) + Ay;
-    const double d2 = sqr(Ex - Px) + sqr(Ey - Py);
+      if (0 <= beta && beta <= 1) {
+        // Compute squared distance to E on XY plane
+        const double Ex = beta * (Bx - Ax) + Ax;
+        const double Ey = beta * (By - Ay) + Ay;
+        const double d2 = sqr(Ex - Px) + sqr(Ey - Py);
 
-    if (Pz < Qz && rb * rb < d2) return -1;
-    if (Qz + l < Pz && rt * rt < d2) return -1;
+        if (d2 <= rb * rb) return 1;
+      }
+    }
+
+    // Check if point is cut by top disc
+    if (rt) {
+      const double beta = (Pz - Az - l) / (Bz - Az); // E is on AB at z-height
+
+      if (0 <= beta && beta <= 1) {
+        // Compute squared distance to E on XY plane
+        const double Ex = beta * (Bx - Ax) + Ax;
+        const double Ey = beta * (By - Ay) + Ay;
+        const double d2 = sqr(Ex - Px) + sqr(Ey - Py);
+
+        if (d2 <= rt * rt) return 1;
+      }
+    }
+
+    return -1;
   }
 
   // Check that it's on the line segment
