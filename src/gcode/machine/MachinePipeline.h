@@ -38,5 +38,3 @@ namespace GCode {
     void add(const cb::SmartPointer<MachineInterface> &m);
   };
 }
-
-

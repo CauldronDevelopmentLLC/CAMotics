@@ -24,7 +24,7 @@
 #include "ToolShape.h"
 #include "ToolUnits.h"
 
-#include <gcode/machine/Axes.h>
+#include <gcode/Axes.h>
 
 #include <cbang/json/Serializable.h>
 
@@ -38,7 +38,7 @@ namespace cb {
 
 
 namespace GCode {
-  class Tool : public Axes, cb::JSON::Serializable {
+  class Tool : public Axes {
   protected:
     unsigned number;
     unsigned pocket;

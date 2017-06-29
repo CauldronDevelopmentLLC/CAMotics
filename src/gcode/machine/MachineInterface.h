@@ -20,8 +20,9 @@
 
 #pragma once
 
-#include "Axes.h"
 #include "MachineEnum.h"
+
+#include <gcode/Axes.h>
 
 #include <cbang/Exception.h>
 #include <cbang/LocationRange.h>
@@ -39,7 +40,7 @@ namespace GCode {
     virtual void start() = 0;
     virtual void end() = 0;
 
-    /// @return the currently programed feed rate and optionaly the feed mode.
+    /// @return the currently programmed feed rate and optionaly the feed mode.
     virtual double getFeed(feed_mode_t *mode = 0) const = 0;
 
     /***

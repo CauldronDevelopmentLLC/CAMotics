@@ -20,6 +20,9 @@
 
 #include "Axes.h"
 
+#include <limits>
+#include <cmath>
+
 using namespace std;
 using namespace cb;
 using namespace GCode;
@@ -43,4 +46,22 @@ void Axes::applyABCMatrix(const Matrix4x4D &m) {
 void Axes::applyUVWMatrix(const Matrix4x4D &m) {
   Vector4D v(m * Vector4D(getU(), getV(), getW(), 1));
   setUVW(v[0], v[1], v[2]);
+}
+
+
+void Axes::read(const JSON::Value &value) {
+  for (unsigned i = 0; i < 9; i++)
+    data[i] = value.getNumber(string(1, AXES[i]),
+                              numeric_limits<double>::quiet_NaN());
+}
+
+
+void Axes::write(JSON::Sink &sink) const {
+  sink.beginDict();
+
+  for (unsigned i = 0; i < 9; i++)
+    if (isfinite(data[i]))
+      sink.insert(string(1, AXES[i]), data[i]);
+
+  sink.endDict();
 }

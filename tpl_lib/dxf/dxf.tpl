@@ -199,9 +199,7 @@ function extend(target, source) {
 
 module.exports = extend({
   // Vertices ******************************************************************
-  line_vertices: function(l) {
-    return [l.start, l.end];
-  },
+  line_vertices: function(l) {return [l.start, l.end];},
 
 
   angle_vertex: function(center, radius, angle) {
@@ -226,14 +224,8 @@ module.exports = extend({
   },
 
 
-  polyline_vertices: function(pl) {
-    return pl.vertices;
-  },
-
-
-  spline_vertices: function(s) {
-    return s.ctrlPts;
-  },
+  polyline_vertices: function(pl) {return pl.vertices;},
+  spline_vertices: function(s) {return s.ctrlPts;},
 
 
   element_vertices: function(e) {
@@ -503,6 +495,7 @@ module.exports = extend({
     var p = position();
 
     while (layer.length) {
+      // TODO This is inefficient.  Should put points into octree.
       var match = this.find_closest(p, layer);
       var e = layer[match.i];
       var v = [].concat(this.element_vertices(e));
@@ -549,7 +542,7 @@ module.exports = extend({
       for (var j = 0; j < poly.length; j++)
         cut(poly[j].x, poly[j].y);
 
-      cut(v.x, v.y);
+      //cut(v.x, v.y);
     }
   },
 
@@ -565,6 +558,7 @@ module.exports = extend({
       last = poly[i];
     }
 
+    // Close poly
     length += distance2D(last, poly[0]);
 
     return length;
@@ -804,9 +798,12 @@ module.exports = extend({
   },
 
 
+  // TODO Does not work for unclosed poly lines
   profile_poly: function (poly, config) {
     var self = this;
     if (!poly.length) return [];
+
+    if (config.zStart <= config.zEnd) throw 'zEnd must be less than zStart';
 
     var length = this.poly_length(poly);
     var tab_points = this.compute_tab_points(length, config);

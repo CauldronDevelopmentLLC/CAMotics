@@ -50,7 +50,8 @@ using namespace CAMotics;
 
 ToolPathTask::ToolPathTask(const Project &project) :
   tools(project.getToolTable()),
-  units(project.getUnits() == GCode::ToolUnits::UNITS_MM ? GCode::Units::METRIC :
+  units(project.getUnits() ==
+        GCode::ToolUnits::UNITS_MM ? GCode::Units::METRIC :
         GCode::Units::IMPERIAL), simJSON(project.toString()), errors(0) {
 
   for (Project::iterator it = project.begin(); it != project.end(); it++)
@@ -58,9 +59,7 @@ ToolPathTask::ToolPathTask(const Project &project) :
 }
 
 
-ToolPathTask::~ToolPathTask() {
-  interrupt();
-}
+ToolPathTask::~ToolPathTask() {interrupt();}
 
 
 void ToolPathTask::run() {

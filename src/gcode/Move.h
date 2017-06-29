@@ -24,7 +24,7 @@
 #include "MoveType.h"
 
 #include <gcode/Tool.h>
-#include <gcode/machine/Axes.h>
+#include <gcode/Axes.h>
 
 #include <cbang/geom/Segment.h>
 

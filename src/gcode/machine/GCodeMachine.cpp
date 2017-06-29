@@ -43,7 +43,7 @@ namespace {
               "zero or other math error.");
 
       if (Math::isinf(x))
-        THROW("Numerical error in GCode stream: Infiniate value");
+        THROW("Numerical error in GCode stream: Infinite value");
     }
 
 

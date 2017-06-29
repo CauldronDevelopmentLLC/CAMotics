@@ -110,6 +110,7 @@ if not env.GetOption('clean'):
 
 conf.Finish()
 
+
 # Build in 'build'
 import re
 VariantDir('build', 'src', duplicate = False)
@@ -117,13 +118,15 @@ env.AppendUnique(CPPPATH = ['#/build'])
 
 libs = []
 
+
 # libGCode
 src = []
-for subdir in ['', 'ast', 'parse', 'interp', 'machine']:
+for subdir in ['', 'ast', 'parse', 'interp', 'machine', 'plan']:
     src += Glob('src/gcode/%s/*.cpp' % subdir)
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 lib = env.Library('libGCode', src)
 libs.append(lib)
+
 
 # libSTL
 src = Glob('src/stl/*.cpp')
@@ -131,17 +134,19 @@ src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 lib = env.Library('libSTL', src)
 libs.append(lib)
 
+
 # libDXF
 src = Glob('src/dxf/*.cpp')
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 lib = env.Library('libDXF', src)
 libs.append(lib)
 
+
 # Source
 src = []
 for subdir in [
     '', 'sim', 'probe', 'view', 'opt', 'cam', 'contour', 'qt', 'render',
-    'value', 'dxf']:
+    'value']:
     src += Glob('src/camotics/%s/*.cpp' % subdir)
 
 for subdir in ['']:
@@ -202,7 +207,7 @@ if not have_dxflib:
 
 # Build programs
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
-progs = 'camotics gcodetool tplang camsim'
+progs = 'camotics gcodetool tplang camsim planner'
 execs = []
 for prog in progs.split():
     if prog == 'camotics' and int(env.get('cross_mingw', 0)):

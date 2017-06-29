@@ -24,12 +24,13 @@
 #include <cbang/Math.h>
 #include <cbang/geom/Vector.h>
 #include <cbang/geom/Matrix.h>
+#include <cbang/json/Serializable.h>
 
 #include <cctype>
 
 
 namespace GCode {
-  class Axes : public cb::Vector<9, double> {
+  class Axes : public cb::Vector<9, double>, public cb::JSON::Serializable {
   public:
     typedef cb::Vector<9, double> Super_T;
 
@@ -124,5 +125,9 @@ namespace GCode {
       default: THROWS("Invalid axis index " << i);
       }
     }
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
   };
 }
