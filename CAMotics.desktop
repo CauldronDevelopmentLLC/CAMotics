@@ -6,6 +6,6 @@ Exec=camotics %f
 Terminal=false
 Categories=Science
 Comment=Open-Source Simulation & Computer Aided Machining
-Icon=camotics.png
+Icon=camotics
 StartupNotify=true
 MimeType=application/x-camotics-project;application/x-camotics-nc;
