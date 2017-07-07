@@ -59,7 +59,7 @@ by C!, can be installed with the following command line:
 
 Clone the C! git repository, build the software using scons and set the
 environment variable CBANG_HOME so the CAMotics build system can find it
-later.  **You must install ChakraCore before this step.**
+later.  **You must install V8 or ChakraCore before this step.**
 
     git clone https://github.com/CauldronDevelopmentLLC/cbang.git
     scons -C cbang
