@@ -198,6 +198,9 @@ function extend(target, source) {
 
 
 module.exports = extend({
+  arc_error: 0.0001, // In length units
+
+
   // Vertices ******************************************************************
   line_vertices: function(l) {return [l.start, l.end];},
 
@@ -213,8 +216,22 @@ module.exports = extend({
   arc_vertices: function(a) {
     var angle = (a.endAngle - a.startAngle) * (a.clockwise ? 1 : -1);
     if (angle <= 0) angle += 360;
-    var steps = Math.ceil(Math.abs(angle) / 360 * 100 * a.radius);
+
+    // Allowed error cannot be greater than arc radius
+    var error = Math.min(this.arc_error, a.radius);
+    var error_angle = 2 * Math.acos(1 - error / a.radius);
+
+    // Error angle cannot be greater than 2Pi/3
+    error_angle = Math.min(2 * Math.PI / 3, error_angle);
+
+    var steps = Math.ceil(angle / (error_angle / Math.PI * 180));
     var delta = angle / steps;
+
+    // TODO The estimated arc should straddle the actual arc.  This one
+    // always lies completely inside the arc and therefore always
+    // underestimates it.  However, the arc must still start and stop at the
+    // correct points.  Therefore, it must start and stop where the segments
+    // intersect with the actual arc.
 
     var v = [];
     for (var i = 0; i <= steps; i++)
@@ -542,7 +559,8 @@ module.exports = extend({
       for (var j = 0; j < poly.length; j++)
         cut(poly[j].x, poly[j].y);
 
-      //cut(v.x, v.y);
+      // TODO this is only correct for closed polys
+      cut(v.x, v.y); // Close poly
     }
   },
 
@@ -658,12 +676,11 @@ module.exports = extend({
     if (typeof steps == 'undefined') steps = 1;
 
     var zDelta = zCut / steps;
+    var polys = this.layer_to_polys(layer);
+    if (delta) polys = this.offset_polys(polys, delta);
 
-    for (var i = 0; i < steps; i++) {
-      var polys = this.layer_to_polys(layer);
-      if (delta) polys = this.offset_polys(polys, delta);
+    for (var i = 0; i < steps; i++)
       this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed);
-    }
   },
 
 
