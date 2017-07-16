@@ -19,16 +19,11 @@
 \******************************************************************************/
 
 #include <camotics/CommandLineApp.h>
-#include <gcode/ToolPath.h>
-#include <gcode/interp/Interpreter.h>
+
 #include <gcode/Printer.h>
 #include <gcode/parse/Parser.h>
-
+#include <gcode/interp/Interpreter.h>
 #include <gcode/machine/MachinePipeline.h>
-#include <gcode/machine/MachineState.h>
-#include <gcode/machine/MachineLinearizer.h>
-#include <gcode/machine/MachineUnitAdapter.h>
-#include <gcode/machine/GCodeMachine.h>
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
@@ -44,16 +39,11 @@ class GCodeTool : public CAMotics::CommandLineApp {
   MachinePipeline pipeline;
   SmartPointer<Controller> controller;
 
-  bool linearize;
   bool parseOnly;
 
 public:
   GCodeTool() :
-    CAMotics::CommandLineApp("CAMotics GCode Tool"), linearize(true),
-    parseOnly(false) {
-
-    cmdLine.addTarget("linearize", linearize,
-                      "Convert all moves to straight line movements.");
+    CAMotics::CommandLineApp("CAMotics GCode Tool"), parseOnly(false) {
     cmdLine.addTarget("parse", parseOnly,
                       "Only parse the GCode, don't evaluate it.");
   }
@@ -62,16 +52,11 @@ public:
   // From Application
   void run() {
     if (!parseOnly) {
-      pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
-      if (linearize) pipeline.add(new MachineLinearizer);
-      pipeline.add(new GCodeMachine(*stream, outputUnits));
-      pipeline.add(new MachineState);
-
+      build(pipeline);
       controller = new Controller(pipeline);
     }
 
-    Application::run();
-    cout << flush;
+    CommandLineApp::run();
   }
 
 

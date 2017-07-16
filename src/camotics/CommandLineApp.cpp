@@ -20,6 +20,12 @@
 
 #include "CommandLineApp.h"
 
+#include <gcode/machine/MachineState.h>
+#include <gcode/machine/MachineMatrix.h>
+#include <gcode/machine/MachineLinearizer.h>
+#include <gcode/machine/MachineUnitAdapter.h>
+#include <gcode/machine/GCodeMachine.h>
+
 #include <cbang/config/MinConstraint.h>
 #include <cbang/os/SystemUtilities.h>
 
@@ -34,14 +40,16 @@ namespace io = boost::iostreams;
 #define BOOST_CLOSE_HANDLE io::close_handle
 #endif
 
-using namespace std;
-using namespace cb;
 using namespace CAMotics;
+using namespace GCode;
+using namespace cb;
+using namespace std;
 
 
 CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
   Application(name, hasFeature), out("-"), force(false),
-  outputUnits(GCode::Units::METRIC), defaultUnits(GCode::Units::METRIC) {
+  outputUnits(GCode::Units::METRIC), defaultUnits(GCode::Units::METRIC),
+  maxArcError(0.01), linearize(true) {
   cmdLine.addTarget("out", out, "Output filename or '-' to write "
                     "to the standard output stream");
   cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
@@ -54,6 +62,13 @@ CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
   cmdLine.addTarget("units", outputUnits, "Set output units.");
   cmdLine.addTarget("default-units", defaultUnits,
                     "GCode::Units assumed at the start.");
+
+  cmdLine.addTarget("max-arc-error", maxArcError,
+                    "The maximum allowed error, in length units, when "
+                    "estimating arcs with line segments.  Default value is "
+                    "in mm.");
+  cmdLine.addTarget("linearize", linearize,
+                    "Convert all moves to straight line movements.");
 
   Option &opt = *cmdLine.add("pipe", "Specify a output file descriptor, "
                              "overrides the 'out' option");
@@ -91,7 +106,25 @@ int CommandLineApp::init(int argc, char *argv[]) {
     stream = SystemUtilities::oopen(out);
   }
 
+  // Convert to mm
+  if (outputUnits == GCode::Units::IMPERIAL) maxArcError *= 25.4;
+
   return ret;
+}
+
+
+void CommandLineApp::run() {
+  Application::run();
+  stream->flush();
+}
+
+
+void CommandLineApp::build(GCode::MachinePipeline &pipeline) {
+  pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
+  if (linearize) pipeline.add(new MachineLinearizer(maxArcError));
+  pipeline.add(new MachineMatrix);
+  pipeline.add(new GCodeMachine(*stream, outputUnits));
+  pipeline.add(new MachineState);
 }
 
 

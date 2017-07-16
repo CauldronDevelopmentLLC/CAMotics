@@ -25,10 +25,10 @@
 
 namespace GCode {
   class MachineLinearizer : public MachineAdapter {
-    double arcPrecision;
+    double maxArcError;
 
   public:
-    MachineLinearizer(double arcPrecision = 360) : arcPrecision(arcPrecision) {}
+    MachineLinearizer(double maxArcError = 0.01) : maxArcError(maxArcError) {}
 
     // From MachineInterface
     void arc(const cb::Vector3D &offset, double degrees, plane_t plane);

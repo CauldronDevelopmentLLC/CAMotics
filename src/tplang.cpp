@@ -20,13 +20,7 @@
 
 #include <camotics/CommandLineApp.h>
 
-#include <gcode/machine/Machine.h>
 #include <gcode/machine/MachinePipeline.h>
-#include <gcode/machine/MachineState.h>
-#include <gcode/machine/MachineMatrix.h>
-#include <gcode/machine/MachineLinearizer.h>
-#include <gcode/machine/MachineUnitAdapter.h>
-#include <gcode/machine/GCodeMachine.h>
 
 #include <tplang/TPLContext.h>
 #include <tplang/Interpreter.h>
@@ -63,21 +57,13 @@ public:
   }
 
   // From CommandLineApp
-  int init(int argc, char *argv[]) {
-    int ret = CommandLineApp::init(argc, argv);
-    if (ret == -1) return ret;
-
-    // Build machine pipeline
-    pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
-    pipeline.add(new MachineLinearizer);
-    pipeline.add(new MachineMatrix);
-    pipeline.add(new GCodeMachine(*stream, outputUnits));
-    pipeline.add(new MachineState);
+  void run() {
+    build(pipeline);
 
     if (!simJSON.empty())
       ctx.sim = JSON::Reader::parse(StringInputSource(simJSON));
 
-    return ret;
+    CommandLineApp::run();
   }
 
 
@@ -86,11 +72,10 @@ public:
     ctx.interrupt(); // Terminate Javascript execution
   }
 
+
   // From cb::Reader
   void read(const cb::InputSource &source) {
     tplang::Interpreter(ctx).read(source);
-    stream->flush();
-    cout.flush();
   }
 };
 

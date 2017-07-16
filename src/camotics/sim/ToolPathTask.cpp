@@ -69,7 +69,8 @@ void ToolPathTask::run() {
 
   // Setup
   path = new GCode::ToolPath(tools);
-  // TODO load machine configuration, including rapidFeed
+
+  // TODO load machine configuration, including rapidFeed & maxArcError
   GCode::Machine machine(*path);
   machine.reset();
   GCode::Controller controller(machine, tools);

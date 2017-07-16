@@ -221,7 +221,8 @@ module.exports = extend({
     var error = Math.min(this.arc_error, a.radius);
     var error_angle = 2 * Math.acos(1 - error / a.radius);
 
-    // Error angle cannot be greater than 2Pi/3
+    // Error angle cannot be greater than 2Pi/3 because we need at least 3
+    // segments in a full circle
     error_angle = Math.min(2 * Math.PI / 3, error_angle);
 
     var steps = Math.ceil(angle / (error_angle / Math.PI * 180));

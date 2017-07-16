@@ -37,7 +37,8 @@ namespace GCode {
     double rapidFeed;
 
   public:
-    Machine(MoveStream &stream, double rapidFeed = 1000);
+    Machine(MoveStream &stream, double rapidFeed = 1000,
+            double maxArcError = 0.01);
 
     using MachineAdapter::move;
 

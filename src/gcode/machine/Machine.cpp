@@ -35,10 +35,10 @@ using namespace std;
 using namespace GCode;
 
 
-Machine::Machine(MoveStream &stream, double rapidFeed) :
+Machine::Machine(MoveStream &stream, double rapidFeed, double maxArcError) :
   stream(stream), rapidFeed(rapidFeed) {
   add(new MachineUnitAdapter);
-  add(new MachineLinearizer);
+  add(new MachineLinearizer(maxArcError));
   add(new MachineMatrix);
   add(new MoveSink(*this));
   add(new MachineState);

@@ -55,10 +55,20 @@ void MachineLinearizer::arc(const cb::Vector3D &offset, double angle,
   // Radius
   double radius = cb::Vector2D(offset.x(), offset.y()).length();
 
+  // Allowed error cannot be greater than arc radius
+  double error = std::min(maxArcError, radius);
+  double errorAngle = 2 * acos(1 - error / radius);
+
+  // Error angle cannot be greater than 2Pi/3 because we need at least 3
+  // segments in a full circle
+  errorAngle = std::min(2 * M_PI / 3, errorAngle);
+
   // Segments
-  unsigned segments = (unsigned)(fabs(angle) / (2 * M_PI) * arcPrecision);
-  double zDelta = offset.z() / segments;
+  unsigned segments = (unsigned)ceil(fabs(angle) / errorAngle);
   double deltaAngle = -angle / segments;
+  double zDelta = offset.z() / segments;
+
+  // TODO The estimated arc should straddle the actual arc.  This one
 
   // Create segments
   for (unsigned i = 0; i < segments; i++) {

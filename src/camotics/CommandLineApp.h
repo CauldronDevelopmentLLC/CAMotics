@@ -22,7 +22,9 @@
 
 
 #include "Application.h"
+
 #include <gcode/Units.h>
+#include <gcode/machine/MachinePipeline.h>
 
 #include <iostream>
 
@@ -35,6 +37,8 @@ namespace CAMotics {
   protected:
     GCode::Units outputUnits;
     GCode::Units defaultUnits;
+    double maxArcError;
+    bool linearize;
 
     cb::SmartPointer<std::ostream> stream;
 
@@ -45,6 +49,9 @@ namespace CAMotics {
     // From cb::Application
     static bool _hasFeature(int feature);
     int init(int argc, char *argv[]);
+    void run();
+
+    void build(GCode::MachinePipeline &pipeline);
 
     int metricAction(cb::Option &opt);
     int imperialAction(cb::Option &opt);
