@@ -22,6 +22,7 @@
       topics. Whereas 3D printing simulation and tool path generation is much
       easier. However, such software is essential to using a CNC.
     </p>
+    <p>
       Being able to simulate is a critical part of creating usable CNC tool paths.
       Programming a CNC with out a simulator is cutting with out measuring; it's
       both dangerous and expensive. With CAMotics you can preview the results of
@@ -29,7 +30,6 @@
       save you time and money and open up a world of creative possibilities by
       allowing you to rapidly visualize and improve upon designs without wasting
       material or breaking tools.
-    <p>
     </p>
   </description>
   <screenshots>
