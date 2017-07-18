@@ -27,6 +27,7 @@
 
 #include <camotics/contour/Surface.h>
 #include <camotics/value/ValueGroup.h>
+#include <camotics/machine/MachineModel.h>
 
 #include <cbang/SmartPointer.h>
 #include <cbang/time/Timer.h>
@@ -52,6 +53,7 @@ namespace CAMotics {
     cb::SmartPointer<CuboidView> workpiece;
     cb::SmartPointer<Surface> surface;
     cb::SmartPointer<MoveLookup> moveLookup;
+    cb::SmartPointer<MachineModel> machine;
 
     enum {
       WIRE_FLAG                  = 1 << 0,
@@ -59,13 +61,15 @@ namespace CAMotics {
       SHOW_WORKPIECE_BOUNDS_FLAG = 1 << 3,
       SHOW_PATH_FLAG             = 1 << 4,
       SHOW_TOOL_FLAG             = 1 << 5,
-      SHOW_SURFACE_FLAG          = 1 << 6,
-      SHOW_BBTREE_FLAG           = 1 << 7,
-      BBTREE_LEAVES_FLAG         = 1 << 8,
-      PLAY_FLAG                  = 1 << 9,
-      PATH_VBOS_FLAG             = 1 << 10,
-      SURFACE_VBOS_FLAG          = 1 << 11,
-      TRANSLUCENT_SURFACE_FLAG   = 1 << 12,
+      SHOW_MACHINE_FLAG          = 1 << 6,
+      SHOW_SURFACE_FLAG          = 1 << 7,
+      SHOW_AXES_FLAG             = 1 << 8,
+      SHOW_BBTREE_FLAG           = 1 << 9,
+      BBTREE_LEAVES_FLAG         = 1 << 10,
+      PLAY_FLAG                  = 1 << 11,
+      PATH_VBOS_FLAG             = 1 << 12,
+      SURFACE_VBOS_FLAG          = 1 << 13,
+      TRANSLUCENT_SURFACE_FLAG   = 1 << 14,
     };
 
     View(ValueSet &valueSet);

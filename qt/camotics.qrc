@@ -70,5 +70,6 @@
         <file>icons/down.png</file>
         <file>icons/up.png</file>
         <file>icons/buildbotics.png</file>
+        <file>icons/machine.png</file>
     </qresource>
 </RCC>

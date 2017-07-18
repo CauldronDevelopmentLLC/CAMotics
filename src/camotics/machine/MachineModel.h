@@ -20,42 +20,41 @@
 
 #pragma once
 
-
-#include <camotics/sim/Project.h>
-#include <camotics/view/View.h>
+#include "MachinePart.h"
 
 #include <cbang/SmartPointer.h>
 
-#include <QDialog>
-
-namespace Ui {class SettingsDialog;}
+#include <map>
+#include <vector>
+#include <string>
 
 
 namespace CAMotics {
-  class SettingsDialog : public QDialog {
-    Q_OBJECT;
+  class MachineModel {
+    cb::SmartPointer<cb::JSON::Value> config;
 
-    cb::SmartPointer<Ui::SettingsDialog> ui;
+    std::string name;
+    bool reverseWinding;
+    cb::Vector3D tool;
+    cb::Vector3D workpiece;
 
+    cb::Vector3D offset;
     cb::Rectangle3D bounds;
-    bool changing;
+
+    typedef std::map<std::string, cb::SmartPointer<MachinePart> > parts_t;
+    parts_t parts;
 
   public:
-    SettingsDialog(QWidget *parent);
+    MachineModel(const cb::InputSource &source) {read(source);}
 
-    void addMachine(const std::string &name, const std::string &path);
-    std::string getMachineName() const;
-    std::string getMachinePath() const;
-    std::string getMachinePath(const std::string &machine) const;
+    const std::string &getName() const {return name;}
+    void setPosition(const cb::Vector3D &p);
+    const cb::Rectangle3D &getBounds() const {return bounds;}
+    const cb::Vector3D &getTool() const {return tool;}
+    const cb::Vector3D &getWorkpiece() const {return workpiece;}
 
-    bool exec(Project &project, View &view);
-
-  signals:
-    void machineChanged(QString machine, QString file);
-
-  protected slots:
-    void on_machineComboBox_currentIndexChanged(int index);
-    void on_resolutionComboBox_currentIndexChanged(int index);
-    void on_resolutionDoubleSpinBox_valueChanged(double value);
+    void readModel(const cb::InputSource &source);
+    void read(const cb::InputSource &source);
+    void draw(bool withVBOs, bool wire);
   };
 }

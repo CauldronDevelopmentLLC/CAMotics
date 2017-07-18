@@ -141,9 +141,12 @@ namespace CAMotics {
     void setAutoClose(bool x = true) {autoClose = x;}
 
     void init();
+
     void setUnitLabel(QLabel *label, double value, int precision = 2,
                       bool withUnit = false);
 
+    void loadMachine(const std::string &machine);
+    void loadMachines();
     void loadDefaultExample();
     void loadExamples();
     void loadRecentProjects();
@@ -283,6 +286,8 @@ namespace CAMotics {
     void animate();
     void openRecentProjectsSlot(const QString path);
 
+    void on_machineChanged(QString machine, QString path);
+
     void on_fileTabManager_currentChanged(int index);
     void on_positionSlider_valueChanged(int position);
     void on_positionSlider_sliderPressed();
@@ -355,6 +360,7 @@ namespace CAMotics {
     void on_actionWireSurface_triggered();
     void on_actionHideSurface_triggered();
     void on_actionTool_triggered(bool checked);
+    void on_actionMachine_triggered(bool checked);
     void on_actionWorkpieceBounds_triggered(bool checked);
     void on_actionAxes_triggered(bool checked);
     void on_actionToolPath_triggered(bool checked);

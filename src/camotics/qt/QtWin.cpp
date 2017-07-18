@@ -30,6 +30,7 @@
 #include <camotics/sim/ToolPathTask.h>
 #include <camotics/sim/SurfaceTask.h>
 #include <camotics/sim/ReduceTask.h>
+#include <camotics/machine/MachineModel.h>
 #include <camotics/opt/Opt.h>
 
 #include <stl/Writer.h>
@@ -74,6 +75,10 @@ QtWin::QtWin(Application &app) :
   sliderMoving(false), positionChanged(false) {
 
   ui->setupUi(this);
+
+  // Settings dialog
+  connect(&settingsDialog, SIGNAL(machineChanged(QString, QString)),
+          this, SLOT(on_machineChanged(QString, QString)));
 
   // FileTabManager
   connect(ui->actionUndo, SIGNAL(triggered()),
@@ -134,10 +139,9 @@ QtWin::QtWin(Application &app) :
   backwardIcon.addFile(QString::fromUtf8(":/icons/backward.png"), QSize(),
                        QIcon::Normal, QIcon::Off);
 
-  // Load examples
+  // Load data
+  loadMachines();
   loadExamples();
-
-  // Load recent projects
   loadRecentProjects();
 
   // Add docks to View menu
@@ -246,6 +250,62 @@ void QtWin::setUnitLabel(QLabel *label, double value, int precision,
   double scale = isMetric() ? 1.0 : 1.0 / 25.4;
   label->setText(QString().sprintf("%.*f%s", precision, value * scale,
                                    withUnit ? (isMetric() ? "mm" : "in") : ""));
+}
+
+
+void QtWin::loadMachine(const string &machine) {
+  if (view->machine.isNull() || machine != view->machine->getName()) {
+    string machineFile = settingsDialog.getMachinePath(machine);
+    LOG_DEBUG(1, "Loading machine " << machine << " from " << machineFile);
+    view->machine.release();
+    view->machine = new MachineModel(machineFile);
+    redraw();
+  }
+}
+
+
+void QtWin::loadMachines() {
+  try {
+    const char *paths[] = {
+      "/usr/share/doc/camotics/machines",
+      "../SharedSupport/machines",
+      "machines",
+      0
+    };
+
+    string root = ".";
+    string appPath =
+      QCoreApplication::applicationFilePath().toUtf8().data();
+    if (appPath.empty()) LOG_WARNING("Couldn't get application path");
+    else root = SystemUtilities::dirname(appPath);
+
+    for (const char **p = paths; *p; p++) {
+      string path = *p;
+      if (path[0] != '/') path = root + "/" + path;
+
+      if (SystemUtilities::isDirectory(path)) {
+        unsigned count = 0;
+        DirectoryWalker walker(path, ".*\\.json", 1);
+
+        while (walker.hasNext()) {
+          string filename = walker.next();
+
+          try {
+            SmartPointer<JSON::Value> data = JSON::Reader::parse(filename);
+            if (!data->hasString("name") || !data->hasString("model")) continue;
+
+            count++;
+            settingsDialog.addMachine(data->getString("name"), filename);
+          } CATCH_ERROR;
+        }
+
+        if (count) break;
+      }
+    }
+
+    loadMachine(Settings().get("Settings/Machine", "Taig Mini Mill")
+                .toString().toUtf8().data());
+  } CATCH_ERROR;
 }
 
 
@@ -1691,6 +1751,11 @@ void QtWin::openRecentProjectsSlot(const QString path) {
 }
 
 
+void QtWin::on_machineChanged(QString machine, QString path) {
+  loadMachine(machine.toUtf8().data());
+}
+
+
 void QtWin::on_fileTabManager_currentChanged(int index) {
   redraw();
   updateActions();
@@ -1908,8 +1973,10 @@ void QtWin::on_actionLoadDefaultToolTable_triggered() {
 
 
 void QtWin::on_actionSettings_triggered() {
-  if (!project.isNull()) settingsDialog.exec(*project, *view);
-  updateUnits();
+  if (!project.isNull() && settingsDialog.exec(*project, *view)) {
+    loadMachine(settingsDialog.getMachineName());
+    updateUnits();
+  }
 }
 
 
@@ -2007,13 +2074,19 @@ void QtWin::on_actionHideSurface_triggered() {
 
 
 void QtWin::on_actionAxes_triggered(bool checked) {
-  view->setShowAxes(checked);
+  view->setFlag(View::SHOW_AXES_FLAG, checked);
   redraw();
 }
 
 
 void QtWin::on_actionTool_triggered(bool checked) {
   view->setFlag(View::SHOW_TOOL_FLAG, checked);
+  redraw();
+}
+
+
+void QtWin::on_actionMachine_triggered(bool checked) {
+  view->setFlag(View::SHOW_MACHINE_FLAG, checked);
   redraw();
 }
 

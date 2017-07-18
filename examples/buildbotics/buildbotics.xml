@@ -9,13 +9,13 @@
   <units v='MM'/>
 
   <!-- Renderer -->
-  <resolution v='0.16971'/>
+  <resolution v='0.318559'/>
   <resolution-mode v='HIGH'/>
 
   <!-- Workpiece -->
   <automatic-workpiece v='true'/>
-  <workpiece-max v='(80.9405,80.867,0)'/>
-  <workpiece-min v='(-7.1805,-7.177,-3.15)'/>
+  <workpiece-max v='(197.113,196.913,0)'/>
+  <workpiece-min v='(-12.7125,-12.703,-3.675)'/>
 
   <tool_table>
     <tool length='1' number='1' radius='0.04685' shape='CYLINDRICAL' units='INCH'/>

@@ -146,7 +146,7 @@ libs.append(lib)
 src = []
 for subdir in [
     '', 'sim', 'probe', 'view', 'opt', 'cam', 'contour', 'qt', 'render',
-    'value']:
+    'value', 'machine']:
     src += Glob('src/camotics/%s/*.cpp' % subdir)
 
 for subdir in ['']:
@@ -207,7 +207,7 @@ if not have_dxflib:
 
 # Build programs
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
-progs = 'camotics gcodetool tplang camsim planner'
+progs = 'camotics gcodetool tplang camsim planner tco2stl'
 execs = []
 for prog in progs.split():
     if prog == 'camotics' and int(env.get('cross_mingw', 0)):
@@ -253,16 +253,23 @@ save you time and money and open up a world of creative possibilities by
 allowing you to rapidly visualize and improve upon designs with out wasting
 material or breaking tools.'''
 
-# Package checked in examples
+# Package checked in examples & machinse
 examples = []
+machinse = []
 if 'package' in COMMAND_LINE_TARGETS:
     import subprocess
 
+    # Examples
     cmd = 'git ls-files examples/'
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     examples = p.communicate()[0]
     examples = map(lambda x: [x, x], examples.split())
 
+    # Machines
+    cmd = 'git ls-files machines/'
+    p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
+    machines = p.communicate()[0]
+    machines = map(lambda x: [x, x], machines.split())
 
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
@@ -318,7 +325,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         mime = [['mime.xml', 'camotics.xml']],
         platform_independent = ('tpl_lib'),
 
-        documents = ['README.md', 'CHANGELOG.md'] + examples,
+        documents = ['README.md', 'CHANGELOG.md'] + examples + machines,
         programs = map(lambda x: str(x[0]), execs),
         desktop_menu = ['CAMotics.desktop'],
         changelog = 'CHANGELOG.md',

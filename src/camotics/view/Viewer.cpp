@@ -69,15 +69,30 @@ void Viewer::draw(const View &view) {
   init();
 
   SmartPointer<Surface> surface = view.surface;
+  bool showMachine =
+    !view.machine.isNull() && view.isFlagSet(View::SHOW_MACHINE_FLAG);
 
   // Setup view port
   cb::Rectangle3D bounds = view.path->getBounds();
   if (!surface.isNull()) bounds.add(surface->getBounds());
   bounds.add(view.workpiece->getBounds());
-  view.glDraw(bounds);
+  if (showMachine) bounds.add(view.machine->getBounds());
+  view.glDraw(bounds, view.workpiece->getBounds().getCenter());
 
   // Enable Lighting
   view.setLighting(true);
+
+  cb::Vector3D currentPosition = view.path->getPosition();
+  glPushMatrix();
+
+  if (showMachine) {
+    Vector3D v = view.machine->getWorkpiece() * currentPosition;
+    glTranslatef(v.x(), v.y(), v.z());
+  }
+
+  // Axes
+  if (view.isFlagSet(View::SHOW_AXES_FLAG))
+    view.drawAxes(view.workpiece->getBounds());
 
   // Workpiece bounds
   if (!view.isFlagSet(View::SHOW_WORKPIECE_FLAG) &&
@@ -119,6 +134,8 @@ void Viewer::draw(const View &view) {
   if (view.isFlagSet(View::SHOW_BBTREE_FLAG) && !view.moveLookup.isNull())
     view.moveLookup->draw(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
+  glPopMatrix();
+
   // GCode::Tool
   if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->isEmpty()) {
     const GCode::ToolTable &tools = view.path->getPath()->getTools();
@@ -132,9 +149,14 @@ void Viewer::draw(const View &view) {
       double length = tool.getLength();
       GCode::ToolShape shape = tool.getShape();
 
-      cb::Vector3D currentPosition = view.path->getPosition();
-      glTranslatef(currentPosition.x(), currentPosition.y(),
-                   currentPosition.z());
+      glPushMatrix();
+
+      if (showMachine) {
+        Vector3D v = view.machine->getTool() * currentPosition;
+        glTranslatef(v.x(), v.y(), v.z());
+
+      } else glTranslatef(currentPosition.x(), currentPosition.y(),
+                          currentPosition.z());
 
       if (radius <= 0) {
         // Default tool specs
@@ -180,7 +202,23 @@ void Viewer::draw(const View &view) {
         drawCylinder((GLUquadric *)toolQuad, radius, radius, length);
         break;
       }
+
+      glPopMatrix();
     }
+  }
+
+  // Machine
+  if (showMachine) {
+    glPushMatrix();
+
+    // TODO Work offsets should be configurable
+    glTranslatef(0, 0, -view.workpiece->getBounds().getDimensions().z());
+
+    view.machine->setPosition(currentPosition);
+    view.machine->draw(view.isFlagSet(View::SURFACE_VBOS_FLAG),
+                       view.isFlagSet(View::WIRE_FLAG));
+
+    glPopMatrix();
   }
 
   // Disable Lighting

@@ -21,9 +21,9 @@
 #include "SettingsDialog.h"
 #include "Settings.h"
 
-#include <camotics/view/GL.h>
-
 #include "ui_settings_dialog.h"
+
+#include <camotics/view/GL.h>
 
 using namespace std;
 using namespace cb;
@@ -43,10 +43,39 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 }
 
 
-void SettingsDialog::exec(Project &project, View &view) {
+void SettingsDialog::addMachine(const string &name, const string &path) {
+  ui->machineComboBox->addItem(QString::fromUtf8(name.c_str()),
+                               QString::fromUtf8(path.c_str()));
+}
+
+
+string SettingsDialog::getMachineName() const {
+  return ui->machineComboBox->currentText().toUtf8().data();
+}
+
+
+string SettingsDialog::getMachinePath(const string &machine) const {
+  int i = ui->machineComboBox->findText(QString::fromUtf8(machine.c_str()));
+  if (i == -1) THROWS("Machine '" << machine << "' not found");
+  return ui->machineComboBox->itemData(i).toString().toUtf8().data();
+}
+
+
+string SettingsDialog::getMachinePath() const {
+  return ui->machineComboBox->currentData().toString().toUtf8().data();
+}
+
+
+bool SettingsDialog::exec(Project &project, View &view) {
   Settings settings;
 
   bounds = project.getWorkpieceBounds();
+
+  // Select machine
+  int selectedMachine = ui->machineComboBox->findText
+    (settings.get("Settings/Machine", "Taig Mini Mill").toString());
+  if (selectedMachine != -1)
+    ui->machineComboBox->setCurrentIndex(selectedMachine);
 
   ui->resolutionDoubleSpinBox->setValue(project.getResolution());
   ui->resolutionComboBox->setCurrentIndex(project.getResolutionMode());
@@ -68,14 +97,21 @@ void SettingsDialog::exec(Project &project, View &view) {
   ui->surfaceVBOsCheckBox->setEnabled(haveVBOs());
   ui->pathVBOsCheckBox->setEnabled(haveVBOs());
 
-  if (QDialog::exec() != QDialog::Accepted) return;
+  if (QDialog::exec() != QDialog::Accepted) {
+    if (selectedMachine != -1)
+      ui->machineComboBox->setCurrentIndex(selectedMachine);
+    return false;
+  }
+
+  settings.set("Settings/Machine", ui->machineComboBox->currentText());
 
   project.setResolution(ui->resolutionDoubleSpinBox->value());
 
   int index = ui->resolutionComboBox->currentIndex();
   project.setResolutionMode((ResolutionMode::enum_t)index);
 
-  GCode::ToolUnits units = (GCode::ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
+  GCode::ToolUnits units =
+    (GCode::ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
   project.setUnits(units);
   settings.set("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
 
@@ -87,6 +123,14 @@ void SettingsDialog::exec(Project &project, View &view) {
 
   settings.set("Settings/VBO/Surface", ui->surfaceVBOsCheckBox->isChecked());
   settings.set("Settings/VBO/Path", ui->pathVBOsCheckBox->isChecked());
+
+  return true;
+}
+
+
+void SettingsDialog::on_machineComboBox_currentIndexChanged(int index) {
+  emit machineChanged(ui->machineComboBox->currentText(),
+                      ui->machineComboBox->currentData().toString());
 }
 
 

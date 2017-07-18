@@ -23,6 +23,7 @@
 
 #include "Sink.h"
 
+#include <cbang/geom/Triangle.h>
 #include <cbang/io/OutputSink.h>
 
 
@@ -40,6 +41,7 @@ namespace STL {
                      const std::string &hash = std::string());
     void writeFacet(const cb::Vector3F &v1, const cb::Vector3F &v2,
                     const cb::Vector3F &v3, const cb::Vector3F &normal);
+    void writeFacet(const cb::Triangle3F &t, const cb::Vector3F &normal);
     void writeFooter(const std::string &name,
                      const std::string &hash = std::string());
   };

@@ -35,7 +35,7 @@ using namespace CAMotics;
 View::View(ValueSet &valueSet) :
   values(valueSet), flags(SHOW_PATH_FLAG | SHOW_TOOL_FLAG | SHOW_SURFACE_FLAG |
                           SHOW_WORKPIECE_BOUNDS_FLAG | PATH_VBOS_FLAG |
-                          SURFACE_VBOS_FLAG),
+                          SURFACE_VBOS_FLAG | SHOW_AXES_FLAG),
   speed(1), reverse(false), lastTime(0), path(new ToolPathView(valueSet)),
   workpiece(new CuboidView) {
 

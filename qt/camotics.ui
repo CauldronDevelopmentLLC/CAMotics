@@ -384,6 +384,7 @@
     <addaction name="separator"/>
     <addaction name="actionToolPath"/>
     <addaction name="actionTool"/>
+    <addaction name="actionMachine"/>
     <addaction name="actionWorkpieceBounds"/>
     <addaction name="actionAxes"/>
     <addaction name="separator"/>
@@ -466,6 +467,7 @@
    <addaction name="separator"/>
    <addaction name="actionToolPath"/>
    <addaction name="actionTool"/>
+   <addaction name="actionMachine"/>
    <addaction name="actionWorkpieceBounds"/>
    <addaction name="actionAxes"/>
   </widget>
@@ -3064,6 +3066,21 @@
    </property>
    <property name="toolTip">
     <string>Connect to a Buildbotics CNC Controller</string>
+   </property>
+  </action>
+  <action name="actionMachine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="camotics.qrc">
+     <normaloff>:/icons/machine.png</normaloff>:/icons/machine.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Machine</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle machine display.</string>
    </property>
   </action>
  </widget>

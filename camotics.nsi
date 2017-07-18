@@ -75,6 +75,11 @@ Section -Install
   SetOutPath "$INSTDIR\examples"
   File /r "examples\*.*"
 
+  ; Machines
+  SetOverwrite on
+  SetOutPath "$INSTDIR\machines"
+  File /r "machines\*.*"
+
   ; Desktop
   CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}" \
     "" "$INSTDIR\${PRODUCT_ICON}"

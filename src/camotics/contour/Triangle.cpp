@@ -30,12 +30,23 @@ void Triangle::updateNormal() {
 
 
 Vector3F Triangle::computeNormal() const {
+  return computeNormal(data[0], data[1], data[2]);
+}
+
+
+Vector3F Triangle::computeNormal(const Vector3F &v1, const Vector3F &v2,
+                                 const Vector3F &v3) {
   // Compute face normal
-  Vector3F n = (data[1] - data[0]).cross(data[2] - data[0]);
+  Vector3F n = (v2 - v1).cross(v3 - v1);
 
   // Normalize
   double length = n.length();
   n /= length;
 
   return n;
+}
+
+
+Vector3F Triangle::computeNormal(const Triangle3F &t) {
+  return computeNormal(t[0], t[1], t[2]);
 }

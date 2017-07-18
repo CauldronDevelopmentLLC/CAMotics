@@ -29,19 +29,11 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ViewPort::ViewPort() : width(1024), height(768), zoom(1), axes(true) {
-  resetView();
-}
+ViewPort::ViewPort() : width(1024), height(768), zoom(1) {resetView();}
 
 
-void ViewPort::zoomIn() {
-  if (0.2 < zoom) zoom *= 0.9;
-}
-
-
-void ViewPort::zoomOut() {
-  if (zoom < 30) zoom *= 1.1;
-}
+void ViewPort::zoomIn() {if (0.2 < zoom) zoom *= 0.9;}
+void ViewPort::zoomOut() {if (zoom < 30) zoom *= 1.1;}
 
 
 void ViewPort::center() {
@@ -156,7 +148,8 @@ void ViewPort::glInit() const {
 }
 
 
-void ViewPort::glDraw(const cb::Rectangle3D &bbox) const {
+void ViewPort::glDraw(const cb::Rectangle3D &bbox,
+                      const cb::Vector3D &center) const {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
@@ -194,23 +187,18 @@ void ViewPort::glDraw(const cb::Rectangle3D &bbox) const {
   glRotated(rotation[0], rotation[1], rotation[2], rotation[3]);
 
   // Center
-  cb::Vector3D center = bbox.getCenter();
   glTranslatef(-center.x(), -center.y(), -center.z());
+}
 
-  // Axes
-  if (axes) {
-    double length = (bbox.getWidth() + bbox.getLength() + bbox.getHeight()) / 3;
-    length *= 0.1;
-    double radius = length / 20;
 
-    setLighting(true);
+void ViewPort::drawAxes(const Rectangle3D &bbox) const {
+  double length = (bbox.getWidth() + bbox.getLength() + bbox.getHeight()) / 3;
+  length *= 0.1;
+  double radius = length / 20;
 
-    for (int axis = 0; axis < 3; axis++)
-      for (int up = 0; up < 2; up++)
-        drawAxis(axis, up, length, radius);
-
-    setLighting(false);
-  }
+  for (int axis = 0; axis < 3; axis++)
+    for (int up = 0; up < 2; up++)
+      drawAxis(axis, up, length, radius);
 }
 
 

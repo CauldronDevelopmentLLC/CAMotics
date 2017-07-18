@@ -29,7 +29,6 @@ namespace CAMotics {
     unsigned width;
     unsigned height;
     double zoom;
-    bool axes;
 
     cb::Vector3D rotationStartVec;
     cb::QuaternionD rotationStart;
@@ -47,10 +46,6 @@ namespace CAMotics {
     unsigned getWidth() const {return width;}
     unsigned getHeight() const {return height;}
     double getZoom() const {return zoom;}
-
-    void toggleShowAxes() {axes = !axes;}
-    void setShowAxes(bool x) {axes = x;}
-    bool getShowAxes() const {return axes;}
 
     void zoomIn();
     void zoomOut();
@@ -70,8 +65,10 @@ namespace CAMotics {
     void resetView(char c = 'p');
 
     virtual void glInit() const;
-    virtual void glDraw(const cb::Rectangle3D &bounds) const;
+    virtual void glDraw(const cb::Rectangle3D &bounds,
+                        const cb::Vector3D &center) const;
 
+    void drawAxes(const cb::Rectangle3D &bounds) const;
     void drawAxis(int axis, bool up, double length, double radius) const;
     void setLighting(bool x) const;
     void setWire(bool x) const;

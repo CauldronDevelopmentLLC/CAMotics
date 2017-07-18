@@ -38,5 +38,9 @@ namespace CAMotics {
 
     void updateNormal();
     cb::Vector3F computeNormal() const;
-  };
+    static cb::Vector3F computeNormal(const cb::Vector3F &v1,
+                                      const cb::Vector3F &v2,
+                                      const cb::Vector3F &v3);
+    static cb::Vector3F computeNormal(const cb::Triangle3F &t);
+ };
 }
