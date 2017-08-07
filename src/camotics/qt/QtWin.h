@@ -36,7 +36,7 @@
 
 #include <camotics/ConcurrentTaskManager.h>
 #include <camotics/view/View.h>
-#include <camotics/view/ToolView.h>
+#include <camotics/view/Tool2DView.h>
 #include <camotics/value/ValueSet.h>
 
 #include <cbang/SmartPointer.h>
@@ -45,13 +45,7 @@
 #include <cbang/iostream/LineBufferDevice.h>
 #endif
 
-#include <QtGlobal>
-#if QT_VERSION < 0x050000
-#include <QtGui>
-#else
 #include <QtWidgets>
-#endif
-
 #include <QSignalMapper>
 
 namespace cb {class Application;}

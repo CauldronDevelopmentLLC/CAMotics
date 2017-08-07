@@ -23,10 +23,7 @@
 #include <cbang/json/JSON.h>
 
 #include <QObject>
-
-#if 0x50000 <= QT_VERSION
 #include <QtWebSockets/QtWebSockets>
-#endif
 
 class QNetworkAccessManager;
 

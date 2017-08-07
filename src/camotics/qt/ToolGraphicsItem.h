@@ -22,20 +22,14 @@
 
 
 #include <gcode/Tool.h>
-#include <camotics/view/ToolView.h>
+#include <camotics/view/Tool2DView.h>
 
-#include <QtGlobal>
-#if QT_VERSION < 0x050000
-#include <QtGui>
-#else
 #include <QtWidgets>
-#endif
-
 
 
 namespace CAMotics {
   class ToolGraphicsItem : public QGraphicsPixmapItem {
-    ToolView toolView;
+    Tool2DView toolView;
     unsigned number;
 
   public:

@@ -26,9 +26,11 @@ using namespace CAMotics;
 
 
 CuboidView::~CuboidView() {
-  if (glDeleteBuffers) {
-    if (vertexVBuf) glDeleteBuffers(1, &vertexVBuf);
-    if (normalVBuf) glDeleteBuffers(1, &normalVBuf);
+  if (haveVBOs()) {
+    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+
+    if (vertexVBuf) glFuncs->glDeleteBuffers(1, &vertexVBuf);
+    if (normalVBuf) glFuncs->glDeleteBuffers(1, &normalVBuf);
   }
 }
 
@@ -58,23 +60,25 @@ void CuboidView::draw() {
      0,  0, -1,   0,  0, -1,   0,  0, -1,   0,  0, -1,
   };
 
-  if (glGenBuffers) {
-    if (!vertexVBuf) {
-      glGenBuffers(1, &vertexVBuf);
-      glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-      glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                   vertices, GL_STATIC_DRAW);
+  if (haveVBOs()) {
+    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
 
-      glGenBuffers(1, &normalVBuf);
-      glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
-      glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                   normals, GL_STATIC_DRAW);
+    if (!vertexVBuf) {
+      glFuncs->glGenBuffers(1, &vertexVBuf);
+      glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+      glFuncs->glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
+                            vertices, GL_STATIC_DRAW);
+
+      glFuncs->glGenBuffers(1, &normalVBuf);
+      glFuncs->glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
+      glFuncs->glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
+                            normals, GL_STATIC_DRAW);
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
     glNormalPointer(GL_FLOAT, 0, 0);
 
   } else {

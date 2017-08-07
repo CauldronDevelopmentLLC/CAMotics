@@ -20,8 +20,7 @@
 
 #pragma once
 
-
-#include <GL/glew.h> // Must be first
+#include <QOpenGLFunctions>
 
 #include <cbang/SStream.h>
 
@@ -34,8 +33,10 @@
 
 namespace CAMotics {
   void checkGLError(const std::string &message = std::string());
-
   bool haveVBOs();
+  void glDisk(double radius, unsigned segments);
+  void glCylinder(double base, double top, double height, unsigned segments);
+  void glSphere(double radius, unsigned slices, unsigned stacks);
 }
 
 #ifdef __DEBUG

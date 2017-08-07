@@ -29,9 +29,7 @@ using namespace std;
 
 MachinePart::MachinePart(const string &name,
                          SmartPointer<JSON::Value> &config) :
-  name(name) {
-  vbufs[0] = 0;
-
+  name(name), vbuf(0) {
   if (config->hasList("color")) color.read(config->getList("color"));
   if (config->hasList("init")) init.read(config->getList("init"));
   if (config->hasList("home")) home.read(config->getList("home"));
@@ -110,26 +108,32 @@ void MachinePart::read(const InputSource &source,
 
 void MachinePart::drawLines(bool withVBOs) {
   if (withVBOs && haveVBOs()) {
-    if (!vbufs[0]) {
-      glGenBuffers(2, vbufs);
+    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+
+    if (!vbuf) {
+      glFuncs->glGenBuffers(1, &vbuf);
 
       // Vertices
-      glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-      glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
-                   &lines[0], GL_STATIC_DRAW);
+      glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbuf);
+      glFuncs->glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
+                            &lines[0], GL_STATIC_DRAW);
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbuf);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  } else glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+  } else glVertexPointer(3, GL_FLOAT, 0, &lines[0]);
 
   glEnableClientState(GL_VERTEX_ARRAY);
+  GLboolean light;
+  glGetBooleanv(GL_LIGHTING, &light);
+  glDisable(GL_LIGHTING);
 
-  glDrawArrays(GL_LINES, 0, lines.size());
+  glDrawArrays(GL_LINES, 0, lines.size() / 3);
 
+  if (light) glEnable(GL_LIGHTING);
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -140,7 +144,7 @@ void MachinePart::draw(bool withVBOs, bool wire) {
   glTranslatef(position[0], position[1], position[2]);
 
   if (wire) glColor3ub(color[0], color[1], color[2]);
-  else glColor3ub(0, 0, 0); // Black
+  else glColor3ub(color[0] * 0.8, color[1] * 0.8, color[2] * 0.8);
   drawLines(withVBOs);
 
   if (!wire) {

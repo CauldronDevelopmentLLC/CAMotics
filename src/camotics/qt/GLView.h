@@ -22,17 +22,19 @@
 
 
 #include <QtGlobal>
-#if defined(_WIN32) && QT_VERSION < 0x050000
-#include <winsock2.h> // Must come before below
-#endif
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
 #include <QGLWidget>
+#define PLATFORM_GL_WIDGET QGLWidget
+#else
+#include <QOpenGLWidget>
+#define PLATFORM_GL_WIDGET QOpenGLWidget
+#endif
 
 
 namespace CAMotics {
   class QtWin;
 
-  class GLView : public QGLWidget {
+  class GLView : public PLATFORM_GL_WIDGET {
     Q_OBJECT;
 
   public:

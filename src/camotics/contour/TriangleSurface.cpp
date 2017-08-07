@@ -80,27 +80,31 @@ TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
 
 
 TriangleSurface::~TriangleSurface() {
-  if (vbufs[0]) glDeleteBuffers(2, vbufs);
+  if (vbufs[0]) {
+    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+    if (glFuncs) glFuncs->glDeleteBuffers(2, vbufs);
+  }
 }
 
 
 void TriangleSurface::finalize(bool withVBOs) {
   if (finalized) return;
 
-  useVBOs = haveVBOs() && withVBOs;
+  QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+  useVBOs = haveVBOs() && withVBOs && glFuncs;
 
   if (useVBOs) {
-    if (!vbufs[0]) glGenBuffers(2, vbufs);
+    if (!vbufs[0]) glFuncs->glGenBuffers(2, vbufs);
 
     // Vertices
-    glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
-                 &vertices[0], GL_STATIC_DRAW);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
+    glFuncs->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+                          &vertices[0], GL_STATIC_DRAW);
 
     // Normals
-    glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
-    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
-                 &normals[0], GL_STATIC_DRAW);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
+    glFuncs->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
+                          &normals[0], GL_STATIC_DRAW);
   }
 
   finalized = true;
@@ -155,13 +159,15 @@ void TriangleSurface::draw(bool withVBOs) {
   finalize(withVBOs);
 
   if (useVBOs) {
-    glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
+    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
     glNormalPointer(GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   } else {
     glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);

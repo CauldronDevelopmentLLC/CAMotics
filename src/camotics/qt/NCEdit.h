@@ -57,11 +57,7 @@
 #include <cbang/SmartPointer.h>
 
 #include <QtGlobal>
-#if QT_VERSION < 0x050000
-#include <QtGui>
-#else
 #include <QtWidgets>
-#endif
 
 
 namespace CAMotics {

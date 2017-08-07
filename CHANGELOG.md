@@ -11,6 +11,8 @@
  - Added support for tabs in 2D profile cuts in dfx TPL lib.
  - Added Buildbotics controller connectivity.
  - Fixed modal dialogs.
+ - Fixed Windows OpenGL problems.
+ - Dropped support for Qt4.
 
 ## v1.1.1:
  - Fixed bug preventing ``camsim`` from writing STL data.

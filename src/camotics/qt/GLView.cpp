@@ -21,7 +21,6 @@
 #include "GLView.h"
 
 #include "QtWin.h"
-#include "GLEWInit.h"
 
 #include <cbang/log/Logger.h>
 
@@ -31,7 +30,17 @@ using namespace CAMotics;
 
 
 GLView::GLView(QWidget *parent) :
-  QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::SampleBuffers), parent) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
+  QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::SampleBuffers), parent)
+#else
+  QOpenGLWidget(parent)
+#endif
+{
+#if QT_VERSION_CHECK(5, 4, 0) <= QT_VERSION
+  QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+  format.setSamples(4);
+  setFormat(format);
+#endif
 }
 
 
@@ -57,24 +66,6 @@ void GLView::wheelEvent(QWheelEvent *event) {
 }
 
 
-void GLView::initializeGL() {
-  try {
-    GLEWInit();
-  } catch (const cb::Exception &e) {
-    LOG_ERROR("Failed to load OpenGL.  You may need to upgrade "
-              "your graphics driver.\n" << e);
-    getQtWin().showConsole();
-  }
-
-  getQtWin().initializeGL();
-}
-
-
-void GLView::resizeGL(int w, int h) {
-  getQtWin().resizeGL(w, h);
-}
-
-
-void GLView::paintGL() {
-  getQtWin().paintGL();
-}
+void GLView::initializeGL() {getQtWin().initializeGL();}
+void GLView::resizeGL(int w, int h) {getQtWin().resizeGL(w, h);}
+void GLView::paintGL() {getQtWin().paintGL();}

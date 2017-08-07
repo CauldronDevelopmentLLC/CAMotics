@@ -15,10 +15,8 @@ Export('env')
 env.Tool('config', toolpath = [cbang])
 env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
-    BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
-    EnumVariable('qt_version', 'Version of Qt to use', 'auto',
-                 allowed_values = ('auto', '4', '5')))
-env.CBLoadTools('compiler cbang dist opengl dxflib glew build_info packager')
+    BoolVariable('qt_deps', 'Enable Qt package dependencies', True))
+env.CBLoadTools('compiler cbang dist opengl dxflib build_info packager')
 conf = env.CBConfigure()
 
 # Config vars
@@ -26,24 +24,10 @@ env.Replace(PACKAGE_VERSION = version)
 env.Replace(BUILD_INFO_NS = 'CAMotics::BuildInfo')
 
 # Qt5 tool
-qt_version = env.get('qt_version')
-if qt_version in ('auto', '5'):
-    try:
-        env.Tool('qt5', toolpath = ['./config'])
-        qt_version = '5'
-        env.EnableQtModules = env.EnableQt5Modules
-        env.Uic = env.Uic5
-        env.Qrc = env.Qrc5
-    except:
-        qt_version = '4'
-
-if qt_version == '4':
-    # Qt4 tool
-    env.Tool('qt4', toolpath = ['./config'])
-    qt_version = '4'
-    env.EnableQtModules = env.EnableQt4Modules
-    env.Uic = env.Uic4
-    env.Qrc = env.Qrc4
+env.Tool('qt5', toolpath = ['./config'])
+env.EnableQtModules = env.EnableQt5Modules
+env.Uic = env.Uic5
+env.Qrc = env.Qrc5
 
 # Dist
 if 'dist' in COMMAND_LINE_TARGETS:
@@ -61,11 +45,11 @@ if 'dist' in COMMAND_LINE_TARGETS:
     Return()
 
 
-have_glew = False
 have_cairo = False
 have_dxflib = False
 if not env.GetOption('clean'):
-    if qt_version == '5': env.Replace(cxxstd = 'c++11')
+    # Qt5 needs C++11
+    env.Replace(cxxstd = 'c++11')
 
     # Configure compiler
     conf.CBConfig('compiler')
@@ -80,13 +64,8 @@ if not env.GetOption('clean'):
         raise Exception('Chakra or V8 support is required, please rebuild C! '
                         'You may need to set CHAKRA_CORE_HOME or V8_HOME.')
 
-    # GLEW
-    have_glew = conf.CBConfig('glew', False)
-    if not have_glew: env.AppendUnique(CPPDEFINES = ['GLEW_STATIC'])
-
     # Qt
-    qtmods = 'QtCore QtGui QtOpenGL QtNetwork'
-    if qt_version == '5': qtmods += ' QtWidgets QtWebSockets'
+    qtmods = 'QtCore QtGui QtOpenGL QtNetwork QtWidgets QtWebSockets'
     env.EnableQtModules(qtmods.split())
     if env['PLATFORM'] != 'win32': env.Append(CCFLAGS = ['-fPIC'])
 
@@ -181,14 +160,6 @@ Depends(lib, uic)
 
 # 3rd-party libs
 libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
-
-
-# GLEW
-if not have_glew:
-    glew = SConscript('src/glew/SConscript', variant_dir = 'build/glew')
-    Depends(lib, glew)
-    env.Append(_LIBFLAGS = [glew]) # Force to end
-    env.Append(CPPPATH = ['#/src/glew'])
 
 
 # Cairo
@@ -286,9 +257,7 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     install_files = []
     if env.get('qt_deps'):
-        if qt_version == '5':
-            qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5'
-        else: qt_pkgs = ', libqtcore4, libqtgui4, libqt4-opengl'
+        qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5'
 
         if env['PLATFORM'] == 'win32':
             import shutil

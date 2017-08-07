@@ -25,12 +25,7 @@ namespace CAMotics {
   class View;
 
   class Viewer {
-    void *toolQuad;
-
   public:
-    Viewer() : toolQuad(0) {}
-
-    void init();
     void draw(const View &view);
   };
 }

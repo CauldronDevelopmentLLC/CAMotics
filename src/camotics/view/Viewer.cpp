@@ -23,6 +23,7 @@
 #include "View.h"
 #include "GL.h"
 #include "BoundsView.h"
+#include "ToolView.h"
 
 #include <gcode/ToolTable.h>
 #include <camotics/sim/MoveLookup.h>
@@ -41,33 +42,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-static void drawCylinder(GLUquadric *quad, double radiusA, double radiusB,
-                         double length) {
-  // Body
-  gluCylinder(quad, radiusA, radiusB, length, 100, 100);
-
-  // End caps
-  if (radiusA) gluDisk(quad, 0, radiusA, 100, 100);
-  if (radiusB) {
-    glPushMatrix();
-    glTranslatef(0, 0, length);
-    gluDisk(quad, 0, radiusB, 100, 100);
-    glPopMatrix();
-  }
-}
-
-
-void Viewer::init() {
-  if (!toolQuad) {
-    toolQuad = gluNewQuadric();
-    if (!toolQuad) THROW("Failed to allocate tool quad");
-  }
-}
-
-
 void Viewer::draw(const View &view) {
-  init();
-
   SmartPointer<Surface> surface = view.surface;
   bool showMachine =
     !view.machine.isNull() && view.isFlagSet(View::SHOW_MACHINE_FLAG);
@@ -136,77 +111,6 @@ void Viewer::draw(const View &view) {
 
   glPopMatrix();
 
-  // GCode::Tool
-  if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->isEmpty()) {
-    const GCode::ToolTable &tools = view.path->getPath()->getTools();
-    const GCode::Move &move = view.path->getMove();
-    int toolID = move.getTool();
-
-    if (tools.has(toolID)) {
-      const GCode::Tool &tool = tools.get(toolID);
-      double diameter = tool.getDiameter();
-      double radius = tool.getRadius();
-      double length = tool.getLength();
-      GCode::ToolShape shape = tool.getShape();
-
-      glPushMatrix();
-
-      if (showMachine) {
-        Vector3D v = view.machine->getTool() * currentPosition;
-        glTranslatef(v.x(), v.y(), v.z());
-
-      } else glTranslatef(currentPosition.x(), currentPosition.y(),
-                          currentPosition.z());
-
-      if (radius <= 0) {
-        // Default tool specs
-        radius = 25.4 / 8;
-        shape = GCode::ToolShape::TS_CONICAL;
-
-        glColor4f(1, 0, 0, 1); // Red
-
-      } else glColor4f(1, 0.5, 0, 1); // Orange
-
-      if (length <= 0) length = 50;
-
-      switch (shape) {
-      case GCode::ToolShape::TS_SPHEROID: {
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glTranslatef(0, 0, length / 2);
-        glScaled(1, 1, length / diameter);
-        gluSphere((GLUquadric *)toolQuad, radius, 100, 100);
-        glPopMatrix();
-        break;
-      }
-
-      case GCode::ToolShape::TS_BALLNOSE:
-        glPushMatrix();
-        glTranslatef(0, 0, radius);
-        gluSphere((GLUquadric *)toolQuad, radius, 100, 100);
-        drawCylinder((GLUquadric *)toolQuad, radius, radius, length - radius);
-        glPopMatrix();
-        break;
-
-      case GCode::ToolShape::TS_SNUBNOSE:
-        drawCylinder((GLUquadric *)toolQuad, tool.getSnubDiameter() / 2, radius,
-                     length);
-        break;
-
-      case GCode::ToolShape::TS_CONICAL:
-        drawCylinder((GLUquadric *)toolQuad, 0, radius, length);
-        break;
-
-      case GCode::ToolShape::TS_CYLINDRICAL:
-      default:
-        drawCylinder((GLUquadric *)toolQuad, radius, radius, length);
-        break;
-      }
-
-      glPopMatrix();
-    }
-  }
-
   // Machine
   if (showMachine) {
     glPushMatrix();
@@ -219,6 +123,19 @@ void Viewer::draw(const View &view) {
                        view.isFlagSet(View::WIRE_FLAG));
 
     glPopMatrix();
+  }
+
+  // GCode::Tool
+  if (view.isFlagSet(View::SHOW_TOOL_FLAG) && !view.path->isEmpty()) {
+    const GCode::ToolTable &tools = view.path->getPath()->getTools();
+    const GCode::Move &move = view.path->getMove();
+    int toolID = move.getTool();
+
+    if (tools.has(toolID)) {
+      Vector3D position = currentPosition;
+      if (showMachine) position *= view.machine->getTool();
+      ToolView(tools.get(toolID), position).draw();
+    }
   }
 
   // Disable Lighting

@@ -45,7 +45,7 @@ namespace CAMotics {
     cb::Vector3D offset;
 
     std::vector<float> lines;
-    unsigned vbufs[2];
+    unsigned vbuf;
 
   public:
     MachinePart(const std::string &name,

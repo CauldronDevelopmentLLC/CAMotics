@@ -62,8 +62,10 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
 
 
 ToolPathView::~ToolPathView() {
-  if (colorVBuf) glDeleteBuffers(1, &colorVBuf);
-  if (vertexVBuf) glDeleteBuffers(1, &vertexVBuf);
+  QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+
+  if (colorVBuf) glFuncs->glDeleteBuffers(1, &colorVBuf);
+  if (vertexVBuf) glFuncs->glDeleteBuffers(1, &vertexVBuf);
 }
 
 
@@ -147,7 +149,7 @@ Color ToolPathView::getColor(GCode::MoveType type) {
 
 
 void ToolPathView::update() {
-  if (!dirty) return;
+  if (!dirty || !QOpenGLContext::currentContext()) return;
 
   currentTime = 0;
   currentDistance = 0;
@@ -219,21 +221,23 @@ void ToolPathView::update() {
   numVertices = vertices.size() / 3;
 
   // Setup GL Buffers
+  QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+
   // Colors
   if (useVBOs && !colors.empty()) {
-    if (!colorVBuf) glGenBuffers(1, &colorVBuf);
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-    glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float), &colors[0],
-                 GL_STATIC_DRAW);
+    if (!colorVBuf) glFuncs->glGenBuffers(1, &colorVBuf);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
+    glFuncs->glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
+                          &colors[0], GL_STATIC_DRAW);
     colors.clear();
   }
 
   // Vertices
   if (useVBOs && !vertices.empty()) {
-    if (!vertexVBuf) glGenBuffers(1, &vertexVBuf);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float), &vertices[0],
-                 GL_STATIC_DRAW);
+    if (!vertexVBuf) glFuncs->glGenBuffers(1, &vertexVBuf);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+    glFuncs->glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
+                          &vertices[0], GL_STATIC_DRAW);
     vertices.clear();
   }
 
@@ -249,13 +253,15 @@ void ToolPathView::draw() {
   if (!numColors || !numVertices) return;
 
   if (useVBOs) {
-    glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
+    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glColorPointer(3, GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   } else {
     glColorPointer(3, GL_FLOAT, 0, &colors[0]);
