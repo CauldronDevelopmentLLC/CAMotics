@@ -107,7 +107,7 @@ int CommandLineApp::init(int argc, char *argv[]) {
   }
 
   // Convert to mm
-  if (outputUnits == GCode::Units::IMPERIAL) maxArcError *= 25.4;
+  if (outputUnits == GCode::Units::IMPERIAL) maxArcError /= 25.4;
 
   return ret;
 }
