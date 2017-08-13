@@ -1,0 +1,21 @@
+<camotics>
+  <!-- Note, all values are in mm regardless of 'units' option. -->
+  <!-- NC Files -->
+  <nc-files>
+    locket.tpl
+  </nc-files>
+
+  <!-- Renderer -->
+  <resolution v='0.278155'/>
+  <resolution-mode v='HIGH'/>
+
+  <!-- Workpiece -->
+  <automatic-workpiece v='false'/>
+  <workpiece-max v='(65.0875,65.0875,0)'/>
+  <workpiece-min v='(-65.0875,-65.0875,-6.35)'/>
+
+  <tool_table>
+    <tool length='0.5' number='1' radius='0.0625' shape='CYLINDRICAL' units='INCH'/>
+    <tool length='0.5' number='2' radius='0.125' shape='CONICAL' units='INCH'/>
+  </tool_table>
+</camotics>
