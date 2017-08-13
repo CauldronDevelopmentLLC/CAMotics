@@ -280,6 +280,7 @@ namespace CAMotics {
     void animate();
     void openRecentProjectsSlot(const QString path);
 
+    void on_bbctrlConnected();
     void on_machineChanged(QString machine, QString path);
 
     void on_fileTabManager_currentChanged(int index);

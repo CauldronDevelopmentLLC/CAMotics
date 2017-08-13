@@ -627,6 +627,9 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
   }
 
   gcode = task.getGCode();
+  if (!bbCtrlAPI.isNull() && bbCtrlAPI->isConnected())
+    bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
+
   loadToolPath(task.getPath(), !task.getErrorCount());
 }
 
@@ -776,15 +779,22 @@ void QtWin::connectCNC() {
   connectDialog.setFilename(filename.c_str());
 
   if (connectDialog.exec() == QDialog::Accepted) {
-    if (!bbCtrlAPI) bbCtrlAPI = new BBCtrlAPI(this);
-    bbCtrlAPI->connectCNC(connectDialog.getAddress());
-
-    // Upload GCode
     filename = connectDialog.getFilename().toUtf8().data();
-    if (!filename.empty())
-      bbCtrlAPI->uploadGCode(filename, &gcode->front(), gcode->size());
 
-  } else ui->actionConnect->setChecked(false);
+    if (!filename.empty()) {
+      if (!bbCtrlAPI) {
+        bbCtrlAPI = new BBCtrlAPI(this);
+        connect(bbCtrlAPI.get(), SIGNAL(connected()), this,
+                SLOT(on_bbctrlConnected()));
+      }
+
+      bbCtrlAPI->setFilename(filename);
+      bbCtrlAPI->connectCNC(connectDialog.getAddress());
+      return;
+    }
+  }
+
+  ui->actionConnect->setChecked(false);
 }
 
 
@@ -1754,6 +1764,11 @@ void QtWin::animate() {
 
 void QtWin::openRecentProjectsSlot(const QString path) {
   openProject(path.toUtf8().data());
+}
+
+
+void QtWin::on_bbctrlConnected() {
+  if (!gcode.isNull()) bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
 }
 
 

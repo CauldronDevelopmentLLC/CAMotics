@@ -38,22 +38,31 @@ namespace CAMotics {
     QNetworkAccessManager *netManager;
 
     bool active;
+    bool _connected;
     uint64_t lastMessage;
     QTimer updateTimer;
+    QTimer reconnectTimer;
 
     QWebSocket webSocket;
     QUrl url;
+    std::string filename;
 
     cb::JSON::Dict vars;
 
   public:
     BBCtrlAPI(QtWin *parent);
 
+    bool isConnected() const {return _connected;}
+
     void connectCNC(const QString &address);
     void disconnectCNC();
     void reconnect();
-    void uploadGCode(const std::string &filename, const char *data,
-                     unsigned length);
+    void setFilename(const std::string &filename) {this->filename = filename;}
+    void uploadGCode(const char *data, unsigned length);
+
+  signals:
+    void connected();
+    void disconnected();
 
   protected slots:
     void onError(QAbstractSocket::SocketError error);
@@ -61,5 +70,6 @@ namespace CAMotics {
     void onDisconnected();
     void onTextMessageReceived(const QString &message);
     void onUpdate();
+    void onReconnect();
   };
 }

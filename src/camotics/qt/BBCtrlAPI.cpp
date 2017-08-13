@@ -41,7 +41,8 @@ using namespace std;
 
 
 BBCtrlAPI::BBCtrlAPI(QtWin *parent) :
-  parent(parent), netManager(new QNetworkAccessManager(this)) {
+  parent(parent), netManager(new QNetworkAccessManager(this)), active(false),
+  _connected(false) {
   connect(&webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this,
           SLOT(onError(QAbstractSocket::SocketError)));
   connect(&webSocket, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -50,7 +51,10 @@ BBCtrlAPI::BBCtrlAPI(QtWin *parent) :
           SLOT(onTextMessageReceived(QString)));
 
   updateTimer.setSingleShot(false);
+  reconnectTimer.setSingleShot(true);
+
   connect(&updateTimer, SIGNAL(timeout()), this, SLOT(onUpdate()));
+  connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(onReconnect()));
 }
 
 
@@ -60,7 +64,6 @@ void BBCtrlAPI::connectCNC(const QString &address) {
   url = QString("ws://") + address + QString("/websocket");
   reconnect();
 
-  updateTimer.start(1000);
   active = true;
 }
 
@@ -69,21 +72,18 @@ void BBCtrlAPI::disconnectCNC() {
   active = false;
   webSocket.close();
   updateTimer.stop();
+  reconnectTimer.stop();
 }
 
 
 void BBCtrlAPI::reconnect() {
-  LOG_INFO(1, "Connecting to " << url.toString().toUtf8().data());
-
-  lastMessage = Time::now();
-
-  webSocket.close();
-  webSocket.open(url);
+  updateTimer.stop();
+  uint64_t delta = (Time::now() - lastMessage) * 1000;
+  reconnectTimer.start(lastMessage ? std::min(delta, 4500UL) : 1);
 }
 
 
-void BBCtrlAPI::uploadGCode(const string &filename, const char *data,
-                            unsigned length) {
+void BBCtrlAPI::uploadGCode(const char *data, unsigned length) {
   LOG_INFO(1, "Uploading GCode '" << filename << "'");
 
   // Create multi-part MIME encoded message
@@ -118,11 +118,25 @@ void BBCtrlAPI::onError(QAbstractSocket::SocketError error) {
 
 void BBCtrlAPI::onConnected() {
   LOG_INFO(1, "CNC connected");
+  reconnectTimer.stop();
+  updateTimer.start(1000);
+  lastMessage = Time::now();
+
+  if (!_connected) {
+    _connected = true;
+    emit connected();
+  }
 }
 
 
 void BBCtrlAPI::onDisconnected() {
   LOG_INFO(1, "CNC disconnected");
+
+  if (_connected) {
+    _connected = false;
+    emit disconnected();
+  }
+
   if (active) reconnect();
 }
 
@@ -163,4 +177,14 @@ void BBCtrlAPI::onUpdate() {
     LOG_WARNING("CNC timed out");
     reconnect();
   }
+}
+
+
+void BBCtrlAPI::onReconnect() {
+  if (!active) return;
+
+  LOG_INFO(1, "Connecting to " << url.toString().toUtf8().data());
+
+  if (webSocket.isValid()) webSocket.close();
+  webSocket.open(url);
 }
