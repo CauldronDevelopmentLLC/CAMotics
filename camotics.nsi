@@ -25,6 +25,7 @@
 ; Includes
 !include MUI2.nsh
 !include nsDialogs.nsh
+!include WinVer.nsh
 !include LogicLib.nsh
 
 
@@ -48,6 +49,14 @@ ShowUnInstDetails show
 ; !insertmacro MUI_UNPAGE_COMPONENTS
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "English"
+
+; Functions
+Function .onInit
+  ${IfNot} ${AtLeastWindows7}
+    MessageBox MB_OK "Windows 7 or above is required"
+    Quit
+  ${EndIf}
+FunctionEnd
 
 ; Sections
 Section -Install
