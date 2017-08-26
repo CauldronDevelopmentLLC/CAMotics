@@ -6,13 +6,13 @@
   </nc-files>
 
   <!-- Renderer -->
-  <resolution v='0.4'/>
+  <resolution v='0.25'/>
   <resolution-mode v='MANUAL'/>
 
   <!-- Workpiece -->
   <automatic-workpiece v='true'/>
-  <workpiece-max v='(34.7462,34.7462,0)'/>
-  <workpiece-min v='(-34.7462,-34.7463,-14.7)'/>
+  <workpiece-max v='(34.7462,34.7352,0)'/>
+  <workpiece-min v='(-34.7462,-34.7352,-14.7)'/>
 
   <tool_table>
     <tool length='0.25' number='1' radius='0.25' shape='CONICAL' units='INCH'/>

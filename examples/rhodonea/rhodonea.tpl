@@ -18,11 +18,6 @@ var drawRhodonea = function (n, d, depth, scale) {
  }
 }
 
-tool_set({number: 1, units: IMPERIAL, length: 1/4, diameter: 1/2,
-          shape: CONICAL});
-tool_set({number: 2, units: IMPERIAL, length: 1, diameter: 1/8,
-          shape: CYLINDRICAL});
-
 feed(200);
 speed(4000);
 
