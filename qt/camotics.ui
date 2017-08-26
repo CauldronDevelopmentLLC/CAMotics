@@ -473,7 +473,7 @@
   </widget>
   <widget class="QToolBar" name="simulateToolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Playback Toolbar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
