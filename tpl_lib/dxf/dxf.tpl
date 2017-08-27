@@ -549,11 +549,8 @@ module.exports = extend({
       var d = distance2D(v, p);
 
       if (0.01 < d) {
-        var s = speed()[0];
-        speed(0);
         if (typeof zSafe != 'undefined') rapid({z: zSafe});
         rapid(v);
-        speed(s);
       }
 
       var f = feed()[0];
