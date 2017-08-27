@@ -49,6 +49,7 @@ namespace CAMotics {
     std::string getMachinePath(const std::string &machine) const;
 
     bool exec(Project &project, View &view);
+    using QDialog::exec;
 
   signals:
     void machineChanged(QString machine, QString file);
