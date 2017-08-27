@@ -52,7 +52,7 @@ ShowUnInstDetails show
 
 ; Functions
 Function .onInit
-  ${IfNot} ${AtLeastWindows7}
+  ${IfNot} ${AtLeastWin7}
     MessageBox MB_OK "Windows 7 or above is required"
     Quit
   ${EndIf}
