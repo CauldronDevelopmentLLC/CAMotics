@@ -2,15 +2,27 @@
   "remote": true,
   "root": "/Users/buildbot/camotics",
 
+  "env": {
+    "QTDIR": "$HOME/Qt/5.9.1/clang_64",
+    "PKG_CONFIG_PATH": "$HOME/build/pkgconfig",
+    "V8_HOME": "$HOME/build/v8",
+    "V8_LIBPATH": "$V8_HOME",
+    "OPENSSL_HOME": "$HOME/build/openssl-1.0.2i"
+  },
+
   "scons": {
+    "compiler": "clang",
     "ccflags": "-Wno-unused-local-typedef",
+    "cxxflags": "-stdlib=libc++",
+    "linkflags": "-stdlib=libc++",
+    "cxxstd": "c++11",
     "disable_local": "libevent re2",
     "sse3": 1,
-    "osx_min_ver": "10.6",
+    "osx_min_ver": "10.7",
     "package_arch": "x86_64",
     "sign_keychain": "developer2.keychain",
-    "sign_id_installer": "Developer ID Installer: Joseph Coffland",
-    "sign_id_app": "Developer ID Application: Joseph Coffland",
+    "sign_id_installer": "Developer ID Installer: Joseph Coffland (M9MP6KCS4V)",
+    "sign_id_app": "Developer ID Application: Joseph Coffland (M9MP6KCS4V)",
     "sign_prefix": "org.camotics."
   },
 

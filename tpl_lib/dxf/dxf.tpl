@@ -538,8 +538,9 @@ module.exports = extend({
   },
 
 
-  cut_polys: function(polys, zSafe, zCut, zFeed) {
+  cut_polys: function(polys, zSafe, zCut, zFeed, close) {
     if (!polys.length) return;
+    close = typeof close == 'undefined' ? true : close;
 
     for (var i = 0; i < polys.length; i++) {
       var poly = polys[i];
@@ -548,20 +549,22 @@ module.exports = extend({
       var d = distance2D(v, p);
 
       if (0.01 < d) {
-        rapid({z: zSafe});
+        var s = speed()[0];
+        speed(0);
+        if (typeof zSafe != 'undefined') rapid({z: zSafe});
         rapid(v);
+        speed(s);
       }
 
       var f = feed()[0];
       if (typeof zFeed != 'undefined') feed(zFeed);
-      cut({z: zCut});
+      if (typeof zSafe != 'undefined') cut({z: zCut});
       feed(f);
 
       for (var j = 0; j < poly.length; j++)
         cut(poly[j].x, poly[j].y);
 
-      // TODO this is only correct for closed polys
-      cut(v.x, v.y); // Close poly
+      if (close) cut(v.x, v.y); // Close poly
     }
   },
 
@@ -673,7 +676,8 @@ module.exports = extend({
   },
 
 
-  cut_layer_offset: function (layer, delta, zSafe, zCut, steps, zFeed) {
+  cut_layer_offset: function (layer, delta, zSafe, zCut, steps, zFeed, close) {
+    if (typeof zCut == 'undefined') zCut = 0;
     if (typeof steps == 'undefined') steps = 1;
 
     var zDelta = zCut / steps;
@@ -681,7 +685,7 @@ module.exports = extend({
     if (delta) polys = this.offset_polys(polys, delta);
 
     for (var i = 0; i < steps; i++)
-      this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed);
+      this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed, close);
   },
 
 
@@ -821,7 +825,7 @@ module.exports = extend({
     var self = this;
     if (!poly.length) return [];
 
-    if (config.zStart <= config.zEnd) throw 'zEnd must be less than zStart';
+    if (config.zStart < config.zEnd) throw 'zEnd must be <= zStart';
 
     var length = this.poly_length(poly);
     var tab_points = this.compute_tab_points(length, config);

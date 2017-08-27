@@ -5,7 +5,7 @@
   "env": {
     "TARGET_ARCH": "x86_64",
     "V8_HOME": "c:\\build\\v8-3.14.5",
-    "QTDIR": "c:\\Qt\\Qt5.8.0\\5.8\\msvc2015_64"
+    "QTDIR": "c:\\Qt\\5.6\\msvc2015_64"
   },
 
   "scons": {
