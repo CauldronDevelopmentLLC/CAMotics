@@ -22,8 +22,8 @@
 
 #include <cbang/Exception.h>
 #include <cbang/log/Logger.h>
+#include <cbang/Math.h>
 
-#include <math.h>
 
 using namespace std;
 using namespace cb;

@@ -49,7 +49,8 @@ void Sweep::getBBoxes(const cb::Vector3D &start, const cb::Vector3D &end,
     double maxZ = std::max(p1.z(), p2.z()) + length + tolerance;
 
     bboxes.push_back
-      (cb::Rectangle3D(cb::Vector3D(minX, minY, minZ), cb::Vector3D(maxX, maxY, maxZ)));
+      (cb::Rectangle3D(cb::Vector3D(minX, minY, minZ),
+                       cb::Vector3D(maxX, maxY, maxZ)));
 
     p1 = p2;
   }

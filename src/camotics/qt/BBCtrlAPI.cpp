@@ -79,7 +79,7 @@ void BBCtrlAPI::disconnectCNC() {
 void BBCtrlAPI::reconnect() {
   updateTimer.stop();
   uint64_t delta = (Time::now() - lastMessage) * 1000;
-  reconnectTimer.start(lastMessage ? std::min(delta, 4500UL) : 1);
+  reconnectTimer.start(lastMessage ? std::min(delta, (uint64_t)4500) : 1);
 }
 
 
