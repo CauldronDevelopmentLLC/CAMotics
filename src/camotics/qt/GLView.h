@@ -21,20 +21,13 @@
 #pragma once
 
 
-#include <QtGlobal>
-#if (QT_VERSION < QT_VERSION_CHECK(5, 4, 0))
-#include <QGLWidget>
-#define PLATFORM_GL_WIDGET QGLWidget
-#else
 #include <QOpenGLWidget>
-#define PLATFORM_GL_WIDGET QOpenGLWidget
-#endif
 
 
 namespace CAMotics {
   class QtWin;
 
-  class GLView : public PLATFORM_GL_WIDGET {
+  class GLView : public QOpenGLWidget {
     Q_OBJECT;
 
   public:

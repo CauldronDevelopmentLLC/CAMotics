@@ -725,12 +725,7 @@ void QtWin::redraw(bool now) {
     lastRedraw = Timer::now();
 
     updateWorkpieceBounds();
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
-    ui->simulationView->updateGL();
-#else
     ui->simulationView->update();
-#endif
 
     dirty = false;
     return;
@@ -743,11 +738,7 @@ void QtWin::redraw(bool now) {
 void QtWin::snapshot() {
   string filename = project->getFilename();
   QPixmap pixmap =
-#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
-    QPixmap::fromImage(ui->simulationView->grabFrameBuffer(true));
-#else
     QPixmap::fromImage(ui->simulationView->grabFramebuffer());
-#endif
 
   QList<QByteArray> formats = QImageWriter::supportedImageFormats();
   string fileTypes = "Image files (";

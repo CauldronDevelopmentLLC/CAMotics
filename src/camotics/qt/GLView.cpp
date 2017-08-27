@@ -29,18 +29,10 @@
 using namespace CAMotics;
 
 
-GLView::GLView(QWidget *parent) :
-#if QT_VERSION < QT_VERSION_CHECK(5, 4, 0)
-  QGLWidget(QGLFormat(QGL::AlphaChannel | QGL::SampleBuffers), parent)
-#else
-  QOpenGLWidget(parent)
-#endif
-{
-#if QT_VERSION_CHECK(5, 4, 0) <= QT_VERSION
+GLView::GLView(QWidget *parent) :QOpenGLWidget(parent) {
   QSurfaceFormat format = QSurfaceFormat::defaultFormat();
   format.setSamples(4);
   setFormat(format);
-#endif
 }
 
 
