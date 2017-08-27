@@ -63,5 +63,6 @@ namespace CAMotics {
 
     void drawLines(bool withVBOs);
     void draw(bool withVBOs, bool wire);
+    using TriangleSurface::draw;
   };
 }
