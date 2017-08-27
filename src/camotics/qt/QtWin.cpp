@@ -20,6 +20,7 @@
 
 #include "QtWin.h"
 #include "Settings.h"
+#include "GLView.h"
 
 #include "ui_camotics.h"
 

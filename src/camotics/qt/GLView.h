@@ -45,6 +45,5 @@ namespace CAMotics {
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
-    using QOpenGLWidget::grabFramebuffer;
   };
 }
