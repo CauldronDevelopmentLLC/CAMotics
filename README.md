@@ -1,7 +1,7 @@
-# [http://buildbotics.com/kickstarter](http://buildbotics.com/kickstarter)
-![Now on Kickstarter](https://buildbotics.com/images/buildbotics_now_on_kickstarter.png)
-
 ![CAMotics Logo][1]
+
+# [Buildbotics CNC controller: http://buildbotics.com/kickstarter](http://buildbotics.com/kickstarter)
+![Now on Kickstarter](https://buildbotics.com/images/buildbotics_now_on_kickstarter.png)
 
 CAMotics is an Open-Source software which can simulate 3-axis NC
 machining. It is a fast, flexible and user friendly simulation
