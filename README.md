@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/CauldronDevelopmentLLC/CAMotics.svg?branch=master)](https://travis-ci.org/CauldronDevelopmentLLC/CAMotics)
+# [http://buildbotics.com/kickstarter](http://buildbotics.com/kickstarter)
+![Now on Kickstarter](https://buildbotics.com/images/buildbotics_now_on_kickstarter.png)
 
 ![CAMotics Logo][1]
 
