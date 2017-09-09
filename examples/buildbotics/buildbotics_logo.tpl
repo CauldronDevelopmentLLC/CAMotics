@@ -12,7 +12,7 @@ feed(1600);
 speed(10000);
 tool(2);
 
-scale(2.5, 2.5);
+//scale(2.5, 2.5);
 
 dxf.arc_error = 0.1; // This error gets multipled by the scaling factor
 
@@ -31,4 +31,4 @@ loadIdentity();
 
 rapid({z: zSafe});
 speed(0);
-rapid(40, 100);
+rapid(40, 75);

@@ -94,8 +94,8 @@ bool View::update() {
       else path->incTime(delta);
 
       if ((reverse && path->atStart()) || (!reverse && path->atEnd())) {
-        if (!reverse && path->atEnd()) path->setByRatio(0);
-        else path->setByRatio(1);
+        if (path->atEnd()) path->setByRatio(1);
+        else path->setByRatio(0);
 
         clearFlag(PLAY_FLAG);
       }

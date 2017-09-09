@@ -345,8 +345,10 @@ void Project::setWorkpieceBounds(const cb::Rectangle3D &bounds) {
 
 
 cb::Rectangle3D Project::getWorkpieceBounds() const {
-  cb::Vector3D wpMin = workpieceMin.empty() ? cb::Vector3D() : cb::Vector3D(workpieceMin);
-  cb::Vector3D wpMax = workpieceMax.empty() ? cb::Vector3D() : cb::Vector3D(workpieceMax);
+  cb::Vector3D wpMin =
+    workpieceMin.empty() ? cb::Vector3D() : cb::Vector3D(workpieceMin);
+  cb::Vector3D wpMax =
+    workpieceMax.empty() ? cb::Vector3D() : cb::Vector3D(workpieceMax);
   return cb::Rectangle3D(wpMin, wpMax);
 }
 
