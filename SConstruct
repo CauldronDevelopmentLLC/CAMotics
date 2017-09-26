@@ -100,7 +100,7 @@ libs = []
 
 # libGCode
 src = []
-for subdir in ['', 'ast', 'parse', 'interp', 'machine', 'plan']:
+for subdir in ['', 'ast', 'parse', 'interp', 'machine', 'plan', 'plan/bbctrl']:
     src += Glob('src/gcode/%s/*.cpp' % subdir)
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 lib = env.Library('libGCode', src)

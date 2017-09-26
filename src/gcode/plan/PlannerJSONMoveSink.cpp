@@ -24,45 +24,26 @@ using namespace GCode;
 
 
 void PlannerJSONMoveSink::start() {
-  position = Axes(0.0);
-  maxVel = 0;
   sink.beginList();
 }
 
 
 void PlannerJSONMoveSink::end() {
-  stop = true;
-  outputMove();
   sink.endList();
 }
 
 
 void PlannerJSONMoveSink::setSpeed(double speed) {}
-void PlannerJSONMoveSink::setTool(unsigned tool) {stop = true;}
-void PlannerJSONMoveSink::dwell(double seconds) {stop = true;}
-void PlannerJSONMoveSink::pause(bool optional) {stop = true;}
+void PlannerJSONMoveSink::setTool(unsigned tool) {}
+void PlannerJSONMoveSink::dwell(double seconds) {}
+void PlannerJSONMoveSink::pause(bool optional) {}
 
 
-void PlannerJSONMoveSink::move(const Axes &position, double maxVel) {
-  outputMove();
-
-  if (1000000 < maxVel) maxVel = 1000000;
-
-  this->position = position;
-  this->maxVel = maxVel;
-  hasMove = true;
-}
-
-
-void PlannerJSONMoveSink::outputMove() {
-  if (!hasMove) return;
-  hasMove = false;
-
+void PlannerJSONMoveSink::move(double time, double velocity,
+                               const Axes &position) {
   sink.appendList(true);
-  for (unsigned i = 0; i < 3; i++) sink.append(position[i]);
-  sink.append(maxVel);
-  sink.append(stop ? 0 : maxVel);
+  sink.append(time * 60000); // mS
+  sink.append(velocity);
+  for (unsigned i = 0; i < 4; i++) sink.append(position[i]);
   sink.endList();
-
-  stop = false;
 }

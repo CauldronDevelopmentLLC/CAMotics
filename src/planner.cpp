@@ -27,7 +27,8 @@
 #include <gcode/machine/MachineState.h>
 #include <gcode/machine/MachineLinearizer.h>
 #include <gcode/machine/MachineUnitAdapter.h>
-#include <gcode/plan/Planner.h>
+#include <gcode/plan/LinePlanner.h>
+#include <gcode/plan/TinyGPlanner.h>
 #include <gcode/plan/PlannerJSONMoveSink.h>
 
 #include <cbang/Exception.h>
@@ -52,6 +53,7 @@ public:
   PlannerApp() : CAMotics::CommandLineApp("CAMotics GCode Path Planner") {
     cmdLine.add("json", "JSON configuration or configuration file"
                 )->setType(Option::STRING_TYPE);
+    cmdLine.add("tinyg", "Use the TinyG planner")->setDefault(false);
   }
 
 
@@ -83,9 +85,14 @@ public:
     JSON::Writer writer(*stream);
     PlannerJSONMoveSink plannerSink(writer);
 
+    SmartPointer<MachineAdapter> planner;
+    if (cmdLine["--tinyg"].toBoolean())
+      planner = new TinyGPlanner(plannerSink, config);
+    else planner = new LinePlanner(plannerSink, config);
+
     pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
     pipeline.add(new MachineLinearizer);
-    pipeline.add(new Planner(plannerSink, config));
+    pipeline.add(planner);
     pipeline.add(new MachineState);
 
     controller = new Controller(pipeline);

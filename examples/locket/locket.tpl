@@ -1,4 +1,4 @@
-var mode = 'engrave';
+var mode = 'inside';
 
 
 function circle(depth, width, height, startAngle, angle, cX, cY, offset,

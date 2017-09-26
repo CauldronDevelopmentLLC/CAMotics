@@ -29,14 +29,8 @@ namespace GCode {
   class PlannerJSONMoveSink : public PlannerSink {
     cb::JSON::Sink &sink;
 
-    double maxVel;
-    Axes position;
-    bool hasMove;
-    bool stop;
-
   public:
-    PlannerJSONMoveSink(cb::JSON::Sink &sink) :
-      sink(sink), maxVel(0), position(0.0), hasMove(false), stop(false) {}
+    PlannerJSONMoveSink(cb::JSON::Sink &sink) : sink(sink) {}
 
     // From PlannerSink
     void start();
@@ -48,9 +42,6 @@ namespace GCode {
     void dwell(double seconds);
     void pause(bool optional);
 
-    void move(const Axes &position, double maxVel);
-
-  protected:
-    void outputMove();
+    void move(double time, double velocity, const Axes &position);
   };
 }

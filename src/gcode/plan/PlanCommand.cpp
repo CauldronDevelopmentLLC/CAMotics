@@ -33,7 +33,7 @@ namespace {
 
 PlanMoveCommand::PlanMoveCommand(const PlannerConfig &config, const Axes &start,
                                  const Axes &end, double feed) :
-  config(config), target(end), maxVelocity(feed) {
+  config(config), target(end), maxVel(feed) {
 
   // Compute direction unit vector
   dir = end - start;
@@ -43,9 +43,11 @@ PlanMoveCommand::PlanMoveCommand(const PlannerConfig &config, const Axes &start,
   // Compute max velocity
   for (unsigned i = 0; i < Axes::getSize(); i++)
     if (dir[i]) {
-      double v = config.maxVelocity[i] / dir[i];
-      if (v < maxVelocity) maxVelocity = v;
+      double v = config.maxVel[i] / dir[i];
+      if (v < maxVel) maxVel = v;
     }
+
+  time = fabs(length / maxVel);
 }
 
 
@@ -76,7 +78,7 @@ double PlanMoveCommand::computeJunctionVelocity(const Axes &dir) const {
 
 
 double PlanMoveCommand::getMaxEntryVelocity(const Axes &dir) const {
-  double velocity = min(maxVelocity, computeJunctionVelocity(dir));
+  double velocity = min(maxVel, computeJunctionVelocity(dir));
 
   // Compute max axis velocity
 

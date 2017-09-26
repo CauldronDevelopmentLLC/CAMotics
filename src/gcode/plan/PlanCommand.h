@@ -119,11 +119,11 @@ namespace GCode {
     const PlannerConfig &config;
 
     Axes target;
-    double maxVelocity;
+    double maxVel;
 
     double length;
+    double time;
     Axes dir;
-    Axes velocity;
 
   public:
     PlanMoveCommand(const PlannerConfig &config, const Axes &start,
@@ -134,6 +134,6 @@ namespace GCode {
     // From PlanCommand
     type_t getType() const {return PLAN_MOVE;}
     double getMaxEntryVelocity(const Axes &dir) const;
-    void write(PlannerSink &sink) {sink.move(target, maxVelocity);}
+    void write(PlannerSink &sink) {sink.move(time, maxVel, target);}
   };
 }

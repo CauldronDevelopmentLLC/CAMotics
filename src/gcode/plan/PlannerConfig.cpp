@@ -30,25 +30,20 @@ using namespace std;
 
 
 PlannerConfig::PlannerConfig() :
-  start(0.0), maxVelocity(0.0), maxJerk(0.0), junctionDeviation(0.05),
-  junctionAccel(100000) {}
+  start(0.0), maxVel(10000), maxAccel(200000), maxJerk(50000000),
+  junctionDeviation(0.05), junctionAccel(100000) {}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
   units = Units::parse(value.getString("units", "METRIC"));
 
   if (value.hasDict("start")) start.read(value.getDict("start"));
-  else start = Axes(0.0);
-
-  if (value.hasDict("max-velocity"))
-    maxVelocity.read(value.getDict("max-velocity"));
-  else maxVelocity = Axes(0.0);
-
+  if (value.hasDict("max-vel")) maxVel.read(value.getDict("max-vel"));
+  if (value.hasDict("max-accel")) maxAccel.read(value.getDict("max-accel"));
   if (value.hasDict("max-jerk")) maxJerk.read(value.getDict("max-jerk"));
-  else maxJerk = Axes(0.0);
 
-  junctionDeviation = value.getNumber("junction-deviation", 0.05);
-  junctionAccel = value.getNumber("junction-acceleration", 100000);
+  junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
+  junctionAccel = value.getNumber("junction-accel", junctionAccel);
 }
 
 
@@ -60,14 +55,17 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.beginInsert("start");
   start.write(sink);
 
-  sink.beginInsert("max-velocity");
-  maxVelocity.write(sink);
+  sink.beginInsert("max-vel");
+  maxVel.write(sink);
+
+  sink.beginInsert("max-accel");
+  maxAccel.write(sink);
 
   sink.beginInsert("max-jerk");
   maxJerk.write(sink);
 
   sink.insert("junction-deviation", junctionDeviation);
-  sink.insert("junction-acceleration", junctionAccel);
+  sink.insert("junction-accel", junctionAccel);
 
   sink.endDict();
 }

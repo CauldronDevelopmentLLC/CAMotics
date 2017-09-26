@@ -30,7 +30,8 @@ namespace GCode {
   class PlannerConfig : public cb::JSON::Serializable {
   public:
     Axes start;
-    Axes maxVelocity;
+    Axes maxVel;
+    Axes maxAccel;
     Axes maxJerk;
     double junctionDeviation;
     double junctionAccel;

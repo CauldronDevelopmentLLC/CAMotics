@@ -20,23 +20,30 @@
 
 #pragma once
 
-#include <gcode/Axes.h>
+#include "PlannerSink.h"
+#include "PlannerConfig.h"
+#include "PlanCommand.h"
+
+#include <gcode/machine/MachineAdapter.h>
 
 
 namespace GCode {
-  class PlannerSink {
+  class TinyGPlanner : public MachineAdapter {
+    static PlannerSink *sink;
+    static PlannerConfig config;
+
+    double last_vel;
+
   public:
-    virtual ~PlannerSink() {}
+    TinyGPlanner(PlannerSink &sink, const PlannerConfig &config);
 
-    virtual void start() = 0;
-    virtual void end() = 0;
+    static const PlannerConfig &getConfig() {return config;}
+    static PlannerSink &getSink() {return *sink;}
 
-    virtual void setSpeed(double speed) = 0;
-    virtual void setTool(unsigned tool) = 0;
+    // From MachineInterface
+    void start();
+    void end();
 
-    virtual void dwell(double seconds) = 0;
-    virtual void pause(bool optional) = 0;
-
-    virtual void move(double time, double velocity, const Axes &position) = 0;
+    void move(const Axes &axes, bool rapid);
   };
 }
