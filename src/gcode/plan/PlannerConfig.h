@@ -36,6 +36,7 @@ namespace GCode {
     double junctionDeviation;
     double junctionAccel;
     Units units;
+    double timeStep;
 
     PlannerConfig();
 

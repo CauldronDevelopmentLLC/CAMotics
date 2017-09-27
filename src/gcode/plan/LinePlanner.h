@@ -34,7 +34,7 @@
 namespace GCode {
   class LinePlanner : public MachineAdapter {
     PlannerSink &sink;
-    PlannerConfig config;
+    const PlannerConfig config;
 
     cb::Vector4D position;
     cb::Vector4D execPos;
@@ -44,7 +44,6 @@ namespace GCode {
 
     struct Point {
       cb::Vector4D position;
-      cb::Vector4D unit;
       double length;
 
       double entryVel;

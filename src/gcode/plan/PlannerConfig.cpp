@@ -31,7 +31,7 @@ using namespace std;
 
 PlannerConfig::PlannerConfig() :
   start(0.0), maxVel(10000), maxAccel(200000), maxJerk(50000000),
-  junctionDeviation(0.05), junctionAccel(100000) {}
+  junctionDeviation(0.05), junctionAccel(100000), timeStep(0.005 / 60.0) {}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
@@ -44,6 +44,7 @@ void PlannerConfig::read(const JSON::Value &value) {
 
   junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
   junctionAccel = value.getNumber("junction-accel", junctionAccel);
+  timeStep = value.getNumber("time-step", timeStep);
 }
 
 

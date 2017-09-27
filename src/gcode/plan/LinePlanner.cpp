@@ -67,6 +67,131 @@ namespace {
 
   // Peak ramp up ramp down acceleration over provided length
   double peakAccelFromLength(double Vi, double maxJerk, double length) {
+    // Start with the formula for travel distance (length):
+    //
+    //   L = Vi * t + Jm * t^3 / 6 + Vh * t + Ap * t^2 / 2 - Jm * t^3 / 6
+    //   L = Vi * t + Vh * t + Ap * t^2 / 2
+    //
+    // Where:
+    //
+    //   t  = The ramp up, ramp down time.  Total time T = t * 2.
+    //   L  = length
+    //   Jm = maxJerk
+    //   Ap = The peak acceleration we are looking for.
+    //   Vh = The velocity at peak acceleration.
+    //
+    // Then the formula for Vh is:
+    //
+    //   Vh = Vi + Jm * t^2 / 2
+    //
+    // Substitute Vh:
+    //
+    //   L = Vi * t + (Vi + Jm * t^2 / 2) * t + Ap * t^2 / 2
+    //   L = 2 * Vi * t + Jm * t^3 / 2 + Ap * t^2 / 2
+    //
+    // The time t is just:
+    //
+    //   t = Ap / Jm
+    //
+    // Substitute t:
+    //
+    //   1 / Jm^2 * Ap^3 + 2 * Vi / Jm * Ap - L = 0
+    //
+    // Solve for Ap by the cubic formula:
+    //
+    //   x = (q + (q^2 + (r - p^2)^3)^1/2)^1/3 +
+    //       (q - (q^2 + (r - p^2)^3)^1/2)^1/3 + p
+    //
+    // Where:
+    //
+    //   p = -b / (3 * a)
+    //   q = p^3 + (b * c - 3 * a * d) / (6 * a^2)
+    //   r = c / (3 *a)
+    //
+    // The standard cubic polynomal looks like this:
+    //
+    //   a * x^3 + b * x^2 + c * x + d = 0
+    //
+    // So our coefficients are:
+    //
+    //   a = 1 / Jm^2
+    //   b = 0
+    //   c = 2 * Vi / Jm
+    //   d = -L
+    //
+    // And:
+    //
+    //   x = Ap
+    //
+    // So we have:
+    //
+    //   p = 0
+    //   q = 1 / 2 * L * Jm^2
+    //   r = 2 / 3 * Vi * Jm
+    //
+    //--------------------------------------------------------------------------
+    // Note that the cubic formula involves complex numbers if:
+    //
+    //   (q^2 + (r - p^2)^3) < 0
+    //
+    // Solving for Jm we get:
+    //
+    //   Jm < (-32 * Vi^3) / (27 * L^2)
+    //
+    // When Jm is exactly equal to the right side we have:
+    //
+    //   Ap = 2 * q^(1/3)
+    //
+    // Subsitute q:
+    //
+    //   Ap = 2 * (1 / 2 * L * Jm^2)^(1/3)
+    //
+    // Subsitute Jm:
+    //
+    //   Ap = 2 * (1 / 2 * L * ((-32 * Vi^3) / (27 * L^2))^2)^(1/3)
+    //
+    // Or:
+    //
+    //   Ap = 16 / 9 * Vi^2 / L
+    //
+    // The velocity formula for the ramp up/down is:
+    //
+    //   Vt = Vi + Ap^2 / Jm
+    //
+    // So, when this particular value of Jm occurs:
+    //
+    //   Vt = Vi + (16 / 9 * Vi^2 / L)^2 / ((-32 * Vi^3) / (27 * L^2))
+    //
+    // Or:
+    //
+    //   Vt = -5/3 * Vi
+    //
+    // Since negative velocity is impossible, we never want to get here. In
+    // fact, the ending velocity Vt should never be negative.  When Vt is zero,
+    // we have:
+    //
+    //   Vi + Ap^2 / Jm = 0
+    //   Jm = -Ap^2 / Vi
+    //
+    // If we plug this into our original formula for Ap we get:
+    //
+    //   1 / (- Ap^2 / Vi)^2 * Ap^3 + 2 * Vi / (- Ap^2 / Vi) * a - L = 0
+    //
+    // Or:
+    //
+    //   Ap = -Vi^2 / L
+    //
+    // So our target velocity is zero when:
+    //
+    //   Jm = -Vi^3 / L^2
+    //
+    // With this restriction never have to worry about complex numbers because:
+    //
+    //   -Vi^3 / L^2 > (-32 * Vi^3) / (27 * L^2)
+
+    if (maxJerk < 0 && maxJerk <= -cube(Vi) / square(length))
+      return -square(Vi) / length; // Peak accel when Vt = 0
+
     double q = 0.5 * length * square(maxJerk);
     double r = 2.0 / 3.0 * Vi * maxJerk;
     double sqrtq2r3 = sqrt(square(q) + cube(r));
@@ -135,7 +260,8 @@ namespace {
 
 
   double planVelocityTransition(double Vi, double Vt, double maxAccel,
-                                double maxJerk, double *times) {
+                                double maxJerk, double timeStep,
+                                double *times) {
     // Compute from lowest to highest velocity
     if (Vt < Vi) swap(Vi, Vt);
 
@@ -161,7 +287,8 @@ namespace {
     length += computeDistance(times[0], vel, peakAccel, -maxJerk);
 
     LOG_DEBUG(3, "planVelocityTransition(" << Vi << ", " << Vt << ", "
-              << maxAccel << ", " << maxJerk << ")=" << length);
+              << maxAccel << ", " << maxJerk << ", " << timeStep << ")="
+              << length);
 
     return length;
   }
@@ -241,7 +368,7 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   Vector4D delta = p.position - position;
   position = p.position;
   p.length = delta.length();
-  p.unit = delta / p.length;
+  Vector4D unit = delta / p.length;
 
   if (!p.length) return; // Null move
 
@@ -254,28 +381,28 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
   // Apply axis velocity limits
   for (unsigned i = 0; i < 4; i++)
-    if (p.unit[i]) {
-      double v = fabs(config.maxVel[i] / p.unit[i]);
+    if (unit[i]) {
+      double v = fabs(config.maxVel[i] / unit[i]);
       if (v < p.maxVel) p.maxVel = v;
     }
 
   // Apply axis acceleration limits
   for (unsigned i = 0; i < 4; i++)
-    if (p.unit[i]) {
-      double a = fabs(config.maxAccel[i] / p.unit[i]);
+    if (unit[i]) {
+      double a = fabs(config.maxAccel[i] / unit[i]);
       if (a < p.maxAccel) p.maxAccel = a;
     }
 
   // Apply axis jerk limits
   for (unsigned i = 0; i < 4; i++)
-    if (p.unit[i]) {
-      double j = fabs(config.maxJerk[i] / p.unit[i]);
+    if (unit[i]) {
+      double j = fabs(config.maxJerk[i] / unit[i]);
       if (j < p.maxJerk) p.maxJerk = j;
     }
 
   // Apply junction velocity limit
   if (lastUnit != Vector4D()) {
-    double jv = computeJunctionVelocity(p.unit, lastUnit,
+    double jv = computeJunctionVelocity(unit, lastUnit,
                                         config.junctionDeviation,
                                         config.junctionAccel);
     if (jv < p.exitVel) p.exitVel = jv;
@@ -291,14 +418,13 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   if (plan(it)) backplan(it);
 
   lastExitVel = it->exitVel;
-  lastUnit = it->unit;
+  lastUnit = unit;
 
   exec();
 }
 
 
 void LinePlanner::exec(const Point &p) {
-  const double deltaTime = 0.005 / 60.0; // TODO this should be configurable
   double dist = 0;
   double vel = p.entryVel;
   double accel = 0;
@@ -310,6 +436,9 @@ void LinePlanner::exec(const Point &p) {
             << " maxV="   << setw(12) << p.maxVel
             << " maxA="   << setw(12) << p.maxAccel
             << " maxJ="   << setw(12) << p.maxJerk);
+
+  // Compute unit vector
+  Vector4D unit = (p.position - execPos).normalize();
 
   // Execute each S-curve segment
   for (int i = 0; i < 7; i++) {
@@ -335,10 +464,10 @@ void LinePlanner::exec(const Point &p) {
     if (computeDistance(time, vel, accel, jerk) < 0.0001) continue;
 
     // Compute interpolation steps
-    int steps = round(time / deltaTime);
+    int steps = round(time / config.timeStep);
     double deltaT = time / steps;
 
-    if (time < deltaTime) {
+    if (time < config.timeStep) {
       deltaT = time;
       steps = 1;
     }
@@ -349,7 +478,7 @@ void LinePlanner::exec(const Point &p) {
       double l = dist + computeDistance(t, vel, accel, jerk);
       double v = vel + computeVelocity(t, accel, jerk);
 
-      cb::Vector4D pos = execPos + p.unit * l;
+      cb::Vector4D pos = execPos + unit * l;
       Axes position;
       for (int k = 0; k < 4; k++) position[k] = pos[k];
 
@@ -444,7 +573,8 @@ bool LinePlanner::plan(points_t::iterator it) {
     // Exact or near fit or target velocity is close to max, compute simple
     // velocity transition.
     double lengthRemain = p.length -
-      planVelocityTransition(Vi, Vt, p.maxAccel, p.maxJerk, p.times);
+      planVelocityTransition(Vi, Vt, p.maxAccel, p.maxJerk, config.timeStep,
+                             p.times);
 
     if (lengthRemain < -0.000001)
       THROWS("Velocity transition exceeds length by " << -lengthRemain
@@ -488,10 +618,10 @@ bool LinePlanner::plan(points_t::iterator it) {
 
     // Plan s-curve
     double length = p.length;
-    length -=
-      planVelocityTransition(Vi, peakVel, p.maxAccel, p.maxJerk, p.times);
-    length -=
-      planVelocityTransition(peakVel, Vt, p.maxAccel, p.maxJerk, p.times + 4);
+    length -= planVelocityTransition(Vi, peakVel, p.maxAccel, p.maxJerk,
+                                     config.timeStep, p.times);
+    length -= planVelocityTransition(peakVel, Vt, p.maxAccel, p.maxJerk,
+                                     config.timeStep, p.times + 4);
     p.times[3] = length / peakVel;
 
     // Record change in velocity
