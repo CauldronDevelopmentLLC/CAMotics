@@ -36,30 +36,46 @@ namespace GCode {
   class STL;
 
   class ToolPath :
-    public std::vector<GCode::Move>, public cb::Rectangle3D,
+    protected std::vector<GCode::Move>, public cb::Rectangle3D,
     public GCode::MoveStream, public cb::JSON::Serializable {
     GCode::ToolTable tools;
 
+    double time;
+    double distance;
+
   public:
-    ToolPath(const GCode::ToolTable &tools) : tools(tools) {}
+    ToolPath(const GCode::ToolTable &tools) :
+      tools(tools), time(0), distance(0) {}
     ~ToolPath();
 
     const cb::Rectangle3D &getBounds() const {return *this;}
     const GCode::ToolTable &getTools() const {return tools;}
     GCode::ToolTable &getTools() {return tools;}
+    double getTime() const {return time;}
+    double getDistance() const {return distance;}
 
     int find(double time, unsigned first, unsigned last) const;
     int find(double time) const;
 
     void print() const {}
 
+    // From std::vector<GCode::Move>
+    typedef std::vector<GCode::Move> path_t;
+    using path_t::size;
+    using path_t::empty;
+    using path_t::begin;
+    using path_t::end;
+    using path_t::const_iterator;
+    const Move &operator[](int i) const
+    {return (*static_cast<const path_t *>(this))[i];}
+    const Move &at(int i) const
+    {return static_cast<const path_t *>(this)->at(i);}
+
     // From cb::JSON::Serializable
     using cb::JSON::Serializable::read;
     using cb::JSON::Serializable::write;
     void read(const cb::JSON::Value &value);
     void write(cb::JSON::Sink &sink) const;
-
-    using std::vector<GCode::Move>::operator[];
 
     // From GCode::MoveStream
     void move(GCode::Move &move);
