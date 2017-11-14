@@ -344,9 +344,7 @@ void Controller::reset() {
 }
 
 
-void Controller::newBlock() {
-  moveInAbsoluteCoords = false;
-}
+void Controller::newBlock() {moveInAbsoluteCoords = false;}
 
 
 void Controller::execute(const Code &code, int vars) {
@@ -550,9 +548,9 @@ void Controller::arc(int vars, bool clockwise) {
   // Compute start and end points
   Axes current = getAbsolutePosition();
   Axes target = getNextPosition(vars, !incrementalDistanceMode);
-  cb::Vector2D start = cb::Vector2D(current.get(axes[0]), current.get(axes[1]));
-  cb::Vector2D finish = cb::Vector2D(target.get(axes[0]), target.get(axes[1]));
-  cb::Vector2D center;
+  Vector2D start = Vector2D(current.get(axes[0]), current.get(axes[1]));
+  Vector2D finish = Vector2D(target.get(axes[0]), target.get(axes[1]));
+  Vector2D center;
   double radius;
 
   if (VT_R & vars) {
@@ -568,8 +566,9 @@ void Controller::arc(int vars, bool clockwise) {
     }
 
     // Compute arc center
-    cb::Vector2D m = (start + finish) / 2;
-    cb::Vector2D E = cb::Vector2D(start.y() - finish.y(), finish.x() - start.x());
+    Vector2D m = (start + finish) / 2;
+    Vector2D E =
+      Vector2D(start.y() - finish.y(), finish.x() - start.x());
     double d = (finish - start).length() / 2;
     double l = sqrt(radius * radius - d * d);
 
@@ -585,15 +584,15 @@ void Controller::arc(int vars, bool clockwise) {
   } else {
     // Get arc center
     const char *offsets = getPlaneOffsets(getPlane());
-    cb::Vector2D offset;
+    Vector2D offset;
 
     if (arcIncrementalDistanceMode) {
       offset =
-        cb::Vector2D(vars & letterToVarType(offsets[0]) ? getVar(offsets[0]) : 0,
+        Vector2D(vars & letterToVarType(offsets[0]) ? getVar(offsets[0]) : 0,
                  vars & letterToVarType(offsets[1]) ? getVar(offsets[1]) : 0);
       center = start + offset;
 
-    } else center = cb::Vector2D(getVar(offsets[0]) + getAxisOffset(axes[0]),
+    } else center = Vector2D(getVar(offsets[0]) + getAxisOffset(axes[0]),
                              getVar(offsets[1]) + getAxisOffset(axes[1]));
 
     // Check that the radius matches
@@ -608,8 +607,8 @@ void Controller::arc(int vars, bool clockwise) {
   }
 
   // Compute angle
-  double startAngle = (start - center).angleBetween(cb::Vector2D(1, 0));
-  double finishAngle = (finish - center).angleBetween(cb::Vector2D(1, 0));
+  double startAngle = (start - center).angleBetween(Vector2D(1, 0));
+  double finishAngle = (finish - center).angleBetween(Vector2D(1, 0));
   double angle = finishAngle - startAngle;
   if (0 <= angle) angle -= 2 * M_PI;
   if (!clockwise) angle += 2 * M_PI;
@@ -620,8 +619,8 @@ void Controller::arc(int vars, bool clockwise) {
 
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
-  cb::Vector2D offset = center - start;
-  machine.arc(cb::Vector3D(offset.x(), offset.y(), deltaZ), -angle, getPlane());
+  Vector2D offset = center - start;
+  machine.arc(Vector3D(offset.x(), offset.y(), deltaZ), -angle, getPlane());
   doMove(target, false);
 
   LOG_INFO(3, "Controller: Arc");
