@@ -20,26 +20,24 @@
 
 #pragma once
 
-#include <cbang/SmartPointer.h>
+#include <gcode/interp/Interpreter.h>
+#include <gcode/parse/Tokenizer.h>
 
 
 namespace GCode {
-  class PlanCommand;
+  class Controller;
 
-  class PlanQueue {
-    cb::SmartPointer<PlanCommand> first;
-    cb::SmartPointer<PlanCommand> last;
+  class Runner {
+    Interpreter interpreter;
+    cb::Scanner scanner;
+    GCode::Tokenizer tokenizer;
 
- public:
-    PlanQueue() {}
-    ~PlanQueue();
+    bool done;
 
-    bool empty() const {return first.isNull();}
+  public:
+    Runner(Controller &controller, const cb::InputSource &source);
 
-    const cb::SmartPointer<PlanCommand> &front() const {return first;}
-    const cb::SmartPointer<PlanCommand> &back() const {return last;}
-
-    void push(const cb::SmartPointer<PlanCommand> &cmd);
-    cb::SmartPointer<PlanCommand> pop();
+    bool isDone() const {return done;}
+    void next();
   };
 }

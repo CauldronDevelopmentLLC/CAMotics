@@ -35,8 +35,11 @@ namespace GCode {
     Axes maxJerk;
     double junctionDeviation;
     double junctionAccel;
-    Units units;
     double timeStep;
+
+    Units defaultUnits;
+    Units outputUnits;
+    double maxArcError;
 
     PlannerConfig();
 

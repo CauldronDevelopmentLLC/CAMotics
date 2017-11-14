@@ -18,25 +18,31 @@
 
 \******************************************************************************/
 
-#pragma once
+#include "Runner.h"
 
-#include <gcode/Axes.h>
+#include <cbang/log/Logger.h>
 
 
-namespace GCode {
-  class PlannerSink {
-  public:
-    virtual ~PlannerSink() {}
+using namespace GCode;
+using namespace cb;
+using namespace std;
 
-    virtual void start() = 0;
-    virtual void end() = 0;
 
-    virtual void setSpeed(double speed) = 0;
-    virtual void setTool(unsigned tool) = 0;
+Runner::Runner(Controller &controller, const InputSource &source) :
+  interpreter(controller), scanner(source), tokenizer(scanner), done(false) {
+}
 
-    virtual void dwell(double seconds) = 0;
-    virtual void pause(bool optional) = 0;
 
-    virtual void move(double time, double velocity, const Axes &position) = 0;
-  };
+void Runner::next() {
+  try {
+    done = !interpreter.readBlock(tokenizer);
+
+  } catch (const EndProgram &) {
+    done = true;
+
+  } catch (const Exception &e) {
+    LOG_ERROR(tokenizer.getLocation() << ":" << e.getMessage());
+    LOG_DEBUG(3, e);
+    done = true;
+  }
 }

@@ -18,18 +18,9 @@
 
 \******************************************************************************/
 
-#include <camotics/CommandLineApp.h>
-#include <gcode/ToolPath.h>
-#include <gcode/interp/Interpreter.h>
-#include <gcode/parse/Parser.h>
+#include <camotics/Application.h>
 
-#include <gcode/machine/MachinePipeline.h>
-#include <gcode/machine/MachineState.h>
-#include <gcode/machine/MachineLinearizer.h>
-#include <gcode/machine/MachineUnitAdapter.h>
-#include <gcode/plan/LinePlanner.h>
-#include <gcode/plan/TinyGPlanner.h>
-#include <gcode/plan/PlannerJSONMoveSink.h>
+#include <gcode/plan/Planner.h>
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
@@ -44,13 +35,12 @@ using namespace cb;
 using namespace GCode;
 
 
-class PlannerApp : public CAMotics::CommandLineApp {
+class PlannerApp : public CAMotics::Application {
   PlannerConfig config;
-  MachinePipeline pipeline;
-  SmartPointer<Controller> controller;
 
 public:
-  PlannerApp() : CAMotics::CommandLineApp("CAMotics GCode Path Planner") {
+  PlannerApp() :
+    CAMotics::Application("CAMotics GCode Path Planner") {
     cmdLine.add("json", "JSON configuration or configuration file"
                 )->setType(Option::STRING_TYPE);
     cmdLine.add("tinyg", "Use the TinyG planner")->setDefault(false);
@@ -59,7 +49,7 @@ public:
 
   // From Application
   int init(int argc, char *argv[]) {
-    int ret = CommandLineApp::init(argc, argv);
+    int ret = Application::init(argc, argv);
     if (ret == -1) return ret;
 
     if (cmdLine["--json"].hasValue()) {
@@ -79,34 +69,23 @@ public:
   }
 
 
-  void run() {
-    config.units = outputUnits;
-
-    JSON::Writer writer(*stream);
-    PlannerJSONMoveSink plannerSink(writer);
-
-    SmartPointer<MachineAdapter> planner;
-    if (cmdLine["--tinyg"].toBoolean())
-      planner = new TinyGPlanner(plannerSink, config);
-    else planner = new LinePlanner(plannerSink, config);
-
-    pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
-    pipeline.add(new MachineLinearizer);
-    pipeline.add(planner);
-    pipeline.add(new MachineState);
-
-    controller = new Controller(pipeline);
-
-    Application::run();
-    cout << flush;
-  }
-
-
   // From cb::Reader
   void read(const InputSource &source) {
-    pipeline.start();
-    Interpreter(*controller).read(source);
-    pipeline.end();
+    Planner planner(config);
+    planner.load(source);
+
+    JSON::Writer writer(cout);
+
+    writer.beginList();
+
+    while (!shouldQuit() && planner.hasMore()) {
+      writer.beginAppend();
+      planner.next(writer);
+    }
+
+    writer.endList();
+
+    cout << endl;
   }
 };
 

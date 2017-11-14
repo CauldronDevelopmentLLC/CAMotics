@@ -20,42 +20,41 @@
 
 #pragma once
 
-#include "PlannerSink.h"
 #include "PlannerConfig.h"
-#include "PlanCommand.h"
-#include "PlanQueue.h"
+#include "LinePlanner.h"
 
-#include <gcode/machine/MachineAdapter.h>
+#include <gcode/Controller.h>
+#include <gcode/Runner.h>
+#include <gcode/machine/MachinePipeline.h>
+
+
+namespace cb {namespace JSON {class Sink;}}
 
 
 namespace GCode {
-  class Planner : public MachineAdapter {
-    PlannerSink &sink;
-    PlannerConfig config;
+  class Runner;
 
-    double velocity;
-    Axes position;
+  class Planner {
+    const PlannerConfig &config;
 
-    cb::FileLocation location;
+    MachinePipeline pipeline;
+    cb::SmartPointer<Controller> controller;
+    LinePlanner planner;
 
-    PlanQueue queue;
+    std::string gcode;
+    cb::SmartPointer<Runner> runner;
 
   public:
-    Planner(PlannerSink &sink, const PlannerConfig &config) :
-      sink(sink), config(config), velocity(0) {}
+    Planner(const PlannerConfig &config);
 
-    // From MachineInterface
-    void start();
-    void end();
+    bool isRunning() const;
 
-    void setSpeed(double speed, spin_mode_t mode, double max);
-    void setTool(unsigned tool);
+    void mdi(const std::string &gcode);
+    void load(const cb::InputSource &source);
 
-    void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
-    void pause(bool optional);
-
-  protected:
-    void plan();
+    bool hasMore();
+    void next(cb::JSON::Sink &sink);
+    void release(uint64_t line);
+    void restart(uint64_t line, double length);
   };
 }

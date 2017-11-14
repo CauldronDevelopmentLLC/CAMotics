@@ -31,11 +31,13 @@ using namespace std;
 
 PlannerConfig::PlannerConfig() :
   start(0.0), maxVel(10000), maxAccel(200000), maxJerk(50000000),
-  junctionDeviation(0.05), junctionAccel(100000), timeStep(0.005 / 60.0) {}
+  junctionDeviation(0.05), junctionAccel(100000), timeStep(0.005 / 60.0),
+  maxArcError(0.01) {}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
-  units = Units::parse(value.getString("units", "METRIC"));
+  defaultUnits = Units::parse(value.getString("default-units", "METRIC"));
+  outputUnits = Units::parse(value.getString("output-units", "METRIC"));
 
   if (value.hasDict("start")) start.read(value.getDict("start"));
   if (value.hasDict("max-vel")) maxVel.read(value.getDict("max-vel"));
@@ -45,13 +47,16 @@ void PlannerConfig::read(const JSON::Value &value) {
   junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
   junctionAccel = value.getNumber("junction-accel", junctionAccel);
   timeStep = value.getNumber("time-step", timeStep);
+  maxArcError = value.getNumber("maxArcError", maxArcError);
 }
 
 
 void PlannerConfig::write(JSON::Sink &sink) const {
   sink.beginDict();
 
-  sink.insert("units", units.toString());
+  sink.insert("default-units", defaultUnits.toString());
+  sink.insert("output-units", outputUnits.toString());
+  sink.insert("max-arc-error", maxArcError);
 
   sink.beginInsert("start");
   start.write(sink);

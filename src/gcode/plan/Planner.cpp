@@ -20,80 +20,64 @@
 
 #include "Planner.h"
 
-#include <cbang/Exception.h>
-#include <cbang/Math.h>
-#include <cbang/net/URI.h>
-#include <cbang/log/Logger.h>
+#include <gcode/Runner.h>
+#include <gcode/machine/MachineState.h>
+#include <gcode/machine/MachineLinearizer.h>
+#include <gcode/machine/MachineUnitAdapter.h>
 
-#include <limits>
+#include <cbang/json/Writer.h>
+#include <cbang/io/StringInputSource.h>
+
 
 using namespace cb;
 using namespace std;
 using namespace GCode;
 
 
-void Planner::start() {
-  velocity = 0;
-  position = config.start;
+Planner::Planner(const PlannerConfig &config) :
+  config(config), planner(config) {
 
-  MachineAdapter::start();
-  queue.push(new PlanStartCommand());
+  pipeline.add(new MachineUnitAdapter(config.defaultUnits,
+                                      config.outputUnits));
+  pipeline.add(new MachineLinearizer(config.maxArcError));
+  pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
+  pipeline.add(new MachineState);
+
+  controller = new Controller(pipeline);
 }
 
 
-void Planner::end() {
-  MachineAdapter::end();
-  queue.push(new PlanEndCommand());
-  plan();
+bool Planner::isRunning() const {return !runner.isNull() && !runner->isDone();}
+
+
+void Planner::mdi(const string &gcode) {
+  if (isRunning()) THROW("Planner already running");
+  this->gcode = gcode;
+  load(StringInputSource(this->gcode));
 }
 
 
-void Planner::setSpeed(double speed, spin_mode_t mode, double max) {
-  if (mode == CONSTANT_SURFACE_SPEED)
-    THROWS("Constant surface speed not implemented");
-
-  double oldSpeed = getSpeed();
-  MachineAdapter::setSpeed(speed, mode, max);
-
-  if (oldSpeed != speed) queue.push(new PlanSpeedCommand(speed));
+void Planner::load(const cb::InputSource &source) {
+  if (isRunning()) THROW("Planner already running");
+  runner = new Runner(*controller, source);
+  pipeline.start();
 }
 
 
-void Planner::setTool(unsigned tool) {
-  int oldTool = getTool();
-  MachineAdapter::setTool(tool);
-  if (oldTool != (int)tool) queue.push(new PlanToolCommand(tool));
-}
-
-
-void Planner::dwell(double seconds) {
-  MachineAdapter::dwell(seconds);
-  queue.push(new PlanDwellCommand(seconds));
-}
-
-
-void Planner::pause(bool optional) {
-  MachineAdapter::pause(optional);
-  queue.push(new PlanPauseCommand(optional));
-}
-
-
-void Planner::move(const Axes &target, bool rapid) {
-  MachineAdapter::move(target, rapid);
-
-  // TODO Handle feed rate mode
-  double feed = rapid ? numeric_limits<double>::max() : getFeed();
-  queue.push(new PlanMoveCommand(config, position, target, feed));
-  position = target;
-
-  plan();
-}
-
-
-void Planner::plan() {
-  while (!queue.empty()) {
-    if (!queue.front()->plan()) break;
-    queue.front()->write(sink);
-    queue.pop();
+bool Planner::hasMore() {
+  while (true) {
+    if (planner.hasMove()) return true;
+    if (runner.isNull() || runner->isDone()) return false;
+    runner->next();
+    if (runner->isDone()) pipeline.end();
   }
+}
+
+
+void Planner::next(JSON::Sink &sink) {planner.next(sink);}
+void Planner::release(uint64_t line) {planner.release(line);}
+
+
+void Planner::restart(uint64_t line, double length) {
+  planner.restart(line, length);
 }
