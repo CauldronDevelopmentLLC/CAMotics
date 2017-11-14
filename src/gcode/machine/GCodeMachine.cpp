@@ -74,7 +74,7 @@ void GCodeMachine::beginLine() {
   }
 
   if (newLoc.getLine() != location.getLine()) {
-    stream << "N" << newLoc.getLine() << ' ';
+    stream << 'N' << newLoc.getLine() << ' ';
     location.setLine(newLoc.getLine());
   }
 }
