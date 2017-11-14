@@ -59,9 +59,8 @@ namespace GCode {
     const cb::Vector3D &getEndPt() const {return cb::Segment3D::getEnd();}
     int getTool() const {return tool;}
     double getFeed() const {return feed;}
-    void setFeed(double feed) {this->feed = feed;}
+    void setFeed(double feed);
     double getSpeed() const {return speed;}
-    void setSpeed(double speed) {this->speed = speed;}
     unsigned getLine() const {return line;}
 
     double getDistance() const {return dist;}
