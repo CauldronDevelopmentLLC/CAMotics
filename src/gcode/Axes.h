@@ -111,19 +111,23 @@ namespace GCode {
       }
     }
 
-    inline static char toAxis(unsigned i) {
+    inline static char toAxis(unsigned i, bool lower = false) {
       switch (i) {
-      case 0: return 'X';
-      case 1: return 'Y';
-      case 2: return 'Z';
-      case 3: return 'A';
-      case 4: return 'B';
-      case 5: return 'C';
-      case 6: return 'U';
-      case 7: return 'V';
-      case 8: return 'W';
+      case 0: return lower ? 'x' : 'X';
+      case 1: return lower ? 'y' : 'Y';
+      case 2: return lower ? 'z' : 'Z';
+      case 3: return lower ? 'a' : 'A';
+      case 4: return lower ? 'b' : 'B';
+      case 5: return lower ? 'c' : 'C';
+      case 6: return lower ? 'u' : 'U';
+      case 7: return lower ? 'v' : 'V';
+      case 8: return lower ? 'w' : 'W';
       default: THROWS("Invalid axis index " << i);
       }
+    }
+
+    inline static std::string toAxisName(unsigned i, bool lower = false) {
+      return std::string(1, toAxis(i, lower));
     }
 
     // From cb::JSON::Serializable
