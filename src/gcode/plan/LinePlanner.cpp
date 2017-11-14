@@ -20,6 +20,12 @@
 
 #include "LinePlanner.h"
 
+#include "LineCommand.h"
+#include "SpeedCommand.h"
+#include "ToolCommand.h"
+#include "DwellCommand.h"
+#include "PauseCommand.h"
+
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
@@ -57,78 +63,51 @@ namespace {
 }
 
 
-LinePlanner::Point::Point(uint64_t line) :
-  line(line), length(0), entryVel(numeric_limits<double>::max()),
-  exitVel(numeric_limits<double>::max()), deltaV(0),
-  maxVel(numeric_limits<double>::max()),
-  maxAccel(numeric_limits<double>::max()),
-  maxJerk(numeric_limits<double>::max()) {}
-
-
-
 bool LinePlanner::hasMove() const {
-  return !points.empty() && isFinal(points.begin());
+  return !cmds.empty() && isFinal(cmds.begin());
 }
 
 
 void LinePlanner::next(JSON::Sink &sink) {
   if (!hasMove()) THROW("Planner not ready");
 
-  Point p = points.front();
-
-  sink.beginDict();
-
-  sink.insert("line", p.line);
-
-  sink.insertDict("target", true);
-  for (unsigned i = 0; i < p.position.getSize(); i++)
-    if (p.position[i] != outputPos[i]) {
-      sink.insert(Axes::toAxisName(i, true), p.position[i]);
-      outputPos[i] = p.position[i];
-    }
-  sink.endDict();
-
-  sink.insert("exit-vel", p.exitVel);
-  sink.insert("max-vel", p.maxVel);
-  sink.insert("max-accel", p.maxAccel);
-  sink.insert("max-jerk", p.maxJerk);
-
-  sink.insertList("times", true);
-  for (unsigned i = 0; i < 7; i++) sink.append(p.times[i] * 60000); // ms
-  sink.endList();
-
-  sink.endDict();
-
-  output.push_back(p);
-  points.pop_front();
+  SmartPointer<PlannerCommand> cmd = cmds.front();
+  cmd->write(sink);
+  output.push_back(cmd);
+  cmds.pop_front();
 }
 
 
 void LinePlanner::release(uint64_t line) {
-  while (!output.empty() && output.front().line <= line)
+  while (!output.empty() && output.front()->getLine() <= line)
     output.pop_front();
 }
 
 
 void LinePlanner::restart(uint64_t line, double length) {
-  // Find replan point in output
+  // Find replan command in output
   while (true) {
-    if (output.empty() || line < output.front().line)
-      THROWS("Planner line " << line << " not found");
-    if (output.front().line == line) break;
+    if (output.empty() || line < output.front()->getLine())
+      THROWS("Planner line " << line << " at length " << length
+             << " not found");
+
+    if (output.front()->getLine() == line) {
+      if (output.front()->getLength() <= length) break;
+      else length -= output.front()->getLength();
+    }
+
     output.pop_front(); // Release any moves before the restart
   }
 
   // Reload previously output moves
-  points.splice(points.begin(), output, output.begin(), output.end());
+  cmds.splice(cmds.begin(), output, output.begin(), output.end());
 
   // Reset output position
   outputPos = Vector4D(numeric_limits<double>::quiet_NaN());
 
   // Replan from zero velocity
-  points.front().entryVel = 0;
-  points.front().length -= length;
-  for (auto it = points.begin(); it != points.end(); it++)
+  cmds.front()->restart(length);
+  for (auto it = cmds.begin(); it != cmds.end(); it++)
     if (plan(it)) backplan(it);
 }
 
@@ -147,55 +126,75 @@ void LinePlanner::start() {
 void LinePlanner::end() {
   MachineAdapter::end();
 
-  if (!points.empty()) {
-    points.back().exitVel = 0;
-    plan(std::prev(points.end()));
+  if (!cmds.empty()) {
+    cmds.back()->setExitVelocity(0);
+    plan(std::prev(cmds.end()));
   }
+}
+
+
+void LinePlanner::setSpeed(double speed, spin_mode_t mode, double max) {
+  MachineAdapter::setSpeed(speed, mode, max);
+  // TODO handle spin mode
+  push(new SpeedCommand(getLine(), speed));
+}
+
+
+void LinePlanner::setTool(unsigned tool) {
+  MachineAdapter::setTool(tool);
+  push(new ToolCommand(getLine(), tool));
+}
+
+
+void LinePlanner::dwell(double seconds) {
+  MachineAdapter::dwell(seconds);
+  push(new DwellCommand(getLine(), seconds));
 }
 
 
 void LinePlanner::move(const Axes &target, bool rapid) {
   MachineAdapter::move(target, rapid);
 
-  Point p(getLocation().getStart().getLine());
+  SmartPointer<LineCommand> lc = new LineCommand(getLine());
 
   for (int i = 0; i < 4; i++)
-    p.position[i] = target[i];
+    lc->position[i] = target[i];
 
-  // Compute axis and point lengths
-  Vector4D delta = p.position - position;
-  position = p.position;
-  p.length = delta.length();
-  Vector4D unit = delta / p.length;
+  // Compute axis and lengths
+  Vector4D delta = lc->position - position;
+  position = lc->position;
+  lc->length = delta.length();
+  Vector4D unit = delta / lc->length;
 
-  if (!p.length) return; // Null move
+  // TODO ignore too short moves
+  if (!lc->length) return; // Null move
 
   // Apply user velocity limit
   // TODO Handle feed rate mode
   if (!rapid) {
-    p.maxVel = getFeed();
-    if (!p.maxVel) THROWS("Non-rapid move with zero feed rate");
+    lc->maxVel = getFeed();
+    if (!lc->maxVel) THROWS("Non-rapid move with zero feed rate");
   }
 
   // Apply axis velocity limits
   for (unsigned i = 0; i < 4; i++)
     if (unit[i]) {
       double v = fabs(config.maxVel[i] / unit[i]);
-      if (v < p.maxVel) p.maxVel = v;
+      if (v < lc->maxVel) lc->maxVel = v;
     }
 
   // Apply axis jerk limits
   for (unsigned i = 0; i < 4; i++)
     if (unit[i]) {
       double j = fabs(config.maxJerk[i] / unit[i]);
-      if (j < p.maxJerk) p.maxJerk = j;
+      if (j < lc->maxJerk) lc->maxJerk = j;
     }
 
   // Apply axis acceleration limits
   for (unsigned i = 0; i < 4; i++)
     if (unit[i]) {
       double a = fabs(config.maxAccel[i] / unit[i]);
-      if (a < p.maxAccel) p.maxAccel = a;
+      if (a < lc->maxAccel) lc->maxAccel = a;
     }
 
   // Apply junction velocity limit
@@ -203,31 +202,44 @@ void LinePlanner::move(const Axes &target, bool rapid) {
     double jv = computeJunctionVelocity(unit, lastUnit,
                                         config.junctionDeviation,
                                         config.junctionAccel);
-    if (jv < p.exitVel) p.exitVel = jv;
+    if (jv < lc->exitVel) lc->exitVel = jv;
   }
-
-  // Limit point velocity
-  p.entryVel = lastExitVel;
-  if (p.maxVel < p.exitVel) p.exitVel = p.maxVel;
-
-  // Plan move
-  points.push_back(p);
-  auto it = std::prev(points.end());
-  if (plan(it)) backplan(it);
-
-  lastExitVel = it->exitVel;
   lastUnit = unit;
+
+  // Limit velocity
+  if (lc->maxVel < lc->exitVel) lc->exitVel = lc->maxVel;
+
+  // Add move
+  push(lc);
 }
 
 
-bool LinePlanner::isFinal(points_t::const_iterator it) const {
-  double velocity = it->exitVel;
+void LinePlanner::pause(bool optional) {
+  MachineAdapter::pause(optional);
+  push(new PauseCommand(getLine(), optional));
+}
+
+
+void LinePlanner::push(const cb::SmartPointer<PlannerCommand> &cmd) {
+  cmds.push_back(cmd);
+
+  // Plan move
+  cmd->setEntryVelocity(lastExitVel);
+  auto it = std::prev(cmds.end());
+  if (plan(it)) backplan(it);
+
+  lastExitVel = cmd->getExitVelocity();
+}
+
+
+bool LinePlanner::isFinal(cmds_t::const_iterator it) const {
+  double velocity = (*it)->getExitVelocity();
   if (!velocity) return true;
 
   // Check if there is enough velocity change in the following blocks to
   // deccelerate to zero if necessary.
-  while (++it != points.end()) {
-    velocity -= it->deltaV;
+  while (++it != cmds.end()) {
+    velocity -= (*it)->getDeltaVelocity();
     if (velocity <= 0) return true;
   }
 
@@ -235,11 +247,23 @@ bool LinePlanner::isFinal(points_t::const_iterator it) const {
 }
 
 
-bool LinePlanner::plan(points_t::iterator it) {
-  Point &p = *it;
+bool LinePlanner::plan(cmds_t::iterator it) {
+  const SmartPointer<PlannerCommand> &pc = *it;
+
+  if (!pc.isInstance<LineCommand>()) {
+    if (it != cmds.begin() &&
+        pc->getEntryVelocity() < (*std::prev(it))->getExitVelocity()) {
+      (*std::prev(it))->setExitVelocity(pc->getEntryVelocity());
+      return true;
+    }
+
+    return false;
+  }
+
+  LineCommand &lc = *it->cast<LineCommand>();
   bool backplan = false;
-  double Vi = p.entryVel;
-  double Vt = p.exitVel;
+  double Vi = lc.entryVel;
+  double Vt = lc.exitVel;
 
   bool swapped = false;
   if (Vt < Vi) {
@@ -248,67 +272,69 @@ bool LinePlanner::plan(points_t::iterator it) {
   }
 
   // Compute minimum length for velocity change
-  double length = computeLength(Vi, Vt, p.maxAccel, p.maxJerk);
+  double length = computeLength(Vi, Vt, lc.maxAccel, lc.maxJerk);
 
   // Check if velocity change fits
-  if (p.length < length) {
+  if (lc.length < length) {
     // Velocity change does not fit, compute a lower target velocity
-    length = p.length; // New target velocity will fit exactly
-    Vt = peakVelocity(Vi, p.maxAccel, p.maxJerk, length);
+    length = lc.length; // New target velocity will fit exactly
+    Vt = peakVelocity(Vi, lc.maxAccel, lc.maxJerk, length);
 
     // Update velocities
     if (swapped) {
       // Backplaning  necessary
       backplan = true;
 
-      if (it == points.begin())
+      if (it == cmds.begin())
         THROWS("Cannot backplan, previous move unavailable");
 
-      LOG_DEBUG(3, "Backplan: entryVel=" << p.entryVel
-                << " prev.exitVel=" << std::prev(it)->exitVel << " Vt=" << Vt);
+      LOG_DEBUG(3, "Backplan: entryVel=" << lc.entryVel
+                << " prev.exitVel=" << (*std::prev(it))->getExitVelocity()
+                << " Vt=" << Vt);
 
-      p.entryVel = std::prev(it)->exitVel = Vt;
+      lc.entryVel = Vt;
+      (*std::prev(it))->setExitVelocity(Vt);
 
     } else {
-      p.exitVel = Vt;
-      if (std::next(it) != points.end()) std::next(it)->entryVel = Vt;
+      lc.exitVel = Vt;
+      if (std::next(it) != cmds.end()) (*std::next(it))->setEntryVelocity(Vt);
     }
   }
 
   // Zero times
-  for (int i = 0; i < 7; i++) p.times[i] = 0;
+  for (int i = 0; i < 7; i++) lc.times[i] = 0;
 
   // Plan curve segments
-  if ((0.95 * p.length <= length && length <= p.length) ||
-      p.maxVel * 0.95 < Vt) {
+  if ((0.95 * lc.length <= length && length <= lc.length) ||
+      lc.maxVel * 0.95 < Vt) {
     // Exact or near fit or target velocity is close to max, compute simple
     // velocity transition.
-    double lengthRemain = p.length -
-      planVelocityTransition(Vi, Vt, p.maxAccel, p.maxJerk, p.times);
+    double lengthRemain = lc.length -
+      planVelocityTransition(Vi, Vt, lc.maxAccel, lc.maxJerk, lc.times);
 
     if (lengthRemain < -0.000001)
       THROWS("Velocity transition exceeds length by " << -lengthRemain
-             << " required=" << p.length << " computed=" << length
+             << " required=" << lc.length << " computed=" << length
              << " Vt=" << Vt);
 
     // If there is length left, add a constant velocity segment
-    if (0.000001 < lengthRemain) p.times[3] = lengthRemain / Vt;
+    if (0.000001 < lengthRemain) lc.times[3] = lengthRemain / Vt;
 
     // Record change in velocity
-    p.deltaV = Vt - Vi;
+    lc.deltaV = Vt - Vi;
 
   } else {
     // Velocity change fits and a higher peak velocity can be achieved.
     // Search for a peak velocity that fits well.
-    double peakVel = p.maxVel;
+    double peakVel = lc.maxVel;
     double maxVel = peakVel;
     double minVel = Vt;
     int rounds = 0;
 
     while (true) {
-      double headLen = computeLength(Vi, peakVel, p.maxAccel, p.maxJerk);
-      double tailLen = computeLength(Vt, peakVel, p.maxAccel, p.maxJerk);
-      double bodyLen = p.length - headLen - tailLen;
+      double headLen = computeLength(Vi, peakVel, lc.maxAccel, lc.maxJerk);
+      double tailLen = computeLength(Vt, peakVel, lc.maxAccel, lc.maxJerk);
+      double bodyLen = lc.length - headLen - tailLen;
 
       if (0 <= bodyLen) {
         // Fits, stop if we are close enough or there have been enough rounds
@@ -327,29 +353,29 @@ bool LinePlanner::plan(points_t::iterator it) {
     }
 
     // Plan s-curve
-    double length = p.length;
-    length -= planVelocityTransition(Vi, peakVel, p.maxAccel, p.maxJerk,
-                                     p.times);
-    length -= planVelocityTransition(peakVel, Vt, p.maxAccel, p.maxJerk,
-                                     p.times + 4);
-    p.times[3] = length / peakVel;
+    double length = lc.length;
+    length -= planVelocityTransition(Vi, peakVel, lc.maxAccel, lc.maxJerk,
+                                     lc.times);
+    length -= planVelocityTransition(peakVel, Vt, lc.maxAccel, lc.maxJerk,
+                                     lc.times + 4);
+    lc.times[3] = length / peakVel;
 
     // Record change in velocity
-    p.deltaV = peakVel - Vi + peakVel - Vt;
+    lc.deltaV = peakVel - Vi + peakVel - Vt;
   }
 
   // Reverse the plan, if velocities were swapped above
   if (swapped)
     for (int i = 0; i < 3; i++)
-      swap(p.times[i], p.times[6 - i]);
+      swap(lc.times[i], lc.times[6 - i]);
 
   return backplan;
 }
 
 
-void LinePlanner::backplan(points_t::iterator it) {
+void LinePlanner::backplan(cmds_t::iterator it) {
   while (true) {
-    if (it == points.begin())
+    if (it == cmds.begin())
       THROWS("Cannot backplan, previous move unavailable");
 
     if (!plan(--it)) break;

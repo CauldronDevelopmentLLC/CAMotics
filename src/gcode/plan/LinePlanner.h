@@ -21,6 +21,7 @@
 #pragma once
 
 #include "PlannerConfig.h"
+#include "PlannerCommand.h"
 
 #include <gcode/machine/MachineAdapter.h>
 
@@ -45,33 +46,14 @@ namespace GCode {
     // Output state
     cb::Vector4D outputPos;
 
-
-    struct Point {
-      uint64_t line;
-
-      cb::Vector4D position;
-      double length;
-
-      double entryVel;
-      double exitVel;
-      double deltaV;
-
-      double maxVel;
-      double maxAccel;
-      double maxJerk;
-
-      double times[7];
-
-      Point(uint64_t line);
-    };
-
-
-    typedef std::list<Point> points_t;
-    points_t points;
-    points_t output;
+    typedef std::list<cb::SmartPointer<PlannerCommand> > cmds_t;
+    cmds_t cmds;
+    cmds_t output;
 
   public:
-    LinePlanner(const PlannerConfig &config) : config(config) {}
+    LinePlanner(const PlannerConfig &config) : config(config), lastExitVel(0) {}
+
+    uint64_t getLine() const {return getLocation().getStart().getLine();}
 
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
@@ -79,14 +61,25 @@ namespace GCode {
     void restart(uint64_t line, double length);
 
     // From MachineInterface
+    //void reset();
     void start();
     void end();
+    void setSpeed(double speed, spin_mode_t mode, double max);
+    void setTool(unsigned tool);
+    //double input(unsigned port, input_mode_t mode, double timeout, bool error)
+    //void output(unsigned port, double value, bool sync)
+    void dwell(double seconds);
     void move(const Axes &axes, bool rapid);
+    //void arc(const cb::Vector3D &offset, double angle, plane_t plane);
+    void pause(bool optional);
+    //bool synchronize(double timeout);
+    //void abort();
 
   protected:
-    bool isFinal(points_t::const_iterator it) const;
-    bool plan(points_t::iterator it);
-    void backplan(points_t::iterator it);
+    void push(const cb::SmartPointer<PlannerCommand> &cmd);
+    bool isFinal(cmds_t::const_iterator it) const;
+    bool plan(cmds_t::iterator it);
+    void backplan(cmds_t::iterator it);
 
     bool isAccelLimited(double Vi, double Vt, double maxAccel,
                         double maxJerk) const;

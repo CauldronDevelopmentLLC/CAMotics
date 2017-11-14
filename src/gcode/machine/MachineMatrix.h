@@ -61,5 +61,3 @@ namespace GCode {
     void updateMatrix(axes_t matrix);
   };
 }
-
-
