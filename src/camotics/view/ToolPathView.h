@@ -40,9 +40,6 @@ namespace CAMotics {
     cb::Vector3D position;
     unsigned line;
 
-    double totalTime;
-    double totalDistance;
-
     double currentTime;
     double currentDistance;
     cb::Vector3D currentPosition;
@@ -83,17 +80,18 @@ namespace CAMotics {
     double getTime() const {return currentTime;}
     bool atStart() const {return getTime() == 0;}
     bool atEnd() const {return getTime() == getTotalTime();}
-    double getRemainingTime() const {return totalTime - currentTime;}
-    double getTotalTime() const {return totalTime;}
-    double getTimeRatio() const {return currentTime / totalTime;}
+    double getRemainingTime() const {return getTotalTime() - currentTime;}
+    double getTotalTime() const {return path.isNull() ? 0 : path->getTime();}
+    double getTimeRatio() const {return currentTime / getTotalTime();}
     double getPercentTime() const {return getTimeRatio() * 100;}
 
     double getDistance() const {return currentDistance;}
     double getRemainingDistance() const
-    {return totalDistance - currentDistance;}
-    double getTotalDistance() const {return totalDistance;}
+    {return getTotalDistance() - currentDistance;}
+    double getTotalDistance() const
+    {return path.isNull() ? 0 : path->getDistance();}
     double getPercentDistance() const
-    {return currentDistance / totalDistance * 100;}
+    {return currentDistance / getTotalDistance() * 100;}
 
     const cb::Vector3D &getPosition() const {return currentPosition;}
     unsigned getProgramLine() const {return currentLine;}

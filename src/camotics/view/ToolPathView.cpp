@@ -33,23 +33,22 @@ using namespace CAMotics;
 
 
 ToolPathView::ToolPathView(ValueSet &valueSet) :
-  values(valueSet), byRemote(true), ratio(1), line(0), totalTime(0),
-  totalDistance(0), currentTime(0), currentDistance(0), currentLine(0),
-  dirty(true), colorVBuf(0), vertexVBuf(0), numVertices(0), numColors(0),
-  useVBOs(true) {
+  values(valueSet), byRemote(true), ratio(1), line(0), currentTime(0),
+  currentDistance(0), currentLine(0), dirty(true), colorVBuf(0), vertexVBuf(0),
+  numVertices(0), numColors(0), useVBOs(true) {
 
   values.add("x", currentPosition.x());
   values.add("y", currentPosition.y());
   values.add("z", currentPosition.z());
 
   values.add("current_time", currentTime);
-  values.add("total_time", totalTime);
+  values.add("total_time", this, &ToolPathView::getTotalTime);
   values.add("remaining_time", this, &ToolPathView::getRemainingTime);
   values.add("time_ratio", this, &ToolPathView::getTimeRatio);
   values.add("percent_time", this, &ToolPathView::getPercentTime);
 
   values.add("current_distance", currentDistance);
-  values.add("total_distance", totalDistance);
+  values.add("total_distance", this, &ToolPathView::getTotalDistance);
   values.add("remaining_distance", this, &ToolPathView::getRemainingDistance);
   values.add("percent_distance", this, &ToolPathView::getPercentDistance);
 
@@ -74,18 +73,7 @@ void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path,
   this->path = path;
   useVBOs = haveVBOs() && withVBOs;
 
-  totalTime = 0;
-  totalDistance = 0;
   currentMove = GCode::Move();
-
-  if (!path.isNull()) {
-    GCode::ToolPath::const_iterator it;
-    for (it = path->begin(); it != path->end(); it++) {
-      totalTime += it->getTime();
-      totalDistance += it->getDistance();
-    }
-  }
-
   dirty = true;
   update();
 
@@ -118,14 +106,14 @@ void ToolPathView::setByRemote(const cb::Vector3D &position, unsigned line) {
 
 
 void ToolPathView::incTime(double amount) {
-  double ratio = this->ratio + amount / totalTime;
+  double ratio = this->ratio + amount / getTotalTime();
   if (1 < ratio) ratio = 1;
   setByRatio(ratio);
 }
 
 
 void ToolPathView::decTime(double amount) {
-  double ratio = this->ratio - amount / totalTime;
+  double ratio = this->ratio - amount / getTotalTime();
   if (ratio < 0) ratio = 0;
   setByRatio(ratio);
 }
@@ -188,7 +176,7 @@ void ToolPathView::update() {
           }
         }
       } else {
-        double time = ratio * totalTime;
+        double time = ratio * getTotalTime();
         if (time < currentTime + moveTime) {
           double delta = time - currentTime;
           end = move.getPtAtTime(time);
