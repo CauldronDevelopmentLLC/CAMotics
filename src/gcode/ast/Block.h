@@ -42,7 +42,7 @@ namespace GCode {
       Super_t(children), deleted(deleted), line(line) {}
 
     bool isDeleted() const {return deleted;}
-    int getLine() const {return line;}
+    int getUserLine() const {return line;}
 
     bool isEmpty() const {return !deleted && line == -1 && empty();}
 
