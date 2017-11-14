@@ -61,7 +61,7 @@ CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
 
   cmdLine.addTarget("units", outputUnits, "Set output units.");
   cmdLine.addTarget("default-units", defaultUnits,
-                    "GCode::Units assumed at the start.");
+                    "Units assumed at the start.");
 
   cmdLine.addTarget("max-arc-error", maxArcError,
                     "The maximum allowed error, in length units, when "
