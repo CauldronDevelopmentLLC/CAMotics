@@ -18,7 +18,7 @@
 
 \******************************************************************************/
 
-#include <camotics/CommandLineApp.h>
+#include <camotics/Application.h>
 #include <camotics/contour/Triangle.h>
 
 #include <stl/Writer.h>
@@ -31,17 +31,18 @@
 #include <cbang/geom/Vector.h>
 
 #include <vector>
+#include <iostream>
 
 using namespace std;
 using namespace cb;
 
 
-class TC02STLApp : public CAMotics::CommandLineApp {
+class TC02STLApp : public CAMotics::Application {
   SmartPointer<STL::Writer> writer;
   vector<Triangle3F> triangles;
 
 public:
-  TC02STLApp() : CAMotics::CommandLineApp("TCO to STL converter") {}
+  TC02STLApp() : CAMotics::Application("TCO to STL converter") {}
 
 
   void parseBlock(const cb::InputSource &source) {
@@ -127,7 +128,7 @@ public:
       if (!line.empty() && line[0] == '[') parseBlock(source);
     }
 
-    STL::Writer writer(*stream, true);
+    STL::Writer writer(cout, true);
 
     writer.writeHeader("tco2stl", triangles.size());
 
