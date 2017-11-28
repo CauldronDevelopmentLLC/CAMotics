@@ -13,10 +13,11 @@ env = Environment(ENV = os.environ,
                   TARGET_ARCH = os.environ.get('TARGET_ARCH', 'x86'))
 Export('env')
 env.Tool('config', toolpath = [cbang])
+env.CBLoadTools('compiler cbang dist opengl dxflib python build_info packager')
 env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
-    BoolVariable('qt_deps', 'Enable Qt package dependencies', True))
-env.CBLoadTools('compiler cbang dist opengl dxflib build_info packager')
+    BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
+    ('python_version', 'Set python version', '3'))
 conf = env.CBConfigure()
 
 # Config vars
@@ -60,6 +61,15 @@ if not env.GetOption('clean'):
     conf.CBConfig('cbang')
     env.CBDefine('USING_CBANG') # Using CBANG macro namespace
 
+    # Include path
+    env.AppendUnique(CPPPATH = ['#/src'])
+
+    # Python
+    pyenv = env.Clone()
+    conf.env = pyenv
+    have_python = conf.CBConfig('python', False)
+    conf.env = env
+
     if not (env.CBConfigEnabled('chakra') or env.CBConfigEnabled('v8')):
         raise Exception('Chakra or V8 support is required, please rebuild C! '
                         'You may need to set CHAKRA_CORE_HOME or V8_HOME.')
@@ -67,7 +77,7 @@ if not env.GetOption('clean'):
     # Qt
     qtmods = 'QtCore QtGui QtOpenGL QtNetwork QtWidgets QtWebSockets'
     env.EnableQtModules(qtmods.split())
-    if env['PLATFORM'] != 'win32': env.Append(CCFLAGS = ['-fPIC'])
+    if env['PLATFORM'] != 'win32': env.AppendUnique(CCFLAGS = ['-fPIC'])
 
     conf.CBConfig('opengl')
 
@@ -77,9 +87,6 @@ if not env.GetOption('clean'):
 
     # DXFlib
     have_dxflib = conf.CBConfig('dxflib', False)
-
-    # Include path
-    env.AppendUnique(CPPPATH = ['#/src'])
 
     conf.CBCheckLib('stdc++')
 
@@ -104,6 +111,7 @@ for subdir in ['', 'ast', 'parse', 'interp', 'machine', 'plan', 'plan/bbctrl']:
     src += Glob('src/gcode/%s/*.cpp' % subdir)
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 lib = env.Library('libGCode', src)
+libGCode = lib
 libs.append(lib)
 
 
@@ -194,6 +202,15 @@ for prog in progs.split():
     Default(p)
     execs.append(p)
 
+
+# Python modules
+if have_python:
+    pyenv['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
+    pymods = 'gplan'
+    for name in pymods.split():
+        mod = pyenv.SharedLibrary(name, ['build/%s.cpp' % name, libGCode],
+                                  SHLIBPREFIX = '')
+        Default(mod)
 
 # Clean
 Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])

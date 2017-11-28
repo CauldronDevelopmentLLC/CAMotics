@@ -35,7 +35,7 @@ namespace GCode {
   class Runner;
 
   class Planner {
-    const PlannerConfig &config;
+    const PlannerConfig config;
 
     MachinePipeline pipeline;
     cb::SmartPointer<Controller> controller;

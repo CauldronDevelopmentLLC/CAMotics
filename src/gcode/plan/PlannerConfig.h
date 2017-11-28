@@ -35,7 +35,6 @@ namespace GCode {
     Axes maxJerk;
     double junctionDeviation;
     double junctionAccel;
-    double timeStep;
 
     Units defaultUnits;
     Units outputUnits;
