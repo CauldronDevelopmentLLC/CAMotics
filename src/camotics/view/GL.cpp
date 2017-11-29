@@ -24,6 +24,7 @@
 #include <cbang/log/Logger.h>
 #include <cbang/Math.h>
 
+#include <QOpenGLFunctions>
 
 using namespace std;
 using namespace cb;

@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <QOpenGLFunctions>
 #include <QOpenGLFunctions_2_1>
 
 #include <cbang/SStream.h>
