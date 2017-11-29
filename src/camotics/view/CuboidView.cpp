@@ -27,10 +27,10 @@ using namespace CAMotics;
 
 CuboidView::~CuboidView() {
   if (haveVBOs()) {
-    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+    GLFuncs &glFuncs = getGLFuncs();
 
-    if (vertexVBuf) glFuncs->glDeleteBuffers(1, &vertexVBuf);
-    if (normalVBuf) glFuncs->glDeleteBuffers(1, &normalVBuf);
+    if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
+    if (normalVBuf) glFuncs.glDeleteBuffers(1, &normalVBuf);
   }
 }
 
@@ -60,47 +60,47 @@ void CuboidView::draw() {
      0,  0, -1,   0,  0, -1,   0,  0, -1,   0,  0, -1,
   };
 
+  GLFuncs &glFuncs = getGLFuncs();
+
   if (haveVBOs()) {
-    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
-
     if (!vertexVBuf) {
-      glFuncs->glGenBuffers(1, &vertexVBuf);
-      glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-      glFuncs->glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                            vertices, GL_STATIC_DRAW);
+      glFuncs.glGenBuffers(1, &vertexVBuf);
+      glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+      glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
+                           vertices, GL_STATIC_DRAW);
 
-      glFuncs->glGenBuffers(1, &normalVBuf);
-      glFuncs->glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
-      glFuncs->glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                            normals, GL_STATIC_DRAW);
+      glFuncs.glGenBuffers(1, &normalVBuf);
+      glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
+      glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
+                           normals, GL_STATIC_DRAW);
     }
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
-    glNormalPointer(GL_FLOAT, 0, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
+    glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
 
   } else {
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glNormalPointer(GL_FLOAT, 0, normals);
+    glFuncs.glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glFuncs.glNormalPointer(GL_FLOAT, 0, normals);
   }
 
-  glEnable(GL_NORMALIZE);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
+  glFuncs.glEnable(GL_NORMALIZE);
+  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
 
-  glPushMatrix();
+  glFuncs.glPushMatrix();
 
   cb::Vector3D bMin = bounds.getMin();
   cb::Vector3D bDim = bounds.getDimensions();
-  glTranslated(bMin.x(), bMin.y(), bMin.z());
-  glScaled(bDim.x(), bDim.y(), bDim.z());
+  glFuncs.glTranslated(bMin.x(), bMin.y(), bMin.z());
+  glFuncs.glScaled(bDim.x(), bDim.y(), bDim.z());
 
-  glDrawArrays(GL_QUADS, 0, 24);
+  glFuncs.glDrawArrays(GL_QUADS, 0, 24);
 
-  glPopMatrix();
+  glFuncs.glPopMatrix();
 
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
+  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
 }

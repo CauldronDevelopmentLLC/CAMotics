@@ -25,6 +25,7 @@
 #include "ui_camotics.h"
 
 #include <camotics/view/Viewer.h>
+#include <camotics/view/GL.h>
 #include <camotics/sim/Project.h>
 #include <camotics/sim/SimulationRun.h>
 #include <camotics/sim/CutWorkpiece.h>
@@ -546,7 +547,7 @@ void QtWin::resizeGL(int w, int h) {
 void QtWin::paintGL() {
   LOG_DEBUG(5, "paintGL()");
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  getGLFuncs().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   viewer->draw(*view);
 }
 

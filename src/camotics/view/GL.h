@@ -21,6 +21,7 @@
 #pragma once
 
 #include <QOpenGLFunctions>
+#include <QOpenGLFunctions_2_1>
 
 #include <cbang/SStream.h>
 
@@ -37,6 +38,9 @@ namespace CAMotics {
   void glDisk(double radius, unsigned segments);
   void glCylinder(double base, double top, double height, unsigned segments);
   void glSphere(double radius, unsigned slices, unsigned stacks);
+
+  typedef QOpenGLFunctions_2_1 GLFuncs;
+  GLFuncs &getGLFuncs();
 }
 
 #ifdef __DEBUG

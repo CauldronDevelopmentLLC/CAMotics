@@ -38,7 +38,7 @@ namespace {
     GLdouble xmin = ymin * aspect;
     GLdouble xmax = ymax * aspect;
 
-    glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+    getGLFuncs().glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
   }
 
 
@@ -113,11 +113,10 @@ namespace {
     M(3, 2) = 0.0;
     M(3, 3) = 1.0;
 #undef M
-    glMultMatrixd(m);
+    getGLFuncs().glMultMatrixd(m);
 
     // Translate Eye to Origin
-    glTranslated(-eyex, -eyey, -eyez);
-
+    getGLFuncs().glTranslated(-eyex, -eyey, -eyez);
   }
 }
 
@@ -140,7 +139,7 @@ void ViewPort::resize(unsigned width, unsigned height) {
   this->width = width;
   this->height = height;
 
-  glViewport(0, 0, width, height);
+  getGLFuncs().glViewport(0, 0, width, height);
 }
 
 
@@ -218,45 +217,49 @@ void ViewPort::glInit() const {
   static const float specular[]         = {1.00, 1.00, 1.00, 1.00};
   static const float materialSpecular[] = {0.25, 0.25, 0.25, 0.70};
 
-  glColor4f(1, 1, 1, 1);
-  glClearColor(0, 0, 0, 0);
-  glClearDepth(1);
+  GLFuncs &glFuncs = getGLFuncs();
 
-  glEnable(GL_LINE_SMOOTH);
-  glEnable(GL_POINT_SMOOTH);
-  glShadeModel(GL_SMOOTH);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
+  glFuncs.glColor4f(1, 1, 1, 1);
+  glFuncs.glClearColor(0, 0, 0, 0);
+  glFuncs.glClearDepth(1);
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glFuncs.glEnable(GL_LINE_SMOOTH);
+  glFuncs.glEnable(GL_POINT_SMOOTH);
+  glFuncs.glShadeModel(GL_SMOOTH);
+  glFuncs.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glFuncs.glEnable(GL_BLEND);
 
-  glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-  glEnable(GL_LIGHT0);
+  glFuncs.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-  glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
-  glMaterialf(GL_FRONT, GL_SHININESS, 25);
+  glFuncs.glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+  glFuncs.glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+  glFuncs.glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+  glFuncs.glEnable(GL_LIGHT0);
+
+  glFuncs.glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+  glFuncs.glMaterialf(GL_FRONT, GL_SHININESS, 25);
 }
 
 
 void ViewPort::glDraw(const cb::Rectangle3D &bbox,
                       const cb::Vector3D &center) const {
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  GLFuncs &glFuncs = getGLFuncs();
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
+  glFuncs.glMatrixMode(GL_MODELVIEW);
+  glFuncs.glLoadIdentity();
+
+  glFuncs.glMatrixMode(GL_PROJECTION);
+  glFuncs.glLoadIdentity();
 
   // Background
-  glBegin(GL_QUADS);
-  glColor3ub(0x25, 0x30, 0x40);
-  glVertex2f(-1, -1);
-  glVertex2f(1, -1);
-  glColor3ub(0x5, 0x5, 0x5);
-  glVertex2f(1, 1);
-  glVertex2f(-1, 1);
-  glEnd();
+  glFuncs.glBegin(GL_QUADS);
+  glFuncs.glColor3ub(0x25, 0x30, 0x40);
+  glFuncs.glVertex2f(-1, -1);
+  glFuncs.glVertex2f(1, -1);
+  glFuncs.glColor3ub(0x5, 0x5, 0x5);
+  glFuncs.glVertex2f(1, 1);
+  glFuncs.glVertex2f(-1, 1);
+  glFuncs.glEnd();
 
   // Compute "radius"
   cb::Vector3D dims = bbox.getDimensions();
@@ -267,19 +270,19 @@ void ViewPort::glDraw(const cb::Rectangle3D &bbox,
   gluPerspective(45, (float)width / height, 1, 100000);
 
   // Translate
-  glTranslatef(translation.x() * radius / zoom,
-               translation.y() * radius / zoom, 0);
+  glFuncs.glTranslatef(translation.x() * radius / zoom,
+                       translation.y() * radius / zoom, 0);
 
   // Scale
   gluLookAt(0, 0, radius / zoom, 0, 0, 0, 0, 1, 0);
 
-  glMatrixMode(GL_MODELVIEW);
+  glFuncs.glMatrixMode(GL_MODELVIEW);
 
   // Rotate
-  glRotated(rotation[0], rotation[1], rotation[2], rotation[3]);
+  glFuncs.glRotated(rotation[0], rotation[1], rotation[2], rotation[3]);
 
   // Center
-  glTranslatef(-center.x(), -center.y(), -center.z());
+  glFuncs.glTranslatef(-center.x(), -center.y(), -center.z());
 }
 
 
@@ -295,22 +298,24 @@ void ViewPort::drawAxes(const Rectangle3D &bbox) const {
 
 
 void ViewPort::drawAxis(int axis, bool up, double length, double radius) const {
-  glPushMatrix();
+  GLFuncs &glFuncs = getGLFuncs();
+
+  glFuncs.glPushMatrix();
 
   switch (axis) {
   case 0:
-    glColor4f(1, 0, 0, 1); // Red
-    glRotated(up ? 90 : 270, 0, 1, 0);
+    glFuncs.glColor4f(1, 0, 0, 1); // Red
+    glFuncs.glRotated(up ? 90 : 270, 0, 1, 0);
     break;
 
   case 1:
-    glColor4f(0, 0.75, 0.1, 1); // Green
-    glRotated(up ? 270 : 90, 1, 0, 0);
+    glFuncs.glColor4f(0, 0.75, 0.1, 1); // Green
+    glFuncs.glRotated(up ? 270 : 90, 1, 0, 0);
     break;
 
   case 2:
-    glColor4f(0, 0, 1, 1); // Blue
-    glRotated(up ? 0 : 180, 1, 0, 0);
+    glFuncs.glColor4f(0, 0, 1, 1); // Blue
+    glFuncs.glRotated(up ? 0 : 180, 1, 0, 0);
     break;
   }
 
@@ -318,36 +323,40 @@ void ViewPort::drawAxis(int axis, bool up, double length, double radius) const {
   glCylinder(radius, radius, length, 128);
 
   // Head
-  glTranslated(0, 0, length);
+  glFuncs.glTranslated(0, 0, length);
   glDisk(1.5 * radius, 128);
   glCylinder(1.5 * radius, 0, 2 * radius, 128);
 
-  glPopMatrix();
+  glFuncs.glPopMatrix();
 }
 
 
 void ViewPort::setLighting(bool x) const {
+  GLFuncs &glFuncs = getGLFuncs();
+
   if (x) {
-    glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_COLOR_MATERIAL);
+    glFuncs.glEnable(GL_LIGHTING);
+    glFuncs.glEnable(GL_DEPTH_TEST);
+    glFuncs.glEnable(GL_COLOR_MATERIAL);
 
   } else {
-    glDisable(GL_COLOR_MATERIAL);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
+    glFuncs.glDisable(GL_COLOR_MATERIAL);
+    glFuncs.glDisable(GL_LIGHTING);
+    glFuncs.glDisable(GL_DEPTH_TEST);
   }
 }
 
 
 void ViewPort::setWire(bool x) const {
+  GLFuncs &glFuncs = getGLFuncs();
+
   if (x) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glDisable(GL_LINE_SMOOTH);
-    glLineWidth(1);
+    glFuncs.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glFuncs.glDisable(GL_LINE_SMOOTH);
+    glFuncs.glLineWidth(1);
 
   } else {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glEnable(GL_LINE_SMOOTH);
+    glFuncs.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glFuncs.glEnable(GL_LINE_SMOOTH);
   }
 }

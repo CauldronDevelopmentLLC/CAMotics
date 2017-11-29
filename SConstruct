@@ -79,7 +79,10 @@ if not env.GetOption('clean'):
     env.EnableQtModules(qtmods.split())
     if env['PLATFORM'] != 'win32': env.AppendUnique(CCFLAGS = ['-fPIC'])
 
-    conf.CBConfig('opengl')
+    # OpenGL
+    if env['PLATFORM'] == 'win32' or int(env.get('cross_mingw', 0)):
+        conf.CBCheckLib('opengl32')
+    else: conf.CBCheckLib('GL')
 
     # Cairo
     have_cairo = \

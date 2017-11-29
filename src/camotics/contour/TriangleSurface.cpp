@@ -80,31 +80,28 @@ TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
 
 
 TriangleSurface::~TriangleSurface() {
-  if (vbufs[0]) {
-    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
-    if (glFuncs) glFuncs->glDeleteBuffers(2, vbufs);
-  }
+  if (vbufs[0]) getGLFuncs().glDeleteBuffers(2, vbufs);
 }
 
 
 void TriangleSurface::finalize(bool withVBOs) {
   if (finalized) return;
 
-  QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
-  useVBOs = haveVBOs() && withVBOs && glFuncs;
+  GLFuncs &glFuncs = getGLFuncs();
+  useVBOs = haveVBOs() && withVBOs;
 
   if (useVBOs) {
-    if (!vbufs[0]) glFuncs->glGenBuffers(2, vbufs);
+    if (!vbufs[0]) glFuncs.glGenBuffers(2, vbufs);
 
     // Vertices
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-    glFuncs->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
+    glFuncs.glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
                           &vertices[0], GL_STATIC_DRAW);
 
     // Normals
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
-    glFuncs->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
-                          &normals[0], GL_STATIC_DRAW);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
+    glFuncs.glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
+                         &normals[0], GL_STATIC_DRAW);
   }
 
   finalized = true;
@@ -158,29 +155,29 @@ void TriangleSurface::draw(bool withVBOs) {
 
   finalize(withVBOs);
 
+  GLFuncs &glFuncs = getGLFuncs();
+
   if (useVBOs) {
-    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
+    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
+    glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
-    glNormalPointer(GL_FLOAT, 0, 0);
-
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   } else {
-    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
-    glNormalPointer(GL_FLOAT, 0, &normals[0]);
+    glFuncs.glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+    glFuncs.glNormalPointer(GL_FLOAT, 0, &normals[0]);
   }
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
+  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
 
-  glDrawArrays(GL_TRIANGLES, 0, getCount() * 3);
+  glFuncs.glDrawArrays(GL_TRIANGLES, 0, getCount() * 3);
 
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
+  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 

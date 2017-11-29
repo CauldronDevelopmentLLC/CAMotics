@@ -45,7 +45,7 @@ namespace CAMotics {
 
 
   void checkGLError(const string &message) {
-    GLenum err = glGetError();
+    GLenum err = getGLFuncs().glGetError();
     if (err != GL_NO_ERROR)
       LOG_ERROR(message << "GL error: " << err << ": " << glErrorString(err));
   }
@@ -59,37 +59,43 @@ namespace CAMotics {
 
 
   void glDisk(double radius, unsigned segments) {
-    glBegin(GL_TRIANGLE_FAN);
+    GLFuncs &glFuncs = getGLFuncs();
 
-    glVertex2f(0, 0);
+    glFuncs.glBegin(GL_TRIANGLE_FAN);
+
+    glFuncs.glVertex2f(0, 0);
 
     for (unsigned i = 0; i < segments; i++) {
       float a = i * 2 * M_PI / (segments - 1);
-      glVertex2f(sin(a) * radius, cos(a) * radius);
+      glFuncs.glVertex2f(sin(a) * radius, cos(a) * radius);
     }
 
-    glEnd();
+    glFuncs.glEnd();
   }
 
 
   void glCylinder(double base, double top, double height, unsigned segments) {
     double b = sqrt((base - top) * (base - top) + height * height);
 
-    glBegin(GL_QUAD_STRIP);
+    GLFuncs &glFuncs = getGLFuncs();
+    glFuncs.glBegin(GL_QUAD_STRIP);
 
     for (unsigned i = 0; i < segments; i++) {
       float a = i * 2 * M_PI / (segments - 1);
 
-      glNormal3f(cos(a) * height / b, sin(a) * height / b, (base - top) / b);
-      glVertex3f(base * cos(a), base * sin(a), 0);
-      glVertex3f(top * cos(a), top * sin(a), height);
+      glFuncs.glNormal3f(cos(a) * height / b, sin(a) * height / b,
+                         (base - top) / b);
+      glFuncs.glVertex3f(base * cos(a), base * sin(a), 0);
+      glFuncs.glVertex3f(top * cos(a), top * sin(a), height);
     }
 
-    glEnd();
+    glFuncs.glEnd();
   }
 
 
   void glSphere(double radius, unsigned lats, unsigned lngs) {
+    GLFuncs &glFuncs = getGLFuncs();
+
     for (unsigned i = 0; i < lats; i++) {
       double lat0 = M_PI * (-0.5 + (double)(i - 1) / (lats - 1));
       double z0 = sin(lat0);
@@ -99,20 +105,29 @@ namespace CAMotics {
       double z1 = sin(lat1);
       double zr1 = cos(lat1);
 
-      glBegin(GL_QUAD_STRIP);
+      glFuncs.glBegin(GL_QUAD_STRIP);
 
       for (unsigned j = 0; j < lngs; j++) {
         double lng = 2 * M_PI * (double)(j - 1) / (lngs - 1);
         double x = cos(lng);
         double y = sin(lng);
 
-        glNormal3f(x * zr0, y * zr0, z0);
-        glVertex3f(x * zr0 * radius, y * zr0 * radius, z0 * radius);
-        glNormal3f(x * zr1, y * zr1, z1);
-        glVertex3f(x * zr1 * radius, y * zr1 * radius, z1 * radius);
+        glFuncs.glNormal3f(x * zr0, y * zr0, z0);
+        glFuncs.glVertex3f(x * zr0 * radius, y * zr0 * radius, z0 * radius);
+        glFuncs.glNormal3f(x * zr1, y * zr1, z1);
+        glFuncs.glVertex3f(x * zr1 * radius, y * zr1 * radius, z1 * radius);
       }
 
-      glEnd();
+      glFuncs.glEnd();
     }
+  }
+
+
+  GLFuncs &getGLFuncs() {
+    QOpenGLContext *ctx = QOpenGLContext::currentContext();
+    if (!ctx) THROW("No active OpenGL context");
+    GLFuncs *glFuncs = ctx->versionFunctions<GLFuncs>();
+    if (!glFuncs) THROW("Failed to access OpenGL functions");
+    return *glFuncs;
   }
 }

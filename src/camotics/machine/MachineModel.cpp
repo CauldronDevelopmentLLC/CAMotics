@@ -107,11 +107,13 @@ void MachineModel::read(const InputSource &source) {
 
 
 void MachineModel::draw(bool withVBOs, bool wire) {
-  glPushMatrix();
-  glTranslatef(offset[0], offset[1], offset[2]);
+  GLFuncs &glFuncs = getGLFuncs();
+
+  glFuncs.glPushMatrix();
+  glFuncs.glTranslatef(offset[0], offset[1], offset[2]);
 
   for (parts_t::const_iterator it = parts.begin(); it != parts.end(); it++)
     it->second->draw(withVBOs, wire);
 
-  glPopMatrix();
+  glFuncs.glPopMatrix();
 }

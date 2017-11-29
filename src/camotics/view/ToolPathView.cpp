@@ -61,10 +61,10 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
 
 
 ToolPathView::~ToolPathView() {
-  QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+  GLFuncs &glFuncs = getGLFuncs();
 
-  if (colorVBuf) glFuncs->glDeleteBuffers(1, &colorVBuf);
-  if (vertexVBuf) glFuncs->glDeleteBuffers(1, &vertexVBuf);
+  if (colorVBuf) glFuncs.glDeleteBuffers(1, &colorVBuf);
+  if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
 }
 
 
@@ -209,22 +209,22 @@ void ToolPathView::update() {
   numVertices = vertices.size() / 3;
 
   // Setup GL Buffers
-  QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+  GLFuncs &glFuncs = getGLFuncs();
 
   // Colors
   if (useVBOs && !colors.empty()) {
-    if (!colorVBuf) glFuncs->glGenBuffers(1, &colorVBuf);
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-    glFuncs->glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
+    if (!colorVBuf) glFuncs.glGenBuffers(1, &colorVBuf);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
+    glFuncs.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
                           &colors[0], GL_STATIC_DRAW);
     colors.clear();
   }
 
   // Vertices
   if (useVBOs && !vertices.empty()) {
-    if (!vertexVBuf) glFuncs->glGenBuffers(1, &vertexVBuf);
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glFuncs->glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
+    if (!vertexVBuf) glFuncs.glGenBuffers(1, &vertexVBuf);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+    glFuncs.glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
                           &vertices[0], GL_STATIC_DRAW);
     vertices.clear();
   }
@@ -240,29 +240,29 @@ void ToolPathView::draw() {
 
   if (!numColors || !numVertices) return;
 
+  GLFuncs &glFuncs = getGLFuncs();
+
   if (useVBOs) {
-    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
+    glFuncs.glColorPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-    glColorPointer(3, GL_FLOAT, 0, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
-
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   } else {
-    glColorPointer(3, GL_FLOAT, 0, &colors[0]);
-    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+    glFuncs.glColorPointer(3, GL_FLOAT, 0, &colors[0]);
+    glFuncs.glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
   }
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glEnableClientState(GL_COLOR_ARRAY);
 
   // Draw
-  glLineWidth(1);
-  glDrawArrays(GL_LINES, 0, numVertices);
+  glFuncs.glLineWidth(1);
+  glFuncs.glDrawArrays(GL_LINES, 0, numVertices);
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
+  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glDisableClientState(GL_COLOR_ARRAY);
 }

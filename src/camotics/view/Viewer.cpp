@@ -43,6 +43,8 @@ using namespace CAMotics;
 
 
 void Viewer::draw(const View &view) {
+  GLFuncs &glFuncs = getGLFuncs();
+
   SmartPointer<Surface> surface = view.surface;
   bool showMachine =
     !view.machine.isNull() && view.isFlagSet(View::SHOW_MACHINE_FLAG);
@@ -58,11 +60,11 @@ void Viewer::draw(const View &view) {
   view.setLighting(true);
 
   cb::Vector3D currentPosition = view.path->getPosition();
-  glPushMatrix();
+  glFuncs.glPushMatrix();
 
   if (showMachine) {
     Vector3D v = view.machine->getWorkpiece() * currentPosition;
-    glTranslatef(v.x(), v.y(), v.z());
+    glFuncs.glTranslatef(v.x(), v.y(), v.z());
   }
 
   // Axes
@@ -72,8 +74,8 @@ void Viewer::draw(const View &view) {
   // Workpiece bounds
   if (!view.isFlagSet(View::SHOW_WORKPIECE_FLAG) &&
       view.isFlagSet(View::SHOW_WORKPIECE_BOUNDS_FLAG)) {
-    glLineWidth(1);
-    glColor4f(1, 1, 1, 0.5); // White
+    glFuncs.glLineWidth(1);
+    glFuncs.glColor4f(1, 1, 1, 0.5); // White
 
     BoundsView(view.workpiece->getBounds()).draw();
   }
@@ -89,9 +91,9 @@ void Viewer::draw(const View &view) {
     const float ambient[] = {12.0 / 255, 45.0 / 255,  83.0 / 255, alpha};
     const float diffuse[] = {16.0 / 255, 59.0 / 255, 108.0 / 255, alpha};
 
-    glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    glFuncs.glDisable(GL_COLOR_MATERIAL);
+    glFuncs.glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    glFuncs.glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
 
     view.setWire(view.isFlagSet(View::WIRE_FLAG));
 
@@ -100,7 +102,7 @@ void Viewer::draw(const View &view) {
 
     if (view.isFlagSet(View::SHOW_WORKPIECE_FLAG)) view.workpiece->draw();
 
-    glEnable(GL_COLOR_MATERIAL);
+    glFuncs.glEnable(GL_COLOR_MATERIAL);
 
     view.setWire(false);
   }
@@ -109,20 +111,21 @@ void Viewer::draw(const View &view) {
   if (view.isFlagSet(View::SHOW_BBTREE_FLAG) && !view.moveLookup.isNull())
     view.moveLookup->draw(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
-  glPopMatrix();
+  glFuncs.glPopMatrix();
 
   // Machine
   if (showMachine) {
-    glPushMatrix();
+    glFuncs.glPushMatrix();
 
     // TODO Work offsets should be configurable
-    glTranslatef(0, 0, -view.workpiece->getBounds().getDimensions().z());
+    glFuncs.glTranslatef(0, 0,
+                         -view.workpiece->getBounds().getDimensions().z());
 
     view.machine->setPosition(currentPosition);
     view.machine->draw(view.isFlagSet(View::SURFACE_VBOS_FLAG),
                        view.isFlagSet(View::WIRE_FLAG));
 
-    glPopMatrix();
+    glFuncs.glPopMatrix();
   }
 
   // GCode::Tool

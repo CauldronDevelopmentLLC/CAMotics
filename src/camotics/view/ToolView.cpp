@@ -26,21 +26,23 @@ using namespace CAMotics;
 
 namespace {
   void drawCylinder(double radiusA, double radiusB, double length) {
+    GLFuncs &glFuncs = getGLFuncs();
+
     // Body
     glCylinder(radiusA, radiusB, length, 128);
 
     // End caps
     if (radiusA) {
-      glNormal3f(0, 0, -1);
+      glFuncs.glNormal3f(0, 0, -1);
       glDisk(radiusA, 128);
     }
 
     if (radiusB) {
-      glPushMatrix();
-      glTranslatef(0, 0, length);
-      glNormal3f(0, 0, 1);
+      glFuncs.glPushMatrix();
+      glFuncs.glTranslatef(0, 0, length);
+      glFuncs.glNormal3f(0, 0, 1);
       glDisk(radiusB, 128);
-      glPopMatrix();
+      glFuncs.glPopMatrix();
     }
   }
 }
@@ -52,37 +54,39 @@ void ToolView::draw() {
   double length = tool.getLength();
   GCode::ToolShape shape = tool.getShape();
 
-  glPushMatrix();
-  glTranslatef(position.x(), position.y(), position.z());
+  GLFuncs &glFuncs = getGLFuncs();
+
+  glFuncs.glPushMatrix();
+  glFuncs.glTranslatef(position.x(), position.y(), position.z());
 
   if (radius <= 0) {
     // Default tool specs
     radius = 25.4 / 8;
     shape = GCode::ToolShape::TS_CONICAL;
 
-    glColor4f(1, 0, 0, 1); // Red
+    glFuncs.glColor4f(1, 0, 0, 1); // Red
 
-  } else glColor4f(1, 0.5, 0, 1); // Orange
+  } else glFuncs.glColor4f(1, 0.5, 0, 1); // Orange
 
   if (length <= 0) length = 50;
 
   switch (shape) {
   case GCode::ToolShape::TS_SPHEROID: {
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef(0, 0, length / 2);
-    glScaled(1, 1, length / diameter);
+    glFuncs.glMatrixMode(GL_MODELVIEW);
+    glFuncs.glPushMatrix();
+    glFuncs.glTranslatef(0, 0, length / 2);
+    glFuncs.glScaled(1, 1, length / diameter);
     glSphere(radius, 128, 128);
-    glPopMatrix();
+    glFuncs.glPopMatrix();
     break;
   }
 
   case GCode::ToolShape::TS_BALLNOSE:
-    glPushMatrix();
-    glTranslatef(0, 0, radius);
+    glFuncs.glPushMatrix();
+    glFuncs.glTranslatef(0, 0, radius);
     glSphere(radius, 128, 128);
     drawCylinder(radius, radius, length - radius);
-    glPopMatrix();
+    glFuncs.glPopMatrix();
     break;
 
   case GCode::ToolShape::TS_SNUBNOSE:
@@ -95,5 +99,5 @@ void ToolView::draw() {
   default: drawCylinder(radius, radius, length); break;
   }
 
-  glPopMatrix();
+  glFuncs.glPopMatrix();
 }

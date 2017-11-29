@@ -107,50 +107,52 @@ void MachinePart::read(const InputSource &source,
 
 
 void MachinePart::drawLines(bool withVBOs) {
-  if (withVBOs && haveVBOs()) {
-    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
+  GLFuncs &glFuncs = getGLFuncs();
 
+  if (withVBOs && haveVBOs()) {
     if (!vbuf) {
-      glFuncs->glGenBuffers(1, &vbuf);
+      glFuncs.glGenBuffers(1, &vbuf);
 
       // Vertices
-      glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-      glFuncs->glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
+      glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
+      glFuncs.glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
                             &lines[0], GL_STATIC_DRAW);
     }
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
+    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  } else glVertexPointer(3, GL_FLOAT, 0, &lines[0]);
+  } else glFuncs.glVertexPointer(3, GL_FLOAT, 0, &lines[0]);
 
-  glEnableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
   GLboolean light;
-  glGetBooleanv(GL_LIGHTING, &light);
-  glDisable(GL_LIGHTING);
+  glFuncs.glGetBooleanv(GL_LIGHTING, &light);
+  glFuncs.glDisable(GL_LIGHTING);
 
-  glDrawArrays(GL_LINES, 0, lines.size() / 3);
+  glFuncs.glDrawArrays(GL_LINES, 0, lines.size() / 3);
 
-  if (light) glEnable(GL_LIGHTING);
-  glDisableClientState(GL_VERTEX_ARRAY);
+  if (light) glFuncs.glEnable(GL_LIGHTING);
+  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
 void MachinePart::draw(bool withVBOs, bool wire) {
-  glPushMatrix();
-  glTranslatef(offset[0], offset[1], offset[2]);
-  glTranslatef(position[0], position[1], position[2]);
+  GLFuncs &glFuncs = getGLFuncs();
 
-  if (wire) glColor3ub(color[0], color[1], color[2]);
-  else glColor3ub(color[0] * 0.8, color[1] * 0.8, color[2] * 0.8);
+  glFuncs.glPushMatrix();
+  glFuncs.glTranslatef(offset[0], offset[1], offset[2]);
+  glFuncs.glTranslatef(position[0], position[1], position[2]);
+
+  if (wire) glFuncs.glColor3ub(color[0], color[1], color[2]);
+  else glFuncs.glColor3ub(color[0] * 0.8, color[1] * 0.8, color[2] * 0.8);
   drawLines(withVBOs);
 
   if (!wire) {
-    glColor3ub(color[0], color[1], color[2]);
+    glFuncs.glColor3ub(color[0], color[1], color[2]);
     TriangleSurface::draw(withVBOs);
   }
 
-  glPopMatrix();
+  glFuncs.glPopMatrix();
 }
