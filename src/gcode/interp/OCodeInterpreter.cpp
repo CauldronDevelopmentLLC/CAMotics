@@ -147,6 +147,7 @@ void OCodeInterpreter::doCall(OCode *ocode) {
 
     } else {
       string name = ocode->getFilename();
+      LOG_DEBUG(3, "Seeking subroutine \"" << name << '"');
       named_subroutines_t::iterator it = namedSubroutines.find(name);
 
       if (it == namedSubroutines.end()) {
@@ -158,7 +159,9 @@ void OCodeInterpreter::doCall(OCode *ocode) {
         else {
           if (loadedFiles.insert(name).second) {
             string path = SystemUtilities::findInPath(scriptPath, name);
-            InputSource source(path);
+            if (path.empty())
+              THROWS("Subroutine \"" << name
+                     << "\" file not found in GCODE_SCRIPT_PATH");
             Parser(interrupter).parse(InputSource(path), *this);
           }
 
