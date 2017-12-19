@@ -340,7 +340,7 @@ void Controller::reset() {
   spinMode = MachineInterface::REVOLUTIONS_PER_MINUTE;
   speed = 0;
   maxSpindleSpeed = 0;
-  setSpindleDir(DIR_OFF);
+  spindleDir = DIR_OFF;
 }
 
 

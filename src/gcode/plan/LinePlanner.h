@@ -53,7 +53,7 @@ namespace GCode {
   public:
     LinePlanner(const PlannerConfig &config) : config(config), lastExitVel(0) {}
 
-    uint64_t getLine() const {return getLocation().getStart().getLine();}
+    int64_t getLine() const {return getLocation().getStart().getLine();}
 
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
