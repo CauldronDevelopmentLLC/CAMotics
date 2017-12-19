@@ -57,3 +57,9 @@ build.ninja
 
 /dockbot/run
 /dockbot/passwd
+
+# Docs
+*.aux
+*.log
+*.pdf
+*.toc

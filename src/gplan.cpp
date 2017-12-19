@@ -5,6 +5,16 @@
 #include <cbang/json/NullSink.h>
 
 
+#define CATCH_PYTHON                                            \
+  catch (const cb::Exception &e) {                              \
+    PyErr_SetString(PyExc_RuntimeError, SSTR(e).c_str());       \
+  } catch (const std::exception &e) {                           \
+    PyErr_SetString(PyExc_RuntimeError, e.what());              \
+  } catch (...) {                                               \
+    PyErr_SetString(PyExc_RuntimeError, "Unknown exception");   \
+  }
+
+
 class PyJSONSink : public cb::JSON::NullSink {
   PyObject *root;
 
@@ -185,83 +195,107 @@ static PyObject *_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 
 
 static int _init(PyPlanner *self, PyObject *args, PyObject *kwds) {
-  GCode::PlannerConfig config;
+  try {
+    GCode::PlannerConfig config;
 
-  PyObject *_config = 0;
+    PyObject *_config = 0;
 
-  static const char *kwlist[] = {"config", 0};
+    static const char *kwlist[] = {"config", 0};
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", (char **)kwlist,
-                                   &_config))
-    return -1;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", (char **)kwlist,
+                                     &_config))
+      return -1;
 
-  // TODO Convert Python object to JSON config
+    // TODO Convert Python object to JSON config
 
-  self->planner = new GCode::Planner(config);
+    self->planner = new GCode::Planner(config);
 
-  return 0;
+    return 0;
+  } CATCH_PYTHON;
+
+  return -1;
 }
 
 
 static PyObject *_is_running(PyPlanner *self) {
-  if (self->planner->isRunning()) Py_RETURN_TRUE;
-  else Py_RETURN_FALSE;
+  try {
+    if (self->planner->isRunning()) Py_RETURN_TRUE;
+    else Py_RETURN_FALSE;
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
 }
 
 
 static PyObject *_mdi(PyPlanner *self, PyObject *args) {
-  const char *gcode;
+  try {
+    const char *gcode;
 
-  if (!PyArg_ParseTuple(args, "s", &gcode)) return 0;
+    if (!PyArg_ParseTuple(args, "s", &gcode)) return 0;
 
-  self->planner->mdi(gcode);
+    self->planner->mdi(gcode);
+  } CATCH_PYTHON;
 
   Py_RETURN_NONE;
 }
 
 
 static PyObject *_load(PyPlanner *self, PyObject *args) {
-  const char *filename;
+  try {
+    const char *filename;
 
-  if (!PyArg_ParseTuple(args, "s", &filename)) return 0;
+    if (!PyArg_ParseTuple(args, "s", &filename)) return 0;
 
-  self->planner->load(std::string(filename));
+    self->planner->load(std::string(filename));
+  } CATCH_PYTHON;
 
   Py_RETURN_NONE;
 }
 
 
 static PyObject *_has_more(PyPlanner *self) {
-  if (self->planner->hasMore()) Py_RETURN_TRUE;
-  else Py_RETURN_FALSE;
+  try {
+    if (self->planner->hasMore()) Py_RETURN_TRUE;
+    else Py_RETURN_FALSE;
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
 }
 
 
 static PyObject *_next(PyPlanner *self) {
-  PyJSONSink sink;
-  self->planner->next(sink);
-  return sink.getRoot();
+  try {
+    PyJSONSink sink;
+    self->planner->next(sink);
+    return sink.getRoot();
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
 }
 
 
 static PyObject *_release(PyPlanner *self, PyObject *args) {
-  uint64_t line;
+  try {
+    uint64_t line;
 
-  if (!PyArg_ParseTuple(args, "K", &line)) return 0;
+    if (!PyArg_ParseTuple(args, "K", &line)) return 0;
 
-  self->planner->release(line);
+    self->planner->release(line);
+  } CATCH_PYTHON;
 
   Py_RETURN_NONE;
 }
 
 
 static PyObject *_restart(PyPlanner *self, PyObject *args) {
-  uint64_t line;
-  double length;
+  try {
+    uint64_t line;
+    double length;
 
-  if (!PyArg_ParseTuple(args, "Kd", &line, &length)) return 0;
+    if (!PyArg_ParseTuple(args, "Kd", &line, &length)) return 0;
 
-  self->planner->restart(line, length);
+    self->planner->restart(line, length);
+  } CATCH_PYTHON;
 
   Py_RETURN_NONE;
 }
