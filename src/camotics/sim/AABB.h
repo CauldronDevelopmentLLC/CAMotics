@@ -48,7 +48,10 @@ namespace CAMotics {
     unsigned getTreeHeight() const;
 
     bool intersects(const cb::Rectangle3D &r);
-    void collisions(const cb::Vector3D &p, std::vector<const GCode::Move *> &moves);
+    void collisions(const cb::Vector3D &p,
+                    std::vector<const GCode::Move *> &moves);
+#ifdef CAMOTICS_GUI
     void draw(bool leavesOnly = true, unsigned height = 1, unsigned depth = 0);
+#endif
   };
 }

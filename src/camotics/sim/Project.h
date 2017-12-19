@@ -79,7 +79,8 @@ namespace CAMotics {
     void setResolutionMode(ResolutionMode mode);
     double getResolution() const {return resolution;}
     void setResolution(double resolution);
-    static double computeResolution(ResolutionMode mode, cb::Rectangle3D bounds);
+    static double computeResolution(ResolutionMode mode,
+                                    cb::Rectangle3D bounds);
     void updateResolution();
 
     RenderMode getRenderMode() const {return mode;}

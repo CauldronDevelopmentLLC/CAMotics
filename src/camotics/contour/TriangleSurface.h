@@ -60,7 +60,9 @@ namespace CAMotics {
     cb::SmartPointer<Surface> copy() const;
     uint64_t getCount() const {return TriangleMesh::getCount();}
     cb::Rectangle3D getBounds() const {return bounds;}
+#ifdef CAMOTICS_GUI
     void draw(bool withVBOs);
+#endif
     void clear();
     void read(STL::Source &source, Task *task = 0);
     void write(STL::Sink &sink, Task *task = 0) const;

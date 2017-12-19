@@ -20,7 +20,9 @@
 
 #include "MachinePart.h"
 
+#ifdef CAMOTICS_GUI
 #include <camotics/view/GL.h>
+#endif
 
 using namespace CAMotics;
 using namespace cb;
@@ -106,6 +108,7 @@ void MachinePart::read(const InputSource &source,
 }
 
 
+#ifdef CAMOTICS_GUI
 void MachinePart::drawLines(bool withVBOs) {
   GLFuncs &glFuncs = getGLFuncs();
 
@@ -156,3 +159,4 @@ void MachinePart::draw(bool withVBOs, bool wire) {
 
   glFuncs.glPopMatrix();
 }
+#endif // CAMOTICS_GUI

@@ -17,7 +17,10 @@ env.CBLoadTools('compiler cbang dist opengl dxflib python build_info packager')
 env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
-    ('python_version', 'Set python version', '3'))
+    ('python_version', 'Set python version', '3'),
+    BoolVariable('with_tpl', 'Enable TPL', True),
+    BoolVariable('with_gui', 'Enable graphical user interface', True),
+    )
 conf = env.CBConfigure()
 
 # Config vars
@@ -70,24 +73,30 @@ if not env.GetOption('clean'):
     have_python = conf.CBConfig('python', False)
     conf.env = env
 
-    if not (env.CBConfigEnabled('chakra') or env.CBConfigEnabled('v8')):
-        raise Exception('Chakra or V8 support is required, please rebuild C! '
-                        'You may need to set CHAKRA_CORE_HOME or V8_HOME.')
-
-    # Qt
-    qtmods = 'QtCore QtGui QtOpenGL QtNetwork QtWidgets QtWebSockets'
-    env.EnableQtModules(qtmods.split())
     if env['PLATFORM'] != 'win32': env.AppendUnique(CCFLAGS = ['-fPIC'])
-    env.CBDefine(['QT_NO_OPENGL_ES_2', 'GL_GLEXT_PROTOTYPES'])
 
-    # OpenGL
-    if env['PLATFORM'] == 'win32' or int(env.get('cross_mingw', 0)):
-        conf.CBCheckLib('opengl32')
-    else: conf.CBCheckLib('GL')
+    if env['with_tpl']:
+        if not (env.CBConfigEnabled('chakra') or env.CBConfigEnabled('v8')):
+            raise Exception(
+                'Chakra or V8 support is required, please rebuild C! You may '
+                'need to set CHAKRA_CORE_HOME or V8_HOME.')
 
-    # Cairo
-    have_cairo = \
-        conf.CBCheckCHeader('cairo/cairo.h') and conf.CBCheckLib('cairo')
+    if env['with_gui']:
+        # Qt
+        qtmods = 'QtCore QtGui QtOpenGL QtNetwork QtWidgets QtWebSockets'
+        env.EnableQtModules(qtmods.split())
+        env.CBDefine(['QT_NO_OPENGL_ES_2', 'GL_GLEXT_PROTOTYPES'])
+
+        # OpenGL
+        if env['PLATFORM'] == 'win32' or int(env.get('cross_mingw', 0)):
+            conf.CBCheckLib('opengl32')
+        else: conf.CBCheckLib('GL')
+
+        # Cairo
+        have_cairo = \
+            conf.CBCheckCHeader('cairo/cairo.h') and conf.CBCheckLib('cairo')
+
+        env.CBDefine(['CAMOTICS_GUI'])
 
     # DXFlib
     have_dxflib = conf.CBConfig('dxflib', False)
@@ -135,27 +144,28 @@ libs.append(lib)
 
 # Source
 src = []
-for subdir in [
-    '', 'sim', 'probe', 'view', 'opt', 'cam', 'contour', 'qt', 'render',
-    'value', 'machine']:
-    src += Glob('src/camotics/%s/*.cpp' % subdir)
 
-for subdir in ['']:
-    src += Glob('src/tplang/%s/*.cpp' % subdir)
+subdirs = ['', 'sim', 'probe', 'opt', 'cam', 'contour', 'machine', 'render']
+if env['with_gui']: subdirs += ['view', 'qt', 'value']
+for subdir in subdirs: src += Glob('src/camotics/%s/*.cpp' % subdir)
+if env['with_tpl']: src += Glob('src/tplang/*.cpp')
 
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 
-# Qt
-dialogs = '''
-  export about donate find new tool settings new_project cam cam_layer connect
-'''.split()
-uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
-for dialog in dialogs:
-    uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
-                       'qt/%s_dialog.ui' % dialog))
 
-qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
-src += qrc
+# Qt
+if env['with_gui']:
+    dialogs = '''
+      export about donate find new tool settings new_project cam cam_layer
+      connect
+    '''.split()
+    uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
+    for dialog in dialogs:
+        uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
+                           'qt/%s_dialog.ui' % dialog))
+
+    qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
+    src += qrc
 
 
 # Build Info
@@ -167,15 +177,16 @@ src += info
 # Build lib
 lib = env.Library('libCAMotics', src)
 libs.append(lib)
-Depends(lib, uic)
+if env['with_gui']: Depends(lib, uic)
 
 
 # 3rd-party libs
-libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
+if env['with_tpl']:
+    libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
 
 
 # Cairo
-if not have_cairo:
+if not have_cairo and env['with_gui']:
     cairo = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
     Depends(lib, cairo)
     env.Append(_LIBFLAGS = [cairo]) # Force to end
@@ -190,18 +201,25 @@ if not have_dxflib:
 
 # Build programs
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
-progs = 'camotics gcodetool tplang camsim planner tco2stl'
+progs = 'gcodetool camsim planner tco2stl'
 execs = []
+
+if env['with_tpl']: progs += ' tplang'
+
+if env['with_gui']:
+    progs += ' camotics'
+    libs += [qrc]
+
 for prog in progs.split():
     if prog == 'camotics' and int(env.get('cross_mingw', 0)):
         _env = env.Clone()
         _env.AppendUnique(LINKFLAGS = ['-Wl,--subsystem,windows'])
     else: _env = env
 
-    p = _env.Program(prog, ['build/%s.cpp' % prog] + libs + [qrc])
+    p = _env.Program(prog, ['build/%s.cpp' % prog] + libs)
     _env.Precious(p)
     _env.Install(env.get('install_prefix') + '/bin/', p)
-    if not have_cairo: Depends(p, cairo)
+    if not have_cairo and env['with_gui']: Depends(p, cairo)
     if not have_dxflib: Depends(p, dxflib)
     Default(p)
     execs.append(p)

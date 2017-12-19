@@ -27,7 +27,10 @@
 #include <cbang/log/Logger.h>
 
 #include <camotics/Task.h>
+#ifdef CAMOTICS_GUI
 #include <camotics/view/GL.h>
+#endif
+
 #include <stl/Source.h>
 #include <stl/Sink.h>
 
@@ -80,13 +83,16 @@ TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
 
 
 TriangleSurface::~TriangleSurface() {
+#ifdef CAMOTICS_GUI
   if (vbufs[0]) getGLFuncs().glDeleteBuffers(2, vbufs);
+#endif
 }
 
 
 void TriangleSurface::finalize(bool withVBOs) {
   if (finalized) return;
 
+#ifdef CAMOTICS_GUI
   GLFuncs &glFuncs = getGLFuncs();
   useVBOs = haveVBOs() && withVBOs;
 
@@ -103,6 +109,7 @@ void TriangleSurface::finalize(bool withVBOs) {
     glFuncs.glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
                          &normals[0], GL_STATIC_DRAW);
   }
+#endif // CAMOTICS_GUI
 
   finalized = true;
 }
@@ -150,6 +157,7 @@ SmartPointer<Surface> TriangleSurface::copy() const {
 }
 
 
+#ifdef CAMOTICS_GUI
 void TriangleSurface::draw(bool withVBOs) {
   if (!getCount()) return; // Nothing to draw
 
@@ -179,6 +187,7 @@ void TriangleSurface::draw(bool withVBOs) {
   glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
   glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
 }
+#endif // CAMOTICS_GUI
 
 
 void TriangleSurface::clear() {

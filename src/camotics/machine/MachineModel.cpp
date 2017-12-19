@@ -20,7 +20,9 @@
 
 #include "MachineModel.h"
 
+#ifdef CAMOTICS_GUI
 #include <camotics/view/GL.h>
+#endif
 
 #include <cbang/json/JSON.h>
 #include <cbang/os/SystemUtilities.h>
@@ -106,6 +108,7 @@ void MachineModel::read(const InputSource &source) {
 }
 
 
+#ifdef CAMOTICS_GUI
 void MachineModel::draw(bool withVBOs, bool wire) {
   GLFuncs &glFuncs = getGLFuncs();
 
@@ -117,3 +120,4 @@ void MachineModel::draw(bool withVBOs, bool wire) {
 
   glFuncs.glPopMatrix();
 }
+#endif

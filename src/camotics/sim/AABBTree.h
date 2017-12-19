@@ -50,6 +50,8 @@ namespace CAMotics {
     void collisions(const cb::Vector3D &p,
                     std::vector<const GCode::Move *> &moves) const;
     void finalize();
+#ifdef CAMOTICS_GUI
     void draw(bool leavesOnly = false);
+#endif
   };
 }

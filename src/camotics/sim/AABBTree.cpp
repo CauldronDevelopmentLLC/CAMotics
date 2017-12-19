@@ -57,9 +57,11 @@ void AABBTree::collisions(const cb::Vector3D &p,
 }
 
 
+#ifdef CAMOTICS_GUI
 void AABBTree::draw(bool leavesOnly) {
   if (root) root->draw(leavesOnly, root->getTreeHeight());
 }
+#endif // CAMOTICS_GUI
 
 
 void AABBTree::finalize() {

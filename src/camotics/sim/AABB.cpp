@@ -20,7 +20,10 @@
 
 #include "AABB.h"
 
+#ifdef CAMOTICS_GUI
 #include <camotics/view/GL.h>
+#endif
+
 #include <camotics/view/BoundsView.h>
 
 #include <cbang/Zap.h>
@@ -118,7 +121,8 @@ bool AABB::intersects(const cb::Rectangle3D &r) {
 }
 
 
-void AABB::collisions(const cb::Vector3D &p, vector<const GCode::Move *> &moves) {
+void AABB::collisions(const cb::Vector3D &p,
+                      vector<const GCode::Move *> &moves) {
   if (!cb::Rectangle3D::contains(p)) return;
   if (isLeaf()) moves.push_back(move);
   if (left) left->collisions(p, moves);
@@ -126,6 +130,7 @@ void AABB::collisions(const cb::Vector3D &p, vector<const GCode::Move *> &moves)
 }
 
 
+#ifdef CAMOTICS_GUI
 void AABB::draw(bool leavesOnly, unsigned height, unsigned depth) {
   if (!(left || right) || !leavesOnly) {
     glColor4f(0.5, 0, (height - depth) / (double)height, 1);
@@ -135,3 +140,4 @@ void AABB::draw(bool leavesOnly, unsigned height, unsigned depth) {
   if (left) left->draw(leavesOnly, height, depth + 1);
   if (right) right->draw(leavesOnly, height, depth + 1);
 }
+#endif

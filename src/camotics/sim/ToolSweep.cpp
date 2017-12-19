@@ -37,8 +37,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ToolSweep::ToolSweep(const SmartPointer<GCode::ToolPath> &path, double startTime,
-                     double endTime) :
+ToolSweep::ToolSweep(const SmartPointer<GCode::ToolPath> &path,
+                     double startTime, double endTime) :
   path(path), startTime(startTime), endTime(endTime) {
 
   if (endTime < startTime) {
