@@ -28,10 +28,11 @@ env.Replace(PACKAGE_VERSION = version)
 env.Replace(BUILD_INFO_NS = 'CAMotics::BuildInfo')
 
 # Qt5 tool
-env.Tool('qt5', toolpath = ['./config'])
-env.EnableQtModules = env.EnableQt5Modules
-env.Uic = env.Uic5
-env.Qrc = env.Qrc5
+if env['with_gui']:
+    env.Tool('qt5', toolpath = ['./config'])
+    env.EnableQtModules = env.EnableQt5Modules
+    env.Uic = env.Uic5
+    env.Qrc = env.Qrc5
 
 # Dist
 if 'dist' in COMMAND_LINE_TARGETS:
