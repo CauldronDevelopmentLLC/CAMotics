@@ -178,21 +178,21 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
   // Apply axis velocity limits
   for (unsigned i = 0; i < 4; i++)
-    if (unit[i]) {
+    if (unit[i] && isfinite(config.maxVel[i])) {
       double v = fabs(config.maxVel[i] / unit[i]);
       if (v < lc->maxVel) lc->maxVel = v;
     }
 
   // Apply axis jerk limits
   for (unsigned i = 0; i < 4; i++)
-    if (unit[i]) {
+    if (unit[i] && isfinite(config.maxJerk[i])) {
       double j = fabs(config.maxJerk[i] / unit[i]);
       if (j < lc->maxJerk) lc->maxJerk = j;
     }
 
   // Apply axis acceleration limits
   for (unsigned i = 0; i < 4; i++)
-    if (unit[i]) {
+    if (unit[i] && isfinite(config.maxAccel[i])) {
       double a = fabs(config.maxAccel[i] / unit[i]);
       if (a < lc->maxAccel) lc->maxAccel = a;
     }
@@ -202,7 +202,7 @@ void LinePlanner::move(const Axes &target, bool rapid) {
     double jv = computeJunctionVelocity(unit, lastUnit,
                                         config.junctionDeviation,
                                         config.junctionAccel);
-    if (jv < lc->exitVel) lc->exitVel = jv;
+    if (jv < lc->entryVel) lc->entryVel = jv;
   }
   lastUnit = unit;
 
