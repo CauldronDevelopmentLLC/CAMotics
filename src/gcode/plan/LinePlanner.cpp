@@ -164,10 +164,12 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   Vector4D delta = lc->position - position;
   position = lc->position;
   lc->length = delta.length();
-  Vector4D unit = delta / lc->length;
 
   // TODO ignore too short moves
   if (!lc->length) return; // Null move
+  if (!isfinite(lc->length)) THROWS("Invalid length");
+
+  Vector4D unit = delta / lc->length;
 
   // Apply user velocity limit
   // TODO Handle feed rate mode
@@ -207,6 +209,7 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   lastUnit = unit;
 
   // Limit velocity
+  if (lc->maxVel < lc->entryVel) lc->entryVel = lc->maxVel;
   if (lc->maxVel < lc->exitVel) lc->exitVel = lc->maxVel;
 
   // Add move
@@ -224,7 +227,7 @@ void LinePlanner::push(const cb::SmartPointer<PlannerCommand> &cmd) {
   cmds.push_back(cmd);
 
   // Plan move
-  cmd->setEntryVelocity(lastExitVel);
+  if (lastExitVel < cmd->getEntryVelocity()) cmd->setEntryVelocity(lastExitVel);
   auto it = std::prev(cmds.end());
   if (plan(it)) backplan(it);
 
@@ -264,6 +267,11 @@ bool LinePlanner::plan(cmds_t::iterator it) {
   bool backplan = false;
   double Vi = lc.entryVel;
   double Vt = lc.exitVel;
+
+  if (it != cmds.begin() && Vi < (*std::prev(it))->getExitVelocity()) {
+    (*std::prev(it))->setExitVelocity(Vi);
+    backplan = true;
+  }
 
   bool swapped = false;
   if (Vt < Vi) {
