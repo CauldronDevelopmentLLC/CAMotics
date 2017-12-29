@@ -56,8 +56,6 @@ void Axes::read(const JSON::Value &value) {
 
     else if (value.hasNumber(toAxisName(i, true)))
       data[i] = value.getNumber(toAxisName(i, true));
-
-    else data[i] = numeric_limits<double>::quiet_NaN();
 }
 
 
