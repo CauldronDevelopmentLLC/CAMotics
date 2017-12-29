@@ -51,8 +51,13 @@ void Axes::applyUVWMatrix(const Matrix4x4D &m) {
 
 void Axes::read(const JSON::Value &value) {
   for (unsigned i = 0; i < 9; i++)
-    data[i] = value.getNumber(string(1, AXES[i]),
-                              numeric_limits<double>::quiet_NaN());
+    if (value.hasNumber(toAxisName(i)))
+      data[i] = value.getNumber(toAxisName(i));
+
+    else if (value.hasNumber(toAxisName(i, true)))
+      data[i] = value.getNumber(toAxisName(i, true));
+
+    else data[i] = numeric_limits<double>::quiet_NaN();
 }
 
 

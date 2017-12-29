@@ -2,7 +2,7 @@
 
 #include <gcode/plan/Planner.h>
 
-#include <cbang/json/NullSink.h>
+#include <cbang/json/JSON.h>
 
 
 #define CATCH_PYTHON                                            \
@@ -176,6 +176,62 @@ public:
 };
 
 
+
+std::string PyUnicode_ToStdString(PyObject *o) {
+  Py_ssize_t size;
+  char *s = PyUnicode_AsUTF8AndSize(o, &size);
+  if (!s) THROW("Conversion from Python object to string failed");
+  return std::string(s, size);
+}
+
+
+cb::SmartPointer<cb::JSON::Value> pyToJSON(PyObject *o) {
+  if (!o) return cb::JSON::Null::instancePtr();
+
+  if (PyMapping_Check(o)) {
+    cb::SmartPointer<cb::JSON::Value> dict = new cb::JSON::Dict;
+    PyObject *items = PyMapping_Items(o);
+
+    Py_ssize_t size = PySequence_Size(items);
+    for (Py_ssize_t i = 0; i < size; i++) {
+      PyObject *item = PySequence_GetItem(items, i);
+      PyObject *key = PyTuple_GetItem(item, 0);
+      PyObject *value = PyTuple_GetItem(item, 1);
+
+      dict->insert(PyUnicode_ToStdString(key), pyToJSON(value));
+    }
+
+    Py_DECREF(items);
+    return dict;
+  }
+
+  if (PyList_Check(o) || PyTuple_Check(o)) {
+    cb::SmartPointer<cb::JSON::Value> list = new cb::JSON::List;
+
+    Py_ssize_t size = PySequence_Size(o);
+    for (Py_ssize_t i = 0; i < size; i++)
+      list->append(pyToJSON(PySequence_GetItem(o, i)));
+
+    return list;
+  }
+
+  if (PyUnicode_Check(o)) return new cb::JSON::String(PyUnicode_ToStdString(o));
+  if (PyLong_Check(o)) return new cb::JSON::Number(PyLong_AsDouble(o));
+  if (PyFloat_Check(o)) return new cb::JSON::Number(PyFloat_AsDouble(o));
+  if (Py_None == o) return cb::JSON::Null::instancePtr();
+
+  // Try to convert to string
+  PyObject *str = PyObject_Str(o);
+  if (str) return new cb::JSON::String(PyUnicode_ToStdString(str));
+
+  // Get ASCII representation
+  PyObject *repr = PyObject_ASCII(o);
+  if (repr) return new cb::JSON::String(PyUnicode_ToStdString(repr));
+
+  return cb::JSON::Null::instancePtr();
+}
+
+
 typedef struct {
   PyObject_HEAD;
   GCode::Planner *planner;
@@ -206,7 +262,8 @@ static int _init(PyPlanner *self, PyObject *args, PyObject *kwds) {
                                      &_config))
       return -1;
 
-    // TODO Convert Python object to JSON config
+    // Convert Python object to JSON config
+    if (_config) config.read(*pyToJSON(_config));
 
     self->planner = new GCode::Planner(config);
 
