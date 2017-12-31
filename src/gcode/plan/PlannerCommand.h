@@ -22,6 +22,8 @@
 
 #include <cbang/StdTypes.h>
 
+#include <limits>
+
 namespace cb {namespace JSON {class Sink;}}
 
 
@@ -31,7 +33,8 @@ namespace GCode {
     double velocity;
 
   public:
-    PlannerCommand(uint64_t id) : id(id), velocity(0) {}
+    PlannerCommand(uint64_t id) :
+      id(id), velocity(std::numeric_limits<double>::max()) {}
     virtual ~PlannerCommand() {}
 
     virtual const char *getType() = 0;
