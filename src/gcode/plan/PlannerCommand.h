@@ -27,16 +27,16 @@ namespace cb {namespace JSON {class Sink;}}
 
 namespace GCode {
   class PlannerCommand {
-    uint64_t line;
+    uint64_t id;
     double velocity;
 
   public:
-    PlannerCommand(uint64_t line) : line(line), velocity(0) {}
+    PlannerCommand(uint64_t id) : id(id), velocity(0) {}
     virtual ~PlannerCommand() {}
 
     virtual const char *getType() = 0;
 
-    uint64_t getLine() const {return line;}
+    uint64_t getID() const {return id;}
 
     virtual double getEntryVelocity() const {return velocity;}
     virtual void setEntryVelocity(double entryVel) {velocity = entryVel;}

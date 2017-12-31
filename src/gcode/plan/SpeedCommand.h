@@ -28,8 +28,8 @@ namespace GCode {
     double speed;
 
   public:
-    SpeedCommand(uint64_t line, double speed) :
-      PlannerCommand(line), speed(speed) {}
+    SpeedCommand(uint64_t id, double speed) :
+      PlannerCommand(id), speed(speed) {}
 
     // From PlannerCommand
     const char *getType() {return "speed";}

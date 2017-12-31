@@ -36,7 +36,7 @@ void PlannerCommand::write(cb::JSON::Sink &sink) {
   sink.beginDict();
 
   sink.insert("type", getType());
-  sink.insert("line", getLine());
+  sink.insert("id", getID());
 
   insert(sink);
 

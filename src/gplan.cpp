@@ -333,11 +333,11 @@ static PyObject *_next(PyPlanner *self) {
 
 static PyObject *_release(PyPlanner *self, PyObject *args) {
   try {
-    uint64_t line;
+    uint64_t id;
 
-    if (!PyArg_ParseTuple(args, "K", &line)) return 0;
+    if (!PyArg_ParseTuple(args, "K", &id)) return 0;
 
-    self->planner->release(line);
+    self->planner->release(id);
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
@@ -346,12 +346,12 @@ static PyObject *_release(PyPlanner *self, PyObject *args) {
 
 static PyObject *_restart(PyPlanner *self, PyObject *args) {
   try {
-    uint64_t line;
+    uint64_t id;
     double length;
 
-    if (!PyArg_ParseTuple(args, "Kd", &line, &length)) return 0;
+    if (!PyArg_ParseTuple(args, "Kd", &id, &length)) return 0;
 
-    self->planner->restart(line, length);
+    self->planner->restart(id, length);
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
@@ -368,7 +368,7 @@ static PyMethodDef _methods[] = {
   {"next", (PyCFunction)_next, METH_NOARGS, "Get next planner data"},
   {"release", (PyCFunction)_release, METH_VARARGS, "Release planner data"},
   {"restart", (PyCFunction)_restart, METH_VARARGS,
-   "Restart planner from given line"},
+   "Restart planner from given ID"},
   {0}
 };
 

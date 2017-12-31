@@ -24,17 +24,14 @@
 
 
 namespace GCode {
-  class PauseCommand : public PlannerCommand {
-    bool optional;
+  class LineNumberCommand : public PlannerCommand {
+    int line;
 
   public:
-    PauseCommand(uint64_t id, bool optional) :
-      PlannerCommand(id), optional(optional) {}
+    LineNumberCommand(uint64_t id, int line) : PlannerCommand(id), line(line) {}
 
     // From PlannerCommand
-    const char *getType() {return "pause";}
-    void setEntryVelocity(double entryVel) {}
-    void setExitVelocity(double exitVel) {}
+    const char *getType() {return "ln";}
     void insert(cb::JSON::Sink &sink);
   };
 }

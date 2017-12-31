@@ -50,10 +50,12 @@ namespace GCode {
     cmds_t cmds;
     cmds_t output;
 
-  public:
-    LinePlanner(const PlannerConfig &config) : config(config), lastExitVel(0) {}
+    uint64_t nextID;
+    int line;
 
-    int64_t getLine() const {return getLocation().getStart().getLine();}
+  public:
+    LinePlanner(const PlannerConfig &config) :
+    config(config), lastExitVel(0), nextID(1), line(-1) {}
 
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
@@ -74,6 +76,7 @@ namespace GCode {
     void pause(bool optional);
     //bool synchronize(double timeout);
     //void abort();
+    void setLocation(const cb::LocationRange &location);
 
   protected:
     void push(const cb::SmartPointer<PlannerCommand> &cmd);

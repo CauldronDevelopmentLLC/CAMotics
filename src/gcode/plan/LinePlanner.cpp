@@ -25,6 +25,7 @@
 #include "ToolCommand.h"
 #include "DwellCommand.h"
 #include "PauseCommand.h"
+#include "LineNumberCommand.h"
 
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
@@ -78,20 +79,20 @@ void LinePlanner::next(JSON::Sink &sink) {
 }
 
 
-void LinePlanner::release(uint64_t line) {
-  while (!output.empty() && output.front()->getLine() <= line)
+void LinePlanner::release(uint64_t id) {
+  while (!output.empty() && output.front()->getID() <= id)
     output.pop_front();
 }
 
 
-void LinePlanner::restart(uint64_t line, double length) {
+void LinePlanner::restart(uint64_t id, double length) {
   // Find replan command in output
   while (true) {
-    if (output.empty() || line < output.front()->getLine())
-      THROWS("Planner line " << line << " at length " << length
+    if (output.empty() || id < output.front()->getID())
+      THROWS("Planner ID " << id << " at length " << length
              << " not found");
 
-    if (output.front()->getLine() == line) {
+    if (output.front()->getID() == id) {
       if (output.front()->getLength() <= length) break;
       else length -= output.front()->getLength();
     }
@@ -136,26 +137,26 @@ void LinePlanner::end() {
 void LinePlanner::setSpeed(double speed, spin_mode_t mode, double max) {
   MachineAdapter::setSpeed(speed, mode, max);
   // TODO handle spin mode
-  push(new SpeedCommand(getLine(), speed));
+  push(new SpeedCommand(nextID++, speed));
 }
 
 
 void LinePlanner::setTool(unsigned tool) {
   MachineAdapter::setTool(tool);
-  push(new ToolCommand(getLine(), tool));
+  push(new ToolCommand(nextID++, tool));
 }
 
 
 void LinePlanner::dwell(double seconds) {
   MachineAdapter::dwell(seconds);
-  push(new DwellCommand(getLine(), seconds));
+  push(new DwellCommand(nextID++, seconds));
 }
 
 
 void LinePlanner::move(const Axes &target, bool rapid) {
   MachineAdapter::move(target, rapid);
 
-  SmartPointer<LineCommand> lc = new LineCommand(getLine());
+  SmartPointer<LineCommand> lc = new LineCommand(nextID++);
 
   for (int i = 0; i < 4; i++)
     lc->position[i] = target[i];
@@ -219,7 +220,18 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
 void LinePlanner::pause(bool optional) {
   MachineAdapter::pause(optional);
-  push(new PauseCommand(getLine(), optional));
+  push(new PauseCommand(nextID++, optional));
+}
+
+
+void LinePlanner::setLocation(const LocationRange &location) {
+  MachineAdapter::setLocation(location);
+  int line = location.getStart().getLine();
+
+  if (0 <= line && line != this->line) {
+    this->line = line;
+    push(new LineNumberCommand(nextID++, line));
+  }
 }
 
 

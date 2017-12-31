@@ -28,8 +28,8 @@ namespace GCode {
     double seconds;
 
   public:
-    DwellCommand(uint64_t line, double seconds) :
-      PlannerCommand(line), seconds(seconds) {}
+    DwellCommand(uint64_t id, double seconds) :
+      PlannerCommand(id), seconds(seconds) {}
 
     // From PlannerCommand
     const char *getType() {return "dwell";}

@@ -28,8 +28,8 @@ namespace GCode {
     unsigned tool;
 
   public:
-    ToolCommand(uint64_t line, unsigned tool) :
-      PlannerCommand(line), tool(tool) {}
+    ToolCommand(uint64_t id, unsigned tool) :
+      PlannerCommand(id), tool(tool) {}
 
     // From PlannerCommand
     const char *getType() {return "tool";}

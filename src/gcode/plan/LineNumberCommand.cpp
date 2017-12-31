@@ -18,23 +18,12 @@
 
 \******************************************************************************/
 
-#pragma once
+#include "LineNumberCommand.h"
 
-#include "PlannerCommand.h"
+#include <cbang/json/Sink.h>
+
+using namespace GCode;
+using namespace cb;
 
 
-namespace GCode {
-  class PauseCommand : public PlannerCommand {
-    bool optional;
-
-  public:
-    PauseCommand(uint64_t id, bool optional) :
-      PlannerCommand(id), optional(optional) {}
-
-    // From PlannerCommand
-    const char *getType() {return "pause";}
-    void setEntryVelocity(double entryVel) {}
-    void setExitVelocity(double exitVel) {}
-    void insert(cb::JSON::Sink &sink);
-  };
-}
+void LineNumberCommand::insert(JSON::Sink &sink) {sink.insert("line", line);}

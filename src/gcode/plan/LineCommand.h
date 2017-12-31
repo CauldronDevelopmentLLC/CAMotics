@@ -41,7 +41,7 @@ namespace GCode {
 
     double times[7];
 
-    LineCommand(uint64_t line);
+    LineCommand(uint64_t id);
 
     // From PlannerCommand
     const char *getType() {return "line";}

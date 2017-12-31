@@ -31,8 +31,8 @@ using namespace cb;
 using namespace std;
 
 
-LineCommand::LineCommand(uint64_t line) :
-  PlannerCommand(line), length(0), entryVel(numeric_limits<double>::max()),
+LineCommand::LineCommand(uint64_t id) :
+  PlannerCommand(id), length(0), entryVel(numeric_limits<double>::max()),
   exitVel(numeric_limits<double>::max()), deltaV(0),
   maxVel(numeric_limits<double>::max()),
   maxAccel(numeric_limits<double>::max()),
