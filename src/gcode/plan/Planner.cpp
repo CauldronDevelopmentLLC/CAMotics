@@ -75,9 +75,9 @@ bool Planner::hasMore() {
 
 
 void Planner::next(JSON::Sink &sink) {planner.next(sink);}
-void Planner::release(uint64_t line) {planner.release(line);}
+void Planner::release(uint64_t id) {planner.release(id);}
 
 
-void Planner::restart(uint64_t line, double length) {
-  planner.restart(line, length);
+void Planner::restart(uint64_t id, const Axes &position) {
+  planner.restart(id, position);
 }

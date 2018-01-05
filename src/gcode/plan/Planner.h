@@ -23,6 +23,7 @@
 #include "PlannerConfig.h"
 #include "LinePlanner.h"
 
+#include <gcode/Axes.h>
 #include <gcode/Controller.h>
 #include <gcode/Runner.h>
 #include <gcode/machine/MachinePipeline.h>
@@ -54,7 +55,7 @@ namespace GCode {
 
     bool hasMore();
     void next(cb::JSON::Sink &sink);
-    void release(uint64_t line);
-    void restart(uint64_t line, double length);
+    void release(uint64_t id);
+    void restart(uint64_t id, const Axes &position);
   };
 }

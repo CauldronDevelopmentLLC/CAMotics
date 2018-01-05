@@ -344,14 +344,23 @@ static PyObject *_release(PyPlanner *self, PyObject *args) {
 }
 
 
-static PyObject *_restart(PyPlanner *self, PyObject *args) {
+static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
   try {
     uint64_t id;
-    double length;
+    GCode::Axes position;
 
-    if (!PyArg_ParseTuple(args, "Kd", &id, &length)) return 0;
+    PyObject *_position = 0;
 
-    self->planner->restart(id, length);
+    static const char *kwlist[] = {"id", "position", 0};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "KO", (char **)kwlist, &id,
+                                     &_position))
+      return 0;
+
+    // Convert Python object to JSON
+    position.read(*pyToJSON(_position));
+
+    self->planner->restart(id, position);
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
@@ -366,7 +375,7 @@ static PyMethodDef _methods[] = {
   {"has_more", (PyCFunction)_has_more, METH_NOARGS,
    "True if the planner has more data"},
   {"next", (PyCFunction)_next, METH_NOARGS, "Get next planner data"},
-  {"release", (PyCFunction)_release, METH_VARARGS, "Release planner data"},
+  {"release", (PyCFunction)_release, METH_KEYWORDS, "Release planner data"},
   {"restart", (PyCFunction)_restart, METH_VARARGS,
    "Restart planner from given ID"},
   {0}
