@@ -109,7 +109,7 @@ void LinePlanner::restart(uint64_t id, double length) {
   // Replan from zero velocity
   cmds.front()->restart(length);
   for (auto it = cmds.begin(); it != cmds.end(); it++)
-    if (plan(it)) backplan(it);
+    plan(it);
 }
 
 
@@ -128,8 +128,9 @@ void LinePlanner::end() {
   MachineAdapter::end();
 
   if (!cmds.empty()) {
-    cmds.back()->setExitVelocity(0);
-    plan(std::prev(cmds.end()));
+    auto it = std::prev(cmds.end());
+    (*it)->setExitVelocity(0);
+    plan(it);
   }
 }
 
@@ -240,8 +241,7 @@ void LinePlanner::push(const cb::SmartPointer<PlannerCommand> &cmd) {
 
   // Plan move
   if (lastExitVel < cmd->getEntryVelocity()) cmd->setEntryVelocity(lastExitVel);
-  auto it = std::prev(cmds.end());
-  if (plan(it)) backplan(it);
+  plan(std::prev(cmds.end()));
 
   lastExitVel = cmd->getExitVelocity();
 }
@@ -262,9 +262,22 @@ bool LinePlanner::isFinal(cmds_t::const_iterator it) const {
 }
 
 
-bool LinePlanner::plan(cmds_t::iterator it) {
+void LinePlanner::plan(cmds_t::iterator it) {
+  if (planOne(it))
+    // Backplan
+    while (true) {
+      if (it == cmds.begin())
+        THROWS("Cannot backplan, previous move unavailable");
+
+      if (!planOne(--it)) break;
+    }
+}
+
+
+bool LinePlanner::planOne(cmds_t::iterator it) {
   const SmartPointer<PlannerCommand> &pc = *it;
 
+  // Plan non-move commands
   if (!pc.isInstance<LineCommand>()) {
     if (it != cmds.begin() &&
         pc->getEntryVelocity() < (*std::prev(it))->getExitVelocity()) {
@@ -280,11 +293,13 @@ bool LinePlanner::plan(cmds_t::iterator it) {
   double Vi = lc.entryVel;
   double Vt = lc.exitVel;
 
+  // Check that entry velocity is not less than last exit velocity
   if (it != cmds.begin() && Vi < (*std::prev(it))->getExitVelocity()) {
     (*std::prev(it))->setExitVelocity(Vi);
     backplan = true;
   }
 
+  // Always plan from lower velocity to higher
   bool swapped = false;
   if (Vt < Vi) {
     swap(Vi, Vt);
@@ -390,16 +405,6 @@ bool LinePlanner::plan(cmds_t::iterator it) {
       swap(lc.times[i], lc.times[6 - i]);
 
   return backplan;
-}
-
-
-void LinePlanner::backplan(cmds_t::iterator it) {
-  while (true) {
-    if (it == cmds.begin())
-      THROWS("Cannot backplan, previous move unavailable");
-
-    if (!plan(--it)) break;
-  }
 }
 
 

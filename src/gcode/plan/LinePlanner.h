@@ -81,8 +81,8 @@ namespace GCode {
   protected:
     void push(const cb::SmartPointer<PlannerCommand> &cmd);
     bool isFinal(cmds_t::const_iterator it) const;
-    bool plan(cmds_t::iterator it);
-    void backplan(cmds_t::iterator it);
+    void plan(cmds_t::iterator it);
+    bool planOne(cmds_t::iterator it);
 
     bool isAccelLimited(double Vi, double Vt, double maxAccel,
                         double maxJerk) const;
