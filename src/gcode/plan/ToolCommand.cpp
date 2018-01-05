@@ -26,4 +26,4 @@ using namespace GCode;
 using namespace cb;
 
 
-void ToolCommand::insert(JSON::Sink &sink) {sink.insert("tool", tool);}
+void ToolCommand::insert(JSON::Sink &sink) const {sink.insert("tool", tool);}

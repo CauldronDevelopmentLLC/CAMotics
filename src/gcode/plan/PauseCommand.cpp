@@ -26,6 +26,6 @@ using namespace GCode;
 using namespace cb;
 
 
-void PauseCommand::insert(JSON::Sink &sink) {
+void PauseCommand::insert(JSON::Sink &sink) const {
   sink.insertBoolean("optional", optional);
 }

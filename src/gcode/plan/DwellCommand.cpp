@@ -26,4 +26,6 @@ using namespace GCode;
 using namespace cb;
 
 
-void DwellCommand::insert(JSON::Sink &sink) {sink.insert("seconds", seconds);}
+void DwellCommand::insert(JSON::Sink &sink) const {
+  sink.insert("seconds", seconds);
+}

@@ -32,7 +32,7 @@ namespace GCode {
       PlannerCommand(id), speed(speed) {}
 
     // From PlannerCommand
-    const char *getType() {return "speed";}
-    void insert(cb::JSON::Sink &sink);
+    const char *getType() const {return "speed";}
+    void insert(cb::JSON::Sink &sink) const;
   };
 }

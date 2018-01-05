@@ -20,6 +20,8 @@
 
 #include "LineCommand.h"
 
+#include "PlannerConfig.h"
+
 #include <gcode/Axes.h>
 
 #include <cbang/json/Sink.h>
@@ -31,28 +33,38 @@ using namespace cb;
 using namespace std;
 
 
-LineCommand::LineCommand(uint64_t id) :
-  PlannerCommand(id), length(0), entryVel(numeric_limits<double>::max()),
-  exitVel(numeric_limits<double>::max()), deltaV(0),
-  maxVel(numeric_limits<double>::max()),
-  maxAccel(numeric_limits<double>::max()),
-  maxJerk(numeric_limits<double>::max()) {}
+LineCommand::LineCommand(uint64_t id, const Vector4D &start,
+                         const Vector4D &end, double feed,
+                         const PlannerConfig &config) :
+  PlannerCommand(id), length(0), entryVel(feed), exitVel(feed), deltaV(0),
+  maxVel(feed), maxAccel(numeric_limits<double>::max()),
+  maxJerk(numeric_limits<double>::max()) {
 
+  // Zero times
+  for (int i = 0; i < 7; i++) times[i] = 0;
 
-void LineCommand::restart(double length) {
-  if (this->length < length) THROWS("Cannot restart from length " << length);
+  for (int i = 0; i < 4; i++)
+    target[i] = end[i];
 
-  setEntryVelocity(0);
-  this->length -= length;
+  computeLimits(start, config);
 }
 
 
-void LineCommand::insert(JSON::Sink &sink) {
+void LineCommand::restart(const Axes &position, const PlannerConfig &config) {
+  Vector4D start;
+  for (int i = 0; i < 4; i++) start[i] = position[i];
+
+  computeLimits(start, config);
+}
+
+
+void LineCommand::insert(JSON::Sink &sink) const {
   sink.insertDict("target", true);
-  for (unsigned i = 0; i < position.getSize(); i++)
-    sink.insert(Axes::toAxisName(i, true), position[i]);
+  for (unsigned i = 0; i < target.getSize(); i++)
+    sink.insert(Axes::toAxisName(i, true), target[i]);
   sink.endDict();
 
+  sink.insert("entry-vel", entryVel);
   sink.insert("exit-vel", exitVel);
   sink.insert("max-vel", maxVel);
   sink.insert("max-accel", maxAccel);
@@ -62,4 +74,42 @@ void LineCommand::insert(JSON::Sink &sink) {
   for (unsigned i = 0; i < 7; i++)
     sink.append(times[i] * 60000); // ms
   sink.endList();
+}
+
+
+void LineCommand::computeLimits(const Vector4D &start,
+                                const PlannerConfig &config) {
+  // Compute axis and lengths
+  Vector4D delta = target - start;
+  length = delta.length();
+
+  if (!length) return; // Null move
+  if (!isfinite(length)) THROWS("Invalid length");
+
+  unit = delta / length;
+
+  // Apply axis velocity limits
+  for (unsigned i = 0; i < 4; i++)
+    if (unit[i] && isfinite(config.maxVel[i])) {
+      double v = fabs(config.maxVel[i] / unit[i]);
+      if (v < maxVel) maxVel = v;
+    }
+
+  // Apply axis jerk limits
+  for (unsigned i = 0; i < 4; i++)
+    if (unit[i] && isfinite(config.maxJerk[i])) {
+      double j = fabs(config.maxJerk[i] / unit[i]);
+      if (j < maxJerk) maxJerk = j;
+    }
+
+  // Apply axis acceleration limits
+  for (unsigned i = 0; i < 4; i++)
+    if (unit[i] && isfinite(config.maxAccel[i])) {
+      double a = fabs(config.maxAccel[i] / unit[i]);
+      if (a < maxAccel) maxAccel = a;
+    }
+
+  // Limit entry & exit velocities
+  if (maxVel < entryVel) entryVel = maxVel;
+  if (maxVel < exitVel) exitVel = maxVel;
 }

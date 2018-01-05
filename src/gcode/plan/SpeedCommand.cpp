@@ -26,4 +26,4 @@ using namespace GCode;
 using namespace cb;
 
 
-void SpeedCommand::insert(JSON::Sink &sink) {sink.insert("speed", speed);}
+void SpeedCommand::insert(JSON::Sink &sink) const {sink.insert("speed", speed);}

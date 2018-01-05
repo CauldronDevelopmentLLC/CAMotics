@@ -20,19 +20,16 @@
 
 #include "PlannerCommand.h"
 
-#include <cbang/json/Sink.h>
-
 using namespace GCode;
 using namespace cb;
 
 
-void PlannerCommand::restart(double length) {
-  if (length) THROWS("Cannot restart from non-zero length " << length);
-  setEntryVelocity(0);
+void PlannerCommand::read(const JSON::Value &value) {
+  THROW("JSON::Serializable::read() not implemented");
 }
 
 
-void PlannerCommand::write(cb::JSON::Sink &sink) {
+void PlannerCommand::write(JSON::Sink &sink) const {
   sink.beginDict();
 
   sink.insert("type", getType());

@@ -28,6 +28,6 @@ using namespace GCode;
 
 
 void Number::print(ostream &stream) const {
-  // TODO What about precision?  The spec says upto about 17 figures
+  // TODO What about precision?  The spec says upto about 17 digits
   stream << String(value);
 }

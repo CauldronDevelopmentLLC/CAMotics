@@ -26,9 +26,11 @@
 
 
 namespace GCode {
+  class PlannerConfig;
+
   class LineCommand : public PlannerCommand {
   public:
-    cb::Vector4D position;
+    cb::Vector4D target;
     double length;
 
     double entryVel;
@@ -41,10 +43,14 @@ namespace GCode {
 
     double times[7];
 
-    LineCommand(uint64_t id);
+    cb::Vector4D unit;
+
+    LineCommand(uint64_t id, const cb::Vector4D &start,
+                const cb::Vector4D &end, double feed,
+                const PlannerConfig &config);
 
     // From PlannerCommand
-    const char *getType() {return "line";}
+    const char *getType() const {return "line";}
 
     double getEntryVelocity() const {return entryVel;}
     void setEntryVelocity(double entryVel) {this->entryVel = entryVel;}
@@ -52,8 +58,11 @@ namespace GCode {
     void setExitVelocity(double exitVel) {this->exitVel = exitVel;}
     double getDeltaVelocity() const {return deltaV;}
     double getLength() const {return length;}
-    void restart(double length);
+    void restart(const Axes &position, const PlannerConfig &config);
 
-    void insert(cb::JSON::Sink &sink);
+    void insert(cb::JSON::Sink &sink) const;
+
+  protected:
+    void computeLimits(const cb::Vector4D &start, const PlannerConfig &config);
   };
 }

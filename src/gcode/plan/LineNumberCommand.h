@@ -31,7 +31,7 @@ namespace GCode {
     LineNumberCommand(uint64_t id, int line) : PlannerCommand(id), line(line) {}
 
     // From PlannerCommand
-    const char *getType() {return "ln";}
-    void insert(cb::JSON::Sink &sink);
+    const char *getType() const {return "ln";}
+    void insert(cb::JSON::Sink &sink) const;
   };
 }

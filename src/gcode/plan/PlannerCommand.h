@@ -20,15 +20,18 @@
 
 #pragma once
 
+#include <gcode/Axes.h>
+
 #include <cbang/StdTypes.h>
+#include <cbang/json/JSON.h>
 
 #include <limits>
 
-namespace cb {namespace JSON {class Sink;}}
-
 
 namespace GCode {
-  class PlannerCommand {
+  class PlannerConfig;
+
+  class PlannerCommand : public cb::JSON::Serializable {
     uint64_t id;
     double velocity;
 
@@ -37,7 +40,7 @@ namespace GCode {
       id(id), velocity(std::numeric_limits<double>::max()) {}
     virtual ~PlannerCommand() {}
 
-    virtual const char *getType() = 0;
+    virtual const char *getType() const = 0;
 
     uint64_t getID() const {return id;}
 
@@ -47,9 +50,12 @@ namespace GCode {
     virtual void setExitVelocity(double exitVel) {velocity = exitVel;}
     virtual double getDeltaVelocity() const {return 0;}
     virtual double getLength() const {return 0;}
-    virtual void restart(double length);
+    virtual void restart(const Axes &position, const PlannerConfig &config) {}
 
-    void write(cb::JSON::Sink &sink);
-    virtual void insert(cb::JSON::Sink &sink) = 0;
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
+
+    virtual void insert(cb::JSON::Sink &sink) const = 0;
   };
 }

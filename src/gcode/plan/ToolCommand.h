@@ -32,7 +32,7 @@ namespace GCode {
       PlannerCommand(id), tool(tool) {}
 
     // From PlannerCommand
-    const char *getType() {return "tool";}
-    void insert(cb::JSON::Sink &sink);
+    const char *getType() const {return "tool";}
+    void insert(cb::JSON::Sink &sink) const;
   };
 }

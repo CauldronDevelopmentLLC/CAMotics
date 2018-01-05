@@ -26,4 +26,6 @@ using namespace GCode;
 using namespace cb;
 
 
-void LineNumberCommand::insert(JSON::Sink &sink) {sink.insert("line", line);}
+void LineNumberCommand::insert(JSON::Sink &sink) const {
+  sink.insert("line", line);
+}

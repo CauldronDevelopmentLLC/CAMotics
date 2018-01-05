@@ -76,6 +76,7 @@ void LinePlanner::next(JSON::Sink &sink) {
   cmd->write(sink);
   output.push_back(cmd);
   cmds.pop_front();
+  lastExitVel = output.back()->getExitVelocity();
 }
 
 
@@ -85,29 +86,29 @@ void LinePlanner::release(uint64_t id) {
 }
 
 
-void LinePlanner::restart(uint64_t id, double length) {
+void LinePlanner::restart(uint64_t id, const Axes &position) {
   // Find replan command in output
   while (true) {
     if (output.empty() || id < output.front()->getID())
-      THROWS("Planner ID " << id << " at length " << length
-             << " not found");
+      THROWS("Planner ID " << id << " not found");
 
-    if (output.front()->getID() == id) {
-      if (output.front()->getLength() <= length) break;
-      else length -= output.front()->getLength();
-    }
+    if (output.front()->getID() == id) break;
 
     output.pop_front(); // Release any moves before the restart
   }
 
+  // Set position
+  for (int i = 0; i < 4; i++)
+    this->position[i] = position[i];
+
   // Reload previously output moves
   cmds.splice(cmds.begin(), output, output.begin(), output.end());
 
-  // Reset output position
-  outputPos = Vector4D(numeric_limits<double>::quiet_NaN());
+  // Reset last exit velocity
+  lastExitVel = 0;
 
   // Replan from zero velocity
-  cmds.front()->restart(length);
+  cmds.front()->restart(position, config);
   for (auto it = cmds.begin(); it != cmds.end(); it++)
     plan(it);
 }
@@ -115,10 +116,9 @@ void LinePlanner::restart(uint64_t id, double length) {
 
 void LinePlanner::start() {
   for (int i = 0; i < 4; i++)
-    position[i] = outputPos[i] = config.start[i];
+    position[i] = config.start[i];
 
   lastExitVel = 0;
-  lastUnit = Vector4D();
 
   MachineAdapter::start();
 }
@@ -157,62 +157,19 @@ void LinePlanner::dwell(double seconds) {
 void LinePlanner::move(const Axes &target, bool rapid) {
   MachineAdapter::move(target, rapid);
 
-  SmartPointer<LineCommand> lc = new LineCommand(nextID++);
+  Vector4D end;
+  for (int i = 0; i < 4; i++) end[i] = target[i];
 
-  for (int i = 0; i < 4; i++)
-    lc->position[i] = target[i];
-
-  // Compute axis and lengths
-  Vector4D delta = lc->position - position;
-  position = lc->position;
-  lc->length = delta.length();
-
-  // TODO ignore too short moves
-  if (!lc->length) return; // Null move
-  if (!isfinite(lc->length)) THROWS("Invalid length");
-
-  Vector4D unit = delta / lc->length;
-
-  // Apply user velocity limit
   // TODO Handle feed rate mode
-  if (!rapid) {
-    lc->maxVel = getFeed();
-    if (!lc->maxVel) THROWS("Non-rapid move with zero feed rate");
-  }
+  double feed = rapid ? numeric_limits<double>::max() : getFeed();
+  if (!feed) THROWS("Non-rapid move with zero feed rate");
 
-  // Apply axis velocity limits
-  for (unsigned i = 0; i < 4; i++)
-    if (unit[i] && isfinite(config.maxVel[i])) {
-      double v = fabs(config.maxVel[i] / unit[i]);
-      if (v < lc->maxVel) lc->maxVel = v;
-    }
+  SmartPointer<LineCommand> lc =
+    new LineCommand(nextID++, position, end, feed, config);
 
-  // Apply axis jerk limits
-  for (unsigned i = 0; i < 4; i++)
-    if (unit[i] && isfinite(config.maxJerk[i])) {
-      double j = fabs(config.maxJerk[i] / unit[i]);
-      if (j < lc->maxJerk) lc->maxJerk = j;
-    }
+  if (!lc->length) return; // Null move
 
-  // Apply axis acceleration limits
-  for (unsigned i = 0; i < 4; i++)
-    if (unit[i] && isfinite(config.maxAccel[i])) {
-      double a = fabs(config.maxAccel[i] / unit[i]);
-      if (a < lc->maxAccel) lc->maxAccel = a;
-    }
-
-  // Apply junction velocity limit
-  if (lastUnit != Vector4D()) {
-    double jv = computeJunctionVelocity(unit, lastUnit,
-                                        config.junctionDeviation,
-                                        config.junctionAccel);
-    if (jv < lc->entryVel) lc->entryVel = jv;
-  }
-  lastUnit = unit;
-
-  // Limit velocity
-  if (lc->maxVel < lc->entryVel) lc->entryVel = lc->maxVel;
-  if (lc->maxVel < lc->exitVel) lc->exitVel = lc->maxVel;
+  position = end;
 
   // Add move
   push(lc);
@@ -238,12 +195,7 @@ void LinePlanner::setLocation(const LocationRange &location) {
 
 void LinePlanner::push(const cb::SmartPointer<PlannerCommand> &cmd) {
   cmds.push_back(cmd);
-
-  // Plan move
-  if (lastExitVel < cmd->getEntryVelocity()) cmd->setEntryVelocity(lastExitVel);
   plan(std::prev(cmds.end()));
-
-  lastExitVel = cmd->getExitVelocity();
 }
 
 
@@ -277,26 +229,53 @@ void LinePlanner::plan(cmds_t::iterator it) {
 bool LinePlanner::planOne(cmds_t::iterator it) {
   const SmartPointer<PlannerCommand> &pc = *it;
 
-  // Plan non-move commands
-  if (!pc.isInstance<LineCommand>()) {
-    if (it != cmds.begin() &&
-        pc->getEntryVelocity() < (*std::prev(it))->getExitVelocity()) {
-      (*std::prev(it))->setExitVelocity(pc->getEntryVelocity());
-      return true;
+  LOG_DEBUG(4, "Planning " << pc->toString());
+
+  // Set entry velocity when at begining
+  bool backplan = false;
+  if (it == cmds.begin()) pc->setEntryVelocity(lastExitVel);
+
+  else {
+    // Make sure entry and exit velocities match
+    const SmartPointer<PlannerCommand> &last = *std::prev(it);
+
+    if (pc->getEntryVelocity() < last->getExitVelocity()) {
+      last->setExitVelocity(pc->getEntryVelocity());
+      backplan = true;
     }
 
-    return false;
+    pc->setEntryVelocity(last->getExitVelocity());
   }
 
-  LineCommand &lc = *it->cast<LineCommand>();
-  bool backplan = false;
-  double Vi = lc.entryVel;
-  double Vt = lc.exitVel;
+  // Done with non-move commands
+  if (!pc.isInstance<LineCommand>()) return backplan;
 
-  // Check that entry velocity is not less than last exit velocity
-  if (it != cmds.begin() && Vi < (*std::prev(it))->getExitVelocity()) {
-    (*std::prev(it))->setExitVelocity(Vi);
-    backplan = true;
+  LineCommand &lc = *pc.cast<LineCommand>();
+  double Vi = lc.getEntryVelocity();
+  double Vt = lc.getExitVelocity();
+
+  // Apply junction velocity limit
+  if (Vi && it != cmds.begin()) {
+    cmds_t::iterator last = std::prev(it);
+    while (true) {
+      if (last->isInstance<LineCommand>()) {
+        const Vector4D &lastUnit = last->cast<LineCommand>()->unit;
+
+        double jv = computeJunctionVelocity(lc.unit, lastUnit,
+                                            config.junctionDeviation,
+                                            config.junctionAccel);
+        if (jv < Vi) {
+          Vi = jv;
+          pc->setEntryVelocity(Vi);
+          (*std::prev(it))->setExitVelocity(Vi);
+          backplan = true;
+        }
+        break;
+      }
+
+      if (last == cmds.begin()) break;
+      last = std::prev(last);
+    }
   }
 
   // Always plan from lower velocity to higher

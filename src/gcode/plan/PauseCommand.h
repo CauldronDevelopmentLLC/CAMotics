@@ -32,9 +32,9 @@ namespace GCode {
       PlannerCommand(id), optional(optional) {}
 
     // From PlannerCommand
-    const char *getType() {return "pause";}
+    const char *getType() const {return "pause";}
     void setEntryVelocity(double entryVel) {}
     void setExitVelocity(double exitVel) {}
-    void insert(cb::JSON::Sink &sink);
+    void insert(cb::JSON::Sink &sink) const;
   };
 }

@@ -40,11 +40,7 @@ namespace GCode {
 
     // Move state
     cb::Vector4D position;
-    cb::Vector4D lastUnit;
     double lastExitVel;
-
-    // Output state
-    cb::Vector4D outputPos;
 
     typedef std::list<cb::SmartPointer<PlannerCommand> > cmds_t;
     cmds_t cmds;
@@ -59,8 +55,8 @@ namespace GCode {
 
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
-    void release(uint64_t line);
-    void restart(uint64_t line, double length);
+    void release(uint64_t id);
+    void restart(uint64_t id, const Axes &position);
 
     // From MachineInterface
     //void reset();
