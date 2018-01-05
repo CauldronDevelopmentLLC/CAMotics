@@ -64,6 +64,9 @@ namespace {
 }
 
 
+bool LinePlanner::isDone() const {return cmds.empty() && output.empty();}
+
+
 bool LinePlanner::hasMove() const {
   return !cmds.empty() && isFinal(cmds.begin());
 }

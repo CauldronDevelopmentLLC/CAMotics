@@ -53,6 +53,7 @@ namespace GCode {
     LinePlanner(const PlannerConfig &config) :
     config(config), lastExitVel(0), nextID(1), line(-1) {}
 
+    bool isDone() const;
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
     void release(uint64_t id);

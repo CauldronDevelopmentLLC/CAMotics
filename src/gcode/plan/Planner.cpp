@@ -47,7 +47,9 @@ Planner::Planner(const PlannerConfig &config) :
 }
 
 
-bool Planner::isRunning() const {return !runner.isNull() && !runner->isDone();}
+bool Planner::isRunning() const {
+  return !runner.isNull() && !runner->isDone() && !planner.isDone();
+}
 
 
 void Planner::mdi(const string &gcode) {
