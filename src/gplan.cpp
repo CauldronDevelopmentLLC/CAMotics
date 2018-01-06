@@ -375,8 +375,8 @@ static PyMethodDef _methods[] = {
   {"has_more", (PyCFunction)_has_more, METH_NOARGS,
    "True if the planner has more data"},
   {"next", (PyCFunction)_next, METH_NOARGS, "Get next planner data"},
-  {"release", (PyCFunction)_release, METH_KEYWORDS, "Release planner data"},
-  {"restart", (PyCFunction)_restart, METH_VARARGS,
+  {"release", (PyCFunction)_release, METH_VARARGS, "Release planner data"},
+  {"restart", (PyCFunction)_restart, METH_KEYWORDS,
    "Restart planner from given ID"},
   {0}
 };

@@ -79,7 +79,7 @@ void LinePlanner::next(JSON::Sink &sink) {
   cmd->write(sink);
   output.push_back(cmd);
   cmds.pop_front();
-  lastExitVel = output.back()->getExitVelocity();
+  lastExitVel = cmd->getExitVelocity();
 }
 
 

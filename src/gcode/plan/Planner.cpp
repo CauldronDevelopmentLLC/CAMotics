@@ -48,7 +48,7 @@ Planner::Planner(const PlannerConfig &config) :
 
 
 bool Planner::isRunning() const {
-  return !runner.isNull() && !runner->isDone() && !planner.isDone();
+  return (!runner.isNull() && !runner->isDone()) || !planner.isDone();
 }
 
 
