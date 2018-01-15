@@ -26,12 +26,10 @@ namespace GCode {
   public:
     typedef enum {MM_PER_MINUTE, INVERSE_TIME, MM_PER_REVOLUTION} feed_mode_t;
     typedef enum {REVOLUTIONS_PER_MINUTE, CONSTANT_SURFACE_SPEED} spin_mode_t;
-    typedef enum {IMMEDIATE, START_ON_RISE, START_ON_FALL, START_WHEN_HIGH,
-                  START_WHEN_LOW, STOP_ON_RISE, STOP_ON_FALL, STOP_WHEN_HIGH,
-                  STOP_WHEN_LOW} input_mode_t;
     typedef enum {XY, XZ, YZ, YV, UV, UW, VW} plane_t;
     typedef enum {XYZ, ABC, UVW, AXES_COUNT} axes_t;
-    typedef enum {OK, TIMEOUT, CONDITION, LIMIT} async_error_t;
-    typedef enum {MIST_COOLANT, FLOOD_COOLANT, PROBE, ANALOG, DIGITAL} port_t;
+    typedef enum {PROBE, X_MIN, X_MAX, Y_MIN, Y_MAX, Z_MIN, Z_MAX, A_MIN, A_MAX,
+                  B_MIN, B_MAX, C_MIN, C_MAX, U_MIN, U_MAX, V_MIN, V_MAX, W_MIN,
+                  W_MAX} port_t;
   };
 }

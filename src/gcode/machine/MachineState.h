@@ -64,10 +64,9 @@ namespace GCode {
     int getTool() const {return tool;}
     void setTool(unsigned tool) {this->tool = tool;}
 
-    int findPort(port_t type, unsigned index) {return -1;}
-    double input(unsigned port, input_mode_t mode, double timeout, bool error)
-    {return 0;}
-    void output(unsigned port, double value, bool sync) {}
+    void wait(unsigned port, bool active, double timeout) {}
+    void seek(unsigned port, bool active, bool error) {}
+    void output(unsigned port, double value) {}
 
     Axes getPosition() const {return position;}
     cb::Vector3D getPosition(axes_t axes) const;
@@ -80,11 +79,6 @@ namespace GCode {
     void setMatrix(const cb::Matrix4x4D &m, axes_t matrix);
 
     void pause(bool optional) {}
-    bool synchronize(double timeout) {return true;}
-    void abort() {}
-
-    async_error_t readAsyncError() {return OK;}
-    void clearAsyncErrors() {}
 
     const cb::LocationRange &getLocation() const {return location;}
     void setLocation(const cb::LocationRange &location)

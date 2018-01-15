@@ -18,30 +18,14 @@
 
 \******************************************************************************/
 
-#pragma once
+#include "SeekCommand.h"
+
+using namespace GCode;
+using namespace cb;
 
 
-#include "MachineAdapter.h"
-
-#include <gcode/MoveStream.h>
-
-#include <cbang/config/Options.h>
-
-
-namespace GCode {
-  class MoveSink : public MachineAdapter {
-    MoveStream &stream;
-
-    bool probePending;
-    double time;
-
-  public:
-    MoveSink(MoveStream &stream);
-
-    // From MachineInterface
-    void reset();
-    void seek(unsigned port, bool active, bool error);
-    void move(const Axes &axes, bool rapid);
-    void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
-  };
+void SeekCommand::insert(JSON::Sink &sink) const {
+  sink.insert("port", port);
+  sink.insertBoolean("active", active);
+  sink.insertBoolean("error", error);
 }

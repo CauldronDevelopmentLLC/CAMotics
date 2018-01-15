@@ -79,28 +79,8 @@ void Controller::setSpindleDir(dir_t dir) {
 }
 
 
-void Controller::setMistCoolant(bool enable) {
-  int port = machine.findPort(MachineInterface::MIST_COOLANT);
-  if (port != -1) machine.output(port, enable);
-}
-
-
-bool Controller::getMistCoolant() {
-  int port = machine.findPort(MachineInterface::MIST_COOLANT);
-  return port == -1 ? false : machine.input(port);
-}
-
-
-void Controller::setFloodCoolant(bool enable) {
-  int port = machine.findPort(MachineInterface::FLOOD_COOLANT);
-  if (port != -1) machine.output(port, enable);
-}
-
-
-bool Controller::getFloodCoolant() {
-  int port = machine.findPort(MachineInterface::FLOOD_COOLANT);
-  return port == -1 ? false : machine.input(port);
-}
+void Controller::setMistCoolant(bool enable) {machine.output(0, enable);}
+void Controller::setFloodCoolant(bool enable) {machine.output(1, enable);}
 
 
 double Controller::get(const string &name) const {
@@ -203,9 +183,7 @@ void Controller::setSpeed(double speed) {
 }
 
 
-void Controller::setTool(unsigned tool) {
-  set(TOOL_NUMBER, tool);
-}
+void Controller::setTool(unsigned tool) {set(TOOL_NUMBER, tool);}
 
 
 double Controller::getAxisAbsolutePosition(char axis) const {
@@ -409,13 +387,17 @@ void Controller::execute(const Code &code, int vars) {
 
     case 301: storePredefined2(); break;
 
-    case 330: spindleSynchronizedMotion(false); break;
-    case 331: spindleSynchronizedMotion(true); break;
+    case 330: implemented = false; break;
+    case 331: implemented = false; break;
 
     case 382: straightProbe(vars, true, true); break;
     case 383: straightProbe(vars, true, false); break;
     case 384: straightProbe(vars, false, true); break;
     case 385: straightProbe(vars, false, false); break;
+    case 386: seek(vars, true, false); break;
+    case 387: seek(vars, true, true); break;
+    case 388: seek(vars, false, false); break;
+    case 389: seek(vars, false, true); break;
 
     case 400: cutterRadiusComp = false; break;
     case 410: setCutterRadiusComp(vars, true, false); break;
@@ -627,28 +609,47 @@ void Controller::arc(int vars, bool clockwise) {
 }
 
 
-void Controller::dwell(double seconds) {
-  machine.dwell(seconds);
-}
-
-
-void Controller::spindleSynchronizedMotion(bool rigidTap) {
-  // TODO set position
-}
+void Controller::dwell(double seconds) {machine.dwell(seconds);}
 
 
 void Controller::straightProbe(int vars, bool towardWorkpiece,
                                bool signalError) {
-  int port = machine.findPort(MachineInterface::PROBE);
-  if (port != -1)
-    machine.input(port, towardWorkpiece ? MachineInterface::STOP_WHEN_HIGH :
-                  MachineInterface::STOP_WHEN_LOW, signalError);
-
+  machine.seek(PROBE, towardWorkpiece, signalError);
   makeMove(vars, false, !incrementalDistanceMode);
 
   LOG_INFO(3, "Controller: straight probe "
            << (towardWorkpiece ? "toward" : "away from") << " workpiece"
            << (signalError ? " with error signal" : ""));
+}
+
+
+void Controller::seek(int vars, bool active, bool error) {
+  char targetAxis = 0;
+  bool seekMin;
+
+  for (const char *axes = Axes::AXES; *axes; axes++)
+    if (vars & letterToVarType(*axes)) {
+      if (targetAxis) THROW("Multiple axes in seek");
+      targetAxis = *axes;
+      seekMin = getVar(*axes) < 0;
+    }
+
+  unsigned port;
+  switch (targetAxis) {
+  case 'X': port = seekMin ? X_MIN : X_MAX; break;
+  case 'Y': port = seekMin ? Y_MIN : Y_MAX; break;
+  case 'Z': port = seekMin ? Z_MIN : Z_MAX; break;
+  case 'A': port = seekMin ? A_MIN : A_MAX; break;
+  case 'B': port = seekMin ? B_MIN : B_MAX; break;
+  case 'C': port = seekMin ? C_MIN : C_MAX; break;
+  case 'U': port = seekMin ? U_MIN : U_MAX; break;
+  case 'V': port = seekMin ? V_MIN : V_MAX; break;
+  case 'W': port = seekMin ? W_MIN : W_MAX; break;
+  default: THROW("Seek requires axis");
+  }
+
+  machine.seek(port, active, error);
+  makeMove(vars, false, false);
 }
 
 

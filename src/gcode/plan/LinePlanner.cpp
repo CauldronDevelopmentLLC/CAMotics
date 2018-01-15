@@ -26,6 +26,8 @@
 #include "DwellCommand.h"
 #include "PauseCommand.h"
 #include "LineNumberCommand.h"
+#include "OutputCommand.h"
+#include "SeekCommand.h"
 
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
@@ -64,7 +66,7 @@ namespace {
 }
 
 
-bool LinePlanner::isDone() const {return cmds.empty() && output.empty();}
+bool LinePlanner::isDone() const {return cmds.empty() && out.empty();}
 
 
 bool LinePlanner::hasMove() const {
@@ -77,27 +79,27 @@ void LinePlanner::next(JSON::Sink &sink) {
 
   SmartPointer<PlannerCommand> cmd = cmds.front();
   cmd->write(sink);
-  output.push_back(cmd);
+  out.push_back(cmd);
   cmds.pop_front();
   lastExitVel = cmd->getExitVelocity();
 }
 
 
 void LinePlanner::release(uint64_t id) {
-  while (!output.empty() && output.front()->getID() <= id)
-    output.pop_front();
+  while (!out.empty() && out.front()->getID() <= id)
+    out.pop_front();
 }
 
 
 void LinePlanner::restart(uint64_t id, const Axes &position) {
   // Find replan command in output
   while (true) {
-    if (output.empty() || id < output.front()->getID())
+    if (out.empty() || id < out.front()->getID())
       THROWS("Planner ID " << id << " not found");
 
-    if (output.front()->getID() == id) break;
+    if (out.front()->getID() == id) break;
 
-    output.pop_front(); // Release any moves before the restart
+    out.pop_front(); // Release any moves before the restart
   }
 
   // Set position
@@ -105,7 +107,7 @@ void LinePlanner::restart(uint64_t id, const Axes &position) {
     this->position[i] = position[i];
 
   // Reload previously output moves
-  cmds.splice(cmds.begin(), output, output.begin(), output.end());
+  cmds.splice(cmds.begin(), out, out.begin(), out.end());
 
   // Reset last exit velocity
   lastExitVel = 0;
@@ -148,6 +150,19 @@ void LinePlanner::setSpeed(double speed, spin_mode_t mode, double max) {
 void LinePlanner::setTool(unsigned tool) {
   MachineAdapter::setTool(tool);
   push(new ToolCommand(nextID++, tool));
+}
+
+
+void LinePlanner::seek(unsigned port, bool active, bool error) {
+  MachineAdapter::seek(port, active, error);
+  push(new SeekCommand(nextID++, port, active, error));
+}
+
+
+
+void LinePlanner::output(unsigned port, double value) {
+  MachineAdapter::output(port, value);
+  push(new OutputCommand(nextID++, port, value));
 }
 
 

@@ -66,13 +66,11 @@ namespace GCode {
     int getTool() const {return parent->getTool();}
     void setTool(unsigned tool) {parent->setTool(tool);}
 
-    int findPort(port_t type, unsigned index = 0)
-    {return parent->findPort(type, index);}
-    double input(unsigned port, input_mode_t mode = IMMEDIATE,
-                 double timeout = 0, bool error = false)
-    {return parent->input(port, mode, timeout, error);}
-    void output(unsigned port, double value, bool sync = true)
-    {parent->output(port, value, sync);}
+    void wait(unsigned port, bool active, double timeout)
+    {parent->wait(port, active, timeout);}
+    void seek(unsigned port, bool active, bool error)
+    {parent->seek(port, active, error);}
+    void output(unsigned port, double value) {parent->output(port, value);}
 
     Axes getPosition() const {return parent->getPosition();}
     cb::Vector3D getPosition(axes_t axes) const
@@ -89,11 +87,6 @@ namespace GCode {
     {parent->setMatrix(m, matrix);}
 
     void pause(bool optional = true) {parent->pause(optional);}
-    bool synchronize(double timeout = 0) {return parent->synchronize(timeout);}
-    void abort() {parent->abort();}
-
-    async_error_t readAsyncError() {return parent->readAsyncError();}
-    void clearAsyncErrors() {parent->clearAsyncErrors();}
 
     const cb::LocationRange &getLocation() const {return parent->getLocation();}
     void setLocation(const cb::LocationRange &location)

@@ -20,28 +20,21 @@
 
 #pragma once
 
-
-#include "MachineAdapter.h"
-
-#include <gcode/MoveStream.h>
-
-#include <cbang/config/Options.h>
+#include "PlannerCommand.h"
 
 
 namespace GCode {
-  class MoveSink : public MachineAdapter {
-    MoveStream &stream;
-
-    bool probePending;
-    double time;
+  class SeekCommand : public PlannerCommand {
+    uint32_t port;
+    bool active;
+    bool error;
 
   public:
-    MoveSink(MoveStream &stream);
+    SeekCommand(uint64_t id, uint32_t port, bool active, bool error) :
+      PlannerCommand(id), port(port), active(active), error(error) {}
 
-    // From MachineInterface
-    void reset();
-    void seek(unsigned port, bool active, bool error);
-    void move(const Axes &axes, bool rapid);
-    void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
+    // From PlannerCommand
+    const char *getType() const {return "seek";}
+    void insert(cb::JSON::Sink &sink) const;
   };
 }

@@ -44,7 +44,7 @@ namespace GCode {
 
     typedef std::list<cb::SmartPointer<PlannerCommand> > cmds_t;
     cmds_t cmds;
-    cmds_t output;
+    cmds_t out;
 
     uint64_t nextID;
     int line;
@@ -65,14 +65,13 @@ namespace GCode {
     void end();
     void setSpeed(double speed, spin_mode_t mode, double max);
     void setTool(unsigned tool);
-    //double input(unsigned port, input_mode_t mode, double timeout, bool error)
-    //void output(unsigned port, double value, bool sync)
+    //void wait(unsigned port, bool active, double timeout);
+    void seek(unsigned port, bool active, bool error);
+    void output(unsigned port, double value);
     void dwell(double seconds);
     void move(const Axes &axes, bool rapid);
     //void arc(const cb::Vector3D &offset, double angle, plane_t plane);
     void pause(bool optional);
-    //bool synchronize(double timeout);
-    //void abort();
     void setLocation(const cb::LocationRange &location);
 
   protected:

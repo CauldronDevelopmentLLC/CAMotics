@@ -57,8 +57,8 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("icut(" AXES ", incremental=true)", this, &GCodeModule::cutCB);
   exports.insert("arc(x=0, y=0, z=0, angle, plane, incremental=true)", this,
                  &GCodeModule::arcCB);
-  exports.insert("probe(" AXES ", toward=true, error=true, index=0, port=-1, "
-                 "invert=false)", this, &GCodeModule::probeCB);
+  exports.insert("probe(" AXES ", port=0, active=true, error=true)", this,
+                 &GCodeModule::probeCB);
   exports.insert("dwell(seconds)", this, &GCodeModule::dwellCB);
   exports.insert("feed(rate, mode)", this, &GCodeModule::feedCB);
   exports.insert("speed(rate, surface, max)", this, &GCodeModule::speedCB);
@@ -143,16 +143,8 @@ void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
 
 
 void GCodeModule::probeCB(const js::Value &args, js::Sink &sink) {
-  bool toward = args.getBoolean("toward");
-  bool error = args.getBoolean("error");
-  uint32_t index = args.getInteger("index");
-  int port = args.getInteger("port");
-  bool invert = args.getBoolean("invert");
-
-  if (port == -1) port = ctx.machine.findPort(PROBE, index);
-  if (port != -1)
-    ctx.machine.input(port, toward ^ invert ? STOP_WHEN_HIGH : STOP_WHEN_LOW,
-                      error);
+  ctx.machine.seek(args.getInteger("port"), args.getBoolean("active"),
+                   args.getBoolean("error"));
 
   Axes axes = ctx.machine.getPosition();
   parseAxes(args, axes);

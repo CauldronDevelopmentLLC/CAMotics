@@ -155,43 +155,30 @@ void GCodeMachine::setTool(unsigned tool) {
 }
 
 
-int GCodeMachine::findPort(port_t type, unsigned index) {
-  switch (type) {
-  case MIST_COOLANT: if (index == 0) return 0;
-  case FLOOD_COOLANT: if (index == 0) return 1;
-  case PROBE: if (index == 0) return 2;
-  case ANALOG: if (index < 4) return 3 + index;
-  case DIGITAL: if (index < 4) return 7 + index;
-  }
-
-  return MachineAdapter::findPort(type, index);
+void GCodeMachine::wait(unsigned port, bool active, double timeout) {
+  // TODO
 }
 
 
-double GCodeMachine::input(unsigned port, input_mode_t mode, double timeout,
-                           bool error) {
-  switch (port) {
-  case 0: return mistCoolant;
-  case 1: return floodCoolant;
-  case 2: return 0; // probe
-  case 3: case 4: case 5: case 6: return 0; // analog
-  case 7: case 8: case 9: case 10: return 0; // digital
-  }
-
-  return MachineAdapter::input(port, mode, timeout, error);
+void GCodeMachine::seek(unsigned port, bool active, bool error) {
+  // TODO
 }
 
 
-void GCodeMachine::output(unsigned port, double value, bool sync) {
-  switch (port) {
-  case 0: mistCoolant = value; return;
-  case 1: floodCoolant = value; return;
-  case 2: return; // probe
-  case 3: case 4: case 5: case 6: return; // analog
-  case 7: case 8: case 9: case 10: return; // digital
-  }
+void GCodeMachine::output(unsigned port, double value) {
+  if (value)
+    switch (port) {
+    case 0: stream << "M7\n"; return;
+    case 1: stream << "M8\n"; return;
+    }
 
-  return MachineAdapter::output(port, value, sync);
+  else
+    switch (port) {
+    case 0: stream << "M9\n"; return; // M9 turns off both mist and flood
+    case 1: return;
+    }
+
+  return MachineAdapter::output(port, value);
 }
 
 

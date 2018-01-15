@@ -32,16 +32,13 @@ namespace GCode {
     std::ostream &stream;
     Units units;
 
-    bool mistCoolant;
-    bool floodCoolant;
-
     Axes position;
 
     cb::FileLocation location;
 
   public:
     GCodeMachine(std::ostream &stream, Units units) :
-      stream(stream), units(units), mistCoolant(false), floodCoolant(false) {}
+      stream(stream), units(units) {}
 
     void beginLine();
 
@@ -53,9 +50,9 @@ namespace GCode {
     void setSpeed(double speed, spin_mode_t mode, double max);
     void setTool(unsigned tool);
 
-    int findPort(port_t type, unsigned index);
-    double input(unsigned port, input_mode_t mode, double timeout, bool error);
-    void output(unsigned port, double value, bool sync);
+    void wait(unsigned port, bool active, double timeout);
+    void seek(unsigned port, bool active, bool error);
+    void output(unsigned port, double value);
 
     void dwell(double seconds);
     void move(const Axes &axes, bool rapid);

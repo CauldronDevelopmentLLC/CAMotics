@@ -27,7 +27,8 @@ using namespace GCode;
 using namespace GCode;
 
 
-MoveSink::MoveSink(MoveStream &stream) : stream(stream) {}
+MoveSink::MoveSink(MoveStream &stream) :
+  stream(stream), probePending(false), time(0) {}
 
 
 void MoveSink::reset() {
@@ -37,10 +38,9 @@ void MoveSink::reset() {
 }
 
 
-double MoveSink::input(unsigned port, input_mode_t mode, double timeout,
-                       bool error) {
-  if (mode != IMMEDIATE) probePending = true;
-  return MachineAdapter::input(port, mode, timeout, error);
+void MoveSink::seek(unsigned port, bool active, bool error) {
+  probePending = true;
+  return MachineAdapter::seek(port, active, error);
 }
 
 

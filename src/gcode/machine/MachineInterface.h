@@ -105,69 +105,39 @@ namespace GCode {
     virtual void setTool(unsigned tool) = 0;
 
     /***
-     * Query port by type.
-     * @return The number of the @param index'th with @param type if it exists
-     * or -1 otherwise.
+     * Wait for input change.
+     *
+     * @param port the input port to wait on.
+     * @param active wait for the port to become active if true, inactive
+     *   otherwise.
+     * @param timeout the maximum amount of time to wait or zero to wait
+     *   indefinately.  It is an error of the port does not change to the
+     *   specified state before the timeout expires.
      */
-    virtual int findPort(port_t type, unsigned index = 0) = 0;
+    virtual void wait(unsigned port, bool active, double timeout) = 0;
 
     /***
-     * Analog or digital input.
+     * Causes the immediately following move to pause when the sought input
+     * changes state.
      *
-     * @param port the port number.  Valid values depend on the machine.
-     *
-     * @param mode If IMMEDIATE read and return the value immediately.
-     *
-     * If one of the START_* modes then delay the next move until the
-     * indicated condition occurs.
-     *
-     * If one of the STOP_* modes then stop the the next move if the indicated
-     * condition occurs before the end of the
-     * move.
-     *
-     * If @param mode is not IMMEDIATE this function will still return
-     * immediately but with a 0 value.
-     *
-     * If @param mode is IMMEDIATE then @param timeout has no effect.
-     * If @param mode is one of the START_* modes then a non-zero @param timeout
-     * indicates the maximum number of seconds to delay the next move.
-     *
-     * If @param mode is one of the STOP_* modes then a non-zero timeout
-     * indicates the maximum number of seconds before aborting the next move
-     * before either the move ends on its own or the target condition occurs.
-     *
-     * The timeout always begins from the start of the next move.
-     *
-     * If @param timeout is less than or equal to zero then timeout is infinite.
-     *
-     * If @param error is true and the timeout is reached before either the
-     * condition is met or the move ends then the error TIMEOUT is set.
-     *
-     * If @param error is true and neither the timeout or the input condition
-     * is are met before the move ends then the error CONDITION is set.
-     *
-     * @throw cb::Exception if there are any pending errors, the port is
-     * invalid or the operation is invalid for the specified port.
+     * @param port the input port.
+     * @param active seeking the active state if true, inactive otherwise.
+     * @param error if true, signal an error if the port state is not found
+     *   before the move ends.
      */
-    virtual double input(unsigned port, input_mode_t mode = IMMEDIATE,
-                         double timeout = 0, bool error = true) = 0;
+    virtual void seek(unsigned port, bool active, bool error) = 0;
 
     /***
      * Analog or digital output.
      * @param port the port number.  Valid values depend on the machine.
      * @param value An analog or digital value.
-     * @param sync If true synchronize the output with the next move.
      *
      * @throw cb::Exception if there are any pending errors, the port is invalid
      * or the operation is invalid for the specified port.
      */
-    virtual void output(unsigned port, double value, bool sync = true) = 0;
+    virtual void output(unsigned port, double value) = 0;
 
-    /***
-     * @return the current position of all axes.  A call to this function
-     * implies a call to synchronize(0) and will return the position of the
-     * axes after completion of the final pending move.
-     */
+    /// @return the current position of all axes.
     virtual Axes getPosition() const = 0;
     virtual cb::Vector3D getPosition(axes_t axes) const = 0;
 
@@ -185,9 +155,6 @@ namespace GCode {
      * Move to the position indicated by @param axes at the current feed rate if
      * @param rapid is false, otherwise move at maximum speed.
      * This function may queue the operation and return immediately.
-     *
-     * If a machine limit is hit then the LIMIT error is set and the move
-     * is aborted and any pending operations are canceled.
      *
      * @throw cb::Exception if there are any pending errors, the feed rate is
      * zero or the move would go beyond the limits of the machine.
@@ -208,9 +175,6 @@ namespace GCode {
      * @param plane the plane to which the helical axis is perpendicular.
      * Valid values are XY (the default), XZ or YZ.
      *
-     * If a machine limit is hit then the LIMIT error is set and the move
-     * is aborted and any pending operations are canceled.
-     *
      * @throw cb::Exception if there are any pending errors, the feed rate is
      * zero, the move would go beyond the limits of the machine or the plane
      * is invalid.
@@ -223,26 +187,6 @@ namespace GCode {
     virtual void setMatrix(const cb::Matrix4x4D &m, axes_t matrix = XYZ) = 0;
 
     virtual void pause(bool optional = true) = 0;
-
-    /***
-     * Returns once all outstanding moves have completed unless @param timeout
-     * is non-zero, in which case false will be returned if the timeout, in
-     * seconds, is reached sooner.  Reaching the timeout will not set the
-     * TIMEOUT error.
-     */
-    virtual bool synchronize(double timeout = 0) = 0;
-
-    /// Halt all movement immediately and cancel any pending operations.
-    virtual void abort() = 0;
-
-    /***
-     * Read any pending errors.
-     * @return OK when there are no more errors, the next error code otherwise.
-     */
-    virtual async_error_t readAsyncError() = 0;
-
-    /// Clear any pending errors.
-    virtual void clearAsyncErrors() = 0;
 
     /// Get program location
     virtual const cb::LocationRange &getLocation() const = 0;

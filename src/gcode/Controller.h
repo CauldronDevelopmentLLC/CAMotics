@@ -44,7 +44,7 @@ namespace GCode {
 
   struct EndProgram {}; // Exception
 
-  class Controller : public VarTypes, public ModalGroup {
+  class Controller : public VarTypes, public ModalGroup, public MachineEnum {
   public:
     typedef enum {
       DIR_OFF,
@@ -144,9 +144,7 @@ namespace GCode {
     void setSpindleDir(dir_t dir);
 
     void setMistCoolant(bool enable);
-    bool getMistCoolant();
     void setFloodCoolant(bool enable);
-    bool getFloodCoolant();
 
     // Parameters
     double get(unsigned addr) const
@@ -200,9 +198,8 @@ namespace GCode {
 
     void arc(int vars, bool clockwise);
     void dwell(double seconds);
-    void spindleSynchronizedMotion(bool rigidTap);
-    void straightProbe(int vars, bool towardWorkpiece,
-                               bool signalError);
+    void straightProbe(int vars, bool towardWorkpiece, bool signalError);
+    void seek(int vars, bool active, bool error);
     void drill(int vars, bool dwell, bool feedOut, bool spindleStop);
     void setToolTable(int vars, bool relative);
     void setCoordSystemOffset(unsigned cs, char axis, bool relative);
