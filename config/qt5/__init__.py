@@ -396,9 +396,7 @@ def _detect(env):
             if vernumber < [5, 0, 0]:
                 vernumber = '.'.join([str(x) for x in vernumber])
                 moc = None
-                SCons.Warnings.warn(
-                    QtdirNotFound,
-                    "QT5DIR variable not defined, and detected moc is for Qt %s" % vernumber)
+                raise Exception("QT5DIR variable not defined, and detected moc is for Qt %s" % vernumber)
 
         QT5DIR = os.path.dirname(os.path.dirname(moc))
         SCons.Warnings.warn(
