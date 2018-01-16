@@ -153,14 +153,14 @@ void LinePlanner::setTool(unsigned tool) {
 }
 
 
-void LinePlanner::seek(unsigned port, bool active, bool error) {
+void LinePlanner::seek(port_t port, bool active, bool error) {
   MachineAdapter::seek(port, active, error);
   push(new SeekCommand(nextID++, port, active, error));
 }
 
 
 
-void LinePlanner::output(unsigned port, double value) {
+void LinePlanner::output(port_t port, double value) {
   MachineAdapter::output(port, value);
   push(new OutputCommand(nextID++, port, value));
 }

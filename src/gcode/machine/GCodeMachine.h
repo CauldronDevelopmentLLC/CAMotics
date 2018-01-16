@@ -50,9 +50,9 @@ namespace GCode {
     void setSpeed(double speed, spin_mode_t mode, double max);
     void setTool(unsigned tool);
 
-    void wait(unsigned port, bool active, double timeout);
-    void seek(unsigned port, bool active, bool error);
-    void output(unsigned port, double value);
+    void wait(port_t port, bool active, double timeout);
+    void seek(port_t port, bool active, bool error);
+    void output(port_t port, double value);
 
     void dwell(double seconds);
     void move(const Axes &axes, bool rapid);

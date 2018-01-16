@@ -79,8 +79,14 @@ void Controller::setSpindleDir(dir_t dir) {
 }
 
 
-void Controller::setMistCoolant(bool enable) {machine.output(0, enable);}
-void Controller::setFloodCoolant(bool enable) {machine.output(1, enable);}
+void Controller::setMistCoolant(bool enable) {
+  machine.output(MachineEnum::MIST, enable);
+}
+
+
+void Controller::setFloodCoolant(bool enable) {
+  machine.output(MachineEnum::FLOOD, enable);
+}
 
 
 double Controller::get(const string &name) const {
@@ -390,14 +396,15 @@ void Controller::execute(const Code &code, int vars) {
     case 330: implemented = false; break;
     case 331: implemented = false; break;
 
-    case 382: straightProbe(vars, true, true); break;
-    case 383: straightProbe(vars, true, false); break;
-    case 384: straightProbe(vars, false, true); break;
+    case 382: straightProbe(vars, true,  true);  break;
+    case 383: straightProbe(vars, true,  false); break;
+    case 384: straightProbe(vars, false, true);  break;
     case 385: straightProbe(vars, false, false); break;
-    case 386: seek(vars, true, false); break;
-    case 387: seek(vars, true, true); break;
-    case 388: seek(vars, false, false); break;
-    case 389: seek(vars, false, true); break;
+
+    case 386: seek(vars, true,  true);  break;
+    case 387: seek(vars, true,  false); break;
+    case 388: seek(vars, false, true);  break;
+    case 389: seek(vars, false, false); break;
 
     case 400: cutterRadiusComp = false; break;
     case 410: setCutterRadiusComp(vars, true, false); break;
@@ -634,7 +641,7 @@ void Controller::seek(int vars, bool active, bool error) {
       seekMin = getVar(*axes) < 0;
     }
 
-  unsigned port;
+  port_t port;
   switch (targetAxis) {
   case 'X': port = seekMin ? X_MIN : X_MAX; break;
   case 'Y': port = seekMin ? Y_MIN : Y_MAX; break;

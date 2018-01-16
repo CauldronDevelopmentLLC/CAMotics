@@ -66,11 +66,11 @@ namespace GCode {
     int getTool() const {return parent->getTool();}
     void setTool(unsigned tool) {parent->setTool(tool);}
 
-    void wait(unsigned port, bool active, double timeout)
+    void wait(port_t port, bool active, double timeout)
     {parent->wait(port, active, timeout);}
-    void seek(unsigned port, bool active, bool error)
+    void seek(port_t port, bool active, bool error)
     {parent->seek(port, active, error);}
-    void output(unsigned port, double value) {parent->output(port, value);}
+    void output(port_t port, double value) {parent->output(port, value);}
 
     Axes getPosition() const {return parent->getPosition();}
     cb::Vector3D getPosition(axes_t axes) const

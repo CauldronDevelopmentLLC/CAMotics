@@ -38,7 +38,7 @@ void MoveSink::reset() {
 }
 
 
-void MoveSink::seek(unsigned port, bool active, bool error) {
+void MoveSink::seek(port_t port, bool active, bool error) {
   probePending = true;
   return MachineAdapter::seek(port, active, error);
 }

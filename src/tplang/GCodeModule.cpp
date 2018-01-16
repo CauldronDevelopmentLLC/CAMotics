@@ -89,6 +89,28 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("SPHEROID", ToolShape::TS_SPHEROID);
   exports.insert("SNUBNOSE", ToolShape::TS_SNUBNOSE);
 
+  exports.insert("X_MIN", MachineEnum::X_MIN);
+  exports.insert("X_MAX", MachineEnum::X_MAX);
+  exports.insert("Y_MIN", MachineEnum::Y_MIN);
+  exports.insert("Y_MAX", MachineEnum::Y_MAX);
+  exports.insert("Z_MIN", MachineEnum::Z_MIN);
+  exports.insert("Z_MAX", MachineEnum::Z_MAX);
+  exports.insert("A_MIN", MachineEnum::A_MIN);
+  exports.insert("A_MAX", MachineEnum::A_MAX);
+  exports.insert("B_MIN", MachineEnum::B_MIN);
+  exports.insert("B_MAX", MachineEnum::B_MAX);
+  exports.insert("C_MIN", MachineEnum::C_MIN);
+  exports.insert("C_MAX", MachineEnum::C_MAX);
+  exports.insert("U_MIN", MachineEnum::U_MIN);
+  exports.insert("U_MAX", MachineEnum::U_MAX);
+  exports.insert("V_MIN", MachineEnum::V_MIN);
+  exports.insert("V_MAX", MachineEnum::V_MAX);
+  exports.insert("W_MIN", MachineEnum::W_MIN);
+  exports.insert("W_MAX", MachineEnum::W_MAX);
+  exports.insert("PROBE", MachineEnum::PROBE);
+  exports.insert("FLOOD", MachineEnum::FLOOD);
+  exports.insert("MIST",  MachineEnum::MIST);
+
 #undef XYZ
 #undef ABC
 #undef UVW
@@ -143,8 +165,8 @@ void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
 
 
 void GCodeModule::probeCB(const js::Value &args, js::Sink &sink) {
-  ctx.machine.seek(args.getInteger("port"), args.getBoolean("active"),
-                   args.getBoolean("error"));
+  ctx.machine.seek((MachineEnum::port_t)args.getInteger("port"),
+                   args.getBoolean("active"), args.getBoolean("error"));
 
   Axes axes = ctx.machine.getPosition();
   parseAxes(args, axes);

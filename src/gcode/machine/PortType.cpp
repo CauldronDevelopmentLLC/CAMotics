@@ -18,26 +18,6 @@
 
 \******************************************************************************/
 
-#pragma once
-
-#include "PlannerCommand.h"
-
-#include <gcode/machine/MachineEnum.h>
-
-
-namespace GCode {
-  class SeekCommand : public PlannerCommand {
-    MachineEnum::port_t port;
-    bool active;
-    bool error;
-
-  public:
-    SeekCommand(uint64_t id, MachineEnum::port_t port, bool active,
-                bool error) :
-      PlannerCommand(id), port(port), active(active), error(error) {}
-
-    // From PlannerCommand
-    const char *getType() const {return "seek";}
-    void insert(cb::JSON::Sink &sink) const;
-  };
-}
+#define CBANG_ENUM_IMPL
+#include "PortType.h"
+#include <cbang/enum/MakeEnumerationImpl.def>

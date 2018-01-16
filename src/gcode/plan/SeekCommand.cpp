@@ -25,7 +25,8 @@ using namespace cb;
 
 
 void SeekCommand::insert(JSON::Sink &sink) const {
-  sink.insert("port", port);
+  sink.insert("switch", String::transcode
+              (String::toLower(PortType(port).toString()), "_", "-"));
   sink.insertBoolean("active", active);
   sink.insertBoolean("error", error);
 }

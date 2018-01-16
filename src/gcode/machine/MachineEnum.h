@@ -20,16 +20,16 @@
 
 #pragma once
 
+#include "PortType.h"
+
 
 namespace GCode {
-  class MachineEnum {
+  class MachineEnum : public PortType::Enum {
   public:
     typedef enum {MM_PER_MINUTE, INVERSE_TIME, MM_PER_REVOLUTION} feed_mode_t;
     typedef enum {REVOLUTIONS_PER_MINUTE, CONSTANT_SURFACE_SPEED} spin_mode_t;
     typedef enum {XY, XZ, YZ, YV, UV, UW, VW} plane_t;
     typedef enum {XYZ, ABC, UVW, AXES_COUNT} axes_t;
-    typedef enum {PROBE, X_MIN, X_MAX, Y_MIN, Y_MAX, Z_MIN, Z_MAX, A_MIN, A_MAX,
-                  B_MIN, B_MAX, C_MIN, C_MAX, U_MIN, U_MAX, V_MIN, V_MAX, W_MIN,
-                  W_MAX} port_t;
+    typedef PortType::enum_t port_t;
   };
 }

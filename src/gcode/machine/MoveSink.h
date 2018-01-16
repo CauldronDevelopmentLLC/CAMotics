@@ -40,7 +40,7 @@ namespace GCode {
 
     // From MachineInterface
     void reset();
-    void seek(unsigned port, bool active, bool error);
+    void seek(port_t port, bool active, bool error);
     void move(const Axes &axes, bool rapid);
     void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
   };

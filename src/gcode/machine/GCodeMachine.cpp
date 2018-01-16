@@ -155,27 +155,29 @@ void GCodeMachine::setTool(unsigned tool) {
 }
 
 
-void GCodeMachine::wait(unsigned port, bool active, double timeout) {
+void GCodeMachine::wait(port_t port, bool active, double timeout) {
   // TODO
 }
 
 
-void GCodeMachine::seek(unsigned port, bool active, bool error) {
+void GCodeMachine::seek(port_t port, bool active, bool error) {
   // TODO
 }
 
 
-void GCodeMachine::output(unsigned port, double value) {
+void GCodeMachine::output(port_t port, double value) {
   if (value)
     switch (port) {
-    case 0: stream << "M7\n"; return;
-    case 1: stream << "M8\n"; return;
+    case FLOOD: stream << "M7\n"; return;
+    case MIST: stream << "M8\n"; return;
+    default: break;
     }
 
   else
     switch (port) {
-    case 0: stream << "M9\n"; return; // M9 turns off both mist and flood
-    case 1: return;
+    case FLOOD: stream << "M9\n"; return; // M9 turns off both mist and flood
+    case MIST: return;
+    default: break;
     }
 
   return MachineAdapter::output(port, value);

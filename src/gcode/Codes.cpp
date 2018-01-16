@@ -91,7 +91,7 @@ const Code Codes::gcodes[] = {
   {'G', 21, 12, MG::MG_UNITS, VT::VT_NONE,
    "Use Millimeters"},
 
-  {'G', 28, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 28, 19, MG::MG_ZERO, VT::VT_NONE, // Used for homing on 3D printers
    "Go to Predefined Position 1"},
   {'G', 28.1, 19, MG::MG_ZERO, VT::VT_NONE,
   "Set Predefined Position 1"},
@@ -113,6 +113,15 @@ const Code Codes::gcodes[] = {
    "Straight Probe away from workpiece w/ error signal"},
   {'G', 38.5, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe away from workpiece wo/ error signal"},
+
+  {'G', 38.6, 20, MG::MG_MOTION, VT::VT_AXIS,
+   "Seek active switch w/ error signal"},
+  {'G', 38.7, 20, MG::MG_MOTION, VT::VT_AXIS,
+   "Seek active switch wo/ error signal"},
+  {'G', 38.8, 20, MG::MG_MOTION, VT::VT_AXIS,
+   "Seek inactive switch w/ error signal"},
+  {'G', 38.9, 20, MG::MG_MOTION, VT::VT_AXIS,
+   "Seek inactive switch wo/ error signal"},
 
   {'G', 40, 13, MG::MG_CUTTER_RADIUS, VT::VT_NONE,
    "Cutter Radius Compensation Off"},

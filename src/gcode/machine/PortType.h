@@ -18,26 +18,38 @@
 
 \******************************************************************************/
 
-#pragma once
+#ifndef CBANG_ENUM_EXPAND
+#ifndef GCODE_PORT_TYPE_H
+#define GCODE_PORT_TYPE_H
 
-#include "PlannerCommand.h"
+#define CBANG_ENUM_NAME PortType
+#define CBANG_ENUM_NAMESPACE GCode
+#define CBANG_ENUM_PATH gcode/machine
+#include <cbang/enum/MakeEnumeration.def>
 
-#include <gcode/machine/MachineEnum.h>
+#endif // GCODE_PORT_TYPE_H
+#else // CBANG_ENUM_EXPAND
 
+CBANG_ENUM(X_MIN)
+CBANG_ENUM(X_MAX)
+CBANG_ENUM(Y_MIN)
+CBANG_ENUM(Y_MAX)
+CBANG_ENUM(Z_MIN)
+CBANG_ENUM(Z_MAX)
+CBANG_ENUM(A_MIN)
+CBANG_ENUM(A_MAX)
+CBANG_ENUM(B_MIN)
+CBANG_ENUM(B_MAX)
+CBANG_ENUM(C_MIN)
+CBANG_ENUM(C_MAX)
+CBANG_ENUM(U_MIN)
+CBANG_ENUM(U_MAX)
+CBANG_ENUM(V_MIN)
+CBANG_ENUM(V_MAX)
+CBANG_ENUM(W_MIN)
+CBANG_ENUM(W_MAX)
+CBANG_ENUM(PROBE)
+CBANG_ENUM(FLOOD)
+CBANG_ENUM(MIST)
 
-namespace GCode {
-  class SeekCommand : public PlannerCommand {
-    MachineEnum::port_t port;
-    bool active;
-    bool error;
-
-  public:
-    SeekCommand(uint64_t id, MachineEnum::port_t port, bool active,
-                bool error) :
-      PlannerCommand(id), port(port), active(active), error(error) {}
-
-    // From PlannerCommand
-    const char *getType() const {return "seek";}
-    void insert(cb::JSON::Sink &sink) const;
-  };
-}
+#endif // CBANG_ENUM_EXPAND

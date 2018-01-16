@@ -114,7 +114,7 @@ namespace GCode {
      *   indefinately.  It is an error of the port does not change to the
      *   specified state before the timeout expires.
      */
-    virtual void wait(unsigned port, bool active, double timeout) = 0;
+    virtual void wait(port_t port, bool active, double timeout) = 0;
 
     /***
      * Causes the immediately following move to pause when the sought input
@@ -125,7 +125,7 @@ namespace GCode {
      * @param error if true, signal an error if the port state is not found
      *   before the move ends.
      */
-    virtual void seek(unsigned port, bool active, bool error) = 0;
+    virtual void seek(port_t port, bool active, bool error) = 0;
 
     /***
      * Analog or digital output.
@@ -135,7 +135,7 @@ namespace GCode {
      * @throw cb::Exception if there are any pending errors, the port is invalid
      * or the operation is invalid for the specified port.
      */
-    virtual void output(unsigned port, double value) = 0;
+    virtual void output(port_t port, double value) = 0;
 
     /// @return the current position of all axes.
     virtual Axes getPosition() const = 0;

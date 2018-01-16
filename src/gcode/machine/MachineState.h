@@ -64,9 +64,9 @@ namespace GCode {
     int getTool() const {return tool;}
     void setTool(unsigned tool) {this->tool = tool;}
 
-    void wait(unsigned port, bool active, double timeout) {}
-    void seek(unsigned port, bool active, bool error) {}
-    void output(unsigned port, double value) {}
+    void wait(port_t port, bool active, double timeout) {}
+    void seek(port_t port, bool active, bool error) {}
+    void output(port_t port, double value) {}
 
     Axes getPosition() const {return position;}
     cb::Vector3D getPosition(axes_t axes) const;
