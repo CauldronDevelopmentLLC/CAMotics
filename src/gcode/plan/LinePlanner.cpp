@@ -112,8 +112,18 @@ void LinePlanner::restart(uint64_t id, const Axes &position) {
   // Reset last exit velocity
   lastExitVel = 0;
 
+  // Handle seek
+  auto it = cmds.begin();
+  if ((*it)->isSeeking()) {
+    it++;
+    cmds.pop_front();
+    while (it != cmds.end() && !(*it)->isMove()) it++;
+  }
+
+  if (it == cmds.end()) return;
+
   // Replan from zero velocity
-  cmds.front()->restart(position, config);
+  (*it)->restart(position, config);
   for (auto it = cmds.begin(); it != cmds.end(); it++)
     plan(it);
 }
@@ -156,6 +166,7 @@ void LinePlanner::setTool(unsigned tool) {
 void LinePlanner::seek(port_t port, bool active, bool error) {
   MachineAdapter::seek(port, active, error);
   push(new SeekCommand(nextID++, port, active, error));
+  seeking = true;
 }
 
 
@@ -183,11 +194,13 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   if (!feed) THROWS("Non-rapid move with zero feed rate");
 
   SmartPointer<LineCommand> lc =
-    new LineCommand(nextID++, position, end, feed, config);
+    new LineCommand(nextID++, position, end, feed, seeking, config);
+
+  // Update state
+  position = end;
+  seeking = false;
 
   if (!lc->length) return; // Null move
-
-  position = end;
 
   // Add move
   push(lc);

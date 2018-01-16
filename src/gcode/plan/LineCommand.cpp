@@ -34,11 +34,11 @@ using namespace std;
 
 
 LineCommand::LineCommand(uint64_t id, const Vector4D &start,
-                         const Vector4D &end, double feed,
+                         const Vector4D &end, double feed, bool seeking,
                          const PlannerConfig &config) :
   PlannerCommand(id), length(0), entryVel(feed), exitVel(feed), deltaV(0),
   maxVel(feed), maxAccel(numeric_limits<double>::max()),
-  maxJerk(numeric_limits<double>::max()) {
+  maxJerk(numeric_limits<double>::max()), seeking(seeking) {
 
   // Zero times
   for (int i = 0; i < 7; i++) times[i] = 0;
@@ -108,6 +108,9 @@ void LineCommand::computeLimits(const Vector4D &start,
       double a = fabs(config.maxAccel[i] / unit[i]);
       if (a < maxAccel) maxAccel = a;
     }
+
+  // Seeking
+  if (seeking) exitVel = 0;
 
   // Limit entry & exit velocities
   if (maxVel < entryVel) entryVel = maxVel;

@@ -44,12 +44,17 @@ namespace GCode {
 
     uint64_t getID() const {return id;}
 
+    virtual bool isSeeking() const {return false;}
+    virtual bool isMove() const {return false;}
+
     virtual double getEntryVelocity() const {return velocity;}
     virtual void setEntryVelocity(double entryVel) {velocity = entryVel;}
     virtual double getExitVelocity() const {return velocity;}
     virtual void setExitVelocity(double exitVel) {velocity = exitVel;}
+
     virtual double getDeltaVelocity() const {return 0;}
     virtual double getLength() const {return 0;}
+
     virtual void restart(const Axes &position, const PlannerConfig &config) {}
 
     // From cb::JSON::Serializable

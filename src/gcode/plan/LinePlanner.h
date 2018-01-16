@@ -41,6 +41,7 @@ namespace GCode {
     // Move state
     cb::Vector4D position;
     double lastExitVel;
+    bool seeking;
 
     typedef std::list<cb::SmartPointer<PlannerCommand> > cmds_t;
     cmds_t cmds;
@@ -51,7 +52,7 @@ namespace GCode {
 
   public:
     LinePlanner(const PlannerConfig &config) :
-    config(config), lastExitVel(0), nextID(1), line(-1) {}
+    config(config), lastExitVel(0), seeking(false), nextID(1), line(-1) {}
 
     bool isDone() const;
     bool hasMove() const;

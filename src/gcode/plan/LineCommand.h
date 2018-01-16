@@ -45,12 +45,16 @@ namespace GCode {
 
     cb::Vector4D unit;
 
+    bool seeking;
+
     LineCommand(uint64_t id, const cb::Vector4D &start,
-                const cb::Vector4D &end, double feed,
+                const cb::Vector4D &end, double feed, bool seeking,
                 const PlannerConfig &config);
 
     // From PlannerCommand
     const char *getType() const {return "line";}
+    bool isSeeking() const {return seeking;}
+    bool isMove() const {return true;}
 
     double getEntryVelocity() const {return entryVel;}
     void setEntryVelocity(double entryVel) {this->entryVel = entryVel;}
