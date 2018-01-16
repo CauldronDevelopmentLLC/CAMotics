@@ -90,21 +90,21 @@ void LineCommand::computeLimits(const Vector4D &start,
 
   // Apply axis velocity limits
   for (unsigned i = 0; i < 4; i++)
-    if (unit[i] && isfinite(config.maxVel[i])) {
+    if (unit[i] && config.maxVel[i] && isfinite(config.maxVel[i])) {
       double v = fabs(config.maxVel[i] / unit[i]);
       if (v < maxVel) maxVel = v;
     }
 
   // Apply axis jerk limits
   for (unsigned i = 0; i < 4; i++)
-    if (unit[i] && isfinite(config.maxJerk[i])) {
+    if (unit[i] && config.maxJerk[i] && isfinite(config.maxJerk[i])) {
       double j = fabs(config.maxJerk[i] / unit[i]);
       if (j < maxJerk) maxJerk = j;
     }
 
   // Apply axis acceleration limits
   for (unsigned i = 0; i < 4; i++)
-    if (unit[i] && isfinite(config.maxAccel[i])) {
+    if (unit[i] && config.maxAccel[i] && isfinite(config.maxAccel[i])) {
       double a = fabs(config.maxAccel[i] / unit[i]);
       if (a < maxAccel) maxAccel = a;
     }
