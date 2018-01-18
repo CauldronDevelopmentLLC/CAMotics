@@ -63,8 +63,8 @@ namespace GCode {
     // Block variables
     static const int MAX_VAR = 26;
     double vars[MAX_VAR];
-    cb::SmartPointer<Entity> varExprs[MAX_VAR];
     bool used[MAX_VAR];
+    cb::SmartPointer<Entity> varExprs[MAX_VAR];
 
     // Numbered and named parameters
     double params[MAX_ADDRESS];
@@ -93,8 +93,6 @@ namespace GCode {
   public:
     ControllerImpl(MachineInterface &machine,
                    const ToolTable &tools = ToolTable());
-
-    void reset();
 
     // Variables
     double getVar(char c) const {return vars[c - 'A'];}

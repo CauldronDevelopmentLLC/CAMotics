@@ -43,9 +43,7 @@ void MachineState::reset() {
 }
 
 
-void MachineState::start() {
-  started = true;
-}
+void MachineState::start() {started = true;}
 
 
 void MachineState::end() {

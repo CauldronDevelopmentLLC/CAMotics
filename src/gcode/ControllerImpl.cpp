@@ -34,51 +34,24 @@ using namespace GCode;
 
 ControllerImpl::ControllerImpl(MachineInterface &machine,
                                const ToolTable &tools) :
-  tools(tools) {
+  tools(tools), plane(MachineInterface::XY), latheDiameterMode(true),
+  cutterRadiusComp(false), toolLengthComp(false), pathMode(EXACT_PATH_MODE),
+  returnMode(RETURN_TO_R), motionBlendingTolerance(0), naiveCamTolerance(0),
+  modalMotion(false), incrementalDistanceMode(false),
+  arcIncrementalDistanceMode(true), moveInAbsoluteCoords(false),
+  feedMode(MachineInterface::MM_PER_MINUTE),
+  spinMode(MachineInterface::REVOLUTIONS_PER_MINUTE), spindleDir(DIR_OFF),
+  speed(0), maxSpindleSpeed(0) {
+
   this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
-  reset();
-}
 
-
-void ControllerImpl::reset() {
-  LOG_INFO(3, "Controller: reset");
-
-  memset(params, 0, sizeof(params)); // This should not be reset everytime
   memset(vars, 0, sizeof(vars));
   memset(used, 0, sizeof(used));
-  named.clear();
+  memset(params, 0, sizeof(params));
 
-  for (int i = 0; i < MAX_VAR; i++) varExprs[i] = 0;
-
-  // TODO should we reset the tool table?
-
-  // This should not be reset everytime
+  // Must be after memset() above
   set(CURRENT_COORD_SYSTEM, 1);
-
-  plane = MachineInterface::XY;
-  latheDiameterMode = true;
-  cutterRadiusComp = false;
-  toolLengthComp = false;
-  pathMode = EXACT_PATH_MODE;
-  returnMode = RETURN_TO_R;
-  motionBlendingTolerance = 0;
-  naiveCamTolerance = 0;
-  modalMotion = false;
-  incrementalDistanceMode = false;
-  arcIncrementalDistanceMode = true;
-  moveInAbsoluteCoords = false;
-
-  machine.setMetric();
-
-  setTool(1);
-
-  feedMode = MachineInterface::MM_PER_MINUTE;
-  setFeed(0);
-
-  spinMode = MachineInterface::REVOLUTIONS_PER_MINUTE;
-  speed = 0;
-  maxSpindleSpeed = 0;
-  spindleDir = DIR_OFF;
+  set(TOOL_NUMBER, 1);
 }
 
 
