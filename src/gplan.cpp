@@ -284,6 +284,20 @@ static PyObject *_is_running(PyPlanner *self) {
 }
 
 
+static PyObject *_set(PyPlanner *self, PyObject *args) {
+  try {
+    const char *name;
+    double value;
+
+    if (!PyArg_ParseTuple(args, "sd", &name, &value)) return 0;
+
+    self->planner->set(name, value);
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
+}
+
+
 static PyObject *_mdi(PyPlanner *self, PyObject *args) {
   try {
     const char *gcode;
@@ -370,6 +384,7 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
 static PyMethodDef _methods[] = {
   {"is_running", (PyCFunction)_is_running, METH_NOARGS,
    "True if the planner active"},
+  {"set", (PyCFunction)_set, METH_VARARGS, "Set variable"},
   {"mdi", (PyCFunction)_mdi, METH_VARARGS, "Load MDI commands"},
   {"load", (PyCFunction)_load, METH_VARARGS, "Load GCode by filename"},
   {"has_more", (PyCFunction)_has_more, METH_NOARGS,

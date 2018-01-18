@@ -94,54 +94,30 @@ namespace GCode {
     ControllerImpl(MachineInterface &machine,
                    const ToolTable &tools = ToolTable());
 
-    // Variables
-    double getVar(char c) const {return vars[c - 'A'];}
-    const cb::SmartPointer<Entity> &getVarExpr(char c) const
-    {return varExprs[c - 'A'];}
+    // Vars
+    double getVar(char c) const;
+    const cb::SmartPointer<Entity> &getVarExpr(char c) const;
     double getOffsetVar(char c, bool absolute) const;
     std::string getVarGroupStr(const char *group, bool usedOnly = true) const;
-    static unsigned letterToVarType(char axis);
+    static VarTypes::enum_t getVarType(char letter);
 
-    // State
-    const cb::LocationRange &getLocation() const;
-
-    const ToolTable &getToolTable() {return tools;}
-    const Tool &getTool(unsigned tool) {return tools.get(tool);}
-    unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
-
-    bool getLatheDiameterMode() const {return latheDiameterMode;}
-    bool getLatheRadiusMode() const {return !latheDiameterMode;}
-
-    bool getCutterRadiusComp() const {return cutterRadiusComp;}
-    bool getToolLengthComp() const {return toolLengthComp;}
-    path_mode_t getPathMode() const {return pathMode;}
-    double getMotionBlendingTolerance() const {return motionBlendingTolerance;}
-    double getNaiveCamTolerance() const {return naiveCamTolerance;}
-
-    bool getModalMotion() const {return modalMotion;}
-
-    bool getAbsoluteDistanceMode() const {return !incrementalDistanceMode;}
-    bool getIncrementalDistanceMode() const {return incrementalDistanceMode;}
-
-    dir_t getSpindleDir() const {return spindleDir;}
+    // Spindle
     void setSpindleDir(dir_t dir);
 
+    // Coolant
     void setMistCoolant(bool enable);
     void setFloodCoolant(bool enable);
 
     // Plane
-    MachineInterface::plane_t getPlane() const {return plane;}
     void setPlane(MachineInterface::plane_t plane);
-
-    static const char *getPlaneAxes(MachineInterface::plane_t plane);
-    static const char *getPlaneOffsets(MachineInterface::plane_t plane);
-
-    char getPlaneXAxis() const {return getPlaneAxes(getPlane())[0];}
-    char getPlaneYAxis() const {return getPlaneAxes(getPlane())[1];}
-    char getPlaneZAxis() const {return getPlaneAxes(getPlane())[2];}
-    unsigned getPlaneXVarType() const {return letterToVarType(getPlaneXAxis());}
-    unsigned getPlaneYVarType() const {return letterToVarType(getPlaneYAxis());}
-    unsigned getPlaneZVarType() const {return letterToVarType(getPlaneZAxis());}
+    const char *getPlaneAxes() const;
+    const char *getPlaneOffsets() const;
+    char getPlaneXAxis() const {return getPlaneAxes()[0];}
+    char getPlaneYAxis() const {return getPlaneAxes()[1];}
+    char getPlaneZAxis() const {return getPlaneAxes()[2];}
+    unsigned getPlaneXVarType() const {return getVarType(getPlaneXAxis());}
+    unsigned getPlaneYVarType() const {return getVarType(getPlaneYAxis());}
+    unsigned getPlaneZVarType() const {return getVarType(getPlaneZAxis());}
 
     // Position
     double getAxisAbsolutePosition(char axis) const;
@@ -157,28 +133,42 @@ namespace GCode {
     void doMove(const Axes &pos, bool rapid);
     void makeMove(int vars, bool rapid, bool absolute);
     void moveAxis(char axis, double value, bool rapid);
-
-    // Actions
     void arc(int vars, bool clockwise);
-    void dwell(double seconds);
     void straightProbe(int vars, bool towardWorkpiece, bool signalError);
     void seek(int vars, bool active, bool error);
     void drill(int vars, bool dwell, bool feedOut, bool spindleStop);
-    void setToolTable(int vars, bool relative);
+
+    // Dwell
+    void dwell(double seconds);
+
+    // Coordindate System
     void setCoordSystemRotation(unsigned cs, double rotation);
     void setCoordSystemOffset(unsigned cs, char axis, bool relative);
     void setCoordSystem(int vars, bool relative);
+
+    // Tool
+    const Tool &getTool(unsigned tool) const {return tools.get(tool);}
+    unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
+    void setToolTable(int vars, bool relative);
     void toolChange(bool manual = false);
     void loadToolOffsets(unsigned tool);
     void loadToolVarOffsets(int vars);
+
+    // Predefined locations
     void storePredefined1();
     void storePredefined2();
     void loadPredefined1(int vars);
     void loadPredefined2(int vars);
+
+    // Offsets
     void setGlobalOffsets(int vars);
     void resetGlobalOffsets(bool clearMemory);
     void restoreGlobalOffsets();
+
+    // Compensation
     void setCutterRadiusComp(int vars, bool left, bool dynamic);
+
+    // End program
     void end();
 
     // From Controller

@@ -55,6 +55,14 @@ ControllerImpl::ControllerImpl(MachineInterface &machine,
 }
 
 
+double ControllerImpl::getVar(char c) const {return vars[c - 'A'];}
+
+
+const SmartPointer<Entity> &ControllerImpl::getVarExpr(char c) const {
+  return varExprs[c - 'A'];
+}
+
+
 double ControllerImpl::getOffsetVar(char axis, bool absolute) const {
   LOG_INFO(6, "getOffsetVar(" << axis << ") var=" << getVar(axis) << " offset="
            << getAxisOffset(axis));
@@ -75,7 +83,7 @@ string ControllerImpl::getVarGroupStr(const char *group, bool usedOnly) const {
 }
 
 
-unsigned ControllerImpl::letterToVarType(char letter) {
+VarTypes::enum_t ControllerImpl::getVarType(char letter) {
   switch (letter) {
   case 'A': return VT_A;
   case 'B': return VT_B;
@@ -108,11 +116,6 @@ unsigned ControllerImpl::letterToVarType(char letter) {
 }
 
 
-const LocationRange &ControllerImpl::getLocation() const {
-  return machine.getLocation();
-}
-
-
 void ControllerImpl::setSpindleDir(dir_t dir) {
   spindleDir = dir;
   setSpeed(speed);
@@ -135,7 +138,7 @@ void ControllerImpl::setPlane(MachineInterface::plane_t plane) {
 }
 
 
-const char *ControllerImpl::getPlaneAxes(MachineInterface::plane_t plane) {
+const char *ControllerImpl::getPlaneAxes() const {
   switch (plane) {
   case MachineInterface::XY: return "XYZ";
   case MachineInterface::XZ: return "XZY";
@@ -148,7 +151,7 @@ const char *ControllerImpl::getPlaneAxes(MachineInterface::plane_t plane) {
 }
 
 
-const char *ControllerImpl::getPlaneOffsets(MachineInterface::plane_t plane) {
+const char *ControllerImpl::getPlaneOffsets() const {
   switch (plane) {
   case MachineInterface::XY: return "IJ";
   case MachineInterface::XZ: return "IK";
@@ -228,7 +231,7 @@ Axes ControllerImpl::getNextPosition(int vars, bool absolute) const {
   Axes pos;
 
   for (const char *axes = Axes::AXES; *axes; axes++)
-    if (vars & letterToVarType(*axes))
+    if (vars & getVarType(*axes))
       pos.set(*axes, getOffsetVar(*axes, absolute));
     else pos.set(*axes, getAxisAbsolutePosition(*axes));
 
@@ -260,8 +263,8 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   // TODO Affected by cutter radius compensation
   // TODO Make sure this is correct for planes XZ and YZ
 
-  const char *axes = getPlaneAxes(getPlane());
-  if (getPlane() == MachineInterface::XZ) clockwise = !clockwise;
+  const char *axes = getPlaneAxes();
+  if (plane == MachineInterface::XZ) clockwise = !clockwise;
 
   // Compute start and end points
   Axes current = getAbsolutePosition();
@@ -301,13 +304,13 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
   } else {
     // Get arc center
-    const char *offsets = getPlaneOffsets(getPlane());
+    const char *offsets = getPlaneOffsets();
     Vector2D offset;
 
     if (arcIncrementalDistanceMode) {
       offset =
-        Vector2D(vars & letterToVarType(offsets[0]) ? getVar(offsets[0]) : 0,
-                 vars & letterToVarType(offsets[1]) ? getVar(offsets[1]) : 0);
+        Vector2D(vars & getVarType(offsets[0]) ? getVar(offsets[0]) : 0,
+                 vars & getVarType(offsets[1]) ? getVar(offsets[1]) : 0);
       center = start + offset;
 
     } else center = Vector2D(getVar(offsets[0]) + getAxisOffset(axes[0]),
@@ -338,14 +341,11 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
   Vector2D offset = center - start;
-  machine.arc(Vector3D(offset.x(), offset.y(), deltaZ), -angle, getPlane());
+  machine.arc(Vector3D(offset.x(), offset.y(), deltaZ), -angle, plane);
   doMove(target, false);
 
   LOG_INFO(3, "Controller: Arc");
 }
-
-
-void ControllerImpl::dwell(double seconds) {machine.dwell(seconds);}
 
 
 void ControllerImpl::straightProbe(int vars, bool towardWorkpiece,
@@ -364,7 +364,7 @@ void ControllerImpl::seek(int vars, bool active, bool error) {
   bool seekMin;
 
   for (const char *axes = Axes::AXES; *axes; axes++)
-    if (vars & letterToVarType(*axes)) {
+    if (vars & getVarType(*axes)) {
       if (targetAxis) THROW("Multiple axes in seek");
       targetAxis = *axes;
       seekMin = getVar(*axes) < 0;
@@ -425,7 +425,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
     if (dwell) this->dwell(getVar('P'));
 
     // Stop Spindle
-    dir_t spindleDir = getSpindleDir();
+    dir_t spindleDir = this->spindleDir;
     if (spindleStop) setSpindleDir(DIR_OFF);
 
     // Retract
@@ -437,20 +437,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
 }
 
 
-void ControllerImpl::setToolTable(int vars, bool relative) {
-  Tool &tool = tools.get(getVar('P'));
-
-  for (const char *v = Tool::VARS; *v; v++)
-    if (vars & letterToVarType(*v)) {
-      double value = getVar(*v);
-      if (relative && (letterToVarType(*v) & VT_AXIS))
-        value -= getAxisOffset(*v); // TODO What about R, I, J, Q offsets?
-      tool.set(*v, value);
-    }
-
-  LOG_INFO(3, "Controller: Set Tool Table"
-           << getVarGroupStr("PRXYZABCUVWIJQ", false));
-}
+void ControllerImpl::dwell(double seconds) {machine.dwell(seconds);}
 
 
 void ControllerImpl::setCoordSystemRotation(unsigned cs, double rotation) {
@@ -471,8 +458,24 @@ void ControllerImpl::setCoordSystem(int vars, bool relative) {
   if (vars & VarTypes::VT_R) setCoordSystemRotation(cs, getVar('R'));
 
   for (const char *axis = Axes::AXES; *axis; axis++)
-    if (vars & letterToVarType(*axis))
+    if (vars & getVarType(*axis))
       setCoordSystemOffset(cs, *axis, relative);
+}
+
+
+void ControllerImpl::setToolTable(int vars, bool relative) {
+  Tool &tool = tools.get(getVar('P'));
+
+  for (const char *v = Tool::VARS; *v; v++)
+    if (vars & getVarType(*v)) {
+      double value = getVar(*v);
+      if (relative && (getVarType(*v) & VT_AXIS))
+        value -= getAxisOffset(*v); // TODO What about R, I, J, Q offsets?
+      tool.set(*v, value);
+    }
+
+  LOG_INFO(3, "Controller: Set Tool Table"
+           << getVarGroupStr("PRXYZABCUVWIJQ", false));
 }
 
 
@@ -495,7 +498,7 @@ void ControllerImpl::loadToolOffsets(unsigned number) {
 
 void ControllerImpl::loadToolVarOffsets(int vars) {
   for (const char *axis = Axes::AXES; *axis; axis++)
-    if (vars & letterToVarType(*axis))
+    if (vars & getVarType(*axis))
       // TODO do these need to be offset?
       set(TOOL_X_OFFSET + Axes::toIndex(*axis), getVar(*axis));
 }
@@ -546,7 +549,7 @@ void ControllerImpl::setGlobalOffsets(int vars) {
   set(GLOBAL_OFFSETS_ENABLED, 1);
 
   for (const char *axis = Axes::AXES; *axis; axis++)
-    if (letterToVarType(*axis) & vars) {
+    if (getVarType(*axis) & vars) {
       double offset = getAxisPosition(*axis) - getVar(*axis);
       unsigned index = Axes::toIndex(*axis);
 
