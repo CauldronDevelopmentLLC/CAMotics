@@ -21,7 +21,6 @@
 #include "Planner.h"
 
 #include <gcode/Runner.h>
-#include <gcode/ControllerImpl.h>
 #include <gcode/machine/MachineState.h>
 #include <gcode/machine/MachineLinearizer.h>
 #include <gcode/machine/MachineUnitAdapter.h>
@@ -36,25 +35,18 @@ using namespace GCode;
 
 
 Planner::Planner(const PlannerConfig &config) :
-  config(config), planner(config) {
+  ControllerImpl(pipeline), config(config), planner(config) {
 
   pipeline.add(new MachineUnitAdapter(config.defaultUnits,
                                       config.outputUnits));
   pipeline.add(new MachineLinearizer(config.maxArcError));
   pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
   pipeline.add(new MachineState);
-
-  controller = new ControllerImpl(pipeline);
 }
 
 
 bool Planner::isRunning() const {
   return (!runner.isNull() && !runner->isDone()) || !planner.isDone();
-}
-
-
-void Planner::set(const string &name, double value) {
-  controller->set(name, value);
 }
 
 
@@ -67,7 +59,7 @@ void Planner::mdi(const string &gcode) {
 
 void Planner::load(const cb::InputSource &source) {
   if (isRunning()) THROW("Planner already running");
-  runner = new Runner(*controller, source);
+  runner = new Runner(*this, source);
   pipeline.start();
 }
 
@@ -88,4 +80,10 @@ void Planner::release(uint64_t id) {planner.release(id);}
 
 void Planner::restart(uint64_t id, const Axes &position) {
   planner.restart(id, position);
+}
+
+
+double Planner::get(const string &name) const {
+  if (ControllerImpl::has(name)) return ControllerImpl::get(name);
+  return resolver.isNull() ? 0 : resolver->get(name);
 }

@@ -25,6 +25,7 @@
 
 #include <gcode/Axes.h>
 #include <gcode/Runner.h>
+#include <gcode/ControllerImpl.h>
 #include <gcode/machine/MachinePipeline.h>
 
 
@@ -35,22 +36,33 @@ namespace GCode {
   class Controller;
   class Runner;
 
-  class Planner {
+
+  class NameResolver {
+  public:
+    virtual ~NameResolver() {}
+    virtual double get(const std::string &name) = 0;
+  };
+
+
+  class Planner : public ControllerImpl {
     const PlannerConfig config;
 
     MachinePipeline pipeline;
-    cb::SmartPointer<Controller> controller;
     LinePlanner planner;
 
     std::string gcode;
     cb::SmartPointer<Runner> runner;
 
+    cb::SmartPointer<NameResolver> resolver;
+
   public:
     Planner(const PlannerConfig &config);
 
+    void setResolver(const cb::SmartPointer<NameResolver> &resolver)
+    {this->resolver = resolver;}
+
     bool isRunning() const;
 
-    void set(const std::string &name, double value);
     void mdi(const std::string &gcode);
     void load(const cb::InputSource &source);
 
@@ -58,5 +70,8 @@ namespace GCode {
     void next(cb::JSON::Sink &sink);
     void release(uint64_t id);
     void restart(uint64_t id, const Axes &position);
+
+    // From Controller
+    double get(const std::string &name) const;
   };
 }

@@ -176,6 +176,44 @@ public:
 };
 
 
+class PyNameResolver : public GCode::NameResolver {
+  PyObject *cb;
+
+public:
+  PyNameResolver(PyObject *cb) : cb(cb) {
+    if (!PyCallable_Check(cb)) THROW("Object not callable");
+  }
+
+
+  // From NameResolver
+  double get(const std::string &name) {
+    // Args
+    PyObject *args = PyTuple_New(1);
+    if (!args) THROW("Failed to allocate tuple");
+
+    PyTuple_SetItem(args, 0, PyUnicode_FromString(name.c_str()));
+
+    // Call
+    PyObject *result = PyObject_Call(cb, args, 0);
+    Py_DECREF(args);
+
+    // Convert result
+    if (!result) THROW("Name resolver callback failed");
+    double value = PyFloat_AsDouble(result);
+    Py_DECREF(result);
+
+    if (PyErr_Occurred()) {
+      PyObject *err = PyObject_Str(PyErr_Occurred());
+      char *_errStr = PyUnicode_AsUTF8(err);
+      std::string errStr = _errStr ? _errStr : "";
+      Py_DECREF(err);
+      THROWS("Name resolver callback failed: " << errStr);
+    }
+
+    return value;
+  }
+};
+
 
 std::string PyUnicode_ToStdString(PyObject *o) {
   Py_ssize_t size;
@@ -298,6 +336,19 @@ static PyObject *_set(PyPlanner *self, PyObject *args) {
 }
 
 
+static PyObject *_set_resolver(PyPlanner *self, PyObject *args) {
+  try {
+    PyObject *cb;
+
+    if (!PyArg_ParseTuple(args, "O", &cb)) return 0;
+
+    self->planner->setResolver(new PyNameResolver(cb));
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
+}
+
+
 static PyObject *_mdi(PyPlanner *self, PyObject *args) {
   try {
     const char *gcode;
@@ -384,6 +435,8 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
 static PyMethodDef _methods[] = {
   {"is_running", (PyCFunction)_is_running, METH_NOARGS,
    "True if the planner active"},
+  {"set_resolver", (PyCFunction)_set_resolver, METH_VARARGS,
+   "Set name resolver callback"},
   {"set", (PyCFunction)_set, METH_VARARGS, "Set variable"},
   {"mdi", (PyCFunction)_mdi, METH_VARARGS, "Load MDI commands"},
   {"load", (PyCFunction)_load, METH_VARARGS, "Load GCode by filename"},
