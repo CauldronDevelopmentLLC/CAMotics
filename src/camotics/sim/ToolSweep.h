@@ -47,7 +47,8 @@ namespace CAMotics {
     cb::SmartPointer<MoveLookup> change;
 
   public:
-    ToolSweep(const cb::SmartPointer<GCode::ToolPath> &path, double startTime = 0,
+    ToolSweep(const cb::SmartPointer<GCode::ToolPath> &path,
+              double startTime = 0,
               double endTime = std::numeric_limits<double>::max());
 
     void setStartTime(double startTime) {this->startTime = startTime;}

@@ -23,7 +23,7 @@
 #include <camotics/TaskFilter.h>
 #include <camotics/sim/Project.h>
 #include <camotics/sim/Simulation.h>
-#include <gcode/Controller.h>
+#include <gcode/ControllerImpl.h>
 #include <gcode/interp/Interpreter.h>
 #include <gcode/machine/Machine.h>
 
@@ -73,7 +73,7 @@ void ToolPathTask::run() {
   // TODO load machine configuration, including rapidFeed & maxArcError
   GCode::Machine machine(*path);
   machine.reset();
-  GCode::Controller controller(machine, tools);
+  GCode::ControllerImpl controller(machine, tools);
 
   // Interpret code
   for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {

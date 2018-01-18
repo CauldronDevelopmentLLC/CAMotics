@@ -26,7 +26,7 @@
 #include <gcode/Printer.h>
 
 #include <gcode/machine/MachineState.h>
-#include <gcode/Controller.h>
+#include <gcode/ControllerImpl.h>
 #include <gcode/interp/Interpreter.h>
 
 #include <cbang/SmartPointer.h>
@@ -40,7 +40,7 @@ namespace GCode {class Word;}
 
 namespace CAMotics {
   class Probe :
-    public GCode::MachineState, public GCode::Controller,
+    public GCode::MachineState, public GCode::ControllerImpl,
     public GCode::Printer, public cb::Reader {
     GCode::Interpreter interp;
 
@@ -74,8 +74,7 @@ namespace CAMotics {
     void outputProbe();
 
     // From GCode::Controller
-    using GCode::Controller::execute;
-    void execute(GCode::Word *word, int vars);
+    void execute(const GCode::Code &code, int vars);
 
     // From Processor
     void operator()(const cb::SmartPointer<GCode::Block> &block);

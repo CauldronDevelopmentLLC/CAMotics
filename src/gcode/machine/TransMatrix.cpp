@@ -121,7 +121,8 @@ namespace {
 }
 
 
-void TransMatrix::rotate(double angle, const cb::Vector3D &_v, const cb::Vector3D &_u) {
+void TransMatrix::rotate(double angle, const cb::Vector3D &_v,
+                         const cb::Vector3D &_u) {
   if (!angle) return;
   if (!_v[0] && !_v[1] && !_v[2]) THROW("Invalid rotation axis (0,0,0)");
 

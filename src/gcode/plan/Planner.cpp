@@ -21,6 +21,7 @@
 #include "Planner.h"
 
 #include <gcode/Runner.h>
+#include <gcode/ControllerImpl.h>
 #include <gcode/machine/MachineState.h>
 #include <gcode/machine/MachineLinearizer.h>
 #include <gcode/machine/MachineUnitAdapter.h>
@@ -43,12 +44,17 @@ Planner::Planner(const PlannerConfig &config) :
   pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
   pipeline.add(new MachineState);
 
-  controller = new Controller(pipeline);
+  controller = new ControllerImpl(pipeline);
 }
 
 
 bool Planner::isRunning() const {
   return (!runner.isNull() && !runner->isDone()) || !planner.isDone();
+}
+
+
+void Planner::set(const string &name, double value) {
+  controller->set(name, value);
 }
 
 

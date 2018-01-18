@@ -38,7 +38,8 @@ OctTree::OctNode::~OctNode() {
 }
 
 
-void OctTree::OctNode::insert(const GCode::Move *move, const cb::Rectangle3D &bbox) {
+void OctTree::OctNode::insert(const GCode::Move *move,
+                              const cb::Rectangle3D &bbox) {
   if (!bounds.intersects(bbox)) return;
 
   if (!depth || bbox.contains(bounds)) {
@@ -121,6 +122,7 @@ bool OctTree::intersects(const cb::Rectangle3D &r) const {
 }
 
 
-void OctTree::collisions(const cb::Vector3D &p, vector<const GCode::Move *> &moves) const {
+void OctTree::collisions(const cb::Vector3D &p,
+                         vector<const GCode::Move *> &moves) const {
   root->collisions(p, moves);
 }

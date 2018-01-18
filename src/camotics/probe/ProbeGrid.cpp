@@ -28,7 +28,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ProbeGrid::ProbeGrid(const cb::Rectangle2D &bbox, const cb::Vector2D &divisions) :
+ProbeGrid::ProbeGrid(const cb::Rectangle2D &bbox,
+                     const cb::Vector2D &divisions) :
   bbox(bbox), divisions(divisions),
   cellSize(bbox.getWidth() / divisions.x(), bbox.getLength() / divisions.y()) {
 

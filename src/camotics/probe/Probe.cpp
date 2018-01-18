@@ -40,7 +40,7 @@ using namespace CAMotics;
 
 
 Probe::Probe(Options &options, std::ostream &stream) :
-  GCode::Controller((GCode::MachineState &)*this), GCode::Printer(stream),
+  GCode::ControllerImpl((GCode::MachineState &)*this), GCode::Printer(stream),
   interp(*this), gridSize(5), clearHeight(1), probeDepth(-1), probeFeed(5),
   liftOff(false), liftOffFeed(0.5), minMem(2000), maxMem(5400),
   useLastZExpression(true), pass(0), didOutputProbe(false) {
@@ -147,10 +147,8 @@ void Probe::outputProbe() {
 }
 
 
-void Probe::execute(GCode::Word *word, int vars) {
-  const GCode::Code &code = *word->getCode();
-  GCode::Controller::setLocation(word->getLocation());
-  GCode::Controller::execute(code, vars);
+void Probe::execute(const GCode::Code &code, int vars) {
+  GCode::ControllerImpl::execute(code, vars);
 
   // TODO This should be absolute position & we should account for offsets etc.
   cb::Vector2D pos(getAxisPosition('X'), getAxisPosition('Y'));

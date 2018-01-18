@@ -40,7 +40,7 @@ using namespace GCode;
 
 
 GCodeInterpreter::GCodeInterpreter(Controller &controller) :
-  controller(controller) {}
+  controller(controller), activeMotion(Codes::find('G', 0)) {}
 
 
 void GCodeInterpreter::setReference(unsigned num, double value) {
@@ -159,13 +159,13 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 
     // Implicit motion
     if (implicitMotion && (vars & VT_AXIS) &&
-        controller.getActiveMotion()->priority < priority) {
-      Word *implicitWord = new Word(controller.getActiveMotion());
+        activeMotion->priority < priority) {
+      Word *implicitWord = new Word(activeMotion);
       implicitWord->getLocation() = block->getLocation();
       words.push_back(implicitWord);
       block->push_back(implicitWord);
       implicitMotion = false;
-      priority = controller.getActiveMotion()->priority;
+      priority = activeMotion->priority;
 
     } else if (lowestPriority == (unsigned)~0) break;
 
@@ -198,7 +198,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
         if (priority == code->priority) {
           controller.setLocation(word->getLocation());
           controller.execute(*code, vars);
-          if (code->group == MG_MOTION) controller.setActiveMotion(code);
+          if (code->group == MG_MOTION) activeMotion = code;
         }
 
         wordPriority = code->priority;

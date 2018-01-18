@@ -22,7 +22,7 @@
 #include "TPLContext.h"
 
 #include <gcode/ToolTable.h>
-#include <gcode/Controller.h>
+#include <gcode/ControllerImpl.h>
 #include <gcode/interp/Interpreter.h>
 
 #include <cbang/os/SystemUtilities.h>
@@ -133,7 +133,7 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
   SmartFunctor<TPLContext> popPath(&ctx, &TPLContext::popPath);
 
   Options options;
-  Controller controller(ctx.machine);
+  ControllerImpl controller(ctx.machine);
   Interpreter(controller).read(path);
 }
 

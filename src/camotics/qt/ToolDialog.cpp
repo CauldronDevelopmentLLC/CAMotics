@@ -67,7 +67,8 @@ void ToolDialog::update() {
   // Visibility
   ui->angleDoubleSpinBox->setVisible(shape == GCode::ToolShape::TS_CONICAL);
   ui->angleLabel->setVisible(shape == GCode::ToolShape::TS_CONICAL);
-  ui->snubDiameterDoubleSpinBox->setVisible(shape == GCode::ToolShape::TS_SNUBNOSE);
+  ui->snubDiameterDoubleSpinBox->
+    setVisible(shape == GCode::ToolShape::TS_SNUBNOSE);
   ui->snubDiameterLabel->setVisible(shape == GCode::ToolShape::TS_SNUBNOSE);
 
 #define UPDATE(UI, GET, SET, VALUE)                 \

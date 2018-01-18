@@ -33,7 +33,8 @@ Grid::Grid(const cb::Rectangle3D &bounds, double resolution) :
 }
 
 
-Grid::Grid(const cb::Vector3D &offset, const cb::Vector3U &steps, double resolution) :
+Grid::Grid(const cb::Vector3D &offset, const cb::Vector3U &steps,
+           double resolution) :
   offset(offset), resolution(resolution), steps(steps) {}
 
 
@@ -48,12 +49,14 @@ unsigned Grid::getTotalCells() const {
 
 
 Grid Grid::slice(const cb::Vector3U &start) const {
-  return Grid(offset + (cb::Vector3D)start * resolution, steps - start, resolution);
+  return
+    Grid(offset + (cb::Vector3D)start * resolution, steps - start, resolution);
 }
 
 
 Grid Grid::slice(const cb::Vector3U &start, const cb::Vector3U &end) const {
-  return Grid(offset + (cb::Vector3D)start * resolution, end - start, resolution);
+  return
+    Grid(offset + (cb::Vector3D)start * resolution, end - start, resolution);
 }
 
 

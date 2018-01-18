@@ -33,7 +33,7 @@ Tool2DView::~Tool2DView() {}
 
 
 void Tool2DView::drawGuide(cairo_t *cr, double width, double x, double y,
-                         const char *text, double value) {
+                           const char *text, double value) {
   // Measure
   cairo_set_line_width(cr, 1);
   cairo_move_to(cr, x - width / 2.0, y);
@@ -64,7 +64,7 @@ void Tool2DView::drawGuide(cairo_t *cr, double width, double x, double y,
 
 
 void Tool2DView::drawText(cairo_t *cr, const string &text, unsigned fontSize,
-                        bool bold) {
+                          bool bold) {
   cairo_select_font_face(cr, "serif", CAIRO_FONT_SLANT_NORMAL,
                          bold ? CAIRO_FONT_WEIGHT_BOLD :
                          CAIRO_FONT_WEIGHT_NORMAL);
@@ -131,7 +131,8 @@ void Tool2DView::draw() {
   }
 
   // Scale
-  double xDim = (shape == GCode::ToolShape::TS_SNUBNOSE && diameter < snubDiameter) ?
+  double xDim =
+    (shape == GCode::ToolShape::TS_SNUBNOSE && diameter < snubDiameter) ?
     snubDiameter : diameter;
   double yDim = length;
   double xScale = w / xDim;

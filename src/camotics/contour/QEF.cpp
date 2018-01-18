@@ -61,8 +61,8 @@ cb::Vector3D QEF::evaluate(double mat[12][3], double vec[12], int rows) {
 }
 
 
-void QEF::computeSVD(double mat[12][3], double u[12][3], double v[3][3], double d[3],
-                     int rows) {
+void QEF::computeSVD(double mat[12][3], double u[12][3], double v[3][3],
+                     double d[3], int rows) {
   memcpy(u, mat, rows * 3 * sizeof(double));
 
   double *tau_u = d;
@@ -75,7 +75,8 @@ void QEF::computeSVD(double mat[12][3], double u[12][3], double v[3][3], double 
 }
 
 
-void QEF::factorize(double mat[12][3], double tau_u[3], double tau_v[2], int rows) {
+void QEF::factorize(double mat[12][3], double tau_u[3], double tau_v[2],
+                    int rows) {
   int y;
 
   // bidiagonal factorization of (rows x 3) matrix into :- tau_u, a
@@ -187,8 +188,8 @@ double QEF::factorize_hh(double *ptrs[12], int n) {
 }
 
 
-void QEF::unpack(double u[12][3], double v[3][3], double tau_u[3], double tau_v[2],
-                 int rows) {
+void QEF::unpack(double u[12][3], double v[3][3], double tau_u[3],
+                 double tau_v[2], int rows) {
   // reset v to the identity matrix
   v[0][0] = v[1][1] = v[2][2] = 1;
   v[0][1] = v[0][2] = v[1][0] = v[1][2] = v[2][0] = v[2][1] = 0;
@@ -258,8 +259,8 @@ void QEF::unpack(double u[12][3], double v[3][3], double tau_u[3], double tau_v[
 }
 
 
-void QEF::diagonalize(double u[12][3], double v[3][3], double tau_u[3], double tau_v[2],
-                      int rows) {
+void QEF::diagonalize(double u[12][3], double v[3][3], double tau_u[3],
+                      double tau_v[2], int rows) {
   chop(tau_u, tau_v, 3);
 
   // progressively reduce the matrices into diagonal form
@@ -304,8 +305,8 @@ void QEF::chop(double *a, double *b, int n) {
 }
 
 
-void QEF::qrstep(double u[12][3], double v[3][3], double tau_u[3], double tau_v[3],
-                 int rows, int cols) {
+void QEF::qrstep(double u[12][3], double v[3][3], double tau_u[3],
+                 double tau_v[3], int rows, int cols) {
   if (cols == 2) {
     qrstep_cols2(u, v, tau_u, tau_v, rows);
     return;
@@ -441,7 +442,8 @@ void QEF::qrstep_middle(double u[12][3], double tau_u[3], double tau_v[3],
 }
 
 
-void QEF::qrstep_end(double v[3][3], double tau_u[3], double tau_v[3], int cols) {
+void QEF::qrstep_end(double v[3][3], double tau_u[3], double tau_v[3],
+                     int cols) {
   double x = tau_u[1];
   double y = tau_v[1];
 

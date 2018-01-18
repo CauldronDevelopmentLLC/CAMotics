@@ -37,8 +37,8 @@ GridTree::GridTree(const Grid &grid) :
 GridTree::~GridTree() {}
 
 
-void GridTree::partition(vector<GridTreeRef> &grids, const cb::Rectangle3D &bbox,
-                         unsigned count) {
+void GridTree::partition(vector<GridTreeRef> &grids,
+                         const cb::Rectangle3D &bbox, unsigned count) {
   cb::Rectangle3D bounds = getBounds();
   if (isEmpty() || !bbox.intersects(bounds)) return;
 

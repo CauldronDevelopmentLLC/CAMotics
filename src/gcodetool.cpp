@@ -20,6 +20,7 @@
 
 #include <camotics/CommandLineApp.h>
 
+#include <gcode/ControllerImpl.h>
 #include <gcode/Printer.h>
 #include <gcode/parse/Parser.h>
 #include <gcode/interp/Interpreter.h>
@@ -53,7 +54,7 @@ public:
   void run() {
     if (!parseOnly) {
       build(pipeline);
-      controller = new Controller(pipeline);
+      controller = new ControllerImpl(pipeline);
     }
 
     CommandLineApp::run();

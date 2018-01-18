@@ -29,6 +29,7 @@
 
 #include <gcode/Controller.h>
 
+
 namespace GCode {
   class Code;
   class Word;
@@ -36,11 +37,10 @@ namespace GCode {
   class GCodeInterpreter :
     public Processor, public Evaluator, public VarTypes, public ModalGroup {
     Controller &controller;
+    const Code *activeMotion;
 
   public:
     GCodeInterpreter(Controller &controller);
-
-    Controller &getController() {return controller;}
 
     virtual void setReference(unsigned num, double value);
     virtual void setReference(const std::string &name, double value);

@@ -24,7 +24,6 @@
 #include "LinePlanner.h"
 
 #include <gcode/Axes.h>
-#include <gcode/Controller.h>
 #include <gcode/Runner.h>
 #include <gcode/machine/MachinePipeline.h>
 
@@ -33,6 +32,7 @@ namespace cb {namespace JSON {class Sink;}}
 
 
 namespace GCode {
+  class Controller;
   class Runner;
 
   class Planner {
@@ -50,6 +50,7 @@ namespace GCode {
 
     bool isRunning() const;
 
+    void set(const std::string &name, double value);
     void mdi(const std::string &gcode);
     void load(const cb::InputSource &source);
 

@@ -69,7 +69,8 @@ void MachineMatrix::translate(double x, double y, double z, axes_t matrix) {
 void MachineMatrix::rotate(double angle, double x, double y, double z, double a,
                            double b, double c, axes_t matrix) {
   if (!angle) return;
-  getTransMatrix(matrix).rotate(angle, cb::Vector3D(x, y, z), cb::Vector3D(a, b, c));
+  getTransMatrix(matrix).
+    rotate(angle, cb::Vector3D(x, y, z), cb::Vector3D(a, b, c));
   updateMatrix(matrix);
 }
 
