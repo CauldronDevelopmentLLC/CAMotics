@@ -41,6 +41,7 @@ namespace GCode {
   public:
     virtual ~NameResolver() {}
     virtual double get(const std::string &name) = 0;
+    virtual void set(const std::string &name, double value) = 0;
   };
 
 
@@ -73,5 +74,6 @@ namespace GCode {
 
     // From Controller
     double get(const std::string &name) const;
+    void set(const std::string &name, double value);
   };
 }

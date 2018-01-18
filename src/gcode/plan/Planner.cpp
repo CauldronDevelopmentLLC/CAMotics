@@ -87,3 +87,9 @@ double Planner::get(const string &name) const {
   if (ControllerImpl::has(name)) return ControllerImpl::get(name);
   return resolver.isNull() ? 0 : resolver->get(name);
 }
+
+
+void Planner::set(const string &name, double value) {
+  ControllerImpl::set(name, value);
+  if (!resolver.isNull()) resolver->set(name, value);
+}
