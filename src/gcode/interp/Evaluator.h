@@ -38,8 +38,9 @@ namespace GCode {
 
   class Evaluator {
   public:
-    virtual double lookupReference(unsigned num);
-    virtual double lookupReference(const std::string &name);
+    virtual double lookupReference(unsigned num) {return 0;}
+    virtual double lookupReference(const std::string &name) {return 0;}
+    virtual bool hasReference(const std::string &name) {return false;}
     virtual double eval(UnaryOp &e);
     virtual double eval(BinaryOp &e);
     virtual double eval(QuotedExpr &e);

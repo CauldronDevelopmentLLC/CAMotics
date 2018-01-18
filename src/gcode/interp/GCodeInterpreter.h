@@ -51,5 +51,6 @@ namespace GCode {
     // From Evaluator
     double lookupReference(unsigned num);
     double lookupReference(const std::string &name);
+    bool hasReference(const std::string &name);
   };
 }

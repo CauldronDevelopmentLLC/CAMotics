@@ -39,16 +39,6 @@ using namespace cb;
 using namespace GCode;
 
 
-double Evaluator::lookupReference(unsigned num) {
-  THROW("Named reference not supported");
-}
-
-
-double Evaluator::lookupReference(const string &name) {
-  THROW("Numerical reference not supported");
-}
-
-
 double Evaluator::eval(UnaryOp &e) {
   double value = e.getExpr()->eval(*this);
 
@@ -70,6 +60,8 @@ double Evaluator::eval(BinaryOp &e) {
     return 0;
   }
 
+  // NOTE, LinuxCNC handles floating-point equality differently.
+  //   See ``Equality and floating-point values``.
   switch (e.getType()) {
   case Operator::EXP_OP: return pow(left, right);
   case Operator::MUL_OP: return left * right;
@@ -91,13 +83,17 @@ double Evaluator::eval(BinaryOp &e) {
 }
 
 
-double Evaluator::eval(QuotedExpr &e) {
-  return e.getExpression()->eval(*this);
-}
+double Evaluator::eval(QuotedExpr &e) {return e.getExpression()->eval(*this);}
 
 
 double Evaluator::eval(FunctionCall &e) {
   string name = String::toUpper(e.getName());
+
+  if (name == "EXISTS") {
+    if (!e.getArg1().isInstance<NamedReference>()) return false;
+    return hasReference(e.getArg1().cast<NamedReference>()->getName());
+  }
+
   double arg1 = e.getArg1()->eval(*this);
 
   if (e.getArg2().isNull()) {
@@ -117,15 +113,14 @@ double Evaluator::eval(FunctionCall &e) {
   } else {
     double arg2 = e.getArg2()->eval(*this);
     if (name == "ATAN") return atan2(arg1, arg2) * 180.0 / M_PI;
+    if (name == "NEAR") return fabs(arg1 - arg2) < 0.0001;
   }
 
   THROWS(e.getLocation() << " Unsupported function '" << name << "'");
 }
 
 
-double Evaluator::eval(NamedReference &e) {
-  return lookupReference(e.getName());
-}
+double Evaluator::eval(NamedReference &e) {return lookupReference(e.getName());}
 
 
 double Evaluator::eval(Reference &e) {
@@ -138,9 +133,7 @@ double Evaluator::eval(Reference &e) {
 }
 
 
-double Evaluator::eval(Number &e) {
-  return e.getValue();
-}
+double Evaluator::eval(Number &e) {return e.getValue();}
 
 
 SmartPointer<Entity> Evaluator::reduce(const SmartPointer<Entity> &entity) {

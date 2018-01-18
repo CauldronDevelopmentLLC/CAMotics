@@ -186,6 +186,7 @@ namespace GCode {
     // From Controller
     double get(unsigned addr) const;
     void set(unsigned addr, double value);
+    bool has(const std::string &name) const;
     double get(const std::string &name) const;
     void set(const std::string &name, double value);
 

@@ -223,3 +223,8 @@ double GCodeInterpreter::lookupReference(unsigned num) {
 double GCodeInterpreter::lookupReference(const string &name) {
   return controller.get(name);
 }
+
+
+bool GCodeInterpreter::hasReference(const string &name) {
+  return controller.has(name);
+}

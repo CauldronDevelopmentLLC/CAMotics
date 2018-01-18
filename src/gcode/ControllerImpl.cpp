@@ -642,6 +642,11 @@ void ControllerImpl::set(unsigned addr, double value) {
 }
 
 
+bool ControllerImpl::has(const string &name) const {
+  return named.find(name) != named.end();
+}
+
+
 double ControllerImpl::get(const string &name) const {
   named_t::const_iterator it = named.find(name);
   return it == named.end() ? 0 : it->second;
@@ -658,8 +663,7 @@ void ControllerImpl::setVar(char c, double value) {
 }
 
 
-void ControllerImpl::setVarExpr(char c,
-                                const cb::SmartPointer<Entity> &entity) {
+void ControllerImpl::setVarExpr(char c, const SmartPointer<Entity> &entity) {
   varExprs[c - 'A'] = entity;
 }
 
