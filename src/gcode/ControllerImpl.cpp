@@ -25,7 +25,10 @@
 #include <cbang/log/Logger.h>
 #include <cbang/SStream.h>
 
+#include <limits>
+
 #include <string.h> // For memset()
+
 
 using namespace std;
 using namespace cb;
@@ -573,6 +576,16 @@ void ControllerImpl::restoreGlobalOffsets() {
 }
 
 
+void ControllerImpl::setAxisHomed(int vars, bool homed) {
+  for (const char *axis = Axes::AXES; *axis; axis++)
+    if (getVarType(*axis) & vars) {
+      set(SSTR("_" << (char)tolower(*axis) << "_homed"), homed);
+      set(SSTR("_" << (char)tolower(*axis) << "_home"),
+          homed ? getVar(*axis) : numeric_limits<double>::quiet_NaN());
+    }
+}
+
+
 void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
   if (dynamic) {
     set(TOOL_DIAMETER, (left ? 1 : -1) * getVar('D'));
@@ -723,6 +736,9 @@ void ControllerImpl::execute(const Code &code, int vars) {
       break;
 
     case 281: storePredefined1(); break;
+
+    case 282: setAxisHomed(vars, false); break;
+    case 283: setAxisHomed(vars, true); break;
 
     case 300:
       if (vars & VT_AXIS) {

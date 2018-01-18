@@ -165,6 +165,9 @@ namespace GCode {
     void resetGlobalOffsets(bool clearMemory);
     void restoreGlobalOffsets();
 
+    // Homing
+    void setAxisHomed(int vars, bool homed);
+
     // Compensation
     void setCutterRadiusComp(int vars, bool left, bool dynamic);
 
