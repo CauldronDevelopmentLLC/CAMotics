@@ -181,8 +181,12 @@ class PyNameResolver : public GCode::NameResolver {
 
 public:
   PyNameResolver(PyObject *cb) : cb(cb) {
+    Py_INCREF(cb);
     if (!PyCallable_Check(cb)) THROW("Object not callable");
   }
+
+
+  ~PyNameResolver() {Py_DECREF(cb);}
 
 
   // From NameResolver
