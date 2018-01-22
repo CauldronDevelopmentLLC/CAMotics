@@ -54,7 +54,7 @@ FileTabManager::FileTabManager(QWidget *parent) :
 }
 
 
-void FileTabManager::open(const cb::SmartPointer<NCFile> &file,
+void FileTabManager::open(const SmartPointer<NCFile> &file,
                           int line, int col) {
   // Check if we already have this file open in a tab
   unsigned tab;

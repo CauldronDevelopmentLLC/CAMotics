@@ -33,22 +33,22 @@ void CompositeSweep::add(const SmartPointer<Sweep> &sweep, double zOffset) {
 }
 
 
-void CompositeSweep::getBBoxes(const cb::Vector3D &start,
-                               const cb::Vector3D &end,
-                               vector<cb::Rectangle3D> &bboxes,
+void CompositeSweep::getBBoxes(const Vector3D &start,
+                               const Vector3D &end,
+                               vector<Rectangle3D> &bboxes,
                                double tolerance) const {
   for (unsigned i = 0; i < children.size(); i++)
     children[i]->getBBoxes(start, end, bboxes, tolerance);
 }
 
 
-double CompositeSweep::depth(const cb::Vector3D &start, const cb::Vector3D &end,
-                             const cb::Vector3D &p) const {
+double CompositeSweep::depth(const Vector3D &start, const Vector3D &end,
+                             const Vector3D &p) const {
   double d2 = -numeric_limits<double>::max();
 
   for (unsigned i = 0; i < children.size(); i++) {
     double cd2 =
-      children[i]->depth(start, end, p - cb::Vector3D(0, 0, zOffsets[i]));
+      children[i]->depth(start, end, p - Vector3D(0, 0, zOffsets[i]));
     if (d2 < cd2) d2 = cd2;
   }
 

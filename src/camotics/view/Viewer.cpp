@@ -50,7 +50,7 @@ void Viewer::draw(const View &view) {
     !view.machine.isNull() && view.isFlagSet(View::SHOW_MACHINE_FLAG);
 
   // Setup view port
-  cb::Rectangle3D bounds = view.path->getBounds();
+  Rectangle3D bounds = view.path->getBounds();
   if (!surface.isNull()) bounds.add(surface->getBounds());
   bounds.add(view.workpiece->getBounds());
   if (showMachine) bounds.add(view.machine->getBounds());
@@ -59,7 +59,7 @@ void Viewer::draw(const View &view) {
   // Enable Lighting
   view.setLighting(true);
 
-  cb::Vector3D currentPosition = view.path->getPosition();
+  Vector3D currentPosition = view.path->getPosition();
   glFuncs.glPushMatrix();
 
   if (showMachine) {

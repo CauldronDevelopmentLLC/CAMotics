@@ -29,12 +29,12 @@ using namespace cb;
 using namespace CAMotics;
 
 
-cb::Vector3D FieldFunction::linearIntersect(cb::Vector3D &a, double &aDepth,
-                                            cb::Vector3D &b, double &bDepth) {
+Vector3D FieldFunction::linearIntersect(Vector3D &a, double &aDepth,
+                                            Vector3D &b, double &bDepth) {
   if ((aDepth < 0) == (bDepth < 0))
     THROWS("There is no intersection between points " << a << " & " << b);
 
-  cb::Vector3D mid;
+  Vector3D mid;
 
   // Binary search for intersection point
   for (unsigned i = 0; i < 8; i++) {
@@ -55,9 +55,9 @@ cb::Vector3D FieldFunction::linearIntersect(cb::Vector3D &a, double &aDepth,
 }
 
 
-cb::Vector3D FieldFunction::findNormal(cb::Vector3D &a, double aDepth,
-                                       cb::Vector3D &b, double bDepth) {
-  cb::Vector3D normal;
+Vector3D FieldFunction::findNormal(Vector3D &a, double aDepth,
+                                       Vector3D &b, double bDepth) {
+  Vector3D normal;
 
   // TODO
 
@@ -65,15 +65,15 @@ cb::Vector3D FieldFunction::findNormal(cb::Vector3D &a, double aDepth,
 }
 
 
-bool FieldFunction::cull(const cb::Vector3D &p, double offset) const {
-  return cull(cb::Rectangle3D(p, p).grow(offset));
+bool FieldFunction::cull(const Vector3D &p, double offset) const {
+  return cull(Rectangle3D(p, p).grow(offset));
 }
 
 
-Edge FieldFunction::getEdge(const cb::Vector3D &v1, double depth1,
-                            const cb::Vector3D &v2, double depth2) {
-  cb::Vector3D a = v1;
-  cb::Vector3D b = v2;
+Edge FieldFunction::getEdge(const Vector3D &v1, double depth1,
+                            const Vector3D &v2, double depth2) {
+  Vector3D a = v1;
+  Vector3D b = v2;
 
   Edge e;
   e.vertex = linearIntersect(a, depth1, b, depth2);
@@ -83,8 +83,8 @@ Edge FieldFunction::getEdge(const cb::Vector3D &v1, double depth1,
 }
 
 
-Edge FieldFunction::getEdge(const cb::Vector3D &v1, bool inside1,
-                            const cb::Vector3D &v2, bool inside2) {
+Edge FieldFunction::getEdge(const Vector3D &v1, bool inside1,
+                            const Vector3D &v2, bool inside2) {
   return
     getEdge(v1, (double)(inside1 ? 1 : -1), v2, (double)(inside2 ? 1 : -1));
 }

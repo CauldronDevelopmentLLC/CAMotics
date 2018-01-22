@@ -20,6 +20,7 @@
 
 #include "OCode.h"
 
+using namespace std;
 using namespace GCode;
 
 
@@ -28,7 +29,7 @@ double OCode::eval(Evaluator &evaluator) {
 }
 
 
-void OCode::print(std::ostream &stream) const {
+void OCode::print(ostream &stream) const {
   stream << 'O';
 
   if (numExpr.isNull()) stream << filename;

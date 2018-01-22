@@ -83,7 +83,7 @@ SmartPointer<Task> ConcurrentTaskManager::remove() {
   SmartLock lock(this);
 
   if (done.empty()) return 0;
-  cb::SmartPointer<Task> task = done.front();
+  SmartPointer<Task> task = done.front();
   done.pop_front();
 
   return task;
@@ -140,7 +140,7 @@ void ConcurrentTaskManager::stop() {
 }
 
 
-void ConcurrentTaskManager::complete(const cb::SmartPointer<Task> &task) {
+void ConcurrentTaskManager::complete(const SmartPointer<Task> &task) {
   SmartLock lock(this);
 
   if (task->shouldQuit()) return;

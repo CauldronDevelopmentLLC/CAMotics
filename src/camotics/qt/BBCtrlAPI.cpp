@@ -161,7 +161,7 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
 
     if (updatePosition) {
       uint32_t line = vars.getS32("ln", 0);
-      cb::Vector3D position(vars.getNumber("xp", 0),
+      Vector3D position(vars.getNumber("xp", 0),
                         vars.getNumber("yp", 0),
                         vars.getNumber("zp", 0));
 

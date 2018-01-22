@@ -67,7 +67,7 @@ TPLContext::TPLContext(ostream &out, GCode::MachineInterface &machine,
 }
 
 
-void TPLContext::pushPath(const std::string &path) {
+void TPLContext::pushPath(const string &path) {
   Javascript::pushPath(path);
   machine.setLocation(FileLocation(path));
 }

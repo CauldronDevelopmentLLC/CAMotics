@@ -196,7 +196,7 @@ void TriangleSurface::clear() {
   vertices.clear();
   normals.clear();
 
-  bounds = cb::Rectangle3D();
+  bounds = Rectangle3D();
 }
 
 

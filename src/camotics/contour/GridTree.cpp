@@ -38,22 +38,22 @@ GridTree::~GridTree() {}
 
 
 void GridTree::partition(vector<GridTreeRef> &grids,
-                         const cb::Rectangle3D &bbox, unsigned count) {
-  cb::Rectangle3D bounds = getBounds();
+                         const Rectangle3D &bbox, unsigned count) {
+  Rectangle3D bounds = getBounds();
   if (isEmpty() || !bbox.intersects(bounds)) return;
 
   if (count < 2) {
-    cb::Vector3U offset;
-    cb::Vector3U steps(getSteps());
+    Vector3U offset;
+    Vector3U steps(getSteps());
 
-    cb::Rectangle3D intersection = bbox.intersection(bounds);
+    Rectangle3D intersection = bbox.intersection(bounds);
     if (intersection != bounds) {
       intersection = (intersection - getOffset()) / getResolution();
 
-      cb::Rectangle3U iBounds(intersection.rmin.floor(),
+      Rectangle3U iBounds(intersection.rmin.floor(),
                           intersection.rmax.ceil());
       offset = iBounds.rmin;
-      cb::Vector3U dims = iBounds.getDimensions();
+      Vector3U dims = iBounds.getDimensions();
 
       // Don't let new steps exceed old
       for (unsigned i = 0; i < 3; i++)
@@ -75,6 +75,6 @@ void GridTree::partition(vector<GridTreeRef> &grids,
 }
 
 
-void GridTree::insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset) {
+void GridTree::insertLeaf(GridTreeLeaf *leaf, const Vector3U &offset) {
   GridTreeNode::insertLeaf(leaf, getSteps(), offset);
 }

@@ -49,7 +49,7 @@ void TransMatrix::identity() {
 }
 
 
-void TransMatrix::scale(const cb::Vector3D &o) {
+void TransMatrix::scale(const Vector3D &o) {
   Matrix4x4D t;
 
   for (unsigned j = 0; j < 3; j++) {
@@ -67,7 +67,7 @@ void TransMatrix::scale(const cb::Vector3D &o) {
 }
 
 
-void TransMatrix::translate(const cb::Vector3D &o) {
+void TransMatrix::translate(const Vector3D &o) {
   Matrix4x4D t;
 
   for (unsigned j = 0; j < 3; j++) {
@@ -86,8 +86,8 @@ void TransMatrix::translate(const cb::Vector3D &o) {
 
 
 namespace {
-  void makeRotationMatrix(Matrix4x4D &r, double angle, const cb::Vector3D &m,
-                          const cb::Vector3D &n) {
+  void makeRotationMatrix(Matrix4x4D &r, double angle, const Vector3D &m,
+                          const Vector3D &n) {
     double co = cos(angle);
     double si = sin(angle);
     double l = 1.0 - co;
@@ -121,14 +121,14 @@ namespace {
 }
 
 
-void TransMatrix::rotate(double angle, const cb::Vector3D &_v,
-                         const cb::Vector3D &_u) {
+void TransMatrix::rotate(double angle, const Vector3D &_v,
+                         const Vector3D &_u) {
   if (!angle) return;
   if (!_v[0] && !_v[1] && !_v[2]) THROW("Invalid rotation axis (0,0,0)");
 
-  cb::Vector3D v = _v;
+  Vector3D v = _v;
   v = v.normalize();
-  cb::Vector3D u = transform(_u);
+  Vector3D u = transform(_u);
 
   Matrix4x4D t;
 
@@ -139,10 +139,10 @@ void TransMatrix::rotate(double angle, const cb::Vector3D &_v,
 }
 
 
-void TransMatrix::reflect(const cb::Vector3D &_o) {
+void TransMatrix::reflect(const Vector3D &_o) {
   Matrix4x4D t;
 
-  cb::Vector3D o = transform(_o);
+  Vector3D o = transform(_o);
 
   t[0][0] = 1 - 2 * o[0] * o[0];
   t[0][1] = t[1][0] = -2 * o[0] * o[1];
@@ -157,11 +157,11 @@ void TransMatrix::reflect(const cb::Vector3D &_o) {
 }
 
 
-cb::Vector3D TransMatrix::transform(const cb::Vector3D &p) const {
+Vector3D TransMatrix::transform(const Vector3D &p) const {
   return (m * Vector4D(p, 1)).slice<3>();
 }
 
 
-cb::Vector3D TransMatrix::invert(const cb::Vector3D &p) const {
+Vector3D TransMatrix::invert(const Vector3D &p) const {
   return (i * Vector4D(p, 1)).slice<3>();
 }

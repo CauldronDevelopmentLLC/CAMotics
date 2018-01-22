@@ -57,7 +57,7 @@ void Planner::mdi(const string &gcode) {
 }
 
 
-void Planner::load(const cb::InputSource &source) {
+void Planner::load(const InputSource &source) {
   if (isRunning()) THROW("Planner already running");
   runner = new Runner(*this, source);
   pipeline.start();

@@ -65,7 +65,7 @@ void View::setToolPath(const SmartPointer<GCode::ToolPath> &toolPath) {
 }
 
 
-void View::setWorkpiece(const cb::Rectangle3D &bounds) {
+void View::setWorkpiece(const Rectangle3D &bounds) {
   workpiece->setBounds(bounds);
 }
 
@@ -112,7 +112,7 @@ bool View::update() {
 
 void View::clear() {
   setToolPath(0);
-  setWorkpiece(cb::Rectangle3D());
+  setWorkpiece(Rectangle3D());
   setSurface(0);
   setMoveLookup(0);
   resetView();

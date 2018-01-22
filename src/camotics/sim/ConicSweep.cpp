@@ -25,6 +25,7 @@
 #include <limits>
 
 using namespace std;
+using namespace cb;
 using namespace CAMotics;
 
 
@@ -34,8 +35,8 @@ ConicSweep::ConicSweep(double length, double radius1, double radius2) :
 }
 
 
-void ConicSweep::getBBoxes(const cb::Vector3D &start, const cb::Vector3D &end,
-                           vector<cb::Rectangle3D> &bboxes,
+void ConicSweep::getBBoxes(const Vector3D &start, const Vector3D &end,
+                           vector<Rectangle3D> &bboxes,
                            double tolerance) const {
   Sweep::getBBoxes(start, end, bboxes, rt < rb ? rb : rt, l, 0, tolerance);
 }
@@ -46,8 +47,8 @@ namespace {
 }
 
 
-double ConicSweep::depth(const cb::Vector3D &A, const cb::Vector3D &B,
-                         const cb::Vector3D &P) const {
+double ConicSweep::depth(const Vector3D &A, const Vector3D &B,
+                         const Vector3D &P) const {
   const double Ax = A.x(), Ay = A.y(), Az = A.z();
   const double Bx = B.x(), By = B.y(), Bz = B.z();
   const double Px = P.x(), Py = P.y(), Pz = P.z();

@@ -27,11 +27,11 @@ using namespace cb;
 using namespace CAMotics;
 
 
-GridTreeRef::GridTreeRef(GridTree *ref, const cb::Vector3U &offset,
-                         const cb::Vector3U &steps) : ref(ref), offset(offset) {
+GridTreeRef::GridTreeRef(GridTree *ref, const Vector3U &offset,
+                         const Vector3U &steps) : ref(ref), offset(offset) {
 
   setResolution(ref->getResolution());
-  setOffset(ref->getOffset() + (cb::Vector3D)offset * ref->getResolution());
+  setOffset(ref->getOffset() + (Vector3D)offset * ref->getResolution());
   setSteps(steps);
 }
 
@@ -41,7 +41,7 @@ unsigned GridTreeRef::getCount() const {
 }
 
 
-void GridTreeRef::insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset) {
+void GridTreeRef::insertLeaf(GridTreeLeaf *leaf, const Vector3U &offset) {
   ref->insertLeaf(leaf, this->offset + offset);
 }
 

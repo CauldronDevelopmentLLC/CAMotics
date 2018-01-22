@@ -43,7 +43,7 @@ namespace {
 
 OCodeInterpreter::
 OCodeInterpreter(Controller &controller,
-                 const cb::SmartPointer<Interrupter> &interrupter) :
+                 const SmartPointer<Interrupter> &interrupter) :
   GCodeInterpreter(controller), interrupter(interrupter), condition(true) {}
 
 
@@ -201,7 +201,7 @@ void OCodeInterpreter::doWhile(OCode *ocode) {
   checkExpressions(ocode, "while", 1);
 
   const OCode::expressions_t &expressions = ocode->getExpressions();
-  cb::SmartPointer<Entity> expr = expressions.empty() ? 0 : expressions[0];
+  SmartPointer<Entity> expr = expressions.empty() ? 0 : expressions[0];
 
   if (loopEnd == "while" && loopNumber == ocode->getNumber()) {
     SmartPointer<Program> loop = this->loop;

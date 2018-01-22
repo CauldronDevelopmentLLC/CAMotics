@@ -243,7 +243,7 @@ void QtWin::init() {
 
 void QtWin::setUnitLabel(QLabel *label, double value, int precision,
                          bool withUnit) {
-  if (std::numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
+  if (numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
       Math::isnan(value)) {
     label->setText("nan");
     return;
@@ -946,7 +946,7 @@ void QtWin::newProject() {
 }
 
 
-static bool is_xml(const std::string &filename) {
+static bool is_xml(const string &filename) {
   try {
     if (!SystemUtilities::exists(filename))
       return SystemUtilities::extension(filename) == "xml";
@@ -1414,7 +1414,7 @@ void QtWin::loadWorkpiece() {
 
   // Bounds
   double scale = isMetric() ? 1 : 1 / 25.4;
-  cb::Rectangle3D bounds = project->getWorkpieceBounds();
+  Rectangle3D bounds = project->getWorkpieceBounds();
   ui->xDimDoubleSpinBox->setValue(bounds.getDimensions().x() * scale);
   ui->yDimDoubleSpinBox->setValue(bounds.getDimensions().y() * scale);
   ui->zDimDoubleSpinBox->setValue(bounds.getDimensions().z() * scale);
@@ -1446,7 +1446,7 @@ void QtWin::loadWorkpiece() {
 
 void QtWin::setWorkpieceDim(unsigned dim, double value) {
   double scale = isMetric() ? 1 : 25.4;
-  cb::Rectangle3D bounds = project->getWorkpieceBounds();
+  Rectangle3D bounds = project->getWorkpieceBounds();
   bounds.rmax[dim] = bounds.rmin[dim] + value * scale;
   project->setWorkpieceBounds(bounds);
 
@@ -1457,7 +1457,7 @@ void QtWin::setWorkpieceDim(unsigned dim, double value) {
 
 void QtWin::setWorkpieceOffset(unsigned dim, double value) {
   double scale = isMetric() ? 1 : 25.4;
-  cb::Rectangle3D bounds = project->getWorkpieceBounds();
+  Rectangle3D bounds = project->getWorkpieceBounds();
   bounds.rmax[dim] = bounds.getDimension(dim) + value * scale;
   bounds.rmin[dim] = value * scale;
   project->setWorkpieceBounds(bounds);
@@ -1474,10 +1474,10 @@ void QtWin::updateBounds() {
 
 
 void QtWin::updateToolPathBounds() {
-  cb::Rectangle3D bounds = *toolPath;
-  cb::Vector3D bMin = bounds.getMin();
-  cb::Vector3D bMax = bounds.getMax();
-  cb::Vector3D bDim = bounds.getDimensions();
+  Rectangle3D bounds = *toolPath;
+  Vector3D bMin = bounds.getMin();
+  Vector3D bMax = bounds.getMax();
+  Vector3D bDim = bounds.getDimensions();
 
   setUnitLabel(ui->toolPathBoundsXMinLabel, bMin.x());
   setUnitLabel(ui->toolPathBoundsXMaxLabel, bMax.x());
@@ -1496,10 +1496,10 @@ void QtWin::updateToolPathBounds() {
 void QtWin::updateWorkpieceBounds() {
   if (project.isNull()) return;
 
-  cb::Rectangle3D bounds = project->getWorkpieceBounds();
-  cb::Vector3D bMin = bounds.getMin();
-  cb::Vector3D bMax = bounds.getMax();
-  cb::Vector3D bDim = bounds.getDimensions();
+  Rectangle3D bounds = project->getWorkpieceBounds();
+  Vector3D bMin = bounds.getMin();
+  Vector3D bMax = bounds.getMax();
+  Vector3D bDim = bounds.getDimensions();
 
   setUnitLabel(ui->workpieceBoundsXMinLabel, bMin.x());
   setUnitLabel(ui->workpieceBoundsXMaxLabel, bMax.x());
@@ -1557,7 +1557,7 @@ void QtWin::updatePlaySpeed(const string &name, unsigned value) {
 }
 
 
-void QtWin::updateViewFlags(const std::string &name, unsigned flags) {
+void QtWin::updateViewFlags(const string &name, unsigned flags) {
   ui->actionPlay->setIcon(flags & View::PLAY_FLAG ? pauseIcon : playIcon);
   ui->actionPlay->setText(flags & View::PLAY_FLAG ? "Pause" : "Play");
 }
@@ -1645,7 +1645,7 @@ void QtWin::updateFeed(const string &name, double value) {
 
 
 void QtWin::updateSpeed(const string &name, double value) {
-  if (std::numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
+  if (numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
       Math::isnan(value)) ui->speedLabel->setText("nan");
   else ui->speedLabel->setText(QString().sprintf("%.2f RPM", value));
 }

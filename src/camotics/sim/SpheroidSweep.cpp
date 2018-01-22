@@ -25,20 +25,21 @@
 #include <algorithm>
 
 using namespace std;
+using namespace cb;
 using namespace CAMotics;
 
 
 SpheroidSweep::SpheroidSweep(double radius, double length) :
   radius(radius), length(length == -1 ? radius : length) {
 
-  if (2 * radius != length) scale = cb::Vector3D(1, 1, 2 * radius / length);
+  if (2 * radius != length) scale = Vector3D(1, 1, 2 * radius / length);
   radius2 = radius * radius;
 }
 
 
-void SpheroidSweep::getBBoxes(const cb::Vector3D &start,
-                              const cb::Vector3D &end,
-                              vector<cb::Rectangle3D> &bboxes,
+void SpheroidSweep::getBBoxes(const Vector3D &start,
+                              const Vector3D &end,
+                              vector<Rectangle3D> &bboxes,
                               double tolerance) const {
   Sweep::getBBoxes(start, end, bboxes, radius, length, -radius, tolerance);
 }
@@ -49,13 +50,13 @@ namespace {
 }
 
 
-double SpheroidSweep::depth(const cb::Vector3D &_A, const cb::Vector3D &_B,
-                            const cb::Vector3D &_P) const {
+double SpheroidSweep::depth(const Vector3D &_A, const Vector3D &_B,
+                            const Vector3D &_P) const {
   const double r = radius;
 
-  cb::Vector3D A = _A;
-  cb::Vector3D B = _B;
-  cb::Vector3D P = _P;
+  Vector3D A = _A;
+  Vector3D B = _B;
+  Vector3D P = _P;
 
   // Handle oblong spheroids by scaling the z-axis
   if (2 * radius != length) {
@@ -68,12 +69,12 @@ double SpheroidSweep::depth(const cb::Vector3D &_A, const cb::Vector3D &_B,
   if (P.z() < min(A.z(), B.z()) || max(A.z(), B.z()) + 2 * r < P.z())
     return -1;
 
-  const cb::Vector3D AB = B - A;
-  const cb::Vector3D PA = A - P;
+  const Vector3D AB = B - A;
+  const Vector3D PA = A - P;
 
   // epsilon * beta^2 + gamma * beta + rho = 0
   const double epsilon = AB.dot(AB);
-  const double gamma = AB.dot(PA + cb::Vector3D(0, 0, r));
+  const double gamma = AB.dot(PA + Vector3D(0, 0, r));
   const double rho = PA.dot(PA) + 2 * r * (A.z() - P.z());
   const double sigma = sqr(gamma) - epsilon * rho;
 

@@ -49,7 +49,7 @@ void GCodeInterpreter::setReference(unsigned num, double value) {
 }
 
 
-void GCodeInterpreter::setReference(const std::string &name, double value) {
+void GCodeInterpreter::setReference(const string &name, double value) {
   LOG_DEBUG(3, "Set global variable #<" << name << "> = " << value);
   controller.set(name, value);
 }

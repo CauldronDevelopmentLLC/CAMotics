@@ -140,8 +140,8 @@ void ToolPath::move(GCode::Move &move) {
   push_back(move);
 
   // Bounds
-  cb::Rectangle3D::add(move.getStartPt());
-  cb::Rectangle3D::add(move.getEndPt());
+  Rectangle3D::add(move.getStartPt());
+  Rectangle3D::add(move.getEndPt());
 
   time += move.getTime();
   distance += move.getDistance();

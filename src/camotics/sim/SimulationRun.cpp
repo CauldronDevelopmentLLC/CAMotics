@@ -53,7 +53,7 @@ void SimulationRun::setEndTime(double endTime) {
 
 
 SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
-  cb::Rectangle3D bbox;
+  Rectangle3D bbox;
 
   double start = task->getTime();
 

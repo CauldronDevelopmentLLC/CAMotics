@@ -25,14 +25,14 @@ using namespace cb;
 using namespace CAMotics;
 
 
-Workpiece::Workpiece(const cb::Rectangle3D &r) :
-  cb::Rectangle3D(r), center(r.getCenter()) {
-  cb::Vector3D halfDim = r.getDimensions() / 2;
+Workpiece::Workpiece(const Rectangle3D &r) :
+  Rectangle3D(r), center(r.getCenter()) {
+  Vector3D halfDim = r.getDimensions() / 2;
   halfDim2 = halfDim * halfDim;
 }
 
 
-double Workpiece::depth(const cb::Vector3D &p) const {
+double Workpiece::depth(const Vector3D &p) const {
   double d2 = p.distanceSquared(closestPointOnSurface(p));
-  return cb::Rectangle3D::contains(p) ? d2 : -d2;
+  return Rectangle3D::contains(p) ? d2 : -d2;
 }

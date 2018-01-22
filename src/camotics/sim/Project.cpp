@@ -41,7 +41,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-Project::Project(Options &_options, const std::string &filename) :
+Project::Project(Options &_options, const string &filename) :
   options(_options), filename(filename), workpieceMargin(5), watch(true),
   lastWatch(0), dirty(false) {
 
@@ -138,8 +138,8 @@ void Project::setResolution(double x) {
 }
 
 
-double Project::computeResolution(ResolutionMode mode, cb::Rectangle3D bounds) {
-  if (mode == ResolutionMode::RESOLUTION_MANUAL || bounds == cb::Rectangle3D())
+double Project::computeResolution(ResolutionMode mode, Rectangle3D bounds) {
+  if (mode == ResolutionMode::RESOLUTION_MANUAL || bounds == Rectangle3D())
     return 1;
 
   double divisor;
@@ -269,11 +269,11 @@ bool Project::checkFiles() {
 void Project::updateAutomaticWorkpiece(GCode::ToolPath &path) {
   if (!getAutomaticWorkpiece()) return;
   setAutomaticWorkpiece(true);
-  cb::Rectangle3D wpBounds;
+  Rectangle3D wpBounds;
 
   // Guess workpiece bounds from cutting moves
   vector<SmartPointer<Sweep> > sweeps;
-  vector<cb::Rectangle3D> bboxes;
+  vector<Rectangle3D> bboxes;
 
   for (unsigned i = 0; i < path.size(); i++) {
     const GCode::Move &move = path.at(i);
@@ -292,23 +292,23 @@ void Project::updateAutomaticWorkpiece(GCode::ToolPath &path) {
 
   for (unsigned i = 0; i < bboxes.size(); i++) wpBounds.add(bboxes[i]);
 
-  if (wpBounds == cb::Rectangle3D()) return;
+  if (wpBounds == Rectangle3D()) return;
 
   // Start from z = 0
-  cb::Vector3D bMin = wpBounds.getMin();
-  cb::Vector3D bMax = wpBounds.getMax();
-  wpBounds = cb::Rectangle3D(bMin, cb::Vector3D(bMax.x(), bMax.y(), 0));
+  Vector3D bMin = wpBounds.getMin();
+  Vector3D bMax = wpBounds.getMax();
+  wpBounds = Rectangle3D(bMin, Vector3D(bMax.x(), bMax.y(), 0));
 
   // At least 2mm thick
   if (wpBounds.getHeight() < 2)
-    wpBounds.add(cb::Vector3D(bMin.x(), bMin.y(), bMin.z() - 2));
+    wpBounds.add(Vector3D(bMin.x(), bMin.y(), bMin.z() - 2));
 
   if (wpBounds.isReal()) {
     // Margin
-    cb::Vector3D margin =
+    Vector3D margin =
       wpBounds.getDimensions() * getWorkpieceMargin() / 100.0;
     wpBounds.add(wpBounds.getMin() - margin);
-    wpBounds.add(wpBounds.getMax() + cb::Vector3D(margin.x(), margin.y(), 0));
+    wpBounds.add(wpBounds.getMax() + Vector3D(margin.x(), margin.y(), 0));
 
     setWorkpieceBounds(wpBounds);
   }
@@ -335,7 +335,7 @@ void Project::setWorkpieceMargin(double x) {
 }
 
 
-void Project::setWorkpieceBounds(const cb::Rectangle3D &bounds) {
+void Project::setWorkpieceBounds(const Rectangle3D &bounds) {
   options["workpiece-min"].set(bounds.getMin().toString());
   options["workpiece-max"].set(bounds.getMax().toString());
   updateResolution();
@@ -344,12 +344,12 @@ void Project::setWorkpieceBounds(const cb::Rectangle3D &bounds) {
 }
 
 
-cb::Rectangle3D Project::getWorkpieceBounds() const {
-  cb::Vector3D wpMin =
-    workpieceMin.empty() ? cb::Vector3D() : cb::Vector3D(workpieceMin);
-  cb::Vector3D wpMax =
-    workpieceMax.empty() ? cb::Vector3D() : cb::Vector3D(workpieceMax);
-  return cb::Rectangle3D(wpMin, wpMax);
+Rectangle3D Project::getWorkpieceBounds() const {
+  Vector3D wpMin =
+    workpieceMin.empty() ? Vector3D() : Vector3D(workpieceMin);
+  Vector3D wpMax =
+    workpieceMax.empty() ? Vector3D() : Vector3D(workpieceMax);
+  return Rectangle3D(wpMin, wpMax);
 }
 
 

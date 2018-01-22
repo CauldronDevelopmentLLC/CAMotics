@@ -23,10 +23,11 @@
 #include <cbang/Zap.h>
 
 using namespace std;
+using namespace cb;
 using namespace CAMotics;
 
 
-OctTree::OctNode::OctNode(const cb::Rectangle3D &bounds, unsigned depth) :
+OctTree::OctNode::OctNode(const Rectangle3D &bounds, unsigned depth) :
   bounds(bounds), depth(depth) {
   for (int i = 0; i < 8; i++) children[i] = 0;
 }
@@ -39,7 +40,7 @@ OctTree::OctNode::~OctNode() {
 
 
 void OctTree::OctNode::insert(const GCode::Move *move,
-                              const cb::Rectangle3D &bbox) {
+                              const Rectangle3D &bbox) {
   if (!bounds.intersects(bbox)) return;
 
   if (!depth || bbox.contains(bounds)) {
@@ -47,23 +48,23 @@ void OctTree::OctNode::insert(const GCode::Move *move,
     return;
   }
 
-  cb::Vector3D dims = bounds.getDimensions();
+  Vector3D dims = bounds.getDimensions();
 
-  static cb::Vector3D cubes[16] = {
-    cb::Vector3D(0.0, 0.0, 0.0), cb::Vector3D(0.5, 0.5, 0.5),
-    cb::Vector3D(0.5, 0.0, 0.0), cb::Vector3D(1.0, 0.5, 0.5),
-    cb::Vector3D(0.0, 0.5, 0.0), cb::Vector3D(0.5, 1.0, 0.5),
-    cb::Vector3D(0.5, 0.5, 0.0), cb::Vector3D(1.0, 1.0, 0.5),
+  static Vector3D cubes[16] = {
+    Vector3D(0.0, 0.0, 0.0), Vector3D(0.5, 0.5, 0.5),
+    Vector3D(0.5, 0.0, 0.0), Vector3D(1.0, 0.5, 0.5),
+    Vector3D(0.0, 0.5, 0.0), Vector3D(0.5, 1.0, 0.5),
+    Vector3D(0.5, 0.5, 0.0), Vector3D(1.0, 1.0, 0.5),
 
-    cb::Vector3D(0.0, 0.0, 0.5), cb::Vector3D(0.5, 0.5, 1.0),
-    cb::Vector3D(0.5, 0.0, 0.5), cb::Vector3D(1.0, 0.5, 1.0),
-    cb::Vector3D(0.0, 0.5, 0.5), cb::Vector3D(0.5, 1.0, 1.0),
-    cb::Vector3D(0.5, 0.5, 0.5), cb::Vector3D(1.0, 1.0, 1.0),
+    Vector3D(0.0, 0.0, 0.5), Vector3D(0.5, 0.5, 1.0),
+    Vector3D(0.5, 0.0, 0.5), Vector3D(1.0, 0.5, 1.0),
+    Vector3D(0.0, 0.5, 0.5), Vector3D(0.5, 1.0, 1.0),
+    Vector3D(0.5, 0.5, 0.5), Vector3D(1.0, 1.0, 1.0),
   };
 
   for (int i = 0; i < 8; i++) {
     if (!children[i]) {
-      cb::Rectangle3D cBounds(bounds.getMin() + dims * cubes[i * 2],
+      Rectangle3D cBounds(bounds.getMin() + dims * cubes[i * 2],
                           bounds.getMin() + dims * cubes[i * 2 + 1]);
       children[i] = new OctNode(cBounds, depth - 1);
     }
@@ -73,7 +74,7 @@ void OctTree::OctNode::insert(const GCode::Move *move,
 }
 
 
-bool OctTree::OctNode::intersects(const cb::Rectangle3D &r) const {
+bool OctTree::OctNode::intersects(const Rectangle3D &r) const {
   if (!bounds.intersects(r)) return false;
   if (!moves.empty()) return true;
 
@@ -86,7 +87,7 @@ bool OctTree::OctNode::intersects(const cb::Rectangle3D &r) const {
 }
 
 
-void OctTree::OctNode::collisions(const cb::Vector3D &p,
+void OctTree::OctNode::collisions(const Vector3D &p,
                                   vector<const GCode::Move *> &moves) const {
   if (!bounds.contains(p)) return;
 
@@ -98,11 +99,11 @@ void OctTree::OctNode::collisions(const cb::Vector3D &p,
 }
 
 
-OctTree::OctTree(const cb::Rectangle3D &bounds, unsigned depth) {
+OctTree::OctTree(const Rectangle3D &bounds, unsigned depth) {
   double m = bounds.getDimensions().max();
 
-  root = new OctNode(cb::Rectangle3D(bounds.getMin(), bounds.getMin() +
-                                 cb::Vector3D(m, m, m)), depth);
+  root = new OctNode(Rectangle3D(bounds.getMin(), bounds.getMin() +
+                                 Vector3D(m, m, m)), depth);
 }
 
 
@@ -111,18 +112,18 @@ OctTree::~OctTree() {
 }
 
 
-void OctTree::insert(const GCode::Move *move, const cb::Rectangle3D &bbox) {
+void OctTree::insert(const GCode::Move *move, const Rectangle3D &bbox) {
   this->bbox.add(bbox);
   root->insert(move, bbox);
 }
 
 
-bool OctTree::intersects(const cb::Rectangle3D &r) const {
+bool OctTree::intersects(const Rectangle3D &r) const {
   return root->intersects(r);
 }
 
 
-void OctTree::collisions(const cb::Vector3D &p,
+void OctTree::collisions(const Vector3D &p,
                          vector<const GCode::Move *> &moves) const {
   root->collisions(p, moves);
 }

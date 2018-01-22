@@ -25,21 +25,21 @@ using namespace cb;
 using namespace CAMotics;
 
 
-Grid::Grid(const cb::Rectangle3D &bounds, double resolution) :
+Grid::Grid(const Rectangle3D &bounds, double resolution) :
   resolution(resolution), steps((bounds.getDimensions() / resolution).ceil()) {
 
-  cb::Vector3D dims((cb::Vector3D)steps * resolution);
-  offset = bounds.rmin - cb::Vector3D(dims - bounds.getDimensions()) / 2;
+  Vector3D dims((Vector3D)steps * resolution);
+  offset = bounds.rmin - Vector3D(dims - bounds.getDimensions()) / 2;
 }
 
 
-Grid::Grid(const cb::Vector3D &offset, const cb::Vector3U &steps,
+Grid::Grid(const Vector3D &offset, const Vector3U &steps,
            double resolution) :
   offset(offset), resolution(resolution), steps(steps) {}
 
 
-cb::Rectangle3D Grid::getBounds() const {
-  return cb::Rectangle3D(offset, offset + (cb::Vector3D)steps * resolution);
+Rectangle3D Grid::getBounds() const {
+  return Rectangle3D(offset, offset + (Vector3D)steps * resolution);
 }
 
 
@@ -48,15 +48,15 @@ unsigned Grid::getTotalCells() const {
 }
 
 
-Grid Grid::slice(const cb::Vector3U &start) const {
+Grid Grid::slice(const Vector3U &start) const {
   return
-    Grid(offset + (cb::Vector3D)start * resolution, steps - start, resolution);
+    Grid(offset + (Vector3D)start * resolution, steps - start, resolution);
 }
 
 
-Grid Grid::slice(const cb::Vector3U &start, const cb::Vector3U &end) const {
+Grid Grid::slice(const Vector3U &start, const Vector3U &end) const {
   return
-    Grid(offset + (cb::Vector3D)start * resolution, end - start, resolution);
+    Grid(offset + (Vector3D)start * resolution, end - start, resolution);
 }
 
 
@@ -90,12 +90,12 @@ pair<Grid, Grid> Grid::split(unsigned axis) const {
   if (steps[axis] < 2) return result;
 
   // Left
-  cb::Vector3U stepOffset;
+  Vector3U stepOffset;
   stepOffset[axis] = steps[axis] / 2;
   result.first = Grid(offset, steps - stepOffset, resolution);
 
   // Right
-  cb::Vector3D rOffset(offset + (cb::Vector3D)stepOffset * resolution);
+  Vector3D rOffset(offset + (Vector3D)stepOffset * resolution);
   stepOffset = steps - result.first.getSteps();
   result.second = Grid(rOffset, steps - stepOffset, resolution);
 

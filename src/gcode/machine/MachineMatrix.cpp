@@ -54,14 +54,14 @@ void MachineMatrix::loadIdentity(axes_t matrix) {
 
 
 void MachineMatrix::scale(double x, double y, double z, axes_t matrix) {
-  getTransMatrix(matrix).scale(cb::Vector3D(x, y, z));
+  getTransMatrix(matrix).scale(Vector3D(x, y, z));
   updateMatrix(matrix);
 }
 
 
 void MachineMatrix::translate(double x, double y, double z, axes_t matrix) {
   // TODO Need to convert imperial units to metric
-  getTransMatrix(matrix).translate(cb::Vector3D(x, y, z));
+  getTransMatrix(matrix).translate(Vector3D(x, y, z));
   updateMatrix(matrix);
 }
 
@@ -70,13 +70,13 @@ void MachineMatrix::rotate(double angle, double x, double y, double z, double a,
                            double b, double c, axes_t matrix) {
   if (!angle) return;
   getTransMatrix(matrix).
-    rotate(angle, cb::Vector3D(x, y, z), cb::Vector3D(a, b, c));
+    rotate(angle, Vector3D(x, y, z), Vector3D(a, b, c));
   updateMatrix(matrix);
 }
 
 
 void MachineMatrix::reflect(double x, double y, double z, axes_t matrix) {
-  getTransMatrix(matrix).reflect(cb::Vector3D(x, y, z));
+  getTransMatrix(matrix).reflect(Vector3D(x, y, z));
   updateMatrix(matrix);
 }
 
@@ -102,7 +102,7 @@ Axes MachineMatrix::getPosition() const {
 }
 
 
-cb::Vector3D MachineMatrix::getPosition(axes_t axes) const {
+Vector3D MachineMatrix::getPosition(axes_t axes) const {
   return getTransMatrix(axes).invert(MachineAdapter::getPosition(axes));
 }
 
@@ -119,7 +119,7 @@ void MachineMatrix::move(const Axes &axes, bool rapid) {
 }
 
 
-void MachineMatrix::arc(const cb::Vector3D &offset, double angle,
+void MachineMatrix::arc(const Vector3D &offset, double angle,
                         plane_t plane) {
   THROW("MachineMatrix cannot handle arc directly");
 }

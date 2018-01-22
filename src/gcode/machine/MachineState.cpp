@@ -60,7 +60,7 @@ void MachineState::end() {
 }
 
 
-cb::Vector3D MachineState::getPosition(axes_t axes) const {
+Vector3D MachineState::getPosition(axes_t axes) const {
   switch (axes) {
   case XYZ: return position.getXYZ();
   case ABC: return position.getABC();

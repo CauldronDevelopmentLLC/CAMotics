@@ -111,7 +111,7 @@ MatrixModule::axes_t MatrixModule::parseMatrix(const js::Value &args) {
 
 
 void MatrixModule::getXYZ(const js::Value &args, js::Sink &sink) {
-  cb::Vector3D v = ctx.machine.getPosition(XYZ);
+  Vector3D v = ctx.machine.getPosition(XYZ);
 
   sink.beginList();
   sink.append(v.x());

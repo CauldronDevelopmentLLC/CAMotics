@@ -162,8 +162,8 @@ void Opt::extract(GCode::ToolPath &path) const {
 
   for (paths_t::const_iterator it = paths.begin(); it != paths.end() &&
          !shouldQuit(); it++) {
-    cb::Vector3D last = sink.getPosition().getXYZ();
-    cb::Vector3D next = it->startPoint();
+    Vector3D last = sink.getPosition().getXYZ();
+    Vector3D next = it->startPoint();
 
     sink.setTool(it->begin()->getTool());
     sink.setFeed(it->begin()->getFeed());

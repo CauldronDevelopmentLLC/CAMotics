@@ -28,7 +28,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-GridTreeNode::GridTreeNode(const cb::Vector3U &steps) :
+GridTreeNode::GridTreeNode(const Vector3U &steps) :
   left(0), right(0), count(0) {
   // Choose largest axis
   axis = 2;
@@ -46,15 +46,15 @@ GridTreeNode::~GridTreeNode() {
 
 
 namespace {
-  bool atLeaf(const cb::Vector3U &steps) {
+  bool atLeaf(const Vector3U &steps) {
     return steps.x() == 1 && steps.y() == 1 && steps.z() == 1;
   }
 }
 
 
-void GridTreeNode::insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &_steps,
-                              const cb::Vector3U &offset) {
-  cb::Vector3U steps(_steps);
+void GridTreeNode::insertLeaf(GridTreeLeaf *leaf, const Vector3U &_steps,
+                              const Vector3U &offset) {
+  Vector3U steps(_steps);
 
   if (!steps.x() || !steps.y() || !steps.z()) THROW("Empty tree");
 
@@ -74,7 +74,7 @@ void GridTreeNode::insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &_steps,
   } else { // Right
     steps[axis] -= steps[axis] / 2;
 
-    cb::Vector3U rOffset(offset);
+    Vector3U rOffset(offset);
     rOffset[axis] -= split;
 
     if (atLeaf(steps)) {

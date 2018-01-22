@@ -39,7 +39,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-Probe::Probe(Options &options, std::ostream &stream) :
+Probe::Probe(Options &options, ostream &stream) :
   GCode::ControllerImpl((GCode::MachineState &)*this), GCode::Printer(stream),
   interp(*this), gridSize(5), clearHeight(1), probeDepth(-1), probeFeed(5),
   liftOff(false), liftOffFeed(0.5), minMem(2000), maxMem(5400),

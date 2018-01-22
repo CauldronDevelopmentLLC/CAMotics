@@ -37,17 +37,17 @@ TriangleMesh::TriangleMesh(const TriangleMesh &o) :
   vertices(o.vertices), normals(o.normals) {}
 
 
-void TriangleMesh::Vertex::set(const cb::Vector3D &v) {
+void TriangleMesh::Vertex::set(const Vector3D &v) {
   for (unsigned i = 0; i < 3; i++) (*this)[i] = v[i];
 }
 
 
-cb::Vector3D TriangleMesh::Triangle::computeNormal() const {
+Vector3D TriangleMesh::Triangle::computeNormal() const {
   if (!(vertices[0] && vertices[1] && vertices[2]))
     THROW("Triangle has null vertex");
 
-  cb::Vector3D u = *vertices[0] - *vertices[1];
-  cb::Vector3D v = *vertices[1] - *vertices[2];
+  Vector3D u = *vertices[0] - *vertices[1];
+  Vector3D v = *vertices[1] - *vertices[2];
 
   return u.cross(v).normalize();
 }
@@ -111,13 +111,13 @@ void TriangleMesh::Vertex::findNeighbors(VertexSet &neighbors) const {
 }
 
 
-bool TriangleMesh::Vertex::coplaner(const cb::Vector3D &normal,
+bool TriangleMesh::Vertex::coplaner(const Vector3D &normal,
                                     double tolerance) const {
   for (unsigned i = 0; i < triangles.size() - 1; i++) {
     if (triangles[i]->deleted) continue;
 
-    const cb::Vector3D &na = triangles[i]->normal;
-    const cb::Vector3D &nb = triangles[i + 1]->normal;
+    const Vector3D &na = triangles[i]->normal;
+    const Vector3D &nb = triangles[i + 1]->normal;
 
     double cosAngle = na.dot(nb);
     if (cosAngle < 1 - tolerance) {
@@ -182,9 +182,9 @@ void TriangleMesh::reduce(Task &task) {
   vector<SmartPointer<Vertex> > vertices;
   vector<Triangle> triangles(count);
 
-  typedef map<cb::Vector3D, unsigned> unique_vertices_t;
+  typedef map<Vector3D, unsigned> unique_vertices_t;
   unique_vertices_t uniqueVertices;
-  cb::Vector3D v;
+  Vector3D v;
   unsigned index = 0;
 
   for (unsigned i = 0; i < count; i++) {
@@ -226,7 +226,7 @@ void TriangleMesh::reduce(Task &task) {
       Vertex &neighbor = **it;
 
       // Check if adjacent triangles are coplaner
-      cb::Vector3D n = (v - neighbor).normalize();
+      Vector3D n = (v - neighbor).normalize();
       if (!v.coplaner(n)) continue;
       if (!neighbor.coplaner(n)) continue;
 

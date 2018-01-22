@@ -41,7 +41,7 @@ using namespace CAMotics;
 
 
 void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
-                      const cb::Rectangle3D &bbox, unsigned threads,
+                      const Rectangle3D &bbox, unsigned threads,
                       RenderMode mode) {
   typedef list<SmartPointer<RenderJob> > jobs_t;
   jobs_t jobs;

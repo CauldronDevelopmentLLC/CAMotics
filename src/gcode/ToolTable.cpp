@@ -149,12 +149,10 @@ void ToolTable::startElement(const string &name, const XMLAttributes &attrs) {
 }
 
 
-void ToolTable::endElement(const std::string &name) {
-  current = -1;
-}
+void ToolTable::endElement(const string &name) {current = -1;}
 
 
-void ToolTable::text(const std::string &text) {
+void ToolTable::text(const string &text) {
   if (0 <= current) {
     string desc = String::trim(text);
     if (!desc.empty()) {

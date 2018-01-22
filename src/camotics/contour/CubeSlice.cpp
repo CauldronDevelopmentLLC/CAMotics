@@ -42,25 +42,25 @@ void CubeSlice::compute(FieldFunction &func) {
   right->compute(func);
 
   // Edges
-  const cb::Vector3U &steps = grid.getSteps();
+  const Vector3U &steps = grid.getSteps();
   for (unsigned i = 0; i < 5; i++)
     edges[i].resize(steps.x() + 1, vector<Edge>(steps.y() + 1));
 
-  static cb::Vector3U vIndex[5] = {
-    cb::Vector3U(1, 0, 0), // a
-    cb::Vector3U(0, 1, 0), // b
-    cb::Vector3U(0, 0, 1), // c
-    cb::Vector3U(1, 0, 1), // d
-    cb::Vector3U(0, 1, 1), // e
+  static Vector3U vIndex[5] = {
+    Vector3U(1, 0, 0), // a
+    Vector3U(0, 1, 0), // b
+    Vector3U(0, 0, 1), // c
+    Vector3U(1, 0, 1), // d
+    Vector3U(0, 1, 1), // e
   };
 
   double resolution = grid.getResolution();
-  cb::Vector3D offsets[5];
+  Vector3D offsets[5];
   for (unsigned i = 0; i < 5; i++)
-    offsets[i] = (cb::Vector3D)vIndex[i] * resolution;
+    offsets[i] = (Vector3D)vIndex[i] * resolution;
 
   // For each cell
-  cb::Vector3D p(0, 0, grid.getOffset().z() + resolution * z);
+  Vector3D p(0, 0, grid.getOffset().z() + resolution * z);
 
   for (unsigned x = 0; x <= steps.x(); x++) {
     p.x() = grid.getOffset().x() + resolution * x;
@@ -68,7 +68,7 @@ void CubeSlice::compute(FieldFunction &func) {
     for (unsigned y = 0; y <= steps.y(); y++) {
       p.y() = grid.getOffset().y() + resolution * y;
 
-      cb::Vector3D a = p;
+      Vector3D a = p;
       double aDepth = left->depth(x, y);
       bool cull = func.cull(a, 2.1 * resolution);
 
@@ -76,7 +76,7 @@ void CubeSlice::compute(FieldFunction &func) {
         if (x == steps.x() && (i == 0 || i == 3)) continue;
         if (y == steps.y() && (i == 1 || i == 4)) continue;
 
-        cb::Vector3D b = p + offsets[i];
+        Vector3D b = p + offsets[i];
         double bDepth = depth(x, y, vIndex[i]);
 
         if ((aDepth < 0) != (bDepth < 0) && !cull)
@@ -109,11 +109,11 @@ void CubeSlice::shift() {
 
 uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
   // This table maps vertices to the index needed for the marching cubes table.
-  static const cb::Vector3U vOffset[8] = {
-    cb::Vector3U(0, 0, 0), cb::Vector3U(1, 0, 0),
-    cb::Vector3U(1, 1, 0), cb::Vector3U(0, 1, 0),
-    cb::Vector3U(0, 0, 1), cb::Vector3U(1, 0, 1),
-    cb::Vector3U(1, 1, 1), cb::Vector3U(0, 1, 1),
+  static const Vector3U vOffset[8] = {
+    Vector3U(0, 0, 0), Vector3U(1, 0, 0),
+    Vector3U(1, 1, 0), Vector3U(0, 1, 0),
+    Vector3U(0, 0, 1), Vector3U(1, 0, 1),
+    Vector3U(1, 1, 1), Vector3U(0, 1, 1),
   };
 
   uint8_t vertexFlags = 0;
@@ -152,6 +152,6 @@ uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
 }
 
 
-double CubeSlice::depth(int x, int y, const cb::Vector3U &offset) const {
+double CubeSlice::depth(int x, int y, const Vector3U &offset) const {
   return (offset[2] ? right : left)->depth(x + offset.x(), y + offset.y());
 }

@@ -38,7 +38,7 @@ using namespace CAMotics;
 
 
 namespace CAMotics {
-  bool is_xml(const std::string &filename) {
+  bool is_xml(const string &filename) {
     try {
       if (!SystemUtilities::exists(filename))
         return SystemUtilities::extension(filename) == "xml";

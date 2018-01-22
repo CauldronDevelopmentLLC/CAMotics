@@ -27,15 +27,15 @@ using namespace cb;
 using namespace CAMotics;
 
 
-void Sweep::getBBoxes(const cb::Vector3D &start, const cb::Vector3D &end,
-                      vector<cb::Rectangle3D> &bboxes, double radius,
+void Sweep::getBBoxes(const Vector3D &start, const Vector3D &end,
+                      vector<Rectangle3D> &bboxes, double radius,
                       double length, double zOffset, double tolerance) const {
   const unsigned maxLen = radius * 16;
   double len = start.distance(end);
   unsigned steps = (len <= maxLen) ? 1 : (len / maxLen);
   double stride = 1.0 / steps;
-  cb::Vector3D p1 = start;
-  cb::Vector3D p2;
+  Vector3D p1 = start;
+  Vector3D p2;
 
   for (unsigned i = 0; i < steps; i++) {
     for (unsigned j = 0; j < 3; j++)
@@ -49,8 +49,8 @@ void Sweep::getBBoxes(const cb::Vector3D &start, const cb::Vector3D &end,
     double maxZ = std::max(p1.z(), p2.z()) + length + tolerance;
 
     bboxes.push_back
-      (cb::Rectangle3D(cb::Vector3D(minX, minY, minZ),
-                       cb::Vector3D(maxX, maxY, maxZ)));
+      (Rectangle3D(Vector3D(minX, minY, minZ),
+                       Vector3D(maxX, maxY, maxZ)));
 
     p1 = p2;
   }

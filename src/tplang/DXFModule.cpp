@@ -110,7 +110,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
       case DXF::Entity::DXF_POLYLINE: {
         const DXF::PolyLine &polyLine =
           dynamic_cast<const DXF::PolyLine &>(entity);
-        const vector<cb::Vector3D> &vertices = polyLine.getVertices();
+        const vector<Vector3D> &vertices = polyLine.getVertices();
         sink.insertList("vertices");
 
         for (unsigned k = 0; k < vertices.size(); k++) {
@@ -132,7 +132,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         sink.insert("degree", spline.getDegree());
 
         // Control points
-        const vector<cb::Vector3D> &ctrlPts = spline.getControlPoints();
+        const vector<Vector3D> &ctrlPts = spline.getControlPoints();
         sink.insertList("ctrlPts");
 
         for (unsigned k = 0; k < ctrlPts.size(); k++) {

@@ -83,8 +83,8 @@ void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path,
   if (path.isNull() || path->empty()) return;
 
   // Output stats
-  const cb::Rectangle3D &bbox = getBounds();
-  cb::Vector3D dims = bbox.getDimensions();
+  const Rectangle3D &bbox = getBounds();
+  Vector3D dims = bbox.getDimensions();
   LOG_INFO(1, "GCode::Tool Path bounds " << bbox << " dimensions " << dims);
 }
 
@@ -98,7 +98,7 @@ void ToolPathView::setByRatio(double ratio) {
 }
 
 
-void ToolPathView::setByRemote(const cb::Vector3D &position, unsigned line) {
+void ToolPathView::setByRemote(const Vector3D &position, unsigned line) {
   if (!byRemote || this->position != position || this->line != line) {
     byRemote = true;
     this->position = position;
@@ -144,7 +144,7 @@ void ToolPathView::update() {
 
   currentTime = 0;
   currentDistance = 0;
-  currentPosition = byRemote ? position : cb::Vector3D();
+  currentPosition = byRemote ? position : Vector3D();
   currentLine = 0;
   currentMove = GCode::Move();
 
@@ -158,8 +158,8 @@ void ToolPathView::update() {
       GCode::Move move = *it;
       currentMove = move;
 
-      const cb::Vector3D &start = move.getStartPt();
-      cb::Vector3D end = move.getEndPt();
+      const Vector3D &start = move.getStartPt();
+      Vector3D end = move.getEndPt();
       double moveTime = move.getTime();
       double moveDistance = move.getDistance();
       uint32_t moveLine = move.getLine() + 1; // EMC2 counts from zero

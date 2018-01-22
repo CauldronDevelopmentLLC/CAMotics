@@ -35,7 +35,7 @@ CutWorkpiece::CutWorkpiece(const SmartPointer<ToolSweep> &toolSweep,
 bool CutWorkpiece::isValid() const {
   if (workpiece.isValid()) return false;
 
-  cb::Rectangle3D bounds = getBounds();
+  Rectangle3D bounds = getBounds();
   for (unsigned i = 0; i < 3; i++)
     if (Math::isnan(bounds.getMin()[i]) || Math::isnan(bounds.getMax()[i]) ||
         Math::isinf(bounds.getMin()[i]) || Math::isinf(bounds.getMax()[i]))
@@ -45,20 +45,20 @@ bool CutWorkpiece::isValid() const {
 }
 
 
-cb::Rectangle3D CutWorkpiece::getBounds() const {
-  cb::Rectangle3D bb;
+Rectangle3D CutWorkpiece::getBounds() const {
+  Rectangle3D bb;
   if (workpiece.isValid()) bb = workpiece.getBounds();
   else if (!toolSweep.isNull()) bb = toolSweep->getBounds();
   return bb;
 }
 
 
-bool CutWorkpiece::cull(const cb::Rectangle3D &r) const {
+bool CutWorkpiece::cull(const Rectangle3D &r) const {
   return toolSweep->cull(r);
 }
 
 
-double CutWorkpiece::depth(const cb::Vector3D &p) const {
+double CutWorkpiece::depth(const Vector3D &p) const {
   if (!workpiece.isValid()) return toolSweep->depth(p);
   return min(workpiece.depth(p), -toolSweep->depth(p));
 }

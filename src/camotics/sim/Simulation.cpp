@@ -65,7 +65,7 @@ void Simulation::read(const JSON::Value &value) {
   else tools.clear();
 
   if (value.has("workpiece")) workpiece.read(*value.get("workpiece"));
-  else workpiece = cb::Rectangle3D();
+  else workpiece = Rectangle3D();
 
   path = new GCode::ToolPath(tools);
   if (value.has("path")) path->read(*value.get("path"));
@@ -83,7 +83,7 @@ void Simulation::write(JSON::Sink &sink, bool withPath) const {
     tools.write(sink);
   }
 
-  if (workpiece != cb::Rectangle3D()) {
+  if (workpiece != Rectangle3D()) {
     sink.beginInsert("workpiece");
     workpiece.write(sink);
   }

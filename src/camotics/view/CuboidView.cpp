@@ -22,6 +22,7 @@
 
 #include "GL.h"
 
+using namespace cb;
 using namespace CAMotics;
 
 
@@ -36,7 +37,7 @@ CuboidView::~CuboidView() {
 
 
 void CuboidView::draw() {
-  if (bounds == cb::Rectangle3D()) return;
+  if (bounds == Rectangle3D()) return;
 
   static float vertices[] = {
     1, 0, 0,  1, 0, 1,  1, 1, 1,  1, 1, 0,
@@ -92,8 +93,8 @@ void CuboidView::draw() {
 
   glFuncs.glPushMatrix();
 
-  cb::Vector3D bMin = bounds.getMin();
-  cb::Vector3D bDim = bounds.getDimensions();
+  Vector3D bMin = bounds.getMin();
+  Vector3D bDim = bounds.getDimensions();
   glFuncs.glTranslated(bMin.x(), bMin.y(), bMin.z());
   glFuncs.glScaled(bDim.x(), bDim.y(), bDim.z());
 

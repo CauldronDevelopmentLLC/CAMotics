@@ -30,7 +30,7 @@ using namespace std;
 
 Move::Move(MoveType type, const Axes &start, const Axes &end, double startTime,
            int tool, double feed, double speed, unsigned line) :
-  cb::Segment3D(start.getXYZ(), end.getXYZ()), type(type),
+  Segment3D(start.getXYZ(), end.getXYZ()), type(type),
   start(start), end(end), tool(tool), speed(speed), line(line),
   dist(start.distance(end)), startTime(startTime) {
 
@@ -48,7 +48,7 @@ void Move::setFeed(double feed) {
 }
 
 
-cb::Vector3D Move::getPtAtTime(double time) const {
+Vector3D Move::getPtAtTime(double time) const {
   if (getEndTime() <= time) return getEndPt();
   if (time <= getStartTime()) return getStartPt();
 
@@ -57,7 +57,7 @@ cb::Vector3D Move::getPtAtTime(double time) const {
 }
 
 
-void Move::print(std::ostream &stream) const {
+void Move::print(ostream &stream) const {
   stream
     << "type:" << type << ' '
     << "x:" << end.getX() << ' '

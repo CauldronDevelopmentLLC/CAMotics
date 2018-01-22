@@ -155,7 +155,7 @@ void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
   // TODO Handle 'incremental=false'
 
-  cb::Vector3D
+  Vector3D
     offset(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
   double angle = args.getNumber("angle");
   plane_t plane = args.has("plane") ? (plane_t)args.getInteger("plane") : XY;
@@ -322,8 +322,8 @@ void GCodeModule::workpieceCB(const js::Value &args, js::Sink &sink) {
   if (getUnitAdapter().getUnits() == Units::IMPERIAL)
     workpiece = workpiece / 25.4;
 
-  cb::Vector3D dims = workpiece.getDimensions();
-  const cb::Vector3D &offset = workpiece.getMin();
+  Vector3D dims = workpiece.getDimensions();
+  const Vector3D &offset = workpiece.getMin();
 
   sink.beginDict();
 

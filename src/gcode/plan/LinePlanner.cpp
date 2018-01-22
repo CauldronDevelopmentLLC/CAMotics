@@ -235,7 +235,7 @@ void LinePlanner::pushSetCommand(const string &name, const T &value) {
 }
 
 
-void LinePlanner::push(const cb::SmartPointer<PlannerCommand> &cmd) {
+void LinePlanner::push(const SmartPointer<PlannerCommand> &cmd) {
   cmds.push_back(cmd);
   plan(std::prev(cmds.end()));
 }

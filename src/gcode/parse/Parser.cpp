@@ -89,7 +89,7 @@ SmartPointer<Block> Parser::block(GCode::Tokenizer &tokenizer) {
   }
 
   // Children
-  std::vector<SmartPointer<Entity> > children;
+  vector<SmartPointer<Entity> > children;
 
   // O-Code
   if (tokenizer.isID("O")) children.push_back(ocode(tokenizer));

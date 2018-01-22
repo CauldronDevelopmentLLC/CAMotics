@@ -38,7 +38,7 @@ using namespace CAMotics;
 #define EPSILON 1e-5
 
 
-cb::Vector3D QEF::evaluate(double mat[12][3], double vec[12], int rows) {
+Vector3D QEF::evaluate(double mat[12][3], double vec[12], int rows) {
   // perform singular value decomposition on matrix mat into u, v and d.
   //   u is a matrix of rows x 3 (same as mat);
   //   v is a square matrix 3 x 3 (for 3 columns in mat);
@@ -57,7 +57,7 @@ cb::Vector3D QEF::evaluate(double mat[12][3], double vec[12], int rows) {
   double x[3];
   solveSVD(u, v, d, vec, x, rows);
 
-  return cb::Vector3D(x);
+  return Vector3D(x);
 }
 
 

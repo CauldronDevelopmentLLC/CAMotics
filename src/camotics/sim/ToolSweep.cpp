@@ -63,7 +63,7 @@ ToolSweep::ToolSweep(const SmartPointer<GCode::ToolPath> &path,
     LOG_DEBUG(1, "GCode::Moves: first=" << firstMove << " last=" << lastMove);
 
     GCode::ToolTable &tools = path->getTools();
-    vector<cb::Rectangle3D> bboxes;
+    vector<Rectangle3D> bboxes;
 
     // Gather nodes in a list
     for (int i = firstMove; i <= lastMove; i++) {
@@ -76,8 +76,8 @@ ToolSweep::ToolSweep(const SmartPointer<GCode::ToolPath> &path,
       if (sweeps[tool].isNull())
         sweeps[tool] = getSweep(tools.get(tool));
 
-      cb::Vector3D startPt = move.getPtAtTime(startTime);
-      cb::Vector3D endPt = move.getPtAtTime(endTime);
+      Vector3D startPt = move.getPtAtTime(startTime);
+      Vector3D endPt = move.getPtAtTime(endTime);
 
       sweeps[tool]->getBBoxes(startPt, endPt, bboxes);
 
@@ -95,7 +95,7 @@ ToolSweep::ToolSweep(const SmartPointer<GCode::ToolPath> &path,
 }
 
 
-bool ToolSweep::cull(const cb::Rectangle3D &r) const {
+bool ToolSweep::cull(const Rectangle3D &r) const {
   if (change.isNull()) return false;
   return !change->intersects(r);
 }
@@ -110,7 +110,7 @@ namespace {
 }
 
 
-double ToolSweep::depth(const cb::Vector3D &p) const {
+double ToolSweep::depth(const Vector3D &p) const {
   vector<const GCode::Move *> moves;
   collisions(p, moves);
 
@@ -125,8 +125,8 @@ double ToolSweep::depth(const cb::Vector3D &p) const {
     if (move.getEndTime() < startTime || endTime < move.getStartTime())
       continue;
 
-    cb::Vector3D startPt = move.getPtAtTime(startTime);
-    cb::Vector3D endPt = move.getPtAtTime(endTime);
+    Vector3D startPt = move.getPtAtTime(startTime);
+    Vector3D endPt = move.getPtAtTime(endTime);
 
     double sd2 = sweeps[move.getTool()]->depth(startPt, endPt, p);
     if (0 <= sd2) return sd2; // Approx 5% faster

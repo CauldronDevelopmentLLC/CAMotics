@@ -50,7 +50,7 @@ ConsoleWriter::ConsoleWriter(QWidget *parent) : QTextEdit(parent) {
 
 
 void ConsoleWriter::writeToConsole() {
-  // Only access lines while holding cb::Logger lock
+  // Only access lines while holding Logger lock
   SmartLock lock(&Logger::instance());
 
   for (unsigned i = 0; i < lines.size(); i++) {

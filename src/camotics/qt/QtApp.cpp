@@ -69,7 +69,7 @@ int QtApp::init(int argc, char *argv[]) {
   this->argc = argc;
   this->argv = argv;
 
-  int ret = cb::Application::init(argc, argv);
+  int ret = Application::init(argc, argv);
   if (ret < 0) return ret;
 
   QGuiApplication guiApp(argc, argv);

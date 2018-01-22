@@ -41,7 +41,7 @@ AABB::AABB(AABB *nodes) : left(0), right(0), move(0) {
 
   // Compute bounds
   unsigned count = 0;
-  cb::Vector3D cutV;
+  Vector3D cutV;
   for (AABB *it = nodes; it; it = it->left) {
     if (it->right) THROW("Unexpected right-hand AABB node");
     add(*it);
@@ -113,17 +113,17 @@ unsigned AABB::getTreeHeight() const {
 }
 
 
-bool AABB::intersects(const cb::Rectangle3D &r) {
-  if (!cb::Rectangle3D::intersects(r)) return false;
+bool AABB::intersects(const Rectangle3D &r) {
+  if (!Rectangle3D::intersects(r)) return false;
 
   return isLeaf() ||
     (left && left->intersects(r)) || (right && right->intersects(r));
 }
 
 
-void AABB::collisions(const cb::Vector3D &p,
+void AABB::collisions(const Vector3D &p,
                       vector<const GCode::Move *> &moves) {
-  if (!cb::Rectangle3D::contains(p)) return;
+  if (!Rectangle3D::contains(p)) return;
   if (isLeaf()) moves.push_back(move);
   if (left) left->collisions(p, moves);
   if (right) right->collisions(p, moves);

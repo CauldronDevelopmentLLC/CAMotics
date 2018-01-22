@@ -67,7 +67,7 @@ Axes MachineUnitAdapter::getPosition() const {
 }
 
 
-cb::Vector3D MachineUnitAdapter::getPosition(axes_t axes) const {
+Vector3D MachineUnitAdapter::getPosition(axes_t axes) const {
   return MachineAdapter::getPosition(axes) * mmInchIn();
 }
 
@@ -77,7 +77,7 @@ void MachineUnitAdapter::move(const Axes &axes, bool rapid) {
 }
 
 
-void MachineUnitAdapter::arc(const cb::Vector3D &offset, double angle,
+void MachineUnitAdapter::arc(const Vector3D &offset, double angle,
                              plane_t plane) {
   MachineAdapter::arc(offset * mmInchOut(), angle, plane);
 }

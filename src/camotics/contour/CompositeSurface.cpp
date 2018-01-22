@@ -30,9 +30,9 @@ void CompositeSurface::add(SmartPointer<Surface> s) {
 }
 
 
-cb::SmartPointer<Surface> CompositeSurface::consolidate() {
+SmartPointer<Surface> CompositeSurface::consolidate() {
   if (surfaces.size() == 1) return surfaces[0];
-  cb::SmartPointer<Surface> surface = new TriangleSurface(surfaces);
+  SmartPointer<Surface> surface = new TriangleSurface(surfaces);
   surfaces.clear();
   add(surface);
   return surface;
@@ -57,8 +57,8 @@ uint64_t CompositeSurface::getCount() const {
 }
 
 
-cb::Rectangle3D CompositeSurface::getBounds() const {
-  cb::Rectangle3D bounds;
+Rectangle3D CompositeSurface::getBounds() const {
+  Rectangle3D bounds;
   for (unsigned i = 0; i < surfaces.size(); i++)
     bounds.add(surfaces[i]->getBounds());
   return bounds;
