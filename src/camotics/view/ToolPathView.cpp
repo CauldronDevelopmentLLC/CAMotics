@@ -24,6 +24,7 @@
 
 #include <cbang/Exception.h>
 #include <cbang/log/Logger.h>
+#include <cbang/util/DefaultCatch.h>
 
 #include <limits>
 
@@ -61,10 +62,12 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
 
 
 ToolPathView::~ToolPathView() {
-  GLFuncs &glFuncs = getGLFuncs();
+  try {
+    GLFuncs &glFuncs = getGLFuncs();
 
-  if (colorVBuf) glFuncs.glDeleteBuffers(1, &colorVBuf);
-  if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
+    if (colorVBuf) glFuncs.glDeleteBuffers(1, &colorVBuf);
+    if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
+  } CATCH_ERROR;
 }
 
 

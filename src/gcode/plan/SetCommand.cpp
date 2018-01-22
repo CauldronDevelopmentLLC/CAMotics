@@ -18,12 +18,13 @@
 
 \******************************************************************************/
 
-#include "SpeedCommand.h"
+#include "SetCommand.h"
 
-#include <cbang/json/Sink.h>
-
-using namespace GCode;
 using namespace cb;
+using namespace GCode;
 
 
-void SpeedCommand::insert(JSON::Sink &sink) const {sink.insert("speed", speed);}
+void SetCommand::insert(JSON::Sink &sink) const {
+  sink.insert("name", name);
+  sink.insert("value", *value);
+}

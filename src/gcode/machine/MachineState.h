@@ -23,6 +23,10 @@
 
 #include "MachineInterface.h"
 
+#include <gcode/Addresses.h>
+
+#include <map>
+
 
 namespace GCode {
   class MachineState : public MachineInterface {
@@ -40,6 +44,11 @@ namespace GCode {
     Axes position;
 
     cb::Matrix4x4D matrices[AXES_COUNT];
+
+    // Numbered and named parameters
+    double params[MAX_ADDRESS];
+    typedef std::map<std::string, double> named_t;
+    named_t named;
 
     cb::LocationRange location;
 
@@ -79,6 +88,13 @@ namespace GCode {
     void setMatrix(const cb::Matrix4x4D &m, axes_t matrix);
 
     void pause(bool optional) {}
+
+    double get(unsigned addr) const;
+    void set(unsigned addr, double value);
+
+    bool has(const std::string &name) const;
+    double get(const std::string &name) const;
+    void set(const std::string &name, double value);
 
     const cb::LocationRange &getLocation() const {return location;}
     void setLocation(const cb::LocationRange &location)

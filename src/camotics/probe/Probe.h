@@ -74,7 +74,7 @@ namespace CAMotics {
     void outputProbe();
 
     // From GCode::Controller
-    void execute(const GCode::Code &code, int vars);
+    bool execute(const GCode::Code &code, int vars);
 
     // From Processor
     void operator()(const cb::SmartPointer<GCode::Block> &block);

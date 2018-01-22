@@ -190,25 +190,16 @@ void PyThrowIfError(const std::string &msg) {
 
 
 class PyNameResolver : public GCode::NameResolver {
-  PyObject *getCB;
-  PyObject *setCB;
+  PyObject *cb;
 
 public:
-  PyNameResolver(PyObject *getCB, PyObject *setCB) :
-    getCB(getCB), setCB(setCB) {
-
-    Py_INCREF(getCB);
-    Py_INCREF(setCB);
-
-    if (!PyCallable_Check(getCB)) THROW("get() object not callable");
-    if (!PyCallable_Check(setCB)) THROW("set() object not callable");
+  PyNameResolver(PyObject *cb) :cb(cb) {
+    Py_INCREF(cb);
+    if (!PyCallable_Check(cb)) THROW("get() object not callable");
   }
 
 
-  ~PyNameResolver() {
-    Py_DECREF(getCB);
-    Py_DECREF(setCB);
-  }
+  ~PyNameResolver() {Py_DECREF(cb);}
 
 
   // From NameResolver
@@ -220,7 +211,7 @@ public:
     PyTuple_SetItem(args, 0, PyUnicode_FromString(name.c_str()));
 
     // Call
-    PyObject *result = PyObject_Call(getCB, args, 0);
+    PyObject *result = PyObject_Call(cb, args, 0);
     Py_DECREF(args);
 
     // Convert result
@@ -231,26 +222,6 @@ public:
     PyThrowIfError("Name resolver callback failed: ");
 
     return value;
-  }
-
-
-  void set(const std::string &name, double value) {
-    // Args
-    PyObject *args = PyTuple_New(2);
-    if (!args) THROW("Failed to allocate tuple");
-
-    PyTuple_SetItem(args, 0, PyUnicode_FromString(name.c_str()));
-    PyTuple_SetItem(args, 1, PyFloat_FromDouble(value));
-
-    // Call
-    PyObject *result = PyObject_Call(setCB, args, 0);
-    Py_DECREF(args);
-
-    // Convert result
-    if (!result) THROW("Name resolver callback failed");
-    Py_DECREF(result);
-
-    PyThrowIfError("Name resolver callback failed: ");
   }
 };
 
@@ -378,12 +349,11 @@ static PyObject *_set(PyPlanner *self, PyObject *args) {
 
 static PyObject *_set_resolver(PyPlanner *self, PyObject *args) {
   try {
-    PyObject *getCB;
-    PyObject *setCB;
+    PyObject *cb;
 
-    if (!PyArg_ParseTuple(args, "OO", &getCB, &setCB)) return 0;
+    if (!PyArg_ParseTuple(args, "O", &cb)) return 0;
 
-    self->planner->setResolver(new PyNameResolver(getCB, setCB));
+    self->planner->setResolver(new PyNameResolver(cb));
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;

@@ -188,6 +188,15 @@ namespace GCode {
 
     virtual void pause(bool optional = true) = 0;
 
+    // Number parameters
+    virtual double get(unsigned addr) const = 0;
+    virtual void set(unsigned addr, double value) = 0;
+
+    // Named parameters
+    virtual bool has(const std::string &name) const = 0;
+    virtual double get(const std::string &name) const = 0;
+    virtual void set(const std::string &name, double value) = 0;
+
     /// Get program location
     virtual const cb::LocationRange &getLocation() const = 0;
 

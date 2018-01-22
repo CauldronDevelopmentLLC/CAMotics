@@ -83,7 +83,7 @@ void Probe::read(const InputSource &source) {
 
   // Create probe grid
   pass = 2;
-  cb::Vector2D divisions(ceil(bbox.getWidth() / gridSize),
+  Vector2D divisions(ceil(bbox.getWidth() / gridSize),
                      ceil(bbox.getLength() / gridSize));
   grid = new ProbeGrid(bbox, divisions);
   try {
@@ -147,11 +147,11 @@ void Probe::outputProbe() {
 }
 
 
-void Probe::execute(const GCode::Code &code, int vars) {
-  GCode::ControllerImpl::execute(code, vars);
+bool Probe::execute(const GCode::Code &code, int vars) {
+  bool implemented = GCode::ControllerImpl::execute(code, vars);
 
   // TODO This should be absolute position & we should account for offsets etc.
-  cb::Vector2D pos(getAxisPosition('X'), getAxisPosition('Y'));
+  Vector2D pos(getAxisPosition('X'), getAxisPosition('Y'));
 
   switch (pass) {
   case 1:
@@ -165,6 +165,8 @@ void Probe::execute(const GCode::Code &code, int vars) {
     }
     break;
   }
+
+  return implemented;
 }
 
 
@@ -183,7 +185,7 @@ void Probe::operator()(const SmartPointer<GCode::Block> &block) {
       double y = getAxisPosition('Y');
       double z = getAxisPosition('Z');
 
-      vector<ProbePoint *> pt = grid->find(cb::Vector2D(x, y));
+      vector<ProbePoint *> pt = grid->find(Vector2D(x, y));
       double x1 = pt[0]->x();
       double x2 = pt[1]->x();
       double y1 = pt[0]->y();

@@ -73,9 +73,12 @@ namespace GCode {
     void move(const Axes &axes, bool rapid);
     //void arc(const cb::Vector3D &offset, double angle, plane_t plane);
     void pause(bool optional);
+    void set(const std::string &name, double value);
     void setLocation(const cb::LocationRange &location);
 
   protected:
+    template <typename T>
+    void pushSetCommand(const std::string &name, const T &value);
     void push(const cb::SmartPointer<PlannerCommand> &cmd);
     bool isFinal(cmds_t::const_iterator it) const;
     void plan(cmds_t::iterator it);

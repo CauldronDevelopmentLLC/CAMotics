@@ -37,28 +37,22 @@ using namespace GCode;
 
 ControllerImpl::ControllerImpl(MachineInterface &machine,
                                const ToolTable &tools) :
-  tools(tools), plane(MachineInterface::XY), latheDiameterMode(true),
-  cutterRadiusComp(false), toolLengthComp(false), pathMode(EXACT_PATH_MODE),
-  returnMode(RETURN_TO_R), motionBlendingTolerance(0), naiveCamTolerance(0),
-  modalMotion(false), incrementalDistanceMode(false),
-  arcIncrementalDistanceMode(true), moveInAbsoluteCoords(false),
-  feedMode(MachineInterface::MM_PER_MINUTE),
+  tools(tools), synchronizing(false), plane(MachineInterface::XY),
+  latheDiameterMode(true), cutterRadiusComp(false), toolLengthComp(false),
+  pathMode(EXACT_PATH_MODE), returnMode(RETURN_TO_R),
+  motionBlendingTolerance(0), naiveCamTolerance(0), modalMotion(false),
+  incrementalDistanceMode(false), arcIncrementalDistanceMode(true),
+  moveInAbsoluteCoords(false), feedMode(MachineInterface::MM_PER_MINUTE),
   spinMode(MachineInterface::REVOLUTIONS_PER_MINUTE), spindleDir(DIR_OFF),
   speed(0), maxSpindleSpeed(0) {
 
   this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
 
-  memset(vars, 0, sizeof(vars));
-  memset(used, 0, sizeof(used));
-  memset(params, 0, sizeof(params));
-
-  // Must be after memset() above
-  set(CURRENT_COORD_SYSTEM, 1);
-  set(TOOL_NUMBER, 1);
+  memset(varValues, 0, sizeof(varValues));
 }
 
 
-double ControllerImpl::getVar(char c) const {return vars[c - 'A'];}
+double ControllerImpl::getVar(char c) const {return varValues[c - 'A'];}
 
 
 const SmartPointer<Entity> &ControllerImpl::getVarExpr(char c) const {
@@ -75,12 +69,11 @@ double ControllerImpl::getOffsetVar(char axis, bool absolute) const {
 }
 
 
-string ControllerImpl::getVarGroupStr(const char *group, bool usedOnly) const {
+string ControllerImpl::getVarGroupStr(const char *group) const {
   string s;
 
   for (int i = 0; group[i]; i++)
-    if (!usedOnly || used[group[i] - 'A'])
-      s += SSTR(' ' << group[i] << getVar(group[i]));
+    s += SSTR(' ' << group[i] << getVar(group[i]));
 
   return s;
 }
@@ -389,6 +382,7 @@ void ControllerImpl::seek(int vars, bool active, bool error) {
 
   machine.seek(port, active, error);
   makeMove(vars, false, false);
+  synchronizing = true; // Synchronize with found position
 }
 
 
@@ -477,8 +471,7 @@ void ControllerImpl::setToolTable(int vars, bool relative) {
       tool.set(*v, value);
     }
 
-  LOG_INFO(3, "Controller: Set Tool Table"
-           << getVarGroupStr("PRXYZABCUVWIJQ", false));
+  LOG_INFO(3, "Controller: Set Tool Table" << getVarGroupStr("PRXYZABCUVWIJQ"));
 }
 
 
@@ -621,39 +614,35 @@ void ControllerImpl::end() {
 }
 
 
-double ControllerImpl::get(unsigned addr) const {
-  return addr < MAX_ADDRESS ? params[addr] : params[0];
-}
+double ControllerImpl::get(unsigned addr) const {return machine.get(addr);}
 
 
 void ControllerImpl::set(unsigned addr, double value) {
-  if (addr < MAX_ADDRESS) params[addr] = value;
+  machine.set(addr, value);
 }
 
 
-bool ControllerImpl::has(const string &name) const {
-  return named.find(name) != named.end();
-}
-
-
-double ControllerImpl::get(const string &name) const {
-  named_t::const_iterator it = named.find(name);
-  return it == named.end() ? 0 : it->second;
-}
+bool ControllerImpl::has(const string &name) const {return machine.has(name);}
+double ControllerImpl::get(const string &name) const {return machine.get(name);}
 
 
 void ControllerImpl::set(const string &name, double value) {
-  named[name] = value;
+  machine.set(name, value);
 }
 
 
-void ControllerImpl::setVar(char c, double value) {
-  vars[c - 'A'] = value; used[c - 'A'] = true;
-}
+void ControllerImpl::setVar(char c, double value) {varValues[c - 'A'] = value;}
 
 
 void ControllerImpl::setVarExpr(char c, const SmartPointer<Entity> &entity) {
   varExprs[c - 'A'] = entity;
+}
+
+
+void ControllerImpl::synchronize(const Axes &position) {
+  if (!synchronizing) THROW("Not synchronizing");
+  setAbsolutePosition(position);
+  synchronizing = false;
 }
 
 
@@ -684,34 +673,48 @@ void ControllerImpl::setSpeed(double speed) {
 void ControllerImpl::setTool(unsigned tool) {set(TOOL_NUMBER, tool);}
 
 
-void ControllerImpl::newBlock() {moveInAbsoluteCoords = false;}
+void ControllerImpl::newBlock() {
+  if (synchronizing) {
+    LOG_WARNING("New block started without position of previous seek move");
+    synchronizing = false;
+  }
+  moveInAbsoluteCoords = false;
+}
 
 
-void ControllerImpl::execute(const Code &code, int vars) {
+bool ControllerImpl::execute(const Code &code, int vars) {
   bool implemented = true;
+  bool verbose = true;
 
   switch (code.type) {
   case 'G':
     switch ((unsigned)floor(10 * code.number + 0.5)) {
-    case 0: makeMove(vars, true, !incrementalDistanceMode); return;
-    case 10: makeMove(vars, false, !incrementalDistanceMode); return;
+    case 0:
+      makeMove(vars, true, !incrementalDistanceMode);
+      verbose = false;
+      break;
 
-    case 20: arc(vars, true); return;
-    case 30: arc(vars, false); return;
-    case 40: dwell(getVar('P')); return;
+    case 10:
+      makeMove(vars, false, !incrementalDistanceMode);
+      verbose = false;
+      break;
+
+    case 20: arc(vars, true);    verbose = false; break;
+    case 30: arc(vars, false);   verbose = false; break;
+    case 40: dwell(getVar('P')); verbose = false; break;
 
     case 51: implemented = false; // TODO Quadratic B-spline
     case 52: implemented = false; // TODO NURBS Block Start
     case 53: implemented = false; // TODO NURBS Block End
 
-    case 70: latheDiameterMode = true; break;
+    case 70: latheDiameterMode = true;  break;
     case 80: latheDiameterMode = false; break; // Radius mode
 
     case 100:
       switch ((unsigned)getVar('L')) {
-      case 1: setToolTable(vars, false); break;
+      case 1: setToolTable(vars, false);   break;
       case 2: setCoordSystem(vars, false); break;
-      case 10: setToolTable(vars, true); break;
+      case 10: setToolTable(vars, true);   break;
       case 20: setCoordSystem(vars, true); break;
       }
       break;
@@ -722,8 +725,9 @@ void ControllerImpl::execute(const Code &code, int vars) {
     case 181: setPlane(MachineInterface::UW); break;
     case 190: setPlane(MachineInterface::YZ); break;
     case 191: setPlane(MachineInterface::VW); break;
+
     case 200: machine.setImperial(); break;
-    case 210: machine.setMetric(); break;
+    case 210: machine.setMetric();   break;
 
     case 280:
       if (vars & VT_AXIS) {
@@ -738,7 +742,7 @@ void ControllerImpl::execute(const Code &code, int vars) {
     case 281: storePredefined1(); break;
 
     case 282: setAxisHomed(vars, false); break;
-    case 283: setAxisHomed(vars, true); break;
+    case 283: setAxisHomed(vars, true);  break;
 
     case 300:
       if (vars & VT_AXIS) {
@@ -766,10 +770,10 @@ void ControllerImpl::execute(const Code &code, int vars) {
     case 389: seek(vars, false, false); break;
 
     case 400: cutterRadiusComp = false; break;
-    case 410: setCutterRadiusComp(vars, true, false); break;
-    case 411: setCutterRadiusComp(vars, true, true); break;
+    case 410: setCutterRadiusComp(vars, true, false);  break;
+    case 411: setCutterRadiusComp(vars, true, true);   break;
     case 420: setCutterRadiusComp(vars, false, false); break;
-    case 421: setCutterRadiusComp(vars, false, true); break;
+    case 421: setCutterRadiusComp(vars, false, true);  break;
 
     case 430:
       toolLengthComp = true;
@@ -781,7 +785,7 @@ void ControllerImpl::execute(const Code &code, int vars) {
       break;
     case 490: toolLengthComp = false; break;
 
-    case 530: moveInAbsoluteCoords = true; break;
+    case 530: moveInAbsoluteCoords = true;  break;
     case 540: set(CURRENT_COORD_SYSTEM, 1); break;
     case 550: set(CURRENT_COORD_SYSTEM, 2); break;
     case 560: set(CURRENT_COORD_SYSTEM, 3); break;
@@ -802,33 +806,32 @@ void ControllerImpl::execute(const Code &code, int vars) {
       else naiveCamTolerance = 0;
       break;
 
-    case 730: implemented = false; break; // TODO Drill cycle w/ chip breaking
-    case 760: implemented = false; break; // TODO Thread cycle
+    case 730: implemented = false; break; // Drill cycle w/ chip breaking
+    case 760: implemented = false; break; // Thread cycle
 
-    case 800: modalMotion = false; break;
-
+    case 800: modalMotion = false;              break; // Cancel canned cycle
     case 810: drill(vars, false, false, false); break; // Drill cycle
-    case 820: drill(vars, true, false, false); break; // Drill Cycle w/ Dwell
-    case 830: implemented = false; break; // TODO Peck Drill
-    case 840: implemented = false; break; // TODO Right-Hand Tap
-    case 850: drill(vars, false, true, false); // No Dwell, Feed Out
-    case 860: drill(vars, false, false, true); // Spindle Stop, Rapid Out
-    case 870: implemented = false; break; // TODO Back Boring
-    case 880: implemented = false; break; // TODO Spindle Stop, Manual Out
-    case 890: drill(vars, true, true, false); // Dwell, Feed Out
+    case 820: drill(vars, true, false, false);  break; // Drill cycle w/ dwell
+    case 830: implemented = false;              break; // Peck drill
+    case 840: implemented = false;              break; // Right-hand tap
+    case 850: drill(vars, false, true, false);  break; // No dwell, feed out
+    case 860: drill(vars, false, false, true);  break; // Spin stop rapid out
+    case 870: implemented = false;              break; // Back boring
+    case 880: implemented = false;              break; // Spin stop manual out
+    case 890: drill(vars, true, true, false);   break; // Dwell, feed out
 
-    case 900: incrementalDistanceMode = false; break;
+    case 900: incrementalDistanceMode = false;    break;
     case 901: arcIncrementalDistanceMode = false; break;
-    case 910: incrementalDistanceMode = true; break;
-    case 911: arcIncrementalDistanceMode = true; break;
+    case 910: incrementalDistanceMode = true;     break;
+    case 911: arcIncrementalDistanceMode = true;  break;
 
-    case 920: setGlobalOffsets(vars); break;
-    case 921: resetGlobalOffsets(true); break;
+    case 920: setGlobalOffsets(vars);    break;
+    case 921: resetGlobalOffsets(true);  break;
     case 922: resetGlobalOffsets(false); break;
-    case 923: restoreGlobalOffsets(); break;
+    case 923: restoreGlobalOffsets();    break;
 
-    case 930: feedMode = MachineInterface::INVERSE_TIME; break;
-    case 940: feedMode = MachineInterface::MM_PER_MINUTE; break;
+    case 930: feedMode = MachineInterface::INVERSE_TIME;      break;
+    case 940: feedMode = MachineInterface::MM_PER_MINUTE;     break;
     case 950: feedMode = MachineInterface::MM_PER_REVOLUTION; break;
 
       // NOTE: The spindle modes must be accompanied by a speed
@@ -838,7 +841,7 @@ void ControllerImpl::execute(const Code &code, int vars) {
       break;
     case 970: spinMode = MachineInterface::REVOLUTIONS_PER_MINUTE; break;
 
-    case 980: returnMode = RETURN_TO_R; break;
+    case 980: returnMode = RETURN_TO_R;     break;
     case 990: returnMode = RETURN_TO_OLD_Z; break;
 
     default: implemented = false;
@@ -847,15 +850,19 @@ void ControllerImpl::execute(const Code &code, int vars) {
 
   case 'M':
     switch ((unsigned)code.number) {
-    case 0: case 1: case 60: break; // Pause
-    case 2: case 30: end(); break; // End Program
-    case 3: setSpindleDir(DIR_CLOCKWISE); break;
+    case 0: case 1: case 60:                     break; // Pause
+    case 2: case 30: end();                      break; // End Program
+    case 3: setSpindleDir(DIR_CLOCKWISE);        break;
     case 4: setSpindleDir(DIR_COUNTERCLOCKWISE); break;
-    case 5: setSpindleDir(DIR_OFF); break;
-    case 6: toolChange(true); break; // Manual Tool Change
-    case 7: setMistCoolant(true); break;
-    case 8: setFloodCoolant(true); break;
-    case 9: setMistCoolant(false); setFloodCoolant(false); break;
+    case 5: setSpindleDir(DIR_OFF);              break;
+    case 6: toolChange(true);                    break; // Manual Tool Change
+    case 7: setMistCoolant(true);                break;
+    case 8: setFloodCoolant(true);               break;
+    case 9:
+      setMistCoolant(false);
+      setFloodCoolant(false);
+      break;
+
     default: implemented = false;
     }
     break;
@@ -863,6 +870,6 @@ void ControllerImpl::execute(const Code &code, int vars) {
   default: implemented = false;
   }
 
-  if (!implemented) LOG_WARNING("Not implemented: " << code);
-  else LOG_INFO(3, "Controller: " << code);
+  if (implemented && verbose) LOG_INFO(3, "Controller: " << code);
+  return implemented;
 }

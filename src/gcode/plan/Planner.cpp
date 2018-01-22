@@ -67,7 +67,8 @@ void Planner::load(const cb::InputSource &source) {
 bool Planner::hasMore() {
   while (true) {
     if (planner.hasMove()) return true;
-    if (runner.isNull() || runner->isDone()) return false;
+    if (ControllerImpl::isSynchronizing() || runner.isNull() ||
+        runner->isDone()) return false;
     runner->next();
     if (runner->isDone()) pipeline.end();
   }
@@ -80,16 +81,11 @@ void Planner::release(uint64_t id) {planner.release(id);}
 
 void Planner::restart(uint64_t id, const Axes &position) {
   planner.restart(id, position);
+  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(position);
 }
 
 
 double Planner::get(const string &name) const {
   if (ControllerImpl::has(name)) return ControllerImpl::get(name);
   return resolver.isNull() ? 0 : resolver->get(name);
-}
-
-
-void Planner::set(const string &name, double value) {
-  ControllerImpl::set(name, value);
-  if (!resolver.isNull()) resolver->set(name, value);
 }

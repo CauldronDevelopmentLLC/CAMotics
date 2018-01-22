@@ -535,7 +535,10 @@ void QtWin::glViewWheelEvent(QWheelEvent *event) {
 }
 
 
-void QtWin::initializeGL() {view->glInit();}
+void QtWin::initializeGL() {
+  LOG_DEBUG(5, "initializeGL()");
+  view->glInit();
+}
 
 
 void QtWin::resizeGL(int w, int h) {
@@ -1700,6 +1703,9 @@ void QtWin::resizeEvent(QResizeEvent *event) {
 
 void QtWin::animate() {
   try {
+    // Check if OpenGL is initialized
+    if (!ui->simulationView->isValid()) app.requestExit();
+
     dirty = view->update() || dirty;
 
     // Auto close after auto play

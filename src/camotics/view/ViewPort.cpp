@@ -128,7 +128,7 @@ void ViewPort::zoomOut() {if (zoom < 30) zoom *= 1.1;}
 
 
 void ViewPort::center() {
-  translation = cb::Vector2D(0, 0);
+  translation = Vector2D(0, 0);
   zoom = 0.8;
 }
 
@@ -143,12 +143,12 @@ void ViewPort::resize(unsigned width, unsigned height) {
 }
 
 
-cb::Vector3D ViewPort::findBallVector(const cb::Vector2U &p) const {
+Vector3D ViewPort::findBallVector(const Vector2U &p) const {
   return findBallVector(p.x(), p.y());
 }
 
 
-cb::Vector3D ViewPort::findBallVector(int px, int py) const {
+Vector3D ViewPort::findBallVector(int px, int py) const {
   double x = (double)px / (width / 2.0) - 1.0;
   double y = 1.0 - (double)py / (height / 2.0);
 
@@ -159,7 +159,7 @@ cb::Vector3D ViewPort::findBallVector(int px, int py) const {
   double z2 = 1.0 - x * x - y * y;
   double z = 0 < z2 ? sqrt(z2) : 0; // Clamp to 0
 
-  return cb::Vector3D(x, y, z).normalize();
+  return Vector3D(x, y, z).normalize();
 }
 
 
@@ -170,7 +170,7 @@ void ViewPort::startRotation(int x, int y) {
 
 
 void ViewPort::updateRotation(int x, int y) {
-  cb::Vector3D current = findBallVector(x, y);
+  Vector3D current = findBallVector(x, y);
   double angle = fmod((4 * rotationStartVec.angleBetween(current)), (2 * M_PI));
   QuaternionD delta(AxisAngleD(angle, rotationStartVec.crossProduct(current)));
   rotationQuat =
@@ -183,14 +183,14 @@ void ViewPort::updateRotation(int x, int y) {
 
 
 void ViewPort::startTranslation(int x, int y) {
-  translationStartPt = cb::Vector2D(x, -y);
+  translationStartPt = Vector2D(x, -y);
   translationStart = translation;
 }
 
 
 void ViewPort::updateTranslation(int x, int y) {
-  translation = translationStart + (cb::Vector2D(x, -y) - translationStartPt)
-    / cb::Vector2D(width, height) * 2;
+  translation = translationStart + (Vector2D(x, -y) - translationStartPt)
+    / Vector2D(width, height) * 2;
 }
 
 
@@ -241,8 +241,8 @@ void ViewPort::glInit() const {
 }
 
 
-void ViewPort::glDraw(const cb::Rectangle3D &bbox,
-                      const cb::Vector3D &center) const {
+void ViewPort::glDraw(const Rectangle3D &bbox,
+                      const Vector3D &center) const {
   GLFuncs &glFuncs = getGLFuncs();
 
   glFuncs.glMatrixMode(GL_MODELVIEW);
@@ -262,7 +262,7 @@ void ViewPort::glDraw(const cb::Rectangle3D &bbox,
   glFuncs.glEnd();
 
   // Compute "radius"
-  cb::Vector3D dims = bbox.getDimensions();
+  Vector3D dims = bbox.getDimensions();
   double radius = dims.x() < dims.y() ? dims.y() : dims.x();
   radius = dims.z() < radius ? radius : dims.z();
 

@@ -21,18 +21,16 @@
 #include "LinePlanner.h"
 
 #include "LineCommand.h"
-#include "SpeedCommand.h"
-#include "ToolCommand.h"
 #include "DwellCommand.h"
 #include "PauseCommand.h"
-#include "LineNumberCommand.h"
 #include "OutputCommand.h"
 #include "SeekCommand.h"
+#include "SetCommand.h"
 
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
-#include <cbang/json/Sink.h>
+#include <cbang/json/JSON.h>
 
 #include <limits>
 #include <algorithm>
@@ -115,12 +113,15 @@ void LinePlanner::restart(uint64_t id, const Axes &position) {
   // Handle seek
   auto it = cmds.begin();
   if ((*it)->isSeeking()) {
+    // Skip reset of current move
     it++;
     cmds.pop_front();
+    // Replan next move, if one has already been planned.  Its start position
+    // may have changed.
     while (it != cmds.end() && !(*it)->isMove()) it++;
   }
 
-  if (it == cmds.end()) return;
+  if (it == cmds.end()) return; // Nothing to replan
 
   // Replan from zero velocity
   (*it)->restart(position, config);
@@ -153,13 +154,13 @@ void LinePlanner::end() {
 void LinePlanner::setSpeed(double speed, spin_mode_t mode, double max) {
   MachineAdapter::setSpeed(speed, mode, max);
   // TODO handle spin mode
-  push(new SpeedCommand(nextID++, speed));
+  pushSetCommand("speed", speed);
 }
 
 
 void LinePlanner::setTool(unsigned tool) {
   MachineAdapter::setTool(tool);
-  push(new ToolCommand(nextID++, tool));
+  pushSetCommand("tool", tool);
 }
 
 
@@ -213,14 +214,24 @@ void LinePlanner::pause(bool optional) {
 }
 
 
+void LinePlanner::set(const string &name, double value) {
+  MachineAdapter::set(name, value);
+  pushSetCommand(name, value);
+}
+
+
 void LinePlanner::setLocation(const LocationRange &location) {
   MachineAdapter::setLocation(location);
   int line = location.getStart().getLine();
 
-  if (0 <= line && line != this->line) {
-    this->line = line;
-    push(new LineNumberCommand(nextID++, line));
-  }
+  if (0 <= line && line != this->line)
+    pushSetCommand("line", this->line = line);
+}
+
+
+template <typename T>
+void LinePlanner::pushSetCommand(const string &name, const T &value) {
+  push(new SetCommand(nextID++, name, JSON::Factory::create(value)));
 }
 
 

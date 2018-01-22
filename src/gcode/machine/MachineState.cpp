@@ -22,6 +22,9 @@
 
 #include <cbang/Exception.h>
 
+#include <string.h> // For memset()
+
+using namespace std;
 using namespace cb;
 using namespace GCode;
 
@@ -40,6 +43,11 @@ void MachineState::reset() {
     matrices[i].toIdentity();
 
   location = LocationRange();
+
+  // Init numbered parameters
+  memset(params, 0, sizeof(params));
+  set(CURRENT_COORD_SYSTEM, 1);
+  set(TOOL_NUMBER, 1);
 }
 
 
@@ -72,3 +80,27 @@ void MachineState::setMatrix(const Matrix4x4D &m, axes_t matrix) {
   if (AXES_COUNT <= matrix) THROWS("Invalid matrix " << matrix);
   matrices[matrix] = m;
 }
+
+
+double MachineState::get(unsigned addr) const {
+  return addr < MAX_ADDRESS ? params[addr] : params[0];
+}
+
+
+void MachineState::set(unsigned addr, double value) {
+  if (addr < MAX_ADDRESS) params[addr] = value;
+}
+
+
+bool MachineState::has(const string &name) const {
+  return named.find(name) != named.end();
+}
+
+
+double MachineState::get(const string &name) const {
+  named_t::const_iterator it = named.find(name);
+  return it == named.end() ? 0 : it->second;
+}
+
+
+void MachineState::set(const string &name, double value) {named[name] = value;}

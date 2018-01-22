@@ -88,6 +88,13 @@ namespace GCode {
 
     void pause(bool optional = true) {parent->pause(optional);}
 
+    double get(unsigned addr) const {return parent->get(addr);}
+    void set(unsigned addr, double value) {parent->set(addr, value);}
+
+    bool has(const std::string &name) const {return parent->has(name);}
+    double get(const std::string &name) const {return parent->get(name);}
+    void set(const std::string &name, double value) {parent->set(name, value);}
+
     const cb::LocationRange &getLocation() const {return parent->getLocation();}
     void setLocation(const cb::LocationRange &location)
     {parent->setLocation(location);}

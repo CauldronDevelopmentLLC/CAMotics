@@ -28,7 +28,6 @@
 
 #include <gcode/machine/MachineUnitAdapter.h>
 
-#include <map>
 #include <string>
 
 
@@ -62,14 +61,10 @@ namespace GCode {
 
     // Block variables
     static const int MAX_VAR = 26;
-    double vars[MAX_VAR];
-    bool used[MAX_VAR];
+    double varValues[MAX_VAR];
     cb::SmartPointer<Entity> varExprs[MAX_VAR];
 
-    // Numbered and named parameters
-    double params[MAX_ADDRESS];
-    typedef std::map<std::string, double> named_t;
-    named_t named;
+    bool synchronizing;
 
     // State variables
     MachineInterface::plane_t plane;
@@ -98,7 +93,7 @@ namespace GCode {
     double getVar(char c) const;
     const cb::SmartPointer<Entity> &getVarExpr(char c) const;
     double getOffsetVar(char c, bool absolute) const;
-    std::string getVarGroupStr(const char *group, bool usedOnly = true) const;
+    std::string getVarGroupStr(const char *group) const;
     static VarTypes::enum_t getVarType(char letter);
 
     // Spindle
@@ -184,12 +179,15 @@ namespace GCode {
     void setVar(char c, double value);
     void setVarExpr(char c, const cb::SmartPointer<Entity> &entity);
 
+    bool isSynchronizing() const {return synchronizing;}
+    void synchronize(const Axes &position);
+
     void setLocation(const cb::LocationRange &location);
     void setFeed(double feed);
     void setSpeed(double speed);
     void setTool(unsigned tool);
 
     void newBlock();
-    void execute(const Code &code, int vars);
+    bool execute(const Code &code, int vars);
   };
 }

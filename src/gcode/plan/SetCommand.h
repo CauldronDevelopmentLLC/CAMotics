@@ -22,16 +22,21 @@
 
 #include "PlannerCommand.h"
 
+#include <cbang/json/Value.h>
+
 
 namespace GCode {
-  class LineNumberCommand : public PlannerCommand {
-    int line;
+  class SetCommand : public PlannerCommand {
+    const std::string name;
+    cb::SmartPointer<cb::JSON::Value> value;
 
   public:
-    LineNumberCommand(uint64_t id, int line) : PlannerCommand(id), line(line) {}
+    SetCommand(uint64_t id, const std::string &name,
+               const cb::SmartPointer<cb::JSON::Value> &value) :
+      PlannerCommand(id), name(name), value(value) {}
 
     // From PlannerCommand
-    const char *getType() const {return "ln";}
+    const char *getType() const {return "set";}
     void insert(cb::JSON::Sink &sink) const;
   };
 }

@@ -24,7 +24,7 @@ using namespace cb;
 using namespace GCode;
 
 
-void MachineLinearizer::arc(const cb::Vector3D &offset, double angle,
+void MachineLinearizer::arc(const Vector3D &offset, double angle,
                             plane_t plane) {
   const char *axesNames;
   switch (plane) {
@@ -46,14 +46,14 @@ void MachineLinearizer::arc(const cb::Vector3D &offset, double angle,
   double z = current[axes[2]];
 
   // Center
-  cb::Vector2D center(x + offset.x(), y + offset.y());
+  Vector2D center(x + offset.x(), y + offset.y());
 
   // Start angle
   double startAngle =
-    cb::Vector2D(-offset.x(), -offset.y()).angleBetween(cb::Vector2D(1, 0));
+    Vector2D(-offset.x(), -offset.y()).angleBetween(Vector2D(1, 0));
 
   // Radius
-  double radius = cb::Vector2D(offset.x(), offset.y()).length();
+  double radius = Vector2D(offset.x(), offset.y()).length();
 
   // Allowed error cannot be greater than arc radius
   double error = std::min(maxArcError, radius);

@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "Axes.h"
+
 #include <cbang/SmartPointer.h>
 #include <cbang/LocationRange.h>
 
@@ -48,6 +50,10 @@ namespace GCode {
     virtual void setVar(char c, double value) = 0;
     virtual void setVarExpr(char c, const cb::SmartPointer<Entity> &entity) = 0;
 
+    // Synchronize
+    virtual bool isSynchronizing() const = 0;
+    virtual void synchronize(const Axes &position) = 0;
+
     // State
     virtual void setLocation(const cb::LocationRange &location) = 0;
     virtual void setFeed(double feed) = 0;
@@ -56,6 +62,6 @@ namespace GCode {
 
     // Execution
     virtual void newBlock() = 0;
-    virtual void execute(const Code &code, int vars) = 0;
+    virtual bool execute(const Code &code, int vars) = 0;
   };
 }

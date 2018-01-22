@@ -22,7 +22,7 @@
 
 
 namespace GCode {
-  enum {
+  typedef enum {
     PREDEFINED1_X = 5161,
     PREDEFINED1_Y,
     PREDEFINED1_Z,
@@ -180,5 +180,5 @@ namespace GCode {
     CURRENT_W,
 
     MAX_ADDRESS = 5602, // Max address in EMC2 code
-  };
+  } address_t;
 }

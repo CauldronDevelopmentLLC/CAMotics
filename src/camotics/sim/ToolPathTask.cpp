@@ -72,7 +72,6 @@ void ToolPathTask::run() {
 
   // TODO load machine configuration, including rapidFeed & maxArcError
   GCode::Machine machine(*path);
-  machine.reset();
   GCode::ControllerImpl controller(machine, tools);
 
   // Interpret code

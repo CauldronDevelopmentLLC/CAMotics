@@ -69,14 +69,14 @@ double Evaluator::eval(BinaryOp &e) {
   case Operator::MOD_OP: return fmod(left, right);
   case Operator::ADD_OP: return left + right;
   case Operator::SUB_OP: return left - right;
-  case Operator::EQ_OP: return left == right;
-  case Operator::NE_OP: return left != right;
-  case Operator::GT_OP: return left > right;
-  case Operator::GE_OP: return left >= right;
-  case Operator::LT_OP: return left < right;
-  case Operator::LE_OP: return left <= right;
+  case Operator::EQ_OP:  return left == right;
+  case Operator::NE_OP:  return left != right;
+  case Operator::GT_OP:  return left > right;
+  case Operator::GE_OP:  return left >= right;
+  case Operator::LT_OP:  return left < right;
+  case Operator::LE_OP:  return left <= right;
   case Operator::AND_OP: return left && right;
-  case Operator::OR_OP: return left || right;
+  case Operator::OR_OP:  return left || right;
   case Operator::XOR_OP: return (bool)left ^ (bool)right;
   default: THROWS(e.getLocation() << " Invalid binary operator");
   }
@@ -111,9 +111,9 @@ double Evaluator::eval(FunctionCall &e) {
     if (name == "TAN") return tan(arg1 * M_PI / 180.0);
 
   } else {
+    // NOTE, ATAN is treated as a special case in Parser::functionCall()
     double arg2 = e.getArg2()->eval(*this);
     if (name == "ATAN") return atan2(arg1, arg2) * 180.0 / M_PI;
-    if (name == "NEAR") return fabs(arg1 - arg2) < 0.0001;
   }
 
   THROWS(e.getLocation() << " Unsupported function '" << name << "'");

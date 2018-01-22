@@ -197,8 +197,9 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 
         if (priority == code->priority) {
           controller.setLocation(word->getLocation());
-          controller.execute(*code, vars);
-          if (code->group == MG_MOTION) activeMotion = code;
+          if (!controller.execute(*code, vars))
+            LOG_WARNING("Not implemented: " << *code);
+          else if (code->group == MG_MOTION) activeMotion = code;
         }
 
         wordPriority = code->priority;
