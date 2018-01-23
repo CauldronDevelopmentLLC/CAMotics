@@ -333,6 +333,25 @@ static PyObject *_is_running(PyPlanner *self) {
 }
 
 
+static PyObject *_is_synchronizing(PyPlanner *self) {
+  try {
+    if (self->planner->isSynchronizing()) Py_RETURN_TRUE;
+    else Py_RETURN_FALSE;
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
+}
+
+
+static PyObject *_override_sync(PyPlanner *self) {
+  try {
+    self->planner->overrideSync();
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
+}
+
+
 static PyObject *_set(PyPlanner *self, PyObject *args) {
   try {
     const char *name;
@@ -445,7 +464,11 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
 
 static PyMethodDef _methods[] = {
   {"is_running", (PyCFunction)_is_running, METH_NOARGS,
-   "True if the planner active"},
+   "True if the planner is active"},
+  {"is_synchronizing", (PyCFunction)_is_synchronizing, METH_NOARGS,
+   "True if the planner is synchronizing"},
+  {"override_sync", (PyCFunction)_override_sync, METH_NOARGS,
+   "Override planner synchronization"},
   {"set_resolver", (PyCFunction)_set_resolver, METH_VARARGS,
    "Set name resolver callback"},
   {"set", (PyCFunction)_set, METH_VARARGS, "Set variable"},

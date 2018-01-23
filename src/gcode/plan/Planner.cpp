@@ -50,6 +50,12 @@ bool Planner::isRunning() const {
 }
 
 
+void Planner::overrideSync() {
+  if (ControllerImpl::isSynchronizing())
+    ControllerImpl::synchronize(ControllerImpl::getAbsolutePosition());
+}
+
+
 void Planner::mdi(const string &gcode) {
   if (isRunning()) THROW("Planner already running");
   this->gcode = gcode;

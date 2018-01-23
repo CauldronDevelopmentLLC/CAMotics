@@ -62,6 +62,7 @@ namespace GCode {
     {this->resolver = resolver;}
 
     bool isRunning() const;
+    void overrideSync();
 
     void mdi(const std::string &gcode);
     void load(const cb::InputSource &source);
