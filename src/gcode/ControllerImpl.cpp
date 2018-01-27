@@ -363,7 +363,7 @@ void ControllerImpl::seek(int vars, bool active, bool error) {
     if (vars & getVarType(*axes)) {
       if (targetAxis) THROW("Multiple axes in seek");
       targetAxis = *axes;
-      seekMin = getVar(*axes) < 0;
+      seekMin = (0 < getVar(*axes)) ^ active;
     }
 
   port_t port;
