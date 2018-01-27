@@ -605,6 +605,10 @@ static struct PyModuleDef module = {
 
 
 PyMODINIT_FUNC PyInit_gplan() {
+  // Configure logger
+  cb::Logger::instance().setLogTime(false);
+  cb::Logger::instance().setLogShortLevel(true);
+
   if (PyType_Ready(&PlannerType) < 0) return 0;
 
   PyObject *m = PyModule_Create(&module);
