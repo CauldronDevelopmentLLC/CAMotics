@@ -51,8 +51,7 @@ namespace GCode {
     int line;
 
   public:
-    LinePlanner(const PlannerConfig &config) :
-    config(config), lastExitVel(0), seeking(false), nextID(1), line(-1) {}
+    LinePlanner(const PlannerConfig &config);
 
     bool isDone() const;
     bool hasMove() const;

@@ -64,6 +64,13 @@ namespace {
 }
 
 
+LinePlanner::LinePlanner(const PlannerConfig &config) :
+  config(config), lastExitVel(0), seeking(false), nextID(1), line(-1) {
+  for (unsigned i = 0; i < position.getSize(); i++)
+    position[i] = config.start[i];
+}
+
+
 bool LinePlanner::isDone() const {return cmds.empty() && out.empty();}
 
 
@@ -131,11 +138,7 @@ void LinePlanner::restart(uint64_t id, const Axes &position) {
 
 
 void LinePlanner::start() {
-  for (int i = 0; i < 4; i++)
-    position[i] = config.start[i];
-
   lastExitVel = 0;
-
   MachineAdapter::start();
 }
 
