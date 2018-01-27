@@ -2,7 +2,11 @@
 
 #include <gcode/plan/Planner.h>
 
+#include <cbang/log/Logger.h>
 #include <cbang/json/JSON.h>
+
+#include <boost/iostreams/categories.hpp>
+#include <boost/iostreams/stream.hpp>
 
 
 #define CATCH_PYTHON                                            \
@@ -226,6 +230,58 @@ public:
 };
 
 
+class PyLogger {
+  PyObject *cb;
+
+public:
+    typedef char char_type;
+    typedef boost::iostreams::sink_tag category;
+
+  PyLogger(PyObject *cb) : cb(cb) {
+    Py_INCREF(cb);
+    if (!PyCallable_Check(cb)) THROW("logger object not callable");
+  }
+
+  PyLogger(const PyLogger &o) : cb(o.cb) {Py_INCREF(cb);}
+
+
+  ~PyLogger() {Py_DECREF(cb);}
+
+
+  PyLogger &operator=(const PyLogger &o) {
+    cb = o.cb;
+    Py_INCREF(cb);
+    return *this;
+  }
+
+
+  std::streamsize write(const char *s, std::streamsize n) {
+    // Args
+    PyObject *args = PyTuple_New(1);
+    if (!args) THROW("Failed to allocate tuple");
+
+    PyTuple_SetItem(args, 0, PyUnicode_FromStringAndSize(s, n));
+
+    // Call
+    PyObject *result = PyObject_Call(cb, args, 0);
+    Py_DECREF(args);
+
+    if (!result) THROW("Logger callback failed");
+    Py_DECREF(result);
+
+    PyThrowIfError("Logger callback failed: ");
+
+    return n;
+  }
+};
+
+
+class PyLoggerStream : public boost::iostreams::stream<PyLogger> {
+public:
+  PyLoggerStream(PyObject *cb) {this->open(PyLogger(cb));}
+};
+
+
 std::string PyUnicode_ToStdString(PyObject *o) {
   Py_ssize_t size;
   char *s = PyUnicode_AsUTF8AndSize(o, &size);
@@ -379,6 +435,20 @@ static PyObject *_set_resolver(PyPlanner *self, PyObject *args) {
 }
 
 
+static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
+  try {
+    PyObject *cb;
+
+    if (!PyArg_ParseTuple(args, "O", &cb)) return 0;
+
+    cb::Logger::instance().setScreenStream(new PyLoggerStream(cb));
+
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
+}
+
+
 static PyObject *_mdi(PyPlanner *self, PyObject *args) {
   try {
     const char *gcode;
@@ -471,6 +541,8 @@ static PyMethodDef _methods[] = {
    "Override planner synchronization"},
   {"set_resolver", (PyCFunction)_set_resolver, METH_VARARGS,
    "Set name resolver callback"},
+  {"set_logger", (PyCFunction)_set_logger, METH_VARARGS,
+   "Set logger callback"},
   {"set", (PyCFunction)_set, METH_VARARGS, "Set variable"},
   {"mdi", (PyCFunction)_mdi, METH_VARARGS, "Load MDI commands"},
   {"load", (PyCFunction)_load, METH_VARARGS, "Load GCode by filename"},
