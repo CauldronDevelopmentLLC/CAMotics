@@ -174,22 +174,21 @@ double ControllerImpl::getAxisOffset(char axis) const {
 
 
 double ControllerImpl::getAxisPosition(char axis) const {
-  return get(CURRENT_COORD_ADDR(Axes::toIndex(axis)));
-}
-
-
-void ControllerImpl::setAxisPosition(char axis, double pos) {
-  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos);
+  return getAxisAbsolutePosition(axis) + getAxisOffset(axis);
 }
 
 
 double ControllerImpl::getAxisAbsolutePosition(char axis) const {
-  return getAxisPosition(axis) - getAxisOffset(axis);
+  return position.get(axis);
 }
 
 
 void ControllerImpl::setAxisAbsolutePosition(char axis, double pos) {
-  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos + getAxisOffset(axis));
+  position.set(axis, pos);
+
+  pos += getAxisOffset(axis);
+  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos);
+  set("_" + string(1, tolower(axis)), pos);
 }
 
 
@@ -626,7 +625,14 @@ void ControllerImpl::set(address_t addr, double value) {
     for (const char *axis = Axes::AXES; *axis; axis++) {
       string name = string(1, *axis) + "_offset";
       double offset = getAxisOffset(*axis);
-      if (offset != get(name)) set(name, offset);
+
+      if (offset != get(name)) {
+        double position = getAxisAbsolutePosition(*axis) + offset;
+
+        set(name, offset);
+        set(CURRENT_COORD_ADDR(Axes::toIndex(*axis)), position);
+        set("_" + string(1, tolower(*axis)), position);
+      }
     }
 }
 

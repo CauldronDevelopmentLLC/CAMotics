@@ -39,6 +39,7 @@ namespace GCode {
     static const int MAX_VAR = 26;
     double varValues[MAX_VAR];
 
+    Axes position;
     bool synchronizing;
 
     // State variables
@@ -90,7 +91,6 @@ namespace GCode {
     // Position
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
-    void setAxisPosition(char axis, double pos);
     double getAxisAbsolutePosition(char axis) const;
     void setAxisAbsolutePosition(char axis, double pos);
     Axes getAbsolutePosition() const;
