@@ -32,8 +32,8 @@ using namespace GCode;
 
 
 Word::Word(const Code *code) :
-  type(code->type), expr(new Number(code->number)), value(code->number),
-  code(code) {}
+  type(code->type), expr(new Number(code->number / 10.0)),
+  value(code->number / 10.0), code(code) {}
 
 
 double Word::eval(Evaluator &evaluator) {
@@ -43,6 +43,4 @@ double Word::eval(Evaluator &evaluator) {
 }
 
 
-void Word::print(ostream &stream) const {
-  stream << (char)toupper(type) << *expr;
-}
+void Word::print(ostream &stream) const {stream << type << *expr;}

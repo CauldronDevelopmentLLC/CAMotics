@@ -23,22 +23,50 @@
 
 namespace GCode {
   typedef enum {
+    // 0-30 Local parameters
+    // 31-5000 Global parameters
+
+    // TODO Probe results
+    PROBE_RESULT_X = 5061,
+    PROBE_RESULT_Y,
+    PROBE_RESULT_Z,
+    PROBE_RESULT_A,
+    PROBE_RESULT_B,
+    PROBE_RESULT_C,
+    PROBE_RESULT_U,
+    PROBE_RESULT_V,
+    PROBE_RESULT_W,
+    PROBE_SUCCESS = 5070,
+
+#define PREDEFINED_ADDR(FIRST, AXIS)                                    \
+    ((gcode_address_t)(((FIRST) ? PREDEFINED1_X : PREDEFINED2_X) + (AXIS)))
+
+    // G28 home
     PREDEFINED1_X = 5161,
     PREDEFINED1_Y,
     PREDEFINED1_Z,
+    PREDEFINED1_A,
+    PREDEFINED1_B,
+    PREDEFINED1_C,
     PREDEFINED1_U,
     PREDEFINED1_V,
     PREDEFINED1_W,
 
+    // G30 home
     PREDEFINED2_X = 5181,
     PREDEFINED2_Y,
     PREDEFINED2_Z,
+    PREDEFINED2_A,
+    PREDEFINED2_B,
+    PREDEFINED2_C,
     PREDEFINED2_U,
     PREDEFINED2_V,
     PREDEFINED2_W,
 
-    GLOBAL_OFFSETS_ENABLED = 5210,
+    // G52/G92 offsets
+#define GLOBAL_OFFSET_ADDR(AXIS) ((gcode_address_t)(GLOBAL_X_OFFSET + (AXIS)))
 
+    GLOBAL_OFFSETS_ENABLED = 5210,
     GLOBAL_X_OFFSET = 5211,
     GLOBAL_Y_OFFSET,
     GLOBAL_Z_OFFSET,
@@ -49,7 +77,12 @@ namespace GCode {
     GLOBAL_V_OFFSET,
     GLOBAL_W_OFFSET,
 
-    COORD_SYSTEM_BASE = 5201,
+    // Coordinate systems
+#define COORD_SYSTEM_WIDTH 20
+#define COORD_SYSTEM_ROTATION_MEMBER 9
+#define COORD_SYSTEM_ADDR(CS, MEMBER)                       \
+    ((gcode_address_t)(CS1_X_OFFSET - COORD_SYSTEM_WIDTH +  \
+                       (CS) * COORD_SYSTEM_WIDTH + (MEMBER)))
 
     CURRENT_COORD_SYSTEM = 5220,
 
@@ -152,8 +185,12 @@ namespace GCode {
     CS9_W_OFFSET,
     CS9_ROTATION,
 
+    USER_INPUT = 5399, // M66 result check or wait for input
+
     // Read only
-    TOOL_NUMBER = 5400,
+#define TOOL_OFFSET_ADDR(AXIS) ((gcode_address_t)(TOOL_X_OFFSET + (AXIS)))
+
+    TOOL_NUMBER = 5400, // Active tool, not current T value
     TOOL_X_OFFSET,
     TOOL_Y_OFFSET,
     TOOL_Z_OFFSET,
@@ -168,7 +205,10 @@ namespace GCode {
     TOOL_BACKANGLE,
     TOOL_ORIENTATION,
 
-    // TODO Are these absolute or relative?
+    // Current relative coordinates including all offsets in selected units
+    // TODO these are currently absolute coordinates and always in mm
+#define CURRENT_COORD_ADDR(AXIS) ((gcode_address_t)(CURRENT_X + (AXIS)))
+
     CURRENT_X = 5420,
     CURRENT_Y,
     CURRENT_Z,
@@ -179,6 +219,13 @@ namespace GCode {
     CURRENT_V,
     CURRENT_W,
 
+    DEBUG_ENABLE = 5599, // Enable/disable output of (DEBUG,) messages
+
+    TOOL_CHANGER_FAULT = 5600,
+    TOOL_CHANGER_CODE,
+
     MAX_ADDRESS = 5602, // Max address in EMC2 code
-  } address_t;
+  } gcode_address_t;
+
+  // TODO 5161-5390 should be persisted through machining center power cycle
 }

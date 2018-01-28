@@ -101,8 +101,8 @@ void GCodeMachine::setFeed(double feed, feed_mode_t mode) {
   if (oldMode != mode)
     switch (mode) {
     case INVERSE_TIME:  stream << "G93\n"; break;
-    case MM_PER_MINUTE: stream << "G94\n"; break;
-    case MM_PER_REVOLUTION: stream << "G95\n"; break;
+    case UNITS_PER_MINUTE: stream << "G94\n"; break;
+    case UNITS_PER_REVOLUTION: stream << "G95\n"; break;
     default: THROW("Feed mode must be one of INVERSE_TIME, "
                    "UNITS_PER_MIN or UNITS_PER_REV");
     }
@@ -143,12 +143,12 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
 }
 
 
-void GCodeMachine::setTool(unsigned tool) {
-  int oldTool = getTool();
+void GCodeMachine::changeTool(unsigned tool) {
+  unsigned currentTool = get(TOOL_NUMBER);
 
-  MachineAdapter::setTool(tool);
+  MachineAdapter::changeTool(tool);
 
-  if (oldTool != (int)tool) {
+  if (tool != currentTool) {
     beginLine();
     stream << "M6 T" << tool << '\n';
   }

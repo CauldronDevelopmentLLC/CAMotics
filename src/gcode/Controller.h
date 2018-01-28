@@ -21,6 +21,7 @@
 #pragma once
 
 #include "Axes.h"
+#include "Addresses.h"
 
 #include <cbang/SmartPointer.h>
 #include <cbang/LocationRange.h>
@@ -40,8 +41,8 @@ namespace GCode {
     virtual ~Controller() {}
 
     // Parameters
-    virtual double get(unsigned addr) const = 0;
-    virtual void set(unsigned addr, double value) = 0;
+    virtual double get(gcode_address_t addr) const = 0;
+    virtual void set(gcode_address_t addr, double value) = 0;
     virtual bool has(const std::string &name) const = 0;
     virtual double get(const std::string &name) const = 0;
     virtual void set(const std::string &name, double value) = 0;
@@ -49,6 +50,10 @@ namespace GCode {
     // Variables
     virtual void setVar(char c, double value) = 0;
     virtual void setVarExpr(char c, const cb::SmartPointer<Entity> &entity) = 0;
+
+    // Motion mode
+    virtual unsigned getCurrentMotionMode() = 0;
+    virtual void setCurrentMotionMode(unsigned mode) = 0;
 
     // Synchronize
     virtual bool isSynchronizing() const = 0;

@@ -37,12 +37,13 @@ using namespace GCode;
 
 ControllerImpl::ControllerImpl(MachineInterface &machine,
                                const ToolTable &tools) :
-  tools(tools), synchronizing(false), plane(MachineInterface::XY),
+  tools(tools), synchronizing(false), currentMotionMode(10),
+  plane(MachineInterface::XY),
   latheDiameterMode(true), cutterRadiusComp(false), toolLengthComp(false),
   pathMode(EXACT_PATH_MODE), returnMode(RETURN_TO_R),
-  motionBlendingTolerance(0), naiveCamTolerance(0), modalMotion(false),
+  motionBlendingTolerance(0), naiveCamTolerance(0),
   incrementalDistanceMode(false), arcIncrementalDistanceMode(true),
-  moveInAbsoluteCoords(false), feedMode(MachineInterface::MM_PER_MINUTE),
+  moveInAbsoluteCoords(false), feedMode(MachineInterface::UNITS_PER_MINUTE),
   spinMode(MachineInterface::REVOLUTIONS_PER_MINUTE), spindleDir(DIR_OFF),
   speed(0), maxSpindleSpeed(0) {
 
@@ -161,12 +162,12 @@ const char *ControllerImpl::getPlaneOffsets() const {
 
 
 double ControllerImpl::getAxisAbsolutePosition(char axis) const {
-  return get(CURRENT_X + Axes::toIndex(axis));
+  return get(CURRENT_COORD_ADDR(Axes::toIndex(axis)));
 }
 
 
 void ControllerImpl::setAxisAbsolutePosition(char axis, double pos) {
-  set(CURRENT_X + Axes::toIndex(axis), pos);
+  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos);
 }
 
 
@@ -174,19 +175,20 @@ double ControllerImpl::getAxisOffset(char axis) const {
   double offset = 0;
 
   if (!moveInAbsoluteCoords) {
-    unsigned index = Axes::toIndex(axis);
-
-    // Global offset
-    if (get(GLOBAL_OFFSETS_ENABLED)) offset += get(GLOBAL_X_OFFSET + index);
+    unsigned axisIndex = Axes::toIndex(axis);
 
     // Coordinate system offset
-    unsigned base = COORD_SYSTEM_BASE + get(CURRENT_COORD_SYSTEM) * 20;
-    offset += get(base + index);
+    unsigned cs = get(CURRENT_COORD_SYSTEM);
+    offset += get(COORD_SYSTEM_ADDR(cs, axisIndex));
 
     // Coordinate system rotation
-    if (get(base + 10)) {
+    if (get(COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER))) {
       // TODO XY plane rotation
     }
+
+    // Global offset (after CS offsets above)
+    if (get(GLOBAL_OFFSETS_ENABLED))
+      offset += get(GLOBAL_OFFSET_ADDR(axisIndex));
   }
 
   return offset;
@@ -207,11 +209,6 @@ Axes ControllerImpl::getAbsolutePosition() const {
   LOG_INFO(5, "Controller: Current absolute position is " << pos);
 
   return pos;
-}
-
-
-void ControllerImpl::setAxisPosition(char axis, double pos) {
-  setAxisAbsolutePosition(axis, pos + getAxisOffset(axis));
 }
 
 
@@ -348,6 +345,7 @@ void ControllerImpl::straightProbe(int vars, bool towardWorkpiece,
                                bool signalError) {
   machine.seek(PROBE, towardWorkpiece, signalError);
   makeMove(vars, false, !incrementalDistanceMode);
+  synchronizing = true; // Synchronize with found position
 
   LOG_INFO(3, "Controller: straight probe "
            << (towardWorkpiece ? "toward" : "away from") << " workpiece"
@@ -438,20 +436,24 @@ void ControllerImpl::dwell(double seconds) {machine.dwell(seconds);}
 
 
 void ControllerImpl::setCoordSystemRotation(unsigned cs, double rotation) {
-  unsigned addr = COORD_SYSTEM_BASE + cs * 20 + 9;
-  set(addr, rotation);
+  set(COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER), rotation);
 }
 
 
 void ControllerImpl::setCoordSystemOffset(unsigned cs, char axis,
                                           bool relative) {
-  unsigned addr = COORD_SYSTEM_BASE + cs * 20 + Axes::toIndex(axis);
-  set(addr, getVar(axis));  // TODO set relative offsets ala G10 L20
+  double offset = getVar(axis);
+  if (relative) offset = getAxisPosition(axis) - offset;
+
+  set(COORD_SYSTEM_ADDR(cs, Axes::toIndex(axis)), offset);
 }
 
 
 void ControllerImpl::setCoordSystem(int vars, bool relative) {
   unsigned cs = getVar('P');
+  if (9 < cs) THROWS("Invalid coordinate system number " << cs);
+  if (!cs) cs = get(CURRENT_COORD_SYSTEM);
+
   if (vars & VarTypes::VT_R) setCoordSystemRotation(cs, getVar('R'));
 
   for (const char *axis = Axes::AXES; *axis; axis++)
@@ -475,12 +477,11 @@ void ControllerImpl::setToolTable(int vars, bool relative) {
 }
 
 
-void ControllerImpl::toolChange(bool manual) {
-  int tool = get(TOOL_NUMBER);
-
-  if (machine.getTool() != tool) machine.setTool(tool);
-
-  LOG_INFO(3, "Controller: Tool change T" << tool);
+void ControllerImpl::toolChange() {
+  int tool = get("_selected_tool");
+  if (tool < 0) THROW("No tool selected");
+  machine.changeTool(tool);
+  LOG_INFO(3, "Controller: Tool change " << get(TOOL_NUMBER));
 }
 
 
@@ -488,7 +489,7 @@ void ControllerImpl::loadToolOffsets(unsigned number) {
   const Tool &tool = getTool(number);
 
   for (const char *axis = Axes::AXES; *axis; axis++)
-    set(TOOL_X_OFFSET + Axes::toIndex(*axis), tool.get(*axis));
+    set(TOOL_OFFSET_ADDR(Axes::toIndex(*axis)), tool.get(*axis));
 }
 
 
@@ -496,77 +497,51 @@ void ControllerImpl::loadToolVarOffsets(int vars) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (vars & getVarType(*axis))
       // TODO do these need to be offset?
-      set(TOOL_X_OFFSET + Axes::toIndex(*axis), getVar(*axis));
+      set(TOOL_OFFSET_ADDR(Axes::toIndex(*axis)), getVar(*axis));
 }
 
 
-void ControllerImpl::storePredefined1() {
-  set(PREDEFINED1_X, getAxisAbsolutePosition('X'));
-  set(PREDEFINED1_Y, getAxisAbsolutePosition('Y'));
-  set(PREDEFINED1_Z, getAxisAbsolutePosition('Z'));
-  set(PREDEFINED1_U, getAxisAbsolutePosition('U'));
-  set(PREDEFINED1_V, getAxisAbsolutePosition('V'));
-  set(PREDEFINED1_W, getAxisAbsolutePosition('W'));
+void ControllerImpl::storePredefined(bool first) {
+  for (const char *axis = Axes::AXES; *axis; axis++)
+    set(PREDEFINED_ADDR(first, Axes::toIndex(*axis)),
+        getAxisAbsolutePosition(*axis));
 }
 
 
-void ControllerImpl::storePredefined2() {
-  set(PREDEFINED2_X, getAxisAbsolutePosition('X'));
-  set(PREDEFINED2_Y, getAxisAbsolutePosition('Y'));
-  set(PREDEFINED2_Z, getAxisAbsolutePosition('Z'));
-  set(PREDEFINED2_U, getAxisAbsolutePosition('U'));
-  set(PREDEFINED2_V, getAxisAbsolutePosition('V'));
-  set(PREDEFINED2_W, getAxisAbsolutePosition('W'));
-}
-
-
-void ControllerImpl::loadPredefined1(int vars) {
-  if (vars & VT_X) setAxisAbsolutePosition('X', get(PREDEFINED1_X));
-  if (vars & VT_Y) setAxisAbsolutePosition('Y', get(PREDEFINED1_Y));
-  if (vars & VT_Z) setAxisAbsolutePosition('Z', get(PREDEFINED1_Z));
-  if (vars & VT_U) setAxisAbsolutePosition('U', get(PREDEFINED1_U));
-  if (vars & VT_V) setAxisAbsolutePosition('V', get(PREDEFINED1_V));
-  if (vars & VT_W) setAxisAbsolutePosition('W', get(PREDEFINED1_W));
-}
-
-
-void ControllerImpl::loadPredefined2(int vars) {
-  if (vars & VT_X) setAxisAbsolutePosition('X', get(PREDEFINED2_X));
-  if (vars & VT_Y) setAxisAbsolutePosition('Y', get(PREDEFINED2_Y));
-  if (vars & VT_Z) setAxisAbsolutePosition('Z', get(PREDEFINED2_Z));
-  if (vars & VT_U) setAxisAbsolutePosition('U', get(PREDEFINED2_U));
-  if (vars & VT_V) setAxisAbsolutePosition('V', get(PREDEFINED2_V));
-  if (vars & VT_W) setAxisAbsolutePosition('W', get(PREDEFINED2_W));
+void ControllerImpl::loadPredefined(bool first, int vars) {
+  for (const char *axis = Axes::AXES; *axis; axis++)
+    if (vars & getVarType(*axis))
+      setAxisAbsolutePosition
+        (*axis, get(PREDEFINED_ADDR(first, Axes::toIndex(*axis))));
 }
 
 
 void ControllerImpl::setGlobalOffsets(int vars) {
-  // TODO Test this
+  // TODO Test G52/G92
   set(GLOBAL_OFFSETS_ENABLED, 1);
 
+  // Make the current point have the coordinates specified, without motion
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
+      gcode_address_t addr = GLOBAL_OFFSET_ADDR(Axes::toIndex(*axis));
       double offset = getAxisPosition(*axis) - getVar(*axis);
-      unsigned index = Axes::toIndex(*axis);
 
       // Update global offset
-      set(GLOBAL_X_OFFSET + index, get(GLOBAL_X_OFFSET + index) + offset);
+      set(addr, get(addr) + offset);
     }
 }
 
 
-void ControllerImpl::resetGlobalOffsets(bool clearMemory) {
+void ControllerImpl::resetGlobalOffsets(bool clear) {
   set(GLOBAL_OFFSETS_ENABLED, 0);
 
-  if (clearMemory)
-    for (int i = 0; i < 9; i++)
-      set(GLOBAL_X_OFFSET + i, 0);
+  if (clear)
+    for (unsigned axis = 0; axis < 9; axis++)
+      set(GLOBAL_OFFSET_ADDR(axis), 0);
 }
 
 
-void ControllerImpl::restoreGlobalOffsets() {
-  set(GLOBAL_OFFSETS_ENABLED, 1);
-}
+void ControllerImpl::restoreGlobalOffsets() {set(GLOBAL_OFFSETS_ENABLED, 1);}
 
 
 void ControllerImpl::setAxisHomed(int vars, bool homed) {
@@ -599,14 +574,38 @@ void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
 
 
 void ControllerImpl::end() {
-  // See http://linuxcnc.org/docs/html/gcode_main.html#sub:M0,-M1,-M2,
+  // See http://linuxcnc.org/docs/html/gcode/m-code.html#mcode:m2-m30
+  //
+  // These commands have the following effects:
+  //
+  //   Change from Auto mode to MDI mode.
+  // N/A
+
+  //   Origin offsets are set to the default (like G54).
   set(CURRENT_COORD_SYSTEM, 1);
+
+  //   Selected plane is set to XY plane (like G17).
   setPlane(MachineInterface::XY);
+
+  //   Distance mode is set to absolute mode (like G90).
   incrementalDistanceMode = false;
-  feedMode = MachineInterface::MM_PER_MINUTE;
+
+  //   Feed rate mode is set to units per minute (like G94).
+  feedMode = MachineInterface::UNITS_PER_MINUTE;
+
+  //   Feed and speed overrides are set to ON (like M48).
+  // TODO
+
+  //   Cutter compensation is turned off (like G40).
   cutterRadiusComp = false;
-  // TODO Set feed and speed overrides to ON (like M48)
+
+  //   The spindle is stopped (like M5).
   setSpindleDir(DIR_OFF);
+
+  //   The current motion mode is set to feed (like G1).
+  setCurrentMotionMode(10);
+
+  //   Coolant is turned off (like M9).
   setMistCoolant(false);
   setFloodCoolant(false);
 
@@ -614,10 +613,12 @@ void ControllerImpl::end() {
 }
 
 
-double ControllerImpl::get(unsigned addr) const {return machine.get(addr);}
+double ControllerImpl::get(gcode_address_t addr) const {
+  return machine.get(addr);
+}
 
 
-void ControllerImpl::set(unsigned addr, double value) {
+void ControllerImpl::set(gcode_address_t addr, double value) {
   machine.set(addr, value);
 }
 
@@ -639,9 +640,15 @@ void ControllerImpl::setVarExpr(char c, const SmartPointer<Entity> &entity) {
 }
 
 
+void ControllerImpl::setCurrentMotionMode(unsigned mode) {
+  currentMotionMode = mode;
+}
+
+
 void ControllerImpl::synchronize(const Axes &position) {
   if (!synchronizing) THROW("Not synchronizing");
   setAbsolutePosition(position);
+  // TODO Also set probed position PROBE_RESULT_X-W and PROBE_SUCCESS
   synchronizing = false;
 }
 
@@ -670,7 +677,9 @@ void ControllerImpl::setSpeed(double speed) {
 }
 
 
-void ControllerImpl::setTool(unsigned tool) {set(TOOL_NUMBER, tool);}
+void ControllerImpl::setTool(unsigned tool) {
+  machine.set("_selected_tool", tool);
+}
 
 
 void ControllerImpl::newBlock() {
@@ -688,7 +697,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
   switch (code.type) {
   case 'G':
-    switch ((unsigned)floor(10 * code.number + 0.5)) {
+    switch (code.number) {
     case 0:
       makeMove(vars, true, !incrementalDistanceMode);
       verbose = false;
@@ -712,10 +721,10 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 100:
       switch ((unsigned)getVar('L')) {
-      case 1: setToolTable(vars, false);   break;
-      case 2: setCoordSystem(vars, false); break;
-      case 10: setToolTable(vars, true);   break;
-      case 20: setCoordSystem(vars, true); break;
+      case 1:  setToolTable(vars,   false); break;
+      case 2:  setCoordSystem(vars, false); break;
+      case 10: setToolTable(vars,   true);  break;
+      case 20: setCoordSystem(vars, true);  break;
       }
       break;
 
@@ -732,14 +741,14 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 280:
       if (vars & VT_AXIS) {
         makeMove(vars, true, true);
-        loadPredefined1(vars);
+        loadPredefined(true, vars);
 
-      } else loadPredefined1(VT_AXIS);
+      } else loadPredefined(true, VT_AXIS);
 
       makeMove(0, true, true);
       break;
 
-    case 281: storePredefined1(); break;
+    case 281: storePredefined(true); break;
 
     case 282: setAxisHomed(vars, false); break;
     case 283: setAxisHomed(vars, true);  break;
@@ -747,17 +756,17 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 300:
       if (vars & VT_AXIS) {
         makeMove(vars, true, true);
-        loadPredefined2(vars);
+        loadPredefined(false, vars);
 
-      } else loadPredefined2(VT_AXIS);
+      } else loadPredefined(false, VT_AXIS);
 
       makeMove(0, true, true);
       break;
 
-    case 301: storePredefined2(); break;
+    case 301: storePredefined(false); break;
 
-    case 330: implemented = false; break;
-    case 331: implemented = false; break;
+    case 330: implemented = false; break; // TODO Spindle synchronized motion
+    case 331: implemented = false; break; // TODO Rigid tapping
 
     case 382: straightProbe(vars, true,  true);  break;
     case 383: straightProbe(vars, true,  false); break;
@@ -785,6 +794,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
       break;
     case 490: toolLengthComp = false; break;
 
+    case 520: setGlobalOffsets(vars); break; // Same as G92
     case 530: moveInAbsoluteCoords = true;  break;
     case 540: set(CURRENT_COORD_SYSTEM, 1); break;
     case 550: set(CURRENT_COORD_SYSTEM, 2); break;
@@ -809,7 +819,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 730: implemented = false; break; // Drill cycle w/ chip breaking
     case 760: implemented = false; break; // Thread cycle
 
-    case 800: modalMotion = false;              break; // Cancel canned cycle
+    case 800:                                   break; // Cancel canned cycle
     case 810: drill(vars, false, false, false); break; // Drill cycle
     case 820: drill(vars, true, false, false);  break; // Drill cycle w/ dwell
     case 830: implemented = false;              break; // Peck drill
@@ -831,8 +841,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 923: restoreGlobalOffsets();    break;
 
     case 930: feedMode = MachineInterface::INVERSE_TIME;      break;
-    case 940: feedMode = MachineInterface::MM_PER_MINUTE;     break;
-    case 950: feedMode = MachineInterface::MM_PER_REVOLUTION; break;
+    case 940: feedMode = MachineInterface::UNITS_PER_MINUTE;     break;
+    case 950: feedMode = MachineInterface::UNITS_PER_REVOLUTION; break;
 
       // NOTE: The spindle modes must be accompanied by a speed
     case 960:
@@ -849,19 +859,39 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     break;
 
   case 'M':
-    switch ((unsigned)code.number) {
-    case 0: case 1: case 60:                     break; // Pause
-    case 2: case 30: end();                      break; // End Program
-    case 3: setSpindleDir(DIR_CLOCKWISE);        break;
-    case 4: setSpindleDir(DIR_COUNTERCLOCKWISE); break;
-    case 5: setSpindleDir(DIR_OFF);              break;
-    case 6: toolChange(true);                    break; // Manual Tool Change
-    case 7: setMistCoolant(true);                break;
-    case 8: setFloodCoolant(true);               break;
-    case 9:
+    switch (code.number) {
+    case 0:                                       break; // TODO Pause
+    case 10:                                      break; // TODO Optional pause
+    case 20: end();                               break; // End program
+    case 30: setSpindleDir(DIR_CLOCKWISE);        break;
+    case 40: setSpindleDir(DIR_COUNTERCLOCKWISE); break;
+    case 50: setSpindleDir(DIR_OFF);              break;
+    case 60: toolChange();                        break; // Manual Tool Change
+    case 70: setMistCoolant(true);                break;
+    case 80: setFloodCoolant(true);               break;
+    case 90:
       setMistCoolant(false);
       setFloodCoolant(false);
       break;
+
+      // TODO the following M-Codes
+    case 190: implemented = false; break; // Orient spindle
+    case 300: end(); break; // TODO Exchange pallet shuttles and end program
+    case 480: case 490: // Speed and feed override control
+    case 500: // Feed override control
+    case 510: // Spindle speed override control
+    case 520: // Adaptive feed control
+    case 530: // Feed stop control
+    case 600: // Pallet change pause
+    case 610: // Set current tool
+    case 620: case 630: case 640: case 650: // Digital output
+    case 660: // Wait on input
+    case 670: // Synchronized analog output
+    case 680: // Imediate analog output
+    case 700: // Save modal state
+    case 710: // Invalidate stored state
+    case 720: // Restore modal state
+    case 730: // Save and Auto-restore modal state
 
     default: implemented = false;
     }

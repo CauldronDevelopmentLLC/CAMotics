@@ -30,7 +30,7 @@ namespace GCode {
   class Code {
   public:
     char type;
-    float number;
+    unsigned number; // Code * 10
     unsigned priority;
     ModalGroup group;
     int vars;
@@ -39,6 +39,7 @@ namespace GCode {
 
   std::ostream &operator<<(std::ostream &stream, const Code &code);
 
+
   class Codes {
   public:
     static const Code codes[];
@@ -46,6 +47,6 @@ namespace GCode {
     static const Code g10codes[];
     static const Code mcodes[];
 
-    static const Code *find(char type, float number, float L = 0);
+    static const Code *find(char type, double number, double L = 0);
   };
 }

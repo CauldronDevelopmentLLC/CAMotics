@@ -55,7 +55,7 @@ namespace GCode {
     void end() {parent->end();}
 
     double getFeed(feed_mode_t *mode = 0) const {return parent->getFeed(mode);}
-    void setFeed(double feed, feed_mode_t mode = MM_PER_MINUTE)
+    void setFeed(double feed, feed_mode_t mode = UNITS_PER_MINUTE)
     {parent->setFeed(feed, mode);}
 
     double getSpeed(spin_mode_t *mode = 0, double *max = 0) const
@@ -63,8 +63,7 @@ namespace GCode {
     void setSpeed(double speed, spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
                   double max = 0) {parent->setSpeed(speed, mode, max);}
 
-    int getTool() const {return parent->getTool();}
-    void setTool(unsigned tool) {parent->setTool(tool);}
+    void changeTool(unsigned tool) {parent->changeTool(tool);}
 
     void wait(port_t port, bool active, double timeout)
     {parent->wait(port, active, timeout);}
@@ -88,8 +87,8 @@ namespace GCode {
 
     void pause(bool optional = true) {parent->pause(optional);}
 
-    double get(unsigned addr) const {return parent->get(addr);}
-    void set(unsigned addr, double value) {parent->set(addr, value);}
+    double get(gcode_address_t addr) const {return parent->get(addr);}
+    void set(gcode_address_t addr, double value) {parent->set(addr, value);}
 
     bool has(const std::string &name) const {return parent->has(name);}
     double get(const std::string &name) const {return parent->get(name);}

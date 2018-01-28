@@ -64,7 +64,6 @@ namespace GCode {
     void start();
     void end();
     void setSpeed(double speed, spin_mode_t mode, double max);
-    void setTool(unsigned tool);
     //void wait(port_t port, bool active, double timeout);
     void seek(port_t port, bool active, bool error);
     void output(port_t port, double value);

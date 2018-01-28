@@ -41,12 +41,15 @@ class GCodeTool : public CAMotics::CommandLineApp {
   SmartPointer<Controller> controller;
 
   bool parseOnly;
+  bool annotate;
 
 public:
   GCodeTool() :
-    CAMotics::CommandLineApp("CAMotics GCode Tool"), parseOnly(false) {
+    CAMotics::CommandLineApp("CAMotics GCode Tool"), parseOnly(false),
+    annotate(false) {
     cmdLine.addTarget("parse", parseOnly,
                       "Only parse the GCode, don't evaluate it.");
+    cmdLine.addTarget("annotate", annotate, "Annotate parsed GCode.");
   }
 
 
@@ -64,7 +67,7 @@ public:
   // From cb::Reader
   void read(const InputSource &source) {
     if (parseOnly) {
-      Printer printer(*stream);
+      Printer printer(*stream, annotate);
       Parser().parse(source, printer);
 
     } else {

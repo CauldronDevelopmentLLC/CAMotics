@@ -23,6 +23,7 @@
 #include "MachineEnum.h"
 
 #include <gcode/Axes.h>
+#include <gcode/Addresses.h>
 
 #include <cbang/Exception.h>
 #include <cbang/LocationRange.h>
@@ -50,20 +51,20 @@ namespace GCode {
      *
      * Positive feed rates depend on the feed mode.
      *
-     * MM_PER_MINUTE mode, the default, indicates that the controlled point
+     * UNITS_PER_MINUTE mode, the default, indicates that the controlled point
      * should move @param feed millimeters per minute.
      *
      * INVERSE_TIME mode indicates that each move should be completed in
      * 1 / @param feed minutes.  For example, if @param feed is 2, the move
      * should be completed in half a minute.
      *
-     * MM_PER_REVOLUTION mode indicates the controlled point should move a
+     * UNITS_PER_REVOLUTION mode indicates the controlled point should move a
      * certain number of millimeters per revolution of the spindle.
      *
      * @throw cb::Exception if @param mode is invalid or @param feed is
      * negative.
      */
-    virtual void setFeed(double feed, feed_mode_t mode = MM_PER_MINUTE) = 0;
+    virtual void setFeed(double feed, feed_mode_t mode = UNITS_PER_MINUTE) = 0;
 
     /***
      * @return the currently programed spindle speed and optionaly the spin
@@ -91,18 +92,12 @@ namespace GCode {
                           spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
                           double max = 0) = 0;
 
-    /// @return the currently programed tool number.
-    virtual int getTool() const = 0;
-
     /***
      * Select the active tool.
      * This may cause some machines to run a tool change routine and return to
      * the current location.
-     *
-     * @throw cb::Exception if there are any pending errors, or if the tool
-     * number is invalid.
      */
-    virtual void setTool(unsigned tool) = 0;
+    virtual void changeTool(unsigned tool) = 0;
 
     /***
      * Wait for input change.
@@ -189,8 +184,8 @@ namespace GCode {
     virtual void pause(bool optional = true) = 0;
 
     // Number parameters
-    virtual double get(unsigned addr) const = 0;
-    virtual void set(unsigned addr, double value) = 0;
+    virtual double get(gcode_address_t addr) const = 0;
+    virtual void set(gcode_address_t addr, double value) = 0;
 
     // Named parameters
     virtual bool has(const std::string &name) const = 0;

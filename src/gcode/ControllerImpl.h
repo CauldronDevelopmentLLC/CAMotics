@@ -24,7 +24,6 @@
 #include "VarTypes.h"
 #include "ModalGroup.h"
 #include "ToolTable.h"
-#include "Addresses.h"
 
 #include <gcode/machine/MachineUnitAdapter.h>
 
@@ -67,6 +66,7 @@ namespace GCode {
     bool synchronizing;
 
     // State variables
+    unsigned currentMotionMode;
     MachineInterface::plane_t plane;
     bool latheDiameterMode;          // TODO unsupported
     bool cutterRadiusComp;           // TODO unsupported
@@ -75,7 +75,6 @@ namespace GCode {
     return_mode_t returnMode;
     double motionBlendingTolerance;  // TODO unsupported
     double naiveCamTolerance;        // TODO unsupported
-    bool modalMotion;                // TODO unsupported
     bool incrementalDistanceMode;
     bool arcIncrementalDistanceMode;
     bool moveInAbsoluteCoords;
@@ -120,7 +119,6 @@ namespace GCode {
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
     Axes getAbsolutePosition() const;
-    void setAxisPosition(char axis, double pos);
     void setAbsolutePosition(const Axes &axes);
     Axes getNextPosition(int vars, bool absolute) const;
 
@@ -145,19 +143,17 @@ namespace GCode {
     const Tool &getTool(unsigned tool) const {return tools.get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
     void setToolTable(int vars, bool relative);
-    void toolChange(bool manual = false);
+    void toolChange();
     void loadToolOffsets(unsigned tool);
     void loadToolVarOffsets(int vars);
 
     // Predefined locations
-    void storePredefined1();
-    void storePredefined2();
-    void loadPredefined1(int vars);
-    void loadPredefined2(int vars);
+    void storePredefined(bool first);
+    void loadPredefined(bool first, int vars);
 
     // Offsets
     void setGlobalOffsets(int vars);
-    void resetGlobalOffsets(bool clearMemory);
+    void resetGlobalOffsets(bool clear);
     void restoreGlobalOffsets();
 
     // Homing
@@ -170,14 +166,17 @@ namespace GCode {
     void end();
 
     // From Controller
-    double get(unsigned addr) const;
-    void set(unsigned addr, double value);
+    double get(gcode_address_t addr) const;
+    void set(gcode_address_t addr, double value);
     bool has(const std::string &name) const;
     double get(const std::string &name) const;
     void set(const std::string &name, double value);
 
     void setVar(char c, double value);
     void setVarExpr(char c, const cb::SmartPointer<Entity> &entity);
+
+    unsigned getCurrentMotionMode() {return currentMotionMode;}
+    void setCurrentMotionMode(unsigned mode);
 
     bool isSynchronizing() const {return synchronizing;}
     void synchronize(const Axes &position);

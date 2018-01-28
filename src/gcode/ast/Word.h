@@ -41,12 +41,12 @@ namespace GCode {
     Word(char type, const cb::SmartPointer<Entity> &expr) :
       type(std::toupper(type)), expr(expr), value(0), code(0) {}
 
-    void setType(char type) {this->type = type;}
+    void setType(char type) {this->type = std::toupper(type);}
     char getType() const {return type;}
 
     void setExpression(const cb::SmartPointer<Entity> &expr)
     {this->expr = expr;}
-    cb::SmartPointer<Entity> getExpression() const {return expr;}
+    const cb::SmartPointer<Entity> &getExpression() const {return expr;}
 
     double getValue() const {return value;}
     const Code *getCode() const {return code;}

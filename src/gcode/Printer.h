@@ -30,15 +30,13 @@ namespace GCode {
   protected:
     std::ostream &stream;
 
-    bool addComments;
+    bool annotate;
     bool removeBlankLines;
 
   public:
-    Printer(std::ostream &stream) :
-      stream(stream), addComments(false), removeBlankLines(false) {}
-
-    void setAddComments(bool x) {addComments = x;}
-    void setRemoveBlankLines(bool x) {removeBlankLines = x;}
+    Printer(std::ostream &stream, bool annotate = false,
+            bool removeEmptyLines = false) :
+      stream(stream), annotate(annotate), removeBlankLines(removeEmptyLines) {}
 
     // From Processor
     void operator()(const cb::SmartPointer<Block> &block);

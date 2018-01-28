@@ -165,7 +165,7 @@ void Opt::extract(GCode::ToolPath &path) const {
     Vector3D last = sink.getPosition().getXYZ();
     Vector3D next = it->startPoint();
 
-    sink.setTool(it->begin()->getTool());
+    sink.changeTool(it->begin()->getTool());
     sink.setFeed(it->begin()->getFeed());
     sink.setSpeed(it->begin()->getSpeed());
 
@@ -185,7 +185,7 @@ void Opt::extract(GCode::ToolPath &path) const {
     for (unsigned i = 0; i < it->size(); i++) {
       const GCode::Move &move = it->at(i);
 
-      sink.setTool(move.getTool());
+      sink.changeTool(move.getTool());
       sink.setFeed(move.getFeed());
       sink.setSpeed(move.getSpeed());
       sink.move(move.getEnd(), false);

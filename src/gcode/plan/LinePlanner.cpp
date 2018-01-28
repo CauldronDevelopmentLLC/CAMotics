@@ -161,12 +161,6 @@ void LinePlanner::setSpeed(double speed, spin_mode_t mode, double max) {
 }
 
 
-void LinePlanner::setTool(unsigned tool) {
-  MachineAdapter::setTool(tool);
-  pushSetCommand("tool", tool);
-}
-
-
 void LinePlanner::seek(port_t port, bool active, bool error) {
   MachineAdapter::seek(port, active, error);
   push(new SeekCommand(nextID++, port, active, error));

@@ -97,11 +97,11 @@ namespace GCode {
     void operator()(const cb::SmartPointer<Block> &block);
 
     // From GCodeInterpreter
-    void setReference(unsigned num, double value);
+    void setReference(gcode_address_t addr, double value);
     void setReference(const std::string &name, double value);
 
     // From Evaluator
-    double lookupReference(unsigned num);
+    double lookupReference(gcode_address_t addr);
     double lookupReference(const std::string &name);
   };
 }

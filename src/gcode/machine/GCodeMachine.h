@@ -34,11 +34,13 @@ namespace GCode {
 
     Axes position;
 
+    int oldTool;
+
     cb::FileLocation location;
 
   public:
     GCodeMachine(std::ostream &stream, Units units) :
-      stream(stream), units(units) {}
+      stream(stream), units(units), oldTool(-1) {}
 
     void beginLine();
 
@@ -48,7 +50,7 @@ namespace GCode {
 
     void setFeed(double feed, feed_mode_t mode);
     void setSpeed(double speed, spin_mode_t mode, double max);
-    void setTool(unsigned tool);
+    void changeTool(unsigned tool);
 
     void wait(port_t port, bool active, double timeout);
     void seek(port_t port, bool active, bool error);

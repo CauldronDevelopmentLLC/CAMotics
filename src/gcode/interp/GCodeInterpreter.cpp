@@ -40,12 +40,12 @@ using namespace GCode;
 
 
 GCodeInterpreter::GCodeInterpreter(Controller &controller) :
-  controller(controller), activeMotion(Codes::find('G', 0)) {}
+  controller(controller) {}
 
 
-void GCodeInterpreter::setReference(unsigned num, double value) {
-  LOG_DEBUG(3, "Set global variable #" << num << "=" << value);
-  controller.set(num, value);
+void GCodeInterpreter::setReference(gcode_address_t addr, double value) {
+  LOG_DEBUG(3, "Set global variable #" << addr << "=" << value);
+  controller.set(addr, value);
 }
 
 
@@ -74,22 +74,22 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   for (Block::iterator it = block->begin(); it != block->end(); it++) {
     (*it)->eval(*this);
 
-    if ((assign = (*it)->instance<Assign>())) {
+    if ((assign = (*it)->instance<Assign>())) { // Handle Assigns
       Reference *ref;
       NamedReference *nameRef;
 
       if ((ref = assign->getReference()->instance<Reference>()))
-        setReference(ref->getNumber(), assign->getExprValue());
+        setReference((gcode_address_t)ref->getNumber(), assign->getExprValue());
 
       else if ((nameRef = assign->getReference()->instance<NamedReference>()))
         setReference(nameRef->getName(), assign->getExprValue());
 
       else THROW("Invalid reference type in Assign");
 
-    } else if ((word = (*it)->instance<Word>())) {
+    } else if ((word = (*it)->instance<Word>())) { // Handle Words
       double value = word->getValue(); // Must be after eval
       char c = word->getType();
-      const Code *code;
+      const Code *code = 0;
 
       switch (c) {
       case 'F': if (3 < lowestPriority) lowestPriority = 3; break;
@@ -158,12 +158,14 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
     unsigned priority = lowestPriority;
 
     // Implicit motion
+    const Code *activeMotion =
+      Codes::find('G', controller.getCurrentMotionMode() / 10.0);
     if (implicitMotion && (vars & VT_AXIS) &&
         activeMotion->priority < priority) {
-      Word *implicitWord = new Word(activeMotion);
+      SmartPointer<Word> implicitWord = new Word(activeMotion);
       implicitWord->getLocation() = block->getLocation();
-      words.push_back(implicitWord);
-      block->push_back(implicitWord);
+      words.push_back(implicitWord.get());
+      block->push_back(implicitWord); // Block owns Word
       implicitMotion = false;
       priority = activeMotion->priority;
 
@@ -199,7 +201,8 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
           controller.setLocation(word->getLocation());
           if (!controller.execute(*code, vars))
             LOG_WARNING("Not implemented: " << *code);
-          else if (code->group == MG_MOTION) activeMotion = code;
+          else if (code->group == MG_MOTION)
+            controller.setCurrentMotionMode(code->number);
         }
 
         wordPriority = code->priority;
@@ -216,8 +219,8 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 }
 
 
-double GCodeInterpreter::lookupReference(unsigned num) {
-  return controller.get(num);
+double GCodeInterpreter::lookupReference(gcode_address_t addr) {
+  return controller.get(addr);
 }
 
 

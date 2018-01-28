@@ -70,18 +70,18 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("workpiece()", this, &GCodeModule::workpieceCB);
 
   exports.insert("FEED_INVERSE_TIME", INVERSE_TIME);
-  exports.insert("FEED_UNITS_PER_MIN", MM_PER_MINUTE);
-  exports.insert("FEED_UNITS_PER_REV", MM_PER_REVOLUTION);
+  exports.insert("FEED_UNITS_PER_MIN", UNITS_PER_MINUTE);
+  exports.insert("FEED_UNITS_PER_REV", UNITS_PER_REVOLUTION);
 
   exports.insert("IMPERIAL", Units::IMPERIAL);
   exports.insert("METRIC", Units::METRIC);
 
-  exports.insert("XY", XY);
-  exports.insert("XZ", XZ);
-  exports.insert("YZ", YZ);
-  exports.insert("YV", YV);
-  exports.insert("UV", UV);
-  exports.insert("VW", VW);
+  exports.insert("XY", MachineEnum::XY);
+  exports.insert("UV", MachineEnum::UV);
+  exports.insert("XZ", MachineEnum::XZ);
+  exports.insert("UW", MachineEnum::UW);
+  exports.insert("YZ", MachineEnum::YZ);
+  exports.insert("VW", MachineEnum::VW);
 
   exports.insert("CYLINDRICAL", ToolShape::TS_CYLINDRICAL);
   exports.insert("CONICAL", ToolShape::TS_CONICAL);
@@ -193,11 +193,11 @@ void GCodeModule::feedCB(const js::Value &args, js::Sink &sink) {
   }
 
   // Otherwise set feed
-  feed_mode_t mode = MM_PER_MINUTE;
+  feed_mode_t mode = UNITS_PER_MINUTE;
   if (args.has("mode")) {
     mode = (feed_mode_t)args.getInteger("mode");
     switch (mode) {
-    case INVERSE_TIME: case MM_PER_MINUTE: case MM_PER_REVOLUTION: break;
+    case INVERSE_TIME: case UNITS_PER_MINUTE: case UNITS_PER_REVOLUTION: break;
     default: THROW("Feed mode must be FEED_INVERSE_TIME, FEED_UNITS_PER_MIN or "
                    "FEED_UNITS_PER_REV");
     }
@@ -244,9 +244,9 @@ void GCodeModule::toolCB(const js::Value &args, js::Sink &sink) {
 
   if (args.has("number")) {
     number = args.getInteger("number");
-    ctx.machine.setTool(number);
+    ctx.machine.changeTool(number);
 
-  } else number = ctx.machine.getTool();
+  } else number = ctx.machine.get(TOOL_NUMBER);
 
   if (number < 0) return;
 

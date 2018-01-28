@@ -20,13 +20,14 @@
 
 #include "Printer.h"
 
-#include <cbang/SStream.h>
-#include <cbang/log/Logger.h>
-
 #include "Codes.h"
 
 #include "ast/Word.h"
 #include "ast/Number.h"
+
+#include <cbang/SStream.h>
+#include <cbang/Math.h>
+#include <cbang/log/Logger.h>
 
 using namespace std;
 using namespace cb;
@@ -35,26 +36,25 @@ using namespace GCode;
 
 void Printer::operator()(const SmartPointer<Block> &block) {
   if (!block->isEmpty() || !removeBlankLines) {
-    if (addComments) {
+    if (annotate) {
       string comments;
 
+      // Find Words
       Block::const_iterator it;
-      for (it = block->begin(); it != block->end(); it++) {
-        Word *word = dynamic_cast<Word *>(it->get());
-
-        if (word) {
+      for (it = block->begin(); it != block->end(); it++)
+        if (it->isInstance<Word>()) {
+          SmartPointer<Word> word = it->cast<Word>();
           char type = word->getType();
-          Number *number = dynamic_cast<Number *>(word->getExpression().get());
+          const SmartPointer<Entity> &expr = word->getExpression();
 
-          if (number) {
-            double value = number->getValue();
+          if (expr.isInstance<Number>()) {
+            double value = expr.cast<Number>()->getValue();
             const Code *code = Codes::find(type, value);
-
             if (code) comments += SSTR(" (" << code->description << ')');
           }
         }
-      }
 
+      // Try to format to 80 columns
       if (!comments.empty()) {
         string line = SSTR(*block);
         stream << line;

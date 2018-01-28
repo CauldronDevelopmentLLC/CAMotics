@@ -20,6 +20,10 @@
 
 #include "Codes.h"
 
+#include <cbang/Math.h>
+
+#include <ctype.h>
+
 using namespace std;
 using namespace GCode;
 
@@ -28,7 +32,9 @@ typedef VarTypes VT;
 
 
 ostream &GCode::operator<<(ostream &stream, const Code &code) {
-  return stream << code.type << code.number << " (" << code.description << ')';
+  stream << code.type << code.number / 10;
+  if (code.number % 10) stream << '.' << (code.number % 10);
+  return stream << " (" << code.description << ')';
 }
 
 
@@ -47,285 +53,291 @@ const Code Codes::codes[] = {
 const Code Codes::gcodes[] = {
   {'G', 0, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Rapid Linear Motion"},
-  {'G', 1, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 10, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Linear Motion"},
-  {'G', 2, 20, MG::MG_MOTION, VT::VT_ANGLE,
+  {'G', 20, 20, MG::MG_MOTION, VT::VT_ANGLE,
    "Clockwise Arc"},
-  {'G', 3, 20, MG::MG_MOTION, VT::VT_ANGLE,
+  {'G', 30, 20, MG::MG_MOTION, VT::VT_ANGLE,
    "Counterclockwise Arc"},
 
-  {'G', 4, 10, MG::MG_ZERO, VT::VT_P,
+  {'G', 40, 10, MG::MG_ZERO, VT::VT_P,
    "Dwell"},
 
-  {'G', 5.1, 20, MG::MG_MOTION, VT::VT_X | VT::VT_Y | VT::VT_I | VT::VT_J,
+  {'G', 51, 20, MG::MG_MOTION, VT::VT_X | VT::VT_Y | VT::VT_I | VT::VT_J,
    "Quadratic B-spline"},
-  {'G', 5.2, 20, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P | VT::VT_L,
+  {'G', 52, 20, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P | VT::VT_L,
    "Open NURBs Block"},
-  {'G', 5.3, 20, MG::MG_MOTION, VT::VT_NONE,
+  {'G', 53, 20, MG::MG_MOTION, VT::VT_NONE,
    "Close NURBs Block"},
 
-  {'G', 7, 2, MG::MG_LATHE, VT::VT_NONE,
+  {'G', 70, 2, MG::MG_LATHE, VT::VT_NONE,
    "Lathe Diameter Mode"},
-  {'G', 8, 2, MG::MG_LATHE, VT::VT_NONE,
+  {'G', 80, 2, MG::MG_LATHE, VT::VT_NONE,
    "Lathe Radius Mode"},
 
-  {'G', 10, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
+  {'G', 100, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
    VT::VT_ANGLE | VT::VT_Q,
    "System Codes"},
 
-  {'G', 17, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 170, 11, MG::MG_PLANE, VT::VT_NONE,
    "XY Plane Selection"},
-  {'G', 17.1, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 171, 11, MG::MG_PLANE, VT::VT_NONE,
    "UV Plane Selection"},
-  {'G', 18, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 180, 11, MG::MG_PLANE, VT::VT_NONE,
    "ZX Plane Selection"},
-  {'G', 18.1, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 181, 11, MG::MG_PLANE, VT::VT_NONE,
    "WU Plane Selection"},
-  {'G', 19, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 190, 11, MG::MG_PLANE, VT::VT_NONE,
    "YZ Plane Selection"},
-  {'G', 19.1, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 191, 11, MG::MG_PLANE, VT::VT_NONE,
    "VW Plane Selection"},
 
-  {'G', 20, 12, MG::MG_UNITS, VT::VT_NONE,
+  {'G', 200, 12, MG::MG_UNITS, VT::VT_NONE,
    "Use Inches"},
-  {'G', 21, 12, MG::MG_UNITS, VT::VT_NONE,
+  {'G', 210, 12, MG::MG_UNITS, VT::VT_NONE,
    "Use Millimeters"},
 
-  {'G', 28, 19, MG::MG_ZERO, VT::VT_NONE, // Used for homing on 3D printers
+  {'G', 280, 19, MG::MG_ZERO, VT::VT_NONE, // Used for homing on 3D printers
    "Go to Predefined Position 1"},
-  {'G', 28.1, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 281, 19, MG::MG_ZERO, VT::VT_NONE,
   "Set Predefined Position 1"},
-  {'G', 28.2, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 282, 19, MG::MG_ZERO, VT::VT_NONE,
   "Set Axes unhomed"},
-  {'G', 28.3, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 283, 19, MG::MG_ZERO, VT::VT_NONE,
   "Set Axes home positions"},
-  {'G', 30, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 300, 19, MG::MG_ZERO, VT::VT_NONE,
    "Go to Predefined Position 2"},
-  {'G', 30.1, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 301, 19, MG::MG_ZERO, VT::VT_NONE,
    "Set Predefined Position 2"},
 
-  {'G', 33, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
+  {'G', 330, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
    "Spindle-Synchronized Motion"},
-  {'G', 33.1, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
+  {'G', 331, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
    "Rigid Tapping"},
 
-  {'G', 38.2, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 382, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe toward workpiece w/ error signal"},
-  {'G', 38.3, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 383, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe toward workpiece wo/ error signal"},
-  {'G', 38.4, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 384, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe away from workpiece w/ error signal"},
-  {'G', 38.5, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 385, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe away from workpiece wo/ error signal"},
 
-  {'G', 38.6, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 386, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Seek active switch w/ error signal"},
-  {'G', 38.7, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 387, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Seek active switch wo/ error signal"},
-  {'G', 38.8, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 388, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Seek inactive switch w/ error signal"},
-  {'G', 38.9, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 389, 20, MG::MG_MOTION, VT::VT_AXIS,
    "Seek inactive switch wo/ error signal"},
 
-  {'G', 40, 13, MG::MG_CUTTER_RADIUS, VT::VT_NONE,
+  {'G', 400, 13, MG::MG_CUTTER_RADIUS, VT::VT_NONE,
    "Cutter Radius Compensation Off"},
-  {'G', 41, 13, MG::MG_CUTTER_RADIUS, VT::VT_D,
+  {'G', 410, 13, MG::MG_CUTTER_RADIUS, VT::VT_D,
    "Left Cutter Radius Compensation"},
-  {'G', 41.1, 13, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
+  {'G', 411, 13, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
    "Left Dynamic Cutter Radius Compensation"},
-  {'G', 42, 13, MG::MG_CUTTER_RADIUS, VT::VT_D,
+  {'G', 420, 13, MG::MG_CUTTER_RADIUS, VT::VT_D,
    "Right Cutter Radius Compensation"},
-  {'G', 42.1, 13, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
+  {'G', 421, 13, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
    "Right Dynamic Cutter Radius Compensation"},
 
-  {'G', 43, 14, MG::MG_TOOL_OFFSET, VT::VT_H,
+  {'G', 430, 14, MG::MG_TOOL_OFFSET, VT::VT_H,
    "Activate Tool Length Compensation"},
-  {'G', 43.1, 14, MG::MG_TOOL_OFFSET, VT::VT_AXIS,
+  {'G', 431, 14, MG::MG_TOOL_OFFSET, VT::VT_AXIS,
    "Activate Dynamic Tool Length Compensation"},
-  {'G', 49, 14, MG::MG_TOOL_OFFSET, VT::VT_NONE,
+  {'G', 490, 14, MG::MG_TOOL_OFFSET, VT::VT_NONE,
    "Cancel Tool Length Compensation"},
 
-  {'G', 53, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 520, 19, MG::MG_ZERO, VT::VT_AXIS,
+   "Set Coordinate System Offsets"},
+  {'G', 530, 19, MG::MG_ZERO, VT::VT_NONE,
    "Move in Absolute Coordinates"},
 
-  {'G', 54, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 540, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 1"},
-  {'G', 55, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 550, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 2"},
-  {'G', 56, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 560, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 3"},
-  {'G', 57, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 570, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 4"},
-  {'G', 58, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 580, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 5"},
-  {'G', 59, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 590, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 6"},
-  {'G', 59.1, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 591, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 7"},
-  {'G', 59.2, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 592, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 8"},
-  {'G', 59.3, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 593, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 9"},
 
-  {'G', 61, 16, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 610, 16, MG::MG_ZERO, VT::VT_NONE,
    "Set Exact Path Control Mode"},
-  {'G', 61.1, 16, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 611, 16, MG::MG_ZERO, VT::VT_NONE,
    "Set Exact Stop Control Mode"},
-  {'G', 64, 16, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+  {'G', 640, 16, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
    "Set Best Possible Speed Control Mode"},
 
-  {'G', 73, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_ABC | VT::VT_RLQ,
+  {'G', 730, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_ABC | VT::VT_RLQ,
    "Drilling Cycle with Chip Breaking"},
-  {'G', 76, 20, MG::MG_MOTION, VT::VT_P | VT::VT_Z | VT::VT_IJK |  VT::VT_RLQ |
+  {'G', 760, 20, MG::MG_MOTION, VT::VT_P | VT::VT_Z | VT::VT_IJK |  VT::VT_RLQ |
    VT::VT_H | VT::VT_E, "Threading Cycle"},
-  {'G', 80, 20, MG::MG_MOTION, VT::VT_NONE,
+  {'G', 800, 20, MG::MG_MOTION, VT::VT_NONE,
    "Cancel Modal Motion"},
-  {'G', 81, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 810, 20, MG::MG_MOTION, VT::VT_CANNED,
    "Drilling Cycle"},
-  {'G', 82, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
+  {'G', 820, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
    "Drilling Cycle w/ Dwell"},
-  {'G', 83, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 830, 20, MG::MG_MOTION, VT::VT_CANNED,
    "Peck Drilling"},
-  {'G', 84, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 840, 20, MG::MG_MOTION, VT::VT_CANNED,
    "Right-Hand Tapping"},
-  {'G', 85, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 850, 20, MG::MG_MOTION, VT::VT_CANNED,
    "Boring, No Dwell, Feed Out"},
-  {'G', 86, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
+  {'G', 860, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
    "Boring, Spindle Stop, Rapid Out"},
-  {'G', 87, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 870, 20, MG::MG_MOTION, VT::VT_CANNED,
    "Back Boring"},
-  {'G', 88, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 880, 20, MG::MG_MOTION, VT::VT_CANNED,
    "Boring, Spindle Stop, Manual Out"},
-  {'G', 89, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
+  {'G', 890, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
    "Boring, Dwell, Feed Out"},
 
-  {'G', 90, 17, MG::MG_DISTANCE, VT::VT_NONE,
+  {'G', 900, 17, MG::MG_DISTANCE, VT::VT_NONE,
    "XYZ Absolute Distance Mode"},
-  {'G', 90.1, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
+  {'G', 901, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
    "IJK Absolute Distance Mode"},
-  {'G', 91, 17, MG::MG_DISTANCE, VT::VT_NONE,
+  {'G', 910, 17, MG::MG_DISTANCE, VT::VT_NONE,
    "XYZ Incremental Distance Mode"},
-  {'G', 91.1, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
+  {'G', 911, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
    "IJK Incremental Distance Mode"},
 
-  {'G', 92, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 920, 19, MG::MG_ZERO, VT::VT_AXIS,
    "Set Coordinate System Offsets"},
-  {'G', 92.1, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 921, 19, MG::MG_ZERO, VT::VT_AXIS,
    "Reset Coordinate System Offsets"},
-  {'G', 92.2, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 922, 19, MG::MG_ZERO, VT::VT_AXIS,
    "Disable Coordinate System Offsets"},
-  {'G', 92.3, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 923, 19, MG::MG_ZERO, VT::VT_AXIS,
    "Enable Coordinate System Offsets"},
 
-  {'G', 93, 19, MG::MG_FEED_RATE, VT::VT_NONE,
+  {'G', 930, 19, MG::MG_FEED_RATE, VT::VT_NONE,
    "Set Feed Rate Inverse Time Mode"},
-  {'G', 94, 19, MG::MG_FEED_RATE, VT::VT_NONE,
+  {'G', 940, 19, MG::MG_FEED_RATE, VT::VT_NONE,
    "Set Feed Rate Units per Minute Mode"},
-  {'G', 95, 19, MG::MG_FEED_RATE, VT::VT_NONE,
+  {'G', 950, 19, MG::MG_FEED_RATE, VT::VT_NONE,
    "Set Feed Rate Units per Revolution Mode"},
 
-  {'G', 96, 2, MG::MG_ZERO, VT::VT_D | VT::VT_S,
+  {'G', 960, 2, MG::MG_ZERO, VT::VT_D | VT::VT_S,
    "Spindle Constant Surface Speed Mode"},
-  {'G', 97, 2, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 970, 2, MG::MG_ZERO, VT::VT_NONE,
    "Spindle Control RPM Mode"},
 
-  {'G', 98, 18, MG::MG_RETURN_MODE, VT::VT_NONE,
+  {'G', 980, 18, MG::MG_RETURN_MODE, VT::VT_NONE,
    "Set Canned Cycle Return R"},
-  {'G', 99, 18, MG::MG_RETURN_MODE, VT::VT_NONE,
+  {'G', 990, 18, MG::MG_RETURN_MODE, VT::VT_NONE,
    "Set Canned Cycle Return Last"},
   {0},
 };
 
 
 const Code Codes::g10codes[] = {
-  {'G', 1, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
+  {'G', 10, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
    VT::VT_I | VT::VT_J | VT::VT_Q,
    "Set Tool Table"},
-  {'G', 2, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS,
+  {'G', 20, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS,
    "Set Coordinate System"},
-  {'G', 10, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_X |
+  {'G', 100, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_X |
    VT::VT_Z | VT::VT_Q,
    "Set Tool Table To Current Offsets"},
-  {'G', 20, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_AXIS,
+  {'G', 200, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_AXIS,
    "Set Coordinate System To Current Offsets"},
   {0},
 };
 
 
 const Code Codes::mcodes[] = {
-  {'M', 0, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 00, 21, MG::MG_STOPPING, VT::VT_NONE,
    "Pause"},
-  {'M', 1, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 10, 21, MG::MG_STOPPING, VT::VT_NONE,
    "Pause If Stopped"},
-  {'M', 2, 12, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 20, 12, MG::MG_STOPPING, VT::VT_NONE,
    "End Program"},
 
-  {'M', 3, 7, MG::MG_SPINDLE, VT::VT_NONE,
+  {'M', 30, 7, MG::MG_SPINDLE, VT::VT_NONE,
    "Start Spindle Clockwise"},
-  {'M', 4, 7, MG::MG_SPINDLE, VT::VT_NONE,
+  {'M', 40, 7, MG::MG_SPINDLE, VT::VT_NONE,
    "Start Spindle Counterclockwise"},
-  {'M', 5, 7, MG::MG_SPINDLE, VT::VT_NONE,
+  {'M', 50, 7, MG::MG_SPINDLE, VT::VT_NONE,
    "Stop Spindle"},
 
-  {'M', 6, 6, MG::MG_TOOL_CHANGE, VT::VT_NONE,
+  {'M', 60, 6, MG::MG_TOOL_CHANGE, VT::VT_NONE,
    "Manual Tool Change"},
 
-  {'M', 7, 8, MG::MG_COOLANT, VT::VT_NONE,
+  {'M', 70, 8, MG::MG_COOLANT, VT::VT_NONE,
    "Turn Mist Coolant On"},
-  {'M', 8, 8, MG::MG_COOLANT, VT::VT_NONE,
+  {'M', 80, 8, MG::MG_COOLANT, VT::VT_NONE,
    "Turn Flood Coolant On"},
-  {'M', 9, 8, MG::MG_COOLANT, VT::VT_NONE,
+  {'M', 90, 8, MG::MG_COOLANT, VT::VT_NONE,
    "Turn All Coolant Off"},
 
-  {'M', 30, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 300, 21, MG::MG_STOPPING, VT::VT_NONE,
    "Change Pallet Shuttles and End"},
 
-  {'M', 48, 9, MG::MG_OVERRIDE, VT::VT_NONE,
+  {'M', 480, 9, MG::MG_OVERRIDE, VT::VT_NONE,
    "Enable Spindle Speed & Feed Override"},
-  {'M', 49, 9, MG::MG_OVERRIDE, VT::VT_NONE,
+  {'M', 490, 9, MG::MG_OVERRIDE, VT::VT_NONE,
    "Disable Spindle Speed & Feed Override"},
 
-  {'M', 50, 9, MG::MG_OVERRIDE, VT::VT_P,
+  {'M', 500, 9, MG::MG_OVERRIDE, VT::VT_P,
    "Feed Override Control"},
-  {'M', 51, 9, MG::MG_OVERRIDE, VT::VT_P,
+  {'M', 510, 9, MG::MG_OVERRIDE, VT::VT_P,
    "Spindle Speed Override Control"},
-  {'M', 52, 9, MG::MG_OVERRIDE, VT::VT_P,
+  {'M', 520, 9, MG::MG_OVERRIDE, VT::VT_P,
    "Adaptive Feed Control"},
-  {'M', 53, 9, MG::MG_OVERRIDE, VT::VT_P,
+  {'M', 530, 9, MG::MG_OVERRIDE, VT::VT_P,
    "Feed Stop Control"},
 
-  {'M', 60, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 600, 21, MG::MG_STOPPING, VT::VT_NONE,
    "Change Pallet Shuttles and Pause"},
 
-  {'M', 61, 5, MG::MG_ZERO, VT::VT_Q,
+  {'M', 610, 5, MG::MG_ZERO, VT::VT_Q,
    "Set Current Tool Number"},
 
-  {'M', 62, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 620, 20, MG::MG_ZERO, VT::VT_P,
    "Turn On Digital Output Synchronized w/ Motion"},
-  {'M', 63, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 630, 20, MG::MG_ZERO, VT::VT_P,
    "Turn Off Digital Output Synchronized w/ Motion"},
-  {'M', 64, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 640, 20, MG::MG_ZERO, VT::VT_P,
    "Turn On Digital Output Immediately"},
-  {'M', 65, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 650, 20, MG::MG_ZERO, VT::VT_P,
    "Turn Off Digital Output Immediately"},
 
-  {'M', 66, 20, MG::MG_ZERO, VT::VT_P | VT::VT_E | VT::VT_L | VT::VT_Q,
+  {'M', 660, 20, MG::MG_ZERO, VT::VT_P | VT::VT_E | VT::VT_L | VT::VT_Q,
    "Input Control"},
 
-  {'M', 67, 20, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
+  {'M', 670, 20, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
    "Analog Output Synchronized w/ Motion"},
-  {'M', 68, 20, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
+  {'M', 680, 20, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
    "Immediate Analog Output"},
   {0},
 };
 
 
-const Code *Codes::find(char type, float number, float L) {
+const Code *Codes::find(char _type, double _number, double _L) {
+  char type = toupper(_type);
+  unsigned number = round(_number * 10);
+  unsigned L = round(_L * 10);
+
   const Code *table = 0;
 
   switch (type) {
   case 'G':
-    if (number == 10 && L) {
+    if (number == 100 && L) {
       number = L;
       table = g10codes;
 

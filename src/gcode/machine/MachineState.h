@@ -39,8 +39,6 @@ namespace GCode {
     spin_mode_t spinMode;
     double maxSpeed;
 
-    int tool;
-
     Axes position;
 
     cb::Matrix4x4D matrices[AXES_COUNT];
@@ -70,8 +68,7 @@ namespace GCode {
     void setSpeed(double speed, spin_mode_t mode, double max)
     {this->speed = speed; spinMode = mode; maxSpeed = max;}
 
-    int getTool() const {return tool;}
-    void setTool(unsigned tool) {this->tool = tool;}
+    void changeTool(unsigned tool);
 
     void wait(port_t port, bool active, double timeout) {}
     void seek(port_t port, bool active, bool error) {}
@@ -89,8 +86,8 @@ namespace GCode {
 
     void pause(bool optional) {}
 
-    double get(unsigned addr) const;
-    void set(unsigned addr, double value);
+    double get(gcode_address_t addr) const;
+    void set(gcode_address_t addr, double value);
 
     bool has(const std::string &name) const;
     double get(const std::string &name) const;

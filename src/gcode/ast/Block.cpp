@@ -23,8 +23,6 @@
 #include "Word.h"
 #include "OCode.h"
 
-#include <gcode/Codes.h>
-
 #include <iostream>
 
 using namespace std;
@@ -63,7 +61,7 @@ OCode *Block::findOCode() const {
 
 void Block::print(ostream &stream) const {
   if (deleted) stream << '/';
-  if (line != -1) stream << 'N' << line;
+  if (line != -1) stream << 'N' << line << ' ';
 
   for (const_iterator it = begin(); it != end(); it++) {
     if (it != begin()) stream << ' ';
