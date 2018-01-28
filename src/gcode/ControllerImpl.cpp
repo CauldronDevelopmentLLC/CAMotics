@@ -520,8 +520,8 @@ void ControllerImpl::setGlobalOffsets(int vars) {
   // Make the current point have the coordinates specified, without motion
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
+      double offset = getVar(*axis) - getAxisPosition(*axis);
       address_t addr = GLOBAL_OFFSET_ADDR(Axes::toIndex(*axis));
-      double offset = getAxisPosition(*axis) - getVar(*axis);
 
       // Update global offset
       set(addr, get(addr) + offset);
@@ -623,13 +623,13 @@ void ControllerImpl::set(address_t addr, double value) {
   // Check if offsets have changed
   if (GLOBAL_OFFSETS_ENABLED <= addr && addr <= CS9_ROTATION)
     for (const char *axis = Axes::AXES; *axis; axis++) {
-      string name = "_" + string(1, tolower(*axis)) + "_offset";
+      string name = "_offset_" + string(1, tolower(*axis));
       double offset = getAxisOffset(*axis);
 
       if (offset != get(name)) {
-        double position = getAxisAbsolutePosition(*axis) + offset;
-
         set(name, offset);
+
+        double position = getAxisAbsolutePosition(*axis) + offset;
         set(CURRENT_COORD_ADDR(Axes::toIndex(*axis)), position);
         set("_" + string(1, tolower(*axis)), position);
       }
