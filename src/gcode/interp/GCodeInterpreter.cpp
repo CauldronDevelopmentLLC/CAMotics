@@ -43,7 +43,7 @@ GCodeInterpreter::GCodeInterpreter(Controller &controller) :
   controller(controller) {}
 
 
-void GCodeInterpreter::setReference(gcode_address_t addr, double value) {
+void GCodeInterpreter::setReference(address_t addr, double value) {
   LOG_DEBUG(3, "Set global variable #" << addr << "=" << value);
   controller.set(addr, value);
 }
@@ -79,7 +79,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
       NamedReference *nameRef;
 
       if ((ref = assign->getReference()->instance<Reference>()))
-        setReference((gcode_address_t)ref->getNumber(), assign->getExprValue());
+        setReference((address_t)ref->getNumber(), assign->getExprValue());
 
       else if ((nameRef = assign->getReference()->instance<NamedReference>()))
         setReference(nameRef->getName(), assign->getExprValue());
@@ -141,7 +141,6 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 
           // Set variable
           controller.setVar(c, value);
-          controller.setVarExpr(c, word->getExpression());
         }
       }
 
@@ -219,7 +218,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 }
 
 
-double GCodeInterpreter::lookupReference(gcode_address_t addr) {
+double GCodeInterpreter::lookupReference(address_t addr) {
   return controller.get(addr);
 }
 

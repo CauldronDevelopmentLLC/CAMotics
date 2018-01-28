@@ -41,14 +41,14 @@ namespace GCode {
   public:
     GCodeInterpreter(Controller &controller);
 
-    virtual void setReference(gcode_address_t addr, double value);
+    virtual void setReference(address_t addr, double value);
     virtual void setReference(const std::string &name, double value);
 
     // From Processor
     void operator()(const cb::SmartPointer<Block> &block);
 
     // From Evaluator
-    double lookupReference(gcode_address_t addr);
+    double lookupReference(address_t addr);
     double lookupReference(const std::string &name);
     bool hasReference(const std::string &name);
   };

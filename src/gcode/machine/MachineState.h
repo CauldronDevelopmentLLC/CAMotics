@@ -51,10 +51,9 @@ namespace GCode {
     cb::LocationRange location;
 
   public:
-    MachineState() {reset();}
+    MachineState();
 
     // From MachineInterface
-    void reset();
     void start();
     void end();
 
@@ -86,8 +85,8 @@ namespace GCode {
 
     void pause(bool optional) {}
 
-    double get(gcode_address_t addr) const;
-    void set(gcode_address_t addr, double value);
+    double get(address_t addr) const;
+    void set(address_t addr, double value);
 
     bool has(const std::string &name) const;
     double get(const std::string &name) const;

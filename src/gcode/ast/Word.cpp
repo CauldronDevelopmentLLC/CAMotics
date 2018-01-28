@@ -24,7 +24,7 @@
 
 #include <gcode/Codes.h>
 
-#include <cctype>
+#include <cbang/log/Logger.h>
 
 using namespace std;
 using namespace cb;

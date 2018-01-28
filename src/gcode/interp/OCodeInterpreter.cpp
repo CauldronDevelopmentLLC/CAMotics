@@ -133,10 +133,10 @@ void OCodeInterpreter::doCall(OCode *ocode) {
   // Set args as local variables
   unsigned i = 0;
   for (; i < expressions.size() && i < 30; i++)
-    setReference((gcode_address_t)(i + 1), args[i]);
+    setReference((address_t)(i + 1), args[i]);
   for (; i < 30; i++)
-    setReference((gcode_address_t)(i + 1),
-                 GCodeInterpreter::lookupReference((gcode_address_t)i));
+    setReference((address_t)(i + 1),
+                 GCodeInterpreter::lookupReference((address_t)i));
 
   try {
     // Find subroute and call
@@ -369,7 +369,7 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 }
 
 
-void OCodeInterpreter::setReference(gcode_address_t addr, double value) {
+void OCodeInterpreter::setReference(address_t addr, double value) {
   if (!addr || 30 < addr || stack.empty())
     GCodeInterpreter::setReference(addr, value);
 
@@ -391,7 +391,7 @@ void OCodeInterpreter::setReference(const string &name, double value) {
 }
 
 
-double OCodeInterpreter::lookupReference(gcode_address_t addr) {
+double OCodeInterpreter::lookupReference(address_t addr) {
   if (!addr || 30 < addr || stack.empty())
     return GCodeInterpreter::lookupReference(addr);
 

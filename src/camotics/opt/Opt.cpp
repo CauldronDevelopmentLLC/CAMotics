@@ -155,7 +155,6 @@ double Opt::optimize() {
 void Opt::extract(GCode::ToolPath &path) const {
   GCode::MoveSink sink(path);
   sink.setParent(new GCode::MachineState);
-  sink.reset();
 
   GCode::Axes axes = sink.getPosition();
   sink.move(axes, true);

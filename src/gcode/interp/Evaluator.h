@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <gcode/Addresses.h>
 
 #include <string>
 
@@ -38,7 +39,7 @@ namespace GCode {
 
   class Evaluator {
   public:
-    virtual double lookupReference(unsigned num) {return 0;}
+    virtual double lookupReference(address_t addr) {return 0;}
     virtual double lookupReference(const std::string &name) {return 0;}
     virtual bool hasReference(const std::string &name) {return false;}
     virtual double eval(UnaryOp &e);

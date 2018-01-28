@@ -27,41 +27,17 @@
 
 #include <gcode/machine/MachineUnitAdapter.h>
 
-#include <string>
-
 
 namespace GCode {
-  class ControllerImpl : public Controller, public VarTypes, public ModalGroup,
-    public MachineEnum {
-  public:
-    typedef enum {
-      DIR_OFF,
-      DIR_CLOCKWISE,
-      DIR_COUNTERCLOCKWISE,
-    } dir_t;
+  class ControllerImpl :
+    public Controller, public VarTypes, public ModalGroup, public MachineEnum {
 
-
-    typedef enum {
-      EXACT_PATH_MODE,
-      EXACT_STOP_MODE,
-      CONTINUOUS_MODE,
-    } path_mode_t;
-
-
-    typedef enum {
-      RETURN_TO_R,
-      RETURN_TO_OLD_Z,
-    } return_mode_t;
-
-
-  protected:
     MachineUnitAdapter machine;
     ToolTable tools;
 
     // Block variables
     static const int MAX_VAR = 26;
     double varValues[MAX_VAR];
-    cb::SmartPointer<Entity> varExprs[MAX_VAR];
 
     bool synchronizing;
 
@@ -90,8 +66,6 @@ namespace GCode {
 
     // Vars
     double getVar(char c) const;
-    const cb::SmartPointer<Entity> &getVarExpr(char c) const;
-    double getOffsetVar(char c, bool absolute) const;
     std::string getVarGroupStr(const char *group) const;
     static VarTypes::enum_t getVarType(char letter);
 
@@ -114,17 +88,18 @@ namespace GCode {
     unsigned getPlaneZVarType() const {return getVarType(getPlaneZAxis());}
 
     // Position
-    double getAxisAbsolutePosition(char axis) const;
-    void setAxisAbsolutePosition(char axis, double pos);
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
+    void setAxisPosition(char axis, double pos);
+    double getAxisAbsolutePosition(char axis) const;
+    void setAxisAbsolutePosition(char axis, double pos);
     Axes getAbsolutePosition() const;
     void setAbsolutePosition(const Axes &axes);
-    Axes getNextPosition(int vars, bool absolute) const;
+    Axes getNextAbsolutePosition(int vars, bool incremental) const;
 
     // Move
     void doMove(const Axes &pos, bool rapid);
-    void makeMove(int vars, bool rapid, bool absolute);
+    void makeMove(int vars, bool rapid, bool incremental);
     void moveAxis(char axis, double value, bool rapid);
     void arc(int vars, bool clockwise);
     void straightProbe(int vars, bool towardWorkpiece, bool signalError);
@@ -133,11 +108,6 @@ namespace GCode {
 
     // Dwell
     void dwell(double seconds);
-
-    // Coordindate System
-    void setCoordSystemRotation(unsigned cs, double rotation);
-    void setCoordSystemOffset(unsigned cs, char axis, bool relative);
-    void setCoordSystem(int vars, bool relative);
 
     // Tool
     const Tool &getTool(unsigned tool) const {return tools.get(tool);}
@@ -152,12 +122,14 @@ namespace GCode {
     void loadPredefined(bool first, int vars);
 
     // Offsets
+    void setCoordSystem(unsigned cs);
+    void setCoordSystemOffsets(int vars, bool relative);
     void setGlobalOffsets(int vars);
     void resetGlobalOffsets(bool clear);
     void restoreGlobalOffsets();
 
     // Homing
-    void setAxisHomed(int vars, bool homed);
+    void setHomed(int vars, bool homed);
 
     // Compensation
     void setCutterRadiusComp(int vars, bool left, bool dynamic);
@@ -166,14 +138,12 @@ namespace GCode {
     void end();
 
     // From Controller
-    double get(gcode_address_t addr) const;
-    void set(gcode_address_t addr, double value);
+    double get(address_t addr) const;
+    void set(address_t addr, double value);
     bool has(const std::string &name) const;
     double get(const std::string &name) const;
     void set(const std::string &name, double value);
-
     void setVar(char c, double value);
-    void setVarExpr(char c, const cb::SmartPointer<Entity> &entity);
 
     unsigned getCurrentMotionMode() {return currentMotionMode;}
     void setCurrentMotionMode(unsigned mode);

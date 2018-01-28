@@ -37,7 +37,6 @@ namespace GCode {
   public:
     virtual ~MachineInterface() {}
 
-    virtual void reset() = 0;
     virtual void start() = 0;
     virtual void end() = 0;
 
@@ -184,8 +183,8 @@ namespace GCode {
     virtual void pause(bool optional = true) = 0;
 
     // Number parameters
-    virtual double get(gcode_address_t addr) const = 0;
-    virtual void set(gcode_address_t addr, double value) = 0;
+    virtual double get(address_t addr) const = 0;
+    virtual void set(address_t addr, double value) = 0;
 
     // Named parameters
     virtual bool has(const std::string &name) const = 0;

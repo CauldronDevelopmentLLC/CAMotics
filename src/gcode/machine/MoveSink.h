@@ -39,7 +39,6 @@ namespace GCode {
     MoveSink(MoveStream &stream);
 
     // From MachineInterface
-    void reset();
     void seek(port_t port, bool active, bool error);
     void move(const Axes &axes, bool rapid);
     void arc(const cb::Vector3D &offset, double degrees, plane_t plane);

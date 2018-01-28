@@ -129,7 +129,7 @@ double Evaluator::eval(Reference &e) {
   if (num < 1 || MAX_ADDRESS < num || ((unsigned)num) != num)
     THROWS(e.getLocation() << " Invalid reference number " << num);
 
-  return lookupReference((unsigned)num);
+  return lookupReference((address_t)num);
 }
 
 

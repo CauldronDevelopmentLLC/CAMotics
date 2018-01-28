@@ -50,7 +50,6 @@ namespace GCode {
     }
 
     // From MachineInterface
-    void reset() {parent->reset();}
     void start() {parent->start();}
     void end() {parent->end();}
 
@@ -87,8 +86,8 @@ namespace GCode {
 
     void pause(bool optional = true) {parent->pause(optional);}
 
-    double get(gcode_address_t addr) const {return parent->get(addr);}
-    void set(gcode_address_t addr, double value) {parent->set(addr, value);}
+    double get(address_t addr) const {return parent->get(addr);}
+    void set(address_t addr, double value) {parent->set(addr, value);}
 
     bool has(const std::string &name) const {return parent->has(name);}
     double get(const std::string &name) const {return parent->get(name);}

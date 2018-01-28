@@ -1704,7 +1704,8 @@ void QtWin::resizeEvent(QResizeEvent *event) {
 void QtWin::animate() {
   try {
     // Check if OpenGL is initialized
-    if (!ui->simulationView->isValid()) app.requestExit();
+    if (!ui->simulationView->isValid() && ui->simulationView->isVisible())
+      app.requestExit();
 
     dirty = view->update() || dirty;
 
@@ -1715,7 +1716,7 @@ void QtWin::animate() {
     if (dirty) redraw(true);
     if (simDirty) reload(true);
 
-    if (positionChanged && !lastStatusActive &&
+    if (!simRun.isNull() && positionChanged && !lastStatusActive &&
         view->isFlagSet(View::SHOW_SURFACE_FLAG)) {
       positionChanged = false;
       setStatusActive(true);

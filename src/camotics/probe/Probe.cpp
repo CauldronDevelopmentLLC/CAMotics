@@ -174,6 +174,8 @@ void Probe::operator()(const SmartPointer<GCode::Block> &block) {
   interp(block);
 
   if (!block->isDeleted()) {
+    GCode::Word *zWord = block->findWord('Z');
+
     if (!didOutputProbe && block->findWord('M', 3)) {
       outputProbe();
       didOutputProbe = true;
@@ -199,8 +201,7 @@ void Probe::operator()(const SmartPointer<GCode::Block> &block) {
       };
 
       SmartPointer<GCode::Entity> expr;
-      GCode::Word *zWord = block->findWord('Z');
-      if (useLastZExpression) expr = getVarExpr('Z');
+      if (useLastZExpression) expr = lastZExpr;
       else if (zWord) expr = zWord->getExpression();
       else expr = new GCode::Number(z);
 
@@ -224,6 +225,8 @@ void Probe::operator()(const SmartPointer<GCode::Block> &block) {
 
       } else zWord->setExpression(expr);
     }
+
+    if (zWord) lastZExpr = zWord->getExpression();
   }
 
   GCode::Printer::operator()(block);

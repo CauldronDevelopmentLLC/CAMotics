@@ -63,6 +63,7 @@ namespace CAMotics {
 
     cb::Rectangle2D bbox;
     cb::SmartPointer<ProbeGrid> grid;
+    cb::SmartPointer<GCode::Entity> lastZExpr;
 
   public:
     Probe(cb::Options &options, std::ostream &stream);

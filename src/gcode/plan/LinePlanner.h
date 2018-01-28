@@ -60,10 +60,10 @@ namespace GCode {
     void restart(uint64_t id, const Axes &position);
 
     // From MachineInterface
-    //void reset();
     void start();
     void end();
     void setSpeed(double speed, spin_mode_t mode, double max);
+    void changeTool(unsigned tool);
     //void wait(port_t port, bool active, double timeout);
     void seek(port_t port, bool active, bool error);
     void output(port_t port, double value);

@@ -27,10 +27,37 @@ namespace GCode {
   class MachineEnum : public PortType::Enum {
   public:
     typedef enum {
-      UNITS_PER_MINUTE, INVERSE_TIME, UNITS_PER_REVOLUTION
+      DIR_OFF,
+      DIR_CLOCKWISE,
+      DIR_COUNTERCLOCKWISE,
+    } dir_t;
+
+
+    typedef enum {
+      EXACT_PATH_MODE,
+      EXACT_STOP_MODE,
+      CONTINUOUS_MODE,
+    } path_mode_t;
+
+
+    typedef enum {
+      RETURN_TO_R,
+      RETURN_TO_OLD_Z,
+    } return_mode_t;
+
+
+    typedef enum {
+      UNITS_PER_MINUTE,
+      INVERSE_TIME,
+      UNITS_PER_REVOLUTION
     } feed_mode_t;
 
-    typedef enum {REVOLUTIONS_PER_MINUTE, CONSTANT_SURFACE_SPEED} spin_mode_t;
+
+    typedef enum {
+      REVOLUTIONS_PER_MINUTE,
+      CONSTANT_SURFACE_SPEED
+    } spin_mode_t;
+
 
     typedef enum {
       XY = 170,
@@ -41,7 +68,15 @@ namespace GCode {
       VW = 191,
     } plane_t;
 
-    typedef enum {XYZ, ABC, UVW, AXES_COUNT} axes_t;
+
+    typedef enum {
+      XYZ,
+      ABC,
+      UVW,
+      AXES_COUNT
+    } axes_t;
+
+
     typedef PortType::enum_t port_t;
   };
 }

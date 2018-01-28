@@ -29,29 +29,28 @@ using namespace cb;
 using namespace GCode;
 
 
-void MachineState::reset() {
-  started = false;
-  feed = 0;
-  feedMode = UNITS_PER_MINUTE;
-  speed = 0;
-  spinMode = REVOLUTIONS_PER_MINUTE;
-  maxSpeed = 0;
-  position = Axes();
+MachineState::MachineState() :
+  started(false), feed(0), feedMode(UNITS_PER_MINUTE), speed(0),
+  spinMode(REVOLUTIONS_PER_MINUTE), maxSpeed(0) {
 
   for (unsigned i = 0; i < AXES_COUNT; i++)
     matrices[i].toIdentity();
 
-  location = LocationRange();
-
   // Init numbered parameters
   memset(params, 0, sizeof(params));
+
+  // Coordinate system
   set(CURRENT_COORD_SYSTEM, 1);
+
+  // Tool
   set("_selected_tool", -1);
   set(TOOL_NUMBER, -1);
 }
 
 
-void MachineState::start() {started = true;}
+void MachineState::start() {
+  started = true;
+}
 
 
 void MachineState::end() {
@@ -85,17 +84,12 @@ void MachineState::setMatrix(const Matrix4x4D &m, axes_t matrix) {
 }
 
 
-double MachineState::get(gcode_address_t addr) const {
+double MachineState::get(address_t addr) const {
   return addr < MAX_ADDRESS ? params[addr] : params[0];
 }
 
 
-void MachineState::set(gcode_address_t addr, double value) {
-  switch (addr) {
-  case TOOL_NUMBER: set("_current_tool", value); break;
-  default: break;
-  }
-
+void MachineState::set(address_t addr, double value) {
   if (addr < MAX_ADDRESS) params[addr] = value;
 }
 

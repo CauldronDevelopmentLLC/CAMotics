@@ -31,13 +31,6 @@ MoveSink::MoveSink(MoveStream &stream) :
   stream(stream), probePending(false), time(0) {}
 
 
-void MoveSink::reset() {
-  MachineAdapter::reset();
-  probePending = false;
-  time = 0;
-}
-
-
 void MoveSink::seek(port_t port, bool active, bool error) {
   probePending = true;
   return MachineAdapter::seek(port, active, error);
