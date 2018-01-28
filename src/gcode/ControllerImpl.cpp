@@ -220,7 +220,7 @@ Axes ControllerImpl::getNextAbsolutePosition(int vars, bool incremental) const {
       double pos = getVar(*axis);
 
       if (incremental) pos += getAxisAbsolutePosition(*axis);
-      else pos += getAxisOffset(*axis);
+      else pos -= getAxisOffset(*axis);
 
       position.set(*axis, pos);
 
