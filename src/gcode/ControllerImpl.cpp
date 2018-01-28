@@ -623,7 +623,7 @@ void ControllerImpl::set(address_t addr, double value) {
   // Check if offsets have changed
   if (GLOBAL_OFFSETS_ENABLED <= addr && addr <= CS9_ROTATION)
     for (const char *axis = Axes::AXES; *axis; axis++) {
-      string name = string(1, *axis) + "_offset";
+      string name = string(1, tolower(*axis)) + "_offset";
       double offset = getAxisOffset(*axis);
 
       if (offset != get(name)) {
