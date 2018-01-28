@@ -506,7 +506,7 @@ void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (vars & getVarType(*axis)) {
       double offset = getVar(*axis);
-      if (relative) offset = getAxisPosition(*axis) - offset;
+      if (relative) offset -= getAxisPosition(*axis);
 
       set(COORD_SYSTEM_ADDR(cs, Axes::toIndex(*axis)), offset);
     }
