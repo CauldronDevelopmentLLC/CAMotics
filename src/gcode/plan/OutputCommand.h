@@ -22,14 +22,16 @@
 
 #include "PlannerCommand.h"
 
+#include <gcode/machine/MachineEnum.h>
+
 
 namespace GCode {
   class OutputCommand : public PlannerCommand {
-    uint32_t port;
+    MachineEnum::port_t port;
     double value;
 
   public:
-    OutputCommand(uint64_t id, uint32_t port, double value) :
+    OutputCommand(uint64_t id, MachineEnum::port_t port, double value) :
       PlannerCommand(id), port(port), value(value) {}
 
     // From PlannerCommand

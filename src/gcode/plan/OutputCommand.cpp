@@ -25,6 +25,7 @@ using namespace cb;
 
 
 void OutputCommand::insert(JSON::Sink &sink) const {
-  sink.insert("port", port);
+  sink.insert("port", String::transcode
+              (String::toLower(PortType(port).toString()), "_", "-"));
   sink.insert("value", value);
 }
