@@ -45,8 +45,6 @@ namespace GCode {
 
 
   class Planner : public ControllerImpl {
-    const PlannerConfig config;
-
     MachinePipeline pipeline;
     LinePlanner planner;
 
@@ -57,6 +55,8 @@ namespace GCode {
 
   public:
     Planner(const PlannerConfig &config);
+
+    void setConfig(const PlannerConfig &config) {planner.setConfig(config);}
 
     void setResolver(const cb::SmartPointer<NameResolver> &resolver)
     {this->resolver = resolver;}

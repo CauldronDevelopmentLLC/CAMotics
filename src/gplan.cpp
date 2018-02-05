@@ -379,6 +379,22 @@ static int _init(PyPlanner *self, PyObject *args, PyObject *kwds) {
 }
 
 
+static PyObject *_set_config(PyPlanner *self, PyObject *args) {
+  try {
+    PyObject *_config;
+
+    if (!PyArg_ParseTuple(args, "O", &_config)) return 0;
+
+    GCode::PlannerConfig config;
+    config.read(*pyToJSON(_config));
+
+    self->planner->setConfig(config);
+  } CATCH_PYTHON;
+
+  Py_RETURN_NONE;
+}
+
+
 static PyObject *_is_running(PyPlanner *self) {
   try {
     if (self->planner->isRunning()) Py_RETURN_TRUE;
@@ -533,6 +549,8 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
 
 
 static PyMethodDef _methods[] = {
+  {"set_config", (PyCFunction)_set_config, METH_VARARGS,
+   "Change the planner config"},
   {"is_running", (PyCFunction)_is_running, METH_NOARGS,
    "True if the planner is active"},
   {"is_synchronizing", (PyCFunction)_is_synchronizing, METH_NOARGS,

@@ -35,7 +35,7 @@ using namespace GCode;
 
 
 Planner::Planner(const PlannerConfig &config) :
-  ControllerImpl(pipeline), config(config), planner(config) {
+  ControllerImpl(pipeline), planner(config) {
 
   pipeline.add(new MachineUnitAdapter(config.defaultUnits,
                                       config.outputUnits));

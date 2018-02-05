@@ -36,7 +36,7 @@ namespace cb {namespace JSON {class Sink;}}
 
 namespace GCode {
   class LinePlanner : public MachineAdapter {
-    const PlannerConfig config;
+    PlannerConfig config;
 
     // Move state
     cb::Vector4D position;
@@ -53,6 +53,7 @@ namespace GCode {
   public:
     LinePlanner(const PlannerConfig &config);
 
+    void setConfig(const PlannerConfig &config) {this->config = config;}
     bool isDone() const;
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
