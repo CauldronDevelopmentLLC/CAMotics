@@ -65,7 +65,12 @@ namespace {
 
 
 LinePlanner::LinePlanner(const PlannerConfig &config) :
-  config(config), lastExitVel(0), seeking(false), nextID(1), line(-1) {
+  lastExitVel(0), seeking(false), nextID(1), line(-1) {setConfig(config);}
+
+
+void LinePlanner::setConfig(const PlannerConfig &config) {
+  this->config = config;
+
   for (unsigned i = 0; i < position.getSize(); i++)
     position[i] = config.start[i];
 }

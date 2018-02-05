@@ -53,7 +53,7 @@ namespace GCode {
   public:
     LinePlanner(const PlannerConfig &config);
 
-    void setConfig(const PlannerConfig &config) {this->config = config;}
+    void setConfig(const PlannerConfig &config);
     bool isDone() const;
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
