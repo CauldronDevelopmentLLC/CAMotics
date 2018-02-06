@@ -32,12 +32,15 @@ namespace GCode {
     cb::Scanner scanner;
     GCode::Tokenizer tokenizer;
 
-    bool done;
+    bool started;
+    bool ended;
 
   public:
     Runner(Controller &controller, const cb::InputSource &source);
 
-    bool isDone() const {return done;}
+    bool hasStarted() const {return started;}
+    bool hasEnded() const {return ended;}
+
     void next();
   };
 }

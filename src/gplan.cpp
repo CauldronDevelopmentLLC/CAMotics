@@ -4,6 +4,7 @@
 
 #include <cbang/log/Logger.h>
 #include <cbang/json/JSON.h>
+#include <cbang/io/BufferInputSource.h>
 
 #include <boost/iostreams/categories.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -471,7 +472,7 @@ static PyObject *_mdi(PyPlanner *self, PyObject *args) {
 
     if (!PyArg_ParseTuple(args, "s", &gcode)) return 0;
 
-    self->planner->mdi(gcode);
+    self->planner->load(cb::BufferInputSource(gcode));
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
@@ -512,13 +513,13 @@ static PyObject *_next(PyPlanner *self) {
 }
 
 
-static PyObject *_release(PyPlanner *self, PyObject *args) {
+static PyObject *_set_active(PyPlanner *self, PyObject *args) {
   try {
     uint64_t id;
 
     if (!PyArg_ParseTuple(args, "K", &id)) return 0;
 
-    self->planner->release(id);
+    self->planner->setActive(id);
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
@@ -567,7 +568,8 @@ static PyMethodDef _methods[] = {
   {"has_more", (PyCFunction)_has_more, METH_NOARGS,
    "True if the planner has more data"},
   {"next", (PyCFunction)_next, METH_NOARGS, "Get next planner data"},
-  {"release", (PyCFunction)_release, METH_VARARGS, "Release planner data"},
+  {"set_active", (PyCFunction)_set_active, METH_VARARGS, "Tell the planner "
+   "which plan ID is currently active"},
   {"restart", (PyCFunction)_restart, METH_VARARGS | METH_KEYWORDS,
    "Restart planner from given ID"},
   {0}

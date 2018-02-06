@@ -28,6 +28,7 @@
 #include <gcode/ControllerImpl.h>
 #include <gcode/machine/MachinePipeline.h>
 
+#include <vector>
 
 namespace cb {namespace JSON {class Sink;}}
 
@@ -48,9 +49,7 @@ namespace GCode {
     MachinePipeline pipeline;
     LinePlanner planner;
 
-    std::string gcode;
-    cb::SmartPointer<Runner> runner;
-
+    std::vector<cb::SmartPointer<Runner> > runners;
     cb::SmartPointer<NameResolver> resolver;
 
   public:
@@ -64,12 +63,11 @@ namespace GCode {
     bool isRunning() const;
     void overrideSync();
 
-    void mdi(const std::string &gcode);
     void load(const cb::InputSource &source);
 
     bool hasMore();
     void next(cb::JSON::Sink &sink);
-    void release(uint64_t id);
+    void setActive(uint64_t id);
     void restart(uint64_t id, const Axes &position);
 
     // From Controller

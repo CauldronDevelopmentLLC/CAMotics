@@ -95,8 +95,8 @@ void LinePlanner::next(JSON::Sink &sink) {
 }
 
 
-void LinePlanner::release(uint64_t id) {
-  while (!out.empty() && out.front()->getID() <= id)
+void LinePlanner::setActive(uint64_t id) {
+  while (!out.empty() && out.front()->getID() < id)
     out.pop_front();
 }
 

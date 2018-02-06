@@ -25,9 +25,6 @@
 #include <gcode/machine/MachineLinearizer.h>
 #include <gcode/machine/MachineUnitAdapter.h>
 
-#include <cbang/json/Writer.h>
-#include <cbang/io/StringInputSource.h>
-
 
 using namespace cb;
 using namespace std;
@@ -45,9 +42,7 @@ Planner::Planner(const PlannerConfig &config) :
 }
 
 
-bool Planner::isRunning() const {
-  return (!runner.isNull() && !runner->isDone()) || !planner.isDone();
-}
+bool Planner::isRunning() const {return !runners.empty() || !planner.isDone();}
 
 
 void Planner::overrideSync() {
@@ -56,33 +51,30 @@ void Planner::overrideSync() {
 }
 
 
-void Planner::mdi(const string &gcode) {
-  if (isRunning()) THROW("Planner already running");
-  this->gcode = gcode;
-  load(StringInputSource(this->gcode));
-}
-
-
 void Planner::load(const InputSource &source) {
-  if (isRunning()) THROW("Planner already running");
-  runner = new Runner(*this, source);
-  pipeline.start();
+  runners.push_back(new Runner(*this, source));
 }
 
 
 bool Planner::hasMore() {
   while (true) {
     if (planner.hasMove()) return true;
-    if (ControllerImpl::isSynchronizing() || runner.isNull() ||
-        runner->isDone()) return false;
-    runner->next();
-    if (runner->isDone()) pipeline.end();
+    if (ControllerImpl::isSynchronizing() || runners.empty()) return false;
+
+    if (!runners.front()->hasStarted()) pipeline.start();
+
+    runners.front()->next();
+
+    if (runners.front()->hasEnded()) {
+      runners.pop_back();
+      pipeline.end();
+    }
   }
 }
 
 
 void Planner::next(JSON::Sink &sink) {planner.next(sink);}
-void Planner::release(uint64_t id) {planner.release(id);}
+void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
 void Planner::restart(uint64_t id, const Axes &position) {
