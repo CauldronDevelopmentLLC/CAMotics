@@ -189,8 +189,10 @@ void LinePlanner::dwell(double seconds) {
 
 
 void LinePlanner::move(const Axes &target, bool rapid) {
-  LOG_INFO(3, "move(" << target << ", " << (rapid ? "true" : "false") << ")");
   Axes start = getPosition();
+
+  LOG_INFO(3, "move(" << target << ", " << (rapid ? "true" : "false")
+           << ") from " << start);
 
   MachineAdapter::move(target, rapid);
 
