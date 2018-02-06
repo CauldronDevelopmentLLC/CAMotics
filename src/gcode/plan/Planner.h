@@ -28,7 +28,7 @@
 #include <gcode/ControllerImpl.h>
 #include <gcode/machine/MachinePipeline.h>
 
-#include <vector>
+#include <list>
 
 namespace cb {namespace JSON {class Sink;}}
 
@@ -49,7 +49,7 @@ namespace GCode {
     MachinePipeline pipeline;
     LinePlanner planner;
 
-    std::vector<cb::SmartPointer<Runner> > runners;
+    std::list<cb::SmartPointer<Runner> > runners;
     cb::SmartPointer<NameResolver> resolver;
 
   public:

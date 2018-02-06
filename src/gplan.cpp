@@ -4,7 +4,7 @@
 
 #include <cbang/log/Logger.h>
 #include <cbang/json/JSON.h>
-#include <cbang/io/BufferInputSource.h>
+#include <cbang/io/StringStreamInputSource.h>
 
 #include <boost/iostreams/categories.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -472,7 +472,7 @@ static PyObject *_load_string(PyPlanner *self, PyObject *args) {
 
     if (!PyArg_ParseTuple(args, "s", &gcode)) return 0;
 
-    self->planner->load(cb::BufferInputSource(gcode));
+    self->planner->load(cb::StringStreamInputSource(gcode));
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
