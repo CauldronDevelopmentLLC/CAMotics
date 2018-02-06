@@ -38,7 +38,6 @@ namespace GCode {
     PlannerConfig config;
 
     // Move state
-    Axes position;
     double lastExitVel;
     bool seeking;
 
@@ -57,7 +56,7 @@ namespace GCode {
     bool hasMove() const;
     void next(cb::JSON::Sink &sink);
     void setActive(uint64_t id);
-    void restart(uint64_t id, const Axes &position);
+    bool restart(uint64_t id, const Axes &position);
 
     // From MachineInterface
     void start();

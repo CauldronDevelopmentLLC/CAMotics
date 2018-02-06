@@ -70,7 +70,6 @@ LinePlanner::LinePlanner(const PlannerConfig &config) :
 
 void LinePlanner::setConfig(const PlannerConfig &config) {
   this->config = config;
-  position = config.start;
 }
 
 
@@ -99,7 +98,7 @@ void LinePlanner::setActive(uint64_t id) {
 }
 
 
-void LinePlanner::restart(uint64_t id, const Axes &position) {
+bool LinePlanner::restart(uint64_t id, const Axes &position) {
   // Find replan command in output
   while (true) {
     if (out.empty() || id < out.front()->getID())
@@ -110,16 +109,13 @@ void LinePlanner::restart(uint64_t id, const Axes &position) {
     out.pop_front(); // Release any moves before the restart
   }
 
-  // Set position
-  this->position = position;
-
   // Reload previously output moves
   cmds.splice(cmds.begin(), out, out.begin(), out.end());
 
   // Reset last exit velocity
   lastExitVel = 0;
 
-  // Handle seek
+  // Handle restart after seek
   auto it = cmds.begin();
   if ((*it)->isSeeking()) {
     // Skip reset of current move
@@ -130,12 +126,14 @@ void LinePlanner::restart(uint64_t id, const Axes &position) {
     while (it != cmds.end() && !(*it)->isMove()) it++;
   }
 
-  if (it == cmds.end()) return; // Nothing to replan
+  if (it == cmds.end()) return false; // Nothing to replan
 
   // Replan from zero velocity
   (*it)->restart(position, config);
   for (auto it = cmds.begin(); it != cmds.end(); it++)
     plan(it);
+
+  return true;
 }
 
 
@@ -191,9 +189,9 @@ void LinePlanner::dwell(double seconds) {
 
 
 void LinePlanner::move(const Axes &target, bool rapid) {
-  MachineAdapter::move(target, rapid);
+  Axes start = getPosition();
 
-  Axes end = target;
+  MachineAdapter::move(target, rapid);
 
   // TODO Handle feed rate mode
   feed_mode_t mode = UNITS_PER_MINUTE;
@@ -204,10 +202,9 @@ void LinePlanner::move(const Axes &target, bool rapid) {
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
   SmartPointer<LineCommand> lc =
-    new LineCommand(nextID++, position, end, feed, seeking, config);
+    new LineCommand(nextID++, start, target, feed, seeking, config);
 
   // Update state
-  position = end;
   seeking = false;
 
   if (!lc->length) return; // Null move

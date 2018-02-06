@@ -42,6 +42,12 @@ Planner::Planner(const PlannerConfig &config) :
 }
 
 
+void Planner::setConfig(const PlannerConfig &config) {
+  setAbsolutePosition(config.start);
+  planner.setConfig(config);
+}
+
+
 bool Planner::isRunning() const {return !runners.empty() || !planner.isDone();}
 
 
@@ -78,7 +84,7 @@ void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 void Planner::restart(uint64_t id, const Axes &position) {
   if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(position);
-  planner.restart(id, position);
+  if (!planner.restart(id, position)) setAbsolutePosition(position);
 }
 
 

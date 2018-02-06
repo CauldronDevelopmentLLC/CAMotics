@@ -55,7 +55,7 @@ namespace GCode {
   public:
     Planner(const PlannerConfig &config);
 
-    void setConfig(const PlannerConfig &config) {planner.setConfig(config);}
+    void setConfig(const PlannerConfig &config);
 
     void setResolver(const cb::SmartPointer<NameResolver> &resolver)
     {this->resolver = resolver;}
