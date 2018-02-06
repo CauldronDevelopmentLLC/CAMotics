@@ -63,9 +63,8 @@ bool Planner::hasMore() {
 
     if (!runners.front()->hasStarted()) pipeline.start();
 
-    runners.front()->next();
-
-    if (runners.front()->hasEnded()) {
+    // Push a line of GCode to the planner
+    if (!runners.front()->next()) {
       runners.pop_back();
       pipeline.end();
     }

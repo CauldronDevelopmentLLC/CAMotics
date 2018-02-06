@@ -33,14 +33,12 @@ namespace GCode {
     GCode::Tokenizer tokenizer;
 
     bool started;
-    bool ended;
 
   public:
     Runner(Controller &controller, const cb::InputSource &source);
 
     bool hasStarted() const {return started;}
-    bool hasEnded() const {return ended;}
 
-    void next();
+    bool next();
   };
 }

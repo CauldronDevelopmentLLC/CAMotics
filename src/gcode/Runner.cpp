@@ -29,23 +29,21 @@ using namespace std;
 
 
 Runner::Runner(Controller &controller, const InputSource &source) :
-  interpreter(controller), scanner(source), tokenizer(scanner), started(false),
-  ended(false) {
+  interpreter(controller), scanner(source), tokenizer(scanner), started(false) {
 }
 
 
-void Runner::next() {
+bool Runner::next() {
   started = true;
 
   try {
-    ended = !interpreter.readBlock(tokenizer);
+    return interpreter.readBlock(tokenizer);
 
   } catch (const EndProgram &) {
-    ended = true;
-
   } catch (const Exception &e) {
     LOG_ERROR(tokenizer.getLocation() << ":" << e.getMessage());
     LOG_DEBUG(3, e);
-    ended = true;
   }
+
+  return false;
 }
