@@ -76,7 +76,7 @@ void LinePlanner::setConfig(const PlannerConfig &config) {
 }
 
 
-bool LinePlanner::isDone() const {return cmds.empty() && out.empty();}
+bool LinePlanner::isDone() const {return cmds.empty();}
 
 
 bool LinePlanner::hasMove() const {
