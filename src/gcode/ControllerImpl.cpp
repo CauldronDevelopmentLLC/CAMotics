@@ -547,7 +547,7 @@ void ControllerImpl::setHomed(int vars, bool homed) {
       set(SSTR("_" << (char)tolower(*axis) << "_homed"), homed);
       if (homed) {
         set(SSTR("_" << (char)tolower(*axis) << "_home"), getVar(*axis));
-        setAxisAbsolutePosition(getVar(*axis));
+        setAxisAbsolutePosition(*axis, getVar(*axis));
       }
     }
 }
