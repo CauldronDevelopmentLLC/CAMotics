@@ -466,7 +466,7 @@ static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
 }
 
 
-static PyObject *_mdi(PyPlanner *self, PyObject *args) {
+static PyObject *_load_string(PyPlanner *self, PyObject *args) {
   try {
     const char *gcode;
 
@@ -563,7 +563,7 @@ static PyMethodDef _methods[] = {
   {"set_logger", (PyCFunction)_set_logger, METH_VARARGS,
    "Set logger callback"},
   {"set", (PyCFunction)_set, METH_VARARGS, "Set variable"},
-  {"mdi", (PyCFunction)_mdi, METH_VARARGS, "Load MDI commands"},
+  {"load_string", (PyCFunction)_load_string, METH_VARARGS, "Load GCode string"},
   {"load", (PyCFunction)_load, METH_VARARGS, "Load GCode by filename"},
   {"has_more", (PyCFunction)_has_more, METH_NOARGS,
    "True if the planner has more data"},
