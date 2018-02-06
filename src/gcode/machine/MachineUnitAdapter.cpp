@@ -72,6 +72,11 @@ Vector3D MachineUnitAdapter::getPosition(axes_t axes) const {
 }
 
 
+void MachineUnitAdapter::setPosition(const Axes &position) {
+  MachineAdapter::setPosition(position * mmInchOut());
+}
+
+
 void MachineUnitAdapter::move(const Axes &axes, bool rapid) {
   MachineAdapter::move(axes * mmInchOut(), rapid);
 }

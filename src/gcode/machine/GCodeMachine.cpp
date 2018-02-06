@@ -69,26 +69,26 @@ void GCodeMachine::beginLine() {
   const string &filename = newLoc.getFilename();
 
   if (filename != location.getFilename()) {
-    stream << "(File: '" << URI::encode(filename, UNESCAPED) << "')\n";
+    *stream << "(File: '" << URI::encode(filename, UNESCAPED) << "')\n";
     location.setFilename(filename);
   }
 
   if (newLoc.getLine() != location.getLine()) {
-    stream << 'N' << newLoc.getLine() << ' ';
+    *stream << 'N' << newLoc.getLine() << ' ';
     location.setLine(newLoc.getLine());
   }
 }
 
 
 void GCodeMachine::start() {
-  stream << (units == Units::METRIC ? "G21" : "G20") << "\n";
+  *stream << (units == Units::METRIC ? "G21" : "G20") << "\n";
   // TODO set other GCode state
 }
 
 
 void GCodeMachine::end() {
   // Probably should be part of the machine description.
-  stream << "M2\n";
+  *stream << "M2\n";
 }
 
 
@@ -100,16 +100,16 @@ void GCodeMachine::setFeed(double feed, feed_mode_t mode) {
 
   if (oldMode != mode)
     switch (mode) {
-    case INVERSE_TIME:  stream << "G93\n"; break;
-    case UNITS_PER_MINUTE: stream << "G94\n"; break;
-    case UNITS_PER_REVOLUTION: stream << "G95\n"; break;
+    case INVERSE_TIME:         *stream << "G93\n"; break;
+    case UNITS_PER_MINUTE:     *stream << "G94\n"; break;
+    case UNITS_PER_REVOLUTION: *stream << "G95\n"; break;
     default: THROW("Feed mode must be one of INVERSE_TIME, "
                    "UNITS_PER_MIN or UNITS_PER_REV");
     }
 
   if (feed != oldFeed) {
     beginLine();
-    stream << "F" << dtos(feed, false) << '\n';
+    *stream << "F" << dtos(feed, false) << '\n';
   }
 }
 
@@ -124,11 +124,11 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
     beginLine();
 
     switch (mode) {
-    case REVOLUTIONS_PER_MINUTE: stream << "G97\n"; break;
+    case REVOLUTIONS_PER_MINUTE: *stream << "G97\n"; break;
     case CONSTANT_SURFACE_SPEED:
-      stream << "G96 S" << dtos(fabs(speed), false);
-      if (max) stream << " D" << dtos(max, false);
-      stream << '\n';
+      *stream << "G96 S" << dtos(fabs(speed), false);
+      if (max) *stream << " D" << dtos(max, false);
+      *stream << '\n';
       break;
     }
   }
@@ -136,9 +136,9 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
   if (oldSpeed != speed) {
     beginLine();
 
-    if (0 < speed) stream << "M3 S" << dtos(speed, false) << '\n';
-    else if (speed < 0) stream << "M4 S" << dtos(-speed, false) << '\n';
-    else stream << "M5\n";
+    if (0 < speed) *stream << "M3 S" << dtos(speed, false) << '\n';
+    else if (speed < 0) *stream << "M4 S" << dtos(-speed, false) << '\n';
+    else *stream << "M5\n";
   }
 }
 
@@ -150,7 +150,7 @@ void GCodeMachine::changeTool(unsigned tool) {
 
   if (tool != currentTool) {
     beginLine();
-    stream << "M6 T" << tool << '\n';
+    *stream << "M6 T" << tool << '\n';
   }
 }
 
@@ -168,14 +168,14 @@ void GCodeMachine::seek(port_t port, bool active, bool error) {
 void GCodeMachine::output(port_t port, double value) {
   if (value)
     switch (port) {
-    case FLOOD: stream << "M7\n"; return;
-    case MIST: stream << "M8\n"; return;
+    case FLOOD: *stream << "M7\n"; return;
+    case MIST:  *stream << "M8\n"; return;
     default: break;
     }
 
   else
     switch (port) {
-    case FLOOD: stream << "M9\n"; return; // M9 turns off both mist and flood
+    case FLOOD: *stream << "M9\n"; return; // M9 turns off both mist and flood
     case MIST: return;
     default: break;
     }
@@ -186,7 +186,7 @@ void GCodeMachine::output(port_t port, double value) {
 
 void GCodeMachine::dwell(double seconds) {
   beginLine();
-  stream << "G4 P" << dtos(seconds, false) << '\n';
+  *stream << "G4 P" << dtos(seconds, false) << '\n';
   MachineAdapter::dwell(seconds);
 }
 
@@ -200,6 +200,7 @@ bool is_near(double x, double y) {
 void GCodeMachine::move(const Axes &axes, bool rapid) {
   bool first = true;
   bool imperial = units == Units::IMPERIAL;
+  Axes position = getPosition();
 
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (!is_near(position.get(*axis), axes.get(*axis))) {
@@ -210,25 +211,23 @@ void GCodeMachine::move(const Axes &axes, bool rapid) {
 
       if (first) {
         beginLine();
-        stream << 'G' << (rapid ? '0' : '1');
+        *stream << 'G' << (rapid ? '0' : '1');
         first = false;
       }
 
-      stream << ' ' << *axis << value;
+      *stream << ' ' << *axis << value;
     }
 
   if (!first) {
-    stream << '\n';
-    position = axes;
-
-    MachineAdapter::move(position, rapid);
+    *stream << '\n';
+    MachineAdapter::move(axes, rapid);
   }
 }
 
 
 void GCodeMachine::pause(bool optional) {
   beginLine();
-  stream << (optional ? "M1" : "M0") << '\n';
+  *stream << (optional ? "M1" : "M0") << '\n';
   MachineAdapter::pause(optional);
 }
 
@@ -238,5 +237,5 @@ void GCodeMachine::comment(const string &s) const {
   String::tokenize(s, lines, "\n\r", true);
 
   for (unsigned i = 0; i < lines.size(); i++)
-    stream << "(" << lines[i] << ")\n";
+    *stream << "(" << lines[i] << ")\n";
 }

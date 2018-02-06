@@ -73,6 +73,7 @@ namespace GCode {
     Axes getPosition() const {return parent->getPosition();}
     cb::Vector3D getPosition(axes_t axes) const
     {return parent->getPosition(axes);}
+    void setPosition(const Axes &position) {parent->setPosition(position);}
 
     void dwell(double seconds) {parent->dwell(seconds);}
     void move(const Axes &axes, bool rapid = false) {parent->move(axes, rapid);}

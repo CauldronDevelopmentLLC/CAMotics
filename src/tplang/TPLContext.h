@@ -46,7 +46,8 @@ namespace tplang {
     GCode::MachineInterface &machine;
     cb::JSON::ValuePtr sim;
 
-    TPLContext(std::ostream &out, GCode::MachineInterface &machine,
+    TPLContext(const cb::SmartPointer<std::ostream> &stream,
+               GCode::MachineInterface &machine,
                const std::string &jsImpl = std::string());
 
     template <typename T>

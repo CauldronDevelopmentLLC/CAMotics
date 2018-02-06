@@ -28,10 +28,10 @@ using namespace cb;
 using namespace tplang;
 
 
-TPLContext::TPLContext(ostream &out, GCode::MachineInterface &machine,
-                       const string &jsImpl) :
-  js::Javascript(jsImpl), gcodeMod(*this), matrixMod(*this), dxfMod(*this),
-  stlMod(*this), machine(machine) {
+TPLContext::TPLContext(const SmartPointer<ostream> &stream,
+                       GCode::MachineInterface &machine, const string &jsImpl) :
+  js::Javascript(jsImpl, stream), gcodeMod(*this), matrixMod(*this),
+  dxfMod(*this), stlMod(*this), machine(machine) {
 
   // Add modules
   define(gcodeMod);

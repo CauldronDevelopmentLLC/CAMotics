@@ -91,14 +91,7 @@ void MachineMatrix::start() {
 
 
 Axes MachineMatrix::getPosition() const {
-  Axes axes = MachineAdapter::getPosition();
-
-  // TODO this is inefficient
-  axes.setXYZ(getTransMatrix(XYZ).invert(axes.getXYZ()));
-  axes.setABC(getTransMatrix(ABC).invert(axes.getABC()));
-  axes.setUVW(getTransMatrix(UVW).invert(axes.getUVW()));
-
-  return axes;
+  return inverseTransform(MachineAdapter::getPosition());
 }
 
 
@@ -107,15 +100,13 @@ Vector3D MachineMatrix::getPosition(axes_t axes) const {
 }
 
 
+void MachineMatrix::setPosition(const Axes &position) {
+  MachineAdapter::setPosition(transform(position));
+}
+
+
 void MachineMatrix::move(const Axes &axes, bool rapid) {
-  Axes trans(axes);
-
-  // TODO this is inefficient
-  trans.applyXYZMatrix(getMatrix(XYZ));
-  trans.applyABCMatrix(getMatrix(ABC));
-  trans.applyUVWMatrix(getMatrix(UVW));
-
-  MachineAdapter::move(trans, rapid);
+  MachineAdapter::move(transform(axes), rapid);
 }
 
 
@@ -128,6 +119,30 @@ void MachineMatrix::arc(const Vector3D &offset, double angle,
 void MachineMatrix::setMatrix(const Matrix4x4D &t, axes_t matrix) {
   getTransMatrix(matrix).setMatrix(t);
   updateMatrix(matrix);
+}
+
+
+Axes MachineMatrix::transform(const Axes &axes) const {
+  Axes trans(axes);
+
+  // TODO this is inefficient
+  trans.applyXYZMatrix(getMatrix(XYZ));
+  trans.applyABCMatrix(getMatrix(ABC));
+  trans.applyUVWMatrix(getMatrix(UVW));
+
+  return trans;
+}
+
+
+Axes MachineMatrix::inverseTransform(const Axes &axes) const {
+  Axes trans(axes);
+
+  // TODO this is inefficient
+  trans.setXYZ(getTransMatrix(XYZ).invert(axes.getXYZ()));
+  trans.setABC(getTransMatrix(ABC).invert(axes.getABC()));
+  trans.setUVW(getTransMatrix(UVW).invert(axes.getUVW()));
+
+  return trans;
 }
 
 

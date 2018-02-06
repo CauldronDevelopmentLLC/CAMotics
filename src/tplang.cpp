@@ -47,7 +47,7 @@ class TPLangApp : public CAMotics::CommandLineApp {
 
 public:
   TPLangApp() : CommandLineApp("Tool Path Language Interpreter"),
-                ctx(cout, pipeline, jsImpl) {
+                ctx(SmartPointer<ostream>::Phony(&cout), pipeline, jsImpl) {
     cmdLine.addTarget("sim-json", simJSON,
                       "Simulation information in JSON format");
     cmdLine.addTarget("js", jsImpl,

@@ -135,6 +135,9 @@ namespace GCode {
     virtual Axes getPosition() const = 0;
     virtual cb::Vector3D getPosition(axes_t axes) const = 0;
 
+    /// Set the current position of all axes.
+    virtual void setPosition(const Axes &position) = 0;
+
     /***
      * Delay the next move for @param seconds.
      *

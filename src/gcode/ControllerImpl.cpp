@@ -545,11 +545,14 @@ void ControllerImpl::setHomed(int vars, bool homed) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
       set(SSTR("_" << (char)tolower(*axis) << "_homed"), homed);
+
       if (homed) {
         set(SSTR("_" << (char)tolower(*axis) << "_home"), getVar(*axis));
         setAxisAbsolutePosition(*axis, getVar(*axis));
       }
     }
+
+  if (homed) machine.setPosition(getAbsolutePosition());
 }
 
 
@@ -669,6 +672,7 @@ void ControllerImpl::setCurrentMotionMode(unsigned mode) {
 void ControllerImpl::synchronize(const Axes &position) {
   if (!synchronizing) THROW("Not synchronizing");
   setAbsolutePosition(position);
+  machine.setPosition(position);
   // TODO Also set probed position PROBE_RESULT_X-W and PROBE_SUCCESS
   synchronizing = false;
 }

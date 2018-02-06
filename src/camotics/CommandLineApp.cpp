@@ -123,7 +123,7 @@ void CommandLineApp::build(GCode::MachinePipeline &pipeline) {
   pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
   if (linearize) pipeline.add(new MachineLinearizer(maxArcError));
   pipeline.add(new MachineMatrix);
-  pipeline.add(new GCodeMachine(*stream, outputUnits));
+  pipeline.add(new GCodeMachine(stream, outputUnits));
   pipeline.add(new MachineState);
 }
 
