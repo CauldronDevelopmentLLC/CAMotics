@@ -161,7 +161,11 @@ void LinePlanner::end() {
 
 void LinePlanner::setSpeed(double speed, spin_mode_t mode, double max) {
   MachineAdapter::setSpeed(speed, mode, max);
+
   // TODO handle spin mode
+  if (mode != REVOLUTIONS_PER_MINUTE)
+    LOG_WARNING("Constant surface speed not supported");
+
   pushSetCommand("speed", speed);
 }
 
@@ -196,8 +200,12 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   for (int i = 0; i < 4; i++) end[i] = target[i];
 
   // TODO Handle feed rate mode
-  double feed = rapid ? numeric_limits<double>::max() : getFeed();
+  feed_mode_t mode = UNITS_PER_MINUTE;
+  double feed = rapid ? numeric_limits<double>::max() : getFeed(&mode);
   if (!feed) THROWS("Non-rapid move with zero feed rate");
+
+  if (mode != UNITS_PER_MINUTE)
+    LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
   SmartPointer<LineCommand> lc =
     new LineCommand(nextID++, position, end, feed, seeking, config);

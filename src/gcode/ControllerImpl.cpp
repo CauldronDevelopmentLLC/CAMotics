@@ -545,8 +545,10 @@ void ControllerImpl::setHomed(int vars, bool homed) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
       set(SSTR("_" << (char)tolower(*axis) << "_homed"), homed);
-      set(SSTR("_" << (char)tolower(*axis) << "_home"),
-          homed ? getVar(*axis) : numeric_limits<double>::quiet_NaN());
+      if (homed) {
+        set(SSTR("_" << (char)tolower(*axis) << "_home"), getVar(*axis));
+        setAxisAbsolutePosition(getVar(*axis));
+      }
     }
 }
 
@@ -831,9 +833,9 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 880: implemented = false;              break; // Spin stop manual out
     case 890: drill(vars, true, true, false);   break; // Dwell, feed out
 
-    case 900: incrementalDistanceMode = false;    break;
+    case 900: incrementalDistanceMode    = false; break;
     case 901: arcIncrementalDistanceMode = false; break;
-    case 910: incrementalDistanceMode = true;     break;
+    case 910: incrementalDistanceMode    = true;  break;
     case 911: arcIncrementalDistanceMode = true;  break;
 
     case 920: setGlobalOffsets(vars);    break;
@@ -841,7 +843,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 922: resetGlobalOffsets(false); break;
     case 923: restoreGlobalOffsets();    break;
 
-    case 930: feedMode = MachineInterface::INVERSE_TIME;      break;
+    case 930: feedMode = MachineInterface::INVERSE_TIME;         break;
     case 940: feedMode = MachineInterface::UNITS_PER_MINUTE;     break;
     case 950: feedMode = MachineInterface::UNITS_PER_REVOLUTION; break;
 
