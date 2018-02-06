@@ -60,7 +60,7 @@ void Axes::read(const JSON::Value &value) {
 
 
 void Axes::write(JSON::Sink &sink) const {
-  sink.beginDict();
+  sink.beginDict(true);
 
   for (unsigned i = 0; i < 9; i++)
     if (isfinite(data[i]))
