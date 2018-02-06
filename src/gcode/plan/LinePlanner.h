@@ -26,7 +26,6 @@
 #include <gcode/machine/MachineAdapter.h>
 
 #include <cbang/SmartPointer.h>
-#include <cbang/geom/Vector.h>
 
 #include <list>
 
@@ -39,7 +38,7 @@ namespace GCode {
     PlannerConfig config;
 
     // Move state
-    cb::Vector4D position;
+    Axes position;
     double lastExitVel;
     bool seeking;
 
@@ -70,7 +69,7 @@ namespace GCode {
     void output(port_t port, double value);
     void dwell(double seconds);
     void move(const Axes &axes, bool rapid);
-    //void arc(const cb::Vector3D &offset, double angle, plane_t plane);
+    //void arc(const Axes &offset, double angle, plane_t plane);
     void pause(bool optional);
     void set(const std::string &name, double value);
     void setLocation(const cb::LocationRange &location);
@@ -93,8 +92,7 @@ namespace GCode {
                          double maxJerk) const;
     double planVelocityTransition(double Vi, double Vt, double maxAccel,
                                   double maxJerk, double *times) const;
-    double computeJunctionVelocity(const cb::Vector4D &unitA,
-                                   const cb::Vector4D &unitB,
+    double computeJunctionVelocity(const Axes &unitA, const Axes &unitB,
                                    double deviation, double accel) const;
   };
 }

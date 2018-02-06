@@ -70,9 +70,7 @@ LinePlanner::LinePlanner(const PlannerConfig &config) :
 
 void LinePlanner::setConfig(const PlannerConfig &config) {
   this->config = config;
-
-  for (unsigned i = 0; i < position.getSize(); i++)
-    position[i] = config.start[i];
+  position = config.start;
 }
 
 
@@ -113,8 +111,7 @@ void LinePlanner::restart(uint64_t id, const Axes &position) {
   }
 
   // Set position
-  for (int i = 0; i < 4; i++)
-    this->position[i] = position[i];
+  this->position = position;
 
   // Reload previously output moves
   cmds.splice(cmds.begin(), out, out.begin(), out.end());
@@ -196,8 +193,7 @@ void LinePlanner::dwell(double seconds) {
 void LinePlanner::move(const Axes &target, bool rapid) {
   MachineAdapter::move(target, rapid);
 
-  Vector4D end;
-  for (int i = 0; i < 4; i++) end[i] = target[i];
+  Axes end = target;
 
   // TODO Handle feed rate mode
   feed_mode_t mode = UNITS_PER_MINUTE;
@@ -314,7 +310,7 @@ bool LinePlanner::planOne(cmds_t::iterator it) {
     cmds_t::iterator last = std::prev(it);
     while (true) {
       if (last->isInstance<LineCommand>()) {
-        const Vector4D &lastUnit = last->cast<LineCommand>()->unit;
+        const Axes &lastUnit = last->cast<LineCommand>()->unit;
 
         double jv = computeJunctionVelocity(lc.unit, lastUnit,
                                             config.junctionDeviation,
@@ -657,10 +653,11 @@ double LinePlanner::planVelocityTransition(double Vi, double Vt,
 }
 
 
-double LinePlanner::computeJunctionVelocity(const Vector4D &unitA,
-                                            const Vector4D &unitB,
+double LinePlanner::computeJunctionVelocity(const Axes &unitA,
+                                            const Axes &unitB,
                                             double deviation,
                                             double accel) const {
+  // TODO this probably does not make sense for axes A, B, C, U, V or W
   double cosTheta = -unitA.dot(unitB);
 
   if (cosTheta < -0.99) return numeric_limits<double>::max(); // Straight line
@@ -670,7 +667,7 @@ double LinePlanner::computeJunctionVelocity(const Vector4D &unitA,
   double aDelta = 0;
   double bDelta = 0;
 
-  for (int axis = 0; axis < 4; axis++) {
+  for (unsigned axis = 0; axis < Axes::getSize(); axis++) {
     aDelta += square(unitA[axis] * deviation);
     bDelta += square(unitB[axis] * deviation);
   }

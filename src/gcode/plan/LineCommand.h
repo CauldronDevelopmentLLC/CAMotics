@@ -22,7 +22,7 @@
 
 #include "PlannerCommand.h"
 
-#include <cbang/geom/Vector.h>
+#include <gcode/Axes.h>
 
 
 namespace GCode {
@@ -30,7 +30,7 @@ namespace GCode {
 
   class LineCommand : public PlannerCommand {
   public:
-    cb::Vector4D target;
+    Axes target;
     double length;
 
     double entryVel;
@@ -43,13 +43,12 @@ namespace GCode {
 
     double times[7];
 
-    cb::Vector4D unit;
+    Axes unit;
 
     bool seeking;
 
-    LineCommand(uint64_t id, const cb::Vector4D &start,
-                const cb::Vector4D &end, double feed, bool seeking,
-                const PlannerConfig &config);
+    LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
+                bool seeking, const PlannerConfig &config);
 
     // From PlannerCommand
     const char *getType() const {return "line";}
@@ -67,6 +66,6 @@ namespace GCode {
     void insert(cb::JSON::Sink &sink) const;
 
   protected:
-    void computeLimits(const cb::Vector4D &start, const PlannerConfig &config);
+    void computeLimits(const Axes &start, const PlannerConfig &config);
   };
 }

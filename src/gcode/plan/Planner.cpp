@@ -77,8 +77,8 @@ void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
 void Planner::restart(uint64_t id, const Axes &position) {
-  planner.restart(id, position);
   if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(position);
+  planner.restart(id, position);
 }
 
 
