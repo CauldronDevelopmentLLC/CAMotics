@@ -477,7 +477,7 @@ static PyObject *_load_string(PyPlanner *self, PyObject *args) {
 
     if (!PyArg_ParseTuple(args, "s", &gcode)) return 0;
 
-    self->planner->load(cb::StringStreamInputSource(gcode));
+    self->planner->load(cb::StringStreamInputSource(gcode, "MDI"));
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
