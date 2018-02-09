@@ -49,7 +49,7 @@ namespace GCode {
     int line;
 
   public:
-    LinePlanner(const PlannerConfig &config);
+    LinePlanner();
 
     void setConfig(const PlannerConfig &config);
     bool isDone() const;

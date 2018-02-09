@@ -30,6 +30,8 @@ namespace GCode {
   public:
     MachineLinearizer(double maxArcError = 0.01) : maxArcError(maxArcError) {}
 
+    void setMaxArcError(double x) {maxArcError = x;}
+
     // From MachineInterface
     void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
   };

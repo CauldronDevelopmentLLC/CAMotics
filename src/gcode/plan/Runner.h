@@ -18,32 +18,33 @@
 
 \******************************************************************************/
 
-#include "Runner.h"
+#pragma once
 
-#include <cbang/log/Logger.h>
+#include "PlannerConfig.h"
 
-
-using namespace GCode;
-using namespace cb;
-using namespace std;
+#include <gcode/interp/Interpreter.h>
+#include <gcode/parse/Tokenizer.h>
 
 
-Runner::Runner(Controller &controller, const InputSource &source) :
-  interpreter(controller), scanner(source), tokenizer(scanner), started(false) {
-}
+namespace GCode {
+  class Controller;
 
+  class Runner {
+    PlannerConfig config;
 
-bool Runner::next() {
-  started = true;
+    Interpreter interpreter;
+    cb::Scanner scanner;
+    GCode::Tokenizer tokenizer;
 
-  try {
-    return interpreter.readBlock(tokenizer);
+    bool started;
 
-  } catch (const EndProgram &) {
-  } catch (const Exception &e) {
-    LOG_ERROR(tokenizer.getLocation() << ":" << e.getMessage());
-    LOG_DEBUG(3, e);
-  }
+  public:
+    Runner(Controller &controller, const cb::InputSource &source,
+           const PlannerConfig &config);
 
-  return false;
+    const PlannerConfig &getConfig() const {return config;}
+    bool hasStarted() const {return started;}
+
+    bool next();
+  };
 }

@@ -71,8 +71,8 @@ public:
 
   // From cb::Reader
   void read(const InputSource &source) {
-    Planner planner(config);
-    planner.load(source);
+    Planner planner;
+    planner.load(source, config);
 
     JSON::Writer writer(cout);
 

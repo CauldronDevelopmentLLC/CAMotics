@@ -22,11 +22,13 @@
 
 #include "PlannerConfig.h"
 #include "LinePlanner.h"
+#include "Runner.h"
 
 #include <gcode/Axes.h>
-#include <gcode/Runner.h>
 #include <gcode/ControllerImpl.h>
 #include <gcode/machine/MachinePipeline.h>
+#include <gcode/machine/MachineUnitAdapter.h>
+#include <gcode/machine/MachineLinearizer.h>
 
 #include <list>
 
@@ -46,6 +48,8 @@ namespace GCode {
 
 
   class Planner : public ControllerImpl {
+    MachineUnitAdapter unitAdapter;
+    MachineLinearizer linearizer;
     MachinePipeline pipeline;
     LinePlanner planner;
 
@@ -53,7 +57,7 @@ namespace GCode {
     cb::SmartPointer<NameResolver> resolver;
 
   public:
-    Planner(const PlannerConfig &config);
+    Planner();
 
     void setConfig(const PlannerConfig &config);
 
@@ -63,7 +67,7 @@ namespace GCode {
     bool isRunning() const;
     void overrideSync();
 
-    void load(const cb::InputSource &source);
+    void load(const cb::InputSource &source, const PlannerConfig &config);
 
     bool hasMore();
     void next(cb::JSON::Sink &sink);

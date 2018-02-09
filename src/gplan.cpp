@@ -358,41 +358,15 @@ static PyObject *_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 
 static int _init(PyPlanner *self, PyObject *args, PyObject *kwds) {
   try {
-    GCode::PlannerConfig config;
-
-    PyObject *_config = 0;
-
-    static const char *kwlist[] = {"config", 0};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", (char **)kwlist,
-                                     &_config))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "", 0))
       return -1;
 
-    // Convert Python object to JSON config
-    if (_config) config.read(*pyToJSON(_config));
-
-    self->planner = new GCode::Planner(config);
+    self->planner = new GCode::Planner;
 
     return 0;
   } CATCH_PYTHON;
 
   return -1;
-}
-
-
-static PyObject *_set_config(PyPlanner *self, PyObject *args) {
-  try {
-    PyObject *_config;
-
-    if (!PyArg_ParseTuple(args, "O", &_config)) return 0;
-
-    GCode::PlannerConfig config;
-    config.read(*pyToJSON(_config));
-
-    self->planner->setConfig(config);
-  } CATCH_PYTHON;
-
-  Py_RETURN_NONE;
 }
 
 
@@ -473,11 +447,17 @@ static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
 
 static PyObject *_load_string(PyPlanner *self, PyObject *args) {
   try {
+    GCode::PlannerConfig config;
+
+    PyObject *_config = 0;
     const char *gcode;
 
-    if (!PyArg_ParseTuple(args, "s", &gcode)) return 0;
+    if (!PyArg_ParseTuple(args, "s|O", &gcode)) return 0;
 
-    self->planner->load(cb::StringStreamInputSource(gcode, "MDI"));
+    // Convert Python object to JSON config
+    if (_config) config.read(*pyToJSON(_config));
+
+    self->planner->load(cb::StringStreamInputSource(gcode, "MDI"), config);
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
@@ -486,11 +466,17 @@ static PyObject *_load_string(PyPlanner *self, PyObject *args) {
 
 static PyObject *_load(PyPlanner *self, PyObject *args) {
   try {
+    GCode::PlannerConfig config;
+
+    PyObject *_config = 0;
     const char *filename;
 
-    if (!PyArg_ParseTuple(args, "s", &filename)) return 0;
+    if (!PyArg_ParseTuple(args, "s|O", &filename)) return 0;
 
-    self->planner->load(std::string(filename));
+    // Convert Python object to JSON config
+    if (_config) config.read(*pyToJSON(_config));
+
+    self->planner->load(std::string(filename), config);
   } CATCH_PYTHON;
 
   Py_RETURN_NONE;
@@ -555,8 +541,6 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
 
 
 static PyMethodDef _methods[] = {
-  {"set_config", (PyCFunction)_set_config, METH_VARARGS,
-   "Change the planner config"},
   {"is_running", (PyCFunction)_is_running, METH_NOARGS,
    "True if the planner is active"},
   {"is_synchronizing", (PyCFunction)_is_synchronizing, METH_NOARGS,

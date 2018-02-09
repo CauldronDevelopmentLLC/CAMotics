@@ -20,10 +20,9 @@
 
 #include "Planner.h"
 
-#include <gcode/Runner.h>
+#include "Runner.h"
+
 #include <gcode/machine/MachineState.h>
-#include <gcode/machine/MachineLinearizer.h>
-#include <gcode/machine/MachineUnitAdapter.h>
 
 
 using namespace cb;
@@ -31,18 +30,19 @@ using namespace std;
 using namespace GCode;
 
 
-Planner::Planner(const PlannerConfig &config) :
-  ControllerImpl(pipeline), planner(config) {
+Planner::Planner() : ControllerImpl(pipeline) {
 
-  pipeline.add(new MachineUnitAdapter(config.defaultUnits,
-                                      config.outputUnits));
-  pipeline.add(new MachineLinearizer(config.maxArcError));
+  pipeline.add(SmartPointer<MachineUnitAdapter>::Phony(&unitAdapter));
+  pipeline.add(SmartPointer<MachineLinearizer>::Phony(&linearizer));
   pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
   pipeline.add(new MachineState);
 }
 
 
 void Planner::setConfig(const PlannerConfig &config) {
+  unitAdapter.setUnits(config.defaultUnits);
+  unitAdapter.setTargetUnits(config.outputUnits);
+  linearizer.setMaxArcError(config.maxArcError);
   setAbsolutePosition(config.start);
   planner.setConfig(config);
 }
@@ -57,8 +57,8 @@ void Planner::overrideSync() {
 }
 
 
-void Planner::load(const InputSource &source) {
-  runners.push_back(new Runner(*this, source));
+void Planner::load(const InputSource &source, const PlannerConfig &config) {
+  runners.push_back(new Runner(*this, source, config));
 }
 
 
@@ -67,7 +67,10 @@ bool Planner::hasMore() {
     if (planner.hasMove()) return true;
     if (ControllerImpl::isSynchronizing() || runners.empty()) return false;
 
-    if (!runners.front()->hasStarted()) pipeline.start();
+    if (!runners.front()->hasStarted()) {
+      setConfig(runners.front()->getConfig());
+      pipeline.start();
+    }
 
     // Push a line of GCode to the planner
     if (!runners.front()->next()) {

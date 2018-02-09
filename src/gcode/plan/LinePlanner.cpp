@@ -64,8 +64,8 @@ namespace {
 }
 
 
-LinePlanner::LinePlanner(const PlannerConfig &config) :
-  lastExitVel(0), seeking(false), nextID(1), line(-1) {setConfig(config);}
+LinePlanner::LinePlanner() :
+  lastExitVel(0), seeking(false), nextID(1), line(-1) {}
 
 
 void LinePlanner::setConfig(const PlannerConfig &config) {

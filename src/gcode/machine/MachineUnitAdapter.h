@@ -50,6 +50,7 @@ namespace GCode {
      * @throw cb::Exception if @param units is invalid.
      */
     void setUnits(Units units) {this->units = units;}
+    void setTargetUnits(Units units) {targetUnits = units;}
 
     // From MachineInterface
     double getFeed(feed_mode_t *mode) const;
