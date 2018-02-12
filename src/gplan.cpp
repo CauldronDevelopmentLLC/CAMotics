@@ -449,12 +449,10 @@ static PyObject *_load_string(PyPlanner *self, PyObject *args) {
     PyObject *_config = 0;
     const char *gcode;
 
-    if (!PyArg_ParseTuple(args, "s|O", &gcode)) return 0;
+    if (!PyArg_ParseTuple(args, "s|O", &gcode, &_config)) return 0;
 
     // Convert Python object to JSON config
     if (_config) config.read(*pyToJSON(_config));
-
-    LOG_INFO(1, "config:" << config);
 
     self->planner->load(cb::StringStreamInputSource(gcode, "MDI"), config);
   } CATCH_PYTHON;
@@ -470,7 +468,7 @@ static PyObject *_load(PyPlanner *self, PyObject *args) {
     PyObject *_config = 0;
     const char *filename;
 
-    if (!PyArg_ParseTuple(args, "s|O", &filename)) return 0;
+    if (!PyArg_ParseTuple(args, "s|O", &filename, &_config)) return 0;
 
     // Convert Python object to JSON config
     if (_config) config.read(*pyToJSON(_config));

@@ -44,6 +44,7 @@ void Planner::setConfig(const PlannerConfig &config) {
   unitAdapter.setTargetUnits(config.outputUnits);
   linearizer.setMaxArcError(config.maxArcError);
   setAbsolutePosition(config.start);
+  pipeline.setPosition(config.start);
   planner.setConfig(config);
 }
 
