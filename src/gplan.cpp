@@ -358,9 +358,6 @@ static PyObject *_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 
 static int _init(PyPlanner *self, PyObject *args, PyObject *kwds) {
   try {
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "", 0))
-      return -1;
-
     self->planner = new GCode::Planner;
 
     return 0;
