@@ -223,6 +223,7 @@ void LinePlanner::pause(bool optional) {
 
 
 void LinePlanner::set(const string &name, double value) {
+  if (MachineState::get(name) == value) return;
   MachineState::set(name, value);
   pushSetCommand(name, value);
 }

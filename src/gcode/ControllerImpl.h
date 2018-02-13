@@ -128,6 +128,7 @@ namespace GCode {
     void setGlobalOffsets(int vars);
     void resetGlobalOffsets(bool clear);
     void restoreGlobalOffsets();
+    void updateOffsetParams();
 
     // Homing
     void setHomed(int vars, bool homed);

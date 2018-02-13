@@ -561,6 +561,22 @@ void ControllerImpl::resetGlobalOffsets(bool clear) {
 void ControllerImpl::restoreGlobalOffsets() {set(GLOBAL_OFFSETS_ENABLED, 1);}
 
 
+void ControllerImpl::updateOffsetParams() {
+  for (const char *axis = Axes::AXES; *axis; axis++) {
+    string name = "_offset_" + string(1, tolower(*axis));
+    double offset = getAxisOffset(*axis);
+
+    if (offset != get(name)) {
+      set(name, offset);
+
+      double position = getAxisAbsolutePosition(*axis) + offset;
+      set(CURRENT_COORD_ADDR(Axes::toIndex(*axis)), position);
+      set("_" + string(1, tolower(*axis)), position);
+    }
+  }
+}
+
+
 void ControllerImpl::setHomed(int vars, bool homed) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
@@ -647,18 +663,7 @@ void ControllerImpl::set(address_t addr, double value) {
 
   // Check if offsets have changed
   if (GLOBAL_OFFSETS_ENABLED <= addr && addr <= CS9_ROTATION)
-    for (const char *axis = Axes::AXES; *axis; axis++) {
-      string name = "_offset_" + string(1, tolower(*axis));
-      double offset = getAxisOffset(*axis);
-
-      if (offset != get(name)) {
-        set(name, offset);
-
-        double position = getAxisAbsolutePosition(*axis) + offset;
-        set(CURRENT_COORD_ADDR(Axes::toIndex(*axis)), position);
-        set("_" + string(1, tolower(*axis)), position);
-      }
-    }
+    updateOffsetParams();
 }
 
 
