@@ -129,11 +129,13 @@ void ControllerImpl::setSpindleDir(dir_t dir) {
 
 void ControllerImpl::setMistCoolant(bool enable) {
   machine.output(MachineEnum::MIST, enable);
+  machine.set("_mist", enable);
 }
 
 
 void ControllerImpl::setFloodCoolant(bool enable) {
   machine.output(MachineEnum::FLOOD, enable);
+  machine.set("_flood", enable);
 }
 
 
