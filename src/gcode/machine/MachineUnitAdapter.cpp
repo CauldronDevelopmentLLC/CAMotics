@@ -29,36 +29,28 @@ using namespace GCode;
 #define METER_PER_FOOT 0.3048
 
 
-double MachineUnitAdapter::getFeed(feed_mode_t *_mode) const {
-  feed_mode_t mode;
-  double feed = MachineAdapter::getFeed(&mode);
-
-  if (_mode) *_mode = mode;
-
-  return mode == INVERSE_TIME ? feed : feed * mmInchIn();
+double MachineUnitAdapter::getFeed() const {
+  double feed = MachineAdapter::getFeed();
+  return getFeedMode() == INVERSE_TIME ? feed : feed * mmInchIn();
 }
 
 
-void MachineUnitAdapter::setFeed(double feed, feed_mode_t mode) {
+void MachineUnitAdapter::setFeed(double feed) {
   MachineAdapter::setFeed
-    (mode == INVERSE_TIME ? feed : feed * mmInchOut(), mode);
+    (getFeedMode() == INVERSE_TIME ? feed : feed * mmInchOut());
 }
 
 
-double MachineUnitAdapter::getSpeed(spin_mode_t *_mode, double *max) const {
-  spin_mode_t mode;
-  double speed = MachineAdapter::getSpeed(&mode, max);
-
-  if (_mode) *_mode = mode;
-
-  return mode != CONSTANT_SURFACE_SPEED ? speed : speed * meterFootIn();
+double MachineUnitAdapter::getSpeed() const {
+  double speed = MachineAdapter::getSpeed();
+  return
+    getSpinMode() != CONSTANT_SURFACE_SPEED ? speed : speed * meterFootIn();
 }
 
 
-void MachineUnitAdapter::setSpeed(double speed, spin_mode_t mode, double max) {
+void MachineUnitAdapter::setSpeed(double speed) {
   MachineAdapter::setSpeed
-    (mode != CONSTANT_SURFACE_SPEED ? speed : speed * meterFootOut(), mode,
-     max);
+    (getSpinMode() != CONSTANT_SURFACE_SPEED ? speed : speed * meterFootOut());
 }
 
 

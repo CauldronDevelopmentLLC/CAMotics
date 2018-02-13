@@ -43,9 +43,7 @@ ControllerImpl::ControllerImpl(MachineInterface &machine,
   pathMode(EXACT_PATH_MODE), returnMode(RETURN_TO_R),
   motionBlendingTolerance(0), naiveCamTolerance(0),
   incrementalDistanceMode(false), arcIncrementalDistanceMode(true),
-  moveInAbsoluteCoords(false), feedMode(MachineInterface::UNITS_PER_MINUTE),
-  spinMode(MachineInterface::REVOLUTIONS_PER_MINUTE), spindleDir(DIR_OFF),
-  speed(0), maxSpindleSpeed(0) {
+  moveInAbsoluteCoords(false), spindleDir(DIR_OFF), speed(0) {
 
   this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
 
@@ -101,6 +99,26 @@ VarTypes::enum_t ControllerImpl::getVarType(char letter) {
   default: THROWS("Invalid variable name " << letter);
   }
 }
+
+
+void ControllerImpl::setUnits(Units units) {
+  switch (units) {
+    case Units::METRIC:
+    machine.setMetric();
+    machine.set("_metric", 1);
+    machine.set("_imperial", 0);
+    break;
+
+    case Units::IMPERIAL:
+    machine.setImperial();
+    machine.set("_metric", 0);
+    machine.set("_imperial", 1);
+    break;
+  }
+}
+
+
+void ControllerImpl::setFeedMode(feed_mode_t mode) {machine.setFeedMode(mode);}
 
 
 void ControllerImpl::setSpindleDir(dir_t dir) {
@@ -300,8 +318,8 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
     if (arcIncrementalDistanceMode) {
       offset =
-        Vector2D(vars & getVarType(offsets[0]) ? getVar(offsets[0]) : 0,
-                 vars & getVarType(offsets[1]) ? getVar(offsets[1]) : 0);
+        Vector2D((vars & getVarType(offsets[0])) ? getVar(offsets[0]) : 0,
+                  (vars & getVarType(offsets[1])) ? getVar(offsets[1]) : 0);
       center = start + offset;
 
     } else center = Vector2D(getVar(offsets[0]) + getAxisOffset(axes[0]),
@@ -591,7 +609,7 @@ void ControllerImpl::end() {
   incrementalDistanceMode = false;
 
   // Feed rate mode is set to units per minute (G94)
-  feedMode = MachineInterface::UNITS_PER_MINUTE;
+  setFeedMode(MachineInterface::UNITS_PER_MINUTE);
 
   // Feed and speed overrides are set to on (M48)
   // TODO
@@ -683,7 +701,7 @@ void ControllerImpl::setLocation(const LocationRange &location) {
 }
 
 
-void ControllerImpl::setFeed(double feed) {machine.setFeed(feed, feedMode);}
+void ControllerImpl::setFeed(double feed) {machine.setFeed(feed);}
 
 
 void ControllerImpl::setSpeed(double speed) {
@@ -698,7 +716,7 @@ void ControllerImpl::setSpeed(double speed) {
   default: THROW("Invalid spindle direction");
   }
 
-  machine.setSpeed(mspeed, spinMode, maxSpindleSpeed);
+  machine.setSpeed(mspeed);
 }
 
 
@@ -730,9 +748,9 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 40: dwell(getVar('P')); break;
 
-    case 51: implemented = false; // TODO Quadratic B-spline
-    case 52: implemented = false; // TODO NURBS Block Start
-    case 53: implemented = false; // TODO NURBS Block End
+    case 51: implemented = false; break; // TODO Quadratic B-spline
+    case 52: implemented = false; break; // TODO NURBS Block Start
+    case 53: implemented = false; break; // TODO NURBS Block End
 
     case 70: latheDiameterMode = true;  break;
     case 80: latheDiameterMode = false; break; // Radius mode
@@ -753,8 +771,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 190: setPlane(MachineInterface::YZ); break;
     case 191: setPlane(MachineInterface::VW); break;
 
-    case 200: machine.setImperial(); break;
-    case 210: machine.setMetric();   break;
+    case 200: setUnits(Units::IMPERIAL); break;
+    case 210: setUnits(Units::METRIC);   break;
 
     case 280: case 300:
       if (vars & VT_AXIS) makeMove(vars, true, true);
@@ -847,17 +865,19 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 922: resetGlobalOffsets(false); break;
     case 923: restoreGlobalOffsets();    break;
 
-    case 930: feedMode = MachineInterface::INVERSE_TIME;         break;
-    case 940: feedMode = MachineInterface::UNITS_PER_MINUTE;     break;
-    case 950: feedMode = MachineInterface::UNITS_PER_REVOLUTION; break;
+    case 930: setFeedMode(MachineInterface::INVERSE_TIME);         break;
+    case 940: setFeedMode(MachineInterface::UNITS_PER_MINUTE);     break;
+    case 950: setFeedMode(MachineInterface::UNITS_PER_REVOLUTION); break;
 
       // NOTE: The spindle modes must be accompanied by a speed
     case 960:
-      spinMode = MachineInterface::CONSTANT_SURFACE_SPEED;
-      maxSpindleSpeed = getVar('D');
+      machine.setSpinMode(MachineInterface::CONSTANT_SURFACE_SPEED,
+                          (vars & VT_D) ? getVar('D') : 0);
       break;
 
-    case 970: spinMode = MachineInterface::REVOLUTIONS_PER_MINUTE; break;
+    case 970:
+      machine.setSpinMode(MachineInterface::REVOLUTIONS_PER_MINUTE);
+      break;
 
     case 980: returnMode = RETURN_TO_R;     break;
     case 990: returnMode = RETURN_TO_OLD_Z; break;

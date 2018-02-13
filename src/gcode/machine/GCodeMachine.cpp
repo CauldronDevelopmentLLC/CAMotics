@@ -92,11 +92,20 @@ void GCodeMachine::end() {
 }
 
 
-void GCodeMachine::setFeed(double feed, feed_mode_t mode) {
-  feed_mode_t oldMode;
-  double oldFeed = getFeed(&oldMode);
+void GCodeMachine::setFeed(double feed) {
+  double oldFeed = getFeed();
+  MachineAdapter::setFeed(feed);
 
-  MachineAdapter::setFeed(feed, mode);
+  if (feed != oldFeed) {
+    beginLine();
+    *stream << "F" << dtos(feed, false) << '\n';
+  }
+}
+
+
+void GCodeMachine::setFeedMode(feed_mode_t mode) {
+  feed_mode_t oldMode = getFeedMode();
+  MachineAdapter::setFeedMode(mode);
 
   if (oldMode != mode)
     switch (mode) {
@@ -106,32 +115,12 @@ void GCodeMachine::setFeed(double feed, feed_mode_t mode) {
     default: THROW("Feed mode must be one of INVERSE_TIME, "
                    "UNITS_PER_MIN or UNITS_PER_REV");
     }
-
-  if (feed != oldFeed) {
-    beginLine();
-    *stream << "F" << dtos(feed, false) << '\n';
-  }
 }
 
 
-void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
-  spin_mode_t oldMode;
-  double oldSpeed = getSpeed(&oldMode);
-
-  MachineAdapter::setSpeed(speed, mode, max);
-
-  if (oldMode != mode) {
-    beginLine();
-
-    switch (mode) {
-    case REVOLUTIONS_PER_MINUTE: *stream << "G97\n"; break;
-    case CONSTANT_SURFACE_SPEED:
-      *stream << "G96 S" << dtos(fabs(speed), false);
-      if (max) *stream << " D" << dtos(max, false);
-      *stream << '\n';
-      break;
-    }
-  }
+void GCodeMachine::setSpeed(double speed) {
+  double oldSpeed = getSpeed();
+  MachineAdapter::setSpeed(speed);
 
   if (oldSpeed != speed) {
     beginLine();
@@ -139,6 +128,27 @@ void GCodeMachine::setSpeed(double speed, spin_mode_t mode, double max) {
     if (0 < speed) *stream << "M3 S" << dtos(speed, false) << '\n';
     else if (speed < 0) *stream << "M4 S" << dtos(-speed, false) << '\n';
     else *stream << "M5\n";
+  }
+}
+
+
+void GCodeMachine::setSpinMode(spin_mode_t mode, double max) {
+  double oldMax = 0;
+  spin_mode_t oldMode = getSpinMode(&oldMax);
+
+  MachineAdapter::setSpinMode(mode, max);
+
+  if (oldMode != mode || (oldMax != max && mode == CONSTANT_SURFACE_SPEED)) {
+    beginLine();
+
+    switch (mode) {
+    case REVOLUTIONS_PER_MINUTE: *stream << "G97\n"; break;
+    case CONSTANT_SURFACE_SPEED:
+      *stream << "G96 S" << getSpeed(); // Must output speed with G96
+      if (max) *stream << " D" << dtos(max, false);
+      *stream << '\n';
+      break;
+    }
   }
 }
 

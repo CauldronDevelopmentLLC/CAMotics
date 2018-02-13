@@ -23,7 +23,7 @@
 #include "PlannerConfig.h"
 #include "PlannerCommand.h"
 
-#include <gcode/machine/MachineAdapter.h>
+#include <gcode/machine/MachineState.h>
 
 #include <cbang/SmartPointer.h>
 
@@ -34,7 +34,7 @@ namespace cb {namespace JSON {class Sink;}}
 
 
 namespace GCode {
-  class LinePlanner : public MachineAdapter {
+  class LinePlanner : public MachineState {
     PlannerConfig config;
 
     // Move state
@@ -61,7 +61,7 @@ namespace GCode {
     // From MachineInterface
     void start();
     void end();
-    void setSpeed(double speed, spin_mode_t mode, double max);
+    void setSpeed(double speed);
     void changeTool(unsigned tool);
     //void wait(port_t port, bool active, double timeout);
     void seek(port_t port, bool active, bool error);

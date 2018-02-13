@@ -48,9 +48,7 @@ MachineState::MachineState() :
 }
 
 
-void MachineState::start() {
-  started = true;
-}
+void MachineState::start() {started = true;}
 
 
 void MachineState::end() {
@@ -59,7 +57,22 @@ void MachineState::end() {
 }
 
 
-void MachineState::changeTool(unsigned tool) {set(TOOL_NUMBER, tool);}
+void MachineState::setFeed(double feed) {
+  this->feed = feed;
+  set("_feed", feed);
+}
+
+
+void MachineState::setSpeed(double speed) {
+  this->speed = speed;
+  set("_speed", speed);
+}
+
+
+void MachineState::changeTool(unsigned tool) {
+  set(TOOL_NUMBER, tool);
+  set("_tool", tool);
+}
 
 
 Vector3D MachineState::getPosition(axes_t axes) const {

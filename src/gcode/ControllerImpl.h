@@ -55,11 +55,8 @@ namespace GCode {
     bool incrementalDistanceMode;
     bool arcIncrementalDistanceMode;
     bool moveInAbsoluteCoords;
-    MachineInterface::feed_mode_t feedMode;
-    MachineInterface::spin_mode_t spinMode;
     dir_t spindleDir;
     double speed;
-    double maxSpindleSpeed;
 
   public:
     ControllerImpl(MachineInterface &machine,
@@ -70,7 +67,11 @@ namespace GCode {
     std::string getVarGroupStr(const char *group) const;
     static VarTypes::enum_t getVarType(char letter);
 
-    // Spindle
+    // Units
+    void setUnits(Units units);
+
+    // Feed & speed
+    void setFeedMode(feed_mode_t mode);
     void setSpindleDir(dir_t dir);
 
     // Coolant

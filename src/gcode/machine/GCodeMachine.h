@@ -44,8 +44,10 @@ namespace GCode {
     void start();
     void end();
 
-    void setFeed(double feed, feed_mode_t mode);
-    void setSpeed(double speed, spin_mode_t mode, double max);
+    void setFeed(double feed);
+    void setFeedMode(feed_mode_t mode);
+    void setSpeed(double speed);
+    void setSpinMode(spin_mode_t mode, double max);
     void changeTool(unsigned tool);
 
     void wait(port_t port, bool active, double timeout);

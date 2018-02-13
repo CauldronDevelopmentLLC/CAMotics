@@ -53,11 +53,11 @@ namespace GCode {
     void setTargetUnits(Units units) {targetUnits = units;}
 
     // From MachineInterface
-    double getFeed(feed_mode_t *mode) const;
-    void setFeed(double feed, feed_mode_t mode);
+    double getFeed() const;
+    void setFeed(double feed);
 
-    double getSpeed(spin_mode_t *mode, double *max) const;
-    void setSpeed(double speed, spin_mode_t mode, double max);
+    double getSpeed() const;
+    void setSpeed(double speed);
 
     Axes getPosition() const;
     cb::Vector3D getPosition(axes_t axes) const;

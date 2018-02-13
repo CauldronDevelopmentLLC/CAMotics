@@ -40,15 +40,22 @@ namespace GCode {
     virtual void start() = 0;
     virtual void end() = 0;
 
-    /// @return the currently programmed feed rate and optionaly the feed mode.
-    virtual double getFeed(feed_mode_t *mode = 0) const = 0;
+    /// @return the currently programmed feed rate.
+    virtual double getFeed() const = 0;
 
     /***
-     * Set the feed rate.
-     * A positive feed rate is measured in millimeters.  If the feed rate is 0,
-     * the default, then no moves can be made.
+     * Set the feed rate.  Feed rate is measured in millimeters.  If the feed
+     * rate is 0, the default, then no moves can be made.
      *
-     * Positive feed rates depend on the feed mode.
+     * @throw cb::Exception if  @param feed is negative.
+     */
+    virtual void setFeed(double feed) = 0;
+
+    /// @return the currently programmed feed mode.
+    virtual feed_mode_t getFeedMode() const = 0;
+
+    /***
+     * Set the feed rate mode.
      *
      * UNITS_PER_MINUTE mode, the default, indicates that the controlled point
      * should move @param feed millimeters per minute.
@@ -60,22 +67,28 @@ namespace GCode {
      * UNITS_PER_REVOLUTION mode indicates the controlled point should move a
      * certain number of millimeters per revolution of the spindle.
      *
-     * @throw cb::Exception if @param mode is invalid or @param feed is
-     * negative.
+     * @throw cb::Exception if @param mode is invalid.
      */
-    virtual void setFeed(double feed, feed_mode_t mode = UNITS_PER_MINUTE) = 0;
+    virtual void setFeedMode(feed_mode_t mode) = 0;
 
-    /***
-     * @return the currently programed spindle speed and optionaly the spin
-     * mode and max speed.
-     */
-    virtual double getSpeed(spin_mode_t *mode = 0, double *max = 0) const = 0;
+    /// @return the currently programed spindle speed.
+    virtual double getSpeed() const = 0;
 
     /***
      * Set the spindle speed.
      *
      * @param speed A positive value indicates clockwise spin.  A negative value
      * counterclockwise spin.  0 indicates no spin.
+     */
+    virtual void setSpeed(double speed) = 0;
+
+    /***
+     * @return the currently programed spin mode and optionally the max speed.
+     */
+    virtual spin_mode_t getSpinMode(double *max = 0) const = 0;
+
+    /***
+     * Set the spin mode.
      *
      * @param mode REVOLUTIONS_PER_MINUTE, the default, indicates spin
      * measured in revolutions per minute.  CONSTANT_SURFACE_SPEED sets the
@@ -84,12 +97,10 @@ namespace GCode {
      * If @param mode is CONSTANT_SURFACE_SPEED and @param max is greater than
      * zero then @param max is the maxiumum spindle revolutions per minute.
      *
-     * @throw cb::Exception if there are any pending errors or @param mode is
-     * invalid.
+     * @throw cb::Exception @param mode is invalid.
      */
-    virtual void setSpeed(double speed,
-                          spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
-                          double max = 0) = 0;
+    virtual void setSpinMode(spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
+                             double max = 0) = 0;
 
     /***
      * Select the active tool.

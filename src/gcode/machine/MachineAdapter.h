@@ -53,14 +53,18 @@ namespace GCode {
     void start() {parent->start();}
     void end() {parent->end();}
 
-    double getFeed(feed_mode_t *mode = 0) const {return parent->getFeed(mode);}
-    void setFeed(double feed, feed_mode_t mode = UNITS_PER_MINUTE)
-    {parent->setFeed(feed, mode);}
+    double getFeed() const {return parent->getFeed();}
+    void setFeed(double feed) {parent->setFeed(feed);}
+    feed_mode_t getFeedMode() const {return parent->getFeedMode();}
+    void setFeedMode(feed_mode_t mode){parent->setFeedMode(mode);}
 
-    double getSpeed(spin_mode_t *mode = 0, double *max = 0) const
-    {return parent->getSpeed(mode, max);}
-    void setSpeed(double speed, spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
-                  double max = 0) {parent->setSpeed(speed, mode, max);}
+    double getSpeed() const {return parent->getSpeed();}
+    void setSpeed(double speed) {parent->setSpeed(speed);}
+
+    spin_mode_t getSpinMode(double *max = 0) const
+    {return parent->getSpinMode(max);}
+    void setSpinMode(spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
+                     double max = 0) {parent->setSpinMode(mode, max);}
 
     void changeTool(unsigned tool) {parent->changeTool(tool);}
 

@@ -139,12 +139,12 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 
 void LinePlanner::start() {
   lastExitVel = 0;
-  MachineAdapter::start();
+  MachineState::start();
 }
 
 
 void LinePlanner::end() {
-  MachineAdapter::end();
+  MachineState::end();
 
   if (!cmds.empty()) {
     auto it = std::prev(cmds.end());
@@ -154,11 +154,11 @@ void LinePlanner::end() {
 }
 
 
-void LinePlanner::setSpeed(double speed, spin_mode_t mode, double max) {
-  MachineAdapter::setSpeed(speed, mode, max);
+void LinePlanner::setSpeed(double speed) {
+  MachineState::setSpeed(speed);
 
   // TODO handle spin mode
-  if (mode != REVOLUTIONS_PER_MINUTE)
+  if (getSpinMode() != REVOLUTIONS_PER_MINUTE)
     LOG_WARNING("Constant surface speed not supported");
 
   pushSetCommand("speed", speed);
@@ -169,7 +169,7 @@ void LinePlanner::changeTool(unsigned tool) {pushSetCommand("tool", tool);}
 
 
 void LinePlanner::seek(port_t port, bool active, bool error) {
-  MachineAdapter::seek(port, active, error);
+  MachineState::seek(port, active, error);
   push(new SeekCommand(nextID++, port, active, error));
   seeking = true;
 }
@@ -177,13 +177,13 @@ void LinePlanner::seek(port_t port, bool active, bool error) {
 
 
 void LinePlanner::output(port_t port, double value) {
-  MachineAdapter::output(port, value);
+  MachineState::output(port, value);
   push(new OutputCommand(nextID++, port, value));
 }
 
 
 void LinePlanner::dwell(double seconds) {
-  MachineAdapter::dwell(seconds);
+  MachineState::dwell(seconds);
   push(new DwellCommand(nextID++, seconds));
 }
 
@@ -194,14 +194,13 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   LOG_DEBUG(3, "move(" << target << ", " << (rapid ? "true" : "false")
             << ") from " << start);
 
-  MachineAdapter::move(target, rapid);
+  MachineState::move(target, rapid);
 
   // TODO Handle feed rate mode
-  feed_mode_t mode = UNITS_PER_MINUTE;
-  double feed = rapid ? numeric_limits<double>::max() : getFeed(&mode);
+  double feed = rapid ? numeric_limits<double>::max() : getFeed();
   if (!feed) THROWS("Non-rapid move with zero feed rate");
 
-  if (mode != UNITS_PER_MINUTE)
+  if (getFeedMode() != UNITS_PER_MINUTE)
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
   SmartPointer<LineCommand> lc =
@@ -218,19 +217,19 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
 
 void LinePlanner::pause(bool optional) {
-  MachineAdapter::pause(optional);
+  MachineState::pause(optional);
   push(new PauseCommand(nextID++, optional));
 }
 
 
 void LinePlanner::set(const string &name, double value) {
-  MachineAdapter::set(name, value);
+  MachineState::set(name, value);
   pushSetCommand(name, value);
 }
 
 
 void LinePlanner::setLocation(const LocationRange &location) {
-  MachineAdapter::setLocation(location);
+  MachineState::setLocation(location);
   int line = location.getStart().getLine();
 
   if (0 <= line && line != this->line)

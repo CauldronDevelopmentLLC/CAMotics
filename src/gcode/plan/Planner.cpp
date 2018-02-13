@@ -22,8 +22,6 @@
 
 #include "Runner.h"
 
-#include <gcode/machine/MachineState.h>
-
 
 using namespace cb;
 using namespace std;
@@ -31,11 +29,9 @@ using namespace GCode;
 
 
 Planner::Planner() : ControllerImpl(pipeline) {
-
   pipeline.add(SmartPointer<MachineUnitAdapter>::Phony(&unitAdapter));
   pipeline.add(SmartPointer<MachineLinearizer>::Phony(&linearizer));
   pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
-  pipeline.add(new MachineState);
 }
 
 

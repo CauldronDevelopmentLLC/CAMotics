@@ -182,28 +182,28 @@ void GCodeModule::dwellCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::feedCB(const js::Value &args, js::Sink &sink) {
   // Return feed info if no arguments were given
   if (!args.has("rate")) {
-    feed_mode_t mode;
-
     sink.beginList();
-    sink.append(ctx.machine.getFeed(&mode));
-    sink.append(mode);
+    sink.append(ctx.machine.getFeed());
+    sink.append(ctx.machine.getFeedMode());
     sink.endList();
 
     return;
   }
 
   // Otherwise set feed
-  feed_mode_t mode = UNITS_PER_MINUTE;
+  ctx.machine.setFeed(args.getNumber("rate"));
+
   if (args.has("mode")) {
-    mode = (feed_mode_t)args.getInteger("mode");
+    feed_mode_t mode = (feed_mode_t)args.getInteger("mode");
+
     switch (mode) {
     case INVERSE_TIME: case UNITS_PER_MINUTE: case UNITS_PER_REVOLUTION: break;
     default: THROW("Feed mode must be FEED_INVERSE_TIME, FEED_UNITS_PER_MIN or "
                    "FEED_UNITS_PER_REV");
     }
-  }
 
-  ctx.machine.setFeed(args.getNumber("rate"), mode);
+    ctx.machine.setFeedMode(mode);
+  }
 
   sink.write(ctx.machine.getFeed());
 }
@@ -212,28 +212,26 @@ void GCodeModule::feedCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::speedCB(const js::Value &args, js::Sink &sink) {
   // Return spindle info if no arguments were given
   if (!args.has("rate")) {
-    spin_mode_t mode;
-    double max;
+    double max = 0;
 
     sink.beginList();
-    sink.append(ctx.machine.getSpeed(&mode, &max));
-    sink.append(mode);
-    sink.append(max);
+    sink.append(ctx.machine.getSpeed());
+    sink.append(ctx.machine.getSpinMode(&max));
+    if (max) sink.append(max);
     sink.endList();
 
     return;
   }
 
   // Otherwise set spindle
-  spin_mode_t mode = REVOLUTIONS_PER_MINUTE;
-  double max = 0;
-
   if (args.has("surface")) {
-    mode = CONSTANT_SURFACE_SPEED;
+    double max = 0;
     if (args.has("max")) max = args.getNumber("max");
-  }
+    ctx.machine.setSpinMode(CONSTANT_SURFACE_SPEED, max);
 
-  ctx.machine.setSpeed(args.getNumber("rate"), mode, max);
+  } else ctx.machine.setSpinMode(REVOLUTIONS_PER_MINUTE);
+
+  ctx.machine.setSpeed(args.getNumber("rate"));
 
   sink.write(ctx.machine.getSpeed());
 }

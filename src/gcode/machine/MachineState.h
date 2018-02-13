@@ -57,15 +57,17 @@ namespace GCode {
     void start();
     void end();
 
-    double getFeed(feed_mode_t *mode = 0) const
-    {if (mode) *mode = feedMode; return feed;}
-    void setFeed(double feed, feed_mode_t mode)
-    {this->feed = feed; feedMode = mode;}
+    double getFeed() const {return feed;}
+    void setFeed(double feed);
+    feed_mode_t getFeedMode() const {return feedMode;}
+    void setFeedMode(feed_mode_t feedMode){this->feedMode = feedMode;}
 
-    double getSpeed(spin_mode_t *mode = 0, double *max = 0) const
-    {if (mode) *mode = spinMode; if (max) *max = maxSpeed; return speed;}
-    void setSpeed(double speed, spin_mode_t mode, double max)
-    {this->speed = speed; spinMode = mode; maxSpeed = max;}
+    double getSpeed() const {return speed;}
+    void setSpeed(double speed);
+    spin_mode_t getSpinMode(double *max = 0) const
+    {if (max) *max = maxSpeed; return spinMode;}
+    void setSpinMode(spin_mode_t mode, double max)
+    {spinMode = mode; maxSpeed = max;}
 
     void changeTool(unsigned tool);
 
