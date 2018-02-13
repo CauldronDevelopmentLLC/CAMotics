@@ -77,24 +77,25 @@ bool LinePlanner::isDone() const {return cmds.empty();}
 
 
 bool LinePlanner::hasMove() const {
-  return !cmds.empty() && isFinal(cmds.begin());
+  return !cmds.empty() && isFinal(cmds.front());
 }
 
 
-void LinePlanner::next(JSON::Sink &sink) {
+uint64_t LinePlanner::next(JSON::Sink &sink) {
   if (!hasMove()) THROW("Planner not ready");
 
-  SmartPointer<PlannerCommand> cmd = cmds.front();
+  PlannerCommand *cmd = cmds.front();
   cmd->write(sink);
-  out.push_back(cmd);
-  cmds.pop_front();
+  out.push_back(cmds.pop_front());
   lastExitVel = cmd->getExitVelocity();
+
+  return cmd->getID();
 }
 
 
 void LinePlanner::setActive(uint64_t id) {
   while (!out.empty() && out.front()->getID() < id)
-    out.pop_front();
+    delete out.pop_front();
 }
 
 
@@ -106,32 +107,32 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 
     if (out.front()->getID() == id) break;
 
-    out.pop_front(); // Release any moves before the restart
+    delete out.pop_front(); // Release any moves before the restart
   }
 
   // Reload previously output moves
-  cmds.splice(cmds.begin(), out, out.begin(), out.end());
+  while (!out.empty()) cmds.push_front(out.pop_back());
 
   // Reset last exit velocity
   lastExitVel = 0;
 
   // Handle restart after seek
-  auto it = cmds.begin();
-  if ((*it)->isSeeking()) {
+  PlannerCommand *cmd = cmds.front();
+  if (cmd->isSeeking()) {
     // Skip reset of current move
-    it++;
-    cmds.pop_front();
+    cmd = cmd->next;
+    delete cmds.pop_front();
     // Replan next move, if one has already been planned.  Its start position
     // may have changed.
-    while (it != cmds.end() && !(*it)->isMove()) it++;
+    while (cmd && !cmd->isMove()) cmd = cmd->next;
   }
 
-  if (it == cmds.end()) return false; // Nothing to replan
+  if (!cmd) return false; // Nothing to replan
 
   // Replan from zero velocity
-  (*it)->restart(position, config);
-  for (auto it = cmds.begin(); it != cmds.end(); it++)
-    plan(it);
+  cmd->restart(position, config);
+  for (cmd = cmds.front(); cmd->next; cmd = cmd->next)
+    plan(cmd);
 
   return true;
 }
@@ -147,9 +148,8 @@ void LinePlanner::end() {
   MachineState::end();
 
   if (!cmds.empty()) {
-    auto it = std::prev(cmds.end());
-    (*it)->setExitVelocity(0);
-    plan(it);
+    cmds.back()->setExitVelocity(0);
+    plan(cmds.back());
   }
 }
 
@@ -203,13 +203,17 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   if (getFeedMode() != UNITS_PER_MINUTE)
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
-  SmartPointer<LineCommand> lc =
+  LineCommand *lc =
     new LineCommand(nextID++, start, target, feed, seeking, config);
 
   // Update state
   seeking = false;
 
-  if (!lc->length) return; // Null move
+  // Null move
+  if (!lc->length) {
+    delete lc;
+    return;
+  }
 
   // Add move
   push(lc);
@@ -244,88 +248,89 @@ void LinePlanner::pushSetCommand(const string &name, const T &value) {
 }
 
 
-void LinePlanner::push(const SmartPointer<PlannerCommand> &cmd) {
+void LinePlanner::push(PlannerCommand *cmd) {
   cmds.push_back(cmd);
-  plan(std::prev(cmds.end()));
+  plan(cmd);
 }
 
 
-bool LinePlanner::isFinal(cmds_t::const_iterator it) const {
-  double velocity = (*it)->getExitVelocity();
+bool LinePlanner::isFinal(PlannerCommand *cmd) const {
+  double velocity = cmd->getExitVelocity();
   if (!velocity) return true;
 
   // Check if there is enough velocity change in the following blocks to
   // deccelerate to zero if necessary.
-  while (++it != cmds.end()) {
-    velocity -= (*it)->getDeltaVelocity();
+  unsigned count = 0;
+  while (cmd->next) {
+    cmd = cmd->next;
+    velocity -= cmd->getDeltaVelocity();
     if (velocity <= 0) return true;
+    if (config.maxLookahead <= ++count)
+      THROWS("Planner exceeded max lookahead (" << config.maxLookahead << ")");
   }
 
   return false;
 }
 
 
-void LinePlanner::plan(cmds_t::iterator it) {
-  if (planOne(it))
+void LinePlanner::plan(PlannerCommand *cmd) {
+  if (planOne(cmd))
     // Backplan
     while (true) {
-      if (it == cmds.begin())
-        THROWS("Cannot backplan, previous move unavailable");
-
-      if (!planOne(--it)) break;
+      if (!cmd->prev) THROWS("Cannot backplan, previous move unavailable");
+      cmd = cmd->prev;
+      if (!planOne(cmd)) break;
     }
 }
 
 
-bool LinePlanner::planOne(cmds_t::iterator it) {
-  const SmartPointer<PlannerCommand> &pc = *it;
-
-  LOG_DEBUG(4, "Planning " << pc->toString());
+bool LinePlanner::planOne(PlannerCommand *cmd) {
+  LOG_DEBUG(4, "Planning " << cmd->toString());
 
   // Set entry velocity when at begining
   bool backplan = false;
-  if (it == cmds.begin()) pc->setEntryVelocity(lastExitVel);
+  if (!cmd->prev) cmd->setEntryVelocity(lastExitVel);
 
   else {
     // Make sure entry and exit velocities match
-    const SmartPointer<PlannerCommand> &last = *std::prev(it);
+    PlannerCommand *last = cmd->prev;
 
-    if (pc->getEntryVelocity() < last->getExitVelocity()) {
-      last->setExitVelocity(pc->getEntryVelocity());
+    if (cmd->getEntryVelocity() < last->getExitVelocity()) {
+      last->setExitVelocity(cmd->getEntryVelocity());
       backplan = true;
     }
 
-    pc->setEntryVelocity(last->getExitVelocity());
+    cmd->setEntryVelocity(last->getExitVelocity());
   }
 
   // Done with non-move commands
-  if (!pc.isInstance<LineCommand>()) return backplan;
+  if (!dynamic_cast<LineCommand *>(cmd)) return backplan;
 
-  LineCommand &lc = *pc.cast<LineCommand>();
+  LineCommand &lc = *dynamic_cast<LineCommand *>(cmd);
   double Vi = lc.getEntryVelocity();
   double Vt = lc.getExitVelocity();
 
   // Apply junction velocity limit
-  if (Vi && it != cmds.begin()) {
-    cmds_t::iterator last = std::prev(it);
+  if (Vi && cmd->prev) {
+    PlannerCommand *last = cmd->prev;
     while (true) {
-      if (last->isInstance<LineCommand>()) {
-        const Axes &lastUnit = last->cast<LineCommand>()->unit;
+      if (dynamic_cast<LineCommand *>(last)) {
+        const Axes &lastUnit = dynamic_cast<LineCommand *>(last)->unit;
 
         double jv = computeJunctionVelocity(lc.unit, lastUnit,
                                             config.junctionDeviation,
                                             config.junctionAccel);
         if (jv < Vi) {
           Vi = jv;
-          pc->setEntryVelocity(Vi);
-          (*std::prev(it))->setExitVelocity(Vi);
+          cmd->setEntryVelocity(Vi);
+          cmd->prev->setExitVelocity(Vi);
           backplan = true;
         }
         break;
       }
 
-      if (last == cmds.begin()) break;
-      last = std::prev(last);
+      if (!last->prev) break;
+      last = last->prev;
     }
   }
 
@@ -350,19 +355,19 @@ bool LinePlanner::planOne(cmds_t::iterator it) {
       // Backplaning  necessary
       backplan = true;
 
-      if (it == cmds.begin())
+      if (!cmd->prev)
         THROWS("Cannot backplan, previous move unavailable");
 
       LOG_DEBUG(3, "Backplan: entryVel=" << lc.entryVel
-                << " prev.exitVel=" << (*std::prev(it))->getExitVelocity()
+                << " prev.exitVel=" << cmd->prev->getExitVelocity()
                 << " Vt=" << Vt);
 
       lc.entryVel = Vt;
-      (*std::prev(it))->setExitVelocity(Vt);
+      cmd->prev->setExitVelocity(Vt);
 
     } else {
       lc.exitVel = Vt;
-      if (std::next(it) != cmds.end()) (*std::next(it))->setEntryVelocity(Vt);
+      if (cmd->next) cmd->next->setEntryVelocity(Vt);
     }
   }
 
@@ -430,9 +435,16 @@ bool LinePlanner::planOne(cmds_t::iterator it) {
   }
 
   // Reverse the plan, if velocities were swapped above
-  if (swapped)
+  if (swapped) {
     for (int i = 0; i < 3; i++)
       swap(lc.times[i], lc.times[6 - i]);
+
+    swap(Vi, Vt);
+  }
+
+  // Use what we could accelerate to as an upper bound
+  double deltaV = peakVelocity(Vt, lc.maxAccel, lc.maxJerk, lc.length) - Vt;
+  if (lc.deltaV < deltaV) lc.deltaV = deltaV;
 
   return backplan;
 }
@@ -571,7 +583,7 @@ double LinePlanner::peakVelocity(double Vi, double maxAccel, double maxJerk,
   double peakAccel = peakAccelFromLength(Vi, maxJerk, length);
   double Vp;
 
-  if (maxAccel < peakAccel) {
+  if (fabs(maxAccel) < fabs(peakAccel)) {
     // With constant accel period
     //
     // Solve:
@@ -588,6 +600,7 @@ double LinePlanner::peakVelocity(double Vi, double maxAccel, double maxJerk,
   } else Vp = Vi + square(peakAccel) / maxJerk; // No constant accel period
 
   if (!isfinite(Vp)) THROW("Invalid peak velocity");
+  if (Vp < 0) Vp = 0;
 
   LOG_DEBUG(3, "peakVelocity(" << Vi << ", " << maxAccel << ", " << maxJerk
             << ", length=" << length << ") = " << Vp << " with"

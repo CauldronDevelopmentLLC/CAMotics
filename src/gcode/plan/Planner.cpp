@@ -78,7 +78,7 @@ bool Planner::hasMore() {
 }
 
 
-void Planner::next(JSON::Sink &sink) {planner.next(sink);}
+uint64_t Planner::next(JSON::Sink &sink) {return planner.next(sink);}
 void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 

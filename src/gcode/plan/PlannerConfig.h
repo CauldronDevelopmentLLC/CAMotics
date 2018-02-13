@@ -39,6 +39,7 @@ namespace GCode {
     Units defaultUnits;
     Units outputUnits;
     double maxArcError;
+    unsigned maxLookahead;
 
     PlannerConfig();
 

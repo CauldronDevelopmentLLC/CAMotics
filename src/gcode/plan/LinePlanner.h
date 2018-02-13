@@ -22,12 +22,11 @@
 
 #include "PlannerConfig.h"
 #include "PlannerCommand.h"
+#include "List.h"
 
 #include <gcode/machine/MachineState.h>
 
 #include <cbang/SmartPointer.h>
-
-#include <list>
 
 
 namespace cb {namespace JSON {class Sink;}}
@@ -41,9 +40,9 @@ namespace GCode {
     double lastExitVel;
     bool seeking;
 
-    typedef std::list<cb::SmartPointer<PlannerCommand> > cmds_t;
-    cmds_t cmds;
-    cmds_t out;
+    typedef List<PlannerCommand> cmd_t;
+    cmd_t cmds;
+    cmd_t out;
 
     uint64_t nextID;
     int line;
@@ -54,7 +53,7 @@ namespace GCode {
     void setConfig(const PlannerConfig &config);
     bool isDone() const;
     bool hasMove() const;
-    void next(cb::JSON::Sink &sink);
+    uint64_t next(cb::JSON::Sink &sink);
     void setActive(uint64_t id);
     bool restart(uint64_t id, const Axes &position);
 
@@ -76,10 +75,10 @@ namespace GCode {
   protected:
     template <typename T>
     void pushSetCommand(const std::string &name, const T &value);
-    void push(const cb::SmartPointer<PlannerCommand> &cmd);
-    bool isFinal(cmds_t::const_iterator it) const;
-    void plan(cmds_t::iterator it);
-    bool planOne(cmds_t::iterator it);
+    void push(PlannerCommand *cmd);
+    bool isFinal(PlannerCommand *cmd) const;
+    void plan(PlannerCommand *cmd);
+    bool planOne(PlannerCommand *cmd);
 
     bool isAccelLimited(double Vi, double Vt, double maxAccel,
                         double maxJerk) const;

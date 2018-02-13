@@ -80,7 +80,7 @@ public:
 
     while (!shouldQuit() && planner.hasMore()) {
       writer.beginAppend();
-      planner.next(writer);
+      planner.setActive(planner.next(writer));
 
       // Cannot synchronize with actual machine so fake it.
       if (planner.isSynchronizing()) planner.overrideSync();

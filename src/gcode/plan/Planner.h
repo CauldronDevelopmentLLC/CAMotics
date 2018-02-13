@@ -70,7 +70,7 @@ namespace GCode {
     void load(const cb::InputSource &source, const PlannerConfig &config);
 
     bool hasMore();
-    void next(cb::JSON::Sink &sink);
+    uint64_t next(cb::JSON::Sink &sink);
     void setActive(uint64_t id);
     void restart(uint64_t id, const Axes &position);
 

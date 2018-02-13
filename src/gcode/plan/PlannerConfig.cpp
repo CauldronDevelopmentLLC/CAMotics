@@ -31,7 +31,8 @@ using namespace std;
 
 PlannerConfig::PlannerConfig() :
   start(0.0), maxVel(10000), maxAccel(200000), maxJerk(50000000),
-  junctionDeviation(0.05), junctionAccel(100000), maxArcError(0.01) {}
+  junctionDeviation(0.05), junctionAccel(100000), maxArcError(0.01),
+  maxLookahead(4096) {}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
@@ -45,7 +46,8 @@ void PlannerConfig::read(const JSON::Value &value) {
 
   junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
   junctionAccel = value.getNumber("junction-accel", junctionAccel);
-  maxArcError = value.getNumber("maxArcError", maxArcError);
+  maxArcError = value.getNumber("max-arc-error", maxArcError);
+  maxLookahead = value.getNumber("max-lookahead", maxLookahead);
 }
 
 
@@ -54,7 +56,6 @@ void PlannerConfig::write(JSON::Sink &sink) const {
 
   sink.insert("default-units", defaultUnits.toString());
   sink.insert("output-units", outputUnits.toString());
-  sink.insert("max-arc-error", maxArcError);
 
   sink.beginInsert("start");
   start.write(sink);
@@ -70,6 +71,8 @@ void PlannerConfig::write(JSON::Sink &sink) const {
 
   sink.insert("junction-deviation", junctionDeviation);
   sink.insert("junction-accel", junctionAccel);
+  sink.insert("max-arc-error", maxArcError);
+  sink.insert("max-lookahead", maxLookahead);
 
   sink.endDict();
 }
