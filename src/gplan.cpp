@@ -373,7 +373,7 @@ static PyObject *_is_running(PyPlanner *self) {
     else Py_RETURN_FALSE;
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -383,16 +383,17 @@ static PyObject *_is_synchronizing(PyPlanner *self) {
     else Py_RETURN_FALSE;
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
 static PyObject *_override_sync(PyPlanner *self) {
   try {
     self->planner->overrideSync();
+    Py_RETURN_NONE;
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -404,9 +405,11 @@ static PyObject *_set(PyPlanner *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "sd", &name, &value)) return 0;
 
     self->planner->set(name, value);
+    Py_RETURN_NONE;
+
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -417,10 +420,11 @@ static PyObject *_set_resolver(PyPlanner *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "O", &cb)) return 0;
 
     self->planner->setResolver(new PyNameResolver(cb));
+    Py_RETURN_NONE;
 
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -436,9 +440,11 @@ static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
     if (0 <= level) cb::Logger::instance().setVerbosity(level);
     if (domainLevels) cb::Logger::instance().setLogDomainLevels(domainLevels);
 
+    Py_RETURN_NONE;
+
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -455,9 +461,11 @@ static PyObject *_load_string(PyPlanner *self, PyObject *args) {
     if (_config) config.read(*pyToJSON(_config));
 
     self->planner->load(cb::StringStreamInputSource(gcode, "MDI"), config);
+    Py_RETURN_NONE;
+
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -474,9 +482,11 @@ static PyObject *_load(PyPlanner *self, PyObject *args) {
     if (_config) config.read(*pyToJSON(_config));
 
     self->planner->load(std::string(filename), config);
+    Py_RETURN_NONE;
+
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -486,7 +496,7 @@ static PyObject *_has_more(PyPlanner *self) {
     else Py_RETURN_FALSE;
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -497,7 +507,7 @@ static PyObject *_next(PyPlanner *self) {
     return sink.getRoot();
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -508,9 +518,11 @@ static PyObject *_set_active(PyPlanner *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "K", &id)) return 0;
 
     self->planner->setActive(id);
+    Py_RETURN_NONE;
+
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
@@ -531,9 +543,11 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
     position.read(*pyToJSON(_position));
 
     self->planner->restart(id, position);
+    Py_RETURN_NONE;
+
   } CATCH_PYTHON;
 
-  Py_RETURN_NONE;
+  return 0;
 }
 
 
