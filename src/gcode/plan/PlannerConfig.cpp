@@ -31,8 +31,8 @@ using namespace std;
 
 PlannerConfig::PlannerConfig() :
   start(0.0), maxVel(10000), maxAccel(200000), maxJerk(50000000),
-  junctionDeviation(0.05), junctionAccel(100000), maxArcError(0.01),
-  maxLookahead(4096) {}
+  junctionDeviation(0.05), junctionAccel(100000), minTravel(0.000001),
+  maxArcError(0.01), maxLookahead(4096) {}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
@@ -46,6 +46,7 @@ void PlannerConfig::read(const JSON::Value &value) {
 
   junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
   junctionAccel = value.getNumber("junction-accel", junctionAccel);
+  minTravel = value.getNumber("min-travel", minTravel);
   maxArcError = value.getNumber("max-arc-error", maxArcError);
   maxLookahead = value.getNumber("max-lookahead", maxLookahead);
 }
@@ -71,6 +72,7 @@ void PlannerConfig::write(JSON::Sink &sink) const {
 
   sink.insert("junction-deviation", junctionDeviation);
   sink.insert("junction-accel", junctionAccel);
+  sink.insert("min-travel", minTravel);
   sink.insert("max-arc-error", maxArcError);
   sink.insert("max-lookahead", maxLookahead);
 

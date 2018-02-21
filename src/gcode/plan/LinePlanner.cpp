@@ -382,13 +382,13 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
     double lengthRemain = lc.length -
       planVelocityTransition(Vi, Vt, lc.maxAccel, lc.maxJerk, lc.times);
 
-    if (lengthRemain < -0.000001)
+    if (lengthRemain < -config.minTravel)
       THROWS("Velocity transition exceeds length by " << -lengthRemain
              << " required=" << lc.length << " computed=" << length
              << " Vt=" << Vt);
 
-    // If there is length left, add a constant velocity segment
-    if (0.000001 < lengthRemain) lc.times[3] = lengthRemain / Vt;
+    // If there is appreciable length left, add a constant velocity segment
+    if (config.minTravel < lengthRemain) lc.times[3] = lengthRemain / Vt;
 
     // Record change in velocity
     lc.deltaV = Vt - Vi;
@@ -428,7 +428,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
                                      lc.times);
     length -= planVelocityTransition(peakVel, Vt, lc.maxAccel, lc.maxJerk,
                                      lc.times + 4);
-    lc.times[3] = length / peakVel;
+    if (config.minTravel < length) lc.times[3] = length / peakVel;
 
     // Record change in velocity
     lc.deltaV = peakVel - Vi + peakVel - Vt;

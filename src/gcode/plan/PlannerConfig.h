@@ -38,6 +38,7 @@ namespace GCode {
 
     Units defaultUnits;
     Units outputUnits;
+    double minTravel;
     double maxArcError;
     unsigned maxLookahead;
 
