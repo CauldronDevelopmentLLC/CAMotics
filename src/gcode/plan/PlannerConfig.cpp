@@ -30,16 +30,15 @@ using namespace std;
 
 
 PlannerConfig::PlannerConfig() :
-  start(0.0), maxVel(10000), maxAccel(200000), maxJerk(50000000),
-  junctionDeviation(0.05), junctionAccel(100000), minTravel(0.000001),
-  maxArcError(0.01), maxLookahead(4096) {}
+  maxVel(10000), maxAccel(200000), maxJerk(50000000), junctionDeviation(0.05),
+  junctionAccel(100000), minTravel(0.000001), maxArcError(0.01),
+  maxLookahead(4096) {}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
   defaultUnits = Units::parse(value.getString("default-units", "METRIC"));
   outputUnits = Units::parse(value.getString("output-units", "METRIC"));
 
-  if (value.hasDict("start")) start.read(value.getDict("start"));
   if (value.hasDict("max-vel")) maxVel.read(value.getDict("max-vel"));
   if (value.hasDict("max-accel")) maxAccel.read(value.getDict("max-accel"));
   if (value.hasDict("max-jerk")) maxJerk.read(value.getDict("max-jerk"));
@@ -57,9 +56,6 @@ void PlannerConfig::write(JSON::Sink &sink) const {
 
   sink.insert("default-units", defaultUnits.toString());
   sink.insert("output-units", outputUnits.toString());
-
-  sink.beginInsert("start");
-  start.write(sink);
 
   sink.beginInsert("max-vel");
   maxVel.write(sink);

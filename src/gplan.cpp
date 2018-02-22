@@ -397,22 +397,6 @@ static PyObject *_override_sync(PyPlanner *self) {
 }
 
 
-static PyObject *_set(PyPlanner *self, PyObject *args) {
-  try {
-    const char *name;
-    double value;
-
-    if (!PyArg_ParseTuple(args, "sd", &name, &value)) return 0;
-
-    self->planner->set(name, value);
-    Py_RETURN_NONE;
-
-  } CATCH_PYTHON;
-
-  return 0;
-}
-
-
 static PyObject *_set_resolver(PyPlanner *self, PyObject *args) {
   try {
     PyObject *cb;
@@ -440,6 +424,40 @@ static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
     if (0 <= level) cb::Logger::instance().setVerbosity(level);
     if (domainLevels) cb::Logger::instance().setLogDomainLevels(domainLevels);
 
+    Py_RETURN_NONE;
+
+  } CATCH_PYTHON;
+
+  return 0;
+}
+
+
+static PyObject *_set_position(PyPlanner *self, PyObject *args) {
+  try {
+    GCode::Axes position;
+    PyObject *_position = 0;
+
+    if (!PyArg_ParseTuple(args, "O", &_position)) return 0;
+
+    position.read(*pyToJSON(_position));
+
+    self->planner->setPosition(position);
+    Py_RETURN_NONE;
+
+  } CATCH_PYTHON;
+
+  return 0;
+}
+
+
+static PyObject *_set(PyPlanner *self, PyObject *args) {
+  try {
+    const char *name;
+    double value;
+
+    if (!PyArg_ParseTuple(args, "sd", &name, &value)) return 0;
+
+    self->planner->set(name, value);
     Py_RETURN_NONE;
 
   } CATCH_PYTHON;
@@ -562,6 +580,8 @@ static PyMethodDef _methods[] = {
    "Set name resolver callback"},
   {"set_logger", (PyCFunction)_set_logger, METH_VARARGS,
    "Set logger callback"},
+  {"set_position", (PyCFunction)_set_position, METH_VARARGS,
+   "Set current position"},
   {"set", (PyCFunction)_set, METH_VARARGS, "Set variable"},
   {"load_string", (PyCFunction)_load_string, METH_VARARGS, "Load GCode string"},
   {"load", (PyCFunction)_load, METH_VARARGS, "Load GCode by filename"},

@@ -60,6 +60,7 @@ namespace GCode {
     Planner();
 
     void setConfig(const PlannerConfig &config);
+    void setPosition(const Axes &position);
 
     void setResolver(const cb::SmartPointer<NameResolver> &resolver)
     {this->resolver = resolver;}
