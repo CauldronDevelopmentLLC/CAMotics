@@ -227,7 +227,9 @@ void LinePlanner::pause(bool optional) {
 
 
 void LinePlanner::set(const string &name, double value) {
-  if (MachineState::get(name) == value) return;
+  if (MachineState::get(name) == value && !String::endsWith(name, "_home"))
+    return;
+
   MachineState::set(name, value);
   pushSetCommand(name, value);
 }
