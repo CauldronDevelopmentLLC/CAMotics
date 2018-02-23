@@ -434,11 +434,11 @@ static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
 
 static PyObject *_set_position(PyPlanner *self, PyObject *args) {
   try {
-    GCode::Axes position;
     PyObject *_position = 0;
 
     if (!PyArg_ParseTuple(args, "O", &_position)) return 0;
 
+    GCode::Axes position = self->planner->getPosition();
     position.read(*pyToJSON(_position));
 
     self->planner->setPosition(position);

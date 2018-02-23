@@ -35,17 +35,20 @@ Planner::Planner() : ControllerImpl(pipeline) {
 }
 
 
-void Planner::setConfig(const PlannerConfig &config) {
-  unitAdapter.setUnits(config.defaultUnits);
-  unitAdapter.setTargetUnits(config.outputUnits);
-  linearizer.setMaxArcError(config.maxArcError);
-  planner.setConfig(config);
-}
+Axes Planner::getPosition() const {return getAbsolutePosition();}
 
 
 void Planner::setPosition(const Axes &position) {
   setAbsolutePosition(position);
   pipeline.setPosition(position);
+}
+
+
+void Planner::setConfig(const PlannerConfig &config) {
+  unitAdapter.setUnits(config.defaultUnits);
+  unitAdapter.setTargetUnits(config.outputUnits);
+  linearizer.setMaxArcError(config.maxArcError);
+  planner.setConfig(config);
 }
 
 
