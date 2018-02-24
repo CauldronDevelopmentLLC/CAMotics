@@ -60,6 +60,12 @@ namespace GCode {
 
 
     typedef enum {
+      PAUSE_PROGRAM,
+      PAUSE_OPTIONAL,
+      PAUSE_PALLET_CHANGE,
+    } pause_t;
+
+    typedef enum {
       XY = 170,
       UV = 171,
       XZ = 180,

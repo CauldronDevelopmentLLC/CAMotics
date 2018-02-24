@@ -68,9 +68,10 @@ namespace GCode {
     void dwell(double seconds);
     void move(const Axes &axes, bool rapid);
     //void arc(const Axes &offset, double angle, plane_t plane);
-    void pause(bool optional);
+    void pause(pause_t type);
     void set(const std::string &name, double value);
     void setLocation(const cb::LocationRange &location);
+    void message(const std::string &s);
 
   protected:
     template <typename T>

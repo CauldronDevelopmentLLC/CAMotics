@@ -24,8 +24,17 @@
 
 using namespace GCode;
 using namespace cb;
+using namespace std;
 
 
 void PauseCommand::insert(JSON::Sink &sink) const {
-  sink.insertBoolean("optional", optional);
+  string pauseType;
+
+  switch (type) {
+  case PAUSE_PROGRAM:       pauseType = "program";       break;
+  case PAUSE_OPTIONAL:      pauseType = "optional";      break;
+  case PAUSE_PALLET_CHANGE: pauseType = "pallet-change"; break;
+  }
+
+  sink.insert("pause-type", pauseType);
 }

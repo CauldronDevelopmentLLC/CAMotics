@@ -89,7 +89,7 @@ namespace GCode {
     void setMatrix(const cb::Matrix4x4D &m, axes_t matrix)
     {parent->setMatrix(m, matrix);}
 
-    void pause(bool optional = true) {parent->pause(optional);}
+    void pause(pause_t type) {parent->pause(type);}
 
     double get(address_t addr) const {return parent->get(addr);}
     void set(address_t addr, double value) {parent->set(addr, value);}
@@ -103,5 +103,6 @@ namespace GCode {
     {parent->setLocation(location);}
 
     void comment(const std::string &s) const {parent->comment(s);}
+    void message(const std::string &s) {parent->message(s);}
   };
 }

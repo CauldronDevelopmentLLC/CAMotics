@@ -40,6 +40,9 @@ namespace GCode {
   public:
     virtual ~Controller() {}
 
+    // Message
+    virtual void message(const std::string &text) = 0;
+
     // Parameters
     virtual double get(address_t addr) const = 0;
     virtual void set(address_t addr, double value) = 0;

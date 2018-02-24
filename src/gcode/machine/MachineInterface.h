@@ -47,7 +47,7 @@ namespace GCode {
      * Set the feed rate.  Feed rate is measured in millimeters.  If the feed
      * rate is 0, the default, then no moves can be made.
      *
-     * @throw cb::Exception if  @param feed is negative.
+     * @throw cb::Exception if @param feed is negative.
      */
     virtual void setFeed(double feed) = 0;
 
@@ -194,7 +194,7 @@ namespace GCode {
 
     virtual void setMatrix(const cb::Matrix4x4D &m, axes_t matrix = XYZ) = 0;
 
-    virtual void pause(bool optional = true) = 0;
+    virtual void pause(pause_t type) = 0;
 
     // Number parameters
     virtual double get(address_t addr) const = 0;
@@ -213,5 +213,8 @@ namespace GCode {
 
     /// Output comment
     virtual void comment(const std::string &s) const = 0;
+
+    /// Output message
+    virtual void message(const std::string &s) = 0;
   };
 }

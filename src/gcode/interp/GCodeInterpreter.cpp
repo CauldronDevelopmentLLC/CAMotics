@@ -55,6 +55,37 @@ void GCodeInterpreter::setReference(const string &name, double value) {
 }
 
 
+void GCodeInterpreter::specialComment(const string text) {
+  string::const_iterator it = text.begin();
+  string::const_iterator end = text.end();
+
+  // Skip space
+  while (it != end && isspace(*it)) it++;
+
+  // Look for special comment code
+  string code;
+  while (it != end && *it != ',' && !isspace(*it) && code.length() < 3)
+    code.append(1, tolower(*it++));
+
+  // Skip space
+  while (it != end && isspace(*it)) it++;
+
+  // Look for comma
+  if (it != end && *it == ',') {
+    it++;
+
+    // Skip space
+    while (it != end && isspace(*it)) it++;
+
+    string content(it, end);
+
+    if (code == "msg") controller.message(content);
+    // TODO handle DEBUG, PRINT, PROBE* and LOG*
+    // See http://linuxcnc.org/docs/html/gcode/overview.html#gcode:comments
+  }
+}
+
+
 void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   if (block->isDeleted()) return;
 
@@ -67,6 +98,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   unsigned lowestPriority = ~0;
   bool implicitMotion = true;
   vector<Word *> words;
+  Comment *lastComment;
 
   controller.newBlock();
 
@@ -146,11 +178,15 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 
       words.push_back(word);
 
-    } else if ((*it)->instance<Comment>()) { // Ignore
+    } else if ((*it)->instance<Comment>())
+      lastComment = (*it)->instance<Comment>();
 
-    } else LOG_WARNING((*it)->getCol()
-                       << ":Unsupported or unexpected entity: " << **it);
+    else LOG_WARNING((*it)->getCol()
+                     << ":Unsupported or unexpected entity: " << **it);
   }
+
+  // Handle special comments
+  if (lastComment) specialComment(lastComment->getText());
 
   // Process command words in order of priority
   while (true) {

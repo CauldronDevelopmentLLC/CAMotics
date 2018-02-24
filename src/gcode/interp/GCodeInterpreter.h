@@ -44,6 +44,8 @@ namespace GCode {
     virtual void setReference(address_t addr, double value);
     virtual void setReference(const std::string &name, double value);
 
+    void specialComment(const std::string text);
+
     // From Processor
     void operator()(const cb::SmartPointer<Block> &block);
 

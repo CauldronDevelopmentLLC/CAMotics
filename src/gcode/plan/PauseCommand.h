@@ -22,14 +22,16 @@
 
 #include "PlannerCommand.h"
 
+#include <gcode/machine/MachineEnum.h>
+
 
 namespace GCode {
-  class PauseCommand : public PlannerCommand {
-    bool optional;
+  class PauseCommand : public PlannerCommand, public MachineEnum {
+    pause_t type;
 
   public:
-    PauseCommand(uint64_t id, bool optional) :
-      PlannerCommand(id), optional(optional) {}
+    PauseCommand(uint64_t id, pause_t type) :
+      PlannerCommand(id), type(type) {}
 
     // From PlannerCommand
     const char *getType() const {return "pause";}

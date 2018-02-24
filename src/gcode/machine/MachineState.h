@@ -86,7 +86,7 @@ namespace GCode {
     const cb::Matrix4x4D &getMatrix(axes_t matrix) const;
     void setMatrix(const cb::Matrix4x4D &m, axes_t matrix);
 
-    void pause(bool optional) {}
+    void pause(pause_t type) {}
 
     double get(address_t addr) const;
     void set(address_t addr, double value);
@@ -100,5 +100,6 @@ namespace GCode {
     {this->location = location;}
 
     void comment(const std::string &s) const {}
+    void message(const std::string &s) {}
   };
 }

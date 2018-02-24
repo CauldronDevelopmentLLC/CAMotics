@@ -136,10 +136,12 @@ namespace GCode {
     // Compensation
     void setCutterRadiusComp(int vars, bool left, bool dynamic);
 
-    // End program
+    // Program control
     void end();
 
     // From Controller
+    void message(const std::string &text);
+
     double get(address_t addr) const;
     void set(address_t addr, double value);
     bool has(const std::string &name) const;

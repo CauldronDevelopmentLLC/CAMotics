@@ -56,8 +56,9 @@ namespace GCode {
 
     void dwell(double seconds);
     void move(const Axes &axes, bool rapid);
-    void pause(bool optional);
+    void pause(pause_t pause);
 
     void comment(const std::string &s) const;
+    void message(const std::string &s);
   };
 }

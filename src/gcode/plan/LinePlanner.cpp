@@ -220,9 +220,9 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 }
 
 
-void LinePlanner::pause(bool optional) {
-  MachineState::pause(optional);
-  push(new PauseCommand(nextID++, optional));
+void LinePlanner::pause(pause_t type) {
+  MachineState::pause(type);
+  push(new PauseCommand(nextID++, type));
 }
 
 
@@ -241,6 +241,12 @@ void LinePlanner::setLocation(const LocationRange &location) {
 
   if (0 <= line && line != this->line)
     pushSetCommand("line", this->line = line);
+}
+
+
+void LinePlanner::message(const string &s) {
+  MachineState::message(s);
+  pushSetCommand("message", s);
 }
 
 

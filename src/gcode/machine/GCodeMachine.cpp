@@ -235,10 +235,18 @@ void GCodeMachine::move(const Axes &axes, bool rapid) {
 }
 
 
-void GCodeMachine::pause(bool optional) {
+void GCodeMachine::pause(pause_t type) {
+  MachineAdapter::pause(type);
+
+  string code;
+  switch (type) {
+  case PAUSE_PROGRAM:       code = "M0"; break;
+  case PAUSE_OPTIONAL:      code = "M1"; break;
+  case PAUSE_PALLET_CHANGE: code = "M60"; break;
+  }
+
   beginLine();
-  *stream << (optional ? "M1" : "M0") << '\n';
-  MachineAdapter::pause(optional);
+  *stream << code << '\n';
 }
 
 
@@ -248,4 +256,9 @@ void GCodeMachine::comment(const string &s) const {
 
   for (unsigned i = 0; i < lines.size(); i++)
     *stream << "(" << lines[i] << ")\n";
+}
+
+
+void GCodeMachine::message(const string &s) {
+  *stream << "(MSG," << String::escapeC(s) << ")\n";
 }

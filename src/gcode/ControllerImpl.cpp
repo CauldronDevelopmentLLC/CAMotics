@@ -649,6 +649,9 @@ void ControllerImpl::end() {
 }
 
 
+void ControllerImpl::message(const string &text) {machine.message(text);}
+
+
 double ControllerImpl::get(address_t addr) const {
   // TODO some values set by interpreter need to be converted to current units
   return machine.get(addr);
@@ -895,8 +898,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
   case 'M':
     switch (code.number) {
-    case 0:                                       break; // TODO Pause
-    case 10:                                      break; // TODO Optional pause
+    case 0:  machine.pause(PAUSE_PROGRAM);        break; // Pause
+    case 10: machine.pause(PAUSE_OPTIONAL);       break; // Optional pause
     case 20: end();                               break; // End program
     case 30: setSpindleDir(DIR_CLOCKWISE);        break;
     case 40: setSpindleDir(DIR_COUNTERCLOCKWISE); break;
@@ -916,8 +919,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 500: // Feed override control
     case 510: // Spindle speed override control
     case 520: // Adaptive feed control
-    case 530: // Feed stop control
-    case 600: // Pallet change pause
+    case 530: implemented = false; break; // Feed stop control
+    case 600: machine.pause(PAUSE_PALLET_CHANGE); break; // Pallet change pause
     case 610: // Set current tool
     case 620: case 630: case 640: case 650: // Digital output
     case 660: // Wait on input

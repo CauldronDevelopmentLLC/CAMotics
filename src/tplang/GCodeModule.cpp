@@ -291,7 +291,8 @@ void GCodeModule::unitsCB(const js::Value &args, js::Sink &sink) {
 
 
 void GCodeModule::pauseCB(const js::Value &args, js::Sink &sink) {
-  ctx.machine.pause(args.getBoolean("optional"));
+  bool optional = args.getBoolean("optional");
+  ctx.machine.pause(optional ? PAUSE_OPTIONAL : PAUSE_PROGRAM);
 }
 
 
