@@ -98,7 +98,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   unsigned lowestPriority = ~0;
   bool implicitMotion = true;
   vector<Word *> words;
-  Comment *lastComment;
+  Comment *lastComment = 0;
 
   controller.newBlock();
 
