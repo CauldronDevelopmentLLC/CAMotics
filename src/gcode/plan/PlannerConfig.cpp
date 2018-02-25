@@ -31,8 +31,9 @@ using namespace std;
 
 PlannerConfig::PlannerConfig() :
   maxVel(10000), maxAccel(200000), maxJerk(50000000), junctionDeviation(0.05),
-  junctionAccel(100000), minTravel(0.000001), maxArcError(0.01),
-  maxLookahead(4096) {}
+  junctionAccel(100000), minSoftLimit(numeric_limits<double>::quiet_NaN()),
+  maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
+  maxArcError(0.01), maxLookahead(4096) {}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
@@ -45,6 +46,12 @@ void PlannerConfig::read(const JSON::Value &value) {
 
   junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
   junctionAccel = value.getNumber("junction-accel", junctionAccel);
+
+  if (value.hasDict("min-soft-limit"))
+    minSoftLimit.read(value.getDict("min-soft-limit"));
+  if (value.hasDict("max-soft-limit"))
+    maxSoftLimit.read(value.getDict("max-soft-limit"));
+
   minTravel = value.getNumber("min-travel", minTravel);
   maxArcError = value.getNumber("max-arc-error", maxArcError);
   maxLookahead = value.getNumber("max-lookahead", maxLookahead);
@@ -68,6 +75,13 @@ void PlannerConfig::write(JSON::Sink &sink) const {
 
   sink.insert("junction-deviation", junctionDeviation);
   sink.insert("junction-accel", junctionAccel);
+
+  sink.beginInsert("min-soft-limit");
+  minSoftLimit.write(sink);
+
+  sink.beginInsert("max-soft-limit");
+  maxSoftLimit.write(sink);
+
   sink.insert("min-travel", minTravel);
   sink.insert("max-arc-error", maxArcError);
   sink.insert("max-lookahead", maxLookahead);

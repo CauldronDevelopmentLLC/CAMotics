@@ -35,6 +35,9 @@ namespace GCode {
     double junctionDeviation;
     double junctionAccel;
 
+    Axes minSoftLimit;
+    Axes maxSoftLimit;
+
     Units defaultUnits;
     Units outputUnits;
     double minTravel;

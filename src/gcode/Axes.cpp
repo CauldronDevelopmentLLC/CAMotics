@@ -51,10 +51,10 @@ void Axes::applyUVWMatrix(const Matrix4x4D &m) {
 
 void Axes::read(const JSON::Value &value) {
   for (unsigned i = 0; i < 9; i++)
-    if (value.hasNumber(toAxisName(i)))
+    if (value.has(toAxisName(i)))
       data[i] = value.getNumber(toAxisName(i));
 
-    else if (value.hasNumber(toAxisName(i, true)))
+    else if (value.has(toAxisName(i, true)))
       data[i] = value.getNumber(toAxisName(i, true));
 }
 
@@ -63,7 +63,7 @@ void Axes::write(JSON::Sink &sink) const {
   sink.beginDict(true);
 
   for (unsigned i = 0; i < 9; i++)
-    if (isfinite(data[i]))
+    if (!isnan(data[i]))
       sink.insert(string(1, AXES[i]), data[i]);
 
   sink.endDict();

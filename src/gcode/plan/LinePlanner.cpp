@@ -73,6 +73,24 @@ void LinePlanner::setConfig(const PlannerConfig &config) {
 }
 
 
+void LinePlanner::checkSoftLimits(const Axes &p) {
+  for (unsigned axis = 0; axis < Axes::getSize(); axis++)
+    if (isfinite(p[axis])) {
+      if (isfinite(config.minSoftLimit[axis]) &&
+          p[axis] < config.minSoftLimit[axis])
+        THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
+               << " less than minimum soft limit "
+               << config.minSoftLimit[axis]);
+
+      if (isfinite(config.maxSoftLimit[axis]) &&
+          config.maxSoftLimit[axis] < p[axis])
+        THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
+               << " greater than maximum soft limit "
+               << config.maxSoftLimit[axis]);
+    }
+}
+
+
 bool LinePlanner::isDone() const {return cmds.empty();}
 
 
@@ -203,6 +221,10 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
   LOG_DEBUG(3, "move(" << target << ", " << (rapid ? "true" : "false")
             << ") from " << start);
+
+  // Check limits
+  checkSoftLimits(start);
+  checkSoftLimits(target);
 
   MachineState::move(target, rapid);
 

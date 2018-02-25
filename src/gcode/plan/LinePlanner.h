@@ -51,6 +51,7 @@ namespace GCode {
     LinePlanner();
 
     void setConfig(const PlannerConfig &config);
+    void checkSoftLimits(const Axes &p);
     bool isDone() const;
     bool hasMove() const;
     uint64_t next(cb::JSON::Sink &sink);
