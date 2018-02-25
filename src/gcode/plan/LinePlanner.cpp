@@ -223,7 +223,6 @@ void LinePlanner::move(const Axes &target, bool rapid) {
             << ") from " << start);
 
   // Check limits
-  checkSoftLimits(start);
   checkSoftLimits(target);
 
   MachineState::move(target, rapid);
