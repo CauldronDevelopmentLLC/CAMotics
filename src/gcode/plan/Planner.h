@@ -75,6 +75,7 @@ namespace GCode {
     bool hasMore();
     uint64_t next(cb::JSON::Sink &sink);
     void setActive(uint64_t id);
+    void stop();
     void restart(uint64_t id, const Axes &position);
 
     // From Controller

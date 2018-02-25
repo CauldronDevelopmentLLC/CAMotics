@@ -89,6 +89,14 @@ uint64_t Planner::next(JSON::Sink &sink) {return planner.next(sink);}
 void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
+void Planner::stop() {
+  if (ControllerImpl::isSynchronizing())
+    ControllerImpl::synchronize(getAbsolutePosition());
+  planner.stop();
+  runners.clear();
+}
+
+
 void Planner::restart(uint64_t id, const Axes &position) {
   if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(position);
   if (!planner.restart(id, position)) setAbsolutePosition(position);

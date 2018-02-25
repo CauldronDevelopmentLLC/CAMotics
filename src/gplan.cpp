@@ -544,6 +544,16 @@ static PyObject *_set_active(PyPlanner *self, PyObject *args) {
 }
 
 
+static PyObject *_stop(PyPlanner *self) {
+  try {
+    self->planner->stop();
+    Py_RETURN_NONE;
+  } CATCH_PYTHON;
+
+  return 0;
+}
+
+
 static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
   try {
     uint64_t id;
@@ -590,6 +600,7 @@ static PyMethodDef _methods[] = {
   {"next", (PyCFunction)_next, METH_NOARGS, "Get next planner data"},
   {"set_active", (PyCFunction)_set_active, METH_VARARGS, "Tell the planner "
    "which plan ID is currently active"},
+  {"stop", (PyCFunction)_stop, METH_NOARGS, "Stop planner"},
   {"restart", (PyCFunction)_restart, METH_VARARGS | METH_KEYWORDS,
    "Restart planner from given ID"},
   {0}

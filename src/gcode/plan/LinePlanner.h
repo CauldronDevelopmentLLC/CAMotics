@@ -55,6 +55,7 @@ namespace GCode {
     bool hasMove() const;
     uint64_t next(cb::JSON::Sink &sink);
     void setActive(uint64_t id);
+    void stop();
     bool restart(uint64_t id, const Axes &position);
 
     // From MachineInterface

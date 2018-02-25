@@ -99,6 +99,16 @@ void LinePlanner::setActive(uint64_t id) {
 }
 
 
+void LinePlanner::stop() {
+  lastExitVel = 0;
+  seeking = false;
+  nextID = 1;
+  line = -1;
+  cmds.clear();
+  out.clear();
+}
+
+
 bool LinePlanner::restart(uint64_t id, const Axes &position) {
   // Find replan command in output
   while (true) {
