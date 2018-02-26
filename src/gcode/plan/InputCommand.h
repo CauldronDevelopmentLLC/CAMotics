@@ -20,45 +20,22 @@
 
 #pragma once
 
+#include "PlannerCommand.h"
 
-#include "MachineAdapter.h"
+#include <gcode/machine/MachineEnum.h>
 
-#include <gcode/Units.h>
-
-#include <ostream>
 
 namespace GCode {
-  class GCodeMachine : public MachineAdapter {
-    cb::SmartPointer<std::ostream> stream;
-    Units units;
-    int oldTool;
-    cb::FileLocation location;
+  class InputCommand : public PlannerCommand, public MachineEnum {
+    port_t port;
+    input_mode_t mode;
+    double timeout;
 
   public:
-    GCodeMachine(const cb::SmartPointer<std::ostream> &stream, Units units) :
-      stream(stream), units(units), oldTool(-1) {}
+    InputCommand(uint64_t id, port_t port, input_mode_t mode, double timeout);
 
-    void beginLine();
-
-    // From MachineInterface
-    void start();
-    void end();
-
-    void setFeed(double feed);
-    void setFeedMode(feed_mode_t mode);
-    void setSpeed(double speed);
-    void setSpinMode(spin_mode_t mode, double max);
-    void changeTool(unsigned tool);
-
-    void input(port_t port, input_mode_t mode, double timeout);
-    void seek(port_t port, bool active, bool error);
-    void output(port_t port, double value);
-
-    void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
-    void pause(pause_t pause);
-
-    void comment(const std::string &s) const;
-    void message(const std::string &s);
+    // From PlannerCommand
+    const char *getType() const {return "input";}
+    void insert(cb::JSON::Sink &sink) const;
   };
 }

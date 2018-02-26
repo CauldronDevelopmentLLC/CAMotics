@@ -68,7 +68,6 @@ namespace GCode {
     {this->resolver = resolver;}
 
     bool isRunning() const;
-    void overrideSync();
 
     void load(const cb::InputSource &source, const PlannerConfig &config);
 

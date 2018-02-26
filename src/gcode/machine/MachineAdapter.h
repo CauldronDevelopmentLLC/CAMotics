@@ -68,8 +68,8 @@ namespace GCode {
 
     void changeTool(unsigned tool) {parent->changeTool(tool);}
 
-    void wait(port_t port, bool active, double timeout)
-    {parent->wait(port, active, timeout);}
+    void input(port_t port, input_mode_t mode, double timeout)
+    {parent->input(port, mode, timeout);}
     void seek(port_t port, bool active, bool error)
     {parent->seek(port, active, error);}
     void output(port_t port, double value) {parent->output(port, value);}

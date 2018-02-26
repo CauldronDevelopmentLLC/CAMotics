@@ -394,16 +394,6 @@ static PyObject *_is_synchronizing(PyPlanner *self) {
 }
 
 
-static PyObject *_override_sync(PyPlanner *self) {
-  try {
-    self->planner->overrideSync();
-    Py_RETURN_NONE;
-  } CATCH_PYTHON;
-
-  return 0;
-}
-
-
 static PyObject *_set_resolver(PyPlanner *self, PyObject *args) {
   try {
     PyObject *cb;
@@ -565,7 +555,6 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
   try {
     uint64_t id;
     GCode::Axes position;
-
     PyObject *_position = 0;
 
     static const char *kwlist[] = {"id", "position", 0};
@@ -586,13 +575,28 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
 }
 
 
+static PyObject *_synchronize(PyPlanner *self, PyObject *args, PyObject *kwds) {
+  try {
+    double result = 0;
+    static const char *kwlist[] = {"result", 0};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", (char **)kwlist, &result))
+      return 0;
+
+    self->planner->synchronize(result);
+    Py_RETURN_NONE;
+
+  } CATCH_PYTHON;
+
+  return 0;
+}
+
+
 static PyMethodDef _methods[] = {
   {"is_running", (PyCFunction)_is_running, METH_NOARGS,
    "True if the planner is active"},
   {"is_synchronizing", (PyCFunction)_is_synchronizing, METH_NOARGS,
    "True if the planner is synchronizing"},
-  {"override_sync", (PyCFunction)_override_sync, METH_NOARGS,
-   "Override planner synchronization"},
   {"set_resolver", (PyCFunction)_set_resolver, METH_VARARGS,
    "Set name resolver callback"},
   {"set_logger", (PyCFunction)_set_logger, METH_VARARGS,
@@ -610,6 +614,8 @@ static PyMethodDef _methods[] = {
   {"stop", (PyCFunction)_stop, METH_NOARGS, "Stop planner"},
   {"restart", (PyCFunction)_restart, METH_VARARGS | METH_KEYWORDS,
    "Restart planner from given ID"},
+  {"synchronize", (PyCFunction)_synchronize, METH_VARARGS | METH_KEYWORDS,
+   "Continue with result synchronized command"},
   {0}
 };
 

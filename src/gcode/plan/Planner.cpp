@@ -54,12 +54,6 @@ void Planner::setConfig(const PlannerConfig &config) {
 bool Planner::isRunning() const {return !runners.empty() || !planner.isDone();}
 
 
-void Planner::overrideSync() {
-  if (ControllerImpl::isSynchronizing())
-    ControllerImpl::synchronize(ControllerImpl::getAbsolutePosition());
-}
-
-
 void Planner::load(const InputSource &source, const PlannerConfig &config) {
   runners.push_back(new Runner(*this, source, config));
 }
@@ -95,15 +89,14 @@ void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
 void Planner::stop() {
-  if (ControllerImpl::isSynchronizing())
-    ControllerImpl::synchronize(getAbsolutePosition());
+  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(0);
   planner.stop();
   runners.clear();
 }
 
 
 void Planner::restart(uint64_t id, const Axes &position) {
-  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(position);
+  setPosition(position);
   if (!planner.restart(id, position)) setAbsolutePosition(position);
 }
 

@@ -64,7 +64,7 @@ namespace GCode {
     void end();
     void setSpeed(double speed);
     void changeTool(unsigned tool);
-    //void wait(port_t port, bool active, double timeout);
+    void input(port_t port, input_mode_t mode, double timeout);
     void seek(port_t port, bool active, bool error);
     void output(port_t port, double value);
     void dwell(double seconds);

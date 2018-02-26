@@ -25,6 +25,7 @@
 #include "PauseCommand.h"
 #include "OutputCommand.h"
 #include "SeekCommand.h"
+#include "InputCommand.h"
 #include "SetCommand.h"
 
 #include <cbang/Exception.h>
@@ -194,6 +195,12 @@ void LinePlanner::setSpeed(double speed) {
 
 
 void LinePlanner::changeTool(unsigned tool) {pushSetCommand("tool", tool);}
+
+
+void LinePlanner::input(port_t port, input_mode_t mode, double timeout) {
+  MachineState::input(port, mode, timeout);
+  push(new InputCommand(nextID++, port, mode, timeout));
+}
 
 
 void LinePlanner::seek(port_t port, bool active, bool error) {

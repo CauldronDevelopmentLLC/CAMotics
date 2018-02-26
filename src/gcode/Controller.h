@@ -59,7 +59,7 @@ namespace GCode {
 
     // Synchronize
     virtual bool isSynchronizing() const = 0;
-    virtual void synchronize(const Axes &position) = 0;
+    virtual void synchronize(double result) = 0;
 
     // State
     virtual void setLocation(const cb::LocationRange &location) = 0;

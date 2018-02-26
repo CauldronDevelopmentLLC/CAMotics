@@ -112,14 +112,13 @@ namespace GCode {
     /***
      * Wait for input change.
      *
-     * @param port the input port to wait on.
-     * @param active wait for the port to become active if true, inactive
-     *   otherwise.
-     * @param timeout the maximum amount of time to wait or zero to wait
+     * @param port the input port to input on.
+     * @param mode one of IMEDIATE, RISE, FALL, HIGH or LOW
+     * @param timeout the maximum amount of time to input or zero to input
      *   indefinately.  It is an error of the port does not change to the
      *   specified state before the timeout expires.
      */
-    virtual void wait(port_t port, bool active, double timeout) = 0;
+    virtual void input(port_t port, input_mode_t mode, double timeout) = 0;
 
     /***
      * Causes the immediately following move to pause when the sought input

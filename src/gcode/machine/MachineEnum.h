@@ -83,6 +83,15 @@ namespace GCode {
     } axes_t;
 
 
+    typedef enum {
+      INPUT_IMMEDIATE,
+      INPUT_RISE,
+      INPUT_FALL,
+      INPUT_HIGH,
+      INPUT_LOW,
+    } input_mode_t;
+
+
     typedef PortType::enum_t port_t;
   };
 }

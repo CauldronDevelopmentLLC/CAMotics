@@ -18,23 +18,30 @@
 
 \******************************************************************************/
 
-#pragma once
+#include "InputCommand.h"
 
-#include "PlannerCommand.h"
+using namespace GCode;
+using namespace cb;
 
-#include <gcode/machine/MachineEnum.h>
+
+InputCommand::InputCommand(uint64_t id, port_t port, input_mode_t mode,
+                         double timeout) :
+  PlannerCommand(id), port(port), mode(mode), timeout(timeout) {
+  if (timeout) setEntryVelocity(0);
+}
 
 
-namespace GCode {
-  class PauseCommand : public PlannerCommand, public MachineEnum {
-    pause_t type;
+void InputCommand::insert(JSON::Sink &sink) const {
+  sink.insert("port", String::transcode
+              (String::toLower(PortType(port).toString()), "_", "-"));
 
-  public:
-    PauseCommand(uint64_t id, pause_t type) :
-      PlannerCommand(id), type(type) {setEntryVelocity(0);}
+  switch (mode) {
+  case INPUT_RISE: sink.insert("mode", "rise"); break;
+  case INPUT_FALL: sink.insert("mode", "fall"); break;
+  case INPUT_HIGH: sink.insert("mode", "high"); break;
+  case INPUT_LOW:  sink.insert("mode", "low");  break;
+  default: sink.insert("mode", "immediate"); break;
+  }
 
-    // From PlannerCommand
-    const char *getType() const {return "pause";}
-    void insert(cb::JSON::Sink &sink) const;
-  };
+  sink.insert("timeout", timeout);
 }

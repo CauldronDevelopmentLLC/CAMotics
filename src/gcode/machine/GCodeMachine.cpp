@@ -165,7 +165,7 @@ void GCodeMachine::changeTool(unsigned tool) {
 }
 
 
-void GCodeMachine::wait(port_t port, bool active, double timeout) {
+void GCodeMachine::input(port_t port, input_mode_t mode, double timeout) {
   // TODO
 }
 

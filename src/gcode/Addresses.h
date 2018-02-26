@@ -26,7 +26,9 @@ namespace GCode {
     // 0-30 Local parameters
     // 31-5000 Global parameters
 
-    // TODO Probe results
+#define PROBE_RESULT_ADDR(AXIS) ((address_t)(PROBE_RESULT_X + (AXIS)))
+
+    // Probe results
     PROBE_RESULT_X = 5061,
     PROBE_RESULT_Y,
     PROBE_RESULT_Z,

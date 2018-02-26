@@ -83,7 +83,7 @@ public:
       planner.setActive(planner.next(writer));
 
       // Cannot synchronize with actual machine so fake it.
-      if (planner.isSynchronizing()) planner.overrideSync();
+      if (planner.isSynchronizing()) planner.synchronize(0);
     }
 
     writer.endList();

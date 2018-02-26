@@ -40,7 +40,15 @@ namespace GCode {
     double varValues[MAX_VAR];
 
     Axes position;
-    bool synchronizing;
+
+    typedef enum {
+      SYNC_NONE,
+      SYNC_SEEK,
+      SYNC_PROBE,
+      SYNC_INPUT,
+    } synchronize_state_t;
+
+    synchronize_state_t syncState;
 
     // State variables
     unsigned currentMotionMode;
@@ -77,6 +85,10 @@ namespace GCode {
     // Coolant
     void setMistCoolant(bool enable);
     void setFloodCoolant(bool enable);
+
+    // I/O
+    void digitalOutput(unsigned index, bool enable, bool synchronized);
+    void input(unsigned index, bool digital, input_mode_t mode, double timeout);
 
     // Plane
     void setPlane(MachineInterface::plane_t plane);
@@ -152,8 +164,8 @@ namespace GCode {
     unsigned getCurrentMotionMode() {return currentMotionMode;}
     void setCurrentMotionMode(unsigned mode);
 
-    bool isSynchronizing() const {return synchronizing;}
-    void synchronize(const Axes &position);
+    bool isSynchronizing() const {return syncState != SYNC_NONE;}
+    void synchronize(double result);
 
     void setLocation(const cb::LocationRange &location);
     void setFeed(double feed);

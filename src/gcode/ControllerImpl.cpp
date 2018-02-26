@@ -37,7 +37,7 @@ using namespace GCode;
 
 ControllerImpl::ControllerImpl(MachineInterface &machine,
                                const ToolTable &tools) :
-  tools(tools), synchronizing(false), currentMotionMode(10),
+  tools(tools), syncState(SYNC_NONE), currentMotionMode(10),
   plane(MachineInterface::XY),
   latheDiameterMode(true), cutterRadiusComp(false), toolLengthComp(false),
   pathMode(EXACT_PATH_MODE), returnMode(RETURN_TO_R),
@@ -136,6 +136,41 @@ void ControllerImpl::setMistCoolant(bool enable) {
 void ControllerImpl::setFloodCoolant(bool enable) {
   machine.output(MachineEnum::FLOOD, enable);
   machine.set("_flood", enable);
+}
+
+
+void ControllerImpl::digitalOutput(unsigned index, bool enable,
+                                   bool synchronized) {
+  if (3 < index) {
+    LOG_WARNING("Invalid digital output " << index);
+    return;
+  }
+
+  machine.output((port_t)(DIGITAL_OUT_0 + index), enable);
+}
+
+
+void ControllerImpl::input(unsigned index, bool digital, input_mode_t mode,
+                           double timeout) {
+  if (3 < index) {
+    LOG_WARNING("Invalid " << (digital ? "digital" : "analog") << " input "
+                << index);
+    return;
+  }
+
+  if (INPUT_LOW < mode) {
+    LOG_WARNING("Invalid input mode " << mode);
+    return;
+  }
+
+  if (timeout < 0) {
+    LOG_WARNING("Invalid timeout " << timeout);
+    return;
+  }
+
+  syncState = SYNC_INPUT; // Synchronize input result
+  machine.input((port_t)((digital ? DIGITAL_IN_0 : ANALOG_IN_0) + index),
+               mode, timeout);
 }
 
 
@@ -360,10 +395,10 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
 
 void ControllerImpl::straightProbe(int vars, bool towardWorkpiece,
-                               bool signalError) {
+                                   bool signalError) {
+  syncState = SYNC_PROBE; // Synchronize with found position
   machine.seek(PROBE, towardWorkpiece, signalError);
   makeMove(vars, false, incrementalDistanceMode);
-  synchronizing = true; // Synchronize with found position
 
   LOG_INFO(3, "Controller: straight probe "
            << (towardWorkpiece ? "toward" : "away from") << " workpiece"
@@ -396,9 +431,9 @@ void ControllerImpl::seek(int vars, bool active, bool error) {
   default: THROW("Seek requires axis");
   }
 
+  syncState = SYNC_SEEK; // Synchronize with found position
   machine.seek(port, active, error);
   makeMove(vars, false, true);
-  synchronizing = true; // Synchronize with found position
 }
 
 
@@ -615,6 +650,7 @@ void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
 
 
 void ControllerImpl::end() {
+  // TODO replace this with GCode override
   // See http://linuxcnc.org/docs/html/gcode/m-code.html#mcode:m2-m30
 
   // Origin offsets are set to the default (G54)
@@ -697,12 +733,25 @@ void ControllerImpl::setCurrentMotionMode(unsigned mode) {
 }
 
 
-void ControllerImpl::synchronize(const Axes &position) {
-  if (!synchronizing) THROW("Not synchronizing");
-  setAbsolutePosition(position);
-  machine.setPosition(position);
-  // TODO Also set probed position PROBE_RESULT_X-W and PROBE_SUCCESS
-  synchronizing = false;
+void ControllerImpl::synchronize(double result) {
+  if (syncState == SYNC_NONE) THROW("Not synchronizing");
+
+  switch (syncState) {
+  case SYNC_NONE: break;
+
+  case SYNC_SEEK:
+  case SYNC_PROBE:
+    // Set probed position PROBE_RESULT_X-W and PROBE_SUCCESS
+    set(PROBE_SUCCESS, result);
+    for (const char *axis = Axes::AXES; *axis; axis++)
+      set(PROBE_RESULT_ADDR(Axes::toIndex(*axis)),
+          getAxisAbsolutePosition(*axis));
+    break;
+
+  case SYNC_INPUT: set(USER_INPUT, result); break;
+  }
+
+  syncState = SYNC_NONE;
 }
 
 
@@ -736,9 +785,9 @@ void ControllerImpl::setTool(unsigned tool) {
 
 
 void ControllerImpl::startBlock() {
-  if (synchronizing) {
+  if (syncState != SYNC_NONE) {
     LOG_WARNING("New block started without position of previous seek move");
-    synchronizing = false;
+    syncState = SYNC_NONE;
   }
   moveInAbsoluteCoords = false;
 }
@@ -912,20 +961,31 @@ bool ControllerImpl::execute(const Code &code, int vars) {
       setFloodCoolant(false);
       break;
 
-      // TODO the following M-Codes
-    case 190: implemented = false; break; // Orient spindle
     case 300: end(); break; // TODO Exchange pallet shuttles and end program
+
+    case 600: machine.pause(PAUSE_PALLET_CHANGE); break; // Pallet change pause
+
+    case 620: digitalOutput(getVar('P'), true,  true); break;
+    case 630: digitalOutput(getVar('P'), false, true); break;
+    case 640: digitalOutput(getVar('P'), true,  false); break;
+    case 650: digitalOutput(getVar('P'), false, false); break;
+
+    case 660:
+      input((vars & VT_P) ? getVar('P') : getVar('E'), vars & VT_P,
+            (input_mode_t)((vars & VT_L) ? getVar('L') : 0),
+            (vars & VT_Q) ? getVar('Q') : 0);
+      break;
+
+      // TODO the following M-Codes
+    case 190: // Orient spindle
     case 480: case 490: // Speed and feed override control
     case 500: // Feed override control
     case 510: // Spindle speed override control
     case 520: // Adaptive feed control
-    case 530: implemented = false; break; // Feed stop control
-    case 600: machine.pause(PAUSE_PALLET_CHANGE); break; // Pallet change pause
+    case 530: // Feed stop control
     case 610: // Set current tool
-    case 620: case 630: case 640: case 650: // Digital output
-    case 660: // Wait on input
     case 670: // Synchronized analog output
-    case 680: // Imediate analog output
+    case 680: // Immediate analog output
     case 700: // Save modal state
     case 710: // Invalidate stored state
     case 720: // Restore modal state
