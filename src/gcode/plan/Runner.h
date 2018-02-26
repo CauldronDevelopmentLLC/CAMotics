@@ -33,8 +33,7 @@ namespace GCode {
     PlannerConfig config;
 
     Interpreter interpreter;
-    cb::Scanner scanner;
-    GCode::Tokenizer tokenizer;
+    std::vector<cb::SmartPointer<GCode::Tokenizer> > tokenizers;
 
     bool started;
 
@@ -45,6 +44,11 @@ namespace GCode {
     const PlannerConfig &getConfig() const {return config;}
     bool hasStarted() const {return started;}
 
-    bool next();
+    void push(const cb::InputSource &source);
+
+    bool hasMore();
+    void next();
+
+    bool execute(const Code &code, int vars);
   };
 }

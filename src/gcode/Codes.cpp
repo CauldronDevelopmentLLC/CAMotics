@@ -20,21 +20,40 @@
 
 #include "Codes.h"
 
+#include <cbang/String.h>
 #include <cbang/Math.h>
 
 #include <ctype.h>
 
 using namespace std;
+using namespace cb;
 using namespace GCode;
 
 typedef ModalGroup MG;
 typedef VarTypes VT;
 
 
+bool Code::operator<(const Code &o) const {
+  return type < o.type || (type == o.type && number < o.number);
+}
+
+
+Code Code::parse(const string &s) {
+  if (1 < s.length()) {
+    char code = toupper(s[0]);
+    unsigned number = round(10 * String::parseDouble(s.substr(1)));
+    if (isalpha(code)) return {code, number};
+  }
+
+  THROWS("Invalid code '" << s << "'");
+}
+
+
 ostream &GCode::operator<<(ostream &stream, const Code &code) {
   stream << code.type << code.number / 10;
   if (code.number % 10) stream << '.' << (code.number % 10);
-  return stream << " (" << code.description << ')';
+  if (code.description) stream << " (" << code.description << ')';
+  return stream;
 }
 
 
@@ -51,23 +70,23 @@ const Code Codes::codes[] = {
 
 
 const Code Codes::gcodes[] = {
-  {'G', 0, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 0, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Rapid Linear Motion"},
-  {'G', 10, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 10, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Linear Motion"},
-  {'G', 20, 20, MG::MG_MOTION, VT::VT_ANGLE,
+  {'G', 20, 21, MG::MG_MOTION, VT::VT_ANGLE,
    "Clockwise Arc"},
-  {'G', 30, 20, MG::MG_MOTION, VT::VT_ANGLE,
+  {'G', 30, 21, MG::MG_MOTION, VT::VT_ANGLE,
    "Counterclockwise Arc"},
 
-  {'G', 40, 10, MG::MG_ZERO, VT::VT_P,
+  {'G', 40, 11, MG::MG_ZERO, VT::VT_P,
    "Dwell"},
 
-  {'G', 51, 20, MG::MG_MOTION, VT::VT_X | VT::VT_Y | VT::VT_I | VT::VT_J,
+  {'G', 51, 21, MG::MG_MOTION, VT::VT_X | VT::VT_Y | VT::VT_I | VT::VT_J,
    "Quadratic B-spline"},
-  {'G', 52, 20, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P | VT::VT_L,
+  {'G', 52, 21, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P | VT::VT_L,
    "Open NURBs Block"},
-  {'G', 53, 20, MG::MG_MOTION, VT::VT_NONE,
+  {'G', 53, 21, MG::MG_MOTION, VT::VT_NONE,
    "Close NURBs Block"},
 
   {'G', 70, 2, MG::MG_LATHE, VT::VT_NONE,
@@ -75,161 +94,161 @@ const Code Codes::gcodes[] = {
   {'G', 80, 2, MG::MG_LATHE, VT::VT_NONE,
    "Lathe Radius Mode"},
 
-  {'G', 100, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
+  {'G', 100, 20, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
    VT::VT_ANGLE | VT::VT_Q,
    "System Codes"},
 
-  {'G', 170, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 170, 12, MG::MG_PLANE, VT::VT_NONE,
    "XY Plane Selection"},
-  {'G', 171, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 171, 12, MG::MG_PLANE, VT::VT_NONE,
    "UV Plane Selection"},
-  {'G', 180, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 180, 12, MG::MG_PLANE, VT::VT_NONE,
    "ZX Plane Selection"},
-  {'G', 181, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 181, 12, MG::MG_PLANE, VT::VT_NONE,
    "WU Plane Selection"},
-  {'G', 190, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 190, 12, MG::MG_PLANE, VT::VT_NONE,
    "YZ Plane Selection"},
-  {'G', 191, 11, MG::MG_PLANE, VT::VT_NONE,
+  {'G', 191, 12, MG::MG_PLANE, VT::VT_NONE,
    "VW Plane Selection"},
 
-  {'G', 200, 12, MG::MG_UNITS, VT::VT_NONE,
+  {'G', 200, 13, MG::MG_UNITS, VT::VT_NONE,
    "Use Inches"},
-  {'G', 210, 12, MG::MG_UNITS, VT::VT_NONE,
+  {'G', 210, 13, MG::MG_UNITS, VT::VT_NONE,
    "Use Millimeters"},
 
-  {'G', 280, 19, MG::MG_ZERO, VT::VT_NONE, // Used for homing on 3D printers
+  {'G', 280, 20, MG::MG_ZERO, VT::VT_NONE, // Used for homing on 3D printers
    "Go to Predefined Position 1"},
-  {'G', 281, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 281, 20, MG::MG_ZERO, VT::VT_NONE,
   "Set Predefined Position 1"},
-  {'G', 282, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 282, 20, MG::MG_ZERO, VT::VT_NONE,
   "Set Axes unhomed"},
-  {'G', 283, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 283, 20, MG::MG_ZERO, VT::VT_NONE,
   "Set Axes home positions"},
-  {'G', 300, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 300, 20, MG::MG_ZERO, VT::VT_NONE,
    "Go to Predefined Position 2"},
-  {'G', 301, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 301, 20, MG::MG_ZERO, VT::VT_NONE,
    "Set Predefined Position 2"},
 
-  {'G', 330, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
+  {'G', 330, 21, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
    "Spindle-Synchronized Motion"},
-  {'G', 331, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
+  {'G', 331, 21, MG::MG_MOTION, VT::VT_XYZ | VT::VT_K,
    "Rigid Tapping"},
 
-  {'G', 382, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 382, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe toward workpiece w/ error signal"},
-  {'G', 383, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 383, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe toward workpiece wo/ error signal"},
-  {'G', 384, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 384, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe away from workpiece w/ error signal"},
-  {'G', 385, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 385, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe away from workpiece wo/ error signal"},
 
-  {'G', 386, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 386, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Seek active switch w/ error signal"},
-  {'G', 387, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 387, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Seek active switch wo/ error signal"},
-  {'G', 388, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 388, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Seek inactive switch w/ error signal"},
-  {'G', 389, 20, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 389, 21, MG::MG_MOTION, VT::VT_AXIS,
    "Seek inactive switch wo/ error signal"},
 
-  {'G', 400, 13, MG::MG_CUTTER_RADIUS, VT::VT_NONE,
+  {'G', 400, 14, MG::MG_CUTTER_RADIUS, VT::VT_NONE,
    "Cutter Radius Compensation Off"},
-  {'G', 410, 13, MG::MG_CUTTER_RADIUS, VT::VT_D,
+  {'G', 410, 14, MG::MG_CUTTER_RADIUS, VT::VT_D,
    "Left Cutter Radius Compensation"},
-  {'G', 411, 13, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
+  {'G', 411, 14, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
    "Left Dynamic Cutter Radius Compensation"},
-  {'G', 420, 13, MG::MG_CUTTER_RADIUS, VT::VT_D,
+  {'G', 420, 14, MG::MG_CUTTER_RADIUS, VT::VT_D,
    "Right Cutter Radius Compensation"},
-  {'G', 421, 13, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
+  {'G', 421, 14, MG::MG_CUTTER_RADIUS, VT::VT_D | VT::VT_L,
    "Right Dynamic Cutter Radius Compensation"},
 
-  {'G', 430, 14, MG::MG_TOOL_OFFSET, VT::VT_H,
+  {'G', 430, 15, MG::MG_TOOL_OFFSET, VT::VT_H,
    "Activate Tool Length Compensation"},
-  {'G', 431, 14, MG::MG_TOOL_OFFSET, VT::VT_AXIS,
+  {'G', 431, 15, MG::MG_TOOL_OFFSET, VT::VT_AXIS,
    "Activate Dynamic Tool Length Compensation"},
-  {'G', 490, 14, MG::MG_TOOL_OFFSET, VT::VT_NONE,
+  {'G', 490, 15, MG::MG_TOOL_OFFSET, VT::VT_NONE,
    "Cancel Tool Length Compensation"},
 
-  {'G', 520, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 520, 20, MG::MG_ZERO, VT::VT_AXIS,
    "Set Coordinate System Offsets"},
-  {'G', 530, 19, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 530, 20, MG::MG_ZERO, VT::VT_NONE,
    "Move in Absolute Coordinates"},
 
-  {'G', 540, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 540, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 1"},
-  {'G', 550, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 550, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 2"},
-  {'G', 560, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 560, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 3"},
-  {'G', 570, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 570, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 4"},
-  {'G', 580, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 580, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 5"},
-  {'G', 590, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 590, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 6"},
-  {'G', 591, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 591, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 7"},
-  {'G', 592, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 592, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 8"},
-  {'G', 593, 15, MG::MG_COORD_SYSTEM, VT::VT_NONE,
+  {'G', 593, 16, MG::MG_COORD_SYSTEM, VT::VT_NONE,
    "Select Coordinate System 9"},
 
-  {'G', 610, 16, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 610, 17, MG::MG_ZERO, VT::VT_NONE,
    "Set Exact Path Control Mode"},
-  {'G', 611, 16, MG::MG_ZERO, VT::VT_NONE,
+  {'G', 611, 17, MG::MG_ZERO, VT::VT_NONE,
    "Set Exact Stop Control Mode"},
-  {'G', 640, 16, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+  {'G', 640, 17, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
    "Set Best Possible Speed Control Mode"},
 
-  {'G', 730, 20, MG::MG_MOTION, VT::VT_XYZ | VT::VT_ABC | VT::VT_RLQ,
+  {'G', 730, 21, MG::MG_MOTION, VT::VT_XYZ | VT::VT_ABC | VT::VT_RLQ,
    "Drilling Cycle with Chip Breaking"},
-  {'G', 760, 20, MG::MG_MOTION, VT::VT_P | VT::VT_Z | VT::VT_IJK |  VT::VT_RLQ |
+  {'G', 760, 21, MG::MG_MOTION, VT::VT_P | VT::VT_Z | VT::VT_IJK |  VT::VT_RLQ |
    VT::VT_H | VT::VT_E, "Threading Cycle"},
-  {'G', 800, 20, MG::MG_MOTION, VT::VT_NONE,
+  {'G', 800, 21, MG::MG_MOTION, VT::VT_NONE,
    "Cancel Modal Motion"},
-  {'G', 810, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 810, 21, MG::MG_MOTION, VT::VT_CANNED,
    "Drilling Cycle"},
-  {'G', 820, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
+  {'G', 820, 21, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
    "Drilling Cycle w/ Dwell"},
-  {'G', 830, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 830, 21, MG::MG_MOTION, VT::VT_CANNED,
    "Peck Drilling"},
-  {'G', 840, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 840, 21, MG::MG_MOTION, VT::VT_CANNED,
    "Right-Hand Tapping"},
-  {'G', 850, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 850, 21, MG::MG_MOTION, VT::VT_CANNED,
    "Boring, No Dwell, Feed Out"},
-  {'G', 860, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
+  {'G', 860, 21, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
    "Boring, Spindle Stop, Rapid Out"},
-  {'G', 870, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 870, 21, MG::MG_MOTION, VT::VT_CANNED,
    "Back Boring"},
-  {'G', 880, 20, MG::MG_MOTION, VT::VT_CANNED,
+  {'G', 880, 21, MG::MG_MOTION, VT::VT_CANNED,
    "Boring, Spindle Stop, Manual Out"},
-  {'G', 890, 20, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
+  {'G', 890, 21, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
    "Boring, Dwell, Feed Out"},
 
-  {'G', 900, 17, MG::MG_DISTANCE, VT::VT_NONE,
+  {'G', 900, 18, MG::MG_DISTANCE, VT::VT_NONE,
    "XYZ Absolute Distance Mode"},
-  {'G', 901, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
+  {'G', 901, 18, MG::MG_ARC_DISTANCE, VT::VT_NONE,
    "IJK Absolute Distance Mode"},
-  {'G', 910, 17, MG::MG_DISTANCE, VT::VT_NONE,
+  {'G', 910, 18, MG::MG_DISTANCE, VT::VT_NONE,
    "XYZ Incremental Distance Mode"},
-  {'G', 911, 17, MG::MG_ARC_DISTANCE, VT::VT_NONE,
+  {'G', 911, 18, MG::MG_ARC_DISTANCE, VT::VT_NONE,
    "IJK Incremental Distance Mode"},
 
-  {'G', 920, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 920, 20, MG::MG_ZERO, VT::VT_AXIS,
    "Set Coordinate System Offsets"},
-  {'G', 921, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 921, 20, MG::MG_ZERO, VT::VT_AXIS,
    "Reset Coordinate System Offsets"},
-  {'G', 922, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 922, 20, MG::MG_ZERO, VT::VT_AXIS,
    "Disable Coordinate System Offsets"},
-  {'G', 923, 19, MG::MG_ZERO, VT::VT_AXIS,
+  {'G', 923, 20, MG::MG_ZERO, VT::VT_AXIS,
    "Enable Coordinate System Offsets"},
 
-  {'G', 930, 19, MG::MG_FEED_RATE, VT::VT_NONE,
+  {'G', 930, 20, MG::MG_FEED_RATE, VT::VT_NONE,
    "Set Feed Rate Inverse Time Mode"},
-  {'G', 940, 19, MG::MG_FEED_RATE, VT::VT_NONE,
+  {'G', 940, 20, MG::MG_FEED_RATE, VT::VT_NONE,
    "Set Feed Rate Units per Minute Mode"},
-  {'G', 950, 19, MG::MG_FEED_RATE, VT::VT_NONE,
+  {'G', 950, 20, MG::MG_FEED_RATE, VT::VT_NONE,
    "Set Feed Rate Units per Revolution Mode"},
 
   {'G', 960, 2, MG::MG_ZERO, VT::VT_D | VT::VT_S,
@@ -237,35 +256,35 @@ const Code Codes::gcodes[] = {
   {'G', 970, 2, MG::MG_ZERO, VT::VT_NONE,
    "Spindle Control RPM Mode"},
 
-  {'G', 980, 18, MG::MG_RETURN_MODE, VT::VT_NONE,
+  {'G', 980, 19, MG::MG_RETURN_MODE, VT::VT_NONE,
    "Set Canned Cycle Return R"},
-  {'G', 990, 18, MG::MG_RETURN_MODE, VT::VT_NONE,
+  {'G', 990, 19, MG::MG_RETURN_MODE, VT::VT_NONE,
    "Set Canned Cycle Return Last"},
   {0},
 };
 
 
 const Code Codes::g10codes[] = {
-  {'G', 10, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
+  {'G', 10, 20, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS |
    VT::VT_I | VT::VT_J | VT::VT_Q,
    "Set Tool Table"},
-  {'G', 20, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS,
+  {'G', 20, 20, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_AXIS,
    "Set Coordinate System"},
-  {'G', 100, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_X |
+  {'G', 100, 20, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R | VT::VT_X |
    VT::VT_Z | VT::VT_Q,
    "Set Tool Table To Current Offsets"},
-  {'G', 200, 19, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_AXIS,
+  {'G', 200, 20, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_AXIS,
    "Set Coordinate System To Current Offsets"},
   {0},
 };
 
 
 const Code Codes::mcodes[] = {
-  {'M', 00, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 00, 22, MG::MG_STOPPING, VT::VT_NONE,
    "Pause"},
-  {'M', 10, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 10, 22, MG::MG_STOPPING, VT::VT_NONE,
    "Pause If Stopped"},
-  {'M', 20, 12, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 20, 22, MG::MG_STOPPING, VT::VT_NONE,
    "End Program"},
 
   {'M', 30, 7, MG::MG_SPINDLE, VT::VT_NONE,
@@ -285,7 +304,7 @@ const Code Codes::mcodes[] = {
   {'M', 90, 8, MG::MG_COOLANT, VT::VT_NONE,
    "Turn All Coolant Off"},
 
-  {'M', 300, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 300, 22, MG::MG_STOPPING, VT::VT_NONE,
    "Change Pallet Shuttles and End"},
 
   {'M', 480, 9, MG::MG_OVERRIDE, VT::VT_NONE,
@@ -302,59 +321,260 @@ const Code Codes::mcodes[] = {
   {'M', 530, 9, MG::MG_OVERRIDE, VT::VT_P,
    "Feed Stop Control"},
 
-  {'M', 600, 21, MG::MG_STOPPING, VT::VT_NONE,
+  {'M', 600, 22, MG::MG_STOPPING, VT::VT_NONE,
    "Change Pallet Shuttles and Pause"},
 
-  {'M', 610, 5, MG::MG_ZERO, VT::VT_Q,
+  {'M', 610, 6, MG::MG_TOOL_CHANGE, VT::VT_Q,
    "Set Current Tool Number"},
 
-  {'M', 620, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 620, 21, MG::MG_ZERO, VT::VT_P,
    "Turn On Digital Output Synchronized w/ Motion"},
-  {'M', 630, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 630, 21, MG::MG_ZERO, VT::VT_P,
    "Turn Off Digital Output Synchronized w/ Motion"},
-  {'M', 640, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 640, 21, MG::MG_ZERO, VT::VT_P,
    "Turn On Digital Output Immediately"},
-  {'M', 650, 20, MG::MG_ZERO, VT::VT_P,
+  {'M', 650, 21, MG::MG_ZERO, VT::VT_P,
    "Turn Off Digital Output Immediately"},
 
-  {'M', 660, 20, MG::MG_ZERO, VT::VT_P | VT::VT_E | VT::VT_L | VT::VT_Q,
+  {'M', 660, 21, MG::MG_ZERO, VT::VT_P | VT::VT_E | VT::VT_L | VT::VT_Q,
    "Input Control"},
 
-  {'M', 670, 20, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
+  {'M', 670, 21, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
    "Analog Output Synchronized w/ Motion"},
-  {'M', 680, 20, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
+  {'M', 680, 21, MG::MG_ZERO, VT::VT_E | VT::VT_Q,
    "Immediate Analog Output"},
+
+  {'M', 1000, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1010, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1020, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1030, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1040, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1050, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1060, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1070, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1080, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1090, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1100, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1110, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1120, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1130, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1140, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1150, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1160, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1170, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1180, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1190, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1200, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1210, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1220, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1230, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1240, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1250, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1260, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1270, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1280, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1290, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1300, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1310, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1320, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1330, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1340, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1350, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1360, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1370, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1380, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1390, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1400, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1410, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1420, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1430, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1440, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1450, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1460, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1470, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1480, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1490, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1500, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1510, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1520, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1530, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1540, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1550, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1560, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1570, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1580, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1590, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1600, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1610, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1620, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1630, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1640, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1650, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1660, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1670, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1680, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1690, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1700, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1710, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1720, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1730, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1740, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1750, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1760, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1770, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1780, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1790, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1800, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1810, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1820, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1830, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1840, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1850, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1860, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1870, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1880, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1890, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1900, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1910, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1920, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1930, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1940, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1950, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1960, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1970, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1980, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
+  {'M', 1990, 10, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
+   "User Defined Command"},
   {0},
 };
+
+
+namespace {
+  const Code *findCode(const Code *table, unsigned number) {
+    // A linear search will do pig
+    for (int i = 0; table[i].type; i++)
+      if (table[i].number == number) return &table[i];
+
+    return 0; // Not found
+  }
+}
 
 
 const Code *Codes::find(char _type, double _number, double _L) {
   char type = toupper(_type);
   unsigned number = round(_number * 10);
-  unsigned L = round(_L * 10);
-
-  const Code *table = 0;
 
   switch (type) {
   case 'G':
-    if (number == 100 && L) {
-      number = L;
-      table = g10codes;
+    if (number == 100 && _L) return findCode(g10codes, round(_L * 10));
+    return findCode(gcodes, number);
 
-    } else table = gcodes;
-    break;
-
-  case 'M': table = mcodes; break;
+  case 'M': return findCode(mcodes, number);
 
   default:
     for (int i = 0; codes[i].type; i++)
       if (codes[i].type == type) return &codes[i];
     return 0;
   }
-
-  // A linear search will do pig
-  for (int i = 0; table[i].type; i++)
-    if (table[i].number == number) return &table[i];
 
   return 0;
 }

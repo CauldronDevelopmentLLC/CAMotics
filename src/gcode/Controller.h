@@ -68,7 +68,8 @@ namespace GCode {
     virtual void setTool(unsigned tool) = 0;
 
     // Execution
-    virtual void newBlock() = 0;
+    virtual void startBlock() = 0;
     virtual bool execute(const Code &code, int vars) = 0;
+    virtual void endBlock() = 0;
   };
 }

@@ -22,7 +22,6 @@
 
 #include "Runner.h"
 
-
 using namespace cb;
 using namespace std;
 using namespace GCode;
@@ -68,19 +67,25 @@ void Planner::load(const InputSource &source, const PlannerConfig &config) {
 
 bool Planner::hasMore() {
   while (true) {
+    if (!runners.empty() && !runners.front()->hasMore()) {
+      runners.pop_front();
+      pipeline.end();
+    }
+
     if (planner.hasMove()) return true;
+
     if (ControllerImpl::isSynchronizing() || runners.empty()) return false;
 
-    if (!runners.front()->hasStarted()) {
-      setConfig(runners.front()->getConfig());
+    Runner &runner = *runners.front();
+
+    if (!runner.hasStarted()) {
+      const PlannerConfig &config = runner.getConfig();
+      setConfig(config);
       pipeline.start();
     }
 
     // Push a line of GCode to the planner
-    if (!runners.front()->next()) {
-      runners.pop_front();
-      pipeline.end();
-    }
+    runner.next();
   }
 }
 
@@ -106,4 +111,10 @@ void Planner::restart(uint64_t id, const Axes &position) {
 double Planner::get(const string &name) const {
   if (ControllerImpl::has(name)) return ControllerImpl::get(name);
   return resolver.isNull() ? 0 : resolver->get(name);
+}
+
+
+bool Planner::execute(const Code &code, int vars) {
+  if (!runners.empty() && runners.front()->execute(code, vars)) return true;
+  return ControllerImpl::execute(code, vars);
 }

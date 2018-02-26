@@ -20,7 +20,11 @@
 
 #include "Runner.h"
 
+#include <gcode/Codes.h>
+
 #include <cbang/log/Logger.h>
+
+#include <cbang/io/StringStreamInputSource.h>
 
 
 using namespace GCode;
@@ -30,20 +34,48 @@ using namespace std;
 
 Runner::Runner(Controller &controller, const InputSource &source,
                const PlannerConfig &config) :
-  config(config), interpreter(controller), scanner(source), tokenizer(scanner),
-  started(false) {}
+  config(config), interpreter(controller), started(false) {
+
+  push(source);
+  if (!config.programStart.empty())
+    push(StringStreamInputSource(config.programStart, "<program-start>"));
+}
 
 
-bool Runner::next() {
+void Runner::push(const InputSource &source) {
+  tokenizers.push_back(new GCode::Tokenizer(source));
+}
+
+
+bool Runner::hasMore() {return !tokenizers.empty();}
+
+
+void Runner::next() {
   started = true;
 
-  try {
-    return interpreter.readBlock(tokenizer);
+  while (!tokenizers.empty()) {
+    try {
+      if (interpreter.readBlock(*tokenizers.back())) return;
+      else tokenizers.pop_back();
 
-  } catch (const EndProgram &) {
-  } catch (const Exception &e) {
-    LOG_ERROR(tokenizer.getLocation() << ":" << e.getMessage());
-    LOG_DEBUG(3, e);
+    } catch (const EndProgram &) {
+      tokenizers.pop_back();
+
+    } catch (const Exception &e) {
+      LOG_ERROR(tokenizers.back()->getLocation() << ":" << e.getMessage());
+      LOG_DEBUG(3, e);
+      tokenizers.clear();
+    }
+  }
+}
+
+
+bool Runner::execute(const Code &code, int vars) {
+  if (tokenizers.size() < 2 && config.hasOverride(code)) {
+    const string &gcode = config.getOverride(code);
+    push(StringStreamInputSource(gcode, SSTR("<" << code << ">")));
+
+    return true;
   }
 
   return false;

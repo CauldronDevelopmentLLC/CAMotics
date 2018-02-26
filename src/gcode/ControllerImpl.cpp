@@ -735,7 +735,7 @@ void ControllerImpl::setTool(unsigned tool) {
 }
 
 
-void ControllerImpl::newBlock() {
+void ControllerImpl::startBlock() {
   if (synchronizing) {
     LOG_WARNING("New block started without position of previous seek move");
     synchronizing = false;

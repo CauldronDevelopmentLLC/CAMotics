@@ -22,8 +22,11 @@
 
 #include <gcode/Axes.h>
 #include <gcode/Units.h>
+#include <gcode/Codes.h>
 
 #include <cbang/json/Serializable.h>
+
+#include <map>
 
 
 namespace GCode {
@@ -44,7 +47,13 @@ namespace GCode {
     double maxArcError;
     unsigned maxLookahead;
 
+    std::string programStart;
+    std::map<const Code, std::string> overrides;
+
     PlannerConfig();
+
+    bool hasOverride(const Code &code) const;
+    const std::string &getOverride(const Code &code) const;
 
     // From cb::JSON::Serializable
     void read(const cb::JSON::Value &value);

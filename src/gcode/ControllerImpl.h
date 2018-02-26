@@ -160,7 +160,8 @@ namespace GCode {
     void setSpeed(double speed);
     void setTool(unsigned tool);
 
-    void newBlock();
+    void startBlock();
     bool execute(const Code &code, int vars);
+    void endBlock() {}
   };
 }

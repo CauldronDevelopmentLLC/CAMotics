@@ -20,9 +20,13 @@
 
 #include "PlannerConfig.h"
 
+#include <gcode/Codes.h>
+
+#include <cbang/log/Logger.h>
 #include <cbang/json/JSON.h>
 
 #include <limits>
+#include <cctype>
 
 using namespace GCode;
 using namespace cb;
@@ -34,6 +38,19 @@ PlannerConfig::PlannerConfig() :
   junctionAccel(100000), minSoftLimit(numeric_limits<double>::quiet_NaN()),
   maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
   maxArcError(0.01), maxLookahead(4096) {}
+
+
+bool PlannerConfig::hasOverride(const Code &code) const {
+  return overrides.find(code) != overrides.end();
+}
+
+
+const string &PlannerConfig::getOverride(const Code &code) const {
+  const auto it = overrides.find(code);
+  if (it != overrides.end()) return it->second;
+
+  THROWS("Override code " << code << " not found");
+}
 
 
 void PlannerConfig::read(const JSON::Value &value) {
@@ -55,6 +72,14 @@ void PlannerConfig::read(const JSON::Value &value) {
   minTravel = value.getNumber("min-travel", minTravel);
   maxArcError = value.getNumber("max-arc-error", maxArcError);
   maxLookahead = value.getNumber("max-lookahead", maxLookahead);
+
+  programStart = value.getString("program-start", "");
+
+  if (value.hasDict("overrides")) {
+    const JSON::Dict &dict = value.getDict("overrides");
+    for (unsigned i = 0; i < dict.size(); i++)
+      overrides[Code::parse(dict.keyAt(i))] = dict.getString(i);
+  }
 }
 
 
@@ -85,6 +110,17 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.insert("min-travel", minTravel);
   sink.insert("max-arc-error", maxArcError);
   sink.insert("max-lookahead", maxLookahead);
+
+  if (!programStart.empty()) sink.insert("program-start", programStart);
+
+  if (!overrides.empty()) {
+    sink.insertDict("overrides");
+
+    for (auto const &i : overrides)
+      sink.insert(SSTR(i.first), i.second);
+
+    sink.endDict();
+  }
 
   sink.endDict();
 }

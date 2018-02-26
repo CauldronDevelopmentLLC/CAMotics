@@ -59,8 +59,7 @@ void Parser::parse(GCode::Tokenizer &tokenizer, Processor &processor,
 
 void Parser::parse(const InputSource &source, Processor &processor,
                    unsigned maxErrors) {
-  Scanner scanner(source);
-  GCode::Tokenizer tokenizer(scanner);
+  GCode::Tokenizer tokenizer(source);
 
   parse(tokenizer, processor, maxErrors);
 }

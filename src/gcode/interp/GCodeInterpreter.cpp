@@ -31,6 +31,7 @@
 #include <cbang/String.h>
 
 #include <cbang/log/Logger.h>
+#include <cbang/util/SmartFunctor.h>
 
 #include <cctype>
 
@@ -100,7 +101,8 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   vector<Word *> words;
   Comment *lastComment = 0;
 
-  controller.newBlock();
+  controller.startBlock();
+  SmartFunctor<Controller> callEndBlock(&controller, &Controller::endBlock);
 
   // Evaluate all expressions and set variables
   for (Block::iterator it = block->begin(); it != block->end(); it++) {

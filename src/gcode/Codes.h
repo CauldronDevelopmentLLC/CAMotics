@@ -35,6 +35,10 @@ namespace GCode {
     ModalGroup group;
     int vars;
     const char *description;
+
+    bool operator<(const Code &o) const;
+
+    static Code parse(const std::string &s);
   };
 
   std::ostream &operator<<(std::ostream &stream, const Code &code);

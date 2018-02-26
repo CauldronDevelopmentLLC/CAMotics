@@ -122,8 +122,7 @@ void GCodeHighlighter::setFormat(const Token &token, ColorComponent cc) {
 void GCodeHighlighter::highlightBlock(const QString &text) {
   try {
     QByteArray array = text.toUtf8();
-    Scanner scanner(InputSource(array.data(), array.length()));
-    GCode::Tokenizer tokenizer(scanner);
+    GCode::Tokenizer tokenizer(InputSource(array.data(), array.length()));
 
     // Deleted
     if (tokenizer.consume(DIV_TOKEN))

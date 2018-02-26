@@ -41,13 +41,13 @@ bool Tokenizer::isID(const string &id) const {
 
 
 void Tokenizer::comment() {
-  scanner.match(';');
+  scanner->match(';');
   current.setType(COMMENT_TOKEN);
 
   string value;
-  while (scanner.hasMore() && scanner.peek() != '\n') {
-    if (scanner.peek() != '\r') value.append(1, scanner.peek());
-    scanner.advance();
+  while (scanner->hasMore() && scanner->peek() != '\n') {
+    if (scanner->peek() != '\r') value.append(1, scanner->peek());
+    scanner->advance();
   }
 
   current.setValue(value);
@@ -55,16 +55,16 @@ void Tokenizer::comment() {
 
 
 void Tokenizer::parenComment() {
-  scanner.match('(');
+  scanner->match('(');
   current.setType(PAREN_COMMENT_TOKEN);
 
   string value;
-  while (scanner.hasMore() && scanner.peek() != ')') {
-    value.append(1, scanner.peek());
-    scanner.advance();
+  while (scanner->hasMore() && scanner->peek() != ')') {
+    value.append(1, scanner->peek());
+    scanner->advance();
   }
 
-  scanner.match(')');
+  scanner->match(')');
 
   current.setValue(value);
 }
@@ -73,7 +73,7 @@ void Tokenizer::parenComment() {
 void Tokenizer::number(bool positive) {
   string value;
   bool foundDot = false;
-  char c = scanner.peek();
+  char c = scanner->peek();
 
   do {
     if (c == '.') {
@@ -83,10 +83,10 @@ void Tokenizer::number(bool positive) {
 
     value.append(string(1, c));
 
-    scanner.advance();
-    scanner.skipWhiteSpace(whiteSpace);
-    if (!scanner.hasMore()) break;
-    c = scanner.peek();
+    scanner->advance();
+    scanner->skipWhiteSpace(whiteSpace);
+    if (!scanner->hasMore()) break;
+    c = scanner->peek();
 
   } while (isdigit(c) || (!foundDot && c == '.'));
 
@@ -103,13 +103,13 @@ void Tokenizer::number(bool positive) {
 void Tokenizer::id() {
   string value;
 
-  char c = scanner.peek();
+  char c = scanner->peek();
   while (isalpha(c) || c == '_') {
     value.append(string(1, c));
 
-    scanner.advance();
-    if (!scanner.hasMore()) break;
-    c = scanner.peek();
+    scanner->advance();
+    if (!scanner->hasMore()) break;
+    c = scanner->peek();
   }
 
   current.set(ID_TOKEN, value);
@@ -117,17 +117,17 @@ void Tokenizer::id() {
 
 
 void Tokenizer::next() {
-  scanner.skipWhiteSpace(whiteSpace);
+  scanner->skipWhiteSpace(whiteSpace);
 
-  cb::FileLocation start = scanner.getLocation();
+  cb::FileLocation start = scanner->getLocation();
 
-  if (!scanner.hasMore()) {
+  if (!scanner->hasMore()) {
     current.set(EOF_TOKEN, "");
     return;
   }
 
   bool needAdvance = true;
-  int c = scanner.peek();
+  int c = scanner->peek();
   switch (c) {
   case 0: current.set(EOF_TOKEN, ""); return;
 
@@ -143,8 +143,8 @@ void Tokenizer::next() {
     break;
 
   case '*':
-    scanner.advance();
-    if (scanner.peek() == '*') current.set(EXP_TOKEN, "**");
+    scanner->advance();
+    if (scanner->peek() == '*') current.set(EXP_TOKEN, "**");
     else {
       current.set(MUL_TOKEN, c);
       needAdvance = false;
@@ -171,7 +171,7 @@ void Tokenizer::next() {
       THROWS("Invalid character: '" << cb::String::escapeC(c) << "'");
   }
 
-  if (needAdvance) scanner.advance();
+  if (needAdvance) scanner->advance();
 
-  current.getLocation() = cb::LocationRange(start, scanner.getLocation());
+  current.getLocation() = cb::LocationRange(start, scanner->getLocation());
 }

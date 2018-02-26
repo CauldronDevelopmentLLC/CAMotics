@@ -80,5 +80,6 @@ namespace GCode {
 
     // From Controller
     double get(const std::string &name) const;
+    bool execute(const Code &code, int vars);
   };
 }
