@@ -160,6 +160,10 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 
   // Replan from zero velocity
   cmd->restart(position, config);
+
+  // Check if the restart was at the end of the command
+  if (!cmd->getLength()) delete cmds.pop_front();
+
   for (cmd = cmds.front(); cmd->next; cmd = cmd->next)
     plan(cmd);
 
