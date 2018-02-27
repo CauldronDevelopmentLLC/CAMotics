@@ -33,7 +33,8 @@ namespace GCode {
     PlannerConfig config;
 
     Interpreter interpreter;
-    std::vector<cb::SmartPointer<GCode::Tokenizer> > tokenizers;
+    typedef std::vector<cb::SmartPointer<GCode::Tokenizer> > tokenizers_t;
+    tokenizers_t tokenizers;
 
     bool started;
 

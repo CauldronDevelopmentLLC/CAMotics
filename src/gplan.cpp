@@ -469,7 +469,7 @@ static PyObject *_load_string(PyPlanner *self, PyObject *args) {
     // Convert Python object to JSON config
     if (_config) config.read(*pyToJSON(_config));
 
-    self->planner->load(cb::StringStreamInputSource(gcode, "MDI"), config);
+    self->planner->load(cb::StringStreamInputSource(gcode, "<MDI>"), config);
     Py_RETURN_NONE;
 
   } CATCH_PYTHON;

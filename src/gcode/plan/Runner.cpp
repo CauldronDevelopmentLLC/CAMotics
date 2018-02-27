@@ -23,6 +23,7 @@
 #include <gcode/Codes.h>
 
 #include <cbang/log/Logger.h>
+#include <cbang/util/SmartFunctor.h>
 
 #include <cbang/io/StringStreamInputSource.h>
 
@@ -54,18 +55,15 @@ void Runner::next() {
   started = true;
 
   while (!tokenizers.empty()) {
+    // Remove the top program on error or when complete
+    SmartFunctor<tokenizers_t> pop(&tokenizers, &tokenizers_t::pop_back);
+
     try {
-      if (interpreter.readBlock(*tokenizers.back())) return;
-      else tokenizers.pop_back();
-
-    } catch (const EndProgram &) {
-      tokenizers.pop_back();
-
-    } catch (const Exception &e) {
-      LOG_ERROR(tokenizers.back()->getLocation() << ":" << e.getMessage());
-      LOG_DEBUG(3, e);
-      tokenizers.clear();
-    }
+      if (interpreter.readBlock(*tokenizers.back())) {
+        pop.setEngaged(false); // Don't pop
+        return;
+      }
+    } catch (const EndProgram &) {}
   }
 }
 
