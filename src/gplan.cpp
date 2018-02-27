@@ -294,13 +294,7 @@ std::string PyUnicode_ToStdString(PyObject *o) {
 cb::SmartPointer<cb::JSON::Value> pyToJSON(PyObject *o) {
   if (!o) return cb::JSON::Null::instancePtr();
 
-#if PY_MAJOR_VERSION >= 3
-    int const isString = PyBytes_Check(o) || PyUnicode_Check(o);
-#else
-    int const isString = PyString_Check(o) || PyUnicode_Check(o);
-#endif
-
-  if (!isString && PyMapping_Check(o)) {
+  if (PyDict_Check(o)) {
     cb::SmartPointer<cb::JSON::Value> dict = new cb::JSON::Dict;
     PyObject *items = PyMapping_Items(o);
     if (!items) THROW("Expected items");
