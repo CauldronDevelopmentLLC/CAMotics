@@ -166,12 +166,12 @@ void GCodeMachine::changeTool(unsigned tool) {
 
 
 void GCodeMachine::input(port_t port, input_mode_t mode, double timeout) {
-  // TODO
+  // TODO Output GCode for machine.input()
 }
 
 
 void GCodeMachine::seek(port_t port, bool active, bool error) {
-  // TODO
+  // TODO Output GCode for machine.seek()
 }
 
 

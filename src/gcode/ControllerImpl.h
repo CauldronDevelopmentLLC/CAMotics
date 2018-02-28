@@ -137,6 +137,8 @@ namespace GCode {
     // Offsets
     void setCoordSystem(unsigned cs);
     void setCoordSystemOffsets(int vars, bool relative);
+    double getAxisGlobalOffset(char axis) const;
+    void setAxisGlobalOffset(char axis, double offset);
     void setGlobalOffsets(int vars);
     void resetGlobalOffsets(bool clear);
     void restoreGlobalOffsets();

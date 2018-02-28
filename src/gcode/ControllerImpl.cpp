@@ -553,8 +553,7 @@ void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
   if (!cs) cs = get(CURRENT_COORD_SYSTEM);
 
   if (vars & VarTypes::VT_R) {
-    // TODO
-    LOG_WARNING("Coordinate system rotation not supported");
+    LOG_WARNING("Coordinate system rotation not supported"); // TODO
     set(COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER), getVar('R'));
   }
 
@@ -568,18 +567,24 @@ void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
 }
 
 
+double ControllerImpl::getAxisGlobalOffset(char axis) const {
+  return get(GLOBAL_OFFSET_ADDR(Axes::toIndex(axis)));
+}
+
+
+void ControllerImpl::setAxisGlobalOffset(char axis, double offset) {
+  set(GLOBAL_OFFSET_ADDR(Axes::toIndex(axis)), offset);
+}
+
+
 void ControllerImpl::setGlobalOffsets(int vars) {
-  // TODO Test G52/G92
   set(GLOBAL_OFFSETS_ENABLED, 1);
 
   // Make the current point have the coordinates specified, without motion
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
-      double offset = getVar(*axis) - getAxisPosition(*axis);
-      address_t addr = GLOBAL_OFFSET_ADDR(Axes::toIndex(*axis));
-
-      // Update global offset
-      set(addr, get(addr) + offset);
+      double diff = getAxisPosition(*axis) - getVar(*axis);
+      setAxisGlobalOffset(*axis, getAxisGlobalOffset(*axis) - diff);
     }
 }
 
@@ -620,16 +625,17 @@ void ControllerImpl::setHomed(int vars, bool homed) {
       if (homed) {
         set(SSTR("_" << (char)tolower(*axis) << "_home"), getVar(*axis));
         setAxisAbsolutePosition(*axis, getVar(*axis));
+        setAxisGlobalOffset(*axis, 0);
       }
     }
 
+  // Notify machine that axis positions have changed
   if (homed) machine.setPosition(getAbsolutePosition());
 }
 
 
 void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
-  // TODO
-  LOG_WARNING("Cutter radius compensation not implemented");
+  LOG_WARNING("Cutter radius compensation not implemented"); // TODO
 
   if (dynamic) {
     set(TOOL_DIAMETER, (left ? 1 : -1) * getVar('D'));
@@ -665,8 +671,7 @@ void ControllerImpl::end() {
   // Feed rate mode is set to units per minute (G94)
   setFeedMode(MachineInterface::UNITS_PER_MINUTE);
 
-  // Feed and speed overrides are set to on (M48)
-  // TODO
+  // TODO Feed and speed overrides are set to on (M48)
 
   // Cutter compensation is turned off (G40)
   cutterRadiusComp = false;
