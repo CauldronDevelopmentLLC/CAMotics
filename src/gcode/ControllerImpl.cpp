@@ -253,14 +253,14 @@ Axes ControllerImpl::getAbsolutePosition() const {
   for (const char *axes = Axes::AXES; *axes; axes++)
     pos.set(*axes, getAxisAbsolutePosition(*axes));
 
-  LOG_INFO(5, "Controller: Current absolute position is " << pos);
+  LOG_INFO(5, "Controller: Current absolute position is " << pos << "mm");
 
   return pos;
 }
 
 
 void ControllerImpl::setAbsolutePosition(const Axes &axes) {
-  LOG_INFO(5, "Controller: Set absolute position to " << axes);
+  LOG_INFO(5, "Controller: Set absolute position to " << axes << "mm");
 
   for (const char *var = Axes::AXES; *var; var++)
     setAxisAbsolutePosition(*var, axes.get(*var));
@@ -281,7 +281,7 @@ Axes ControllerImpl::getNextAbsolutePosition(int vars, bool incremental) const {
 
     } else position.set(*axis, getAxisAbsolutePosition(*axis));
 
-  LOG_INFO(5, "Controller: Next absolute position is " << position);
+  LOG_INFO(5, "Controller: Next absolute position is " << position << "mm");
 
   return position;
 }
@@ -367,9 +367,9 @@ void ControllerImpl::arc(int vars, bool clockwise) {
     double radiusDiff = fabs(radius - finish.distance(center));
     if ((machine.isImperial() && 0.0002 < radiusDiff) ||
         (machine.isMetric() && 0.002 < radiusDiff)) {
-      LOG_WARNING("Arc radiuses differ by " << radiusDiff);
-      LOG_DEBUG(1, " center=" << center << " start=" << start << " finish="
-                << finish << " offset=" << offset);
+      LOG_WARNING("Arc radiuses differ by " << radiusDiff << "mm");
+      LOG_DEBUG(1, "center=" << center << "start=" << start
+                << "finish=" << finish << "offset=" << offset);
     }
   }
 

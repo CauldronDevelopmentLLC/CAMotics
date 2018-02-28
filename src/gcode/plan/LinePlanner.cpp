@@ -80,14 +80,14 @@ void LinePlanner::checkSoftLimits(const Axes &p) {
       if (isfinite(config.minSoftLimit[axis]) &&
           p[axis] < config.minSoftLimit[axis])
         THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
-               << " less than minimum soft limit "
-               << config.minSoftLimit[axis]);
+               << "mm less than minimum soft limit "
+               << config.minSoftLimit[axis] << "mm");
 
       if (isfinite(config.maxSoftLimit[axis]) &&
           config.maxSoftLimit[axis] < p[axis])
         THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
-               << " greater than maximum soft limit "
-               << config.maxSoftLimit[axis]);
+               << "mm greater than maximum soft limit "
+               << config.maxSoftLimit[axis] << "mm");
     }
 }
 
@@ -434,8 +434,8 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
 
     if (lengthRemain < -config.minTravel)
       THROWS("Velocity transition exceeds length by " << -lengthRemain
-             << " required=" << lc.length << " computed=" << length
-             << " Vt=" << Vt);
+             << "mm required=" << lc.length << "mm computed=" << length
+             << "mm Vt=" << Vt);
 
     // If there is appreciable length left, add a constant velocity segment
     if (config.minTravel < lengthRemain) lc.times[3] = lengthRemain / Vt;

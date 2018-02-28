@@ -77,7 +77,7 @@ void LineCommand::computeLimits(const Axes &start,
   length = delta.length();
 
   if (!length) return; // Ignore null move
-  if (!isfinite(length)) THROWS("Invalid length");
+  if (!isfinite(length)) THROWS("Invalid length " << length);
 
   // Compute unit vector
   unit = delta / length;

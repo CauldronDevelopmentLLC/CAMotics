@@ -50,5 +50,5 @@ void Machine::move(Move &move) {
 
   stream.move(move);
 
-  LOG_INFO(3, "Machine: Move to " << move.getEndPt());
+  LOG_INFO(3, "Machine: Move to " << move.getEndPt() << "mm");
 }
