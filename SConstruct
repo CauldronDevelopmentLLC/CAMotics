@@ -310,7 +310,7 @@ if 'package' in COMMAND_LINE_TARGETS:
                    '--release', '--no-translations', 'camotics.exe']
 
             if subprocess.call(cmd):
-                raise Exception, 'Call to windeployqt failed'
+                raise Exception('Call to windeployqt failed')
 
             for name in os.listdir('build/win32'):
                 if 'vcredist' in name: env['VCREDIST'] = name

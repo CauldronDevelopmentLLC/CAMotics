@@ -43,7 +43,6 @@ public:
     CAMotics::Application("CAMotics GCode Path Planner") {
     cmdLine.add("json", "JSON configuration or configuration file"
                 )->setType(Option::STRING_TYPE);
-    cmdLine.add("tinyg", "Use the TinyG planner")->setDefault(false);
   }
 
 

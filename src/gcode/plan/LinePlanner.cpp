@@ -314,7 +314,7 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
   while (cmd->next) {
     cmd = cmd->next;
     velocity -= cmd->getDeltaVelocity();
-    if (velocity <= 0) return true;
+    if (velocity <= Math::nextUp(0)) return true;
     if (config.maxLookahead <= ++count)
       THROWS("Planner exceeded max lookahead (" << config.maxLookahead << ")");
   }
@@ -395,7 +395,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
   double length = computeLength(Vi, Vt, lc.maxAccel, lc.maxJerk);
 
   // Check if velocity change fits
-  if (lc.length < length) {
+  if (lc.length < Math::nextDown(length)) {
     // Velocity change does not fit, compute a lower target velocity
     length = lc.length; // New target velocity will fit exactly
     Vt = peakVelocity(Vi, lc.maxAccel, lc.maxJerk, length);
@@ -425,7 +425,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
   for (int i = 0; i < 7; i++) lc.times[i] = 0;
 
   // Plan curve segments
-  if ((0.95 * lc.length <= length && length <= lc.length) ||
+  if ((0.95 * lc.length <= length && length <= Math::nextUp(lc.length)) ||
       lc.maxVel * 0.95 < Vt) {
     // Exact or near fit or target velocity is close to max, compute simple
     // velocity transition.
@@ -469,6 +469,14 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
         // Does not fit, try a lower velocity
         maxVel = peakVel;
         peakVel = minVel + (peakVel - minVel) / 2;
+
+        // Quit trying if we are really close to minVel
+        if (peakVel < minVel + 0.0001) {
+          LOG_WARNING("peakVel=" << peakVel << " bodyLen=" << bodyLen
+                      << " length=" << length << " lc.length=" << lc.length);
+          peakVel = minVel;
+          break;
+        }
       }
     }
 
@@ -502,7 +510,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
 
 bool LinePlanner::isAccelLimited(double Vi, double Vt, double maxAccel,
                                  double maxJerk) const {
-  return Vi + square(maxAccel) / maxJerk < Vt;
+  return Vi + square(maxAccel) / maxJerk < Math::nextDown(Vt);
 }
 
 
@@ -633,7 +641,7 @@ double LinePlanner::peakVelocity(double Vi, double maxAccel, double maxJerk,
   double peakAccel = peakAccelFromLength(Vi, maxJerk, length);
   double Vp;
 
-  if (fabs(maxAccel) < fabs(peakAccel)) {
+  if (fabs(maxAccel) < Math::nextDown(fabs(peakAccel))) {
     // With constant accel period
     //
     // Solve:
@@ -650,7 +658,7 @@ double LinePlanner::peakVelocity(double Vi, double maxAccel, double maxJerk,
   } else Vp = Vi + square(peakAccel) / maxJerk; // No constant accel period
 
   if (!isfinite(Vp)) THROW("Invalid peak velocity");
-  if (Vp < 0) Vp = 0;
+  if (Vp <= Math::nextUp(0)) Vp = 0;
 
   LOG_DEBUG(3, "peakVelocity(" << Vi << ", " << maxAccel << ", " << maxJerk
             << ", length=" << length << ") = " << Vp << " with"

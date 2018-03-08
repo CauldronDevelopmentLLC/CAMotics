@@ -202,8 +202,7 @@ void GCodeMachine::dwell(double seconds) {
 
 
 bool is_near(double x, double y) {
-  return y - 2 * numeric_limits<double>::epsilon() <= x &&
-    x <= y + numeric_limits<double>::epsilon() * 2;
+  return Math::nextDown(y) <= x && x <= Math::nextUp(y);
 }
 
 
