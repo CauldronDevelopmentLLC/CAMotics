@@ -40,11 +40,11 @@ MachineState::MachineState() :
   memset(params, 0, sizeof(params));
 
   // Coordinate system
-  set(CURRENT_COORD_SYSTEM, 1);
+  set(CURRENT_COORD_SYSTEM, 1, NO_UNITS);
 
   // Tool
-  set("_selected_tool", -1);
-  set(TOOL_NUMBER, -1);
+  set("_selected_tool", -1, NO_UNITS);
+  set(TOOL_NUMBER, -1, NO_UNITS);
 }
 
 
@@ -59,19 +59,19 @@ void MachineState::end() {
 
 void MachineState::setFeed(double feed) {
   this->feed = feed;
-  set("_feed", feed);
+  set("_feed", feed, METRIC);
 }
 
 
 void MachineState::setSpeed(double speed) {
   this->speed = speed;
-  set("_speed", speed);
+  set("_speed", speed, NO_UNITS);
 }
 
 
 void MachineState::changeTool(unsigned tool) {
-  set(TOOL_NUMBER, tool);
-  set("_tool", tool);
+  set(TOOL_NUMBER, tool, NO_UNITS);
+  set("_tool", tool, NO_UNITS);
 }
 
 
@@ -97,13 +97,14 @@ void MachineState::setMatrix(const Matrix4x4D &m, axes_t matrix) {
 }
 
 
-double MachineState::get(address_t addr) const {
-  return addr < MAX_ADDRESS ? params[addr] : params[0];
+double MachineState::get(address_t addr, Units units) const {
+  if (MAX_ADDRESS <= addr) return 0;
+  return convert(params[addr].units, units, params[addr].value);
 }
 
 
-void MachineState::set(address_t addr, double value) {
-  if (addr < MAX_ADDRESS) params[addr] = value;
+void MachineState::set(address_t addr, double value, Units units) {
+  if (addr < MAX_ADDRESS) params[addr] = {value, units};
 }
 
 
@@ -112,10 +113,13 @@ bool MachineState::has(const string &name) const {
 }
 
 
-double MachineState::get(const string &name) const {
+double MachineState::get(const string &name, Units units) const {
   named_t::const_iterator it = named.find(name);
-  return it == named.end() ? 0 : it->second;
+  if (it == named.end()) return 0;
+  return convert(it->second.units, units, it->second.value);
 }
 
 
-void MachineState::set(const string &name, double value) {named[name] = value;}
+void MachineState::set(const string &name, double value, Units units) {
+  named[name] = {value, units};
+}

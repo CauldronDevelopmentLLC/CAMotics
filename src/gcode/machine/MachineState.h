@@ -44,8 +44,13 @@ namespace GCode {
     cb::Matrix4x4D matrices[AXES_COUNT];
 
     // Numbered and named parameters
-    double params[MAX_ADDRESS];
-    typedef std::map<std::string, double> named_t;
+    typedef struct {
+      double value;
+      Units::enum_t units;
+    } param_t;
+
+    param_t params[MAX_ADDRESS];
+    typedef std::map<std::string, param_t> named_t;
     named_t named;
 
     cb::LocationRange location;
@@ -88,12 +93,12 @@ namespace GCode {
 
     void pause(pause_t type) {}
 
-    double get(address_t addr) const;
-    void set(address_t addr, double value);
+    double get(address_t addr, Units units) const;
+    void set(address_t addr, double value, Units units);
 
     bool has(const std::string &name) const;
-    double get(const std::string &name) const;
-    void set(const std::string &name, double value);
+    double get(const std::string &name, Units units) const;
+    void set(const std::string &name, double value, Units units);
 
     const cb::LocationRange &getLocation() const {return location;}
     void setLocation(const cb::LocationRange &location)

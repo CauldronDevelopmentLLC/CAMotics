@@ -91,12 +91,16 @@ namespace GCode {
 
     void pause(pause_t type) {parent->pause(type);}
 
-    double get(address_t addr) const {return parent->get(addr);}
-    void set(address_t addr, double value) {parent->set(addr, value);}
+    double get(address_t addr, Units units) const
+    {return parent->get(addr, units);}
+    void set(address_t addr, double value, Units units)
+    {parent->set(addr, value, units);}
 
     bool has(const std::string &name) const {return parent->has(name);}
-    double get(const std::string &name) const {return parent->get(name);}
-    void set(const std::string &name, double value) {parent->set(name, value);}
+    double get(const std::string &name, Units units) const
+    {return parent->get(name, units);}
+    void set(const std::string &name, double value, Units units)
+    {parent->set(name, value, units);}
 
     const cb::LocationRange &getLocation() const {return parent->getLocation();}
     void setLocation(const cb::LocationRange &location)

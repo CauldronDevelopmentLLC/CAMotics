@@ -28,8 +28,22 @@ using namespace GCode;
 
 
 Planner::Planner() : ControllerImpl(pipeline) {
+  class ParamResolver : public MachineAdapter {
+    Planner &planner;
+
+  public:
+    ParamResolver(Planner &planner) : planner(planner) {}
+
+    // From MachineInterface
+    double get(const string &name, Units units) const {
+      if (MachineAdapter::has(name)) return MachineAdapter::get(name, units);
+      return planner.resolve(name, units);
+    }
+  };
+
   pipeline.add(SmartPointer<MachineUnitAdapter>::Phony(&unitAdapter));
   pipeline.add(SmartPointer<MachineLinearizer>::Phony(&linearizer));
+  pipeline.add(new ParamResolver(*this));
   pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
 }
 
@@ -101,9 +115,8 @@ void Planner::restart(uint64_t id, const Axes &position) {
 }
 
 
-double Planner::get(const string &name) const {
-  if (ControllerImpl::has(name)) return ControllerImpl::get(name);
-  return resolver.isNull() ? 0 : resolver->get(name);
+double Planner::resolve(const string &name, Units units) const {
+  return resolver.isNull() ? 0 : convert(METRIC, units, resolver->get(name));
 }
 
 

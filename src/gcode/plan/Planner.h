@@ -76,9 +76,9 @@ namespace GCode {
     void setActive(uint64_t id);
     void stop();
     void restart(uint64_t id, const Axes &position);
+    double resolve(const std::string &name, Units units) const;
 
     // From Controller
-    double get(const std::string &name) const;
     bool execute(const Code &code, int vars);
   };
 }

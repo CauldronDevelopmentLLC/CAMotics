@@ -154,7 +154,7 @@ void GCodeMachine::setSpinMode(spin_mode_t mode, double max) {
 
 
 void GCodeMachine::changeTool(unsigned tool) {
-  unsigned currentTool = get(TOOL_NUMBER);
+  unsigned currentTool = get(TOOL_NUMBER, NO_UNITS);
 
   MachineAdapter::changeTool(tool);
 

@@ -244,7 +244,7 @@ void GCodeModule::toolCB(const js::Value &args, js::Sink &sink) {
     number = args.getInteger("number");
     ctx.machine.changeTool(number);
 
-  } else number = ctx.machine.get(TOOL_NUMBER);
+  } else number = ctx.machine.get(TOOL_NUMBER, Units::NO_UNITS);
 
   if (number < 0) return;
 

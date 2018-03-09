@@ -27,7 +27,7 @@
 
 
 namespace GCode {
-  class MachineUnitAdapter : virtual public MachineAdapter, public Units {
+  class MachineUnitAdapter : virtual public MachineAdapter {
   protected:
     Units units;
     Units targetUnits;

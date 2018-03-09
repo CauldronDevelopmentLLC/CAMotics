@@ -23,6 +23,7 @@
 #include "MachineEnum.h"
 
 #include <gcode/Axes.h>
+#include <gcode/Units.h>
 #include <gcode/Addresses.h>
 
 #include <cbang/Exception.h>
@@ -33,7 +34,7 @@
 namespace GCode {
   class MachineMatrix;
 
-  class MachineInterface : public MachineEnum {
+  class MachineInterface : public MachineEnum, public UnitsEnumerationBase {
   public:
     virtual ~MachineInterface() {}
 
@@ -196,13 +197,13 @@ namespace GCode {
     virtual void pause(pause_t type) = 0;
 
     // Number parameters
-    virtual double get(address_t addr) const = 0;
-    virtual void set(address_t addr, double value) = 0;
+    virtual double get(address_t addr, Units units) const = 0;
+    virtual void set(address_t addr, double value, Units units) = 0;
 
     // Named parameters
     virtual bool has(const std::string &name) const = 0;
-    virtual double get(const std::string &name) const = 0;
-    virtual void set(const std::string &name, double value) = 0;
+    virtual double get(const std::string &name, Units units) const = 0;
+    virtual void set(const std::string &name, double value, Units units) = 0;
 
     /// Get program location
     virtual const cb::LocationRange &getLocation() const = 0;

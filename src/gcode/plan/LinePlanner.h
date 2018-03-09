@@ -71,7 +71,7 @@ namespace GCode {
     void move(const Axes &axes, bool rapid);
     //void arc(const Axes &offset, double angle, plane_t plane);
     void pause(pause_t type);
-    void set(const std::string &name, double value);
+    void set(const std::string &name, double value, Units units);
     void setLocation(const cb::LocationRange &location);
     void message(const std::string &s);
 

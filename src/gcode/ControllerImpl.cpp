@@ -37,8 +37,8 @@ using namespace GCode;
 
 ControllerImpl::ControllerImpl(MachineInterface &machine,
                                const ToolTable &tools) :
-  tools(tools), syncState(SYNC_NONE), currentMotionMode(10),
-  plane(MachineInterface::XY),
+  tools(tools), syncState(SYNC_NONE), offsetParamChanged(false),
+  currentMotionMode(10), plane(MachineInterface::XY),
   latheDiameterMode(true), cutterRadiusComp(false), toolLengthComp(false),
   pathMode(EXACT_PATH_MODE), returnMode(RETURN_TO_R),
   motionBlendingTolerance(0), naiveCamTolerance(0),
@@ -101,18 +101,23 @@ VarTypes::enum_t ControllerImpl::getVarType(char letter) {
 }
 
 
+Units ControllerImpl::getUnits() const {return machine.getUnits();}
+
+
 void ControllerImpl::setUnits(Units units) {
   switch (units) {
-    case Units::METRIC:
+  case Units::NO_UNITS: THROW("Cannot set to NO_UNITS");
+
+  case Units::METRIC:
     machine.setMetric();
-    machine.set("_metric", 1);
-    machine.set("_imperial", 0);
+    set("_metric", 1, NO_UNITS);
+    set("_imperial", 0, NO_UNITS);
     break;
 
-    case Units::IMPERIAL:
+  case Units::IMPERIAL:
     machine.setImperial();
-    machine.set("_metric", 0);
-    machine.set("_imperial", 1);
+    set("_metric", 0, NO_UNITS);
+    set("_imperial", 1, NO_UNITS);
     break;
   }
 }
@@ -129,13 +134,13 @@ void ControllerImpl::setSpindleDir(dir_t dir) {
 
 void ControllerImpl::setMistCoolant(bool enable) {
   machine.output(MachineEnum::MIST, enable);
-  machine.set("_mist", enable);
+  set("_mist", enable, NO_UNITS);
 }
 
 
 void ControllerImpl::setFloodCoolant(bool enable) {
   machine.output(MachineEnum::FLOOD, enable);
-  machine.set("_flood", enable);
+  set("_flood", enable, NO_UNITS);
 }
 
 
@@ -216,7 +221,8 @@ double ControllerImpl::getAxisOffset(char axis) const {
   double offset = get(COORD_SYSTEM_ADDR(cs, axisIndex));
 
   // Coordinate system rotation
-  if (get(COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER))) {
+  address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
+  if (get(addr)) {
     // TODO XY plane rotation
   }
 
@@ -242,8 +248,8 @@ void ControllerImpl::setAxisAbsolutePosition(char axis, double pos) {
   position.set(axis, pos);
 
   pos += getAxisOffset(axis);
-  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos);
-  set("_" + string(1, tolower(axis)), pos);
+  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos, getUnits());
+  set("_" + string(1, tolower(axis)), pos, getUnits());
 }
 
 
@@ -514,36 +520,41 @@ void ControllerImpl::toolChange() {
 void ControllerImpl::loadToolOffsets(unsigned number) {
   const Tool &tool = getTool(number);
 
-  for (const char *axis = Axes::AXES; *axis; axis++)
-    set(TOOL_OFFSET_ADDR(Axes::toIndex(*axis)), tool.get(*axis));
+  for (const char *axis = Axes::AXES; *axis; axis++) {
+    address_t addr = TOOL_OFFSET_ADDR(Axes::toIndex(*axis));
+    set(addr, tool.get(*axis), getUnits());
+  }
 }
 
 
 void ControllerImpl::loadToolVarOffsets(int vars) {
   for (const char *axis = Axes::AXES; *axis; axis++)
-    if (vars & getVarType(*axis))
+    if (vars & getVarType(*axis)) {
       // TODO do these need to be offset?
-      set(TOOL_OFFSET_ADDR(Axes::toIndex(*axis)), getVar(*axis));
+      address_t addr = TOOL_OFFSET_ADDR(Axes::toIndex(*axis));
+      set(addr, getVar(*axis), getUnits());
+    }
 }
 
 
 void ControllerImpl::storePredefined(bool first) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     set(PREDEFINED_ADDR(first, Axes::toIndex(*axis)),
-        getAxisAbsolutePosition(*axis));
+                getAxisAbsolutePosition(*axis), getUnits());
 }
 
 
 void ControllerImpl::loadPredefined(bool first, int vars) {
   for (const char *axis = Axes::AXES; *axis; axis++)
-    if (vars & getVarType(*axis))
-      setAxisAbsolutePosition
-        (*axis, get(PREDEFINED_ADDR(first, Axes::toIndex(*axis))));
+    if (vars & getVarType(*axis)) {
+      address_t addr = PREDEFINED_ADDR(first, Axes::toIndex(*axis));
+      setAxisAbsolutePosition(*axis, get(addr));
+    }
 }
 
 
 void ControllerImpl::setCoordSystem(unsigned cs) {
-  set(CURRENT_COORD_SYSTEM, cs);
+  set(CURRENT_COORD_SYSTEM, cs, NO_UNITS);
 }
 
 
@@ -554,7 +565,8 @@ void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
 
   if (vars & VarTypes::VT_R) {
     LOG_WARNING("Coordinate system rotation not supported"); // TODO
-    set(COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER), getVar('R'));
+    address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
+    set(addr, getVar('R'), NO_UNITS);
   }
 
   for (const char *axis = Axes::AXES; *axis; axis++)
@@ -562,7 +574,8 @@ void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
       double offset = getVar(*axis);
       if (relative) offset -= getAxisPosition(*axis);
 
-      set(COORD_SYSTEM_ADDR(cs, Axes::toIndex(*axis)), offset);
+      address_t addr = COORD_SYSTEM_ADDR(cs, Axes::toIndex(*axis));
+      set(addr, offset, getUnits());
     }
 }
 
@@ -573,12 +586,12 @@ double ControllerImpl::getAxisGlobalOffset(char axis) const {
 
 
 void ControllerImpl::setAxisGlobalOffset(char axis, double offset) {
-  set(GLOBAL_OFFSET_ADDR(Axes::toIndex(axis)), offset);
+  set(GLOBAL_OFFSET_ADDR(Axes::toIndex(axis)), offset, getUnits());
 }
 
 
 void ControllerImpl::setGlobalOffsets(int vars) {
-  set(GLOBAL_OFFSETS_ENABLED, 1);
+  set(GLOBAL_OFFSETS_ENABLED, 1, NO_UNITS);
 
   // Make the current point have the coordinates specified, without motion
   for (const char *axis = Axes::AXES; *axis; axis++)
@@ -590,28 +603,34 @@ void ControllerImpl::setGlobalOffsets(int vars) {
 
 
 void ControllerImpl::resetGlobalOffsets(bool clear) {
-  set(GLOBAL_OFFSETS_ENABLED, 0);
+  set(GLOBAL_OFFSETS_ENABLED, 0, NO_UNITS);
 
   if (clear)
     for (unsigned axis = 0; axis < 9; axis++)
-      set(GLOBAL_OFFSET_ADDR(axis), 0);
+      set(GLOBAL_OFFSET_ADDR(axis), 0, getUnits());
 }
 
 
-void ControllerImpl::restoreGlobalOffsets() {set(GLOBAL_OFFSETS_ENABLED, 1);}
+void ControllerImpl::restoreGlobalOffsets() {
+  set(GLOBAL_OFFSETS_ENABLED, 1, NO_UNITS);
+}
 
 
 void ControllerImpl::updateOffsetParams() {
+  if (!offsetParamChanged) return;
+  offsetParamChanged = false;
+
   for (const char *axis = Axes::AXES; *axis; axis++) {
     string name = "_offset_" + string(1, tolower(*axis));
     double offset = getAxisOffset(*axis);
 
     if (offset != get(name)) {
-      set(name, offset);
+      set(name, offset, getUnits());
 
       double position = getAxisAbsolutePosition(*axis) + offset;
-      set(CURRENT_COORD_ADDR(Axes::toIndex(*axis)), position);
-      set("_" + string(1, tolower(*axis)), position);
+      address_t addr = CURRENT_COORD_ADDR(Axes::toIndex(*axis));
+      set(addr, position, getUnits());
+      set("_" + string(1, tolower(*axis)), position, getUnits());
     }
   }
 }
@@ -620,10 +639,12 @@ void ControllerImpl::updateOffsetParams() {
 void ControllerImpl::setHomed(int vars, bool homed) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
-      set(SSTR("_" << (char)tolower(*axis) << "_homed"), homed);
+      string name = SSTR("_" << (char)tolower(*axis) << "_homed");
+      set(name, homed, NO_UNITS);
 
       if (homed) {
-        set(SSTR("_" << (char)tolower(*axis) << "_home"), getVar(*axis));
+        string name = SSTR("_" << (char)tolower(*axis) << "_home");
+        set(name, getVar(*axis), getUnits());
         setAxisAbsolutePosition(*axis, getVar(*axis));
         setAxisGlobalOffset(*axis, 0);
       }
@@ -638,17 +659,23 @@ void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
   LOG_WARNING("Cutter radius compensation not implemented"); // TODO
 
   if (dynamic) {
-    set(TOOL_DIAMETER, (left ? 1 : -1) * getVar('D'));
-    if (vars & VT_L) set(TOOL_ORIENTATION, getVar('L'));
-    else set(TOOL_ORIENTATION, 0);
+    set(TOOL_DIAMETER, (left ? 1 : -1) * getVar('D'), getUnits());
+    if (vars & VT_L) set(TOOL_ORIENTATION, getVar('L'), NO_UNITS);
+    else set(TOOL_ORIENTATION, 0, NO_UNITS);
 
   } else {
-    set(TOOL_ORIENTATION, 0);
+    set(TOOL_ORIENTATION, 0, NO_UNITS);
 
-    if (!(vars & VT_D))
-      set(TOOL_DIAMETER, getTool(getCurrentTool()).getRadius() * 2);
-    else if (!getVar('D')) set(TOOL_DIAMETER, 0);
-    else set(TOOL_DIAMETER, getTool(getVar('D')).getRadius() * 2);
+    if (!(vars & VT_D)) {
+      double dia = getTool(getCurrentTool()).getRadius() * 2;
+      set(TOOL_DIAMETER, dia, getUnits());
+
+    } else if (!getVar('D')) set(TOOL_DIAMETER, 0, getUnits());
+
+    else {
+      double dia = getTool(getVar('D')).getRadius() * 2;
+      set(TOOL_DIAMETER, dia, getUnits());
+    }
   }
 
   cutterRadiusComp = true;
@@ -690,24 +717,40 @@ void ControllerImpl::end() {
 }
 
 
+double ControllerImpl::get(address_t addr, Units units) const {
+  return machine.get(addr, units);
+}
+
+
+void ControllerImpl::set(address_t addr, double value, Units units) {
+  machine.set(addr, value, units);
+
+  // Check if offsets have changed
+  if (GLOBAL_OFFSETS_ENABLED <= addr && addr <= CS9_ROTATION)
+    offsetParamChanged = true;
+}
+
+
+double ControllerImpl::get(const string &name, Units units) const {
+  return machine.get(name, units);
+}
+
+
+void ControllerImpl::set(const string &name, double value, Units units) {
+  machine.set(name, value, units);
+}
+
+
 void ControllerImpl::message(const string &text) {machine.message(text);}
 
 
 double ControllerImpl::get(address_t addr) const {
-  // TODO some values set by interpreter need to be converted to current units
-  return machine.get(addr);
+  return get(addr, getUnits());
 }
 
 
 void ControllerImpl::set(address_t addr, double value) {
-  if (machine.get(addr) == value) return;
-
-  // TODO some values set by interpreter need to be converted from current units
-  machine.set(addr, value);
-
-  // Check if offsets have changed
-  if (GLOBAL_OFFSETS_ENABLED <= addr && addr <= CS9_ROTATION)
-    updateOffsetParams();
+  set(addr, value, getUnits());
 }
 
 
@@ -715,14 +758,12 @@ bool ControllerImpl::has(const string &name) const {return machine.has(name);}
 
 
 double ControllerImpl::get(const string &name) const {
-  // TODO some values set by interpreter need to be converted to current units
-  return machine.get(name);
+  return get(name, getUnits());
 }
 
 
 void ControllerImpl::set(const string &name, double value) {
-  // TODO some values set by interpreter need to be converted from current units
-  machine.set(name, value);
+  set(name, value, getUnits());
 }
 
 
@@ -747,13 +788,13 @@ void ControllerImpl::synchronize(double result) {
   case SYNC_SEEK:
   case SYNC_PROBE:
     // Set probed position PROBE_RESULT_X-W and PROBE_SUCCESS
-    set(PROBE_SUCCESS, result);
+    set(PROBE_SUCCESS, result, NO_UNITS);
     for (const char *axis = Axes::AXES; *axis; axis++)
       set(PROBE_RESULT_ADDR(Axes::toIndex(*axis)),
-          getAxisAbsolutePosition(*axis));
+                  getAxisAbsolutePosition(*axis), getUnits());
     break;
 
-  case SYNC_INPUT: set(USER_INPUT, result); break;
+  case SYNC_INPUT: set(USER_INPUT, result, NO_UNITS); break;
   }
 
   syncState = SYNC_NONE;
@@ -785,7 +826,7 @@ void ControllerImpl::setSpeed(double speed) {
 
 
 void ControllerImpl::setTool(unsigned tool) {
-  machine.set("_selected_tool", tool);
+  set("_selected_tool", tool, NO_UNITS);
 }
 
 
@@ -1002,6 +1043,9 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
   default: implemented = false;
   }
+
+  // Update offsets
+  updateOffsetParams();
 
   // Don't log really common codes
   if (implemented && (40 < code.number || code.type != 'G'))

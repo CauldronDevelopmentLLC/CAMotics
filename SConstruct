@@ -50,8 +50,7 @@ if 'dist' in COMMAND_LINE_TARGETS:
     Return()
 
 
-have_cairo = False
-have_dxflib = False
+have_cairo, have_dxflib, have_python = False, False, False
 if not env.GetOption('clean'):
     # Qt5 needs C++11
     env.Replace(cxxstd = 'c++11')

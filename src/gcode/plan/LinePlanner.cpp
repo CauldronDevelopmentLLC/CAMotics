@@ -268,12 +268,12 @@ void LinePlanner::pause(pause_t type) {
 }
 
 
-void LinePlanner::set(const string &name, double value) {
-  if (MachineState::get(name) == value && !String::endsWith(name, "_home"))
-    return;
+void LinePlanner::set(const string &name, double value, Units units) {
+  if (MachineState::get(name, units) == value &&
+      !String::endsWith(name, "_home")) return;
 
-  MachineState::set(name, value);
-  pushSetCommand(name, value);
+  MachineState::set(name, value, units);
+  pushSetCommand(name, convert(units, METRIC, value));
 }
 
 

@@ -30,7 +30,9 @@
 
 namespace GCode {
   class ControllerImpl :
-    public Controller, public VarTypes, public ModalGroup, public MachineEnum {
+    public Controller, public VarTypesEnumerationBase,
+    public ModalGroupEnumerationBase, public MachineEnum,
+    public UnitsEnumerationBase {
 
     MachineUnitAdapter machine;
     ToolTable tools;
@@ -49,6 +51,7 @@ namespace GCode {
     } synchronize_state_t;
 
     synchronize_state_t syncState;
+    bool offsetParamChanged;
 
     // State variables
     unsigned currentMotionMode;
@@ -76,6 +79,7 @@ namespace GCode {
     static VarTypes::enum_t getVarType(char letter);
 
     // Units
+    Units getUnits() const;
     void setUnits(Units units);
 
     // Feed & speed
@@ -152,6 +156,12 @@ namespace GCode {
 
     // Program control
     void end();
+
+    // Params
+    double get(address_t addr, Units units) const;
+    void set(address_t addr, double value, Units units);
+    double get(const std::string &name, Units units) const;
+    void set(const std::string &name, double value, Units units);
 
     // From Controller
     void message(const std::string &text);

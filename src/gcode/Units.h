@@ -28,10 +28,20 @@
 #define CBANG_ENUM_PREFIX 0
 #include <cbang/enum/MakeEnumeration.def>
 
+namespace GCode {
+  static inline double convert(Units src, Units dst, double value) {
+    if (src == Units::IMPERIAL && dst == Units::METRIC) return value * 25.4;
+    if (src == Units::METRIC && dst == Units::IMPERIAL) return value / 25.4;
+    return value;
+  }
+}
+
+
 #endif // GCODE_UNITS_H
 #else // CBANG_ENUM_EXPAND
 
-CBANG_ENUM_EXPAND(IMPERIAL, 0)
-CBANG_ENUM_EXPAND(METRIC,   1)
+CBANG_ENUM_EXPAND(NO_UNITS, -1)
+CBANG_ENUM_EXPAND(IMPERIAL,  0)
+CBANG_ENUM_EXPAND(METRIC,    1)
 
 #endif // CBANG_ENUM_EXPAND

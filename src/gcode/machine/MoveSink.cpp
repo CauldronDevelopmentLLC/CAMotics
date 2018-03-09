@@ -42,12 +42,12 @@ void MoveSink::move(const Axes &axes, bool rapid) {
     MoveType type = rapid ? Move::MOVE_RAPID :
       (probePending ? Move::MOVE_PROBE : Move::MOVE_CUTTING);
 
-    if (get(TOOL_NUMBER) < 0 && !rapid) {
+    if (get(TOOL_NUMBER, NO_UNITS) < 0 && !rapid) {
       LOG_WARNING("Cutting move but no current tool, selecting tool 1");
-      set(TOOL_NUMBER, 1);
+      set(TOOL_NUMBER, 1, NO_UNITS);
     }
 
-    Move move(type, getPosition(), axes, time, get(TOOL_NUMBER),
+    Move move(type, getPosition(), axes, time, get(TOOL_NUMBER, NO_UNITS),
               getFeed(), getSpeed(), getLocation().getStart().getLine());
 
     time += move.getTime();
