@@ -208,7 +208,6 @@ namespace GCode {
     TOOL_ORIENTATION,
 
     // Current relative coordinates including all offsets in selected units
-    // TODO These are currently always in mm
 #define CURRENT_COORD_ADDR(AXIS) ((address_t)(CURRENT_X + (AXIS)))
 
     CURRENT_X = 5420,

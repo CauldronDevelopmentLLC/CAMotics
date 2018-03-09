@@ -21,6 +21,7 @@
 #include "MachineState.h"
 
 #include <cbang/Exception.h>
+#include <cbang/log/Logger.h>
 
 #include <string.h> // For memset()
 
@@ -45,6 +46,10 @@ MachineState::MachineState() :
   // Tool
   set("_selected_tool", -1, NO_UNITS);
   set(TOOL_NUMBER, -1, NO_UNITS);
+
+  // Units
+  set("_metric", 1, NO_UNITS);
+  set("_imperial", 0, NO_UNITS);
 }
 
 
@@ -99,11 +104,14 @@ void MachineState::setMatrix(const Matrix4x4D &m, axes_t matrix) {
 
 double MachineState::get(address_t addr, Units units) const {
   if (MAX_ADDRESS <= addr) return 0;
-  return convert(params[addr].units, units, params[addr].value);
+  double value = convert(params[addr].units, units, params[addr].value);
+  LOG_DEBUG(5, "get(" << addr << ", " << units << ") = " << value);
+  return value;
 }
 
 
 void MachineState::set(address_t addr, double value, Units units) {
+  LOG_DEBUG(5, "set(" << addr << ", " << value << ", " << units << ')');
   if (addr < MAX_ADDRESS) params[addr] = {value, units};
 }
 
@@ -116,10 +124,13 @@ bool MachineState::has(const string &name) const {
 double MachineState::get(const string &name, Units units) const {
   named_t::const_iterator it = named.find(name);
   if (it == named.end()) return 0;
-  return convert(it->second.units, units, it->second.value);
+  double value = convert(it->second.units, units, it->second.value);
+  LOG_DEBUG(5, "get(" << name << ", " << units << ") = " << value);
+  return value;
 }
 
 
 void MachineState::set(const string &name, double value, Units units) {
+  LOG_DEBUG(5, "set(" << name << ", " << value << ", " << units << ')');
   named[name] = {value, units};
 }

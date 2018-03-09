@@ -41,7 +41,7 @@ namespace GCode {
     static const int MAX_VAR = 26;
     double varValues[MAX_VAR];
 
-    Axes position;
+    Axes position; //< In current units
 
     typedef enum {
       SYNC_NONE,

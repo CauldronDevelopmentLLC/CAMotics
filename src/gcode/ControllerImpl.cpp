@@ -105,6 +105,8 @@ Units ControllerImpl::getUnits() const {return machine.getUnits();}
 
 
 void ControllerImpl::setUnits(Units units) {
+  if (units == machine.getUnits()) return;
+
   switch (units) {
   case Units::NO_UNITS: THROW("Cannot set to NO_UNITS");
 
@@ -112,12 +114,14 @@ void ControllerImpl::setUnits(Units units) {
     machine.setMetric();
     set("_metric", 1, NO_UNITS);
     set("_imperial", 0, NO_UNITS);
+    position = position * 25.4;
     break;
 
   case Units::IMPERIAL:
     machine.setImperial();
     set("_metric", 0, NO_UNITS);
     set("_imperial", 1, NO_UNITS);
+    position = position / 25.4;
     break;
   }
 }
@@ -175,7 +179,7 @@ void ControllerImpl::input(unsigned index, bool digital, input_mode_t mode,
 
   syncState = SYNC_INPUT; // Synchronize input result
   machine.input((port_t)((digital ? DIGITAL_IN_0 : ANALOG_IN_0) + index),
-               mode, timeout);
+                mode, timeout);
 }
 
 
@@ -212,7 +216,7 @@ const char *ControllerImpl::getPlaneOffsets() const {
 
 
 double ControllerImpl::getAxisOffset(char axis) const {
-  if (moveInAbsoluteCoords) return 0;
+  if (moveInAbsoluteCoords) return 0; // TODO could this affect non-move ops?
 
   unsigned axisIndex = Axes::toIndex(axis);
 
@@ -362,7 +366,7 @@ void ControllerImpl::arc(int vars, bool clockwise) {
     if (arcIncrementalDistanceMode) {
       offset =
         Vector2D((vars & getVarType(offsets[0])) ? getVar(offsets[0]) : 0,
-                  (vars & getVarType(offsets[1])) ? getVar(offsets[1]) : 0);
+                 (vars & getVarType(offsets[1])) ? getVar(offsets[1]) : 0);
       center = start + offset;
 
     } else center = Vector2D(getVar(offsets[0]) + getAxisOffset(axes[0]),
@@ -540,7 +544,7 @@ void ControllerImpl::loadToolVarOffsets(int vars) {
 void ControllerImpl::storePredefined(bool first) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     set(PREDEFINED_ADDR(first, Axes::toIndex(*axis)),
-                getAxisAbsolutePosition(*axis), getUnits());
+        getAxisAbsolutePosition(*axis), getUnits());
 }
 
 
@@ -624,7 +628,7 @@ void ControllerImpl::updateOffsetParams() {
     string name = "_offset_" + string(1, tolower(*axis));
     double offset = getAxisOffset(*axis);
 
-    if (offset != get(name)) {
+    if (!has(name) || offset != get(name)) {
       set(name, offset, getUnits());
 
       double position = getAxisAbsolutePosition(*axis) + offset;
@@ -791,7 +795,7 @@ void ControllerImpl::synchronize(double result) {
     set(PROBE_SUCCESS, result, NO_UNITS);
     for (const char *axis = Axes::AXES; *axis; axis++)
       set(PROBE_RESULT_ADDR(Axes::toIndex(*axis)),
-                  getAxisAbsolutePosition(*axis), getUnits());
+          getAxisAbsolutePosition(*axis), getUnits());
     break;
 
   case SYNC_INPUT: set(USER_INPUT, result, NO_UNITS); break;

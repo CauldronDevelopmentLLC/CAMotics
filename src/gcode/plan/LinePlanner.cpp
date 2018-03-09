@@ -80,13 +80,13 @@ void LinePlanner::checkSoftLimits(const Axes &p) {
       if (isfinite(config.minSoftLimit[axis]) &&
           p[axis] < config.minSoftLimit[axis])
         THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
-               << "mm less than minimum soft limit "
+               << "mm is less than minimum soft limit "
                << config.minSoftLimit[axis] << "mm");
 
       if (isfinite(config.maxSoftLimit[axis]) &&
           config.maxSoftLimit[axis] < p[axis])
         THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
-               << "mm greater than maximum soft limit "
+               << "mm is greater than maximum soft limit "
                << config.maxSoftLimit[axis] << "mm");
     }
 }
