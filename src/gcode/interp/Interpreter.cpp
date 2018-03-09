@@ -52,5 +52,11 @@ void Interpreter::operator()(const SmartPointer<Block> &block) {
   location.setCol(-1);
   SmartLogThreadPrefix prefix(SSTR(location << ":"));
 
-  OCodeInterpreter::operator()(block);
+  try {
+    OCodeInterpreter::operator()(block);
+
+  } catch (const Exception &e) {
+    throw Exception(SSTR(e.getMessage() << "\nWhile executing GCode block:"
+                         << *block), location, e);
+  }
 }
