@@ -251,8 +251,8 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   // Update state
   seeking = false;
 
-  // Null move
-  if (!lc->length) {
+  // Null or short move
+  if (lc->length < 0.000000001) {
     delete lc;
     return;
   }
