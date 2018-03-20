@@ -22,8 +22,9 @@
 
 #include <gcode/Codes.h>
 
-#include <cbang/log/Logger.h>
 #include <cbang/SStream.h>
+#include <cbang/Catch.h>
+#include <cbang/log/Logger.h>
 
 #include <limits>
 
@@ -522,12 +523,14 @@ void ControllerImpl::toolChange() {
 
 
 void ControllerImpl::loadToolOffsets(unsigned number) {
-  const Tool &tool = getTool(number);
+  try {
+    const Tool &tool = getTool(number);
 
-  for (const char *axis = Axes::AXES; *axis; axis++) {
-    address_t addr = TOOL_OFFSET_ADDR(Axes::toIndex(*axis));
-    set(addr, tool.get(*axis), getUnits());
-  }
+    for (const char *axis = Axes::AXES; *axis; axis++) {
+      address_t addr = TOOL_OFFSET_ADDR(Axes::toIndex(*axis));
+      set(addr, tool.get(*axis), getUnits());
+    }
+  } CATCH_WARNING; // Tool may not exist
 }
 
 
@@ -662,27 +665,30 @@ void ControllerImpl::setHomed(int vars, bool homed) {
 void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
   LOG_WARNING("Cutter radius compensation not implemented"); // TODO
 
-  if (dynamic) {
-    set(TOOL_DIAMETER, (left ? 1 : -1) * getVar('D'), getUnits());
-    if (vars & VT_L) set(TOOL_ORIENTATION, getVar('L'), NO_UNITS);
-    else set(TOOL_ORIENTATION, 0, NO_UNITS);
+  try {
+    if (dynamic) {
+      set(TOOL_DIAMETER, (left ? 1 : -1) * getVar('D'), getUnits());
+      if (vars & VT_L) set(TOOL_ORIENTATION, getVar('L'), NO_UNITS);
+      else set(TOOL_ORIENTATION, 0, NO_UNITS);
 
-  } else {
-    set(TOOL_ORIENTATION, 0, NO_UNITS);
+    } else {
+      set(TOOL_ORIENTATION, 0, NO_UNITS);
 
-    if (!(vars & VT_D)) {
-      double dia = getTool(getCurrentTool()).getRadius() * 2;
-      set(TOOL_DIAMETER, dia, getUnits());
+      if (!(vars & VT_D)) {
+        double dia = getTool(getCurrentTool()).getRadius() * 2;
+        set(TOOL_DIAMETER, dia, getUnits());
 
-    } else if (!getVar('D')) set(TOOL_DIAMETER, 0, getUnits());
+      } else if (!getVar('D')) set(TOOL_DIAMETER, 0, getUnits());
 
-    else {
-      double dia = getTool(getVar('D')).getRadius() * 2;
-      set(TOOL_DIAMETER, dia, getUnits());
+      else {
+        double dia = getTool(getVar('D')).getRadius() * 2;
+        set(TOOL_DIAMETER, dia, getUnits());
+      }
     }
-  }
 
-  cutterRadiusComp = true;
+    cutterRadiusComp = true;
+
+  } CATCH_WARNING; // Tool may not exist
 }
 
 
