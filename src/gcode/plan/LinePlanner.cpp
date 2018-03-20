@@ -361,28 +361,25 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
   double Vt = lc.getExitVelocity();
 
   // Apply junction velocity limit
-  if (Vi && cmd->prev) {
-    PlannerCommand *last = cmd->prev;
-    while (true) {
-      if (dynamic_cast<LineCommand *>(last)) {
-        const Axes &lastUnit = dynamic_cast<LineCommand *>(last)->unit;
+  if (Vi && cmd->prev && config.minJunctionLength <= lc.length)
+    for (PlannerCommand *last = cmd->prev; last; last = last->prev) {
+      if (!dynamic_cast<LineCommand *>(last)) continue;
+      const LineCommand &lastLC = *dynamic_cast<LineCommand *>(last);
 
-        double jv = computeJunctionVelocity(lc.unit, lastUnit,
-                                            config.junctionDeviation,
-                                            config.junctionAccel);
-        if (jv < Vi) {
-          Vi = jv;
-          cmd->setEntryVelocity(Vi);
-          cmd->prev->setExitVelocity(Vi);
-          backplan = true;
-        }
-        break;
+      if (lastLC.length < config.minJunctionLength) continue;
+
+      double maxAccel = min(lc.maxAccel, lastLC.maxAccel);
+      double jv = computeJunctionVelocity(lc.unit, lastLC.unit,
+                                          config.junctionDeviation, maxAccel);
+      if (jv < Vi) {
+        Vi = jv;
+        cmd->setEntryVelocity(Vi);
+        cmd->prev->setExitVelocity(Vi);
+        backplan = true;
       }
 
-      if (!last->prev) break;
-      last = last->prev;
+      break;
     }
-  }
 
   // Always plan from lower velocity to higher
   bool swapped = false;
@@ -734,22 +731,9 @@ double LinePlanner::computeJunctionVelocity(const Axes &unitA,
   if (cosTheta < -0.99) return numeric_limits<double>::max(); // Straight line
   if (0.99 < cosTheta) return 0; // Reversal
 
-  // Fuse the junction deviations into a vector sum
-  double aDelta = 0;
-  double bDelta = 0;
+  // Credit goes to the Grbl project for the following calculation.
+  // Trig half angle identity
+  double sinThetaD2 = sqrt(0.5 * (1.0 - cosTheta));
 
-  for (unsigned axis = 0; axis < Axes::getSize(); axis++) {
-    aDelta += square(unitA[axis] * deviation);
-    bDelta += square(unitB[axis] * deviation);
-  }
-
-  LOG_DEBUG(3, "delta A=" << aDelta << " delta B=" << bDelta);
-
-  if (!aDelta || !bDelta) return 0; // A unit vector is null
-
-  double delta = (sqrt(aDelta) + sqrt(bDelta)) / 2;
-  double theta2 = acos(cosTheta) / 2;
-  double radius = delta * sin(theta2) / (1 - sin(theta2));
-
-  return sqrt(radius * accel);
+  return sqrt(accel * deviation * sinThetaD2 / (1.0 - sinThetaD2));
 }

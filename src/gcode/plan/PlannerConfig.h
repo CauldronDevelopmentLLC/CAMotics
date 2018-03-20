@@ -36,7 +36,7 @@ namespace GCode {
     Axes maxAccel;
     Axes maxJerk;
     double junctionDeviation;
-    double junctionAccel;
+    double minJunctionLength;
 
     Axes minSoftLimit;
     Axes maxSoftLimit;
