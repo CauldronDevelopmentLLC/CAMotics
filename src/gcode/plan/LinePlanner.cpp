@@ -368,10 +368,21 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
 
       if (lastLC.length < config.minJunctionLength) continue;
 
-      double maxAccel = min(lc.maxAccel, lastLC.maxAccel);
-      double jv = computeJunctionVelocity(lc.unit, lastLC.unit,
-                                          config.junctionDeviation, maxAccel);
+      double maxVel = min(lastLC.maxVel, lc.maxVel);
+      double jv = computeJunctionVelocity(lc.unit, lastLC.unit, maxVel);
       if (jv < Vi) {
+        double cosTheta = -lc.unit.dot(lastLC.unit);
+        double angle = acos(cosTheta) / M_PI * 180;
+
+        LOG_DEBUG(5, "junctionVelocity=" << jv
+                  << " unitA=" << lc.unit
+                  << " unitB=" << lastLC.unit
+                  << " lenA=" << lc.length
+                  << " lenB=" << lastLC.length
+                  << " cosTheta=" << cosTheta
+                  << " angle=" << angle
+                  << " id=" << lc.getID());
+
         Vi = jv;
         cmd->setEntryVelocity(Vi);
         cmd->prev->setExitVelocity(Vi);
@@ -723,17 +734,12 @@ double LinePlanner::planVelocityTransition(double Vi, double Vt,
 
 double LinePlanner::computeJunctionVelocity(const Axes &unitA,
                                             const Axes &unitB,
-                                            double deviation,
-                                            double accel) const {
+                                            double maxVel) const {
   // TODO this probably does not make sense for axes A, B, C, U, V or W
-  double cosTheta = -unitA.dot(unitB);
+  double cosTheta = unitA.dot(unitB);
 
-  if (cosTheta < -0.99) return numeric_limits<double>::max(); // Straight line
-  if (0.99 < cosTheta) return 0; // Reversal
+  if (cosTheta <= 0) return 0; // Right angle or more
+  if (1 < cosTheta) cosTheta = 1;
 
-  // Credit goes to the Grbl project for the following calculation.
-  // Trig half angle identity
-  double sinThetaD2 = sqrt(0.5 * (1.0 - cosTheta));
-
-  return sqrt(accel * deviation * sinThetaD2 / (1.0 - sinThetaD2));
+  return sqrt(cosTheta) * maxVel;
 }
