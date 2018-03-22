@@ -94,6 +94,6 @@ namespace GCode {
     double planVelocityTransition(double Vi, double Vt, double maxAccel,
                                   double maxJerk, double *times) const;
     double computeJunctionVelocity(const Axes &unitA, const Axes &unitB,
-                                   double maxVel) const;
+                                   double deviation, double accel) const;
   };
 }

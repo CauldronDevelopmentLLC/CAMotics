@@ -368,9 +368,11 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
 
       if (lastLC.length < config.minJunctionLength) continue;
 
-      double maxVel = min(lastLC.maxVel, lc.maxVel);
-      double jv = computeJunctionVelocity(lc.unit, lastLC.unit, maxVel);
+      double jv = computeJunctionVelocity(lc.unit, lastLC.unit,
+                                          config.junctionDeviation,
+                                          config.junctionAccel);
       if (jv < Vi) {
+#if DEBUG
         double cosTheta = -lc.unit.dot(lastLC.unit);
         double angle = acos(cosTheta) / M_PI * 180;
 
@@ -382,6 +384,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
                   << " cosTheta=" << cosTheta
                   << " angle=" << angle
                   << " id=" << lc.getID());
+#endif
 
         Vi = jv;
         cmd->setEntryVelocity(Vi);
@@ -734,12 +737,30 @@ double LinePlanner::planVelocityTransition(double Vi, double Vt,
 
 double LinePlanner::computeJunctionVelocity(const Axes &unitA,
                                             const Axes &unitB,
-                                            double maxVel) const {
+                                            double deviation,
+                                            double accel) const {
   // TODO this probably does not make sense for axes A, B, C, U, V or W
-  double cosTheta = unitA.dot(unitB);
+  double cosTheta = -unitA.dot(unitB);
 
-  if (cosTheta <= 0) return 0; // Right angle or more
-  if (1 < cosTheta) cosTheta = 1;
+  if (cosTheta < -0.99) return numeric_limits<double>::max(); // Straight line
+  if (0.99 < cosTheta) return 0; // Reversal
 
-  return sqrt(cosTheta) * maxVel;
+  // Fuse the junction deviations into a vector sum
+  double aDelta = 0;
+  double bDelta = 0;
+
+  for (unsigned axis = 0; axis < Axes::getSize(); axis++) {
+    aDelta += square(unitA[axis] * deviation);
+    bDelta += square(unitB[axis] * deviation);
+  }
+
+  LOG_DEBUG(3, "delta A=" << aDelta << " delta B=" << bDelta);
+
+  if (!aDelta || !bDelta) return 0; // A unit vector is null
+
+  double delta = (sqrt(aDelta) + sqrt(bDelta)) / 2;
+  double theta2 = acos(cosTheta) / 2;
+  double radius = delta * sin(theta2) / (1 - sin(theta2));
+
+  return sqrt(radius * accel);
 }
