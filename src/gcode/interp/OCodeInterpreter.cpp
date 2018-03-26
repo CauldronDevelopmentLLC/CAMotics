@@ -66,6 +66,7 @@ void OCodeInterpreter::checkExpressions(OCode *ocode, const char *name,
 void OCodeInterpreter::upScope() {
   stack.pop_back();
   nameStack.pop_back();
+  controller.popScope();
 }
 
 
@@ -73,6 +74,7 @@ void OCodeInterpreter::downScope() {
   stack.push_back(vector<double>(30));
   nameStack.push_back(name_map_t());
   if (stack.size() == 11) LOG_WARNING("exceeded recursion depth 10");
+  controller.pushScope();
 }
 
 

@@ -67,6 +67,10 @@ namespace GCode {
     virtual void setSpeed(double speed) = 0;
     virtual void setTool(unsigned tool) = 0;
 
+    // Scope
+    virtual void pushScope() = 0;
+    virtual void popScope() = 0;
+
     // Execution
     virtual void startBlock() = 0;
     virtual bool execute(const Code &code, int vars) = 0;
