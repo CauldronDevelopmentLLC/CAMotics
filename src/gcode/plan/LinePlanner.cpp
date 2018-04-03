@@ -27,6 +27,7 @@
 #include "SeekCommand.h"
 #include "InputCommand.h"
 #include "SetCommand.h"
+#include "EndCommand.h"
 
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
@@ -179,11 +180,7 @@ void LinePlanner::start() {
 
 void LinePlanner::end() {
   MachineState::end();
-
-  if (!cmds.empty()) {
-    cmds.back()->setExitVelocity(0);
-    plan(cmds.back());
-  }
+  push(new EndCommand(nextID++));
 }
 
 
