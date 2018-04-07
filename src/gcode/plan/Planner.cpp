@@ -103,15 +103,15 @@ void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
 void Planner::stop() {
-  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(0);
+  if (ControllerImpl::isSynchronizing())
+    ControllerImpl::synchronize(0); // 0 indicates probe was unsuccessful
   planner.stop();
   runners.clear();
 }
 
 
 void Planner::restart(uint64_t id, const Axes &position) {
-  setPosition(position);
-  if (!planner.restart(id, position)) setAbsolutePosition(position);
+  if (!planner.restart(id, position)) setPosition(position);
 }
 
 

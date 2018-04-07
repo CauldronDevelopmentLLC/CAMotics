@@ -863,8 +863,9 @@ void ControllerImpl::synchronize(double result) {
 
   case SYNC_SEEK:
   case SYNC_PROBE:
-    // Set probed position PROBE_RESULT_X-W and PROBE_SUCCESS
+    // Set PROBE_SUCCESS and probed position in PROBE_RESULT_X to W
     set(PROBE_SUCCESS, result, NO_UNITS);
+
     for (const char *axis = Axes::AXES; *axis; axis++)
       set(PROBE_RESULT_ADDR(Axes::toIndex(*axis)),
           getAxisAbsolutePosition(*axis), getUnits());
