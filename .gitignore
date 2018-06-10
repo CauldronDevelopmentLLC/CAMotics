@@ -44,6 +44,8 @@ moc_*.cc
 /camprobe
 /camsim
 /camopt
+/planner
+/tco2stl
 
 # Packages
 *.deb
