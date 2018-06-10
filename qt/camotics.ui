@@ -396,8 +396,7 @@
     <addaction name="actionTopView"/>
     <addaction name="actionBottomView"/>
     <addaction name="separator"/>
-    <addaction name="actionHideConsole"/>
-    <addaction name="actionShowConsole"/>
+    <addaction name="actionToggleConsole"/>
    </widget>
    <widget class="QMenu" name="menuSimulate">
     <property name="title">
@@ -2922,6 +2921,9 @@
    </property>
   </action>
   <action name="actionHideConsole">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="camotics.qrc">
      <normaloff>:/icons/hide.png</normaloff>:/icons/hide.png</iconset>
@@ -2934,6 +2936,9 @@
    </property>
   </action>
   <action name="actionShowConsole">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="camotics.qrc">
      <normaloff>:/icons/show.png</normaloff>:/icons/show.png</iconset>
@@ -3081,6 +3086,14 @@
    </property>
    <property name="toolTip">
     <string>Toggle machine display.</string>
+   </property>
+  </action>
+  <action name="actionToggleConsole">
+   <property name="text">
+    <string>Toggle Console</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
    </property>
   </action>
  </widget>

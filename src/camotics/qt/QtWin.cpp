@@ -1544,11 +1544,15 @@ void QtWin::setStatusActive(bool active) {
 
 void QtWin::showConsole() {
   ui->splitter->setSizes(QList<int>() << 5 << 1);
+  ui->actionShowConsole->setChecked(true);
+  ui->actionHideConsole->setChecked(false);
 }
 
 
 void QtWin::hideConsole() {
   ui->splitter->setSizes(QList<int>() << 1 << 0);
+  ui->actionHideConsole->setChecked(true);
+  ui->actionShowConsole->setChecked(false);
 }
 
 
@@ -2174,6 +2178,17 @@ void QtWin::on_actionShowConsole_triggered() {
   sizes[0] = 1;
   sizes[1] = 1;
   ui->splitter->setSizes(sizes);
+}
+
+
+void QtWin::on_actionToggleConsole_triggered() {
+  bool isHidden = ui->actionHideConsole->isChecked();
+  if (isHidden) {
+    showConsole();
+  }
+  else {
+    hideConsole();
+  }
 }
 
 

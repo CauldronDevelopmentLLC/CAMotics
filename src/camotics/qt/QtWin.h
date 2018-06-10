@@ -370,6 +370,7 @@ namespace CAMotics {
 
     void on_actionHideConsole_triggered();
     void on_actionShowConsole_triggered();
+    void on_actionToggleConsole_triggered();
 
     void on_hideConsolePushButton_clicked();
     void on_clearConsolePushButton_clicked();
