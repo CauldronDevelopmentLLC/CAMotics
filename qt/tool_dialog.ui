@@ -22,7 +22,7 @@
      <x>9</x>
      <y>10</y>
      <width>690</width>
-     <height>436</height>
+     <height>437</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -329,6 +329,17 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>numberSpinBox</tabstop>
+  <tabstop>unitsComboBox</tabstop>
+  <tabstop>shapeComboBox</tabstop>
+  <tabstop>angleDoubleSpinBox</tabstop>
+  <tabstop>diameterDoubleSpinBox</tabstop>
+  <tabstop>lengthDoubleSpinBox</tabstop>
+  <tabstop>snubDiameterDoubleSpinBox</tabstop>
+  <tabstop>descriptionLineEdit</tabstop>
+  <tabstop>toolView</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
