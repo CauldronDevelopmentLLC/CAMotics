@@ -23,15 +23,12 @@
 
 #include "Tool.h"
 
-#include <gcode/Processor.h>
-
 #include <map>
 
 
 namespace GCode {
   class ToolTable :
-    public std::map<unsigned, Tool>, public Processor,
-    public cb::JSON::Serializable {
+    public std::map<unsigned, Tool>, public cb::JSON::Serializable {
 
   public:
     bool has(unsigned tool) const;
@@ -40,9 +37,6 @@ namespace GCode {
     Tool &get(unsigned tool);
     void set(const Tool &tool);
     void add(const Tool &tool);
-
-    // From Processor
-    void operator()(const cb::SmartPointer<Block> &block);
 
     // From JSON::Serializable
     using cb::JSON::Serializable::read;

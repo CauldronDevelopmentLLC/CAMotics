@@ -20,20 +20,12 @@
 
 #include "ToolTable.h"
 
-#include <gcode/parse/Parser.h>
-#include <gcode/ast/Block.h>
-#include <gcode/ast/Word.h>
-
 #include <cbang/Exception.h>
 #include <cbang/String.h>
 
 #include <cbang/log/Logger.h>
-#include <cbang/os/SystemUtilities.h>
 #include <cbang/json/Sink.h>
 #include <cbang/json/Dict.h>
-
-#include <cctype>
-#include <vector>
 
 using namespace std;
 using namespace cb;
@@ -80,36 +72,6 @@ void ToolTable::add(const Tool &tool) {
 
   LOG_INFO(3, "Added tool " << tool.getNumber() << " with radius "
            << tool.getRadius());
-}
-
-
-void ToolTable::operator()(const SmartPointer<Block> &block) {
-  Evaluator eval;
-
-  // Evaluate expressions
-  for (Block::iterator it = block->begin(); it != block->end(); it++)
-    (*it)->eval(eval);
-
-  Word *T = block->findWord('T');
-  Word *P = block->findWord('P');
-  Word *D = block->findWord('D');
-
-  if (T) {
-    unsigned number = T->getValue();
-    unsigned pocket = P ? P->getValue() : number;
-
-    Tool tool(number, pocket);
-
-    if (D) tool.setRadius(D->getValue() / 2);
-
-    for (const char *c = "XYZABCUVWIJQ"; *c; c++) {
-      Word *word = block->findWord(*c);
-      if (word) tool.set(*c, word->getValue());
-    }
-
-    // Add tool
-    add(tool);
-  }
 }
 
 
