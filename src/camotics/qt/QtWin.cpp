@@ -131,6 +131,12 @@ QtWin::QtWin(Application &app) :
   // Hide unfinished optimize
   ui->actionOptimize->setVisible(false);
 
+  // P.H.
+  // Set action shortcuts
+  ui->actionZoomIn->setShortcut(tr("Alt+-"));
+  ui->actionZoomOut->setShortcuts({ tr("Alt+="), tr("Alt++") });
+  ui->actionZoomAll->setShortcut(tr("Alt+A"));
+
   // Load icons
   playIcon.addFile(QString::fromUtf8(":/icons/play.png"), QSize(),
                    QIcon::Normal, QIcon::Off);
@@ -2198,3 +2204,24 @@ void QtWin::on_hideConsolePushButton_clicked() {
 
 
 void QtWin::on_clearConsolePushButton_clicked() {ui->console->clear();}
+
+
+// P.H.
+// Add zoom methods
+void QtWin::glViewZoomIn() {
+  view->zoomIn();
+  redraw(true);
+}
+
+
+void QtWin::glViewZoomOut() {
+  view->zoomOut();
+  redraw(true);
+}
+
+
+// TODO Calculate extents of all displayed geometry and scale accordingly.
+void QtWin::glViewZoomAll() {
+  view->center();
+  redraw(true);
+}

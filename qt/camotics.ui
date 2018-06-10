@@ -396,6 +396,9 @@
     <addaction name="actionTopView"/>
     <addaction name="actionBottomView"/>
     <addaction name="separator"/>
+    <addaction name="actionZoomOut"/>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomAll"/>
     <addaction name="actionToggleConsole"/>
    </widget>
    <widget class="QMenu" name="menuSimulate">
@@ -3107,6 +3110,30 @@
    </property>
    <property name="shortcut">
     <string>Alt+C</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="text">
+    <string>Zoom +</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Larger</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="text">
+    <string>Zoom -</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Smaller</string>
+   </property>
+  </action>
+  <action name="actionZoomAll">
+   <property name="text">
+    <string>Zoom All</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Smaller</string>
    </property>
   </action>
  </widget>
