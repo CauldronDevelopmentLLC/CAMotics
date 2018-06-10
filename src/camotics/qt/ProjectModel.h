@@ -31,12 +31,12 @@
 namespace GCode {class Tool;}
 
 namespace CAMotics {
-  class Project;
+  namespace Project {class Project;}
 
   class ProjectModel : public QAbstractItemModel {
     Q_OBJECT;
 
-    cb::SmartPointer<Project> project;
+    cb::SmartPointer<Project::Project> project;
 
   public:
     typedef enum {
@@ -48,11 +48,11 @@ namespace CAMotics {
       TOOL_ITEM,
     } item_t;
 
-    ProjectModel(const cb::SmartPointer<Project> &project,
+    ProjectModel(const cb::SmartPointer<Project::Project> &project,
                  QObject *parent = 0);
     ~ProjectModel();
 
-    void setProject(const cb::SmartPointer<Project> &project);
+    void setProject(const cb::SmartPointer<Project::Project> &project);
 
     std::string getFile(unsigned i) const;
     std::string getFile(const QModelIndex &index) const;

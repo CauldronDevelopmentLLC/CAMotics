@@ -42,8 +42,8 @@ int ToolDialog::edit() {
 void ToolDialog::update() {
   updating = true;
 
-  GCode::ToolUnits units = tool.getUnits();
-  double scale = units == GCode::ToolUnits::UNITS_MM ? 1.0 : 1.0 / 25.4;
+  GCode::Units units = tool.getUnits();
+  double scale = units == GCode::Units::METRIC ? 1.0 : 1.0 / 25.4;
   GCode::ToolShape shape = tool.getShape();
   double length = tool.getLength();
   double radius = tool.getRadius();
@@ -53,13 +53,13 @@ void ToolDialog::update() {
     tool.setLength(radius);
 
   // Step
-  double step = units == GCode::ToolUnits::UNITS_MM ? 1 : 0.125;
+  double step = units == GCode::Units::METRIC ? 1 : 0.125;
   ui->lengthDoubleSpinBox->setSingleStep(step);
   ui->diameterDoubleSpinBox->setSingleStep(step);
   ui->snubDiameterDoubleSpinBox->setSingleStep(step);
 
   // Suffix
-  const char *suffix = units == GCode::ToolUnits::UNITS_MM ? "mm" : "in";
+  const char *suffix = units == GCode::Units::METRIC ? "mm" : "in";
   ui->lengthDoubleSpinBox->setSuffix(suffix);
   ui->diameterDoubleSpinBox->setSuffix(suffix);
   ui->snubDiameterDoubleSpinBox->setSuffix(suffix);
@@ -112,7 +112,7 @@ void ToolDialog::on_numberSpinBox_valueChanged(int value) {
 
 void ToolDialog::on_unitsComboBox_currentIndexChanged(int value) {
   if (updating) return;
-  tool.setUnits((GCode::ToolUnits::enum_t)value);
+  tool.setUnits((GCode::Units::enum_t)value);
   update();
 }
 
@@ -134,7 +134,7 @@ void ToolDialog::on_angleDoubleSpinBox_valueChanged(double angle) {
 void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double length) {
   if (updating) return;
 
-  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::Units::METRIC ? 1.0 : 25.4;
   tool.setLength(length * scale);
 
   update();
@@ -144,7 +144,7 @@ void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double length) {
 void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double diameter) {
   if (updating) return;
 
-  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::Units::METRIC ? 1.0 : 25.4;
   double angle = tool.getAngle();
 
   tool.setDiameter(diameter * scale);
@@ -158,7 +158,7 @@ void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double diameter) {
 void ToolDialog::on_snubDiameterDoubleSpinBox_valueChanged(double value) {
   if (updating) return;
 
-  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::Units::METRIC ? 1.0 : 25.4;
 
   tool.setSnubDiameter(value * scale);
   update();

@@ -66,10 +66,10 @@ string SettingsDialog::getMachinePath() const {
 }
 
 
-bool SettingsDialog::exec(Project &project, View &view) {
+bool SettingsDialog::exec(Project::Project &project, View &view) {
   Settings settings;
 
-  bounds = project.getWorkpieceBounds();
+  bounds = project.getWorkpiece().getBounds();
 
   // Select machine
   int selectedMachine = ui->machineComboBox->findText
@@ -83,9 +83,11 @@ bool SettingsDialog::exec(Project &project, View &view) {
 
   ui->defaultUnitsComboBox->
     setCurrentIndex(settings.get("Settings/Units",
-                                 GCode::ToolUnits::UNITS_MM).toInt());
+                                 GCode::Units::METRIC).toInt());
 
-  ui->renderModeComboBox->setCurrentIndex(project.getRenderMode());
+  ui->renderModeComboBox->
+    setCurrentIndex(settings.get("Settings/RenderMode", 0).toInt());
+
   ui->aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
   ui->aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
@@ -105,18 +107,19 @@ bool SettingsDialog::exec(Project &project, View &view) {
 
   settings.set("Settings/Machine", ui->machineComboBox->currentText());
 
-  project.setResolution(ui->resolutionDoubleSpinBox->value());
+  ResolutionMode mode =
+    (ResolutionMode::enum_t)ui->resolutionComboBox->currentIndex();
+  project.setResolutionMode(mode);
 
-  int index = ui->resolutionComboBox->currentIndex();
-  project.setResolutionMode((ResolutionMode::enum_t)index);
+  if (mode == ResolutionMode::RESOLUTION_MANUAL)
+    project.setResolution(ui->resolutionDoubleSpinBox->value());
 
-  GCode::ToolUnits units =
-    (GCode::ToolUnits::enum_t)ui->unitsComboBox->currentIndex();
+  GCode::Units units =
+    (GCode::Units::enum_t)ui->unitsComboBox->currentIndex();
   project.setUnits(units);
   settings.set("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
 
-  index = ui->renderModeComboBox->currentIndex();
-  project.setRenderMode((RenderMode::enum_t)index);
+  settings.set("Settings/RenderMode", ui->renderModeComboBox->currentIndex());
 
   view.setFlag(View::SHOW_BBTREE_FLAG, ui->aabbCheckBox->isChecked());
   view.setFlag(View::BBTREE_LEAVES_FLAG, ui->aabbLeavesCheckBox->isChecked());
@@ -138,7 +141,7 @@ void SettingsDialog::on_resolutionComboBox_currentIndexChanged(int index) {
   if (changing) return;
 
   ResolutionMode mode = (ResolutionMode::enum_t)index;
-  double resolution = Project::computeResolution(mode, bounds);
+  double resolution = Project::Project::computeResolution(mode, bounds);
 
   changing = true;
   ui->resolutionDoubleSpinBox->setValue(resolution);

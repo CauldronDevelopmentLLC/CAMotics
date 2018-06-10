@@ -61,7 +61,7 @@
 
 
 namespace CAMotics {
-  class NCFile;
+  namespace Project {class File;}
   class NCDocLayout;
   class Highlighter;
   class SidebarWidget;
@@ -80,7 +80,7 @@ namespace CAMotics {
 
     FileTabManager *parent;
 
-    cb::SmartPointer<NCFile> file;
+    cb::SmartPointer<Project::File> file;
     cb::SmartPointer<NCDocLayout> layout;
     cb::SmartPointer<Highlighter> highlighter;
     cb::SmartPointer<SidebarWidget> sidebar;
@@ -98,12 +98,12 @@ namespace CAMotics {
     Q_DISABLE_COPY(NCEdit);
 
   public:
-    NCEdit(const cb::SmartPointer<NCFile> &file,
+    NCEdit(const cb::SmartPointer<Project::File> &file,
            const cb::SmartPointer<Highlighter> &highlighter,
            FileTabManager *parent = 0);
     ~NCEdit();
 
-    const cb::SmartPointer<NCFile> &getFile() const {return file;}
+    const cb::SmartPointer<Project::File> &getFile() const {return file;}
     bool isTPL() const;
 
     void loadLightScheme();

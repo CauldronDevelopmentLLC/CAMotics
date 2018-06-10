@@ -1,0 +1,39 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.228943,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "conical",
+          "length": 15.088835,
+          "diameter": 12.5,
+          "description": ""
+        },
+        "2": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 25.4,
+          "diameter": 3.125,
+          "description": ""
+        },
+        "3": {
+          "units": "metric",
+          "shape": "ballnose",
+          "length": 30.125,
+          "diameter": 6.25,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 0,
+        "bounds": {
+          "min": [-2.5, -2.5, -6],
+          "max": [97.5, 97.5, 0]
+        }
+      },
+      "files": [
+        "wave.tpl"
+      ]
+    }

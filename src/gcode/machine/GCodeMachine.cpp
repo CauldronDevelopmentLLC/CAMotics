@@ -73,7 +73,7 @@ void GCodeMachine::beginLine() {
     location.setFilename(filename);
   }
 
-  if (newLoc.getLine() != location.getLine()) {
+  if (0 <= newLoc.getLine() && newLoc.getLine() != location.getLine()) {
     *stream << 'N' << newLoc.getLine() << ' ';
     location.setLine(newLoc.getLine());
   }

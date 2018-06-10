@@ -156,7 +156,9 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
       string key = json->keyAt(i);
       vars.insert(key, json->get(key));
 
-      if (key == "xp" || key == "yp" || key == "zp") updatePosition = true;
+      if (key == "xp" || key == "yp" || key == "zp" ||
+          key == "offset_x" || key == "offset_y" || key == "offset_z")
+        updatePosition = true;
     }
 
     if (updatePosition) {
@@ -164,8 +166,11 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
       Vector3D position(vars.getNumber("xp", 0),
                         vars.getNumber("yp", 0),
                         vars.getNumber("zp", 0));
+      Vector3D offset(vars.getNumber("offset_x", 0),
+                      vars.getNumber("offset_y", 0),
+                      vars.getNumber("offset_z", 0));
 
-      parent->getView()->path->setByRemote(position, line);
+      parent->getView()->path->setByRemote(position + offset, line);
       parent->redraw();
     }
   } CATCH_ERROR;

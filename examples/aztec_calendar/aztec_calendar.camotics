@@ -1,0 +1,25 @@
+{
+      "units": "imperial",
+      "resolution-mode": "manual",
+      "resolution": 0.5,
+      "tools": {
+        "30": {
+          "units": "metric",
+          "shape": "conical",
+          "length": 10,
+          "diameter": 2.5,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": true,
+        "margin": 5,
+        "bounds": {
+          "min": [-203.2, -203.2, -15.24],
+          "max": [203.2, 203.2, 3.81]
+        }
+      },
+      "files": [
+        "aztec_calendar.nc"
+      ]
+    }

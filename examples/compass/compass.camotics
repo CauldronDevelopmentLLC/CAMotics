@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "medium",
+      "resolution": 0.674104,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1,
+          "diameter": 0.125,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-5, -5, -12.7],
+          "max": [62, 85, 0]
+        }
+      },
+      "files": [
+        "compass.tpl"
+      ]
+    }

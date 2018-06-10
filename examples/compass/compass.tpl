@@ -220,8 +220,7 @@ var wall = 3;
 var toolDia = 25.4 / 8;
 var toolRadius = toolDia / 2;
 var maxPass = 5;
-tool_set({number: 1, units: IMPERIAL, length: 1, diameter: 1/8,
-          shape: CYLINDRICAL});
+
 tool(1);
 rapid({z: 5});
 translate(5, 5);

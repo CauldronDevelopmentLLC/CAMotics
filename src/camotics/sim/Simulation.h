@@ -40,7 +40,6 @@ namespace CAMotics {
 
   class Simulation : public cb::JSON::Serializable {
   public:
-    GCode::ToolTable tools;
     cb::SmartPointer<GCode::ToolPath> path;
     Workpiece workpiece;
     double resolution;
@@ -48,14 +47,13 @@ namespace CAMotics {
     RenderMode mode;
     unsigned threads;
 
-    Simulation() :
-      resolution(1), time(0), mode(RenderMode::MCUBES_MODE), threads(0) {}
-    Simulation(const GCode::ToolTable &tools,
-               const cb::SmartPointer<GCode::ToolPath> &path,
+    Simulation(const cb::SmartPointer<GCode::ToolPath> &path,
                const Workpiece &workpiece, double resolution, double time,
                RenderMode mode, unsigned threads) :
-      tools(tools), path(path), workpiece(workpiece), resolution(resolution),
+      path(path), workpiece(workpiece), resolution(resolution),
       time(time), mode(mode), threads(threads) {}
+
+    const GCode::ToolTable &getTools() const {return path->getTools();}
 
     std::string computeHash() const;
 

@@ -56,7 +56,7 @@ class QMdiSubWindow;
 
 namespace CAMotics {
   class Viewer;
-  class Project;
+  namespace Project {class Project;}
   class Simulation;
   class SimulationRun;
   class CutWorkpiece;
@@ -99,7 +99,7 @@ namespace CAMotics {
     cb::Options &options;
 
     ValueSet valueSet;
-    cb::SmartPointer<Project> project;
+    cb::SmartPointer<Project::Project> project;
     cb::SmartPointer<SimulationRun> simRun;
     cb::SmartPointer<View> view;
     cb::SmartPointer<Viewer> viewer;
@@ -188,7 +188,7 @@ namespace CAMotics {
 
     bool runNewProjectDialog();
     GCode::ToolTable getNewToolTable();
-    GCode::ToolUnits getNewUnits();
+    GCode::Units getNewUnits();
 
     bool runCAMDialog(const std::string &filename);
 
@@ -196,7 +196,8 @@ namespace CAMotics {
                          const std::string &filters,
                          const std::string &filename, bool save,
                          bool anyFile = false);
-    const cb::SmartPointer<Project> &getProject() const {return project;}
+    const cb::SmartPointer<Project::Project> &getProject() const
+    {return project;}
     void loadProject();
     void resetProject();
     void newProject();
@@ -204,7 +205,7 @@ namespace CAMotics {
     bool saveProject(bool saveas = false);
     void revertProject();
     bool isMetric() const;
-    GCode::ToolUnits getDefaultUnits() const;
+    GCode::Units getDefaultUnits() const;
 
     void updateFiles();
     void newFile(bool tpl);
@@ -361,7 +362,6 @@ namespace CAMotics {
     void on_actionToolPath_triggered(bool checked);
 
     void on_actionAddFile_triggered();
-    void on_actionReloadFile_triggered();
     void on_actionEditFile_triggered();
     void on_actionRemoveFile_triggered();
     void on_actionAddTool_triggered();

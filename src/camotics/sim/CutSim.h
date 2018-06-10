@@ -26,8 +26,8 @@
 namespace GCode {class ToolPath;}
 
 namespace CAMotics {
+  namespace Project {class Project;}
   class Surface;
-  class Project;
   class Simulation;
   class Task;
 
@@ -39,7 +39,8 @@ namespace CAMotics {
     CutSim();
     ~CutSim();
 
-    cb::SmartPointer<GCode::ToolPath> computeToolPath(const Project &project);
+    cb::SmartPointer<GCode::ToolPath>
+    computeToolPath(const Project::Project &project);
     cb::SmartPointer<Surface> computeSurface(const Simulation &sim);
     void reduceSurface(Surface &surface);
 

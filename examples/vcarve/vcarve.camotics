@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "medium",
+      "resolution": 0.06304,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "conical",
+          "length": 2,
+          "diameter": 2,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-2.89442, 0.476477, -0.5],
+          "max": [13.5167, 5.56491, 0.25]
+        }
+      },
+      "files": [
+        "vcarve.ngc"
+      ]
+    }

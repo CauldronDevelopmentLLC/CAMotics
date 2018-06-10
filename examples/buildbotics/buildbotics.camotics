@@ -1,0 +1,32 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.178658,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1,
+          "diameter": 0.0937,
+          "description": ""
+        },
+        "2": {
+          "units": "imperial",
+          "shape": "conical",
+          "length": 0.125,
+          "diameter": 0.25,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": true,
+        "margin": 5,
+        "bounds": {
+          "min": [-7.1805, -7.177, -3.675],
+          "max": [80.9405, 80.867, 0]
+        }
+      },
+      "files": [
+        "buildbotics_logo.tpl"
+      ]
+    }

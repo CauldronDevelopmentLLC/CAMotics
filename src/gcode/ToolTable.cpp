@@ -32,9 +32,6 @@
 #include <cbang/json/Sink.h>
 #include <cbang/json/Dict.h>
 
-#include <cbang/xml/XMLProcessor.h>
-#include <cbang/xml/XMLWriter.h>
-
 #include <cctype>
 #include <vector>
 
@@ -43,12 +40,7 @@ using namespace cb;
 using namespace GCode;
 
 
-ToolTable::ToolTable() : current(-1) {}
-
-
-bool ToolTable::has(unsigned tool) const {
-  return find(tool) != end();
-}
+bool ToolTable::has(unsigned tool) const {return find(tool) != end();}
 
 
 const Tool &ToolTable::at(unsigned index) const {
@@ -119,61 +111,6 @@ void ToolTable::operator()(const SmartPointer<Block> &block) {
     add(tool);
   }
 }
-
-
-XMLHandler *ToolTable::getHandler(XMLProcessor &processor,
-                                  const XMLAttributes &attrs) {
-  processor.pushContext();
-  clear(); // New tool table
-  return this;
-}
-
-
-void ToolTable::freeHandler(XMLProcessor &processor, XMLHandler *handler) {
-  processor.popContext();
-}
-
-
-void ToolTable::startElement(const string &name, const XMLAttributes &attrs) {
-  if (name == "tool") {
-    unsigned number;
-    if (attrs.has("number")) number = String::parseU32(attrs["number"]);
-    else number = size();
-
-    Tool tool(number);
-    current = number;
-    tool.read(attrs);
-
-    add(tool);
-  }
-}
-
-
-void ToolTable::endElement(const string &name) {current = -1;}
-
-
-void ToolTable::text(const string &text) {
-  if (0 <= current) {
-    string desc = String::trim(text);
-    if (!desc.empty()) {
-      Tool &tool = get(current);
-
-      if (!tool.getDescription().empty())
-        desc = tool.getDescription() + " " + desc;
-
-      tool.setDescription(desc);
-    }
-  }
-}
-
-
-void ToolTable::write(XMLWriter &writer) const {
-  writer.startElement("tool_table");
-  for (const_iterator it = begin(); it != end(); it++)
-    it->second.write(writer);
-  writer.endElement("tool_table");
-}
-
 
 
 void ToolTable::read(const JSON::Value &value) {

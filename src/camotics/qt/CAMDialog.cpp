@@ -28,16 +28,17 @@
 
 
 using namespace CAMotics;
+using namespace cb;
 using namespace std;
 
 
 CAMDialog::CAMDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::CAMDialog), layerDialog(this), editRow(-1) {
+  QDialog(parent), ui(new Ui::CAMDialog), layerDialog(this), metric(true),
+  layers(new JSON::List), editRow(-1) {
 
   ui->setupUi(this);
 
-  connect(&layerDialog, SIGNAL(accepted()),
-          this, SLOT(layerDialogAccepted()));
+  connect(&layerDialog, SIGNAL(accepted()), this, SLOT(layerDialogAccepted()));
 }
 
 
@@ -58,8 +59,8 @@ void CAMDialog::loadDXFLayers(const string &filename) {
 }
 
 
-void CAMDialog::setUnits(GCode::ToolUnits units) {
-  bool metric = units == GCode::ToolUnits::UNITS_MM;
+void CAMDialog::setUnits(GCode::Units units) {
+  metric = units == GCode::Units::METRIC;
 
   ui->xTranslateDoubleSpinBox->setSuffix(metric ? " mm" : " in");
   ui->yTranslateDoubleSpinBox->setSuffix(metric ? " mm" : " in");
@@ -74,6 +75,83 @@ int CAMDialog::getSelectedRow() const {
     ui->camTableWidget->selectionModel()->selectedIndexes();
   if (indexes.empty()) return -1;
   return indexes.first().row();
+}
+
+
+void CAMDialog::read(const JSON::Value &value) {
+  double scale = metric ? 1 : 25.4;
+
+  if (value.hasDict("translate")) {
+    const JSON::Dict &d = value.getDict("translate");
+    ui->xTranslateDoubleSpinBox->setValue(d.getNumber("x", 0) * scale);
+    ui->yTranslateDoubleSpinBox->setValue(d.getNumber("y", 0) * scale);
+  }
+
+  if (value.hasDict("scale")) {
+    const JSON::Dict &d = value.getDict("scale");
+    ui->xScaleDoubleSpinBox->setValue(d.getNumber("x", 0));
+    ui->yScaleDoubleSpinBox->setValue(d.getNumber("y", 0));
+  }
+
+  if (value.hasDict("shrink")) {
+    const JSON::Dict &d = value.getDict("shrink");
+    ui->xShrinkCheckBox->setChecked(d.getBoolean("x", false));
+    ui->yShrinkCheckBox->setChecked(d.getBoolean("y", false));
+  }
+
+  if (value.hasDict("flip")) {
+    const JSON::Dict &d = value.getDict("flip");
+    ui->xFlipCheckBox->setChecked(d.getBoolean("x", false));
+    ui->yFlipCheckBox->setChecked(d.getBoolean("y", false));
+  }
+
+  if (value.hasDict("array")) {
+    const JSON::Dict &d = value.getDict("array");
+    ui->xArraySpinBox->setValue(d.getNumber("x", 0));
+    ui->yArraySpinBox->setValue(d.getNumber("y", 0));
+  }
+
+  ui->safeDoubleSpinBox->setValue(value.getNumber("safe-height", 0) * scale);
+
+  layers = value.get("layers", layers);
+}
+
+
+void CAMDialog::write(JSON::Sink &sink) const {
+  double scale = metric ? 1 : 25.4;
+
+  sink.beginDict();
+
+  sink.insertDict("translate");
+  sink.insert("x", ui->xTranslateDoubleSpinBox->value() / scale);
+  sink.insert("y", ui->yTranslateDoubleSpinBox->value() / scale);
+  sink.endDict();
+
+  sink.insertDict("scale");
+  sink.insert("x", ui->xScaleDoubleSpinBox->value());
+  sink.insert("y", ui->yScaleDoubleSpinBox->value());
+  sink.endDict();
+
+  sink.insertDict("shrink");
+  sink.insertBoolean("x", ui->xShrinkCheckBox->isChecked());
+  sink.insertBoolean("y", ui->yShrinkCheckBox->isChecked());
+  sink.endDict();
+
+  sink.insertDict("flip");
+  sink.insertBoolean("x", ui->xFlipCheckBox->isChecked());
+  sink.insertBoolean("y", ui->yFlipCheckBox->isChecked());
+  sink.endDict();
+
+  sink.insertDict("array");
+  sink.insert("x", ui->xArraySpinBox->value());
+  sink.insert("y", ui->yArraySpinBox->value());
+  sink.endDict();
+
+  sink.insert("safe-height", ui->safeDoubleSpinBox->value() / scale);
+
+  sink.insert("layers", *layers);
+
+  sink.endDict();
 }
 
 
@@ -101,41 +179,40 @@ void CAMDialog::on_camTableWidget_activated(QModelIndex index) {
   int row = index.row();
   if (row < 0) return;
 
-  layerDialog.setLayer(layers[row]);
+  layerDialog.read(layers->getDict(row));
   editRow = row;
   layerDialog.show();
 }
 
 
+void CAMDialog::setRow(int row, int col, const string &text) {
+  const QString s = QString().fromUtf8(text.c_str());
+  ui->camTableWidget->setItem(row, col, new QTableWidgetItem(s));
+}
+
+
 void CAMDialog::layerDialogAccepted() {
-  CAMLayer layer = layerDialog.getLayer();
+  SmartPointer<JSON::Value> layer = layerDialog.toJSON();
   QTableWidget *table = ui->camTableWidget;
   int row;
 
   if (editRow < 0) {
     row = table->rowCount();
     table->setRowCount(row + 1);
-    layers.push_back(layer);
+    layers->append(layer);
 
   } else {
     row = editRow;
-    layers[row] = layer;
+    layers->set(row, layer);
   }
 
-  table->setItem(row, 0,
-                 new QTableWidgetItem(QString().fromUtf8(layer.name.c_str())));
-  table->setItem(row, 1, new QTableWidgetItem
-                 (QString().sprintf("%d", layer.tool)));
-  table->setItem(row, 2, new QTableWidgetItem
-                 (QString().sprintf("%d", layer.feed)));
-  table->setItem(row, 3, new QTableWidgetItem
-                 (QString().sprintf("%d", layer.speed)));
-  table->setItem(row, 4, new QTableWidgetItem
-                 (layer.getOffsetString().c_str()));
-  table->setItem(row, 5, new QTableWidgetItem
-                 (QString()
-                  .sprintf("%0.5g to %0.5g", layer.startDepth,
-                           layer.endDepth)));
-  table->setItem(row, 6, new QTableWidgetItem
-                 (QString().sprintf("%0.5g", layer.maxStep)));
+  setRow(row, 0, layer->getString("name"));
+  setRow(row, 1, layer->getAsString("tool", "0"));
+  setRow(row, 2, layer->getAsString("feed", "0"));
+  setRow(row, 3, layer->getAsString("speed", "0"));
+  setRow(row, 4, layer->getAsString("offset-type", "0"));
+  setRow(row, 5, String::printf("%0.5g to %0.5g",
+                                layer->getNumber("start-depth", 0),
+                                layer->getNumber("end-depth", 0)));
+  setRow(row, 6, String::printf("%0.5g", layer->getNumber("max-step-down", 0)));
 }

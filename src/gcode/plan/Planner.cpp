@@ -52,7 +52,7 @@ Axes Planner::getPosition() const {return getAbsolutePosition();}
 
 
 void Planner::setPosition(const Axes &position) {
-  setAbsolutePosition(position);
+  setAbsolutePosition(position, METRIC);
   pipeline.setPosition(position);
 }
 

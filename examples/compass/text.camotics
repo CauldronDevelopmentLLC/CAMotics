@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "very_high",
+      "resolution": 0.125146,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "conical",
+          "length": 0.25,
+          "diameter": 0.125,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [0, 0, -5],
+          "max": [56, 70, 0]
+        }
+      },
+      "files": [
+        "text.tpl"
+      ]
+    }

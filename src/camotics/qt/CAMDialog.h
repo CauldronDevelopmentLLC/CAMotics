@@ -31,28 +31,35 @@ namespace Ui {class CAMDialog;}
 
 
 namespace CAMotics {
-  class CAMDialog : public QDialog {
+  class CAMDialog : public QDialog, public cb::JSON::Serializable {
     Q_OBJECT;
 
     cb::SmartPointer<Ui::CAMDialog> ui;
 
     CAMLayerDialog layerDialog;
-    std::vector<CAMLayer> layers;
+    bool metric;
+    cb::SmartPointer<cb::JSON::Value> layers;
     int editRow;
 
   public:
     CAMDialog(QWidget *parent);
 
     void loadDXFLayers(const std::string &filename);
-    void setUnits(GCode::ToolUnits units);
+    void setUnits(GCode::Units units);
 
     int getSelectedRow() const;
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
 
   protected slots:
     void on_addLayerPushButton_clicked();
     void on_upPushButton_clicked();
     void on_downPushButton_clicked();
     void on_camTableWidget_activated(QModelIndex index);
+
+    void setRow(int row, int col, const std::string &text);
     void layerDialogAccepted();
   };
 }

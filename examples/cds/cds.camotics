@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.151818,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1,
+          "diameter": 0.125,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-27, -27, -6],
+          "max": [27, 27, 0]
+        }
+      },
+      "files": [
+        "cds.tpl"
+      ]
+    }

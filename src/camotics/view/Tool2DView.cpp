@@ -50,9 +50,9 @@ void Tool2DView::drawGuide(cairo_t *cr, double width, double x, double y,
   cairo_show_text(cr, text);
 
   // Value
-  double scale = tool.getUnits() == GCode::ToolUnits::UNITS_MM ? 1.0 : 25.4;
+  double scale = tool.getUnits() == GCode::Units::METRIC ? 1.0 : 25.4;
   string s = "  " + String(value / scale) +
-    (tool.getUnits() == GCode::ToolUnits::UNITS_MM ? "mm" : "in");
+    (tool.getUnits() == GCode::Units::METRIC ? "mm" : "in");
   cairo_show_text(cr, s.c_str());
 
   // Connector

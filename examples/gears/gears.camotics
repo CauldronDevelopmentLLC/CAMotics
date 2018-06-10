@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.235543,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 10,
+          "diameter": 2,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-60.5, -60.5, -3],
+          "max": [119.5, 60.5, 0]
+        }
+      },
+      "files": [
+        "gears.tpl"
+      ]
+    }

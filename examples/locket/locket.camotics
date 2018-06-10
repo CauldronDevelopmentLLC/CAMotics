@@ -1,0 +1,32 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.278155,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 0.5,
+          "diameter": 0.125,
+          "description": ""
+        },
+        "2": {
+          "units": "imperial",
+          "shape": "conical",
+          "length": 0.5,
+          "diameter": 0.25,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-65.0875, -65.0875, -6.35],
+          "max": [65.0875, 65.0875, 0]
+        }
+      },
+      "files": [
+        "locket.tpl"
+      ]
+    }

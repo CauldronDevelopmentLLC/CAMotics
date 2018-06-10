@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "medium",
+      "resolution": 0.508957,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "ballnose",
+          "length": 1,
+          "diameter": 0.0625,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 1,
+        "bounds": {
+          "min": [0, 0.134404, -3],
+          "max": [100, 110, 0]
+        }
+      },
+      "files": [
+        "tiny_cat_outline.ngc"
+      ]
+    }

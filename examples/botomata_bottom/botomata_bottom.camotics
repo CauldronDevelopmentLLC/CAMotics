@@ -1,0 +1,39 @@
+{
+      "units": "metric",
+      "resolution-mode": "medium",
+      "resolution": 1.121903,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1.5,
+          "diameter": 0.25,
+          "description": ""
+        },
+        "2": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1.5,
+          "diameter": 0.125,
+          "description": ""
+        },
+        "3": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1.5,
+          "diameter": 0.0625,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": true,
+        "margin": 0,
+        "bounds": {
+          "min": [-45.7195, -45.7195, -20],
+          "max": [45.7195, 147.3195, 0]
+        }
+      },
+      "files": [
+        "botomata_bottom.nc"
+      ]
+    }

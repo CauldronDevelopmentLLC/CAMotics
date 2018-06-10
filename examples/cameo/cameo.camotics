@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.365095,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "ballnose",
+          "length": 10,
+          "diameter": 2,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-83.6, -104.153, -7],
+          "max": [83.6, 103.747, 0]
+        }
+      },
+      "files": [
+        "cameo.nc"
+      ]
+    }

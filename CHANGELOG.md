@@ -13,6 +13,7 @@
  - Fixed modal dialogs.
  - Fixed Windows OpenGL problems.
  - Dropped support for Qt4.
+ - Change from XML to JSON project file format and .camotics extension.
 
 ## v1.1.1:
  - Fixed bug preventing ``camsim`` from writing STL data.

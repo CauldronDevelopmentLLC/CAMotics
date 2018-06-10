@@ -22,19 +22,11 @@
 
 
 #include "ToolShape.h"
-#include "ToolUnits.h"
+#include "Units.h"
 
 #include <gcode/Axes.h>
 
 #include <cbang/json/Serializable.h>
-
-
-namespace cb {
-  namespace JSON {class Sink;}
-
-  class XMLWriter;
-  class XMLAttributes;
-}
 
 
 namespace GCode {
@@ -42,7 +34,7 @@ namespace GCode {
   protected:
     unsigned number;
     unsigned pocket;
-    ToolUnits units;
+    Units units;
     ToolShape shape;
     double vars[4];
     double snubDiameter;
@@ -53,7 +45,7 @@ namespace GCode {
     static Tool null;
 
     Tool(unsigned number = 0, unsigned pocket = 0,
-         ToolUnits units = ToolUnits::UNITS_MM);
+         Units units = Units::METRIC);
 
     unsigned getNumber() const {return number;}
     void setNumber(unsigned number) {this->number = number;}
@@ -68,8 +60,8 @@ namespace GCode {
     void setIndex(unsigned i, double value)
     {if (i < 9) Axes::setIndex(i, value); else vars[i - 9] = value;}
 
-    ToolUnits getUnits() const {return units;}
-    void setUnits(ToolUnits units) {this->units = units;}
+    Units getUnits() const {return units;}
+    void setUnits(Units units) {this->units = units;}
     ToolShape getShape() const {return shape;}
     void setShape(ToolShape shape) {this->shape = shape;}
     const std::string &getDescription() const {return description;}
@@ -90,9 +82,6 @@ namespace GCode {
     void setSnubDiameter(double value) {snubDiameter = value;}
 
     std::ostream &print(std::ostream &stream) const;
-
-    void read(const cb::XMLAttributes &attrs);
-    void write(cb::XMLWriter &writer) const;
 
     void write(cb::JSON::Sink &sink, bool withNumber) const;
 

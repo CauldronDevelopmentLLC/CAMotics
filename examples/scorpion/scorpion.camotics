@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.313222,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 12.7,
+          "diameter": 1,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [14.1468, -5.4365, -3],
+          "max": [216.309, 247.905, 0]
+        }
+      },
+      "files": [
+        "scorpion.nc"
+      ]
+    }

@@ -132,9 +132,9 @@ namespace GCode {
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
     double getAxisAbsolutePosition(char axis) const;
-    void setAxisAbsolutePosition(char axis, double pos);
+    void setAxisAbsolutePosition(char axis, double pos, Units units);
     Axes getAbsolutePosition() const;
-    void setAbsolutePosition(const Axes &axes);
+    void setAbsolutePosition(const Axes &axes, Units units);
     Axes getNextAbsolutePosition(int vars, bool incremental) const;
 
     // Move
@@ -152,7 +152,7 @@ namespace GCode {
     // Tool
     const Tool &getTool(unsigned tool) const {return tools.get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
-    void setToolTable(int vars, bool relative);
+    void setTools(int vars, bool relative);
     void toolChange();
     void loadToolOffsets(unsigned tool);
     void loadToolVarOffsets(int vars);

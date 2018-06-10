@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.304236,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1,
+          "diameter": 0.125,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [0, 0, -11],
+          "max": [80, 160, 0]
+        }
+      },
+      "files": [
+        "stretching_cat.tpl"
+      ]
+    }

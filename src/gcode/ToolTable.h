@@ -25,23 +25,15 @@
 
 #include <gcode/Processor.h>
 
-#include <cbang/xml/XMLHandlerFactory.h>
-#include <cbang/xml/XMLHandler.h>
-
 #include <map>
 
 
 namespace GCode {
   class ToolTable :
     public std::map<unsigned, Tool>, public Processor,
-    public cb::XMLHandlerFactory, public cb::XMLHandler,
     public cb::JSON::Serializable {
 
-    int current; ///< Used during XML parsing
-
   public:
-    ToolTable();
-
     bool has(unsigned tool) const;
     const Tool &at(unsigned index) const;
     const Tool &get(unsigned tool) const;
@@ -51,18 +43,6 @@ namespace GCode {
 
     // From Processor
     void operator()(const cb::SmartPointer<Block> &block);
-
-    // From XMLHandlerFactory
-    XMLHandler *getHandler(cb::XMLProcessor &processor,
-                           const cb::XMLAttributes &attrs);
-    void freeHandler(cb::XMLProcessor &processor, cb::XMLHandler *handler);
-
-    // From XMLHandler
-    void startElement(const std::string &name, const cb::XMLAttributes &attrs);
-    void endElement(const std::string &name);
-    void text(const std::string &text);
-
-    void write(cb::XMLWriter &writer) const;
 
     // From JSON::Serializable
     using cb::JSON::Serializable::read;

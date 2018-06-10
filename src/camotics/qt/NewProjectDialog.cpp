@@ -31,15 +31,15 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
 }
 
 
-void NewProjectDialog::setUnits(GCode::ToolUnits units) {
+void NewProjectDialog::setUnits(GCode::Units units) {
   ui->unitsComboBox->setCurrentIndex
-    (units == GCode::ToolUnits::UNITS_MM ? 0 : 1);
+    (units == GCode::Units::METRIC ? 0 : 1);
 }
 
 
-GCode::ToolUnits NewProjectDialog::getUnits() const {
+GCode::Units NewProjectDialog::getUnits() const {
   return ui->unitsComboBox->currentIndex() == 0 ?
-    GCode::ToolUnits::UNITS_MM : GCode::ToolUnits::UNITS_INCH;
+    GCode::Units::METRIC : GCode::Units::IMPERIAL;
 }
 
 

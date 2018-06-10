@@ -288,12 +288,17 @@ double ControllerImpl::getAxisAbsolutePosition(char axis) const {
 }
 
 
-void ControllerImpl::setAxisAbsolutePosition(char axis, double pos) {
-  position.set(axis, pos);
+void ControllerImpl::setAxisAbsolutePosition(char axis, double pos,
+                                             Units units) {
+  double scale = 1;
+  if (units == METRIC && getUnits() == IMPERIAL) scale = 1.0 / 25.4;
+  else if (units == IMPERIAL && getUnits() == METRIC) scale = 25.4;
+
+  position.set(axis, pos * scale);
 
   pos += getAxisOffset(axis);
-  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos, getUnits());
-  set("_" + string(1, tolower(axis)), pos, getUnits());
+  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos, units);
+  set("_" + string(1, tolower(axis)), pos, units);
 }
 
 
@@ -309,11 +314,11 @@ Axes ControllerImpl::getAbsolutePosition() const {
 }
 
 
-void ControllerImpl::setAbsolutePosition(const Axes &axes) {
-  LOG_INFO(5, "Controller: Set absolute position to " << axes << "mm");
+void ControllerImpl::setAbsolutePosition(const Axes &axes, Units units) {
+  LOG_INFO(5, "Controller: Set absolute position to " << axes << units);
 
   for (const char *var = Axes::AXES; *var; var++)
-    setAxisAbsolutePosition(*var, axes.get(*var));
+    setAxisAbsolutePosition(*var, axes.get(*var), units);
 }
 
 
@@ -339,7 +344,7 @@ Axes ControllerImpl::getNextAbsolutePosition(int vars, bool incremental) const {
 
 void ControllerImpl::doMove(const Axes &pos, bool rapid) {
   machine.move(pos, rapid);
-  setAbsolutePosition(pos);
+  setAbsolutePosition(pos, getUnits());
 }
 
 
@@ -538,7 +543,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
 void ControllerImpl::dwell(double seconds) {machine.dwell(seconds);}
 
 
-void ControllerImpl::setToolTable(int vars, bool relative) {
+void ControllerImpl::setTools(int vars, bool relative) {
   Tool &tool = tools.get(getVar('P'));
 
   for (const char *v = Tool::VARS; *v; v++)
@@ -594,7 +599,7 @@ void ControllerImpl::loadPredefined(bool first, int vars) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (vars & getVarType(*axis)) {
       address_t addr = PREDEFINED_ADDR(first, Axes::toIndex(*axis));
-      setAxisAbsolutePosition(*axis, get(addr));
+      setAxisAbsolutePosition(*axis, get(addr), getUnits());
     }
 }
 
@@ -692,7 +697,7 @@ void ControllerImpl::setHomed(int vars, bool homed) {
       if (homed) {
         string name = SSTR("_" << (char)tolower(*axis) << "_home");
         set(name, getVar(*axis), getUnits());
-        setAxisAbsolutePosition(*axis, getVar(*axis));
+        setAxisAbsolutePosition(*axis, getVar(*axis), getUnits());
         setAxisGlobalOffset(*axis, 0);
       }
     }
@@ -826,7 +831,7 @@ double ControllerImpl::get(address_t addr) const {return get(addr, getUnits());}
 
 
 void ControllerImpl::set(address_t addr, double value) {
-  set(addr, value, getUnits());
+  set(addr, value, NO_UNITS);
 }
 
 
@@ -839,7 +844,7 @@ double ControllerImpl::get(const string &name) const {
 
 
 void ControllerImpl::set(const string &name, double value) {
-  set(name, value, getUnits());
+  set(name, value, NO_UNITS);
 }
 
 
@@ -952,9 +957,9 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 100:
       switch ((unsigned)getVar('L')) {
-      case 1:  setToolTable(vars,          false); break;
+      case 1:  setTools(vars, false); break;
       case 2:  setCoordSystemOffsets(vars, false); break;
-      case 10: setToolTable(vars,          true);  break;
+      case 10: setTools(vars, true);  break;
       case 20: setCoordSystemOffsets(vars, true);  break;
       }
       break;

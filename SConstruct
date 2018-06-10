@@ -145,7 +145,7 @@ libs.append(lib)
 # Source
 src = []
 
-subdirs = ['', 'sim', 'probe', 'opt', 'cam', 'contour', 'machine', 'render']
+subdirs = ['', 'sim', 'probe', 'opt', 'project', 'contour', 'machine', 'render']
 if env['with_gui']: subdirs += ['view', 'qt', 'value']
 for subdir in subdirs: src += Glob('src/camotics/%s/*.cpp' % subdir)
 if env['with_tpl']: src += Glob('src/tplang/*.cpp')

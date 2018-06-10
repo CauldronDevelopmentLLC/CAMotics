@@ -29,8 +29,8 @@
 namespace CAMotics {
   class QtWin;
   class FileDialog;
-  class NCFile;
   class NCEdit;
+  namespace Project {class File;}
 
 
   class FileTabManager : public QTabWidget {
@@ -42,11 +42,11 @@ namespace CAMotics {
   public:
     FileTabManager(QWidget *parent = 0);
 
-    void open(const cb::SmartPointer<NCFile> &file,
+    void open(const cb::SmartPointer<Project::File> &file,
               int line = -1, int col = -1);
     bool isFileTab(unsigned tab) const {return offset <= tab;}
     bool isModified(unsigned tab) const;
-    const cb::SmartPointer<NCFile> &getFile(unsigned tab) const;
+    const cb::SmartPointer<Project::File> &getFile(unsigned tab) const;
     bool checkSave(unsigned tab);
     bool checkSaveAll();
     void save();

@@ -26,7 +26,7 @@
 
 #include <camotics/view/Viewer.h>
 #include <camotics/view/GL.h>
-#include <camotics/sim/Project.h>
+#include <camotics/project/Project.h>
 #include <camotics/sim/SimulationRun.h>
 #include <camotics/sim/CutWorkpiece.h>
 #include <camotics/sim/ToolPathTask.h>
@@ -342,13 +342,13 @@ void QtWin::loadExamples() {
       if (SystemUtilities::isDirectory(path)) {
         typedef map<string, string> examples_t;
         examples_t examples;
-        DirectoryWalker walker(path, ".*\\.xml", 2);
+        DirectoryWalker walker(path, ".*\\.camotics", 2);
 
         while (walker.hasNext()) {
           string filename = walker.next();
           string dirname = SystemUtilities::dirname(filename);
           string basename = SystemUtilities::basename(filename);
-          string name = basename.substr(0, basename.size() - 4);
+          string name = SystemUtilities::splitExt(basename)[0];
 
           if (String::endsWith(dirname, "/" + name)) {
             name = String::trim(name);
@@ -577,14 +577,13 @@ void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
   this->toolPath = toolPath;
 
   // Update changed Project settings
-  project->updateAutomaticWorkpiece(*toolPath);
-  project->updateResolution();
+  project->getWorkpiece().update(*toolPath);
 
   // Setup view
   view->setFlag(View::PATH_VBOS_FLAG,
                 Settings().get("Settings/VBO/Path", true).toBool());
   view->setToolPath(toolPath);
-  view->setWorkpiece(project->getWorkpieceBounds());
+  view->setWorkpiece(project->getWorkpiece().getBounds());
 
   // Update UI
   loadWorkpiece();
@@ -611,13 +610,14 @@ void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
   }
 
   // Simulation
-  project->path = toolPath;
-  project->time = view->getTime();
-  project->threads = options["threads"].toInteger();
-  project->workpiece = project->getWorkpieceBounds();
+  RenderMode mode =
+    (RenderMode::enum_t)Settings().get("Settings/RenderMode", 0).toInt();
+  Simulation sim(toolPath, project->getWorkpiece().getBounds(),
+                 project->getResolution(), view->getTime(),
+                 mode, options["threads"].toInteger());
 
   // Load new surface
-  taskMan.addTask(new SurfaceTask(*project));
+  taskMan.addTask(new SurfaceTask(sim));
 }
 
 
@@ -851,7 +851,7 @@ void QtWin::exportData() {
 
   // Export
   if (exportDialog.surfaceSelected()) {
-    string hash = project.isNull() ? "" : project->computeHash();
+    string hash = simRun->getSimulation().computeHash();
     bool binary = exportDialog.binarySTLSelected();
     surface->writeSTL(*stream, binary, "CAMotics Surface", hash);
 
@@ -860,7 +860,7 @@ void QtWin::exportData() {
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());
-    project->write(writer, true);
+    simRun->getSimulation().write(writer, true);
     writer.close();
   }
 }
@@ -880,13 +880,13 @@ GCode::ToolTable QtWin::getNewToolTable() {
     return loadDefaultToolTable();
 
   if (newProjectDialog.currentToolTableSelected())
-    return project.isNull() ? GCode::ToolTable() : project->getToolTable();
+    return project.isNull() ? GCode::ToolTable() : project->getTools();
 
   return GCode::ToolTable();
 }
 
 
-GCode::ToolUnits QtWin::getNewUnits() {return newProjectDialog.getUnits();}
+GCode::Units QtWin::getNewUnits() {return newProjectDialog.getUnits();}
 
 
 bool QtWin::runCAMDialog(const string &filename) {
@@ -933,41 +933,23 @@ void QtWin::newProject() {
 
   // Save tool table before resetting project
   GCode::ToolTable toolTable = getNewToolTable();
-  GCode::ToolUnits units = getNewUnits();
+  GCode::Units units = getNewUnits();
 
   // Create new project
   resetProject();
-  project = new Project(options);
+  project = new Project::Project;
   project->setUnits(units);
-  project->getToolTable() = toolTable;
+  project->getTools() = toolTable;
 
   reload();
   loadProject();
 }
 
 
-static bool is_xml(const string &filename) {
-  try {
-    if (!SystemUtilities::exists(filename))
-      return SystemUtilities::extension(filename) == "xml";
-
-    SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::in);
-
-    while (true) {
-      int c = stream->peek();
-      if (c == '<') return true;
-      else if (isspace(c)) stream->get(); // Next
-      else return false; // Not XML
-    }
-
-  } CATCH_WARNING;
-
-  return false;
-}
-
-
 void QtWin::openProject(const string &_filename) {
   if (!checkSave()) return;
+
+  project = new Project::Project;
 
   string filename = _filename;
   QSettings settings;
@@ -977,7 +959,8 @@ void QtWin::openProject(const string &_filename) {
   if (filename.empty()) {
     filename = QFileDialog::getOpenFileName
       (this, tr("Open File"), lastDir,
-       tr("Supported Files (*.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;"
+       tr("Supported Files "
+          "(*.camotics *.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;"
           "All Files (*.*)")).toUtf8().data();
     if (filename.empty()) return;
     settings.setValue("Projects/lastDir", QString::fromUtf8(filename.c_str()));
@@ -1029,13 +1012,22 @@ void QtWin::openProject(const string &_filename) {
   LOG_INFO(1, "Opening " << filename);
 
   try {
-    // Check if the file appears to be XML
-    bool xml = is_xml(filename);
+    // Check for project file
+    string ext = SystemUtilities::extension(filename);
+    bool is_project = ext == "camotics" || ext == "xml";
 
-    if (!xml) {
-      // Check if .xml file exists
-      string xmlPath = SystemUtilities::splitExt(filename)[0] + ".xml";
-      if (SystemUtilities::exists(xmlPath) && is_xml(xmlPath)) {
+    if (!is_project) {
+      string projectPath;
+
+      // Check if .camotics files exists
+      string path = SystemUtilities::swapExtension(filename, "camotics");
+      if (SystemUtilities::exists(path)) projectPath = path;
+      else {
+        string path = SystemUtilities::swapExtension(filename, "xml");
+        if (SystemUtilities::exists(path)) projectPath = path;
+      }
+
+      if (!projectPath.empty()) {
         int response =
           QMessageBox::question
           (this, "Project File Exists", "An CAMotics project file for the "
@@ -1046,31 +1038,32 @@ void QtWin::openProject(const string &_filename) {
 
         if (response == QMessageBox::Cancel) return;
         if (response == QMessageBox::Yes) {
-          xml = true;
-          filename = xmlPath;
+          is_project = true;
+          filename = projectPath;
         }
       }
     }
 
     resetProject();
 
-    if (xml) project = new Project(options, filename);
+    if (is_project) project = new Project::Project(filename);
     else {
       // Otherwise, create a new project with the file
 
       if (!runNewProjectDialog()) return;
 
-      if (String::toLower(SystemUtilities::extension(filename)) == "dxf")
+      if (String::toLower(SystemUtilities::extension(filename)) == "dxf") {
         if (!runCAMDialog(filename)) return;
+        // TODO handle CAM JSON
+      }
 
       // Save tool table before resetting project
       GCode::ToolTable toolTable = getNewToolTable();
-      GCode::ToolUnits units = getNewUnits();
+      GCode::Units units = getNewUnits();
 
-      project = new Project(options);
-      project->addFile(filename);
+      project->getFiles().add(filename);
       project->setUnits(units);
-      project->getToolTable() = toolTable;
+      project->getTools() = toolTable;
     }
   } CATCH_ERROR;
 
@@ -1082,18 +1075,20 @@ void QtWin::openProject(const string &_filename) {
 
 bool QtWin::saveProject(bool saveAs) {
   string filename = project->getFilename();
+  string ext = SystemUtilities::extension(filename);
 
-  if (saveAs || filename.empty()) {
+  if (saveAs || filename.empty() || ext != "camotics") {
     if (!filename.empty())
-      filename = SystemUtilities::swapExtension(filename, "xml");
+      filename = SystemUtilities::swapExtension(filename, "camotics");
 
-    filename = openFile("Save Project", "Projects (*.xml)", filename, true);
+    filename =
+      openFile("Save Project", "Projects (*.camotics)", filename, true);
     if (filename.empty()) return false;
 
     string ext = SystemUtilities::extension(filename);
-    if (ext.empty()) filename += ".xml";
-    else if (ext != "xml") {
-      warning("Project file must have .xml extension, not saved!");
+    if (ext.empty()) filename += ".camotics";
+    else if (ext != "camotics") {
+      warning("Project file must have .camotics extension, not saved!");
       return false;
     }
   }
@@ -1126,22 +1121,20 @@ void QtWin::revertProject() {
 }
 
 
-bool QtWin::isMetric() const {
-  return project.isNull() || project->isMetric();
-}
+bool QtWin::isMetric() const {return project.isNull() || project->isMetric();}
 
 
-GCode::ToolUnits QtWin::getDefaultUnits() const {
-  return (GCode::ToolUnits::enum_t)QSettings().value("Settings/Units").toInt();
+GCode::Units QtWin::getDefaultUnits() const {
+  return (GCode::Units::enum_t)QSettings().value("Settings/Units").toInt();
 }
 
 
 void QtWin::updateFiles() {
   QStringList list;
 
-  for (unsigned i = 0; i < project->getFileCount(); i++)
-    list.append(QString::fromUtf8
-                (project->getFile(i)->getRelativePath().c_str()));
+  const Project::Files &files = project->getFiles();
+  for (unsigned i = 0; i < files.size(); i++)
+    list.append(QString::fromUtf8(files.getRelativePath(i).c_str()));
 
   ui->filesListView->setModel(new QStringListModel(list));
 }
@@ -1164,35 +1157,40 @@ void QtWin::newFile(bool tpl) {
     warning("TPL file must have .tpl extension");
     return;
 
-  } else if (!tpl && (ext == "xml" || ext == "tpl")) {
-    warning("GCode file cannot have .tpl or .xml extension");
+  } else if (!tpl && (ext == "camotics" || ext == "xml" || ext == "tpl")) {
+    warning("GCode file cannot have .tpl, .camotics or .xml extension");
     return;
   }
 
-  project->addFile(filename);
+  project->getFiles().add(filename);
   updateFiles();
 }
 
 
 void QtWin::addFile() {
   string filename =
-    openFile("Add file", "Supported Files (*.nc *.ngc "
+    openFile("Add file", "Supported Files (*.dxf, *.nc *.ngc "
              "*.gcode *.tap *.tpl);;All Files (*.*)", "", false);
   if (filename.empty()) return;
 
-  project->addFile(filename);
+  if (String::toLower(SystemUtilities::extension(filename)) == "dxf") {
+    if (!runCAMDialog(filename)) return;
+    // TODO handle CAM JSON
+  }
+
+  project->getFiles().add(filename);
   updateFiles();
 }
 
 
 void QtWin::editFile(unsigned index) {
-  SmartPointer<NCFile> file = project->getFile(index);
+  SmartPointer<Project::File> file = project->getFiles().get(index);
   if (!file.isNull()) ui->fileTabManager->open(file);
 }
 
 
 void QtWin::removeFile(unsigned index) {
-  project->removeFile(index);
+  project->getFiles().remove(index);
   updateFiles();
 }
 
@@ -1215,7 +1213,7 @@ bool QtWin::checkSave(bool canCancel) {
 
 
 void QtWin::activateFile(const string &filename, int line, int col) {
-  SmartPointer<NCFile> file = project->findFile(filename);
+  SmartPointer<Project::File> file = project->getFiles().find(filename);
   if (!file.isNull()) ui->fileTabManager->open(file, line, col);
 }
 
@@ -1234,9 +1232,8 @@ void QtWin::updateActions() {
     ui->actionRevertFile->setText("Revert File");
 
   } else {
-    SmartPointer<NCFile> file = ui->fileTabManager->getFile(tab);
-    string basename = SystemUtilities::basename(file->getAbsolutePath());
-    QString title = QString::fromUtf8(basename.c_str());
+    SmartPointer<Project::File> file = ui->fileTabManager->getFile(tab);
+    QString title = QString::fromUtf8(file->getBasename().c_str());
 
     bool modified = ui->fileTabManager->isModified(tab);
     bool exists = file->exists();
@@ -1268,7 +1265,7 @@ void QtWin::updateUnits() {
 
 void QtWin::updateToolTables() {
   GCode::ToolTable tools;
-  if (!project.isNull()) tools = project->getToolTable();
+  if (!project.isNull()) tools = project->getTools();
 
   QStringList list;
   for (GCode::ToolTable::iterator it = tools.begin(); it != tools.end(); it++)
@@ -1288,7 +1285,7 @@ void QtWin::toolsChanged() {
 void QtWin::editTool(unsigned number) {
   if (project.isNull()) return;
 
-  GCode::ToolTable &tools = project->getToolTable();
+  GCode::ToolTable &tools = project->getTools();
 
   if (tools.has(number)) toolDialog.setTool(tools.get(number));
   else toolDialog.getTool().setNumber(number);
@@ -1318,7 +1315,7 @@ void QtWin::editTool(unsigned number) {
 
 void QtWin::addTool() {
   if (project.isNull()) return;
-  GCode::ToolTable &tools = project->getToolTable();
+  GCode::ToolTable &tools = project->getTools();
 
   for (unsigned i = 1; i < 1000; i++)
     if (!tools.has(i)) {
@@ -1331,14 +1328,14 @@ void QtWin::addTool() {
 
 
 void QtWin::removeTool(unsigned number) {
-  project->getToolTable().erase(number);
+  project->getTools().erase(number);
   toolsChanged();
 }
 
 
 void QtWin::exportToolTable() {
   if (project.isNull()) return;
-  const GCode::ToolTable &tools = project->getToolTable();
+  const GCode::ToolTable &tools = project->getTools();
 
   string filename =
     SystemUtilities::dirname(project->getFilename()) + "/tools.json";
@@ -1368,7 +1365,7 @@ void QtWin::importToolTable() {
     return;
   }
 
-  project->getToolTable() = tools;
+  project->getTools() = tools;
   toolsChanged();
 }
 
@@ -1400,21 +1397,23 @@ GCode::ToolTable QtWin::loadDefaultToolTable() {
 
 
 void QtWin::updateWorkpiece() {
-  view->setWorkpiece(project->getWorkpieceBounds());
+  view->setWorkpiece(project->getWorkpiece().getBounds());
   redraw();
 }
 
 
 void QtWin::loadWorkpiece() {
-  if (project->getAutomaticWorkpiece()) on_automaticCuboidRadioButton_clicked();
+  const Project::Workpiece &workpiece = project->getWorkpiece();
+
+  if (workpiece.isAutomatic()) on_automaticCuboidRadioButton_clicked();
   else on_manualCuboidRadioButton_clicked();
 
   LOCK_UI_UPDATES;
-  ui->marginDoubleSpinBox->setValue(project->getWorkpieceMargin());
+  ui->marginDoubleSpinBox->setValue(workpiece.getMargin());
 
   // Bounds
   double scale = isMetric() ? 1 : 1 / 25.4;
-  Rectangle3D bounds = project->getWorkpieceBounds();
+  Rectangle3D bounds = workpiece.getBounds();
   ui->xDimDoubleSpinBox->setValue(bounds.getDimensions().x() * scale);
   ui->yDimDoubleSpinBox->setValue(bounds.getDimensions().y() * scale);
   ui->zDimDoubleSpinBox->setValue(bounds.getDimensions().z() * scale);
@@ -1446,9 +1445,9 @@ void QtWin::loadWorkpiece() {
 
 void QtWin::setWorkpieceDim(unsigned dim, double value) {
   double scale = isMetric() ? 1 : 25.4;
-  Rectangle3D bounds = project->getWorkpieceBounds();
+  Rectangle3D bounds = project->getWorkpiece().getBounds();
   bounds.rmax[dim] = bounds.rmin[dim] + value * scale;
-  project->setWorkpieceBounds(bounds);
+  project->getWorkpiece().setBounds(bounds);
 
   updateWorkpiece();
   redraw(true);
@@ -1457,10 +1456,10 @@ void QtWin::setWorkpieceDim(unsigned dim, double value) {
 
 void QtWin::setWorkpieceOffset(unsigned dim, double value) {
   double scale = isMetric() ? 1 : 25.4;
-  Rectangle3D bounds = project->getWorkpieceBounds();
+  Rectangle3D bounds = project->getWorkpiece().getBounds();
   bounds.rmax[dim] = bounds.getDimension(dim) + value * scale;
   bounds.rmin[dim] = value * scale;
-  project->setWorkpieceBounds(bounds);
+  project->getWorkpiece().setBounds(bounds);
 
   updateWorkpiece();
   redraw(true);
@@ -1496,7 +1495,7 @@ void QtWin::updateToolPathBounds() {
 void QtWin::updateWorkpieceBounds() {
   if (project.isNull()) return;
 
-  Rectangle3D bounds = project->getWorkpieceBounds();
+  Rectangle3D bounds = project->getWorkpiece().getBounds();
   Vector3D bMin = bounds.getMin();
   Vector3D bMax = bounds.getMax();
   Vector3D bDim = bounds.getDimensions();
@@ -1827,7 +1826,6 @@ void QtWin::on_filesListView_customContextMenuRequested(QPoint point) {
 
   menu.addAction(ui->actionAddFile);
   menu.addAction(ui->actionEditFile);
-  menu.addAction(ui->actionReloadFile);
   menu.addAction(ui->actionRemoveFile);
 
   menu.exec(ui->filesListView->mapToGlobal(point));
@@ -1836,7 +1834,7 @@ void QtWin::on_filesListView_customContextMenuRequested(QPoint point) {
 
 void QtWin::on_toolTableListView_activated(const QModelIndex &index) {
   if (index.isValid())
-    editTool(project->getToolTable().at(index.row()).getNumber());
+    editTool(project->getTools().at(index.row()).getNumber());
 }
 
 
@@ -1870,10 +1868,10 @@ void QtWin::on_automaticCuboidRadioButton_clicked() {
 
   PROTECT_UI_UPDATE;
 
-  if (project->getAutomaticWorkpiece()) return;
+  if (project->getWorkpiece().isAutomatic()) return;
 
-  project->setAutomaticWorkpiece(true);
-  project->updateAutomaticWorkpiece(*toolPath);
+  project->getWorkpiece().setAutomatic(true);
+  project->getWorkpiece().update(*toolPath);
   loadWorkpiece();
 
   redraw(true);
@@ -1883,8 +1881,8 @@ void QtWin::on_automaticCuboidRadioButton_clicked() {
 void QtWin::on_marginDoubleSpinBox_valueChanged(double value) {
   PROTECT_UI_UPDATE;
 
-  project->setWorkpieceMargin(value);
-  if (!toolPath.isNull()) project->updateAutomaticWorkpiece(*toolPath);
+  project->getWorkpiece().setMargin(value);
+  if (!toolPath.isNull()) project->getWorkpiece().update(*toolPath);
   loadWorkpiece();
 
   redraw(true);
@@ -1898,9 +1896,9 @@ void QtWin::on_manualCuboidRadioButton_clicked() {
 
   PROTECT_UI_UPDATE;
 
-  if (!project->getAutomaticWorkpiece()) return;
+  if (!project->getWorkpiece().isAutomatic()) return;
 
-  project->setAutomaticWorkpiece(false);
+  project->getWorkpiece().setAutomatic(false);
   loadWorkpiece();
 
   redraw(true);
@@ -1984,12 +1982,12 @@ void QtWin::on_actionRevertFile_triggered() {ui->fileTabManager->revert();}
 
 
 void QtWin::on_actionSaveDefaultToolTable_triggered() {
-  if (!project.isNull()) saveDefaultToolTable(project->getToolTable());
+  if (!project.isNull()) saveDefaultToolTable(project->getTools());
 }
 
 
 void QtWin::on_actionLoadDefaultToolTable_triggered() {
-  if (!project.isNull()) project->getToolTable() = loadDefaultToolTable();
+  if (!project.isNull()) project->getTools() = loadDefaultToolTable();
 }
 
 
@@ -2130,12 +2128,6 @@ void QtWin::on_actionAddFile_triggered() {
 }
 
 
-void QtWin::on_actionReloadFile_triggered() {
-  openProject(project->getFile(ui->filesListView->currentIndex().row())->
-              getRelativePath());
-}
-
-
 void QtWin::on_actionEditFile_triggered() {
   editFile(ui->filesListView->currentIndex().row());
 }
@@ -2151,13 +2143,13 @@ void QtWin::on_actionAddTool_triggered() {addTool();}
 
 void QtWin::on_actionEditTool_triggered() {
   int row = ui->toolTableListView->currentIndex().row();
-  editTool(project->getToolTable().at(row).getNumber());
+  editTool(project->getTools().at(row).getNumber());
 }
 
 
 void QtWin::on_actionRemoveTool_triggered() {
   int row = ui->toolTableListView->currentIndex().row();
-  removeTool(project->getToolTable().at(row).getNumber());
+  removeTool(project->getTools().at(row).getNumber());
 }
 
 

@@ -25,7 +25,7 @@
 #include "GCodeHighlighter.h"
 #include "TPLHighlighter.h"
 
-#include <camotics/sim/NCFile.h>
+#include <camotics/project/File.h>
 
 #include <cbang/Exception.h>
 #include <cbang/os/SystemUtilities.h>
@@ -54,7 +54,7 @@ FileTabManager::FileTabManager(QWidget *parent) :
 }
 
 
-void FileTabManager::open(const SmartPointer<NCFile> &file,
+void FileTabManager::open(const SmartPointer<Project::File> &file,
                           int line, int col) {
   // Check if we already have this file open in a tab
   unsigned tab;
@@ -63,17 +63,14 @@ void FileTabManager::open(const SmartPointer<NCFile> &file,
 
   // Create new tab
   if ((unsigned)QTabWidget::count() <= tab) {
-    string absPath = file->getAbsolutePath();
-
-    bool isTPL = String::endsWith(absPath, ".tpl");
     SmartPointer<Highlighter> highlighter;
-    if (isTPL) highlighter = new TPLHighlighter;
+    if (file->isTPL()) highlighter = new TPLHighlighter;
     else highlighter = new GCodeHighlighter;
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
     NCEdit *editor = new NCEdit(file, highlighter, this);
 
-    QFile qFile(QString::fromUtf8(absPath.c_str()));
+    QFile qFile(QString::fromUtf8(file->getPath().c_str()));
     qFile.open(QFile::ReadOnly);
     QString contents = qFile.readAll();
     qFile.close();
@@ -87,8 +84,7 @@ void FileTabManager::open(const SmartPointer<NCFile> &file,
     connect(editor, SIGNAL(findNext()), SIGNAL(findNext()));
     connect(editor, SIGNAL(findResult(bool)), SIGNAL(findResult(bool)));
 
-    QString title = QString::fromUtf8
-      (SystemUtilities::basename(file->getAbsolutePath()).c_str());
+    QString title = QString::fromUtf8(file->getBasename().c_str());
     tab = (unsigned)QTabWidget::addTab(editor, title);
     QApplication::restoreOverrideCursor();
   }
@@ -125,7 +121,7 @@ bool FileTabManager::isModified(unsigned tab) const {
 }
 
 
-const SmartPointer<NCFile> &FileTabManager::getFile(unsigned tab) const {
+const SmartPointer<Project::File> &FileTabManager::getFile(unsigned tab) const {
   validateTabIndex(tab);
   return ((NCEdit *)QTabWidget::widget(tab))->getFile();
 }
@@ -200,19 +196,19 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
 
   // Get absolute path
   NCEdit *editor = (NCEdit *)QTabWidget::widget(tab);
-  NCFile &file = *editor->getFile();
-  string filename = file.getAbsolutePath();
+  Project::File &file = *editor->getFile();
+  string path = file.getPath();
 
   // Get type
   bool tpl = editor->isTPL();
 
   if (saveAs) {
-    filename = win->openFile("Save file", tpl ? "TPL (*.tpl)" :
-                             "GCode (*.nc *.ngc *.gcode)", filename, true);
-    if (filename.empty()) return;
+    path = win->openFile("Save file", tpl ? "TPL (*.tpl)" :
+                         "GCode (*.nc *.ngc *.gcode)", path, true);
+    if (path.empty()) return;
 
-    string ext = SystemUtilities::extension(filename);
-    if (ext.empty()) filename += tpl ? ".tpl" : ".gcode";
+    string ext = SystemUtilities::extension(path);
+    if (ext.empty()) path += tpl ? ".tpl" : ".gcode";
 
     else if (tpl && ext != "tpl") {
       win->warning("TPL file must have .tpl extension");
@@ -226,20 +222,19 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
 
   // Save data
   QString content = editor->toPlainText();
-  QFile qFile(QString::fromUtf8(filename.c_str()));
+  QFile qFile(QString::fromUtf8(path.c_str()));
   if (!qFile.open(QFile::WriteOnly | QIODevice::Truncate))
-    THROWS("Could not save '" << filename << "'");
+    THROWS("Could not save '" << path << "'");
   qFile.write(content.toUtf8());
   qFile.close();
 
-  // Update file name
-  filename = SystemUtilities::absolute(filename);
-  if (filename != file.getAbsolutePath()) {
-    file.setFilename(filename);
+  // Update file path
+  path = SystemUtilities::absolute(path);
+  if (path != file.getPath()) {
+    file.setPath(path);
 
     // Update tab title
-    QString
-      title(QString::fromUtf8(SystemUtilities::basename(filename).c_str()));
+    QString title(QString::fromUtf8(file.getBasename().c_str()));
     QTabWidget::setTabText(tab, title);
   }
 
@@ -247,7 +242,7 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
   editor->document()->setModified(false);
 
   // Notify
-  win->showMessage("Saved " + file.getRelativePath());
+  win->showMessage("Saved " + file.getBasename());
 }
 
 
@@ -265,15 +260,14 @@ void FileTabManager::revert(unsigned tab) {
   // Check if modified
   if (!isModified(tab)) return;
 
-  // Get absolute path
+  // Get file
   NCEdit *editor = (NCEdit *)QTabWidget::widget(tab);
-  NCFile &file = *editor->getFile();
-  string filename = file.getAbsolutePath();
+  Project::File &file = *editor->getFile();
 
-  if (!SystemUtilities::exists(filename)) return;
+  if (!file.exists()) return;
 
   // Read data
-  QFile qFile(filename.c_str());
+  QFile qFile(file.getPath().c_str());
   qFile.open(QFile::ReadOnly);
   QString contents = qFile.readAll();
   qFile.close();
@@ -286,7 +280,7 @@ void FileTabManager::revert(unsigned tab) {
   editor->document()->setModified(false);
 
   // Notify
-  win->showMessage("Reverted " + file.getRelativePath());
+  win->showMessage("Reverted " + file.getBasename());
 }
 
 
