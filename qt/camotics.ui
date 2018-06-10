@@ -422,6 +422,7 @@
     <addaction name="actionImportToolTable"/>
     <addaction name="actionSaveDefaultToolTable"/>
     <addaction name="actionLoadDefaultToolTable"/>
+    <addaction name="actionAddTool"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
