@@ -131,6 +131,20 @@ QtWin::QtWin(Application &app) :
   // Hide unfinished optimize
   ui->actionOptimize->setVisible(false);
 
+  // P.H.
+  // Set action shortcuts
+  ui->actionZoomIn->setShortcut(tr("Alt+-"));
+  ui->actionZoomOut->setShortcuts({ tr("Alt+="), tr("Alt++") });
+  ui->actionZoomAll->setShortcut(tr("Alt+A"));
+  ui->actionToggleConsole->setShortcut(tr("Alt+C"));
+  ui->actionTopView->setShortcut(tr("Alt+1"));
+  ui->actionFrontView->setShortcut(tr("Alt+2"));
+  ui->actionBackView->setShortcut(tr("Alt+3"));
+  ui->actionLeftView->setShortcut(tr("Alt+4"));
+  ui->actionRightView->setShortcut(tr("Alt+5"));
+  ui->actionBottomView->setShortcut(tr("Alt+6"));
+  ui->actionIsoView->setShortcut(tr("Alt+7"));
+
   // Load icons
   playIcon.addFile(QString::fromUtf8(":/icons/play.png"), QSize(),
                    QIcon::Normal, QIcon::Off);
@@ -1543,11 +1557,15 @@ void QtWin::setStatusActive(bool active) {
 
 void QtWin::showConsole() {
   ui->splitter->setSizes(QList<int>() << 5 << 1);
+  ui->actionShowConsole->setChecked(true);
+  ui->actionHideConsole->setChecked(false);
 }
 
 
 void QtWin::hideConsole() {
   ui->splitter->setSizes(QList<int>() << 1 << 0);
+  ui->actionHideConsole->setChecked(true);
+  ui->actionShowConsole->setChecked(false);
 }
 
 
@@ -1639,7 +1657,8 @@ void QtWin::updateTool(const string &name, unsigned value) {
 
 
 void QtWin::updateFeed(const string &name, double value) {
-  ui->feedLabel->setText(QString().sprintf("%.2f", value));
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  ui->feedLabel->setText(QString().sprintf("%.2f", value * scale));
 }
 
 
@@ -2169,9 +2188,41 @@ void QtWin::on_actionShowConsole_triggered() {
 }
 
 
+void QtWin::on_actionToggleConsole_triggered() {
+  bool isHidden = ui->actionHideConsole->isChecked();
+  if (isHidden) {
+    showConsole();
+  }
+  else {
+    hideConsole();
+  }
+}
+
+
 void QtWin::on_hideConsolePushButton_clicked() {
   on_actionHideConsole_triggered();
 }
 
 
 void QtWin::on_clearConsolePushButton_clicked() {ui->console->clear();}
+
+
+// P.H.
+// Add zoom methods
+void QtWin::glViewZoomIn() {
+  view->zoomIn();
+  redraw(true);
+}
+
+
+void QtWin::glViewZoomOut() {
+  view->zoomOut();
+  redraw(true);
+}
+
+
+// TODO Calculate extents of all displayed geometry and scale accordingly.
+void QtWin::glViewZoomAll() {
+  view->center();
+  redraw(true);
+}

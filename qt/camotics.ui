@@ -322,7 +322,7 @@
     </property>
     <widget class="QMenu" name="menuRecent_projects">
      <property name="title">
-      <string>Recent projects</string>
+      <string>&amp;Recent projects</string>
      </property>
     </widget>
     <addaction name="actionNew"/>
@@ -352,7 +352,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
@@ -367,7 +367,7 @@
    </widget>
    <widget class="QMenu" name="menuView_2">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="actionFullscreen"/>
     <addaction name="separator"/>
@@ -384,24 +384,26 @@
     <addaction name="separator"/>
     <addaction name="actionToolPath"/>
     <addaction name="actionTool"/>
-    <addaction name="actionMachine"/>
     <addaction name="actionWorkpieceBounds"/>
     <addaction name="actionAxes"/>
+    <addaction name="actionMachine"/>
     <addaction name="separator"/>
-    <addaction name="actionIsoView"/>
+    <addaction name="actionTopView"/>
     <addaction name="actionFrontView"/>
     <addaction name="actionBackView"/>
     <addaction name="actionLeftView"/>
     <addaction name="actionRightView"/>
-    <addaction name="actionTopView"/>
     <addaction name="actionBottomView"/>
+    <addaction name="actionIsoView"/>
     <addaction name="separator"/>
-    <addaction name="actionHideConsole"/>
-    <addaction name="actionShowConsole"/>
+    <addaction name="actionZoomOut"/>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomAll"/>
+    <addaction name="actionToggleConsole"/>
    </widget>
    <widget class="QMenu" name="menuSimulate">
     <property name="title">
-     <string>Simulate</string>
+     <string>Si&amp;mulate</string>
     </property>
     <addaction name="actionStop"/>
     <addaction name="actionRun"/>
@@ -413,7 +415,7 @@
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionExport"/>
@@ -423,6 +425,7 @@
     <addaction name="actionImportToolTable"/>
     <addaction name="actionSaveDefaultToolTable"/>
     <addaction name="actionLoadDefaultToolTable"/>
+    <addaction name="actionAddTool"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -467,9 +470,9 @@
    <addaction name="separator"/>
    <addaction name="actionToolPath"/>
    <addaction name="actionTool"/>
-   <addaction name="actionMachine"/>
    <addaction name="actionWorkpieceBounds"/>
    <addaction name="actionAxes"/>
+   <addaction name="actionMachine"/>
   </widget>
   <widget class="QToolBar" name="simulateToolBar">
    <property name="windowTitle">
@@ -2262,7 +2265,7 @@
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Save All</string>
+    <string>Save A&amp;ll</string>
    </property>
    <property name="toolTip">
     <string>Save the current project</string>
@@ -2286,7 +2289,7 @@
      <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
    </property>
    <property name="text">
-    <string>Export</string>
+    <string>&amp;Export</string>
    </property>
    <property name="toolTip">
     <string>Export surface, gcode or simulation data</string>
@@ -2301,6 +2304,9 @@
      <normaloff>:/icons/snapshot.png</normaloff>:/icons/snapshot.png</iconset>
    </property>
    <property name="text">
+    <string>&amp;Screenshot</string>
+   </property>
+   <property name="iconText">
     <string>Screenshot</string>
    </property>
    <property name="toolTip">
@@ -2598,7 +2604,7 @@
      <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
    </property>
    <property name="text">
-    <string>New Tool</string>
+    <string>&amp;New Tool</string>
    </property>
    <property name="toolTip">
     <string>Add a new tool</string>
@@ -2622,7 +2628,7 @@
      <normaloff>:/icons/add.png</normaloff>:/icons/add.png</iconset>
    </property>
    <property name="text">
-    <string>Add File</string>
+    <string>A&amp;dd File</string>
    </property>
    <property name="toolTip">
     <string>Add a new file to the project</string>
@@ -2706,7 +2712,7 @@
      <normaloff>:/icons/donate.png</normaloff>:/icons/donate.png</iconset>
    </property>
    <property name="text">
-    <string>Donate</string>
+    <string>&amp;Donate</string>
    </property>
    <property name="toolTip">
     <string>Please consider support this software.</string>
@@ -2732,7 +2738,7 @@
   </action>
   <action name="actionDefaultLayout">
    <property name="text">
-    <string>Default Layout</string>
+    <string>&amp;Default Layout</string>
    </property>
   </action>
   <action name="actionExamples">
@@ -2740,17 +2746,17 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Examples</string>
+    <string>&amp;Examples</string>
    </property>
   </action>
   <action name="actionMinimalLayout">
    <property name="text">
-    <string>Minimal Layout</string>
+    <string>&amp;Minimal Layout</string>
    </property>
   </action>
   <action name="actionFullLayout">
    <property name="text">
-    <string>Full Layout</string>
+    <string>&amp;Full Layout</string>
    </property>
    <property name="toolTip">
     <string>Full Layout</string>
@@ -2758,12 +2764,12 @@
   </action>
   <action name="actionToolbars">
    <property name="text">
-    <string>Toolbars</string>
+    <string>&amp;Toolbars</string>
    </property>
   </action>
   <action name="actionDocks">
    <property name="text">
-    <string>Docks</string>
+    <string>Doc&amp;ks</string>
    </property>
   </action>
   <action name="actionFullscreen">
@@ -2783,7 +2789,10 @@
      <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
    </property>
    <property name="text">
-    <string>Help</string>
+    <string>&amp;Help</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
   <action name="actionRevertFile">
@@ -2795,7 +2804,7 @@
      <normaloff>:/icons/revert.png</normaloff>:/icons/revert.png</iconset>
    </property>
    <property name="text">
-    <string>Revert File</string>
+    <string>Re&amp;vert File</string>
    </property>
    <property name="toolTip">
     <string>Revert changes to NC file.</string>
@@ -2810,7 +2819,7 @@
      <normaloff>:/icons/save_as.png</normaloff>:/icons/save_as.png</iconset>
    </property>
    <property name="text">
-    <string>Save File As</string>
+    <string>Save File A&amp;s</string>
    </property>
    <property name="toolTip">
     <string>Save NC file to a specified location.</string>
@@ -2825,7 +2834,7 @@
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save File</string>
+    <string>Save &amp;File</string>
    </property>
    <property name="toolTip">
     <string>Save file.</string>
@@ -2912,7 +2921,7 @@
      <normaloff>:/icons/select-all.png</normaloff>:/icons/select-all.png</iconset>
    </property>
    <property name="text">
-    <string>Select All</string>
+    <string>Select &amp;All</string>
    </property>
    <property name="toolTip">
     <string>Select all text in editor.</string>
@@ -2922,6 +2931,9 @@
    </property>
   </action>
   <action name="actionHideConsole">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="camotics.qrc">
      <normaloff>:/icons/hide.png</normaloff>:/icons/hide.png</iconset>
@@ -2934,6 +2946,9 @@
    </property>
   </action>
   <action name="actionShowConsole">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="camotics.qrc">
      <normaloff>:/icons/show.png</normaloff>:/icons/show.png</iconset>
@@ -2975,7 +2990,7 @@
      <normaloff>:/icons/tool-export.png</normaloff>:/icons/tool-export.png</iconset>
    </property>
    <property name="text">
-    <string>Export Tool Table</string>
+    <string>E&amp;xport Tool Table</string>
    </property>
    <property name="toolTip">
     <string>Export tool table</string>
@@ -2987,7 +3002,7 @@
      <normaloff>:/icons/tool-import.png</normaloff>:/icons/tool-import.png</iconset>
    </property>
    <property name="text">
-    <string>Import Tool Table</string>
+    <string>&amp;Import Tool Table</string>
    </property>
    <property name="toolTip">
     <string>Import tool table</string>
@@ -2999,7 +3014,7 @@
      <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save Tool Table As Default</string>
+    <string>Save Tool Table &amp;As Default</string>
    </property>
    <property name="toolTip">
     <string>Save curent tool table as default</string>
@@ -3011,7 +3026,7 @@
      <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
    </property>
    <property name="text">
-    <string>Load Default Tool Table</string>
+    <string>&amp;Load Default Tool Table</string>
    </property>
    <property name="toolTip">
     <string>Load default tool table</string>
@@ -3023,7 +3038,7 @@
      <normaloff>:/icons/settings.png</normaloff>:/icons/settings.png</iconset>
    </property>
    <property name="text">
-    <string>Settings</string>
+    <string>&amp;Settings</string>
    </property>
    <property name="toolTip">
     <string>Edit settings</string>
@@ -3050,7 +3065,7 @@
      <normaloff>:/icons/buildbotics.png</normaloff>:/icons/buildbotics.png</iconset>
    </property>
    <property name="text">
-    <string>Connect</string>
+    <string>&amp;Connect</string>
    </property>
    <property name="toolTip">
     <string>Connect to a Buildbotics CNC Controller</string>
@@ -3069,6 +3084,44 @@
    </property>
    <property name="toolTip">
     <string>Toggle machine display.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
+   </property>
+  </action>
+  <action name="actionToggleConsole">
+   <property name="text">
+    <string>Toggle &amp;Console</string>
+   </property>
+   <property name="iconText">
+    <string>Toggle &amp;Console</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="text">
+    <string>Zoom +</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Larger</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="text">
+    <string>Zoom -</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Smaller</string>
+   </property>
+  </action>
+  <action name="actionZoomAll">
+   <property name="text">
+    <string>Zoom All</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Smaller</string>
    </property>
   </action>
  </widget>

@@ -243,6 +243,10 @@ namespace CAMotics {
     void hideConsole();
     void appendConsole(const std::string &line);
 
+    void glViewZoomIn();
+    void glViewZoomOut();
+    void glViewZoomAll();
+
     // Value Observers
     void updatePlaySpeed(const std::string &name, unsigned value);
     void updateViewFlags(const std::string &name, unsigned flags);
@@ -370,8 +374,13 @@ namespace CAMotics {
 
     void on_actionHideConsole_triggered();
     void on_actionShowConsole_triggered();
+    void on_actionToggleConsole_triggered();
 
     void on_hideConsolePushButton_clicked();
     void on_clearConsolePushButton_clicked();
+
+    void on_actionZoomIn_triggered() {glViewZoomIn();}
+    void on_actionZoomOut_triggered() {glViewZoomOut();}
+    void on_actionZoomAll_triggered() {glViewZoomAll();}
   };
 }
