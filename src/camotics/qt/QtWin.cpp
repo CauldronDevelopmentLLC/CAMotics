@@ -1658,7 +1658,8 @@ void QtWin::updateTool(const string &name, unsigned value) {
 
 
 void QtWin::updateFeed(const string &name, double value) {
-  ui->feedLabel->setText(QString().sprintf("%.2f", value));
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  ui->feedLabel->setText(QString().sprintf("%.2f", value * scale));
 }
 
 
