@@ -2190,12 +2190,8 @@ void QtWin::on_actionShowConsole_triggered() {
 
 void QtWin::on_actionToggleConsole_triggered() {
   bool isHidden = ui->actionHideConsole->isChecked();
-  if (isHidden) {
-    showConsole();
-  }
-  else {
-    hideConsole();
-  }
+  if (isHidden) showConsole();
+  else hideConsole();
 }
 
 
