@@ -20,6 +20,11 @@
 
 #include "OCodeInterpreter.h"
 
+#include "SubroutineCall.h"
+#include "SubroutineLoader.h"
+#include "DoLoop.h"
+#include "RepeatLoop.h"
+
 #include <gcode/ast/Program.h>
 #include <gcode/ast/OCode.h>
 
@@ -33,21 +38,60 @@ using namespace std;
 using namespace cb;
 using namespace GCode;
 
-namespace {
-  struct ReturnException {unsigned n; ReturnException(unsigned n) : n(n) {}};
-  struct BreakException {unsigned n; BreakException(unsigned n) : n(n) {}};
-  struct ContinueException
-  {unsigned n; ContinueException(unsigned n) : n(n) {}};
+
+OCodeInterpreter::OCodeInterpreter(Controller &controller) :
+  GCodeInterpreter(controller), condition(true) {}
+
+
+OCodeInterpreter::~OCodeInterpreter() {
+  // Unwind stack in correct order
+  while (!producers.empty()) producers.pop_back();
 }
 
 
-OCodeInterpreter::
-OCodeInterpreter(Controller &controller,
-                 const SmartPointer<Interrupter> &interrupter) :
-  GCodeInterpreter(controller), interrupter(interrupter), condition(true) {}
+const SmartPointer<Program> &
+OCodeInterpreter::lookupSubroutine(const string &name) const {
+  auto it = namedSubroutines.find(name);
+  if (it == namedSubroutines.end())
+    THROWS("Subroutine " << name << " not found");
+  return it->second;
+}
 
 
-OCodeInterpreter::~OCodeInterpreter() {} // Hide member destructors
+void OCodeInterpreter::push(const SmartPointer<Producer> &producer) {
+  producers.push_back(producer);
+}
+
+
+void OCodeInterpreter::push(const InputSource &source) {
+  push(new Parser(source));
+}
+
+void OCodeInterpreter::push(Program &program) {
+  push(new ProgramProducer(SmartPointer<Program>::Phony(&program)));
+}
+
+
+bool OCodeInterpreter::hasMore() {
+  while (!producers.empty()) {
+    if (producers.back()->hasMore()) return true;
+    producers.pop_back();
+  }
+
+  return false;
+}
+
+
+void OCodeInterpreter::next() {
+  if (producers.empty()) return;
+
+  try {
+    (*this)(producers.back()->next());
+
+  } catch (const EndProgram &) {
+    while (!producers.empty()) producers.pop_back();
+  }
+}
 
 
 void OCodeInterpreter::checkExpressions(OCode *ocode, const char *name,
@@ -65,15 +109,13 @@ void OCodeInterpreter::checkExpressions(OCode *ocode, const char *name,
 
 void OCodeInterpreter::upScope() {
   stack.pop_back();
-  nameStack.pop_back();
   controller.popScope();
 }
 
 
 void OCodeInterpreter::downScope() {
-  stack.push_back(vector<double>(30));
-  nameStack.push_back(name_map_t());
-  if (stack.size() == 11) LOG_WARNING("exceeded recursion depth 10");
+  stack.push_back(StackEntry());
+  if (stack.size() == 101) LOG_WARNING("exceeded recursion depth 100");
   controller.pushScope();
 }
 
@@ -128,9 +170,9 @@ void OCodeInterpreter::doCall(OCode *ocode) {
   for (unsigned i = 0; i < expressions.size() && i < 30; i++)
     args.push_back(expressions[i]->eval(*this));
 
-  // Variable scoping
-  downScope();
-  SmartFunctor<OCodeInterpreter> closeScope(this, &OCodeInterpreter::upScope);
+  // Note, creating SubroutineCall affects variable scope
+  SmartPointer<SubroutineCall> subroutineCall =
+    new SubroutineCall(*this, ocode->getNumber());
 
   // Set args as local variables
   unsigned i = 0;
@@ -140,65 +182,69 @@ void OCodeInterpreter::doCall(OCode *ocode) {
     setReference((address_t)(i + 1),
                  GCodeInterpreter::lookupReference((address_t)i));
 
-  try {
-    // Find subroute and call
-    if (ocode->getFilename().empty()) {
-      unsigned number = ocode->getNumber();
-      subroutines_t::iterator it = subroutines.find(number);
+  // Find subroute and call
+  if (ocode->getFilename().empty()) {
+    unsigned number = ocode->getNumber();
+    subroutines_t::iterator it = subroutines.find(number);
 
-      if (it == subroutines.end())
-        THROWS("Subroutine " << number << " not found");
-      it->second->process(*this);
+    if (it == subroutines.end())
+      THROWS("Subroutine " << number << " not found");
+    subroutineCall->setProgram(it->second);
 
-    } else {
-      string name = ocode->getFilename();
-      LOG_DEBUG(3, "Seeking subroutine \"" << name << '"');
-      named_subroutines_t::iterator it = namedSubroutines.find(name);
+  } else {
+    string name = ocode->getFilename();
+    LOG_DEBUG(3, "Seeking subroutine \"" << name << '"');
+    named_subroutines_t::iterator it = namedSubroutines.find(name);
 
-      if (it == namedSubroutines.end()) {
-        // Try to load subroutine from file
-        const char *scriptPath = SystemUtilities::getenv("GCODE_SCRIPT_PATH");
-        if (!scriptPath)
-          LOG_WARNING("Environment variable GCODE_SCRIPT_PATH not set");
+    if (it != namedSubroutines.end())
+      subroutineCall->setProgram(it->second);
 
-        else {
-          if (loadedFiles.insert(name).second) {
-            string path = SystemUtilities::findInPath(scriptPath, name);
-            if (path.empty())
-              THROWS("Subroutine \"" << name
-                     << "\" file not found in GCODE_SCRIPT_PATH");
-            Parser(interrupter).parse(InputSource(path), *this);
-          }
-
-          // Look up again
-          it = namedSubroutines.find(name);
-        }
-      }
-
-      if (it == namedSubroutines.end())
+    else {
+      // Try to load subroutine from file
+      const char *scriptPath = SystemUtilities::getenv("GCODE_SCRIPT_PATH");
+      if (!scriptPath) {
+        LOG_WARNING("Environment variable GCODE_SCRIPT_PATH not set");
         THROWS("Subroutine " << name << " not found");
 
-      it->second->process(*this);
-    }
+      } else if (loadedFiles.insert(name).second) {
+        string path = SystemUtilities::findInPath(scriptPath, name);
+        if (path.empty())
+          THROWS("Subroutine \"" << name
+                 << "\" file not found in GCODE_SCRIPT_PATH");
 
-  } catch (const ReturnException &e) {
-    if (e.n != ocode->getNumber())
-      LOG_WARNING("Return number does not match subroutine");
+        push(new SubroutineLoader(name, subroutineCall, *this));
+        push(new Parser(InputSource(path)));
+        return;
+      }
+    }
   }
+
+  if (!subroutineCall->getProgram().isNull()) push(subroutineCall);
 }
 
 
 void OCodeInterpreter::doReturn(OCode *ocode) {
   checkExpressions(ocode, "return", 0);
-  throw ReturnException(ocode->getNumber());
+
+  while (!producers.empty()) {
+    SmartPointer<Producer> producer = producers.back();
+    producers.pop_back();
+
+    if (producer.isInstance<SubroutineCall>()) {
+      if (producer.cast<SubroutineCall>()->getNumber() != ocode->getNumber())
+        LOG_WARNING("Return number does not match subroutine");
+
+      break;
+    }
+  }
 }
 
 
 void OCodeInterpreter::doDo(OCode *ocode) {
   checkExpressions(ocode, "do", 0);
-  loopNumber = ocode->getNumber();
-  loop = new Program;
-  loopEnd = "while";
+  loop.number = ocode->getNumber();
+  loop.program = new Program;
+  loop.end = "while";
 }
 
 
@@ -208,29 +254,15 @@ void OCodeInterpreter::doWhile(OCode *ocode) {
   const OCode::expressions_t &expressions = ocode->getExpressions();
   SmartPointer<Entity> expr = expressions.empty() ? 0 : expressions[0];
 
-  if (loopEnd == "while" && loopNumber == ocode->getNumber()) {
-    SmartPointer<Program> loop = this->loop;
-    this->loop = 0;
-
-    do {
-      try {
-        loop->process(*this);
-
-      } catch (const ContinueException &e) {
-        if (e.n == ocode->getNumber()) continue;
-        throw;
-
-      } catch (const BreakException &e) {
-        if (e.n == ocode->getNumber()) break;
-        throw;
-      }
-    } while(!expr.isNull() && expr->eval(*this));
+  if (loop.end == "while" && loop.number == ocode->getNumber()) {
+    push(new DoLoop(ocode->getNumber(), loop.program, *this, expr, true));
+    loop.program = 0;
 
   } else {
-    loopNumber = ocode->getNumber();
-    loop = new Program;
-    loopEnd = "endwhile";
-    loopExpr = expr;
+    loop.number = ocode->getNumber();
+    loop.program = new Program;
+    loop.end = "endwhile";
+    loop.expr = expr;
   }
 }
 
@@ -238,36 +270,42 @@ void OCodeInterpreter::doWhile(OCode *ocode) {
 void OCodeInterpreter::doEndWhile(OCode *ocode) {
   checkExpressions(ocode, "endwhile", 0);
 
-  SmartPointer<Program> loop = this->loop;
-  SmartPointer<Entity> expr = loopExpr;
-
-  this->loop = 0;
-  loopExpr = 0;
-
-  while (!expr.isNull() && expr->eval(*this))
-    try {
-      loop->process(*this);
-
-    } catch (const ContinueException &e) {
-      if (e.n == ocode->getNumber()) continue;
-      throw;
-
-    } catch (const BreakException &e) {
-      if (e.n == ocode->getNumber()) break;
-      throw;
-    }
+  push(new DoLoop(ocode->getNumber(), loop.program, *this, loop.expr, false));
+  loop.program = 0;
+  loop.expr = 0;
 }
 
 
 void OCodeInterpreter::doBreak(OCode *ocode) {
   checkExpressions(ocode, "break", 0);
-  throw BreakException(ocode->getNumber());
+
+  while (!producers.empty()) {
+    SmartPointer<Producer> producer = producers.back();
+    if (!producer.isInstance<Loop>())
+      THROWS("Break outside loop or OCode number mismatch");
+
+    producers.pop_back();
+
+    if (producer.cast<Loop>()->getNumber() != ocode->getNumber()) break;
+  }
 }
 
 
 void OCodeInterpreter::doContinue(OCode *ocode) {
   checkExpressions(ocode, "continue", 0);
-  throw ContinueException(ocode->getNumber());
+
+  while (!producers.empty()) {
+    SmartPointer<Producer> producer = producers.back();
+    if (!producer.isInstance<Loop>())
+      THROWS("Break outside loop or OCode number mismatch");
+
+    if (producer.cast<Loop>()->getNumber() != ocode->getNumber()) {
+      producer.cast<Loop>()->continueLoop();
+      break;
+    }
+
+    producers.pop_back();
+  }
 }
 
 
@@ -302,21 +340,19 @@ void OCodeInterpreter::doEndIf(OCode *ocode) {
 
 void OCodeInterpreter::doRepeat(OCode *ocode) {
   checkExpressions(ocode, "repeat", 1);
-  loopNumber = ocode->getNumber();
-  loop = new Program;
-  loopEnd = "endrepeat";
+  loop.number = ocode->getNumber();
+  loop.program = new Program;
+  loop.end = "endrepeat";
   const OCode::expressions_t &expressions = ocode->getExpressions();
-  repeat = expressions.empty() ? 0 : expressions[0]->eval(*this);
+  loop.repeat = expressions.empty() ? 0 : expressions[0]->eval(*this);
 }
 
 
 void OCodeInterpreter::doEndRepeat(OCode *ocode) {
   checkExpressions(ocode, "endrepeat", 0);
 
-  SmartPointer<Program> loop = this->loop;
-  this->loop = 0;
-  unsigned repeat = this->repeat;
-  for (unsigned i = 0; i < repeat; i++) loop->process(*this);
+  push(new RepeatLoop(ocode->getNumber(), loop.program, loop.repeat));
+  loop.program = 0;
 }
 
 
@@ -336,8 +372,9 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   }
 
   // Loop
-  if (!loop.isNull() && (number != loopNumber || keyword != loopEnd)) {
-    loop->push_back(block);
+  if (!loop.program.isNull() &&
+      (number != loop.number || keyword != loop.end)) {
+    loop.program->push_back(block);
     return;
   }
 
@@ -377,18 +414,18 @@ void OCodeInterpreter::setReference(address_t addr, double value) {
 
   else {
     LOG_DEBUG(3, "Set local variable #" << addr << " = " << value);
-    stack.back()[addr - 1] = value; // Local variable assignment
+    stack.back().nums[addr - 1] = value; // Local variable assignment
   }
 }
 
 
 void OCodeInterpreter::setReference(const string &name, double value) {
-  if (nameStack.empty() || name[0] == '_')
+  if (stack.empty() || name[0] == '_')
     GCodeInterpreter::setReference(name, value);
 
   else {
     LOG_DEBUG(3, "Set local variable #<" << name << "> = " << value);
-    nameStack.back()[name] = value; // Local variable assignment
+    stack.back().names[name] = value; // Local variable assignment
   }
 }
 
@@ -398,14 +435,14 @@ double OCodeInterpreter::lookupReference(address_t addr) {
     return GCodeInterpreter::lookupReference(addr);
 
   // Local variable reference
-  return stack.back()[addr - 1];
+  return stack.back().nums[addr - 1];
 }
 
 
 double OCodeInterpreter::lookupReference(const string &name) {
-  if (name[0] != '_' && !nameStack.empty()) {
-    name_map_t &nameMap = nameStack.back();
-    name_map_t::iterator it = nameMap.find(name);
+  if (name[0] != '_' && !stack.empty()) {
+    auto &nameMap = stack.back().names;
+    auto it = nameMap.find(name);
     if (it != nameMap.end()) return it->second;
     THROWS("Local reference to '" << name << "' not found");
   }

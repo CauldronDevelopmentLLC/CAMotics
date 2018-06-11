@@ -68,7 +68,7 @@ public:
   void read(const InputSource &source) {
     if (parseOnly) {
       Printer printer(*stream, annotate);
-      Parser().parse(source, printer);
+      Parser(source).parse(printer);
 
     } else {
       pipeline.start();

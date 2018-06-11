@@ -149,18 +149,18 @@ void ToolPathTask::run() {
     } else // Assume it's just GCode
       filter.push(io::file_source(filename));
 
-    try {
-      InputSource src(filter, filename);
+    // Parse GCode
+    GCode::Interpreter interp(controller);
+    interp.push(InputSource(filter, filename));
 
-      // Parse GCode
-      GCode::Interpreter interp(controller, SmartPointer<Task>::Phony(this));
-      interp.read(src);
-      errors += interp.getErrorCount();
+    while (!Task::shouldQuit() && interp.hasMore() && errors < 32)
+      try {
+        interp.next();
 
-    } catch (const Exception &e) {
-      LOG_ERROR(e);
-      errors++;
-    }
+      } catch (const Exception &e) {
+        LOG_ERROR(e);
+        errors++;
+      }
 
     // Wait for Subprocess
     if (!proc.isNull() && proc->waitFor(5, 10)) errors++;

@@ -20,23 +20,20 @@
 
 #pragma once
 
-
-#include <cbang/SmartPointer.h>
-
-#include <vector>
-
 #include "Block.h"
 #include "Entity.h"
 
 #include <gcode/Processor.h>
+
+#include <cbang/SmartPointer.h>
+
+#include <vector>
 
 
 namespace GCode {
   class Program : public Entity, public std::vector<cb::SmartPointer<Block> >,
                   public Processor {
   public:
-    void process(Processor &processor);
-
     // From Entity
     void print(std::ostream &stream) const;
 

@@ -44,32 +44,31 @@ Runner::Runner(Controller &controller, const InputSource &source,
 
 
 void Runner::push(const InputSource &source) {
-  tokenizers.push_back(new GCode::Tokenizer(source));
+  parsers.push_back(new GCode::Parser(source));
 }
 
 
-bool Runner::hasMore() {return !tokenizers.empty();}
+bool Runner::hasMore() {return !parsers.empty() || interpreter.hasMore();}
 
 
 void Runner::next() {
   started = true;
 
-  while (!tokenizers.empty()) {
-    // Remove the top program on error or when complete
-    SmartFunctor<tokenizers_t> pop(&tokenizers, &tokenizers_t::pop_back);
+  while (hasMore()) {
+    if (!interpreter.hasMore()) {
+      interpreter.push(parsers.back());
+      parsers.pop_back();
+      continue;
+    }
 
-    try {
-      if (interpreter.readBlock(*tokenizers.back())) {
-        pop.setEngaged(false); // Don't pop
-        return;
-      }
-    } catch (const EndProgram &) {}
+    interpreter.next();
+    break;
   }
 }
 
 
 bool Runner::execute(const Code &code, int vars) {
-  if (tokenizers.size() < 2 && config.hasOverride(code)) {
+  if (parsers.size() < 2 && config.hasOverride(code)) {
     const string &gcode = config.getOverride(code);
     push(StringStreamInputSource(gcode, SSTR("<" << code << ">")));
 

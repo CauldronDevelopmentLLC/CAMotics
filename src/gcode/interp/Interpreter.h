@@ -20,10 +20,7 @@
 
 #pragma once
 
-
 #include "OCodeInterpreter.h"
-
-#include <gcode/parse/Parser.h>
 
 #include <cbang/SmartPointer.h>
 #include <cbang/io/Reader.h>
@@ -33,22 +30,11 @@ namespace GCode {
   class Tokenizer;
 
   class Interpreter : public OCodeInterpreter, public cb::Reader {
-    Parser parser;
-
-  protected:
-    unsigned errors;
-
   public:
-    Interpreter(Controller &controller,
-                const cb::SmartPointer<Interrupter> &interrupter =
-                new NullInterrupter) :
-      OCodeInterpreter(controller, interrupter), parser(interrupter),
-      errors(0) {}
+    Interpreter(Controller &controller) :
+      OCodeInterpreter(controller) {}
 
-    unsigned getErrorCount() const {return errors;}
-
-    bool readBlock(GCode::Tokenizer &tokenizer);
-    void read(const cb::InputSource &source, unsigned maxErrors);
+    unsigned run(unsigned maxErrors = 32);
 
     // From cb::Reader
     void read(const cb::InputSource &source);
