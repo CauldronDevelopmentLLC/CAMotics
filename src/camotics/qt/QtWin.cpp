@@ -136,6 +136,14 @@ QtWin::QtWin(Application &app) :
   ui->actionZoomIn->setShortcut(tr("Alt+-"));
   ui->actionZoomOut->setShortcuts({ tr("Alt+="), tr("Alt++") });
   ui->actionZoomAll->setShortcut(tr("Alt+A"));
+  ui->actionToggleConsole->setShortcut(tr("Alt+C"));
+  ui->actionTopView->setShortcut(tr("Alt+1"));
+  ui->actionFrontView->setShortcut(tr("Alt+2"));
+  ui->actionBackView->setShortcut(tr("Alt+3"));
+  ui->actionLeftView->setShortcut(tr("Alt+4"));
+  ui->actionRightView->setShortcut(tr("Alt+5"));
+  ui->actionBottomView->setShortcut(tr("Alt+6"));
+  ui->actionIsoView->setShortcut(tr("Alt+7"));
 
   // Load icons
   playIcon.addFile(QString::fromUtf8(":/icons/play.png"), QSize(),
