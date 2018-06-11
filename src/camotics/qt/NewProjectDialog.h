@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <gcode/ToolUnits.h>
+#include <gcode/Units.h>
 
 #include <cbang/SmartPointer.h>
 
@@ -37,9 +37,9 @@ namespace CAMotics {
   public:
     NewProjectDialog(QWidget *parent);
 
-    void setUnits(GCode::ToolUnits units);
+    void setUnits(GCode::Units units);
 
-    GCode::ToolUnits getUnits() const;
+    GCode::Units getUnits() const;
     bool defaultToolTableSelected() const;
     bool currentToolTableSelected() const;
   };

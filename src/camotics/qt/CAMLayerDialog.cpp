@@ -23,11 +23,12 @@
 #include "ui_cam_layer_dialog.h"
 
 using namespace CAMotics;
+using namespace cb;
 using namespace std;
 
 
 CAMLayerDialog::CAMLayerDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::CAMLayerDialog) {
+  QDialog(parent), ui(new Ui::CAMLayerDialog), metric(true) {
   ui->setupUi(this);
 }
 
@@ -39,8 +40,8 @@ void CAMLayerDialog::setLayers(const vector<string> &layers) {
 }
 
 
-void CAMLayerDialog::setUnits(GCode::ToolUnits units) {
-  bool metric = units == GCode::ToolUnits::UNITS_MM;
+void CAMLayerDialog::setUnits(GCode::Units units) {
+  metric = units == GCode::Units::METRIC;
 
   ui->feedSpinBox->setSuffix(metric ? " mm/min" : " in/min");
   ui->offsetDoubleSpinBox->setSuffix(metric ? " mm" : " in");
@@ -50,44 +51,63 @@ void CAMLayerDialog::setUnits(GCode::ToolUnits units) {
 }
 
 
-CAMLayer CAMLayerDialog::getLayer() const {
-  return CAMLayer(ui->layerComboBox->currentText().toUtf8().data(),
-                  ui->toolSpinBox->value(),
-                  ui->feedSpinBox->value(),
-                  ui->speedSpinBox->value(),
-                  (OffsetType::enum_t)ui->offsetComboBox->currentIndex(),
-                  ui->offsetDoubleSpinBox->value(),
-                  ui->startDepthDoubleSpinBox->value(),
-                  ui->endDepthDoubleSpinBox->value(),
-                  ui->stepDoubleSpinBox->value());
+string CAMLayerDialog::getOffsetType(int index) const {
+  return String::toLower(ui->offsetComboBox->itemText(index).toUtf8().data());
 }
 
 
-void CAMLayerDialog::setLayer(const CAMLayer &layer) {
-  int index =
-    ui->layerComboBox->findText(QString().fromUtf8(layer.name.c_str()));
-  if (index != -1) ui->layerComboBox->setCurrentIndex(index);
+string CAMLayerDialog::getOffsetType() const {
+  return getOffsetType(ui->offsetComboBox->currentIndex());
+}
 
-  ui->toolSpinBox->setValue(layer.tool);
-  ui->feedSpinBox->setValue(layer.feed);
-  ui->speedSpinBox->setValue(layer.speed);
-  ui->offsetComboBox->setCurrentIndex(layer.offsetType);
-  ui->offsetDoubleSpinBox->setValue(layer.offset);
-  ui->startDepthDoubleSpinBox->setValue(layer.startDepth);
-  ui->endDepthDoubleSpinBox->setValue(layer.endDepth);
-  ui->stepDoubleSpinBox->setValue(layer.maxStep);
+
+void CAMLayerDialog::setOffsetType(const string &offset) {
+  for (int i = 0; i < ui->offsetComboBox->count(); i++)
+    if (offset == getOffsetType(i)) ui->offsetComboBox->setCurrentIndex(i);
 }
 
 
 void CAMLayerDialog::update() {
-  bool manual = ui->offsetComboBox->currentIndex() == 3;
-  ui->offsetDoubleSpinBox->setEnabled(manual);
+  ui->offsetDoubleSpinBox->setEnabled(getOffsetType() == "custom");
 }
 
 
 int CAMLayerDialog::exec() {
   update();
   return QDialog::exec();
+}
+
+
+void CAMLayerDialog::read(const JSON::Value &value) {
+  const double scale = metric ? 1 : 25.4;
+
+  ui->toolSpinBox->setValue(value.getNumber("tool", 0));
+  ui->feedSpinBox->setValue(value.getNumber("feed", 0) * scale);
+  ui->speedSpinBox->setValue(value.getNumber("speed", 0));
+  setOffsetType(value.getString("offset-type", "none"));
+  ui->offsetDoubleSpinBox->setValue(value.getNumber("offset", 0));
+  ui->startDepthDoubleSpinBox->
+    setValue(value.getNumber("start-depth", 0) * scale);
+  ui->endDepthDoubleSpinBox->setValue(value.getNumber("end-depth", 0) * scale);
+  ui->stepDoubleSpinBox->setValue(value.getNumber("max-step-down", 0) * scale);
+}
+
+
+void CAMLayerDialog::write(JSON::Sink &sink) const {
+  const double scale = metric ? 1 : 25.4;
+
+  sink.beginDict();
+  sink.insert("name", ui->layerComboBox->currentText().toUtf8().data());
+  sink.insert("tool", (int)ui->toolSpinBox->value());
+  sink.insert("feed", ui->feedSpinBox->value() / scale);
+  sink.insert("speed", ui->speedSpinBox->value());
+  sink.insert("offset-type", getOffsetType());
+  if (getOffsetType() == "custom")
+    sink.insert("offset", ui->offsetDoubleSpinBox->value());
+  sink.insert("start-depth", ui->startDepthDoubleSpinBox->value() / scale);
+  sink.insert("end-depth", ui->endDepthDoubleSpinBox->value() / scale);
+  sink.insert("max-step-down", ui->stepDoubleSpinBox->value() / scale);
+  sink.endDict();
 }
 
 

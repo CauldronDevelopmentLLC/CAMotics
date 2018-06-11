@@ -39,16 +39,40 @@ using namespace GCode;
 ControllerImpl::ControllerImpl(MachineInterface &machine,
                                const ToolTable &tools) :
   tools(tools), syncState(SYNC_NONE), offsetParamChanged(false),
-  currentMotionMode(10), plane(MachineInterface::XY),
-  latheDiameterMode(true), cutterRadiusComp(false), toolLengthComp(false),
-  pathMode(EXACT_PATH_MODE), returnMode(RETURN_TO_R),
-  motionBlendingTolerance(0), naiveCamTolerance(0),
-  incrementalDistanceMode(false), arcIncrementalDistanceMode(true),
-  moveInAbsoluteCoords(false), spindleDir(DIR_OFF), speed(0) {
+  currentMotionMode(10) {
+
+  state.units                      = this->machine.getUnits();
+  state.plane                      = XY;
+  state.cutterRadiusComp           = false;
+  state.toolDiameter               = 0;
+  state.toolOrientation            = 0;
+  state.incrementalDistanceMode    = false;
+  state.feedMode                   = UNITS_PER_MINUTE;
+  state.coordSystem                = 1;
+  state.toolLengthComp             = false;
+  state.returnMode                 = RETURN_TO_R;
+  state.spinMode                   = REVOLUTIONS_PER_MINUTE;
+  state.arcIncrementalDistanceMode = true;
+  state.latheDiameterMode          = true;
+  state.pathMode                   = EXACT_PATH_MODE;
+  state.feed                       = 0;
+  state.speed                      = 0;
+  state.spindleDir                 = DIR_OFF;
+  state.mist                       = false;
+  state.flood                      = false;
+  state.speedOverride              = 0;
+  state.feedOverride               = 0;
+  state.adaptiveFeed               = false;
+  state.feedHold                   = false;
+  state.motionBlendingTolerance    = 0;
+  state.naiveCamTolerance          = 0;
+  state.moveInAbsoluteCoords       = false;
 
   this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
 
   memset(varValues, 0, sizeof(varValues));
+
+  pushScope();
 }
 
 
@@ -113,37 +137,51 @@ void ControllerImpl::setUnits(Units units) {
 
   case Units::METRIC:
     machine.setMetric();
-    set("_metric", 1, NO_UNITS);
+    set("_metric",   1, NO_UNITS);
     set("_imperial", 0, NO_UNITS);
     position = position * 25.4;
     break;
 
   case Units::IMPERIAL:
     machine.setImperial();
-    set("_metric", 0, NO_UNITS);
+    set("_metric",   0, NO_UNITS);
     set("_imperial", 1, NO_UNITS);
     position = position / 25.4;
     break;
   }
+
+  state.units = units;
 }
 
 
-void ControllerImpl::setFeedMode(feed_mode_t mode) {machine.setFeedMode(mode);}
+void ControllerImpl::setFeedMode(feed_mode_t mode) {
+  state.feedMode = mode;
+  machine.setFeedMode(mode);
+}
 
 
 void ControllerImpl::setSpindleDir(dir_t dir) {
-  spindleDir = dir;
-  setSpeed(speed);
+  state.spindleDir = dir;
+  setSpeed(state.speed);
+}
+
+
+void ControllerImpl::setSpinMode(spin_mode_t mode, double max) {
+  state.spinMode = mode;
+  state.spinMax = max;
+  machine.setSpinMode(mode, max);
 }
 
 
 void ControllerImpl::setMistCoolant(bool enable) {
+  state.mist = enable;
   machine.output(MachineEnum::MIST, enable);
   set("_mist", enable, NO_UNITS);
 }
 
 
 void ControllerImpl::setFloodCoolant(bool enable) {
+  state.flood = enable;
   machine.output(MachineEnum::FLOOD, enable);
   set("_flood", enable, NO_UNITS);
 }
@@ -184,40 +222,41 @@ void ControllerImpl::input(unsigned index, bool digital, input_mode_t mode,
 }
 
 
-void ControllerImpl::setPlane(MachineInterface::plane_t plane) {
-  if (MachineInterface::VW < plane) THROW("Invalid plane");
-  this->plane = plane;
+void ControllerImpl::setPlane(plane_t plane) {
+  if (VW < plane) THROWS("Invalid plane: " << plane);
+  state.plane = plane;
 }
 
 
 const char *ControllerImpl::getPlaneAxes() const {
-  switch (plane) {
-  case MachineInterface::XY: return "XYZ";
-  case MachineInterface::XZ: return "XZY";
-  case MachineInterface::YZ: return "YZX";
-  case MachineInterface::UV: return "UVW";
-  case MachineInterface::UW: return "UWV";
-  case MachineInterface::VW: return "VZU";
-  default: THROWS("Invalid plane: " << plane);
+  switch (state.plane) {
+  case XY: return "XYZ";
+  case XZ: return "XZY";
+  case YZ: return "YZX";
+  case UV: return "UVW";
+  case UW: return "UWV";
+  case VW: return "VZU";
+  default: THROWS("Invalid plane: " << state.plane);
   }
 }
 
 
 const char *ControllerImpl::getPlaneOffsets() const {
-  switch (plane) {
-  case MachineInterface::XY: return "IJ";
-  case MachineInterface::XZ: return "IK";
-  case MachineInterface::YZ: return "JK";
-  case MachineInterface::UV: return "IJ";
-  case MachineInterface::UW: return "IK";
-  case MachineInterface::VW: return "JK";
-  default: THROWS("Invalid plane: " << plane);
+  switch (state.plane) {
+  case XY: return "IJ";
+  case XZ: return "IK";
+  case YZ: return "JK";
+  case UV: return "IJ";
+  case UW: return "IK";
+  case VW: return "JK";
+  default: THROWS("Invalid plane: " << state.plane);
   }
 }
 
 
 double ControllerImpl::getAxisOffset(char axis) const {
-  if (moveInAbsoluteCoords) return 0; // TODO could this affect non-move ops?
+  // TODO could this affect non-move ops?
+  if (state.moveInAbsoluteCoords) return 0;
 
   unsigned axisIndex = Axes::toIndex(axis);
 
@@ -249,12 +288,17 @@ double ControllerImpl::getAxisAbsolutePosition(char axis) const {
 }
 
 
-void ControllerImpl::setAxisAbsolutePosition(char axis, double pos) {
-  position.set(axis, pos);
+void ControllerImpl::setAxisAbsolutePosition(char axis, double pos,
+                                             Units units) {
+  double scale = 1;
+  if (units == METRIC && getUnits() == IMPERIAL) scale = 1.0 / 25.4;
+  else if (units == IMPERIAL && getUnits() == METRIC) scale = 25.4;
+
+  position.set(axis, pos * scale);
 
   pos += getAxisOffset(axis);
-  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos, getUnits());
-  set("_" + string(1, tolower(axis)), pos, getUnits());
+  set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos, units);
+  set("_" + string(1, tolower(axis)), pos, units);
 }
 
 
@@ -270,11 +314,11 @@ Axes ControllerImpl::getAbsolutePosition() const {
 }
 
 
-void ControllerImpl::setAbsolutePosition(const Axes &axes) {
-  LOG_INFO(5, "Controller: Set absolute position to " << axes << "mm");
+void ControllerImpl::setAbsolutePosition(const Axes &axes, Units units) {
+  LOG_INFO(5, "Controller: Set absolute position to " << axes << units);
 
   for (const char *var = Axes::AXES; *var; var++)
-    setAxisAbsolutePosition(*var, axes.get(*var));
+    setAxisAbsolutePosition(*var, axes.get(*var), units);
 }
 
 
@@ -300,7 +344,7 @@ Axes ControllerImpl::getNextAbsolutePosition(int vars, bool incremental) const {
 
 void ControllerImpl::doMove(const Axes &pos, bool rapid) {
   machine.move(pos, rapid);
-  setAbsolutePosition(pos);
+  setAbsolutePosition(pos, getUnits());
 }
 
 
@@ -321,11 +365,11 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   // TODO Make sure this is correct for planes XZ and YZ
 
   const char *axes = getPlaneAxes();
-  if (plane == MachineInterface::XZ) clockwise = !clockwise;
+  if (state.plane == XZ) clockwise = !clockwise;
 
   // Compute start and end points
   Axes current = getAbsolutePosition();
-  Axes target = getNextAbsolutePosition(vars, incrementalDistanceMode);
+  Axes target = getNextAbsolutePosition(vars, state.incrementalDistanceMode);
   Vector2D start = Vector2D(current.get(axes[0]), current.get(axes[1]));
   Vector2D finish = Vector2D(target.get(axes[0]), target.get(axes[1]));
   Vector2D center;
@@ -364,7 +408,7 @@ void ControllerImpl::arc(int vars, bool clockwise) {
     const char *offsets = getPlaneOffsets();
     Vector2D offset;
 
-    if (arcIncrementalDistanceMode) {
+    if (state.arcIncrementalDistanceMode) {
       offset =
         Vector2D((vars & getVarType(offsets[0])) ? getVar(offsets[0]) : 0,
                  (vars & getVarType(offsets[1])) ? getVar(offsets[1]) : 0);
@@ -398,7 +442,7 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
   Vector2D offset = center - start;
-  machine.arc(Vector3D(offset.x(), offset.y(), deltaZ), -angle, plane);
+  machine.arc(Vector3D(offset.x(), offset.y(), deltaZ), -angle, state.plane);
   doMove(target, false);
 
   LOG_INFO(3, "Controller: Arc");
@@ -409,7 +453,7 @@ void ControllerImpl::straightProbe(int vars, bool towardWorkpiece,
                                    bool signalError) {
   syncState = SYNC_PROBE; // Synchronize with found position
   machine.seek(PROBE, towardWorkpiece, signalError);
-  makeMove(vars, false, incrementalDistanceMode);
+  makeMove(vars, false, state.incrementalDistanceMode);
 
   LOG_INFO(3, "Controller: straight probe "
            << (towardWorkpiece ? "toward" : "away from") << " workpiece"
@@ -456,7 +500,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
   unsigned L = (vars & VT_L) ? (unsigned)getVar('L') : 1;
 
   double zClear = 0;
-  switch (returnMode) {
+  switch (state.returnMode) {
   case RETURN_TO_R: zClear = r; break;
   case RETURN_TO_OLD_Z: {
     double oldZ = getAxisPosition(getPlaneZAxis());
@@ -471,20 +515,20 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
     if (!i && z < r) moveAxis(getPlaneZAxis(), r, true);
 
     // Traverse to XY
-    makeMove(xyVars, true, incrementalDistanceMode);
+    makeMove(xyVars, true, state.incrementalDistanceMode);
 
     // Traverse to Z if above
     z = getAxisPosition(getPlaneZAxis());
     if (z != r) moveAxis(getPlaneZAxis(), r, true);
 
     // Drill
-    makeMove(zVar, false, incrementalDistanceMode);
+    makeMove(zVar, false, state.incrementalDistanceMode);
 
     // Dwell
     if (dwell) this->dwell(getVar('P'));
 
     // Stop Spindle
-    dir_t spindleDir = this->spindleDir;
+    dir_t spindleDir = state.spindleDir;
     if (spindleStop) setSpindleDir(DIR_OFF);
 
     // Retract
@@ -499,7 +543,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
 void ControllerImpl::dwell(double seconds) {machine.dwell(seconds);}
 
 
-void ControllerImpl::setToolTable(int vars, bool relative) {
+void ControllerImpl::setTools(int vars, bool relative) {
   Tool &tool = tools.get(getVar('P'));
 
   for (const char *v = Tool::VARS; *v; v++)
@@ -555,12 +599,13 @@ void ControllerImpl::loadPredefined(bool first, int vars) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (vars & getVarType(*axis)) {
       address_t addr = PREDEFINED_ADDR(first, Axes::toIndex(*axis));
-      setAxisAbsolutePosition(*axis, get(addr));
+      setAxisAbsolutePosition(*axis, get(addr), getUnits());
     }
 }
 
 
 void ControllerImpl::setCoordSystem(unsigned cs) {
+  state.coordSystem = cs;
   set(CURRENT_COORD_SYSTEM, cs, NO_UNITS);
 }
 
@@ -652,7 +697,7 @@ void ControllerImpl::setHomed(int vars, bool homed) {
       if (homed) {
         string name = SSTR("_" << (char)tolower(*axis) << "_home");
         set(name, getVar(*axis), getUnits());
-        setAxisAbsolutePosition(*axis, getVar(*axis));
+        setAxisAbsolutePosition(*axis, getVar(*axis), getUnits());
         setAxisGlobalOffset(*axis, 0);
       }
     }
@@ -667,26 +712,22 @@ void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
 
   try {
     if (dynamic) {
-      set(TOOL_DIAMETER, (left ? 1 : -1) * getVar('D'), getUnits());
-      if (vars & VT_L) set(TOOL_ORIENTATION, getVar('L'), NO_UNITS);
-      else set(TOOL_ORIENTATION, 0, NO_UNITS);
+      state.toolDiameter = (left ? 1 : -1) * getVar('D');
+      if (vars & VT_L) state.toolOrientation = getVar('L');
+      else state.toolOrientation = 0;
 
     } else {
-      set(TOOL_ORIENTATION, 0, NO_UNITS);
+      state.toolOrientation = 0;
 
-      if (!(vars & VT_D)) {
-        double dia = getTool(getCurrentTool()).getRadius() * 2;
-        set(TOOL_DIAMETER, dia, getUnits());
-
-      } else if (!getVar('D')) set(TOOL_DIAMETER, 0, getUnits());
-
-      else {
-        double dia = getTool(getVar('D')).getRadius() * 2;
-        set(TOOL_DIAMETER, dia, getUnits());
-      }
+      if (!(vars & VT_D))
+        state.toolDiameter = getTool(getCurrentTool()).getRadius() * 2;
+      else if (!getVar('D')) state.toolDiameter = 0;
+      else state.toolDiameter = getTool(getVar('D')).getRadius() * 2;
     }
 
-    cutterRadiusComp = true;
+    set(TOOL_DIAMETER, state.toolDiameter, getUnits());
+    set(TOOL_ORIENTATION, state.toolOrientation, NO_UNITS);
+    state.cutterRadiusComp = true;
 
   } CATCH_WARNING; // Tool may not exist
 }
@@ -700,18 +741,18 @@ void ControllerImpl::end() {
   setCoordSystem(1);
 
   // Selected plane is set to XY plane (G17)
-  setPlane(MachineInterface::XY);
+  setPlane(XY);
 
   // Distance mode is set to absolute mode (G90)
-  incrementalDistanceMode = false;
+  state.incrementalDistanceMode = false;
 
   // Feed rate mode is set to units per minute (G94)
-  setFeedMode(MachineInterface::UNITS_PER_MINUTE);
+  setFeedMode(UNITS_PER_MINUTE);
 
   // TODO Feed and speed overrides are set to on (M48)
 
   // Cutter compensation is turned off (G40)
-  cutterRadiusComp = false;
+  state.cutterRadiusComp = false;
 
   // The spindle is stopped (M5)
   setSpindleDir(DIR_OFF);
@@ -751,16 +792,46 @@ void ControllerImpl::set(const string &name, double value, Units units) {
 }
 
 
-void ControllerImpl::message(const string &text) {machine.message(text);}
+void ControllerImpl::saveModalState(bool autoRestore) {
+  if (autoRestore && stateStack.size() == 1)
+    LOG_WARNING("Cannot autorestore modal state from top scope");
 
-
-double ControllerImpl::get(address_t addr) const {
-  return get(addr, getUnits());
+  state.autoRestore = autoRestore;
+  stateStack.back() = new state_t(this->state);
 }
 
 
+void ControllerImpl::clearSavedModalState() {stateStack.back().release();}
+
+
+void ControllerImpl::restoreModalState() {
+  if (stateStack.back().isNull()) {
+    LOG_ERROR("Cannot restore modal state when not previously saved at this "
+              "scope");
+    return;
+  }
+
+  state = *stateStack.back();
+
+  setUnits(state.units);
+  set(TOOL_DIAMETER, state.toolDiameter, getUnits());
+  set(TOOL_ORIENTATION, state.toolOrientation, NO_UNITS);
+  setFeedMode(state.feedMode);
+  setCoordSystem(state.coordSystem);
+  setSpinMode(state.spinMode, state.spinMax);
+  setFeed(state.feed);
+  setSpeed(state.speed);
+  setMistCoolant(state.mist);
+  setFloodCoolant(state.flood);
+}
+
+
+void ControllerImpl::message(const string &text) {machine.message(text);}
+double ControllerImpl::get(address_t addr) const {return get(addr, getUnits());}
+
+
 void ControllerImpl::set(address_t addr, double value) {
-  set(addr, value, getUnits());
+  set(addr, value, NO_UNITS);
 }
 
 
@@ -773,7 +844,7 @@ double ControllerImpl::get(const string &name) const {
 
 
 void ControllerImpl::set(const string &name, double value) {
-  set(name, value, getUnits());
+  set(name, value, NO_UNITS);
 }
 
 
@@ -797,8 +868,9 @@ void ControllerImpl::synchronize(double result) {
 
   case SYNC_SEEK:
   case SYNC_PROBE:
-    // Set probed position PROBE_RESULT_X-W and PROBE_SUCCESS
+    // Set PROBE_SUCCESS and probed position in PROBE_RESULT_X to W
     set(PROBE_SUCCESS, result, NO_UNITS);
+
     for (const char *axis = Axes::AXES; *axis; axis++)
       set(PROBE_RESULT_ADDR(Axes::toIndex(*axis)),
           getAxisAbsolutePosition(*axis), getUnits());
@@ -816,15 +888,18 @@ void ControllerImpl::setLocation(const LocationRange &location) {
 }
 
 
-void ControllerImpl::setFeed(double feed) {machine.setFeed(feed);}
+void ControllerImpl::setFeed(double feed) {
+  state.feed = feed;
+  machine.setFeed(feed);
+}
 
 
 void ControllerImpl::setSpeed(double speed) {
-  this->speed = speed;
+  state.speed = speed;
 
   double mspeed;
 
-  switch (spindleDir) {
+  switch (state.spindleDir) {
   case DIR_OFF: mspeed = 0; break;
   case DIR_CLOCKWISE: mspeed = speed; break;
   case DIR_COUNTERCLOCKWISE: mspeed = -speed; break;
@@ -840,12 +915,22 @@ void ControllerImpl::setTool(unsigned tool) {
 }
 
 
+void ControllerImpl::pushScope() {stateStack.push_back(0);}
+
+
+void ControllerImpl::popScope() {
+  if (!stateStack.back().isNull() && stateStack.back()->autoRestore)
+    restoreModalState();
+  stateStack.pop_back();
+}
+
+
 void ControllerImpl::startBlock() {
   if (syncState != SYNC_NONE) {
     LOG_WARNING("New block started without position of previous seek move");
     syncState = SYNC_NONE;
   }
-  moveInAbsoluteCoords = false;
+  state.moveInAbsoluteCoords = false;
 }
 
 
@@ -855,8 +940,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
   switch (code.type) {
   case 'G':
     switch (code.number) {
-    case 0:  makeMove(vars, true,  incrementalDistanceMode); break;
-    case 10: makeMove(vars, false, incrementalDistanceMode); break;
+    case 0:  makeMove(vars, true,  state.incrementalDistanceMode); break;
+    case 10: makeMove(vars, false, state.incrementalDistanceMode); break;
 
     case 20: arc(vars, true);    break;
     case 30: arc(vars, false);   break;
@@ -867,24 +952,24 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 52: implemented = false; break; // TODO NURBS Block Start
     case 53: implemented = false; break; // TODO NURBS Block End
 
-    case 70: latheDiameterMode = true;  break;
-    case 80: latheDiameterMode = false; break; // Radius mode
+    case 70: state.latheDiameterMode = true;  break;
+    case 80: state.latheDiameterMode = false; break; // Radius mode
 
     case 100:
       switch ((unsigned)getVar('L')) {
-      case 1:  setToolTable(vars,          false); break;
+      case 1:  setTools(vars, false); break;
       case 2:  setCoordSystemOffsets(vars, false); break;
-      case 10: setToolTable(vars,          true);  break;
+      case 10: setTools(vars, true);  break;
       case 20: setCoordSystemOffsets(vars, true);  break;
       }
       break;
 
-    case 170: setPlane(MachineInterface::XY); break;
-    case 171: setPlane(MachineInterface::UV); break;
-    case 180: setPlane(MachineInterface::XZ); break;
-    case 181: setPlane(MachineInterface::UW); break;
-    case 190: setPlane(MachineInterface::YZ); break;
-    case 191: setPlane(MachineInterface::VW); break;
+    case 170: setPlane(XY); break;
+    case 171: setPlane(UV); break;
+    case 180: setPlane(XZ); break;
+    case 181: setPlane(UW); break;
+    case 190: setPlane(YZ); break;
+    case 191: setPlane(VW); break;
 
     case 200: setUnits(Units::IMPERIAL); break;
     case 210: setUnits(Units::METRIC);   break;
@@ -915,26 +1000,26 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 388: seek(vars, false, true);  break;
     case 389: seek(vars, false, false); break;
 
-    case 400: cutterRadiusComp = false; break;
+    case 400: state.cutterRadiusComp = false; break;
     case 410: setCutterRadiusComp(vars, true, false);  break;
     case 411: setCutterRadiusComp(vars, true, true);   break;
     case 420: setCutterRadiusComp(vars, false, false); break;
     case 421: setCutterRadiusComp(vars, false, true);  break;
 
     case 430:
-      toolLengthComp = true;
+      state.toolLengthComp = true;
       loadToolOffsets((vars & VT_H) ? getVar('H') : getCurrentTool());
       break;
 
     case 431:
-      toolLengthComp = true;
+      state.toolLengthComp = true;
       loadToolVarOffsets(vars);
       break;
 
-    case 490: toolLengthComp = false; break;
+    case 490: state.toolLengthComp = false; break;
 
     case 520: setGlobalOffsets(vars); break; // Same as G92
-    case 530: moveInAbsoluteCoords = true;  break;
+    case 530: state.moveInAbsoluteCoords = true;  break;
     case 540: setCoordSystem(1); break;
     case 550: setCoordSystem(2); break;
     case 560: setCoordSystem(3); break;
@@ -945,15 +1030,15 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 592: setCoordSystem(8); break;
     case 593: setCoordSystem(9); break;
 
-    case 610: pathMode = EXACT_PATH_MODE; break;
-    case 611: pathMode = EXACT_STOP_MODE; break;
+    case 610: state.pathMode = EXACT_PATH_MODE; break;
+    case 611: state.pathMode = EXACT_STOP_MODE; break;
 
     case 640:
-      pathMode = CONTINUOUS_MODE;
-      if (vars & VT_P) motionBlendingTolerance = getVar('P');
-      else motionBlendingTolerance = 0;
-      if (vars & VT_Q) naiveCamTolerance = getVar('Q');
-      else naiveCamTolerance = 0;
+      state.pathMode = CONTINUOUS_MODE;
+      if (vars & VT_P) state.motionBlendingTolerance = getVar('P');
+      else state.motionBlendingTolerance = 0;
+      if (vars & VT_Q) state.naiveCamTolerance = getVar('Q');
+      else state.naiveCamTolerance = 0;
       break;
 
     case 730: implemented = false; break; // Drill cycle w/ chip breaking
@@ -970,32 +1055,31 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 880: implemented = false;              break; // Spin stop manual out
     case 890: drill(vars, true, true, false);   break; // Dwell, feed out
 
-    case 900: incrementalDistanceMode    = false; break;
-    case 901: arcIncrementalDistanceMode = false; break;
-    case 910: incrementalDistanceMode    = true;  break;
-    case 911: arcIncrementalDistanceMode = true;  break;
+    case 900: state.incrementalDistanceMode    = false; break;
+    case 901: state.arcIncrementalDistanceMode = false; break;
+    case 910: state.incrementalDistanceMode    = true;  break;
+    case 911: state.arcIncrementalDistanceMode = true;  break;
 
     case 920: setGlobalOffsets(vars);    break;
     case 921: resetGlobalOffsets(true);  break;
     case 922: resetGlobalOffsets(false); break;
     case 923: restoreGlobalOffsets();    break;
 
-    case 930: setFeedMode(MachineInterface::INVERSE_TIME);         break;
-    case 940: setFeedMode(MachineInterface::UNITS_PER_MINUTE);     break;
-    case 950: setFeedMode(MachineInterface::UNITS_PER_REVOLUTION); break;
+    case 930: setFeedMode(INVERSE_TIME);         break;
+    case 940: setFeedMode(UNITS_PER_MINUTE);     break;
+    case 950: setFeedMode(UNITS_PER_REVOLUTION); break;
 
       // NOTE: The spindle modes must be accompanied by a speed
     case 960:
-      machine.setSpinMode(MachineInterface::CONSTANT_SURFACE_SPEED,
-                          (vars & VT_D) ? getVar('D') : 0);
+      setSpinMode(CONSTANT_SURFACE_SPEED, (vars & VT_D) ? getVar('D') : 0);
       break;
 
     case 970:
-      machine.setSpinMode(MachineInterface::REVOLUTIONS_PER_MINUTE);
+      setSpinMode(REVOLUTIONS_PER_MINUTE);
       break;
 
-    case 980: returnMode = RETURN_TO_R;     break;
-    case 990: returnMode = RETURN_TO_OLD_Z; break;
+    case 980: state.returnMode = RETURN_TO_R;     break;
+    case 990: state.returnMode = RETURN_TO_OLD_Z; break;
 
     default: implemented = false;
     }
@@ -1032,6 +1116,11 @@ bool ControllerImpl::execute(const Code &code, int vars) {
             (vars & VT_Q) ? getVar('Q') : 0);
       break;
 
+    case 700: saveModalState(false);   break;
+    case 710: clearSavedModalState(); break;
+    case 720: restoreModalState();     break;
+    case 730: saveModalState(true);    break;
+
       // TODO the following M-Codes
     case 190: // Orient spindle
     case 480: case 490: // Speed and feed override control
@@ -1042,10 +1131,6 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 610: // Set current tool
     case 670: // Synchronized analog output
     case 680: // Immediate analog output
-    case 700: // Save modal state
-    case 710: // Invalidate stored state
-    case 720: // Restore modal state
-    case 730: // Save and Auto-restore modal state
 
     default: implemented = false;
     }

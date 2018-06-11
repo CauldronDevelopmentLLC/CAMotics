@@ -316,7 +316,7 @@ void GCodeModule::commentCB(const js::Value &args, js::Sink &sink) {
 
 void GCodeModule::workpieceCB(const js::Value &args, js::Sink &sink) {
   Rectangle3D workpiece;
-  workpiece.read(ctx.sim->getDict("workpiece"));
+  workpiece.read(*ctx.sim->get("workpiece")->get("bounds"));
 
   if (getUnitAdapter().getUnits() == Units::IMPERIAL)
     workpiece = workpiece / 25.4;

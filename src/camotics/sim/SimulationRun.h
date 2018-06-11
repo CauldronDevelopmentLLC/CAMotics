@@ -46,6 +46,8 @@ namespace CAMotics {
     SimulationRun(const Simulation &sim);
     ~SimulationRun();
 
+    Simulation &getSimulation() {return sim;}
+
     cb::SmartPointer<MoveLookup> getMoveLookup() const;
 
     void setEndTime(double endTime);

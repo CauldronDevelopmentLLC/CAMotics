@@ -20,12 +20,11 @@
 
 #pragma once
 
-#include <gcode/Interrupter.h>
 #include <cbang/os/Condition.h>
 
 
 namespace CAMotics {
-  class Task : public GCode::Interrupter, public cb::Condition {
+  class Task : public cb::Condition {
     bool interrupted;
 
     double startTime;
@@ -52,8 +51,5 @@ namespace CAMotics {
     double end();
 
     virtual void run() {};
-
-    // From GCode::Interrupter
-    bool interrupt() const {return shouldQuit();}
   };
 }

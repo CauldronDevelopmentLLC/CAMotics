@@ -1,0 +1,32 @@
+{
+      "units": "metric",
+      "resolution-mode": "manual",
+      "resolution": 0.25,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "conical",
+          "length": 0.25,
+          "diameter": 0.5,
+          "description": ""
+        },
+        "2": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1,
+          "diameter": 0.125,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": true,
+        "margin": 5,
+        "bounds": {
+          "min": [-34.74625, -34.73525, -14.7],
+          "max": [34.74625, 34.73525, 0]
+        }
+      },
+      "files": [
+        "rhodonea.tpl"
+      ]
+    }

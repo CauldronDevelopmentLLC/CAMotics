@@ -20,6 +20,9 @@
 
 #include "Interpreter.h"
 
+#include <gcode/parse/Parser.h>
+#include <gcode/parse/Tokenizer.h>
+
 #include <cbang/SStream.h>
 #include <cbang/util/SmartDepth.h>
 #include <cbang/log/SmartLogThreadPrefix.h>
@@ -28,21 +31,26 @@ using namespace cb;
 using namespace GCode;
 
 
-bool Interpreter::readBlock(GCode::Tokenizer &tokenizer) {
-  return parser.parseOne(tokenizer, *this);
+unsigned Interpreter::run(unsigned maxErrors) {
+  unsigned errors = 0;
+
+  while (hasMore())
+    try {
+      next();
+
+    } catch (const Exception &e) {
+      LOG_ERROR(e);
+      if (maxErrors < ++errors) THROW("Too many errors aborting");
+    }
+
+  return errors;
 }
 
 
-void Interpreter::read(const InputSource &source, unsigned maxErrors) {
-  try {
-    parser.parse(source, *this, maxErrors);
-  } catch (const EndProgram &) {}
-
-  errors += parser.getErrorCount();
+void Interpreter::read(const InputSource &source) {
+  push(source);
+  run();
 }
-
-
-void Interpreter::read(const InputSource &source) {read(source, 32);}
 
 
 void Interpreter::operator()(const SmartPointer<Block> &block) {

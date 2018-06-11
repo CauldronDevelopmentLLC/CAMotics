@@ -23,7 +23,7 @@
 #include "PlannerConfig.h"
 
 #include <gcode/interp/Interpreter.h>
-#include <gcode/parse/Tokenizer.h>
+#include <gcode/parse/Parser.h>
 
 
 namespace GCode {
@@ -33,8 +33,8 @@ namespace GCode {
     PlannerConfig config;
 
     Interpreter interpreter;
-    typedef std::vector<cb::SmartPointer<GCode::Tokenizer> > tokenizers_t;
-    tokenizers_t tokenizers;
+    typedef std::vector<cb::SmartPointer<GCode::Parser> > parsers_t;
+    parsers_t parsers;
 
     bool started;
 

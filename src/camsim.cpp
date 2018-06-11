@@ -19,10 +19,12 @@
 \******************************************************************************/
 
 #include <camotics/Application.h>
+#include <camotics/sim/Simulation.h>
 #include <camotics/sim/CutSim.h>
-#include <camotics/sim/Project.h>
-#include <stl/Writer.h>
+#include <camotics/project/Project.h>
 #include <camotics/contour/Surface.h>
+
+#include <stl/Writer.h>
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
@@ -38,47 +40,27 @@ using namespace CAMotics;
 
 
 namespace CAMotics {
-  bool is_xml(const string &filename) {
-    try {
-      if (!SystemUtilities::exists(filename))
-        return SystemUtilities::extension(filename) == "xml";
-
-      SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::in);
-
-      while (true) {
-        int c = stream->peek();
-        if (c == '<') return true;
-        else if (isspace(c)) stream->get(); // Next
-        else return false; // Not XML
-      }
-
-    } CATCH_WARNING;
-
-    return false;
-  }
-
-
   class SimApp : public Application {
     double time;
     bool reduce;
     bool binary;
+    RenderMode renderMode;
     string resolution;
     unsigned threads;
 
     string input;
     SmartPointer<ostream> output;
 
-    Project project;
+    Project::Project project;
     CutSim cutSim;
 
   public:
     SimApp() :
-      Application("CAMotics Sim"), time(0),
-      reduce(true), binary(true), threads(SystemInfo::instance().getCPUCount()),
-      project(options) {
+      Application("CAMotics Sim"), time(0), reduce(true), binary(true),
+      threads(SystemInfo::instance().getCPUCount()) {
 
       cmdLine.setUsageArgs
-        ("[OPTIONS] <project.xml | input.gcode | input.tpl> <output.stl>");
+        ("[OPTIONS] <project.camotics | input.gcode | input.tpl> <output.stl>");
 
       cmdLine.setAllowConfigAsFirstArg(false);
       cmdLine.setAllowPositionalArgs(true);
@@ -88,6 +70,8 @@ namespace CAMotics {
       cmdLine.addTarget("reduce", reduce, "Reduce cut workpiece.");
       cmdLine.addTarget("binary", binary,
                         "Output binary STL, otherwise ASCII.");
+      cmdLine.addTarget("render-mode", renderMode,
+                        "Render surface generation mode.");
       cmdLine.addTarget("resolution", resolution, "Valid values are 'low', "
                         "'medium', 'high' or a decimal value.");
       cmdLine.addTarget("threads", threads, "Number of simulation threads.");
@@ -119,8 +103,9 @@ namespace CAMotics {
 
     void run() {
       // Open project
-      if (is_xml(input)) project.load(input);
-      else project.addFile(input); // Assume TPL or G-Code
+      string ext = SystemUtilities::extension(input);
+      if (ext == "xml" || ext == "camotics") project.load(input);
+      else project.getFiles().add(input); // Assume TPL or G-Code
 
       // Resolution
       if (!resolution.empty()) {
@@ -138,17 +123,18 @@ namespace CAMotics {
       }
 
       // Generate tool path
-      project.time = time ? time : numeric_limits<double>::max();
-      project.threads = threads;
-      project.workpiece = project.getWorkpieceBounds();
-      project.path = cutSim.computeToolPath(project);
-
-      // Configure simulation
-      project.updateAutomaticWorkpiece(*project.path);
+      SmartPointer<GCode::ToolPath> path = cutSim.computeToolPath(project);
 
       // Simulate
+      Rectangle3D bounds = project.getWorkpiece().getBounds();
+      project.getWorkpiece().update(*path);
+
+      Simulation sim(path, bounds, project.getResolution(),
+                     time ? time : numeric_limits<double>::max(),
+                     renderMode, threads);
+
       SmartPointer<Surface> surface;
-      if (!shouldQuit()) surface = cutSim.computeSurface(project);
+      if (!shouldQuit()) surface = cutSim.computeSurface(sim);
 
       // Reduce
       if (reduce && !shouldQuit()) cutSim.reduceSurface(*surface);
@@ -156,7 +142,7 @@ namespace CAMotics {
       // Export surface
       if (!shouldQuit())
         surface->writeSTL
-          (*output, binary, "CAMotics Surface", project.computeHash());
+          (*output, binary, "CAMotics Surface", sim.computeHash());
     }
 
 

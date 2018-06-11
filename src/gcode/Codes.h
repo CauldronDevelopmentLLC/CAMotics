@@ -27,11 +27,40 @@
 #include <ostream>
 
 namespace GCode {
+  typedef enum {
+    PRI_OWORD,
+    PRI_COMMENT,
+    PRI_MODE,
+    PRI_FEED_RATE,
+    PRI_SPEED,
+    PRI_TOOL,
+    PRI_IO,
+    PRI_CHANGE_TOOL,
+    PRI_SPINDLE,
+    PRI_STATE,
+    PRI_COOLANT,
+    PRI_OVERRIDES,
+    PRI_USER,
+    PRI_DWELL,
+    PRI_PLANE,
+    PRI_UNITS,
+    PRI_RADIUS_COMP,
+    PRI_LENGTH_COMP,
+    PRI_COORD_SYS,
+    PRI_PATH,
+    PRI_DIST,
+    PRI_RETRACT,
+    PRI_OFFSETS,
+    PRI_MOTION,
+    PRI_STOP,
+  } code_priority_t;
+
+
   class Code {
   public:
     char type;
     unsigned number; // Code * 10
-    unsigned priority;
+    code_priority_t priority;
     ModalGroup group;
     int vars;
     const char *description;

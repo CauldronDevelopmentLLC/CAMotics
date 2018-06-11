@@ -122,6 +122,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QDoubleSpinBox" name="xTranslateDoubleSpinBox">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
         <property name="decimals">
          <number>4</number>
         </property>
@@ -184,6 +187,9 @@
       </item>
       <item row="2" column="1">
        <widget class="QDoubleSpinBox" name="yTranslateDoubleSpinBox">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
         <property name="decimals">
          <number>4</number>
         </property>
@@ -272,6 +278,9 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="safeDoubleSpinBox">
+          <property name="suffix">
+           <string> mm</string>
+          </property>
           <property name="decimals">
            <number>4</number>
           </property>

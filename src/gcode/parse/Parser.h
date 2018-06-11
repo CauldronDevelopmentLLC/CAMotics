@@ -20,10 +20,11 @@
 
 #pragma once
 
-#include <gcode/Processor.h>
-#include <gcode/NullInterrupter.h>
+#include "Tokenizer.h"
 
-#include <gcode/ast/Block.h>
+#include <gcode/Processor.h>
+#include <gcode/Producer.h>
+
 #include <gcode/ast/Comment.h>
 #include <gcode/ast/Word.h>
 #include <gcode/ast/Assign.h>
@@ -31,57 +32,48 @@
 #include <gcode/ast/Number.h>
 #include <gcode/ast/FunctionCall.h>
 
-#include <cbang/SmartPointer.h>
 #include <cbang/io/InputSource.h>
-
-#include <istream>
-#include <string>
 
 
 namespace GCode {
-  class Tokenizer;
-
-  class Parser {
-    cb::SmartPointer<Interrupter> interrupter;
-    unsigned errors;
+  class Parser : public Producer {
+    cb::SmartPointer<Tokenizer> tokenizer;
 
   public:
-    Parser(const cb::SmartPointer<Interrupter> &interrupter =
-           new NullInterrupter) :
-      interrupter(interrupter), errors(0) {}
+    Parser(const cb::SmartPointer<Tokenizer> &tokenizer) :
+      tokenizer(tokenizer) {}
+    Parser(Tokenizer &tokenizer) :
+      tokenizer(cb::SmartPointer<Tokenizer>::Phony(&tokenizer)) {}
+    Parser(const cb::InputSource &source);
 
-    void resetErrorCount() {errors = 0;}
-    unsigned getErrorCount() {return errors;}
+    unsigned parse(Processor &processor, unsigned maxErrors = 32);
 
-    void parse(Tokenizer &tokenizer, Processor &processor,
-               unsigned maxErrors = 32);
-    void parse(const cb::InputSource &source, Processor &processor,
-               unsigned maxErrors = 32);
+    // From Producer
+    bool hasMore() const {return tokenizer->hasMore();}
+    cb::SmartPointer<Block> next();
 
-    bool parseOne(Tokenizer &tokenizer, Processor &processor);
+    cb::SmartPointer<Block> block();
 
-    cb::SmartPointer<Block> block(Tokenizer &tokenizer);
+    cb::SmartPointer<Comment> comment();
+    cb::SmartPointer<Word> word();
+    cb::SmartPointer<Assign> assign();
+    cb::SmartPointer<OCode> ocode();
 
-    cb::SmartPointer<Comment> comment(Tokenizer &tokenizer);
-    cb::SmartPointer<Word> word(Tokenizer &tokenizer);
-    cb::SmartPointer<Assign> assign(Tokenizer &tokenizer);
-    cb::SmartPointer<OCode> ocode(Tokenizer &tokenizer);
+    cb::SmartPointer<Entity> numberRefOrExpr();
+    cb::SmartPointer<Entity> expression();
 
-    cb::SmartPointer<Entity> numberRefOrExpr(Tokenizer &tokenizer);
-    cb::SmartPointer<Entity> expression(Tokenizer &tokenizer);
+    cb::SmartPointer<Entity> boolOp();
+    cb::SmartPointer<Entity> compareOp();
+    cb::SmartPointer<Entity> addOp();
+    cb::SmartPointer<Entity> mulOp();
+    cb::SmartPointer<Entity> expOp();
+    cb::SmartPointer<Entity> unaryOp();
 
-    cb::SmartPointer<Entity> boolOp(Tokenizer &tokenizer);
-    cb::SmartPointer<Entity> compareOp(Tokenizer &tokenizer);
-    cb::SmartPointer<Entity> addOp(Tokenizer &tokenizer);
-    cb::SmartPointer<Entity> mulOp(Tokenizer &tokenizer);
-    cb::SmartPointer<Entity> expOp(Tokenizer &tokenizer);
-    cb::SmartPointer<Entity> unaryOp(Tokenizer &tokenizer);
+    cb::SmartPointer<Entity> primary();
 
-    cb::SmartPointer<Entity> primary(Tokenizer &tokenizer);
-
-    cb::SmartPointer<Entity> quotedExpr(Tokenizer &tokenizer);
-    cb::SmartPointer<FunctionCall> functionCall(Tokenizer &tokenizer);
-    cb::SmartPointer<Number> number(Tokenizer &tokenizer);
-    cb::SmartPointer<Entity> reference(Tokenizer &tokenizer);
+    cb::SmartPointer<Entity> quotedExpr();
+    cb::SmartPointer<FunctionCall> functionCall();
+    cb::SmartPointer<Number> number();
+    cb::SmartPointer<Entity> reference();
   };
 }

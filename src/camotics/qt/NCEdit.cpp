@@ -138,7 +138,7 @@ namespace CAMotics {
 }
 
 
-NCEdit::NCEdit(const SmartPointer<NCFile> &file,
+NCEdit::NCEdit(const SmartPointer<Project::File> &file,
                const SmartPointer<Highlighter> &highlighter,
                FileTabManager *parent) :
   QPlainTextEdit(parent), parent(parent), file(file),

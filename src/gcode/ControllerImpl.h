@@ -55,19 +55,41 @@ namespace GCode {
 
     // State variables
     unsigned currentMotionMode;
-    MachineInterface::plane_t plane;
-    bool latheDiameterMode;          // TODO unsupported
-    bool cutterRadiusComp;           // TODO unsupported
-    bool toolLengthComp;             // TODO unsupported
-    path_mode_t pathMode;            // TODO unsupported
-    return_mode_t returnMode;
-    double motionBlendingTolerance;  // TODO unsupported
-    double naiveCamTolerance;        // TODO unsupported
-    bool incrementalDistanceMode;
-    bool arcIncrementalDistanceMode;
-    bool moveInAbsoluteCoords;
-    dir_t spindleDir;
-    double speed;
+
+    typedef struct {
+      bool autoRestore;
+
+      Units units;                     // G20, G21
+      plane_t plane;                   // G17-G19.1
+      bool cutterRadiusComp;           // G40-G42.1 TODO unsupported
+      double toolDiameter;             // TOOL_DIAMETER
+      double toolOrientation;          // TOOL_ORIENTATION
+      bool incrementalDistanceMode;    // G90, G91
+      feed_mode_t feedMode;            // G93, G94, G95
+      unsigned coordSystem;            // G54-G59.3 CURRENT_COORD_SYSTEM
+      bool toolLengthComp;             // G43, G43.1, G49 TODO unsupported
+      return_mode_t returnMode;        // G98, G99
+      spin_mode_t spinMode;            // G96, G97
+      double spinMax;
+      bool arcIncrementalDistanceMode; // G90.1, G91.1
+      bool latheDiameterMode;          // G7, G8 TODO unsupported
+      path_mode_t pathMode;            // G61, G61.1, G64 TODO unsupported
+      double feed;                     // F
+      double speed;                    // S
+      dir_t spindleDir;                // M3-M5
+      bool mist;                       // M7, M9
+      bool flood;                      // M8, M9
+      double speedOverride;            // M48, M51 TODO unsupported
+      double feedOverride;             // M40, M50 TODO unsupported
+      bool adaptiveFeed;               // M52 TODO unsupported
+      bool feedHold;                   // M53 TODO unsupported
+      double motionBlendingTolerance;  // G64 TODO unsupported
+      double naiveCamTolerance;        // G64 TODO unsupported
+      bool moveInAbsoluteCoords;       // G53
+    } state_t;
+
+    state_t state;
+    std::vector<cb::SmartPointer<state_t> > stateStack;
 
   public:
     ControllerImpl(MachineInterface &machine,
@@ -85,6 +107,7 @@ namespace GCode {
     // Feed & speed
     void setFeedMode(feed_mode_t mode);
     void setSpindleDir(dir_t dir);
+    void setSpinMode(spin_mode_t mode, double max = 0);
 
     // Coolant
     void setMistCoolant(bool enable);
@@ -95,7 +118,7 @@ namespace GCode {
     void input(unsigned index, bool digital, input_mode_t mode, double timeout);
 
     // Plane
-    void setPlane(MachineInterface::plane_t plane);
+    void setPlane(plane_t plane);
     const char *getPlaneAxes() const;
     const char *getPlaneOffsets() const;
     char getPlaneXAxis() const {return getPlaneAxes()[0];}
@@ -109,9 +132,9 @@ namespace GCode {
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
     double getAxisAbsolutePosition(char axis) const;
-    void setAxisAbsolutePosition(char axis, double pos);
+    void setAxisAbsolutePosition(char axis, double pos, Units units);
     Axes getAbsolutePosition() const;
-    void setAbsolutePosition(const Axes &axes);
+    void setAbsolutePosition(const Axes &axes, Units units);
     Axes getNextAbsolutePosition(int vars, bool incremental) const;
 
     // Move
@@ -129,7 +152,7 @@ namespace GCode {
     // Tool
     const Tool &getTool(unsigned tool) const {return tools.get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
-    void setToolTable(int vars, bool relative);
+    void setTools(int vars, bool relative);
     void toolChange();
     void loadToolOffsets(unsigned tool);
     void loadToolVarOffsets(int vars);
@@ -163,6 +186,11 @@ namespace GCode {
     double get(const std::string &name, Units units) const;
     void set(const std::string &name, double value, Units units);
 
+    // Modal State
+    void saveModalState(bool autoRestore);
+    void clearSavedModalState();
+    void restoreModalState();
+
     // From Controller
     void message(const std::string &text);
 
@@ -183,6 +211,9 @@ namespace GCode {
     void setFeed(double feed);
     void setSpeed(double speed);
     void setTool(unsigned tool);
+
+    void pushScope();
+    void popScope();
 
     void startBlock();
     bool execute(const Code &code, int vars);

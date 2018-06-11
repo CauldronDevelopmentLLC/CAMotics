@@ -21,7 +21,7 @@
 #pragma once
 
 
-#include <camotics/sim/Project.h>
+#include <camotics/project/Project.h>
 #include <camotics/view/View.h>
 
 #include <cbang/SmartPointer.h>
@@ -48,7 +48,7 @@ namespace CAMotics {
     std::string getMachinePath() const;
     std::string getMachinePath(const std::string &machine) const;
 
-    bool exec(Project &project, View &view);
+    bool exec(Project::Project &project, View &view);
     using QDialog::exec;
 
   signals:

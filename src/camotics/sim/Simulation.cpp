@@ -60,9 +60,10 @@ string Simulation::computeHash() const {
 void Simulation::read(const JSON::Value &value) {
   resolution = value.getNumber("resolution", 0);
   time = value.getNumber("time", 0);
+  mode = RenderMode::parse(value.getString("render-mode", mode.toString()));
 
+  GCode::ToolTable tools;
   if (value.has("tools")) tools.read(*value.get("tools"));
-  else tools.clear();
 
   if (value.has("workpiece")) workpiece.read(*value.get("workpiece"));
   else workpiece = Rectangle3D();
@@ -77,10 +78,11 @@ void Simulation::write(JSON::Sink &sink, bool withPath) const {
 
   sink.insert("resolution", resolution);
   sink.insert("time", time);
+  sink.insert("render-mode", mode.toString());
 
-  if (!tools.empty()) {
+  if (!path.isNull() && !path->getTools().empty()) {
     sink.beginInsert("tools");
-    tools.write(sink);
+    path->getTools().write(sink);
   }
 
   if (workpiece != Rectangle3D()) {

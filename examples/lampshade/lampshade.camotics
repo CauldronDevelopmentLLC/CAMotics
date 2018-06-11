@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "manual",
+      "resolution": 1,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 10,
+          "diameter": 1.5875,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-5, -5, -6],
+          "max": [295, 495, 0]
+        }
+      },
+      "files": [
+        "lampshade.tpl"
+      ]
+    }

@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "medium",
+      "resolution": 1.026897,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 20,
+          "diameter": 2.5,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 0,
+        "bounds": {
+          "min": [-2, -1, -32],
+          "max": [92, 89, 0]
+        }
+      },
+      "files": [
+        "tiger.nc"
+      ]
+    }

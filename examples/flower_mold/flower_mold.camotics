@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "manual",
+      "resolution": 0.3,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 10,
+          "diameter": 1,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-3.92956, -3.92829, -9.95121],
+          "max": [61.0796, 61.0529, 0]
+        }
+      },
+      "files": [
+        "flower_mold.nc"
+      ]
+    }

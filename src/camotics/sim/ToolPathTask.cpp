@@ -21,8 +21,9 @@
 #include "ToolPathTask.h"
 
 #include <camotics/TaskFilter.h>
-#include <camotics/sim/Project.h>
+#include <camotics/project/Project.h>
 #include <camotics/sim/Simulation.h>
+
 #include <gcode/ControllerImpl.h>
 #include <gcode/interp/Interpreter.h>
 #include <gcode/machine/Machine.h>
@@ -48,14 +49,13 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ToolPathTask::ToolPathTask(const Project &project) :
-  tools(project.getToolTable()),
-  units(project.getUnits() ==
-        GCode::ToolUnits::UNITS_MM ? GCode::Units::METRIC :
-        GCode::Units::IMPERIAL), simJSON(project.toString()), errors(0) {
+ToolPathTask::ToolPathTask(const Project::Project &project) :
+  tools(project.getTools()), units(project.getUnits()),
+  simJSON(project.toString()), errors(0) {
 
-  for (Project::iterator it = project.begin(); it != project.end(); it++)
-    files.push_back((*it)->getAbsolutePath());
+  const Project::Files &files = project.getFiles();
+  for (unsigned i = 0; i < files.size(); i++)
+    this->files.push_back(files.get(i)->getPath());
 }
 
 
@@ -149,18 +149,18 @@ void ToolPathTask::run() {
     } else // Assume it's just GCode
       filter.push(io::file_source(filename));
 
-    try {
-      InputSource src(filter, filename);
+    // Parse GCode
+    GCode::Interpreter interp(controller);
+    interp.push(InputSource(filter, filename));
 
-      // Parse GCode
-      GCode::Interpreter interp(controller, SmartPointer<Task>::Phony(this));
-      interp.read(src);
-      errors += interp.getErrorCount();
+    while (!Task::shouldQuit() && interp.hasMore() && errors < 32)
+      try {
+        interp.next();
 
-    } catch (const Exception &e) {
-      LOG_ERROR(e);
-      errors++;
-    }
+      } catch (const Exception &e) {
+        LOG_ERROR(e);
+        errors++;
+      }
 
     // Wait for Subprocess
     if (!proc.isNull() && proc->waitFor(5, 10)) errors++;

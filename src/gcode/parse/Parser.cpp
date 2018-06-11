@@ -20,8 +20,6 @@
 
 #include "Parser.h"
 
-#include "Tokenizer.h"
-
 #include <gcode/ast/UnaryOp.h>
 #include <gcode/ast/BinaryOp.h>
 #include <gcode/ast/QuotedExpr.h>
@@ -30,11 +28,9 @@
 
 #include <cbang/String.h>
 #include <cbang/Exception.h>
-#include <cbang/os/SystemUtilities.h>
+#include <cbang/log/Logger.h>
 #include <cbang/parse/ParseScope.h>
-#include <cbang/util/DefaultCatch.h>
 
-#include <fstream>
 #include <cctype>
 
 using namespace std;
@@ -42,48 +38,50 @@ using namespace cb;
 using namespace GCode;
 
 
-void Parser::parse(GCode::Tokenizer &tokenizer, Processor &processor,
-                   unsigned maxErrors) {
-  while (!interrupter->interrupt()) {
+Parser::Parser(const InputSource &source) :
+  tokenizer(new GCode::Tokenizer(source)) {}
+
+
+unsigned Parser::parse(Processor &processor, unsigned maxErrors) {
+  unsigned errors = 0;
+
+  while (tokenizer->hasMore()) {
     try {
-      if (!parseOne(tokenizer, processor)) break;
+      processor(next());
 
     } catch (const Exception &e) {
-      LOG_ERROR(tokenizer.getLocation() << ':' << e.getMessage());
-      LOG_DEBUG(3, e);
+      LOG_ERROR(e);
       if (maxErrors < ++errors) THROW("Too many errors aborting");
     }
+  }
+
+  return errors;
+}
+
+
+SmartPointer<Block> Parser::next() {
+  try {
+    return block();
+
+  } catch (const Exception &e) {
+    LOG_DEBUG(3, e);
+    throw Exception("Parser", tokenizer->getLocation().getStart(), e);
   }
 }
 
 
-void Parser::parse(const InputSource &source, Processor &processor,
-                   unsigned maxErrors) {
-  GCode::Tokenizer tokenizer(source);
-
-  parse(tokenizer, processor, maxErrors);
-}
-
-
-bool Parser::parseOne(GCode::Tokenizer &tokenizer, Processor &processor) {
-  if (!tokenizer.hasMore()) return false;
-  processor(block(tokenizer));
-  return true;
-}
-
-
-SmartPointer<Block> Parser::block(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<Block> Parser::block() {
+  ParseScope scope(tokenizer->getScanner());
 
   // Deleted
   bool deleted = false;
-  if (tokenizer.consume(TokenType::DIV_TOKEN)) deleted = true;
+  if (tokenizer->consume(TokenType::DIV_TOKEN)) deleted = true;
 
   // Line number
   int line = -1;
-  if (tokenizer.isID("N")) {
-    tokenizer.advance();
-    Token num = tokenizer.match(TokenType::NUMBER_TOKEN);
+  if (tokenizer->isID("N")) {
+    tokenizer->advance();
+    Token num = tokenizer->match(TokenType::NUMBER_TOKEN);
     line = String::parseU32(num.getValue());
   }
 
@@ -91,31 +89,31 @@ SmartPointer<Block> Parser::block(GCode::Tokenizer &tokenizer) {
   vector<SmartPointer<Entity> > children;
 
   // O-Code
-  if (tokenizer.isID("O")) children.push_back(ocode(tokenizer));
+  if (tokenizer->isID("O")) children.push_back(ocode());
 
-  while (tokenizer.hasMore()) {
-    switch (tokenizer.getType()) {
+  while (tokenizer->hasMore()) {
+    switch (tokenizer->getType()) {
     case TokenType::EOL_TOKEN: break; // End of block
 
     case TokenType::COMMENT_TOKEN:
     case TokenType::PAREN_COMMENT_TOKEN:
-      children.push_back(comment(tokenizer));
+      children.push_back(comment());
       break;
 
     case TokenType::POUND_TOKEN:
-      children.push_back(assign(tokenizer));
+      children.push_back(assign());
       break;
 
     default:
-      if (!tokenizer.isType(TokenType::ID_TOKEN))
-        THROWS("Expected word or assignment, found " << tokenizer.getType());
+      if (!tokenizer->isType(TokenType::ID_TOKEN))
+        THROWS("Expected word or assignment, found " << tokenizer->getType());
 
-      children.push_back(word(tokenizer));
+      children.push_back(word());
       break;
     }
 
-    if (tokenizer.getType() == TokenType::EOL_TOKEN) {
-      tokenizer.advance();
+    if (tokenizer->getType() == TokenType::EOL_TOKEN) {
+      tokenizer->advance();
       break;
     }
   }
@@ -124,102 +122,102 @@ SmartPointer<Block> Parser::block(GCode::Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Comment> Parser::comment(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<Comment> Parser::comment() {
+  ParseScope scope(tokenizer->getScanner());
 
   Token token;
-  bool paren = tokenizer.getType() == TokenType::PAREN_COMMENT_TOKEN;
+  bool paren = tokenizer->getType() == TokenType::PAREN_COMMENT_TOKEN;
 
-  if (paren) token = tokenizer.advance();
-  else token = tokenizer.match(TokenType::COMMENT_TOKEN);
+  if (paren) token = tokenizer->advance();
+  else token = tokenizer->match(TokenType::COMMENT_TOKEN);
 
   return scope.set(new Comment(token.getValue(), paren));
 }
 
 
-SmartPointer<Word> Parser::word(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<Word> Parser::word() {
+  ParseScope scope(tokenizer->getScanner());
 
-  string name = tokenizer.match(TokenType::ID_TOKEN).getValue();
+  string name = tokenizer->match(TokenType::ID_TOKEN).getValue();
   if (name.length() != 1) THROWS("Invalid word '" << name << "'");
 
-  return scope.set(new Word(toupper(name[0]), numberRefOrExpr(tokenizer)));
+  return scope.set(new Word(toupper(name[0]), numberRefOrExpr()));
 }
 
 
-SmartPointer<Assign> Parser::assign(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<Assign> Parser::assign() {
+  ParseScope scope(tokenizer->getScanner());
 
-  SmartPointer<Entity> ref = reference(tokenizer);
-  tokenizer.match(TokenType::ASSIGN_TOKEN);
+  SmartPointer<Entity> ref = reference();
+  tokenizer->match(TokenType::ASSIGN_TOKEN);
 
-  return scope.set(new Assign(ref, expression(tokenizer)));
+  return scope.set(new Assign(ref, expression()));
 }
 
 
-SmartPointer<OCode> Parser::ocode(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<OCode> Parser::ocode() {
+  ParseScope scope(tokenizer->getScanner());
 
-  tokenizer.match(TokenType::ID_TOKEN); // The 'O'
+  tokenizer->match(TokenType::ID_TOKEN); // The 'O'
 
   SmartPointer<OCode> ocode;
 
-  if (tokenizer.isType(TokenType::OANGLE_TOKEN)) {
-    tokenizer.match(TokenType::OANGLE_TOKEN);
-    string name = tokenizer.match(TokenType::ID_TOKEN).getValue();
-    tokenizer.match(TokenType::CANGLE_TOKEN);
-    string keyword = tokenizer.match(TokenType::ID_TOKEN).getValue();
+  if (tokenizer->isType(TokenType::OANGLE_TOKEN)) {
+    tokenizer->match(TokenType::OANGLE_TOKEN);
+    string name = tokenizer->match(TokenType::ID_TOKEN).getValue();
+    tokenizer->match(TokenType::CANGLE_TOKEN);
+    string keyword = tokenizer->match(TokenType::ID_TOKEN).getValue();
 
     ocode = new OCode(String::toLower(name), keyword);
 
   } else {
-    SmartPointer<Entity> numExpr = numberRefOrExpr(tokenizer);
-    string keyword = tokenizer.match(TokenType::ID_TOKEN).getValue();
+    SmartPointer<Entity> numExpr = numberRefOrExpr();
+    string keyword = tokenizer->match(TokenType::ID_TOKEN).getValue();
 
     ocode = new OCode(numExpr, keyword);
   }
 
-  while (tokenizer.isType(TokenType::OBRACKET_TOKEN))
-    ocode->addExpression(quotedExpr(tokenizer));
+  while (tokenizer->isType(TokenType::OBRACKET_TOKEN))
+    ocode->addExpression(quotedExpr());
 
   scope.set(ocode->getLocation());
   return ocode;
 }
 
 
-SmartPointer<Entity> Parser::numberRefOrExpr(GCode::Tokenizer &tokenizer) {
-  switch (tokenizer.getType()) {
-  case TokenType::POUND_TOKEN: return reference(tokenizer);
-  case TokenType::OBRACKET_TOKEN: return quotedExpr(tokenizer);
-  case TokenType::NUMBER_TOKEN: return number(tokenizer);
+SmartPointer<Entity> Parser::numberRefOrExpr() {
+  switch (tokenizer->getType()) {
+  case TokenType::POUND_TOKEN: return reference();
+  case TokenType::OBRACKET_TOKEN: return quotedExpr();
+  case TokenType::NUMBER_TOKEN: return number();
   case TokenType::ADD_TOKEN:
-  case TokenType::SUB_TOKEN: return unaryOp(tokenizer);
+  case TokenType::SUB_TOKEN: return unaryOp();
   default: THROWS("Expected number, reference, or bracked expression, found "
-                  << tokenizer.getType());
+                  << tokenizer->getType());
   }
 }
 
 
-SmartPointer<Entity> Parser::expression(GCode::Tokenizer &tokenizer) {
-  return boolOp(tokenizer);
+SmartPointer<Entity> Parser::expression() {
+  return boolOp();
 }
 
 
-SmartPointer<Entity> Parser::boolOp(GCode::Tokenizer &tokenizer) {
-  SmartPointer<Entity> entity = compareOp(tokenizer);
+SmartPointer<Entity> Parser::boolOp() {
+  SmartPointer<Entity> entity = compareOp();
 
   while (true) {
-    if (tokenizer.getType() == TokenType::ID_TOKEN) {
+    if (tokenizer->getType() == TokenType::ID_TOKEN) {
       Operator op;
 
-      string id = String::toUpper(tokenizer.getValue());
+      string id = String::toUpper(tokenizer->getValue());
       if (id == "AND") op = Operator::AND_OP;
       else if (id == "OR") op = Operator::OR_OP;
       else if (id == "XOR") op = Operator::XOR_OP;
 
       if (op != Operator::NO_OP) {
-        tokenizer.advance();
-        entity = new BinaryOp(op, entity, compareOp(tokenizer));
+        tokenizer->advance();
+        entity = new BinaryOp(op, entity, compareOp());
       }
     }
     break;
@@ -229,14 +227,14 @@ SmartPointer<Entity> Parser::boolOp(GCode::Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::compareOp(GCode::Tokenizer &tokenizer) {
-  SmartPointer<Entity> entity = addOp(tokenizer);
+SmartPointer<Entity> Parser::compareOp() {
+  SmartPointer<Entity> entity = addOp();
 
   while (true) {
-    if (tokenizer.getType() == TokenType::ID_TOKEN) {
+    if (tokenizer->getType() == TokenType::ID_TOKEN) {
       Operator op;
 
-      string id = String::toUpper(tokenizer.getValue());
+      string id = String::toUpper(tokenizer->getValue());
       if (id == "EQ") op = Operator::EQ_OP;
       else if (id == "NE") op = Operator::NE_OP;
       else if (id == "GT") op = Operator::GT_OP;
@@ -245,8 +243,8 @@ SmartPointer<Entity> Parser::compareOp(GCode::Tokenizer &tokenizer) {
       else if (id == "LE") op = Operator::LE_OP;
 
       if (op != Operator::NO_OP) {
-        tokenizer.advance();
-        entity = new BinaryOp(op, entity, addOp(tokenizer));
+        tokenizer->advance();
+        entity = new BinaryOp(op, entity, addOp());
         continue;
       }
     }
@@ -257,20 +255,20 @@ SmartPointer<Entity> Parser::compareOp(GCode::Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::addOp(GCode::Tokenizer &tokenizer) {
-  SmartPointer<Entity> entity = mulOp(tokenizer);
+SmartPointer<Entity> Parser::addOp() {
+  SmartPointer<Entity> entity = mulOp();
 
   while (true) {
     Operator op;
-    switch(tokenizer.getType()) {
+    switch(tokenizer->getType()) {
     case TokenType::ADD_TOKEN: op = Operator::ADD_OP; break;
     case TokenType::SUB_TOKEN: op = Operator::SUB_OP; break;
     default: break;
     }
 
     if (op != Operator::NO_OP) {
-      tokenizer.advance();
-      entity = new BinaryOp(op, entity, mulOp(tokenizer));
+      tokenizer->advance();
+      entity = new BinaryOp(op, entity, mulOp());
 
     } else break;
   }
@@ -279,24 +277,24 @@ SmartPointer<Entity> Parser::addOp(GCode::Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::mulOp(GCode::Tokenizer &tokenizer) {
-  SmartPointer<Entity> entity = expOp(tokenizer);
+SmartPointer<Entity> Parser::mulOp() {
+  SmartPointer<Entity> entity = expOp();
 
   while (true) {
     Operator op;
-    switch(tokenizer.getType()) {
+    switch(tokenizer->getType()) {
     case TokenType::MUL_TOKEN: op = Operator::MUL_OP; break;
     case TokenType::DIV_TOKEN: op = Operator::DIV_OP; break;
     case TokenType::ID_TOKEN:
-      if (String::toUpper(tokenizer.getValue()) == "MOD")
+      if (String::toUpper(tokenizer->getValue()) == "MOD")
         op = Operator::MOD_OP;
       break;
     default: break;
     }
 
     if (op != Operator::NO_OP) {
-      tokenizer.advance();
-      entity = new BinaryOp(op, entity, expOp(tokenizer));
+      tokenizer->advance();
+      entity = new BinaryOp(op, entity, expOp());
 
     } else break;
   }
@@ -305,12 +303,12 @@ SmartPointer<Entity> Parser::mulOp(GCode::Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::expOp(GCode::Tokenizer &tokenizer) {
-  SmartPointer<Entity> entity = primary(tokenizer);
+SmartPointer<Entity> Parser::expOp() {
+  SmartPointer<Entity> entity = primary();
 
   while (true) {
-    if (tokenizer.consume(TokenType::EXP_TOKEN))
-      entity = new BinaryOp(Operator::EXP_OP, entity, primary(tokenizer));
+    if (tokenizer->consume(TokenType::EXP_TOKEN))
+      entity = new BinaryOp(Operator::EXP_OP, entity, primary());
     else break;
   }
 
@@ -318,76 +316,76 @@ SmartPointer<Entity> Parser::expOp(GCode::Tokenizer &tokenizer) {
 }
 
 
-SmartPointer<Entity> Parser::unaryOp(GCode::Tokenizer &tokenizer) {
+SmartPointer<Entity> Parser::unaryOp() {
   Operator op;
-  switch(tokenizer.getType()) {
+  switch(tokenizer->getType()) {
   case TokenType::ADD_TOKEN: op = Operator::ADD_OP; break;
   case TokenType::SUB_TOKEN: op = Operator::SUB_OP; break;
   default:
-    THROWS("Expected unary - or + operator, found " << tokenizer.getType());
+    THROWS("Expected unary - or + operator, found " << tokenizer->getType());
   }
 
-  tokenizer.advance();
+  tokenizer->advance();
 
-  return new UnaryOp(op, numberRefOrExpr(tokenizer));
+  return new UnaryOp(op, numberRefOrExpr());
 }
 
 
-SmartPointer<Entity> Parser::primary(GCode::Tokenizer &tokenizer) {
-  switch (tokenizer.getType()) {
-  case TokenType::ID_TOKEN: return functionCall(tokenizer);
-  default: return numberRefOrExpr(tokenizer);
+SmartPointer<Entity> Parser::primary() {
+  switch (tokenizer->getType()) {
+  case TokenType::ID_TOKEN: return functionCall();
+  default: return numberRefOrExpr();
   }
 }
 
 
-SmartPointer<Entity> Parser::quotedExpr(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<Entity> Parser::quotedExpr() {
+  ParseScope scope(tokenizer->getScanner());
 
-  tokenizer.match(TokenType::OBRACKET_TOKEN);
-  SmartPointer<Entity> expr = expression(tokenizer);
-  tokenizer.match(TokenType::CBRACKET_TOKEN);
+  tokenizer->match(TokenType::OBRACKET_TOKEN);
+  SmartPointer<Entity> expr = expression();
+  tokenizer->match(TokenType::CBRACKET_TOKEN);
 
   return scope.set(new QuotedExpr(expr));
 }
 
 
 SmartPointer<FunctionCall>
-Parser::functionCall(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
-  string name = tokenizer.match(TokenType::ID_TOKEN).getValue();
-  SmartPointer<Entity> arg1 = quotedExpr(tokenizer);
+Parser::functionCall() {
+  ParseScope scope(tokenizer->getScanner());
+  string name = tokenizer->match(TokenType::ID_TOKEN).getValue();
+  SmartPointer<Entity> arg1 = quotedExpr();
   SmartPointer<Entity> arg2;
 
   // Special case
   if (String::toUpper(name) == "ATAN" &&
-      tokenizer.consume(TokenType::DIV_TOKEN))
-    arg2 = quotedExpr(tokenizer);
+      tokenizer->consume(TokenType::DIV_TOKEN))
+    arg2 = quotedExpr();
 
   return scope.set(new FunctionCall(name, arg1, arg2));
 }
 
 
-SmartPointer<Number> Parser::number(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<Number> Parser::number() {
+  ParseScope scope(tokenizer->getScanner());
   double value =
-    String::parseDouble(tokenizer.match(TokenType::NUMBER_TOKEN).getValue());
+    String::parseDouble(tokenizer->match(TokenType::NUMBER_TOKEN).getValue());
 
   return scope.set(new Number(value));
 }
 
 
-SmartPointer<Entity> Parser::reference(GCode::Tokenizer &tokenizer) {
-  ParseScope scope(tokenizer.getScanner());
+SmartPointer<Entity> Parser::reference() {
+  ParseScope scope(tokenizer->getScanner());
 
-  tokenizer.match(TokenType::POUND_TOKEN);
+  tokenizer->match(TokenType::POUND_TOKEN);
 
-  if (tokenizer.consume(TokenType::OANGLE_TOKEN)) {
-    string id = tokenizer.match(TokenType::ID_TOKEN).getValue();
-    tokenizer.match(TokenType::CANGLE_TOKEN);
+  if (tokenizer->consume(TokenType::OANGLE_TOKEN)) {
+    string id = tokenizer->match(TokenType::ID_TOKEN).getValue();
+    tokenizer->match(TokenType::CANGLE_TOKEN);
 
     return scope.set(new NamedReference(id));
 
   } else
-    return scope.set(new Reference(numberRefOrExpr(tokenizer)));
+    return scope.set(new Reference(numberRefOrExpr()));
 }

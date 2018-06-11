@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include <gcode/ToolUnits.h>
-#include <camotics/cam/CAMLayer.h>
+#include <gcode/Units.h>
 
 #include <cbang/SmartPointer.h>
+#include <cbang/json/JSON.h>
 
 #include <QDialog>
 #include <QTableWidget>
@@ -33,22 +33,28 @@ namespace Ui {class CAMLayerDialog;}
 
 
 namespace CAMotics {
-  class CAMLayerDialog : public QDialog {
+  class CAMLayerDialog : public QDialog, public cb::JSON::Serializable {
     Q_OBJECT;
 
     cb::SmartPointer<Ui::CAMLayerDialog> ui;
+    bool metric;
 
   public:
     CAMLayerDialog(QWidget *parent);
 
     void setLayers(const std::vector<std::string> &layers);
-    void setUnits(GCode::ToolUnits units);
+    void setUnits(GCode::Units units);
 
-    CAMLayer getLayer() const;
-    void setLayer(const CAMLayer &layer);
+    std::string getOffsetType(int index) const;
+    std::string getOffsetType() const;
+    void setOffsetType(const std::string &offset);
 
     void update();
     int exec();
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
 
   protected slots:
     void on_offsetComboBox_currentIndexChanged(int) {update();}

@@ -36,6 +36,7 @@ namespace GCode {
 
   class GCodeInterpreter :
     public Processor, public Evaluator, public VarTypes, public ModalGroup {
+  protected:
     Controller &controller;
 
   public:

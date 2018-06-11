@@ -23,9 +23,10 @@
 
 #include "GCodeInterpreter.h"
 
-#include <gcode/NullInterrupter.h>
+#include <gcode/Producer.h>
 
 #include <cbang/SmartPointer.h>
+#include <cbang/io/InputSource.h>
 
 #include <map>
 #include <set>
@@ -36,7 +37,7 @@ namespace GCode {
   class Program;
 
   class OCodeInterpreter : public GCodeInterpreter {
-    cb::SmartPointer<Interrupter> interrupter;
+    std::vector<cb::SmartPointer<Producer> > producers;
 
     typedef std::map<unsigned, cb::SmartPointer<Program> > subroutines_t;
     subroutines_t subroutines;
@@ -48,31 +49,40 @@ namespace GCode {
     std::string subroutineName;
 
     // Variable call stack
-    typedef std::vector<std::vector<double> > stack_t;
-    stack_t stack;
-    typedef std::map<std::string, double> name_map_t;
-    typedef std::vector<name_map_t> name_stack_t;
-    name_stack_t nameStack;
+    struct StackEntry {
+      std::vector<double> nums;
+      std::map<std::string, double> names;
+
+      StackEntry() : nums(30) {}
+    };
+
+    std::vector<StackEntry> stack;
 
     std::vector<unsigned> conditions;
     bool condition;
 
-    unsigned loopNumber;
-    cb::SmartPointer<Program> loop;
-    std::string loopEnd;
-    cb::SmartPointer<Entity> loopExpr;
-    unsigned repeat;
+    struct {
+      unsigned number;
+      cb::SmartPointer<Program> program;
+      std::string end;
+      cb::SmartPointer<Entity> expr;
+      unsigned repeat;
+    } loop;
 
     std::set<std::string> loadedFiles;
 
   public:
-    OCodeInterpreter(Controller &controller,
-                     const cb::SmartPointer<Interrupter> &interrupter
-                     = new NullInterrupter);
+    OCodeInterpreter(Controller &controller);
     virtual ~OCodeInterpreter();
 
-    const cb::SmartPointer<Interrupter> &getInterrupter() const
-    {return interrupter;}
+    const cb::SmartPointer<Program> &
+    lookupSubroutine(const std::string &name) const;
+
+    void push(const cb::SmartPointer<Producer> &producer);
+    void push(const cb::InputSource &source);
+    void push(Program &program);
+    bool hasMore();
+    void next();
 
     void checkExpressions(OCode *ocode, const char *name, unsigned count);
     void upScope();

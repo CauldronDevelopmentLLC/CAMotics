@@ -1,0 +1,33 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.253321,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "ballnose",
+          "length": 0.625,
+          "diameter": 0.1,
+          "description": ""
+        },
+        "2": {
+          "units": "imperial",
+          "shape": "cylindrical",
+          "length": 1,
+          "diameter": 0.0625,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-40, -40, -12.7],
+          "max": [40, 40, 0]
+        }
+      },
+      "files": [
+        "heart.ngc",
+        "cutout.ngc"
+      ]
+    }

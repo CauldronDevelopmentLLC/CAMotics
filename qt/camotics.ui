@@ -3056,18 +3056,6 @@
     <string>Edit selected file</string>
    </property>
   </action>
-  <action name="actionReloadFile">
-   <property name="icon">
-    <iconset resource="camotics.qrc">
-     <normaloff>:/icons/view-refresh.png</normaloff>:/icons/view-refresh.png</iconset>
-   </property>
-   <property name="text">
-    <string>Reload File</string>
-   </property>
-   <property name="toolTip">
-    <string>Reload this file</string>
-   </property>
-  </action>
   <action name="actionConnect">
    <property name="checkable">
     <bool>true</bool>

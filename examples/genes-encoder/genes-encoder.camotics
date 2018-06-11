@@ -1,0 +1,25 @@
+{
+      "units": "imperial",
+      "resolution-mode": "medium",
+      "resolution": 0.215681,
+      "tools": {
+        "7": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 10,
+          "diameter": 1.5875,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 5,
+        "bounds": {
+          "min": [-35.4139, -35.4139, -0.5],
+          "max": [35.4139, 35.4139, 0]
+        }
+      },
+      "files": [
+        "genes-encoder.ngc"
+      ]
+    }

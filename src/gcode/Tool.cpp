@@ -38,7 +38,7 @@ const char *Tool::VARS = "XYZABCUVWRIJQ";
 Tool Tool::null;
 
 
-Tool::Tool(unsigned number, unsigned pocket, ToolUnits units) :
+Tool::Tool(unsigned number, unsigned pocket, Units units) :
   number(number), pocket(pocket), units(units),
   shape(ToolShape::TS_CYLINDRICAL) {
 
@@ -46,7 +46,7 @@ Tool::Tool(unsigned number, unsigned pocket, ToolUnits units) :
   memset(vars, 0, sizeof(vars));
   setShape(ToolShape::TS_CYLINDRICAL);
 
-  if (units == ToolUnits::UNITS_MM) {
+  if (units == Units::METRIC) {
     setLength(10);
     setRadius(1);
 
@@ -63,7 +63,7 @@ string Tool::getSizeText() const {
   double diameter = getDiameter();
   double length = getLength();
 
-  if (getUnits() == ToolUnits::UNITS_INCH) {
+  if (getUnits() == Units::IMPERIAL) {
     diameter /= 25.4;
     length /= 25.4;
   }
@@ -73,7 +73,10 @@ string Tool::getSizeText() const {
     s = String::printf("%gdeg %g", getAngle(), diameter);
   else s = String::printf("%gx%g", diameter, length);
 
-  return s + String::toLower(getUnits().toString());
+  if (getUnits() == Units::METRIC) s += "mm";
+  else s += "in";
+
+  return s;
 }
 
 
@@ -102,57 +105,14 @@ ostream &Tool::print(ostream &stream) const {
 }
 
 
-void Tool::read(const XMLAttributes &attrs) {
-  if (attrs.has("units")) try {
-      setUnits(ToolUnits::parse(attrs["units"]));
-    } CATCH_ERROR;
-
-  if (attrs.has("shape")) try {
-      setShape(ToolShape::parse(attrs["shape"]));
-    } CATCH_ERROR;
-
-  double scale = getUnits() == ToolUnits::UNITS_INCH ? 25.4 : 1;
-
-  if (attrs.has("length"))
-    setLength(String::parseDouble(attrs["length"]) * scale);
-  else THROWS("Tool " << number << " missing length");
-
-  if (attrs.has("radius"))
-    setRadius(String::parseDouble(attrs["radius"]) * scale);
-  else if (attrs.has("diameter"))
-    setRadius(String::parseDouble(attrs["diameter"]) / 2.0 * scale);
-  else THROWS("Tool " << number << " has neither radius or diameter");
-
-  if (attrs.has("snub_diameter"))
-    setSnubDiameter(String::parseDouble(attrs["snub_diameter"]) * scale);
-}
-
-
-void Tool::write(XMLWriter &writer) const {
-  double scale = getUnits() == ToolUnits::UNITS_INCH ? 1.0 / 25.4 : 1;
-  const double small = 0.0000001;
-
-  XMLAttributes attrs;
-  attrs["number"] = String(number);
-  attrs["units"] = getUnits().toString();
-  attrs["shape"] = getShape().toString();
-  attrs["length"] = String(getLength() * scale);
-  attrs["radius"] = String(getRadius() * scale);
-  if (getShape() == ToolShape::TS_SNUBNOSE && small < getSnubDiameter())
-    attrs["snub_diameter"] = String(getSnubDiameter() * scale);
-
-  writer.simpleElement("tool", getDescription(), attrs);
-}
-
-
 void Tool::write(JSON::Sink &sink, bool withNumber) const {
   sink.beginDict();
 
-  double scale = units == ToolUnits::UNITS_INCH ? 1.0 / 25.4 : 1;
+  double scale = units == Units::IMPERIAL ? 1.0 / 25.4 : 1;
 
   if (withNumber) sink.insert("number", number);
-  sink.insert("units", getUnits().toString());
-  sink.insert("shape", getShape().toString());
+  sink.insert("units", String::toLower(getUnits().toString()));
+  sink.insert("shape", String::toLower(getShape().toString()));
   sink.insert("length", getLength() * scale);
   sink.insert("diameter", getDiameter() * scale);
   if (getShape() == ToolShape::TS_SNUBNOSE)
@@ -167,9 +127,9 @@ void Tool::read(const JSON::Value &value) {
   setNumber(value.getU32("number", number));
 
   if (value.hasString("units"))
-    units = ToolUnits::parse(value.getString("units"));
+    units = Units::parse(value.getString("units"));
 
-  double scale = units == ToolUnits::UNITS_INCH ? 25.4 : 1;
+  double scale = units == Units::IMPERIAL ? 25.4 : 1;
 
   if (value.hasString("shape"))
     shape = ToolShape::parse(value.getString("shape"));

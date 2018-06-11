@@ -72,13 +72,12 @@ Probe::Probe(Options &options, ostream &stream) :
 void Probe::read(const InputSource &source) {
   // Parse program
   GCode::Program program;
-  GCode::Parser().parse(source, program);
+  GCode::Parser(source).parse(program);
 
   // Compute bounding box
   pass = 1;
-  try {
-    program.process(interp);
-  } catch (const GCode::EndProgram &) {}
+  interp.push(program);
+  interp.run();
   LOG_DEBUG(1, "Bounding box: " << bbox);
 
   // Create probe grid
@@ -86,13 +85,14 @@ void Probe::read(const InputSource &source) {
   Vector2D divisions(ceil(bbox.getWidth() / gridSize),
                      ceil(bbox.getLength() / gridSize));
   grid = new ProbeGrid(bbox, divisions);
-  try {
-    program.process(interp);
-  } catch (const GCode::EndProgram &) {}
+  interp.push(program);
+  interp.run();
 
   // Output program with probe
   didOutputProbe = false;
-  program.process(*this);
+
+  for (auto it = program.begin(); it != program.end(); it++)
+    (*this)(*it);
 }
 
 

@@ -34,8 +34,9 @@ using namespace std;
 
 
 PlannerConfig::PlannerConfig() :
-  maxVel(10000), maxAccel(200000), maxJerk(50000000), junctionDeviation(0.02),
-  minJunctionLength(0.01), minSoftLimit(numeric_limits<double>::quiet_NaN()),
+  maxVel(10000), maxAccel(200000), maxJerk(50000000), junctionDeviation(0.05),
+  junctionAccel(100000), minJunctionLength(0.01),
+  minSoftLimit(numeric_limits<double>::quiet_NaN()),
   maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
   maxArcError(0.01), maxLookahead(4096) {}
 
@@ -62,6 +63,7 @@ void PlannerConfig::read(const JSON::Value &value) {
   if (value.hasDict("max-jerk")) maxJerk.read(value.getDict("max-jerk"));
 
   junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
+  junctionAccel = value.getNumber("junction-accel", junctionAccel);
   minJunctionLength = value.getNumber("min-junction-length", minJunctionLength);
 
   if (value.hasDict("min-soft-limit"))
@@ -99,6 +101,7 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   maxJerk.write(sink);
 
   sink.insert("junction-deviation", junctionDeviation);
+  sink.insert("junction-accel", junctionAccel);
   sink.insert("min-junction-length", minJunctionLength);
 
   sink.beginInsert("min-soft-limit");

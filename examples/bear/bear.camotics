@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.294723,
+      "tools": {
+        "1": {
+          "units": "imperial",
+          "shape": "ballnose",
+          "length": 1,
+          "diameter": 0.125,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": false,
+        "margin": 0,
+        "bounds": {
+          "min": [0, 0, -20],
+          "max": [80, 80, 0]
+        }
+      },
+      "files": [
+        "bear.nc"
+      ]
+    }

@@ -27,6 +27,7 @@
 #include "SeekCommand.h"
 #include "InputCommand.h"
 #include "SetCommand.h"
+#include "EndCommand.h"
 
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
@@ -179,11 +180,7 @@ void LinePlanner::start() {
 
 void LinePlanner::end() {
   MachineState::end();
-
-  if (!cmds.empty()) {
-    cmds.back()->setExitVelocity(0);
-    plan(cmds.back());
-  }
+  push(new EndCommand(nextID++));
 }
 
 
@@ -368,10 +365,24 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
 
       if (lastLC.length < config.minJunctionLength) continue;
 
-      double maxAccel = min(lc.maxAccel, lastLC.maxAccel);
       double jv = computeJunctionVelocity(lc.unit, lastLC.unit,
-                                          config.junctionDeviation, maxAccel);
+                                          config.junctionDeviation,
+                                          config.junctionAccel);
       if (jv < Vi) {
+#if DEBUG
+        double cosTheta = -lc.unit.dot(lastLC.unit);
+        double angle = acos(cosTheta) / M_PI * 180;
+
+        LOG_DEBUG(5, "junctionVelocity=" << jv
+                  << " unitA=" << lc.unit
+                  << " unitB=" << lastLC.unit
+                  << " lenA=" << lc.length
+                  << " lenB=" << lastLC.length
+                  << " cosTheta=" << cosTheta
+                  << " angle=" << angle
+                  << " id=" << lc.getID());
+#endif
+
         Vi = jv;
         cmd->setEntryVelocity(Vi);
         cmd->prev->setExitVelocity(Vi);
@@ -731,9 +742,22 @@ double LinePlanner::computeJunctionVelocity(const Axes &unitA,
   if (cosTheta < -0.99) return numeric_limits<double>::max(); // Straight line
   if (0.99 < cosTheta) return 0; // Reversal
 
-  // Credit goes to the Grbl project for the following calculation.
-  // Trig half angle identity
-  double sinThetaD2 = sqrt(0.5 * (1.0 - cosTheta));
+  // Fuse the junction deviations into a vector sum
+  double aDelta = 0;
+  double bDelta = 0;
 
-  return sqrt(accel * deviation * sinThetaD2 / (1.0 - sinThetaD2));
+  for (unsigned axis = 0; axis < Axes::getSize(); axis++) {
+    aDelta += square(unitA[axis] * deviation);
+    bDelta += square(unitB[axis] * deviation);
+  }
+
+  LOG_DEBUG(3, "delta A=" << aDelta << " delta B=" << bDelta);
+
+  if (!aDelta || !bDelta) return 0; // A unit vector is null
+
+  double delta = (sqrt(aDelta) + sqrt(bDelta)) / 2;
+  double theta2 = acos(cosTheta) / 2;
+  double radius = delta * sin(theta2) / (1 - sin(theta2));
+
+  return sqrt(radius * accel);
 }

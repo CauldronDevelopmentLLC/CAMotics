@@ -36,7 +36,7 @@ namespace cb {
 }
 
 namespace CAMotics {
-  class Project;
+  namespace Project {class Project;}
 
   class ToolPathTask : public Task {
     GCode::ToolTable tools;
@@ -52,7 +52,7 @@ namespace CAMotics {
     cb::SmartPointer<cb::Thread> logCopier;
 
     public:
-    ToolPathTask(const Project &project);
+    ToolPathTask(const Project::Project &project);
     ~ToolPathTask();
 
     unsigned getErrorCount() const {return errors;}

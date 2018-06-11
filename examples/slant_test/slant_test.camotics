@@ -1,0 +1,26 @@
+{
+      "units": "metric",
+      "resolution-mode": "high",
+      "resolution": 0.050118,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "snubnose",
+          "length": 5.5,
+          "diameter": 4,
+          "snub_diameter": 2,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": true,
+        "margin": 1,
+        "bounds": {
+          "min": [-2.14, -2.14, -5.05],
+          "max": [12.14, 12.14, 0]
+        }
+      },
+      "files": [
+        "slant_test.nc"
+      ]
+    }

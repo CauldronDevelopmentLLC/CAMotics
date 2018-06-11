@@ -25,11 +25,6 @@ using namespace cb;
 using namespace GCode;
 
 
-void Program::process(Processor &processor) {
-  for (const_iterator it = begin(); it != end(); it++) processor(*it);
-}
-
-
 void Program::print(ostream &stream) const {
   for (const_iterator it = begin(); it != end(); it++)
     stream << **it << '\n';

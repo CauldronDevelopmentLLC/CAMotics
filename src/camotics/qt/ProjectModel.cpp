@@ -21,7 +21,7 @@
 #include "ProjectModel.h"
 
 #include <gcode/ToolTable.h>
-#include <camotics/sim/Project.h>
+#include <camotics/project/Project.h>
 
 #include <cbang/SStream.h>
 
@@ -30,7 +30,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ProjectModel::ProjectModel(const SmartPointer<Project> &project,
+ProjectModel::ProjectModel(const SmartPointer<Project::Project> &project,
                            QObject *parent) :
   QAbstractItemModel(parent), project(project) {
 }
@@ -39,7 +39,7 @@ ProjectModel::ProjectModel(const SmartPointer<Project> &project,
 ProjectModel::~ProjectModel() {}
 
 
-void ProjectModel::setProject(const SmartPointer<Project> &project) {
+void ProjectModel::setProject(const SmartPointer<Project::Project> &project) {
   beginResetModel();
   this->project = project;
   endResetModel();
@@ -47,7 +47,7 @@ void ProjectModel::setProject(const SmartPointer<Project> &project) {
 
 
 string ProjectModel::getFile(unsigned i) const {
-  return project->getFile(i)->getRelativePath();
+  return project->getFiles().getRelativePath(i);
 }
 
 
@@ -57,7 +57,7 @@ string ProjectModel::getFile(const QModelIndex &index) const {
 
 
 GCode::Tool &ProjectModel::getTool(unsigned i) const {
-  GCode::ToolTable &tools = project->getToolTable();
+  GCode::ToolTable &tools = project->getTools();
 
   GCode::ToolTable::iterator it = tools.begin();
   for (; i && it != tools.end(); it++) i--;
@@ -81,7 +81,7 @@ string ProjectModel::getToolString(unsigned i) const {
 
 QModelIndex ProjectModel::getToolIndex(unsigned number) const {
   // Find tool index
-  GCode::ToolTable &tools = project->getToolTable();
+  GCode::ToolTable &tools = project->getTools();
   int row = 0;
   for (GCode::ToolTable::iterator it = tools.begin(); it != tools.end(); it++) {
     if (it->first == number) break;
@@ -161,8 +161,8 @@ int ProjectModel::rowCount(const QModelIndex &parent) const {
   switch (getType(parent)) {
   case NULL_ITEM: return 1;
   case PROJECT_ITEM: return 2;
-  case PATHS_ITEM: return project->getFileCount();
-  case TOOLS_ITEM: return project->getToolTable().size();
+  case PATHS_ITEM: return project->getFiles().size();
+  case TOOLS_ITEM: return project->getTools().size();
   default: return 0;
   }
 }
