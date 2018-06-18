@@ -24,11 +24,17 @@
 #include <gcode/parse/Tokenizer.h>
 
 #include <cbang/SStream.h>
-#include <cbang/util/SmartDepth.h>
+#include <cbang/util/SmartToggle.h>
 #include <cbang/log/SmartLogThreadPrefix.h>
 
+using namespace std;
 using namespace cb;
 using namespace GCode;
+
+
+void Interpreter::addOverride(const Code &code, const string &gcode) {
+  overrides[code] = gcode;
+}
 
 
 unsigned Interpreter::run(unsigned maxErrors) {
@@ -36,7 +42,10 @@ unsigned Interpreter::run(unsigned maxErrors) {
 
   while (hasMore())
     try {
-      next();
+      (*this)(next());
+
+    } catch (const EndProgram &) {
+      unwind();
 
     } catch (const Exception &e) {
       LOG_ERROR(e);
@@ -44,6 +53,31 @@ unsigned Interpreter::run(unsigned maxErrors) {
     }
 
   return errors;
+}
+
+
+void Interpreter::execute(const Code &code, int vars) {
+  class SmartToggleProducer : public SmartToggle, public Producer {
+  public:
+    SmartToggleProducer(bool &toggle) : SmartToggle(toggle) {}
+
+    // From Producer
+    bool hasMore() const {return false;}
+    cb::SmartPointer<Block> next() {THROW("Invalid");}
+  };
+
+
+  if (!inOverride) {
+    auto it = overrides.find(code);
+
+    if (it != overrides.end()) {
+      push(new SmartToggleProducer(inOverride));
+      push(it->second, SSTR("<" << code << ">"));
+      return;
+    }
+  }
+
+  GCodeInterpreter::execute(code, vars);
 }
 
 

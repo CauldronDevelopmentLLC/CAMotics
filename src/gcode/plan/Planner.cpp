@@ -27,7 +27,7 @@ using namespace std;
 using namespace GCode;
 
 
-Planner::Planner() : ControllerImpl(pipeline) {
+Planner::Planner() : ControllerImpl(pipeline), started(false) {
   class ParamResolver : public MachineAdapter {
     Planner &planner;
 
@@ -78,6 +78,7 @@ bool Planner::hasMore() {
     if (!runners.empty() && !runners.front()->hasMore()) {
       runners.pop_front();
       pipeline.end();
+      started = false;
     }
 
     if (planner.hasMove()) return true;
@@ -86,14 +87,14 @@ bool Planner::hasMore() {
 
     Runner &runner = *runners.front();
 
-    if (!runner.hasStarted()) {
-      const PlannerConfig &config = runner.getConfig();
-      setConfig(config);
+    if (!started) {
+      setConfig(runner.getConfig());
       pipeline.start();
+      started = true;
     }
 
     // Push a line of GCode to the planner
-    runner.next();
+    runner.step();
   }
 }
 
@@ -117,10 +118,4 @@ void Planner::restart(uint64_t id, const Axes &position) {
 
 double Planner::resolve(const string &name, Units units) const {
   return resolver.isNull() ? 0 : convert(METRIC, units, resolver->get(name));
-}
-
-
-bool Planner::execute(const Code &code, int vars) {
-  if (!runners.empty() && runners.front()->execute(code, vars)) return true;
-  return ControllerImpl::execute(code, vars);
 }

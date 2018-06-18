@@ -22,11 +22,7 @@
 
 
 #include "GCodeInterpreter.h"
-
-#include <gcode/Producer.h>
-
-#include <cbang/SmartPointer.h>
-#include <cbang/io/InputSource.h>
+#include "ProducerStack.h"
 
 #include <map>
 #include <set>
@@ -34,19 +30,17 @@
 
 
 namespace GCode {
-  class Program;
+  class OCodeInterpreter : public GCodeInterpreter, public ProducerStack {
+    // Subroutines
+    struct {
+      std::map<unsigned, cb::SmartPointer<Program> > numbered;
+      std::map<std::string, cb::SmartPointer<Program> > named;
 
-  class OCodeInterpreter : public GCodeInterpreter {
-    std::vector<cb::SmartPointer<Producer> > producers;
-
-    typedef std::map<unsigned, cb::SmartPointer<Program> > subroutines_t;
-    subroutines_t subroutines;
-    typedef std::map<std::string, cb::SmartPointer<Program> >
-    named_subroutines_t;
-    named_subroutines_t namedSubroutines;
-    cb::SmartPointer<Program> subroutine;
-    unsigned subroutineNumber;
-    std::string subroutineName;
+      cb::SmartPointer<Program> current;
+      unsigned number;
+      std::string name;
+      std::set<std::string> loadedFiles;
+    } sub;
 
     // Variable call stack
     struct StackEntry {
@@ -58,9 +52,11 @@ namespace GCode {
 
     std::vector<StackEntry> stack;
 
+    // Conditions
     std::vector<unsigned> conditions;
     bool condition;
 
+    // Loops
     struct {
       unsigned number;
       cb::SmartPointer<Program> program;
@@ -69,20 +65,12 @@ namespace GCode {
       unsigned repeat;
     } loop;
 
-    std::set<std::string> loadedFiles;
 
   public:
     OCodeInterpreter(Controller &controller);
-    virtual ~OCodeInterpreter();
 
     const cb::SmartPointer<Program> &
     lookupSubroutine(const std::string &name) const;
-
-    void push(const cb::SmartPointer<Producer> &producer);
-    void push(const cb::InputSource &source);
-    void push(Program &program);
-    bool hasMore();
-    void next();
 
     void checkExpressions(OCode *ocode, const char *name, unsigned count);
     void upScope();

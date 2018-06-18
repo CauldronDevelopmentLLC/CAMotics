@@ -56,6 +56,13 @@ void GCodeInterpreter::setReference(const string &name, double value) {
 }
 
 
+void GCodeInterpreter::execute(const Code &code, int vars) {
+  if (!controller.execute(code, vars)) LOG_WARNING("Not implemented: " << code);
+  else if (code.group == MG_MOTION)
+    controller.setCurrentMotionMode(code.number);
+}
+
+
 void GCodeInterpreter::specialComment(const string text) {
   string::const_iterator it = text.begin();
   string::const_iterator end = text.end();
@@ -105,7 +112,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   SmartFunctor<Controller> callEndBlock(&controller, &Controller::endBlock);
 
   // Evaluate all expressions and set variables
-  for (Block::iterator it = block->begin(); it != block->end(); it++) {
+  for (auto it = block->begin(); it != block->end(); it++) {
     (*it)->eval(*this);
 
     if ((assign = (*it)->instance<Assign>())) { // Handle Assigns
@@ -236,10 +243,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
 
         if (priority == code->priority) {
           controller.setLocation(word->getLocation());
-          if (!controller.execute(*code, vars))
-            LOG_WARNING("Not implemented: " << *code);
-          else if (code->group == MG_MOTION)
-            controller.setCurrentMotionMode(code->number);
+          execute(*code, vars);
         }
 
         wordPriority = code->priority;

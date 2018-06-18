@@ -56,6 +56,8 @@ namespace GCode {
     std::list<cb::SmartPointer<Runner> > runners;
     cb::SmartPointer<NameResolver> resolver;
 
+    bool started;
+
   public:
     Planner();
 
@@ -77,8 +79,5 @@ namespace GCode {
     void stop();
     void restart(uint64_t id, const Axes &position);
     double resolve(const std::string &name, Units units) const;
-
-    // From Controller
-    bool execute(const Code &code, int vars);
   };
 }

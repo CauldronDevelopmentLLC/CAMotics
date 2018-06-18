@@ -65,7 +65,7 @@ SmartPointer<Block> Parser::next() {
 
   } catch (const Exception &e) {
     LOG_DEBUG(3, e);
-    throw Exception("Parser", tokenizer->getLocation().getStart(), e);
+    throw Exception(e.getMessage(), tokenizer->getLocation().getStart());
   }
 }
 
@@ -106,7 +106,8 @@ SmartPointer<Block> Parser::block() {
 
     default:
       if (!tokenizer->isType(TokenType::ID_TOKEN))
-        THROWS("Expected word or assignment, found " << tokenizer->getType());
+        THROWS("Expected word or assignment, found "
+               << tokenizer->advance().getType());
 
       children.push_back(word());
       break;
@@ -192,8 +193,9 @@ SmartPointer<Entity> Parser::numberRefOrExpr() {
   case TokenType::NUMBER_TOKEN: return number();
   case TokenType::ADD_TOKEN:
   case TokenType::SUB_TOKEN: return unaryOp();
-  default: THROWS("Expected number, reference, or bracked expression, found "
-                  << tokenizer->getType());
+  default:
+    THROWS("Expected number, reference, or bracked expression, found "
+           << tokenizer->advance().getType());
   }
 }
 
@@ -322,7 +324,8 @@ SmartPointer<Entity> Parser::unaryOp() {
   case TokenType::ADD_TOKEN: op = Operator::ADD_OP; break;
   case TokenType::SUB_TOKEN: op = Operator::SUB_OP; break;
   default:
-    THROWS("Expected unary - or + operator, found " << tokenizer->getType());
+    THROWS("Expected unary - or + operator, found "
+           << tokenizer->advance().getType());
   }
 
   tokenizer->advance();

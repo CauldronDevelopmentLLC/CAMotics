@@ -23,33 +23,20 @@
 #include "PlannerConfig.h"
 
 #include <gcode/interp/Interpreter.h>
-#include <gcode/parse/Parser.h>
 
 
 namespace GCode {
   class Controller;
 
-  class Runner {
+  class Runner : public Interpreter {
     PlannerConfig config;
-
-    Interpreter interpreter;
-    typedef std::vector<cb::SmartPointer<GCode::Parser> > parsers_t;
-    parsers_t parsers;
-
-    bool started;
 
   public:
     Runner(Controller &controller, const cb::InputSource &source,
            const PlannerConfig &config);
 
     const PlannerConfig &getConfig() const {return config;}
-    bool hasStarted() const {return started;}
 
-    void push(const cb::InputSource &source);
-
-    bool hasMore();
-    void next();
-
-    bool execute(const Code &code, int vars);
+    void step();
   };
 }

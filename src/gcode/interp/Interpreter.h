@@ -30,11 +30,19 @@ namespace GCode {
   class Tokenizer;
 
   class Interpreter : public OCodeInterpreter, public cb::Reader {
+    bool inOverride;
+    std::map<const Code, std::string> overrides;
+
   public:
     Interpreter(Controller &controller) :
-      OCodeInterpreter(controller) {}
+      OCodeInterpreter(controller), inOverride(false) {}
+
+    void addOverride(const Code &code, const std::string &gcode);
 
     unsigned run(unsigned maxErrors = 32);
+
+    // From GCodeInterpreter
+    void execute(const Code &code, int vars);
 
     // From cb::Reader
     void read(const cb::InputSource &source);

@@ -22,6 +22,7 @@
 
 #include "Axes.h"
 #include "Addresses.h"
+#include "Codes.h"
 
 #include <cbang/SmartPointer.h>
 #include <cbang/LocationRange.h>

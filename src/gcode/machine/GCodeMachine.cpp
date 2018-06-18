@@ -58,18 +58,11 @@ namespace {
 
 
 void GCodeMachine::beginLine() {
-#define DIGIT_CHARS        "1234567890"
-#define LOWER_CHARS        "abcdefghijklmnopqrstuvwxyz"
-#define UPPER_CHARS        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#define ALPHA_CHARS        LOWER_CHARS UPPER_CHARS
-#define ALPHANUMERIC_CHARS ALPHA_CHARS DIGIT_CHARS
-#define UNESCAPED ALPHANUMERIC_CHARS "-_.!~*/"
-
   const FileLocation &newLoc = getLocation().getStart();
   const string &filename = newLoc.getFilename();
 
   if (filename != location.getFilename()) {
-    *stream << "(File: '" << URI::encode(filename, UNESCAPED) << "')\n";
+    *stream << "(File: " << String::replace(filename, "\\)", "%29") << ")\n";
     location.setFilename(filename);
   }
 

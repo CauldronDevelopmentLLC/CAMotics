@@ -167,8 +167,10 @@ void Tokenizer::next() {
       id();
       needAdvance = false;
 
-    } else
+    } else {
+      scanner->advance();
       THROWS("Invalid character: '" << cb::String::escapeC(c) << "'");
+    }
   }
 
   if (needAdvance) scanner->advance();

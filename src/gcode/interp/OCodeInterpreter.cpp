@@ -25,10 +25,8 @@
 #include "DoLoop.h"
 #include "RepeatLoop.h"
 
-#include <gcode/ast/Program.h>
 #include <gcode/ast/OCode.h>
-
-#include <gcode/parse/Parser.h>
+#include <gcode/ast/Word.h>
 
 #include <cbang/log/Logger.h>
 #include <cbang/util/SmartFunctor.h>
@@ -43,54 +41,11 @@ OCodeInterpreter::OCodeInterpreter(Controller &controller) :
   GCodeInterpreter(controller), condition(true) {}
 
 
-OCodeInterpreter::~OCodeInterpreter() {
-  // Unwind stack in correct order
-  while (!producers.empty()) producers.pop_back();
-}
-
-
 const SmartPointer<Program> &
 OCodeInterpreter::lookupSubroutine(const string &name) const {
-  auto it = namedSubroutines.find(name);
-  if (it == namedSubroutines.end())
-    THROWS("Subroutine " << name << " not found");
+  auto it = sub.named.find(name);
+  if (it == sub.named.end()) THROWS("Subroutine " << name << " not found");
   return it->second;
-}
-
-
-void OCodeInterpreter::push(const SmartPointer<Producer> &producer) {
-  producers.push_back(producer);
-}
-
-
-void OCodeInterpreter::push(const InputSource &source) {
-  push(new Parser(source));
-}
-
-void OCodeInterpreter::push(Program &program) {
-  push(new ProgramProducer(SmartPointer<Program>::Phony(&program)));
-}
-
-
-bool OCodeInterpreter::hasMore() {
-  while (!producers.empty()) {
-    if (producers.back()->hasMore()) return true;
-    producers.pop_back();
-  }
-
-  return false;
-}
-
-
-void OCodeInterpreter::next() {
-  if (producers.empty()) return;
-
-  try {
-    (*this)(producers.back()->next());
-
-  } catch (const EndProgram &) {
-    while (!producers.empty()) producers.pop_back();
-  }
 }
 
 
@@ -123,26 +78,26 @@ void OCodeInterpreter::downScope() {
 void OCodeInterpreter::doSub(OCode *ocode) {
   checkExpressions(ocode, "sub", 0);
 
-  if (!subroutine.isNull()) THROWS("Nested subroutines not allowed");
-  subroutine = new Program;
+  if (!sub.current.isNull()) THROWS("Nested subroutines not allowed");
+  sub.current = new Program;
 
   if (ocode->getFilename().empty()) {
     unsigned number = ocode->getNumber();
 
-    if (subroutines.find(number) != subroutines.end())
+    if (sub.numbered.find(number) != sub.numbered.end())
       LOG_WARNING("redefinition of subroutine " << number);
 
-    subroutines[number] = subroutine;
-    subroutineNumber = number;
+    sub.numbered[number] = sub.current;
+    sub.number = number;
 
   } else {
     string name = ocode->getFilename();
 
-    if (namedSubroutines.find(name) != namedSubroutines.end())
+    if (sub.named.find(name) != sub.named.end())
       LOG_WARNING("redefinition of subroutine " << name);
 
-    namedSubroutines[name] = subroutine;
-    subroutineName = name;
+    sub.named[name] = sub.current;
+    sub.name = name;
   }
 }
 
@@ -150,15 +105,15 @@ void OCodeInterpreter::doSub(OCode *ocode) {
 void OCodeInterpreter::doEndSub(OCode *ocode) {
   checkExpressions(ocode, "endsub", 0);
 
-  if (subroutineName.empty()) {
-    if (subroutineNumber != ocode->getNumber())
+  if (sub.named.empty()) {
+    if (sub.number != ocode->getNumber())
       LOG_WARNING("endsub number does not match");
 
-  } else if (subroutineName != ocode->getFilename())
+  } else if (sub.name != ocode->getFilename())
     LOG_WARNING("endsub name does not match");
 
-  subroutine = 0;
-  subroutineName = "";
+  sub.current = 0;
+  sub.name = "";
 }
 
 
@@ -185,19 +140,18 @@ void OCodeInterpreter::doCall(OCode *ocode) {
   // Find subroute and call
   if (ocode->getFilename().empty()) {
     unsigned number = ocode->getNumber();
-    subroutines_t::iterator it = subroutines.find(number);
+    auto it = sub.numbered.find(number);
 
-    if (it == subroutines.end())
+    if (it == sub.numbered.end())
       THROWS("Subroutine " << number << " not found");
     subroutineCall->setProgram(it->second);
 
   } else {
     string name = ocode->getFilename();
     LOG_DEBUG(3, "Seeking subroutine \"" << name << '"');
-    named_subroutines_t::iterator it = namedSubroutines.find(name);
+    auto it = sub.named.find(name);
 
-    if (it != namedSubroutines.end())
-      subroutineCall->setProgram(it->second);
+    if (it != sub.named.end()) subroutineCall->setProgram(it->second);
 
     else {
       // Try to load subroutine from file
@@ -206,29 +160,29 @@ void OCodeInterpreter::doCall(OCode *ocode) {
         LOG_WARNING("Environment variable GCODE_SCRIPT_PATH not set");
         THROWS("Subroutine " << name << " not found");
 
-      } else if (loadedFiles.insert(name).second) {
+      } else if (sub.loadedFiles.insert(name).second) {
         string path = SystemUtilities::findInPath(scriptPath, name);
         if (path.empty())
           THROWS("Subroutine \"" << name
                  << "\" file not found in GCODE_SCRIPT_PATH");
 
-        push(new SubroutineLoader(name, subroutineCall, *this));
-        push(new Parser(InputSource(path)));
+        ProducerStack::push(new SubroutineLoader(name, subroutineCall, *this));
+        ProducerStack::push(InputSource(path));
         return;
       }
     }
   }
 
-  if (!subroutineCall->getProgram().isNull()) push(subroutineCall);
+  if (!subroutineCall->getProgram().isNull())
+    ProducerStack::push(subroutineCall);
 }
 
 
 void OCodeInterpreter::doReturn(OCode *ocode) {
   checkExpressions(ocode, "return", 0);
 
-  while (!producers.empty()) {
-    SmartPointer<Producer> producer = producers.back();
-    producers.pop_back();
+  while (!ProducerStack::empty()) {
+    SmartPointer<Producer> producer = ProducerStack::pop();
 
     if (producer.isInstance<SubroutineCall>()) {
       if (producer.cast<SubroutineCall>()->getNumber() != ocode->getNumber())
@@ -255,7 +209,8 @@ void OCodeInterpreter::doWhile(OCode *ocode) {
   SmartPointer<Entity> expr = expressions.empty() ? 0 : expressions[0];
 
   if (loop.end == "while" && loop.number == ocode->getNumber()) {
-    push(new DoLoop(ocode->getNumber(), loop.program, *this, expr, true));
+    ProducerStack::push
+      (new DoLoop(ocode->getNumber(), loop.program, *this, expr, true));
     loop.program = 0;
 
   } else {
@@ -270,7 +225,8 @@ void OCodeInterpreter::doWhile(OCode *ocode) {
 void OCodeInterpreter::doEndWhile(OCode *ocode) {
   checkExpressions(ocode, "endwhile", 0);
 
-  push(new DoLoop(ocode->getNumber(), loop.program, *this, loop.expr, false));
+  ProducerStack::push
+    (new DoLoop(ocode->getNumber(), loop.program, *this, loop.expr, false));
   loop.program = 0;
   loop.expr = 0;
 }
@@ -279,33 +235,32 @@ void OCodeInterpreter::doEndWhile(OCode *ocode) {
 void OCodeInterpreter::doBreak(OCode *ocode) {
   checkExpressions(ocode, "break", 0);
 
-  while (!producers.empty()) {
-    SmartPointer<Producer> producer = producers.back();
-    if (!producer.isInstance<Loop>())
-      THROWS("Break outside loop or OCode number mismatch");
-
-    producers.pop_back();
-
-    if (producer.cast<Loop>()->getNumber() != ocode->getNumber()) break;
+  while (!ProducerStack::empty()) {
+    SmartPointer<Producer> producer = ProducerStack::pop();
+    if (!producer.isInstance<Loop>()) THROW("Break outside loop");
+    if (producer.cast<Loop>()->getNumber() == ocode->getNumber()) return;
   }
+
+  THROW("Break outside loop or OCode number mismatch");
 }
 
 
 void OCodeInterpreter::doContinue(OCode *ocode) {
   checkExpressions(ocode, "continue", 0);
 
-  while (!producers.empty()) {
-    SmartPointer<Producer> producer = producers.back();
-    if (!producer.isInstance<Loop>())
-      THROWS("Break outside loop or OCode number mismatch");
+  while (!ProducerStack::empty()) {
+    SmartPointer<Producer> producer = ProducerStack::peek();
+    if (!producer.isInstance<Loop>()) THROW("Continue outside loop");
 
-    if (producer.cast<Loop>()->getNumber() != ocode->getNumber()) {
+    if (producer.cast<Loop>()->getNumber() == ocode->getNumber()) {
       producer.cast<Loop>()->continueLoop();
-      break;
+      return;
     }
 
-    producers.pop_back();
+    ProducerStack::pop();
   }
+
+  THROW("Continue outside loop or OCode number mismatch");
 }
 
 
@@ -351,7 +306,8 @@ void OCodeInterpreter::doRepeat(OCode *ocode) {
 void OCodeInterpreter::doEndRepeat(OCode *ocode) {
   checkExpressions(ocode, "endrepeat", 0);
 
-  push(new RepeatLoop(ocode->getNumber(), loop.program, loop.repeat));
+  ProducerStack::push
+    (new RepeatLoop(ocode->getNumber(), loop.program, loop.repeat));
   loop.program = 0;
 }
 
@@ -364,10 +320,10 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   string keyword = ocode ? ocode->getKeyword() : string();
 
   // Subroutine
-  if (!subroutine.isNull() &&
-      ((number != subroutineNumber && ocode &&
-        ocode->getFilename() != subroutineName) || keyword != "endsub")) {
-    subroutine->push_back(block);
+  if (!sub.current.isNull() &&
+      ((number != sub.number && ocode && ocode->getFilename() != sub.name) ||
+       keyword != "endsub")) {
+    sub.current->push_back(block);
     return;
   }
 
@@ -387,7 +343,12 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   else {
     if (!ocode->getFilename().empty() && keyword != "sub" &&
         keyword != "call" && keyword != "endsub")
-      LOG_WARNING("cannot specify file name on " << keyword);
+      LOG_WARNING("Cannot specify file name on " << keyword);
+
+    for (auto it = block->begin(); it != block->end(); it++)
+      if (*it != ocode && (!(*it)->instance<Word>() ||
+                           (*it)->instance<Word>()->getType() == 'N'))
+        LOG_WARNING("Ignored in O-Code block: " << **it);
 
     if (keyword == "sub") doSub(ocode);
     else if (keyword == "endsub") doEndSub(ocode);

@@ -45,6 +45,8 @@ namespace GCode {
     virtual void setReference(address_t addr, double value);
     virtual void setReference(const std::string &name, double value);
 
+    virtual void execute(const Code &code, int vars);
+
     void specialComment(const std::string text);
 
     // From Processor

@@ -20,14 +20,6 @@
 
 #include "Runner.h"
 
-#include <gcode/Codes.h>
-
-#include <cbang/log/Logger.h>
-#include <cbang/util/SmartFunctor.h>
-
-#include <cbang/io/StringStreamInputSource.h>
-
-
 using namespace GCode;
 using namespace cb;
 using namespace std;
@@ -35,45 +27,22 @@ using namespace std;
 
 Runner::Runner(Controller &controller, const InputSource &source,
                const PlannerConfig &config) :
-  config(config), interpreter(controller), started(false) {
+  Interpreter(controller), config(config) {
+
+  for (auto it = config.overrides.begin(); it != config.overrides.end(); it++)
+    addOverride(it->first, it->second);
 
   push(source);
   if (!config.programStart.empty())
-    push(StringStreamInputSource(config.programStart, "<program-start>"));
+    push(config.programStart, "<program-start>");
 }
 
 
-void Runner::push(const InputSource &source) {
-  parsers.push_back(new GCode::Parser(source));
-}
+void Runner::step() {
+  try {
+    (*this)(Interpreter::next());
 
-
-bool Runner::hasMore() {return !parsers.empty() || interpreter.hasMore();}
-
-
-void Runner::next() {
-  started = true;
-
-  while (hasMore()) {
-    if (!interpreter.hasMore()) {
-      interpreter.push(parsers.back());
-      parsers.pop_back();
-      continue;
-    }
-
-    interpreter.next();
-    break;
+  } catch (const EndProgram &) {
+    unwind();
   }
-}
-
-
-bool Runner::execute(const Code &code, int vars) {
-  if (parsers.size() < 2 && config.hasOverride(code)) {
-    const string &gcode = config.getOverride(code);
-    push(StringStreamInputSource(gcode, SSTR("<" << code << ">")));
-
-    return true;
-  }
-
-  return false;
 }
