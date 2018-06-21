@@ -27,6 +27,7 @@
 
 #include <gcode/ast/OCode.h>
 #include <gcode/ast/Word.h>
+#include <gcode/ast/Comment.h>
 
 #include <cbang/log/Logger.h>
 #include <cbang/util/SmartFunctor.h>
@@ -346,8 +347,9 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
       LOG_WARNING("Cannot specify file name on " << keyword);
 
     for (auto it = block->begin(); it != block->end(); it++)
-      if (*it != ocode && (!(*it)->instance<Word>() ||
-                           (*it)->instance<Word>()->getType() == 'N'))
+      if (*it != ocode && !(*it)->instance<Comment>() &&
+          (!(*it)->instance<Word>() ||
+           (*it)->instance<Word>()->getType() == 'N'))
         LOG_WARNING("Ignored in O-Code block: " << **it);
 
     if (keyword == "sub") doSub(ocode);
