@@ -498,6 +498,41 @@ module.exports = extend({
   },
 
 
+  poly_closest: function(poly, p) {
+    var best = Infinity;
+    var index = undefined;
+
+    for (var i = 0; i < poly.length; i++) {
+      var d = distance2D(poly[i], p);
+
+      if (d < best) {
+        best = d;
+        index = i;
+      }
+    }
+
+    return index;
+  },
+
+
+  polys_closest: function(polys, p) {
+    var best = Infinity;
+    var index = undefined;
+
+    for (var i = 0; i < polys.length; i++) {
+      var closest = this.poly_closest(polys[i], p);
+      var d = distance2D(polys[i][closest], p);
+
+      if (d < best) {
+        best = d;
+        index = i;
+      }
+    }
+
+    return index;
+  },
+
+
   layer_com: function(layer) {
     var polys = this.layer_to_polys(layer);
     return this.polys_com(polys);
@@ -538,18 +573,42 @@ module.exports = extend({
   },
 
 
-  cut_polys: function(polys, zSafe, zCut, zFeed, close) {
+  find_leadin_offset: function (poly, p, delta) {
+    var off = offset([poly], -delta);
+    if (!off.length) return p;
+    var closest = this.poly_closest(off[0], p);
+    return off[0][closest];
+  },
+
+
+  cut_polys: function(polys, zSafe, zCut, zFeed, close, leadin) {
     if (!polys.length) return;
     close = typeof close == 'undefined' ? true : close;
+    leadin = typeof leadin == 'undefined' ? 0 : leadin;
 
-    for (var i = 0; i < polys.length; i++) {
-      var poly = polys[i];
+    polys = polys.slice(); // Copy
+
+    while (polys.length) {
       var p = position();
-      var v = first(poly);
+      var next = this.polys_closest(polys, p);
+      var poly = polys[next];
+      polys.splice(next, 1);
+
+      if (!poly.length) continue;
+
+      var closest = this.poly_closest(poly, p);
+      var v = poly[closest];
+
+      if (leadin) {
+        var leadinV = v;
+        v = this.find_leadin_offset(poly, p, leadin);
+      }
+
       var d = distance2D(v, p);
 
       if (0.01 < d) {
         if (typeof zSafe != 'undefined') rapid({z: zSafe});
+        v.z = zSafe;
         rapid(v);
       }
 
@@ -558,8 +617,12 @@ module.exports = extend({
       if (typeof zSafe != 'undefined') cut({z: zCut});
       feed(f);
 
-      for (var j = 0; j < poly.length; j++)
-        cut(poly[j].x, poly[j].y);
+      if (leadin) v = leadinV;
+
+      for (var j = 0; j < poly.length; j++) {
+        var index = (j + closest) % poly.length;
+        cut(poly[index].x, poly[index].y);
+      }
 
       if (close) cut(v.x, v.y); // Close poly
     }
@@ -673,7 +736,8 @@ module.exports = extend({
   },
 
 
-  cut_layer_offset: function (layer, delta, zSafe, zCut, steps, zFeed, close) {
+  cut_layer_offset: function (layer, delta, zSafe, zCut, steps, zFeed, close,
+                              leadin) {
     if (typeof zCut == 'undefined') zCut = 0;
     if (typeof steps == 'undefined') steps = 1;
 
@@ -682,7 +746,7 @@ module.exports = extend({
     if (delta) polys = this.offset_polys(polys, delta);
 
     for (var i = 0; i < steps; i++)
-      this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed, close);
+      this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed, close, leadin);
   },
 
 
