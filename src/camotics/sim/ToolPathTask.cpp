@@ -153,14 +153,16 @@ void ToolPathTask::run() {
     GCode::Interpreter interp(controller);
     interp.push(InputSource(filter, filename));
 
-    while (!Task::shouldQuit() && interp.hasMore() && errors < 32)
-      try {
-        interp.next();
+    try {
+      while (!Task::shouldQuit() && interp.hasMore() && errors < 32)
+        try {
+          interp(interp.next());
 
-      } catch (const Exception &e) {
-        LOG_ERROR(e);
-        errors++;
-      }
+        } catch (const Exception &e) {
+          LOG_ERROR(e);
+          errors++;
+        }
+    } catch (const GCode::EndProgram &) {}
 
     // Wait for Subprocess
     if (!proc.isNull() && proc->waitFor(5, 10)) errors++;
