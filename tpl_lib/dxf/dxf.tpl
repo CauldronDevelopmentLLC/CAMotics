@@ -574,14 +574,15 @@ module.exports = extend({
 
 
   find_leadin_offset: function (poly, p, delta) {
+    var closest = this.poly_closest(poly, p);
     var off = offset([poly], -delta);
-    if (!off.length) return p;
-    var closest = this.poly_closest(off[0], p);
+    if (!off.length) return poly[closest];
+    closest = this.poly_closest(off[0], p);
     return off[0][closest];
   },
 
 
-  cut_polys: function(polys, zSafe, zCut, zFeed, close, leadin) {
+  cut_polys: function(polys, zSafe, zCut, zFeed, close, leadin, cut_cb) {
     if (!polys.length) return;
     close = typeof close == 'undefined' ? true : close;
     leadin = typeof leadin == 'undefined' ? 0 : leadin;
@@ -608,13 +609,16 @@ module.exports = extend({
 
       if (0.01 < d) {
         if (typeof zSafe != 'undefined') rapid({z: zSafe});
-        v.z = zSafe;
-        rapid(v);
+        v.z = position().z;
+        if (typeof zSafe == 'undefined') cut(v);
+        else rapid(v);
       }
+
+      if (typeof cut_cb != 'undefined') cut_cb(true);
 
       var f = feed()[0];
       if (typeof zFeed != 'undefined') feed(zFeed);
-      if (typeof zSafe != 'undefined') cut({z: zCut});
+      if (typeof zCut != 'undefined') cut({z: zCut});
       feed(f);
 
       if (leadin) v = leadinV;
@@ -625,7 +629,9 @@ module.exports = extend({
       }
 
       if (close) cut(v.x, v.y); // Close poly
-    }
+
+      if (typeof cut_cb != 'undefined') cut_cb(false);
+   }
   },
 
 
@@ -737,7 +743,7 @@ module.exports = extend({
 
 
   cut_layer_offset: function (layer, delta, zSafe, zCut, steps, zFeed, close,
-                              leadin) {
+                              leadin, cut_cb) {
     if (typeof zCut == 'undefined') zCut = 0;
     if (typeof steps == 'undefined') steps = 1;
 
@@ -746,7 +752,8 @@ module.exports = extend({
     if (delta) polys = this.offset_polys(polys, delta);
 
     for (var i = 0; i < steps; i++)
-      this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed, close, leadin);
+      this.cut_polys(polys, zSafe, zDelta * (i + 1), zFeed, close, leadin,
+                     cut_cb);
   },
 
 
