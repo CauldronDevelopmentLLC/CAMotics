@@ -57,6 +57,7 @@ namespace tplang {
     void pauseCB(const cb::js::Value &args, cb::js::Sink &sink);
     void positionCB(const cb::js::Value &args, cb::js::Sink &sink);
     void commentCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void messageCB(const cb::js::Value &args, cb::js::Sink &sink);
     void workpieceCB(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:

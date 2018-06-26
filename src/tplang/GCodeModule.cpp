@@ -67,6 +67,7 @@ void GCodeModule::define(js::Sink &exports) {
   exports.insert("pause(optional=false)", this, &GCodeModule::pauseCB);
   exports.insert("position()", this, &GCodeModule::positionCB);
   exports.insert("comment(...)", this, &GCodeModule::commentCB);
+  exports.insert("message(...)", this, &GCodeModule::messageCB);
   exports.insert("workpiece()", this, &GCodeModule::workpieceCB);
 
   exports.insert("FEED_INVERSE_TIME", INVERSE_TIME);
@@ -311,6 +312,12 @@ void GCodeModule::positionCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::commentCB(const js::Value &args, js::Sink &sink) {
   for (unsigned i = 0; i < args.length(); i++)
     ctx.machine.comment(args.getString(i)); // TODO Call JSON.stringify()
+}
+
+
+void GCodeModule::messageCB(const js::Value &args, js::Sink &sink) {
+  for (unsigned i = 0; i < args.length(); i++)
+    ctx.machine.message(args.getString(i)); // TODO Call JSON.stringify()
 }
 
 
