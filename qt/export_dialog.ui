@@ -194,6 +194,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="cutSurfaceCheckBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>With cut surface</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

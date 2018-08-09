@@ -60,6 +60,8 @@ int ExportDialog::exec() {
 void ExportDialog::enableSurface(bool enable) {
   ui->surfaceFrame->setEnabled(enable && surfaceSelected());
   ui->surfaceRadioButton->setEnabled(enable);
+  ui->cutSurfaceCheckBox->setEnabled(enable);
+  if (!enable) ui->cutSurfaceCheckBox->setChecked(false);
 }
 
 
@@ -96,6 +98,11 @@ bool ExportDialog::binarySTLSelected() const {
 
 bool ExportDialog::compactJSONSelected() const {
   return ui->compactJSONRadioButton->isChecked();
+}
+
+
+bool ExportDialog::withCutSurfaceSelected() const {
+  return ui->cutSurfaceCheckBox->isChecked();
 }
 
 

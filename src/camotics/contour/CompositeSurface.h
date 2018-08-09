@@ -50,5 +50,9 @@ namespace CAMotics {
 #endif
     void write(STL::Sink &sink, Task *task = 0) const;
     void reduce(Task &task);
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
   };
 }

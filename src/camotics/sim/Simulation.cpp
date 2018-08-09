@@ -23,6 +23,7 @@
 #include "Workpiece.h"
 
 #include <camotics/SHA256.h>
+#include <camotics/contour/Surface.h>
 
 #include <gcode/ToolTable.h>
 
@@ -73,7 +74,8 @@ void Simulation::read(const JSON::Value &value) {
 }
 
 
-void Simulation::write(JSON::Sink &sink, bool withPath) const {
+void Simulation::write(JSON::Sink &sink, bool withPath,
+                       const cb::SmartPointer<Surface> &surface) const {
   sink.beginDict();
 
   sink.insert("resolution", resolution);
@@ -93,6 +95,11 @@ void Simulation::write(JSON::Sink &sink, bool withPath) const {
   if (withPath && !path.isNull()) {
     sink.beginInsert("path");
     path->write(sink);
+  }
+
+  if (!surface.isNull()) {
+    sink.beginInsert("surface");
+    surface->write(sink);
   }
 
   sink.endDict();

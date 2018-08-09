@@ -22,6 +22,7 @@
 
 #include <cbang/geom/Rectangle.h>
 #include <cbang/io/OutputSink.h>
+#include <cbang/json/Serializable.h>
 
 
 namespace STL {class Sink;}
@@ -29,7 +30,7 @@ namespace STL {class Sink;}
 namespace CAMotics {
   class Task;
 
-  class Surface {
+  class Surface : cb::JSON::Serializable {
   public:
     virtual ~Surface() {}
 
@@ -44,5 +45,9 @@ namespace CAMotics {
 
     void writeSTL(const cb::OutputSink &sink, bool binary,
                   const std::string &name, const std::string &hash) const;
+
+    // From cb::JSON::Serializable
+    using cb::JSON::Serializable::read;
+    using cb::JSON::Serializable::write;
   };
 }

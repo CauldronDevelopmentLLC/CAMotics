@@ -646,6 +646,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
   }
 
   gcode = task.getGCode();
+  exportDialog.enableGCode(!gcode.isNull());
   if (!bbCtrlAPI.isNull() && bbCtrlAPI->isConnected())
     bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
 
@@ -657,6 +658,7 @@ void QtWin::surfaceComplete(SurfaceTask &task) {
   simRun = task.getSimRun();
   surface = task.getSurface();
   if (surface.isNull()) simRun.release();
+  exportDialog.enableSurface(!surface.isNull());
 
   view->setSurface(surface);
   view->setMoveLookup(simRun->getMoveLookup());
@@ -673,6 +675,8 @@ void QtWin::reduceComplete(ReduceTask &task) {
   surface = task.getSurface();
   view->setSurface(surface);
   redraw();
+
+  exportDialog.enableSurface(!surface.isNull());
 
   setStatusActive(false);
 }
@@ -874,7 +878,8 @@ void QtWin::exportData() {
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());
-    simRun->getSimulation().write(writer, true);
+    simRun->getSimulation().write
+      (writer, true, exportDialog.withCutSurfaceSelected() ? surface : 0);
     writer.close();
   }
 }

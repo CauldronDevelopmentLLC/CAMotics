@@ -81,3 +81,13 @@ void CompositeSurface::reduce(Task &task) {
   consolidate();
   for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->reduce(task);
 }
+
+
+void CompositeSurface::read(const JSON::Value &value) {
+  THROW("Cannot read JSON with CompositSurface");
+}
+
+
+void CompositeSurface::write(JSON::Sink &sink) const {
+  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->write(sink);
+}

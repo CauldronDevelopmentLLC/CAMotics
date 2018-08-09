@@ -25,7 +25,9 @@
 
 #include <gcode/ToolTable.h>
 #include <gcode/ToolPath.h>
+
 #include <camotics/render/RenderMode.h>
+#include <camotics/contour/Surface.h>
 
 #include <cbang/SmartPointer.h>
 #include <cbang/json/Serializable.h>
@@ -57,12 +59,13 @@ namespace CAMotics {
 
     std::string computeHash() const;
 
-    virtual void write(cb::JSON::Sink &sink, bool withPath) const;
+    virtual void write(cb::JSON::Sink &sink, bool withPath,
+                       const cb::SmartPointer<Surface> &surface) const;
 
     // From JSON::Serializable
     using cb::JSON::Serializable::read;
     using cb::JSON::Serializable::write;
     void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const {write(sink, false);}
+    void write(cb::JSON::Sink &sink) const {write(sink, false, 0);}
   };
 }

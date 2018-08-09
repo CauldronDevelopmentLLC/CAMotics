@@ -243,7 +243,8 @@ void TriangleSurface::write(STL::Sink &sink, Task *task) const {
   for (unsigned i = 0; i < getCount() && (!task || !task->shouldQuit()); i++) {
     unsigned offset = i * 9;
 
-    // The vertex normals are all the same
+    // In an STL file, there's only one normal per facet.
+    // They are the same anyway.
     Vector3F normal =
       Vector3F(normals[offset + 0], normals[offset + 1], normals[offset + 2]);
 
@@ -261,4 +262,27 @@ void TriangleSurface::write(STL::Sink &sink, Task *task) const {
 void TriangleSurface::reduce(Task &task) {
   weld();
   TriangleMesh::reduce(task);
+}
+
+
+void TriangleSurface::read(const JSON::Value &value) {
+}
+
+
+void TriangleSurface::write(JSON::Sink &sink) const {
+  sink.beginDict();
+
+  sink.insertList("vertices");
+  for (unsigned i = 0; i < vertices.size(); i++)
+    sink.append(vertices[i]);
+  sink.endList();
+
+  // Only output every third normal since they are the same for a triangle.
+  sink.insertList("normals");
+  for (unsigned i = 0; i < normals.size() / 9; i++)
+    for (unsigned j = 0; j < 3; j++)
+      sink.append(normals[i * 9 + j]);
+  sink.endList();
+
+  sink.endDict();
 }

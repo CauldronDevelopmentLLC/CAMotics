@@ -44,6 +44,7 @@ namespace CAMotics {
     void enableSurface(bool enable);
     void enableGCode(bool enable);
     void enableSimData(bool enable);
+    void enableCutSurface(bool enable);
 
     bool surfaceSelected() const;
     bool gcodeSelected() const;
@@ -51,6 +52,7 @@ namespace CAMotics {
 
     bool binarySTLSelected() const;
     bool compactJSONSelected() const;
+    bool withCutSurfaceSelected() const;
 
   protected slots:
     void on_surfaceRadioButton_clicked();
