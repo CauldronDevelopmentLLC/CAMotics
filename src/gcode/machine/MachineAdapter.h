@@ -101,6 +101,7 @@ namespace GCode {
     {return parent->get(name, units);}
     void set(const std::string &name, double value, Units units)
     {parent->set(name, value, units);}
+    void clear(const std::string &name) {parent->clear(name);}
 
     const cb::LocationRange &getLocation() const {return parent->getLocation();}
     void setLocation(const cb::LocationRange &location)

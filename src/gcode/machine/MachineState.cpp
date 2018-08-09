@@ -134,3 +134,9 @@ void MachineState::set(const string &name, double value, Units units) {
   LOG_DEBUG(5, "set(" << name << ", " << value << ", " << units << ')');
   named[name] = {value, units};
 }
+
+
+void MachineState::clear(const string &name) {
+  LOG_DEBUG(5, "clear(" << name << ')');
+  named.erase(name);
+}

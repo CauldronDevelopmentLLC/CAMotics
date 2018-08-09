@@ -384,11 +384,18 @@ SmartPointer<Entity> Parser::reference() {
   tokenizer->match(TokenType::POUND_TOKEN);
 
   if (tokenizer->consume(TokenType::OANGLE_TOKEN)) {
-    string id = tokenizer->match(TokenType::ID_TOKEN).getValue();
+    string id;
+
+    while (tokenizer->getType() != TokenType::CANGLE_TOKEN)
+      id += tokenizer->advance().getValue();
+
+    id = String::replace(String::toLower(id), " ", "");
+    if (id.empty()) THROW("Reference name cannot be empty");
+
     tokenizer->match(TokenType::CANGLE_TOKEN);
 
     return scope.set(new NamedReference(id));
+  }
 
-  } else
-    return scope.set(new Reference(numberRefOrExpr()));
+  return scope.set(new Reference(numberRefOrExpr()));
 }

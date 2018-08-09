@@ -39,7 +39,7 @@ using namespace GCode;
 
 
 OCodeInterpreter::OCodeInterpreter(Controller &controller) :
-  GCodeInterpreter(controller), condition(true) {}
+  GCodeInterpreter(controller), ifSatisfied(false), condition(true) {}
 
 
 const SmartPointer<Program> &
@@ -51,15 +51,17 @@ OCodeInterpreter::lookupSubroutine(const string &name) const {
 
 
 void OCodeInterpreter::checkExpressions(OCode *ocode, const char *name,
-                                        unsigned count) {
+                                        bool expr, bool optional) {
   const OCode::expressions_t &expressions = ocode->getExpressions();
 
-  if (expressions.size() != count) {
-    if (count)
-      LOG_WARNING("'" << name << "' should have exactly " << count
-                  << "expression" << (1 < count ? "s" : ""));
-    else LOG_WARNING("'" << name << "' should not have any expressions");
-  }
+  if (expressions.empty() && expr && !optional)
+    LOG_WARNING("'" << name << "' missing required expression");
+
+  else if (!expressions.empty() && !expr)
+    LOG_WARNING("'" << name << "' has unexpected expression");
+
+  else if (1 < expressions.size())
+    LOG_WARNING("'" << name << "' has more than one expression");
 }
 
 
@@ -77,7 +79,7 @@ void OCodeInterpreter::downScope() {
 
 
 void OCodeInterpreter::doSub(OCode *ocode) {
-  checkExpressions(ocode, "sub", 0);
+  checkExpressions(ocode, "sub");
 
   if (!sub.current.isNull()) THROWS("Nested subroutines not allowed");
   sub.current = new Program;
@@ -104,7 +106,7 @@ void OCodeInterpreter::doSub(OCode *ocode) {
 
 
 void OCodeInterpreter::doEndSub(OCode *ocode) {
-  checkExpressions(ocode, "endsub", 0);
+  checkExpressions(ocode, "endsub", true, true);
 
   if (sub.named.empty()) {
     if (sub.number != ocode->getNumber())
@@ -113,12 +115,22 @@ void OCodeInterpreter::doEndSub(OCode *ocode) {
   } else if (sub.name != ocode->getFilename())
     LOG_WARNING("endsub name does not match");
 
+  const OCode::expressions_t &expressions = ocode->getExpressions();
+  if (!expressions.empty()) {
+    setReference("_value", expressions[0]->eval(*this));
+    setReference("_value_returned", 1);
+  }
+
   sub.current = 0;
   sub.name = "";
 }
 
 
 void OCodeInterpreter::doCall(OCode *ocode) {
+  // Clear any previous return value
+  clearReference("_value");
+  clearReference("_value_returned");
+
   // Eval args in parent scope
   const OCode::expressions_t &expressions = ocode->getExpressions();
   if (30 < expressions.size()) LOG_WARNING("more than 30 arguments");
@@ -180,7 +192,13 @@ void OCodeInterpreter::doCall(OCode *ocode) {
 
 
 void OCodeInterpreter::doReturn(OCode *ocode) {
-  checkExpressions(ocode, "return", 0);
+  checkExpressions(ocode, "return", true, true);
+
+  const OCode::expressions_t &expressions = ocode->getExpressions();
+  if (!expressions.empty()) {
+    setReference("_value", expressions[0]->eval(*this));
+    setReference("_value_returned", 1);
+  }
 
   while (!ProducerStack::empty()) {
     SmartPointer<Producer> producer = ProducerStack::pop();
@@ -196,7 +214,7 @@ void OCodeInterpreter::doReturn(OCode *ocode) {
 
 
 void OCodeInterpreter::doDo(OCode *ocode) {
-  checkExpressions(ocode, "do", 0);
+  checkExpressions(ocode, "do");
   loop.number = ocode->getNumber();
   loop.program = new Program;
   loop.end = "while";
@@ -204,7 +222,7 @@ void OCodeInterpreter::doDo(OCode *ocode) {
 
 
 void OCodeInterpreter::doWhile(OCode *ocode) {
-  checkExpressions(ocode, "while", 1);
+  checkExpressions(ocode, "while", true);
 
   const OCode::expressions_t &expressions = ocode->getExpressions();
   SmartPointer<Entity> expr = expressions.empty() ? 0 : expressions[0];
@@ -224,7 +242,7 @@ void OCodeInterpreter::doWhile(OCode *ocode) {
 
 
 void OCodeInterpreter::doEndWhile(OCode *ocode) {
-  checkExpressions(ocode, "endwhile", 0);
+  checkExpressions(ocode, "endwhile");
 
   ProducerStack::push
     (new DoLoop(ocode->getNumber(), loop.program, *this, loop.expr, false));
@@ -234,7 +252,7 @@ void OCodeInterpreter::doEndWhile(OCode *ocode) {
 
 
 void OCodeInterpreter::doBreak(OCode *ocode) {
-  checkExpressions(ocode, "break", 0);
+  checkExpressions(ocode, "break");
 
   while (!ProducerStack::empty()) {
     SmartPointer<Producer> producer = ProducerStack::pop();
@@ -247,7 +265,7 @@ void OCodeInterpreter::doBreak(OCode *ocode) {
 
 
 void OCodeInterpreter::doContinue(OCode *ocode) {
-  checkExpressions(ocode, "continue", 0);
+  checkExpressions(ocode, "continue");
 
   while (!ProducerStack::empty()) {
     SmartPointer<Producer> producer = ProducerStack::peek();
@@ -266,24 +284,39 @@ void OCodeInterpreter::doContinue(OCode *ocode) {
 
 
 void OCodeInterpreter::doIf(OCode *ocode) {
-  checkExpressions(ocode, "if", 1);
+  checkExpressions(ocode, "if", true);
 
   const OCode::expressions_t &expressions = ocode->getExpressions();
   conditions.push_back(ocode->getNumber());
   if (!expressions.empty() && !expressions[0]->eval(*this)) condition = false;
+  ifSatisfied = condition;
 }
 
 
 void OCodeInterpreter::doElse(OCode *ocode) {
-  checkExpressions(ocode, "else", 0);
+  checkExpressions(ocode, "else");
   if (conditions.empty() || conditions.back() != ocode->getNumber())
     LOG_WARNING("Mismatched else");
-  else condition = !condition;
+  else condition = !ifSatisfied;
+}
+
+
+void OCodeInterpreter::doElseIf(OCode *ocode) {
+  checkExpressions(ocode, "elseif", true);
+
+  if (conditions.empty() || conditions.back() != ocode->getNumber())
+    LOG_WARNING("Mismatched elseif");
+
+  else if (!ifSatisfied) {
+    const OCode::expressions_t &expressions = ocode->getExpressions();
+    condition = expressions.empty() || expressions[0]->eval(*this);
+    ifSatisfied = condition;
+  }
 }
 
 
 void OCodeInterpreter::doEndIf(OCode *ocode) {
-  checkExpressions(ocode, "endif", 0);
+  checkExpressions(ocode, "endif");
   if (conditions.empty() || conditions.back() != ocode->getNumber())
     LOG_WARNING("Mismatched endif");
 
@@ -295,7 +328,7 @@ void OCodeInterpreter::doEndIf(OCode *ocode) {
 
 
 void OCodeInterpreter::doRepeat(OCode *ocode) {
-  checkExpressions(ocode, "repeat", 1);
+  checkExpressions(ocode, "repeat", true);
   loop.number = ocode->getNumber();
   loop.program = new Program;
   loop.end = "endrepeat";
@@ -305,7 +338,7 @@ void OCodeInterpreter::doRepeat(OCode *ocode) {
 
 
 void OCodeInterpreter::doEndRepeat(OCode *ocode) {
-  checkExpressions(ocode, "endrepeat", 0);
+  checkExpressions(ocode, "endrepeat");
 
   ProducerStack::push
     (new RepeatLoop(ocode->getNumber(), loop.program, loop.repeat));
@@ -338,7 +371,8 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
   // Condition
   if (!conditions.empty() && !condition &&
       (number != conditions.back() ||
-       (keyword != "else" && keyword != "endif"))) return;
+       (keyword != "else" && keyword != "elseif" && keyword != "endif")))
+    return;
 
   if (!ocode) GCodeInterpreter::operator()(block);
   else {
@@ -363,6 +397,7 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
     else if (keyword == "continue") doContinue(ocode);
     else if (keyword == "if") doIf(ocode);
     else if (keyword == "else") doElse(ocode);
+    else if (keyword == "elseif") doElseIf(ocode);
     else if (keyword == "endif") doEndIf(ocode);
     else if (keyword == "repeat") doRepeat(ocode);
     else if (keyword == "endrepeat") doEndRepeat(ocode);

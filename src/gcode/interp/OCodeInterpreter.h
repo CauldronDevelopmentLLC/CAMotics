@@ -54,6 +54,7 @@ namespace GCode {
 
     // Conditions
     std::vector<unsigned> conditions;
+    bool ifSatisfied;
     bool condition;
 
     // Loops
@@ -72,7 +73,8 @@ namespace GCode {
     const cb::SmartPointer<Program> &
     lookupSubroutine(const std::string &name) const;
 
-    void checkExpressions(OCode *ocode, const char *name, unsigned count);
+    void checkExpressions(OCode *ocode, const char *name, bool expr = false,
+                          bool optional = false);
     void upScope();
     void downScope();
 
@@ -87,6 +89,7 @@ namespace GCode {
     void doContinue(OCode *ocode);
     void doIf(OCode *ocode);
     void doElse(OCode *ocode);
+    void doElseIf(OCode *ocode);
     void doEndIf(OCode *ocode);
     void doRepeat(OCode *ocode);
     void doEndRepeat(OCode *ocode);

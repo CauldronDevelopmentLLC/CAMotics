@@ -199,6 +199,7 @@ namespace GCode {
     bool has(const std::string &name) const;
     double get(const std::string &name) const;
     void set(const std::string &name, double value);
+    void clear(const std::string &name);
     void setVar(char c, double value);
 
     unsigned getCurrentMotionMode() {return currentMotionMode;}

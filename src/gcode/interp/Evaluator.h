@@ -42,6 +42,7 @@ namespace GCode {
     virtual double lookupReference(address_t addr) {return 0;}
     virtual double lookupReference(const std::string &name) {return 0;}
     virtual bool hasReference(const std::string &name) {return false;}
+
     virtual double eval(UnaryOp &e);
     virtual double eval(BinaryOp &e);
     virtual double eval(QuotedExpr &e);

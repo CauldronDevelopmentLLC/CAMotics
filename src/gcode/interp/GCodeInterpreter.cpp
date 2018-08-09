@@ -56,6 +56,12 @@ void GCodeInterpreter::setReference(const string &name, double value) {
 }
 
 
+void GCodeInterpreter::clearReference(const string &name) {
+  LOG_DEBUG(3, "Clear global variable #<" << name << ">");
+  controller.clear(name);
+}
+
+
 void GCodeInterpreter::execute(const Code &code, int vars) {
   if (!controller.execute(code, vars)) LOG_WARNING("Not implemented: " << code);
   else if (code.group == MG_MOTION)

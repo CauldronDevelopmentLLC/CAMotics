@@ -50,6 +50,7 @@ namespace GCode {
     virtual bool has(const std::string &name) const = 0;
     virtual double get(const std::string &name) const = 0;
     virtual void set(const std::string &name, double value) = 0;
+    virtual void clear(const std::string &name) = 0;
 
     // Variables
     virtual void setVar(char c, double value) = 0;

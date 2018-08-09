@@ -99,6 +99,7 @@ namespace GCode {
     bool has(const std::string &name) const;
     double get(const std::string &name, Units units) const;
     void set(const std::string &name, double value, Units units);
+    void clear(const std::string &name);
 
     const cb::LocationRange &getLocation() const {return location;}
     void setLocation(const cb::LocationRange &location)

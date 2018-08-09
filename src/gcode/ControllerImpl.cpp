@@ -848,6 +848,9 @@ void ControllerImpl::set(const string &name, double value) {
 }
 
 
+void ControllerImpl::clear(const string &name) {machine.clear(name);}
+
+
 void ControllerImpl::setVar(char c, double value) {
   if (c < 'A' || 'Z' < c)
     THROWS("Invalid var '" << String::escapeC(string(1, c)) << "'");
