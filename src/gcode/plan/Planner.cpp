@@ -117,5 +117,5 @@ void Planner::restart(uint64_t id, const Axes &position) {
 
 
 double Planner::resolve(const string &name, Units units) const {
-  return resolver.isNull() ? 0 : convert(METRIC, units, resolver->get(name));
+  return resolver.isNull() ? 0 : resolver->get(name, units);
 }

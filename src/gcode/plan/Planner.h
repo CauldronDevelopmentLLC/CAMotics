@@ -43,7 +43,7 @@ namespace GCode {
   class NameResolver {
   public:
     virtual ~NameResolver() {}
-    virtual double get(const std::string &name) = 0;
+    virtual double get(const std::string &name, Units units) = 0;
   };
 
 

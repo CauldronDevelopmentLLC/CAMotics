@@ -208,12 +208,13 @@ public:
 
 
   // From NameResolver
-  double get(const std::string &name) {
+  double get(const std::string &name, GCode::Units units) {
     // Args
-    PyObject *args = PyTuple_New(1);
+    PyObject *args = PyTuple_New(2);
     if (!args) THROW("Failed to allocate tuple");
 
     PyTuple_SetItem(args, 0, PyUnicode_FromString(name.c_str()));
+    PyTuple_SetItem(args, 1, PyUnicode_FromString(units.toString()));
 
     // Call
     PyObject *result = PyObject_Call(cb, args, 0);
