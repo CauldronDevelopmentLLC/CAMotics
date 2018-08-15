@@ -145,13 +145,13 @@ const Code Codes::gcodes[] = {
   {'G', 385, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS,
    "Straight Probe away from workpiece wo/ error signal"},
 
-  {'G', 386, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 386, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P,
    "Seek active switch w/ error signal"},
-  {'G', 387, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 387, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P,
    "Seek active switch wo/ error signal"},
-  {'G', 388, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 388, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P,
    "Seek inactive switch w/ error signal"},
-  {'G', 389, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS,
+  {'G', 389, PRI_MOTION, MG::MG_MOTION, VT::VT_AXIS | VT::VT_P,
    "Seek inactive switch wo/ error signal"},
 
   {'G', 400, PRI_RADIUS_COMP, MG::MG_CUTTER_RADIUS, VT::VT_NONE,

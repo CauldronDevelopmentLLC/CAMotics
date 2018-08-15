@@ -23,6 +23,7 @@
 #include <gcode/Codes.h>
 
 #include <cbang/SStream.h>
+#include <cbang/Math.h>
 #include <cbang/Catch.h>
 #include <cbang/log/Logger.h>
 
@@ -462,28 +463,32 @@ void ControllerImpl::straightProbe(int vars, bool towardWorkpiece,
 
 
 void ControllerImpl::seek(int vars, bool active, bool error) {
-  char targetAxis = 0;
-  bool seekMin;
-
-  for (const char *axes = Axes::AXES; *axes; axes++)
-    if (vars & getVarType(*axes)) {
-      if (targetAxis) THROW("Multiple axes in seek");
-      targetAxis = *axes;
-      seekMin = (0 < getVar(*axes)) ^ active;
-    }
-
   port_t port;
-  switch (targetAxis) {
-  case 'X': port = seekMin ? X_MIN : X_MAX; break;
-  case 'Y': port = seekMin ? Y_MIN : Y_MAX; break;
-  case 'Z': port = seekMin ? Z_MIN : Z_MAX; break;
-  case 'A': port = seekMin ? A_MIN : A_MAX; break;
-  case 'B': port = seekMin ? B_MIN : B_MAX; break;
-  case 'C': port = seekMin ? C_MIN : C_MAX; break;
-  case 'U': port = seekMin ? U_MIN : U_MAX; break;
-  case 'V': port = seekMin ? V_MIN : V_MAX; break;
-  case 'W': port = seekMin ? W_MIN : W_MAX; break;
-  default: THROW("Seek requires axis");
+
+  if (vars & VT_P) port = (port_t)round(getVar('P'));
+  else {
+    char targetAxis = 0;
+    bool seekMin;
+
+    for (const char *axes = Axes::AXES; *axes; axes++)
+      if (vars & getVarType(*axes)) {
+        if (targetAxis) THROW("Multiple axes in seek");
+        targetAxis = *axes;
+        seekMin = (0 < getVar(*axes)) ^ active;
+      }
+
+    switch (targetAxis) {
+    case 'X': port = seekMin ? X_MIN : X_MAX; break;
+    case 'Y': port = seekMin ? Y_MIN : Y_MAX; break;
+    case 'Z': port = seekMin ? Z_MIN : Z_MAX; break;
+    case 'A': port = seekMin ? A_MIN : A_MAX; break;
+    case 'B': port = seekMin ? B_MIN : B_MAX; break;
+    case 'C': port = seekMin ? C_MIN : C_MAX; break;
+    case 'U': port = seekMin ? U_MIN : U_MAX; break;
+    case 'V': port = seekMin ? V_MIN : V_MAX; break;
+    case 'W': port = seekMin ? W_MIN : W_MAX; break;
+    default: THROW("Seek requires axis");
+    }
   }
 
   syncState = SYNC_SEEK; // Synchronize with found position
