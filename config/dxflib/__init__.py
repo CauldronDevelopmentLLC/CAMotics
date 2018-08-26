@@ -25,7 +25,7 @@ def configure(conf):
     conf.CBRequireLib('dxflib')
 
     if not conf.TryCompile(test_program, '.cpp'):
-        raise Exception, 'DXFLib missing required features'
+        raise Exception('DXFLib missing required features')
 
     conf.env.CBDefine('HAVE_DXFLIB')
 
