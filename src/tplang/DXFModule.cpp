@@ -103,7 +103,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         sink.insert("radius", arc.getRadius());
         sink.insert("startAngle", arc.getStartAngle());
         sink.insert("endAngle", arc.getEndAngle());
-        sink.insert("clockwise", arc.getClockwise());
+        sink.insertBoolean("clockwise", arc.getClockwise());
         break;
       }
 
