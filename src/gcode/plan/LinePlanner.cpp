@@ -243,7 +243,7 @@ void LinePlanner::move(const Axes &target, bool rapid) {
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
   LineCommand *lc =
-    new LineCommand(nextID++, start, target, feed, seeking, config);
+    new LineCommand(nextID++, start, target, feed, rapid, seeking, config);
 
   // Update state
   seeking = false;

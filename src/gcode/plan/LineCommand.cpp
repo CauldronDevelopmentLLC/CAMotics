@@ -34,11 +34,11 @@ using namespace std;
 
 
 LineCommand::LineCommand(uint64_t id, const Axes &start,
-                         const Axes &end, double feed, bool seeking,
+                         const Axes &end, double feed, bool rapid, bool seeking,
                          const PlannerConfig &config) :
   PlannerCommand(id), target(end), length(0), entryVel(feed), exitVel(feed),
   deltaV(0), maxVel(feed), maxAccel(numeric_limits<double>::max()),
-  maxJerk(numeric_limits<double>::max()), seeking(seeking) {
+  maxJerk(numeric_limits<double>::max()), rapid(rapid), seeking(seeking) {
 
   // Zero times
   for (int i = 0; i < 7; i++) times[i] = 0;
@@ -62,6 +62,9 @@ void LineCommand::insert(JSON::Sink &sink) const {
   sink.insert("max-vel", maxVel);
   sink.insert("max-accel", maxAccel);
   sink.insert("max-jerk", maxJerk);
+
+  if (rapid) sink.insertBoolean("rapid", true);
+  if (seeking) sink.insertBoolean("seeking", true);
 
   sink.insertList("times", true);
   for (unsigned i = 0; i < 7; i++)

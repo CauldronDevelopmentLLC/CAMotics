@@ -45,13 +45,15 @@ namespace GCode {
 
     Axes unit;
 
+    bool rapid;
     bool seeking;
 
     LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
-                bool seeking, const PlannerConfig &config);
+                bool rapid, bool seeking, const PlannerConfig &config);
 
     // From PlannerCommand
     const char *getType() const {return "line";}
+    bool isRapid() const {return rapid;}
     bool isSeeking() const {return seeking;}
     bool isMove() const {return true;}
 
