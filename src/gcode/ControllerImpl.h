@@ -150,7 +150,7 @@ namespace GCode {
     void dwell(double seconds);
 
     // Tool
-    const Tool &getTool(unsigned tool) const {return tools.get(tool);}
+    Tool &getTool(unsigned tool) {return tools.get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
     void setTools(int vars, bool relative);
     void toolChange();

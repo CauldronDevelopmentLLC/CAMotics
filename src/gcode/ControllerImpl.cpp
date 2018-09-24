@@ -549,7 +549,7 @@ void ControllerImpl::dwell(double seconds) {machine.dwell(seconds);}
 
 
 void ControllerImpl::setTools(int vars, bool relative) {
-  Tool &tool = tools.get(getVar('P'));
+  Tool &tool = getTool(getVar('P'));
 
   for (const char *v = Tool::VARS; *v; v++)
     if (vars & getVarType(*v)) {
