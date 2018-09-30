@@ -185,7 +185,7 @@ void PyThrowIfError(const std::string &msg) {
   if (!PyErr_Occurred()) return;
 
   PyObject *err = PyObject_Str(PyErr_Occurred());
-  char *_errStr = PyUnicode_AsUTF8(err);
+  const char *_errStr = PyUnicode_AsUTF8(err);
   std::string errStr = _errStr ? _errStr : "";
   Py_DECREF(err);
 
@@ -286,7 +286,7 @@ public:
 
 std::string PyUnicode_ToStdString(PyObject *o) {
   Py_ssize_t size;
-  char *s = PyUnicode_AsUTF8AndSize(o, &size);
+  const char *s = PyUnicode_AsUTF8AndSize(o, &size);
   if (!s) THROW("Conversion from Python object to string failed");
   return std::string(s, size);
 }
