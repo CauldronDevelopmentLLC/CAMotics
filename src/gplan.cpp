@@ -668,6 +668,7 @@ PyMODINIT_FUNC PyInit_gplan() {
   cb::Logger::instance().setLogTime(false);
   cb::Logger::instance().setLogShortLevel(true);
   cb::Logger::instance().setLogColor(false);
+  cb::Logger::instance().setLogThreadPrefix(true);
 
   if (PyType_Ready(&PlannerType) < 0) return 0;
 
