@@ -30,6 +30,7 @@ namespace GCode {
 
   class LineCommand : public PlannerCommand {
   public:
+    Axes start;
     Axes target;
     double length;
 
@@ -47,9 +48,11 @@ namespace GCode {
 
     bool rapid;
     bool seeking;
+    bool first;
 
     LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
-                bool rapid, bool seeking, const PlannerConfig &config);
+                bool rapid, bool seeking, bool first,
+                const PlannerConfig &config);
 
     // From PlannerCommand
     const char *getType() const {return "line";}
@@ -63,11 +66,13 @@ namespace GCode {
     void setExitVelocity(double exitVel) {this->exitVel = exitVel;}
     double getDeltaVelocity() const {return deltaV;}
     double getLength() const {return length;}
+
+    bool merge(const LineCommand &lc, const PlannerConfig &config);
     void restart(const Axes &position, const PlannerConfig &config);
 
     void insert(cb::JSON::Sink &sink) const;
 
   protected:
-    void computeLimits(const Axes &start, const PlannerConfig &config);
+    void computeLimits(const PlannerConfig &config);
   };
 }

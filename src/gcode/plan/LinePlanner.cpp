@@ -67,7 +67,7 @@ namespace {
 
 
 LinePlanner::LinePlanner() :
-  lastExitVel(0), seeking(false), nextID(1), line(-1) {}
+  lastExitVel(0), seeking(false), firstMove(true), nextID(1), line(-1) {}
 
 
 void LinePlanner::setConfig(const PlannerConfig &config) {
@@ -174,6 +174,7 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 
 void LinePlanner::start() {
   lastExitVel = 0;
+  firstMove = true;
   MachineState::start();
 }
 
@@ -242,16 +243,44 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   if (getFeedMode() != UNITS_PER_MINUTE)
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
-  LineCommand *lc =
-    new LineCommand(nextID++, start, target, feed, rapid, seeking, config);
+  LineCommand *lc = new LineCommand(nextID++, start, target, feed, rapid,
+                                    seeking, firstMove, config);
 
   // Update state
+  firstMove = false;
   seeking = false;
 
   // Null or short move
-  if (lc->length < 0.000000001) {
+  if (lc->length < config.minTravel) {
     delete lc;
     return;
+  }
+
+  // Try to merge move with previous one
+  if (!cmds.empty()) {
+    int setCount = 0;
+
+    for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
+      LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
+      if (prev && prev->merge(*lc, config)) {
+        delete lc;
+        for (int i = 0; i < setCount; i++) delete cmds.pop_back();
+        plan(prev);
+        return;
+      }
+
+      SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
+      if (!sc) break;
+      setCount++;
+
+      // We can safely drop axis or line set commands
+      const string &name = sc->getName();
+      if (name == "line") continue;
+      if (name.length() == 2 && name[0] == '_' && Axes::isAxis(name[1]))
+        continue;
+
+      break;
+    }
   }
 
   // Add move

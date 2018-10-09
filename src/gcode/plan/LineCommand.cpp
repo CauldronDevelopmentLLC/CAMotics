@@ -35,19 +35,43 @@ using namespace std;
 
 LineCommand::LineCommand(uint64_t id, const Axes &start,
                          const Axes &end, double feed, bool rapid, bool seeking,
-                         const PlannerConfig &config) :
-  PlannerCommand(id), target(end), length(0), entryVel(feed), exitVel(feed),
-  deltaV(0), maxVel(feed), maxAccel(numeric_limits<double>::max()),
-  maxJerk(numeric_limits<double>::max()), rapid(rapid), seeking(seeking) {
+                         bool first, const PlannerConfig &config) :
+  PlannerCommand(id), start(start), target(end), length(0), entryVel(feed),
+  exitVel(feed), deltaV(0), maxVel(feed),
+  maxAccel(numeric_limits<double>::max()),
+  maxJerk(numeric_limits<double>::max()), rapid(rapid), seeking(seeking),
+  first(first) {
 
   // Zero times
   for (int i = 0; i < 7; i++) times[i] = 0;
-  computeLimits(start, config);
+  computeLimits(config);
+}
+
+
+bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config) {
+  // Check if moves are compatible
+  if (lc.rapid != rapid || lc.seeking != seeking || lc.first != first)
+    return false;
+
+  // Check if move is too long for merge
+  if (config.maxMergeLength < lc.length) return false;
+
+  // Check move time
+  double mins = 0;
+  for (int i = 0; i < 7; i++) mins += times[i];
+  if (config.minMoveSecs <= mins * 60) return false;
+
+  // Merge
+  target = lc.target;
+  computeLimits(config);
+
+  return true;
 }
 
 
 void LineCommand::restart(const Axes &position, const PlannerConfig &config) {
-  computeLimits(position, config);
+  start = position;
+  computeLimits(config);
 }
 
 
@@ -65,6 +89,7 @@ void LineCommand::insert(JSON::Sink &sink) const {
 
   if (rapid) sink.insertBoolean("rapid", true);
   if (seeking) sink.insertBoolean("seeking", true);
+  if (first) sink.insertBoolean("first", true);
 
   sink.insertList("times", true);
   for (unsigned i = 0; i < 7; i++)
@@ -73,8 +98,7 @@ void LineCommand::insert(JSON::Sink &sink) const {
 }
 
 
-void LineCommand::computeLimits(const Axes &start,
-                                const PlannerConfig &config) {
+void LineCommand::computeLimits(const PlannerConfig &config) {
   // Compute delta vector and length
   Axes delta = target - start;
   length = delta.length();

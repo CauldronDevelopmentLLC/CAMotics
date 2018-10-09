@@ -96,6 +96,17 @@ namespace GCode {
     void applyABCMatrix(const cb::Matrix4x4D &m);
     void applyUVWMatrix(const cb::Matrix4x4D &m);
 
+    inline static bool isAxis(char axis) {
+      switch (std::toupper(axis)) {
+      case 'X': case 'Y': case 'Z':
+      case 'A': case 'B': case 'C':
+      case 'U': case 'V': case 'W':
+        return true;
+      }
+
+      return false;
+    }
+
     inline static unsigned toIndex(char axis) {
       switch (std::toupper(axis)) {
       case 'X': return 0;

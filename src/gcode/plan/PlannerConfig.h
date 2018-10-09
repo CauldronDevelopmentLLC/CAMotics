@@ -48,6 +48,8 @@ namespace GCode {
     double minTravel;
     double maxArcError;
     unsigned maxLookahead;
+    double minMoveSecs;
+    double maxMergeLength;
 
     std::string programStart;
     std::map<const Code, std::string> overrides;

@@ -39,6 +39,7 @@ namespace GCode {
     // Move state
     double lastExitVel;
     bool seeking;
+    bool firstMove;
 
     typedef List<PlannerCommand> cmd_t;
     cmd_t cmds;

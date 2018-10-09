@@ -38,7 +38,7 @@ PlannerConfig::PlannerConfig() :
   junctionAccel(100000), minJunctionLength(0.01),
   minSoftLimit(numeric_limits<double>::quiet_NaN()),
   maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
-  maxArcError(0.01), maxLookahead(4096) {}
+  maxArcError(0.01), maxLookahead(4096), minMoveSecs(0.02), maxMergeLength(2) {}
 
 
 bool PlannerConfig::hasOverride(const Code &code) const {
@@ -74,6 +74,8 @@ void PlannerConfig::read(const JSON::Value &value) {
   minTravel = value.getNumber("min-travel", minTravel);
   maxArcError = value.getNumber("max-arc-error", maxArcError);
   maxLookahead = value.getNumber("max-lookahead", maxLookahead);
+  minMoveSecs = value.getNumber("min-move-seconds", minMoveSecs);
+  maxMergeLength = value.getNumber("max-merge-length", maxMergeLength);
 
   programStart = value.getString("program-start", "");
 
@@ -113,6 +115,8 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.insert("min-travel", minTravel);
   sink.insert("max-arc-error", maxArcError);
   sink.insert("max-lookahead", maxLookahead);
+  sink.insert("min-move-seconds", minMoveSecs);
+  sink.insert("max-merge-length", maxMergeLength);
 
   if (!programStart.empty()) sink.insert("program-start", programStart);
 

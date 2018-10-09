@@ -35,6 +35,8 @@ namespace GCode {
                const cb::SmartPointer<cb::JSON::Value> &value) :
       PlannerCommand(id), name(name), value(value) {}
 
+    const std::string &getName() const {return name;}
+
     // From PlannerCommand
     const char *getType() const {return "set";}
     void insert(cb::JSON::Sink &sink) const;
