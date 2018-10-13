@@ -295,6 +295,7 @@ void LinePlanner::pause(pause_t type) {
 
 
 void LinePlanner::set(const string &name, double value, Units units) {
+  if (name.length() == 2 && name[0] == '_' && Axes::isAxis(name[1])) return;
   if (MachineState::get(name, units) == value &&
       !String::endsWith(name, "_home")) return;
 
