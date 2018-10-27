@@ -228,7 +228,6 @@ void ViewPort::glInit() const {
   glFuncs.glShadeModel(GL_SMOOTH);
   glFuncs.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glFuncs.glEnable(GL_BLEND);
-
   glFuncs.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
   glFuncs.glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);

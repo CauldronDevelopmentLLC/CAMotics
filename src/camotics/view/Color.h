@@ -25,9 +25,17 @@
 
 namespace CAMotics {
   class Color : public cb::Vector<4, float> {
+    typedef cb::Vector<4, float> Super_T;
+
   public:
     Color(float r = 0, float g = 0, float b = 0, float a = 1) :
       cb::Vector<4, float>(r, g, b, a) {}
+    Color(const Super_T &o) : Super_T(o) {}
+
+    void setRed(double r)   {(*this)[0] = r;}
+    void setGreen(double g) {(*this)[1] = g;}
+    void setBlue(double b)  {(*this)[2] = b;}
+    void setAlpha(double a) {(*this)[3] = a;}
 
     static const Color RED;
     static const Color GREEN;

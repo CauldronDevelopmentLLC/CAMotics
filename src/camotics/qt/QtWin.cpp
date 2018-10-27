@@ -2122,6 +2122,12 @@ void QtWin::on_actionAxes_triggered(bool checked) {
 }
 
 
+void QtWin::on_actionIntensity_triggered(bool checked) {
+  view->setFlag(View::PATH_INTENSITY_FLAG, checked);
+  redraw();
+}
+
+
 void QtWin::on_actionTool_triggered(bool checked) {
   view->setFlag(View::SHOW_TOOL_FLAG, checked);
   redraw();

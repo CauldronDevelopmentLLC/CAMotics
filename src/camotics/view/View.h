@@ -70,6 +70,7 @@ namespace CAMotics {
       PATH_VBOS_FLAG             = 1 << 12,
       SURFACE_VBOS_FLAG          = 1 << 13,
       TRANSLUCENT_SURFACE_FLAG   = 1 << 14,
+      PATH_INTENSITY_FLAG        = 1 << 15,
     };
 
     View(ValueSet &valueSet);

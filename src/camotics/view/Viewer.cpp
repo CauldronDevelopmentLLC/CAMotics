@@ -81,8 +81,8 @@ void Viewer::draw(const View &view) {
   }
 
   // GCode::Tool path
+  view.path->update(view.isFlagSet(View::PATH_INTENSITY_FLAG));
   if (view.isFlagSet(View::SHOW_PATH_FLAG)) view.path->draw();
-  else view.path->update();
 
   // Model
   if (view.isFlagSet(View::SHOW_WORKPIECE_FLAG | View::SHOW_SURFACE_FLAG)) {

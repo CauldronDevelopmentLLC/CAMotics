@@ -57,6 +57,7 @@ namespace CAMotics {
     unsigned numColors;
 
     bool useVBOs;
+    bool lastIntensity;
 
   public:
     ToolPathView(ValueSet &valueSet);
@@ -102,9 +103,9 @@ namespace CAMotics {
     double getSpeed() const {return getMove().getSpeed();}
     const char *getDirection() const;
 
-    Color getColor(GCode::MoveType type);
+    Color getColor(GCode::MoveType type, double intensity);
 
-    void update();
+    void update(bool intensity);
     void draw();
   };
 }

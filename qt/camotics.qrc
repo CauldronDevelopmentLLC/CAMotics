@@ -71,5 +71,6 @@
         <file>icons/up.png</file>
         <file>icons/buildbotics.png</file>
         <file>icons/machine.png</file>
+        <file>icons/intensity.png</file>
     </qresource>
 </RCC>

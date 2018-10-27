@@ -36,7 +36,7 @@ using namespace CAMotics;
 ToolPathView::ToolPathView(ValueSet &valueSet) :
   values(valueSet), byRemote(true), ratio(1), line(0), currentTime(0),
   currentDistance(0), currentLine(0), dirty(true), colorVBuf(0), vertexVBuf(0),
-  numVertices(0), numColors(0), useVBOs(true) {
+  numVertices(0), numColors(0), useVBOs(true), lastIntensity(false) {
 
   values.add("x", currentPosition.x());
   values.add("y", currentPosition.y());
@@ -78,7 +78,6 @@ void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path,
 
   currentMove = GCode::Move();
   dirty = true;
-  update();
 
   if (path.isNull() || path->empty()) return;
 
@@ -128,10 +127,11 @@ const char *ToolPathView::getDirection() const {
 }
 
 
-Color ToolPathView::getColor(GCode::MoveType type) {
+Color ToolPathView::getColor(GCode::MoveType type, double intensity) {
   switch (type) {
   case GCode::MoveType::MOVE_RAPID:   return Color::RED;
-  case GCode::MoveType::MOVE_CUTTING: return Color::GREEN;
+  case GCode::MoveType::MOVE_CUTTING:
+    return Color(0, intensity, 0.5 * (1 - intensity));
   case GCode::MoveType::MOVE_PROBE:   return Color::BLUE;
   case GCode::MoveType::MOVE_DRILL:   return Color::YELLOW;
   }
@@ -139,9 +139,11 @@ Color ToolPathView::getColor(GCode::MoveType type) {
 }
 
 
-void ToolPathView::update() {
-  if (!dirty || !QOpenGLContext::currentContext()) return;
+void ToolPathView::update(bool intensity) {
+  if ((!dirty && intensity == lastIntensity) ||
+      !QOpenGLContext::currentContext()) return;
 
+  lastIntensity = intensity;
   currentTime = 0;
   currentDistance = 0;
   currentPosition = byRemote ? position : Vector3D();
@@ -151,10 +153,15 @@ void ToolPathView::update() {
   vertices.clear();
   colors.clear();
 
+  // Find maximum speed
+  double maxSpeed = 0;
+  if (intensity && !path.isNull())
+    for (auto it = path->begin(); it != path->end(); it++)
+      if (maxSpeed < it->getSpeed()) maxSpeed = it->getSpeed();
+
   // Find position on path
-  GCode::ToolPath::const_iterator it;
   if (!path.isNull())
-    for (it = path->begin(); it != path->end(); it++) {
+    for (auto it = path->begin(); it != path->end(); it++) {
       GCode::Move move = *it;
       currentMove = move;
 
@@ -194,7 +201,8 @@ void ToolPathView::update() {
       currentDistance += moveDistance;
 
       // Store GL data
-      Color color = getColor(move.getType());
+      double s = (intensity && maxSpeed) ? move.getSpeed() / maxSpeed : 1;
+      Color color = getColor(move.getType(), s);
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
         vertices.push_back(start[i]);
@@ -239,7 +247,6 @@ void ToolPathView::update() {
 
 void ToolPathView::draw() {
   if (path.isNull()) return;
-  update();
 
   if (!numColors || !numVertices) return;
 

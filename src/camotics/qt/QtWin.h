@@ -363,6 +363,7 @@ namespace CAMotics {
     void on_actionMachine_triggered(bool checked);
     void on_actionWorkpieceBounds_triggered(bool checked);
     void on_actionAxes_triggered(bool checked);
+    void on_actionIntensity_triggered(bool checked);
     void on_actionToolPath_triggered(bool checked);
 
     void on_actionAddFile_triggered();

@@ -472,6 +472,7 @@
    <addaction name="actionTool"/>
    <addaction name="actionWorkpieceBounds"/>
    <addaction name="actionAxes"/>
+   <addaction name="actionIntensity"/>
    <addaction name="actionMachine"/>
   </widget>
   <widget class="QToolBar" name="simulateToolBar">
@@ -3122,6 +3123,27 @@
    </property>
    <property name="toolTip">
     <string>Zoom Smaller</string>
+   </property>
+  </action>
+  <action name="actionIntensity">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="camotics.qrc">
+     <normaloff>:/icons/intensity.png</normaloff>:/icons/intensity.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionIntensity</string>
+   </property>
+   <property name="toolTip">
+    <string>Show tool path intensity.  Useful for LASER paths that vary the S parameter.</string>
    </property>
   </action>
  </widget>
