@@ -44,6 +44,14 @@ namespace GCode {
 
     double times[7];
 
+    struct Speed {
+      double offset;
+      double speed;
+      Speed(double offset, double speed) : offset(offset), speed(speed) {}
+    };
+
+    std::vector<Speed> speeds;
+
     Axes unit;
 
     bool rapid;
@@ -67,7 +75,8 @@ namespace GCode {
     double getDeltaVelocity() const {return deltaV;}
     double getLength() const {return length;}
 
-    bool merge(const LineCommand &lc, const PlannerConfig &config);
+    bool merge(const LineCommand &lc, const PlannerConfig &config,
+               double speed);
     void restart(const Axes &position, const PlannerConfig &config);
 
     void insert(cb::JSON::Sink &sink) const;

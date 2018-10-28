@@ -259,10 +259,11 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   // Try to merge move with previous one
   if (!cmds.empty()) {
     int setCount = 0;
+    double speed = std::numeric_limits<double>::quiet_NaN();
 
     for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
       LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
-      if (prev && prev->merge(*lc, config)) {
+      if (prev && prev->merge(*lc, config, speed)) {
         delete lc;
         for (int i = 0; i < setCount; i++) delete cmds.pop_back();
         plan(prev);
@@ -273,11 +274,11 @@ void LinePlanner::move(const Axes &target, bool rapid) {
       if (!sc) break;
       setCount++;
 
-      // We can safely drop axis or line set commands
+      // We can safely drop line set commands and speed commands can be
+      // synchronized with the move.
       const string &name = sc->getName();
       if (name == "line") continue;
-      if (name.length() == 2 && name[0] == '_' && Axes::isAxis(name[1]))
-        continue;
+      if (name == "speed") {speed = sc->getValue().getNumber(); continue;}
 
       break;
     }

@@ -50,6 +50,9 @@ namespace GCode {
     unsigned maxLookahead;
     double minMoveSecs;
     double maxMergeLength;
+    double maxMergeError;
+    unsigned maxSyncSpeeds;
+    double maxColinearAngle;
 
     std::string programStart;
     std::map<const Code, std::string> overrides;

@@ -36,6 +36,7 @@ namespace GCode {
       PlannerCommand(id), name(name), value(value) {}
 
     const std::string &getName() const {return name;}
+    const cb::JSON::Value &getValue() const {return *value;}
 
     // From PlannerCommand
     const char *getType() const {return "set";}

@@ -27,6 +27,7 @@
 #include <cbang/json/Sink.h>
 
 #include <limits>
+#include <cmath>
 
 using namespace GCode;
 using namespace cb;
@@ -48,18 +49,39 @@ LineCommand::LineCommand(uint64_t id, const Axes &start,
 }
 
 
-bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config) {
+bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
+                        double speed) {
   // Check if moves are compatible
   if (lc.rapid != rapid || lc.seeking != seeking || lc.first != first)
     return false;
 
-  // Check if move is too long for merge
-  if (config.maxMergeLength < lc.length) return false;
+  // Compute angle
+  const double theta = unit.angleBetween(lc.unit);
 
-  // Check move time
-  double mins = 0;
-  for (int i = 0; i < 7; i++) mins += times[i];
-  if (config.minMoveSecs <= mins * 60) return false;
+  // Compute error if moves are merged
+  const double a = length;
+  const double b = lc.length;
+  const double c = sqrt(a * a + b * b - 2 * a * b * cos(theta));
+  const double error = a * b * sin(theta) / c;
+
+  if (config.maxMergeError < error) return false;
+
+  if (config.maxColinearAngle < theta) {
+    // Check if move is too long for merge
+    if (config.maxMergeLength < lc.length || config.maxMergeLength < length)
+      return false;
+
+    // Check move time
+    double mins = 0;
+    for (int i = 0; i < 7; i++) mins += times[i];
+    if (config.minMoveSecs <= mins * 60) return false;
+  }
+
+  // Handle speed
+  if (!std::isnan(speed)) {
+    if (config.maxSyncSpeeds <= speeds.size()) return false;
+    speeds.push_back(Speed(length, speed));
+  }
 
   // Merge
   target = lc.target;
@@ -95,6 +117,17 @@ void LineCommand::insert(JSON::Sink &sink) const {
   for (unsigned i = 0; i < 7; i++)
     sink.append(times[i] * 60000); // ms
   sink.endList();
+
+  if (speeds.size()) {
+    sink.insertList("speeds");
+    for (unsigned i = 0; i < speeds.size(); i++) {
+      sink.appendList();
+      sink.append(speeds[i].offset);
+      sink.append(speeds[i].speed);
+      sink.endList();
+    }
+    sink.endList();
+  }
 }
 
 
