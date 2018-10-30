@@ -30,6 +30,7 @@ namespace GCode {
 
   class LineCommand : public PlannerCommand {
   public:
+    double feed;
     Axes start;
     Axes target;
     double length;

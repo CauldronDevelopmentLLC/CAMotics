@@ -37,11 +37,9 @@ using namespace std;
 LineCommand::LineCommand(uint64_t id, const Axes &start, const Axes &end,
                          double feed, bool rapid, bool seeking, bool first,
                          const PlannerConfig &config) :
-  PlannerCommand(id), start(start), target(end), length(0), entryVel(feed),
-  exitVel(feed), deltaV(0), maxVel(feed),
-  maxAccel(numeric_limits<double>::max()),
-  maxJerk(numeric_limits<double>::max()), rapid(rapid), seeking(seeking),
-  first(first) {
+  PlannerCommand(id), feed(feed), start(start), target(end), length(0),
+  entryVel(0), exitVel(0), deltaV(0), maxVel(0), maxAccel(0), maxJerk(0),
+  rapid(rapid), seeking(seeking), first(first) {
 
   // Zero times
   for (int i = 0; i < 7; i++) times[i] = 0;
@@ -132,6 +130,11 @@ void LineCommand::insert(JSON::Sink &sink) const {
 
 
 void LineCommand::computeLimits(const PlannerConfig &config) {
+  // Reset velocities, accel and jerk
+  entryVel = exitVel = maxVel = feed;
+  maxAccel = numeric_limits<double>::max();
+  maxJerk = numeric_limits<double>::max();
+
   // Compute delta vector and length
   Axes delta = target - start;
   length = delta.length();
