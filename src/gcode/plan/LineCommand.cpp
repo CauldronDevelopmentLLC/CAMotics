@@ -34,9 +34,9 @@ using namespace cb;
 using namespace std;
 
 
-LineCommand::LineCommand(uint64_t id, const Axes &start,
-                         const Axes &end, double feed, bool rapid, bool seeking,
-                         bool first, const PlannerConfig &config) :
+LineCommand::LineCommand(uint64_t id, const Axes &start, const Axes &end,
+                         double feed, bool rapid, bool seeking, bool first,
+                         const PlannerConfig &config) :
   PlannerCommand(id), start(start), target(end), length(0), entryVel(feed),
   exitVel(feed), deltaV(0), maxVel(feed),
   maxAccel(numeric_limits<double>::max()),
@@ -121,7 +121,7 @@ void LineCommand::insert(JSON::Sink &sink) const {
   if (speeds.size()) {
     sink.insertList("speeds");
     for (unsigned i = 0; i < speeds.size(); i++) {
-      sink.appendList();
+      sink.appendList(true);
       sink.append(speeds[i].offset);
       sink.append(speeds[i].speed);
       sink.endList();

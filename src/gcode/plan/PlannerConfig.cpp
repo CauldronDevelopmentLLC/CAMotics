@@ -39,7 +39,7 @@ PlannerConfig::PlannerConfig() :
   minSoftLimit(numeric_limits<double>::quiet_NaN()),
   maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
   maxArcError(0.01), maxLookahead(4096), minMoveSecs(0.02), maxMergeLength(2),
-  maxMergeError(0.1), maxSyncSpeeds(16), maxColinearAngle(0.01) {}
+  maxMergeError(0.1), maxSyncSpeeds(64), maxColinearAngle(0.01) {}
 
 
 bool PlannerConfig::hasOverride(const Code &code) const {

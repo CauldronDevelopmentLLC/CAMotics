@@ -1,4 +1,4 @@
-var mode = 'inside';
+var mode = 'engrave';
 
 
 function circle(depth, width, height, startAngle, angle, cX, cY, offset,
@@ -262,7 +262,7 @@ if (mode == 'inside') {
 } else if (mode == 'outside') top();
 
 else if (mode == 'engrave') {
-    speed(100);
+    speed(20);
     feed(40 * 25.4);
 
     var dxf = require('dxf');

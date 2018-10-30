@@ -6,8 +6,8 @@
         "30": {
           "units": "metric",
           "shape": "conical",
-          "length": 10,
-          "diameter": 2.5,
+          "length": 12.071068,
+          "diameter": 10,
           "description": ""
         }
       },
@@ -15,8 +15,8 @@
         "automatic": true,
         "margin": 5,
         "bounds": {
-          "min": [-203.2, -203.2, -15.24],
-          "max": [203.2, 203.2, 3.81]
+          "min": [-227.815278, -228.22879, -13.529691],
+          "max": [227.581598, 228.05099, 0]
         }
       },
       "files": [
