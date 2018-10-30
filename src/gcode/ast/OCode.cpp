@@ -35,7 +35,7 @@ void OCode::print(ostream &stream) const {
   if (numExpr.isNull()) stream << filename;
   else stream << *numExpr;
 
-  stream << ' ' << keyword;
+  if (!keyword.empty()) stream << ' ' << keyword;
 
   for (unsigned i = 0; i < expressions.size(); i++)
     stream << ' ' << *expressions[i];

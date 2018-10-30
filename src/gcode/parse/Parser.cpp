@@ -173,7 +173,11 @@ SmartPointer<OCode> Parser::ocode() {
 
   } else {
     SmartPointer<Entity> numExpr = numberRefOrExpr();
-    string keyword = tokenizer->match(TokenType::ID_TOKEN).getValue();
+    string keyword;
+
+    // Some postprocesors output an O-Code wo/ a keyword as a program number.
+    if (tokenizer->isType(TokenType::ID_TOKEN))
+      keyword = tokenizer->match(TokenType::ID_TOKEN).getValue();
 
     ocode = new OCode(numExpr, keyword);
   }

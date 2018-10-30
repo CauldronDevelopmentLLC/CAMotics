@@ -401,6 +401,7 @@ void OCodeInterpreter::operator()(const SmartPointer<Block> &block) {
     else if (keyword == "endif") doEndIf(ocode);
     else if (keyword == "repeat") doRepeat(ocode);
     else if (keyword == "endrepeat") doEndRepeat(ocode);
+    else if (keyword.empty()) ; // Ignore program number
     else LOG_WARNING("Unsupported O-Code: " << keyword);
   }
 }
