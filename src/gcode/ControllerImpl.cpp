@@ -903,7 +903,6 @@ void ControllerImpl::setFeed(double feed) {
 
 
 void ControllerImpl::setSpeed(double speed) {
-  if (state.speed == speed) return;
   state.speed = speed;
 
   double mspeed;
