@@ -47,6 +47,7 @@ namespace GCode {
 
     uint64_t nextID;
     int line;
+    double speed;
 
   public:
     LinePlanner();
@@ -64,6 +65,7 @@ namespace GCode {
     void start();
     void end();
     void setSpeed(double speed);
+    void setSpinMode(spin_mode_t mode, double max);
     void changeTool(unsigned tool);
     void input(port_t port, input_mode_t mode, double timeout);
     void seek(port_t port, bool active, bool error);

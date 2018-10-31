@@ -67,7 +67,8 @@ namespace {
 
 
 LinePlanner::LinePlanner() :
-  lastExitVel(0), seeking(false), firstMove(true), nextID(1), line(-1) {}
+  lastExitVel(0), seeking(false), firstMove(true), nextID(1), line(-1),
+  speed(numeric_limits<double>::quiet_NaN()) {}
 
 
 void LinePlanner::setConfig(const PlannerConfig &config) {
@@ -175,6 +176,7 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 void LinePlanner::start() {
   lastExitVel = 0;
   firstMove = true;
+  speed = numeric_limits<double>::quiet_NaN();
   MachineState::start();
 }
 
@@ -188,11 +190,23 @@ void LinePlanner::end() {
 void LinePlanner::setSpeed(double speed) {
   MachineState::setSpeed(speed);
 
-  // TODO handle spin mode
-  if (getSpinMode() != REVOLUTIONS_PER_MINUTE)
-    LOG_WARNING("Constant surface speed not supported");
+  if (this->speed != speed) {
+    this->speed = speed;
+    pushSetCommand("speed", speed);
+  }
+}
 
-  pushSetCommand("speed", speed);
+
+void LinePlanner::setSpinMode(spin_mode_t mode, double max) {
+  MachineState::setSpinMode(mode, max);
+
+  switch (mode) {
+  case REVOLUTIONS_PER_MINUTE: pushSetCommand("spin-mode", "rpm"); break;
+  case CONSTANT_SURFACE_SPEED:
+    pushSetCommand("max-rpm", max);
+    pushSetCommand("spin-mode", "css");
+    break;
+  }
 }
 
 
@@ -236,10 +250,10 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
   MachineState::move(target, rapid);
 
-  // TODO Handle feed rate mode
   double feed = rapid ? numeric_limits<double>::max() : getFeed();
   if (!feed) THROWS("Non-rapid move with zero feed rate");
 
+  // TODO Handle feed rate mode
   if (getFeedMode() != UNITS_PER_MINUTE)
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
@@ -259,7 +273,7 @@ void LinePlanner::move(const Axes &target, bool rapid) {
   // Try to merge move with previous one
   if (!cmds.empty()) {
     int setCmdCount = 0;
-    double speed = std::numeric_limits<double>::quiet_NaN();
+    double speed = numeric_limits<double>::quiet_NaN();
 
     for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
       LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
@@ -323,8 +337,20 @@ void LinePlanner::message(const string &s) {
 
 
 template <typename T>
-void LinePlanner::pushSetCommand(const string &name, const T &value) {
-  push(new SetCommand(nextID++, name, JSON::Factory::create(value)));
+void LinePlanner::pushSetCommand(const string &name, const T &_value) {
+  SmartPointer<JSON::Value> value = JSON::Factory::create(_value);
+
+  // Merge with previous command if possible
+  for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
+    SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
+    if (!sc) break;
+    if (sc->getName() == name) {
+      sc->setValue(value);
+      return;
+    }
+  }
+
+  push(new SetCommand(nextID++, name, value));
 }
 
 
@@ -335,6 +361,13 @@ void LinePlanner::push(PlannerCommand *cmd) {
 
 
 bool LinePlanner::isFinal(PlannerCommand *cmd) const {
+  // Set commands are only final if they are followed by a non-set command
+  if (dynamic_cast<SetCommand *>(cmd)) {
+    for (PlannerCommand *c = cmd; c; c = c->next)
+      if (!dynamic_cast<SetCommand *>(c)) return true;
+    return false;
+  }
+
   double velocity = cmd->getExitVelocity();
   if (!velocity) return true;
 

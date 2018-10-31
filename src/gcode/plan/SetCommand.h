@@ -37,6 +37,8 @@ namespace GCode {
 
     const std::string &getName() const {return name;}
     const cb::JSON::Value &getValue() const {return *value;}
+    void setValue(const cb::SmartPointer<cb::JSON::Value> &value)
+    {this->value = value;}
 
     // From PlannerCommand
     const char *getType() const {return "set";}

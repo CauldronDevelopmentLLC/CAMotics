@@ -58,6 +58,7 @@ namespace GCode {
     bool rapid;
     bool seeking;
     bool first;
+    double error;
 
     LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
                 bool rapid, bool seeking, bool first,

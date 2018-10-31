@@ -39,7 +39,7 @@ LineCommand::LineCommand(uint64_t id, const Axes &start, const Axes &end,
                          const PlannerConfig &config) :
   PlannerCommand(id), feed(feed), start(start), target(end), length(0),
   entryVel(0), exitVel(0), deltaV(0), maxVel(0), maxAccel(0), maxJerk(0),
-  rapid(rapid), seeking(seeking), first(first) {
+  rapid(rapid), seeking(seeking), first(first), error(0) {
 
   // Zero times
   for (int i = 0; i < 7; i++) times[i] = 0;
@@ -63,7 +63,7 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
     const double c = sqrt(a * a + b * b - 2 * a * b * cos(theta));
     const double error = a * b * sin(theta) / c;
 
-    if (config.maxMergeError < error) return false;
+    if (config.maxMergeError < error + this->error) return false;
 
     if (config.maxColinearAngle < theta) {
       // Check if move is too long for merge
@@ -75,6 +75,9 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
       for (int i = 0; i < 7; i++) mins += times[i];
       if (config.minMoveSecs <= mins * 60) return false;
     }
+
+    // Accumulate errors
+    this->error += error;
   }
 
   // Handle speed
