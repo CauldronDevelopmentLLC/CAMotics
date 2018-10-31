@@ -55,31 +55,30 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
 
   // Compute angle
   const double theta = unit.angleBetween(lc.unit);
-
-  // Compute error if moves are merged
   const double a = length;
   const double b = lc.length;
-  const double c = sqrt(a * a + b * b - 2 * a * b * cos(theta));
-  const double error = a * b * sin(theta) / c;
 
-  if (config.maxMergeError < error) return false;
+  if (theta && a && b) {
+    // Compute error if moves are merged
+    const double c = sqrt(a * a + b * b - 2 * a * b * cos(theta));
+    const double error = a * b * sin(theta) / c;
 
-  if (config.maxColinearAngle < theta) {
-    // Check if move is too long for merge
-    if (config.maxMergeLength < lc.length || config.maxMergeLength < length)
-      return false;
+    if (config.maxMergeError < error) return false;
 
-    // Check move time
-    double mins = 0;
-    for (int i = 0; i < 7; i++) mins += times[i];
-    if (config.minMoveSecs <= mins * 60) return false;
+    if (config.maxColinearAngle < theta) {
+      // Check if move is too long for merge
+      if (config.maxMergeLength < lc.length || config.maxMergeLength < length)
+        return false;
+
+      // Check move time
+      double mins = 0;
+      for (int i = 0; i < 7; i++) mins += times[i];
+      if (config.minMoveSecs <= mins * 60) return false;
+    }
   }
 
   // Handle speed
-  if (!std::isnan(speed)) {
-    if (config.maxSyncSpeeds <= speeds.size()) return false;
-    speeds.push_back(Speed(length, speed));
-  }
+  if (!std::isnan(speed)) speeds.push_back(Speed(length, speed));
 
   // Merge
   target = lc.target;

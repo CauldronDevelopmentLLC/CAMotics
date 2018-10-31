@@ -51,7 +51,6 @@ namespace GCode {
     double minMoveSecs;
     double maxMergeLength;
     double maxMergeError;
-    unsigned maxSyncSpeeds;
     double maxColinearAngle;
 
     std::string programStart;

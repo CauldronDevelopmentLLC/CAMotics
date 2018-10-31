@@ -39,7 +39,7 @@ PlannerConfig::PlannerConfig() :
   minSoftLimit(numeric_limits<double>::quiet_NaN()),
   maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
   maxArcError(0.01), maxLookahead(4096), minMoveSecs(0.02), maxMergeLength(2),
-  maxMergeError(0.1), maxSyncSpeeds(64), maxColinearAngle(0.01) {}
+  maxMergeError(0.1), maxColinearAngle(0.01) {}
 
 
 bool PlannerConfig::hasOverride(const Code &code) const {
@@ -78,7 +78,6 @@ void PlannerConfig::read(const JSON::Value &value) {
   minMoveSecs = value.getNumber("min-move-seconds", minMoveSecs);
   maxMergeLength = value.getNumber("max-merge-length", maxMergeLength);
   maxMergeError = value.getNumber("max-merge-error", maxMergeError);
-  maxSyncSpeeds = value.getNumber("max-sync-speeds", maxSyncSpeeds);
   maxColinearAngle = value.getNumber("max-colinear-angle", maxColinearAngle);
 
   programStart = value.getString("program-start", "");
@@ -121,7 +120,6 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.insert("max-lookahead", maxLookahead);
   sink.insert("min-move-seconds", minMoveSecs);
   sink.insert("max-merge-error", maxMergeError);
-  sink.insert("max-sync-speeds", maxSyncSpeeds);
   sink.insert("max-colinear-angle", maxColinearAngle);
 
   if (!programStart.empty()) sink.insert("program-start", programStart);

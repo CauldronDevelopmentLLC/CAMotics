@@ -258,21 +258,21 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
   // Try to merge move with previous one
   if (!cmds.empty()) {
-    int setCount = 0;
+    int setCmdCount = 0;
     double speed = std::numeric_limits<double>::quiet_NaN();
 
     for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
       LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
       if (prev && prev->merge(*lc, config, speed)) {
         delete lc;
-        for (int i = 0; i < setCount; i++) delete cmds.pop_back();
+        for (int i = 0; i < setCmdCount; i++) delete cmds.pop_back();
         plan(prev);
         return;
       }
 
       SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
       if (!sc) break;
-      setCount++;
+      setCmdCount++;
 
       // We can safely drop line set commands and speed commands can be
       // synchronized with the move.
