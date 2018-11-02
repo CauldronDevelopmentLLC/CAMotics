@@ -295,11 +295,11 @@ void LinePlanner::pause(pause_t type) {
 
 
 void LinePlanner::set(const string &name, double value, Units units) {
+  double oldValue = MachineState::get(name, units);
   MachineState::set(name, value, units);
 
   if (name.length() == 2 && name[0] == '_' && Axes::isAxis(name[1])) return;
-  if (MachineState::get(name, units) == value &&
-      !String::endsWith(name, "_home")) return;
+  if (oldValue == value && !String::endsWith(name, "_home")) return;
   if (name == "_speed") return;
 
   pushSetCommand(name, convert(units, METRIC, value));
