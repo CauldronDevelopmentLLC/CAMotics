@@ -20,6 +20,7 @@
 
 #include "LinePlanner.h"
 
+#include "SCurve.h"
 #include "LineCommand.h"
 #include "DwellCommand.h"
 #include "PauseCommand.h"
@@ -44,24 +45,8 @@ using namespace GCode;
 
 
 namespace {
-  template<typename T> T square(T x) {return x * x;}
-  template<typename T> T cube(T x) {return x * x * x;}
-
-
   complex<double> cbrt(complex<double> x) {
     return x.real() < 0 ? -pow(-x, 1.0 / 3.0) : pow(x, 1.0 / 3.0);
-  }
-
-
-  double computeDistance(double t, double v, double a, double j) {
-    // v * t + 1/2 * a * t^2 + 1/6 * j * t^3
-    return t * (v + t * (0.5 * a + 1.0 / 6.0 * j * t));
-  }
-
-
-  double computeVelocity(double t, double a, double j) {
-    // a * t + 1/2 * j * t^2
-    return t * (a + 0.5 * j * t);
   }
 }
 
@@ -776,20 +761,20 @@ double LinePlanner::planVelocityTransition(double Vi, double Vt,
 
   // Acceleration segment
   times[0] = peakAccel / maxJerk;
-  double length = computeDistance(times[0], Vi, 0, maxJerk);
-  double vel = Vi + computeVelocity(times[0], 0, maxJerk);
+  double length = SCurve::distance(times[0], Vi, 0, maxJerk);
+  double vel = Vi + SCurve::velocity(times[0], 0, maxJerk);
 
   // Constant acceleration segment
   if (isAccelLimited(Vi, Vt, peakAccel, maxJerk)) {
     times[1] = (Vt - Vi) / peakAccel - times[0];
-    length += computeDistance(times[1], vel, peakAccel, 0);
-    vel += computeVelocity(times[1], peakAccel, 0);
+    length += SCurve::distance(times[1], vel, peakAccel, 0);
+    vel += SCurve::velocity(times[1], peakAccel, 0);
 
   } else times[1] = 0;
 
   // Decceleration segment
   times[2] = times[0];
-  length += computeDistance(times[0], vel, peakAccel, -maxJerk);
+  length += SCurve::distance(times[0], vel, peakAccel, -maxJerk);
 
   LOG_DEBUG(3, "planVelocityTransition(" << Vi << ", " << Vt << ", "
             << maxAccel << ", " << maxJerk << ")=" << length);

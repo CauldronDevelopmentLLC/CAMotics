@@ -21,6 +21,7 @@
 #include "LineCommand.h"
 
 #include "PlannerConfig.h"
+#include "SCurve.h"
 
 #include <gcode/Axes.h>
 
@@ -118,15 +119,65 @@ void LineCommand::insert(JSON::Sink &sink) const {
     sink.append(times[i] * 60000); // ms
   sink.endList();
 
+  vector<double> offsetTimes;
+  computeOffsetTimes(offsetTimes);
+
   if (speeds.size()) {
     sink.insertList("speeds");
     for (unsigned i = 0; i < speeds.size(); i++) {
       sink.appendList(true);
-      sink.append(speeds[i].offset);
+      sink.append(offsetTimes[i] * 60000); // ms
       sink.append(speeds[i].speed);
       sink.endList();
     }
     sink.endList();
+  }
+}
+
+
+void LineCommand::computeOffsetTimes(vector<double> &offsetTimes) const {
+  double segDist[7];
+  double segJerk[7];
+  double segAccel[7];
+  double segVel[7];
+
+  // Jerks
+  segJerk[0] = segJerk[6] = maxJerk;
+  segJerk[2] = segJerk[4] = -maxJerk;
+  segJerk[1] = segJerk[3] = segJerk[5] = 0;
+
+  // Accels
+  segAccel[1] = segAccel[2] = maxJerk * times[0];
+  segAccel[5] = segAccel[6] = -maxJerk * times[4];
+  segAccel[0] = segAccel[3] = segAccel[4] = 0;
+
+  // Compute velocities and distances for each segment
+  double v = entryVel;
+  for (unsigned i = 0; i < 7; i++) {
+    segVel[i] = v;
+    segDist[i] = SCurve::distance(times[i], segVel[i], segAccel[i], segJerk[i]);
+    v += SCurve::velocity(times[i], segAccel[i], segJerk[i]);
+  }
+
+  // Compute speed offset times
+  offsetTimes.resize(speeds.size());
+  for (unsigned i = 0; i < speeds.size(); i++) {
+    double offset = speeds[i].offset;
+
+    // Find the segment the offset lands in
+    double t = 0;
+    double d = 0;
+    for (unsigned j = 0; j < 7; j++) {
+      if (offset <= d + segDist[j]) {
+        offsetTimes[i] = t + SCurve::timeAtDistance
+          (offset - d, segVel[j], segAccel[j], segJerk[j], times[j]);
+        break;
+      }
+
+      t += times[j];
+      d += segDist[j];
+      if (j == 6) offsetTimes[i] = t;
+    }
   }
 }
 

@@ -84,6 +84,7 @@ namespace GCode {
     void insert(cb::JSON::Sink &sink) const;
 
   protected:
+    void computeOffsetTimes(std::vector<double> &offsetTimes) const;
     void computeLimits(const PlannerConfig &config);
   };
 }
