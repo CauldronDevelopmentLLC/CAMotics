@@ -68,17 +68,13 @@ namespace GCode {
         THROWS("Distance " << d << " beyond max time " << maxT <<
                " with max distance " << maxD);
 
-      // Binary search for solution within tolerance
-      double minT = 0;
+      // Newton–Raphson method to find solution within tolerance
+      double t = 0.5 * maxT; // Initial guess
 
       while (true) {
-        double midT = (maxT + minT) / 2;
-        double midD = distance(midT, v, a, j);
-
-        if (near(midD, d, tolerance)) return midT;
-
-        if (d < midD) maxT = midT;
-        else minT = midT;
+        double x = distance(t, v, a, j) - d;
+        if (near(x, 0, tolerance)) return t;
+        t -= x / (v + velocity(t, a, j));
       }
     }
   }
