@@ -127,6 +127,7 @@ void LineCommand::insert(JSON::Sink &sink) const {
     for (unsigned i = 0; i < speeds.size(); i++) {
       sink.appendList(true);
       sink.append(offsetTimes[i] * 60000); // ms
+      sink.append(speeds[i].offset);
       sink.append(speeds[i].speed);
       sink.endList();
     }
