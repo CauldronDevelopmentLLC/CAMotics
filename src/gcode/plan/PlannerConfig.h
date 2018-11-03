@@ -51,7 +51,8 @@ namespace GCode {
     double minMoveSecs;
     double maxMergeLength;
     double maxMergeError;
-    double maxColinearAngle;
+    double maxCollinearAngle;
+    bool rapidAutoOff;
 
     std::string programStart;
     std::map<const Code, std::string> overrides;

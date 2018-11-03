@@ -53,7 +53,7 @@ namespace {
 
 LinePlanner::LinePlanner() :
   lastExitVel(0), seeking(false), firstMove(true), nextID(1), line(-1),
-  speed(numeric_limits<double>::quiet_NaN()) {}
+  speed(numeric_limits<double>::quiet_NaN()), rapidAutoOff(false) {}
 
 
 void LinePlanner::setConfig(const PlannerConfig &config) {
@@ -277,10 +277,25 @@ void LinePlanner::move(const Axes &target, bool rapid) {
       // synchronized with the move.
       const string &name = sc->getName();
       if (name == "line") continue;
-      if (name == "speed") {speed = sc->getValue().getNumber(); continue;}
+      if (name == "speed") {
+        if (!rapid || !config.rapidAutoOff)
+          speed = sc->getValue().getNumber();
+        continue;
+      }
 
       break;
     }
+  }
+
+  // Handle rapid auto off
+  if (rapid && !rapidAutoOff && config.rapidAutoOff) {
+    if (speed) pushSetCommand("speed", 0);
+    rapidAutoOff = true;
+  }
+
+  if (!rapid && rapidAutoOff) {
+    if (speed) pushSetCommand("speed", speed);
+    rapidAutoOff = false;
   }
 
   // Add move

@@ -70,7 +70,7 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
 
     if (config.maxMergeError < error + this->error) return false;
 
-    if (config.maxColinearAngle < theta) {
+    if (config.maxCollinearAngle < theta) {
       // Check if move is too long for merge
       if (config.maxMergeLength < lc.length || config.maxMergeLength < length)
         return false;

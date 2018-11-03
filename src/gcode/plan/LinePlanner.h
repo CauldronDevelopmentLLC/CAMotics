@@ -48,6 +48,7 @@ namespace GCode {
     uint64_t nextID;
     int line;
     double speed;
+    bool rapidAutoOff;
 
   public:
     LinePlanner();
