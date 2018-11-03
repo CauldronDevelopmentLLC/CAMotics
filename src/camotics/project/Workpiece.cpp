@@ -86,7 +86,7 @@ void Workpiece::update(GCode::ToolPath &path) {
 void Workpiece::read(const JSON::Value &value) {
   automatic = value.getBoolean("automatic", automatic);
   margin = value.getNumber("margin", margin);
-  bounds.read(value.getDict("bounds"));
+  if (value.hasDict("bounds")) bounds.read(value.getDict("bounds"));
 }
 
 
@@ -95,8 +95,10 @@ void Workpiece::write(JSON::Sink &sink) const {
 
   sink.insertBoolean("automatic", automatic);
   sink.insert("margin", margin);
-  sink.beginInsert("bounds");
-  bounds.write(sink);
+  if (bounds.isValid()) {
+    sink.beginInsert("bounds");
+    bounds.write(sink);
+  }
 
   sink.endDict();
 }
