@@ -26,6 +26,7 @@
 #include <gcode/Axes.h>
 
 #include <cbang/json/Sink.h>
+#include <cbang/log/Logger.h>
 
 #include <limits>
 #include <cmath>
@@ -59,6 +60,9 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
   const double a = length;
   const double b = lc.length;
 
+  // Don't merge lines that point in the opposite direction
+  if (isnan(theta) || 3.14 < theta) return false;
+
   if (theta && a && b) {
     // Compute error if moves are merged
     const double c = sqrt(a * a + b * b - 2 * a * b * cos(theta));
@@ -80,6 +84,10 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
     // Accumulate errors
     this->error += error;
   }
+
+  LOG_DEBUG(3, "Merging moves length=" << a << " + " << b
+            << " target=" << target << " -> " << lc.target
+            << " start=" << start << " theta=" << theta);
 
   // Handle speed
   if (!std::isnan(speed)) speeds.push_back(Speed(length, speed));
@@ -228,4 +236,7 @@ void LineCommand::computeLimits(const PlannerConfig &config) {
   // Limit entry & exit velocities
   if (maxVel < entryVel) entryVel = maxVel;
   if (maxVel < exitVel) exitVel = maxVel;
+
+  LOG_DEBUG(3, "Limits computed length=" << length << " maxVel=" << maxVel
+            << " maxJerk=" << maxJerk << " maxAccel=" << maxAccel);
 }
