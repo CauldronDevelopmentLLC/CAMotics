@@ -22,9 +22,7 @@
 
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
-#include <cbang/log/Logger.h>
 
-#include <complex>
 #include <limits>
 
 using namespace std;
@@ -33,6 +31,30 @@ using namespace std;
 namespace GCode {
   bool near(double x, double y, double delta) {
     return x - delta < y && y < x + delta;
+  }
+
+
+  vector<complex<double> > solveQuadratic(double a, double b, double c) {
+    // Find roots of quadratic polynomial of the form:
+    //
+    //   a * x^2 + b * x + c = 0
+
+    vector<complex<double> > solutions;
+
+    if (a) {
+      // Use the quadratic formula:
+      //
+      //   x = (-b +/- sqrt(b^2 - 4 * a * c)) / (2 * a)
+
+      double q = square(b) - 4 * a * c;
+      complex<double> r = sqrt(complex<double>(q));
+
+      solutions.push_back((-b + r) / (2 * a));
+      if (q) solutions.push_back((-b - r) / (2 * a));
+
+    } else if (b) solutions.push_back(-c / b);
+
+    return solutions;
   }
 
 
@@ -76,6 +98,27 @@ namespace GCode {
         if (near(x, 0, tolerance)) return t;
         t -= x / (v + velocity(t, a, j));
       }
+    }
+
+
+    double timeAtVelocity(double iV, double tV, double a, double j,
+                          double tolerance) {
+      if (near(iV, tV, tolerance) || iV < 0 || tV < 0) return 0;
+
+      // Solve j / 2 * t^2 + a * t + (iV - tV) = 0 for t
+      vector<complex<double> > solutions = solveQuadratic(0.5 * j, a, iV - tV);
+
+      double t = numeric_limits<double>::quiet_NaN();
+
+      for (unsigned i = 0; i < solutions.size(); i++)
+        if (abs(solutions[i].imag()) < tolerance && 0 < solutions[i].real())
+          if (isnan(t) || solutions[i].real() < t) t = solutions[i].real();
+
+      if (isnan(t))
+        THROWS("Invalid time at velocity: iV=" << iV << " tV=" << tV << " a="
+               << a << " j=" << j);
+
+      return t;
     }
   }
 }

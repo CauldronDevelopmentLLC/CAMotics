@@ -21,6 +21,7 @@
 #pragma once
 
 #include <vector>
+#include <complex>
 
 
 namespace GCode {
@@ -28,6 +29,8 @@ namespace GCode {
   template<typename T> T cube(T x) {return x * x * x;}
   bool near(double x, double y, double delta);
 
+  std::vector<std::complex<double> >
+  solveQuadratic(double a, double b, double c);
 
   namespace SCurve {
     double distance(double t, double v, double a, double j);
@@ -35,6 +38,8 @@ namespace GCode {
     double acceleration(double t, double j);
 
     double timeAtDistance(double d, double v, double a, double j, double maxT,
-                          double tolerance = 0.0000001);
+                          double tolerance = 1e-7);
+    double timeAtVelocity(double iV, double tV, double a, double j,
+                          double tolerance = 1e-20);
   }
 }

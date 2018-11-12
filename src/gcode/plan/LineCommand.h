@@ -31,6 +31,7 @@ namespace GCode {
   class LineCommand : public PlannerCommand {
   public:
     double feed;
+
     Axes start;
     Axes target;
     double length;
@@ -59,6 +60,7 @@ namespace GCode {
     bool seeking;
     bool first;
     double error;
+    bool restarted;
 
     LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
                 bool rapid, bool seeking, bool first,
@@ -80,11 +82,9 @@ namespace GCode {
     bool merge(const LineCommand &lc, const PlannerConfig &config,
                double speed);
     void restart(const Axes &position, const PlannerConfig &config);
-
     void insert(cb::JSON::Sink &sink) const;
 
   protected:
-    void computeOffsetTimes(std::vector<double> &offsetTimes) const;
     void computeLimits(const PlannerConfig &config);
   };
 }
