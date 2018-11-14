@@ -544,7 +544,7 @@ module.exports = extend({
     layer = [].concat(layer); // Copy layer
 
     var polys = [];
-    var poly = [];
+    var poly = undefined;
     var p = position();
 
     while (layer.length) {
@@ -556,7 +556,7 @@ module.exports = extend({
 
       var d = distance2D(first(v), p);
 
-      if (0.01 < d) {
+      if (0.01 < d || typeof poly == 'undefined') {
         poly = [];
         polys.push(poly);
       }
@@ -913,12 +913,15 @@ module.exports = extend({
       last = seg[seg.length - 1];
     }
 
+    var first = true;
     while (!done) {
-      for (var i = 1; i < prev.length && !done; i++) {
+      for (var i = 1; i < prev.length && (!done || first); i++) {
         done = prev[i].z == config.zEnd;
         add_seg(path, last, prev[i]);
         prev[i].z = last.z;
       }
+
+      first = false;
 
       // Close poly
       if (!done) {
