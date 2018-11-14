@@ -35,9 +35,11 @@ ConcurrentTaskManager::ConcurrentTaskManager() {
 
 
 ConcurrentTaskManager::~ConcurrentTaskManager() {
-  stop();
-  signal();
-  join();
+  try {
+    stop();
+    signal();
+    join();
+  } CATCH_ERROR;
 }
 
 

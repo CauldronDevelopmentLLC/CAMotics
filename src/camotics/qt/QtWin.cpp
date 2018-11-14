@@ -189,9 +189,11 @@ QtWin::QtWin(Application &app) :
 
 
 QtWin::~QtWin() {
-  if (!bbCtrlAPI.isNull()) bbCtrlAPI->disconnectCNC(); // Avoid crash
-  saveAllState();
-  Logger::instance().setScreenStream(cout);
+  try {
+    if (!bbCtrlAPI.isNull()) bbCtrlAPI->disconnectCNC(); // Avoid crash
+    saveAllState();
+    Logger::instance().setScreenStream(cout);
+  } CATCH_ERROR;
 }
 
 

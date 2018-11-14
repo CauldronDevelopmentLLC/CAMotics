@@ -143,7 +143,7 @@ void BBCtrlAPI::onDisconnected() {
 
 void BBCtrlAPI::onTextMessageReceived(const QString &message) {
   string data = message.toUtf8().data();
-  LOG_DEBUG(1, "CNC received: " << data);
+  LOG_DEBUG(4, "CNC received: " << data);
 
   try {
     JSON::ValuePtr json = JSON::Reader::parse(StringInputSource(data));

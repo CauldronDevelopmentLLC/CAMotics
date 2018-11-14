@@ -27,12 +27,14 @@ using namespace CAMotics;
 
 
 CuboidView::~CuboidView() {
-  if (haveVBOs()) {
-    GLFuncs &glFuncs = getGLFuncs();
+  try {
+    if (haveVBOs()) {
+      GLFuncs &glFuncs = getGLFuncs();
 
-    if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
-    if (normalVBuf) glFuncs.glDeleteBuffers(1, &normalVBuf);
-  }
+      if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
+      if (normalVBuf) glFuncs.glDeleteBuffers(1, &normalVBuf);
+    }
+  } catch (...) {}
 }
 
 

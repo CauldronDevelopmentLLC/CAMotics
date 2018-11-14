@@ -84,7 +84,9 @@ TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
 
 TriangleSurface::~TriangleSurface() {
 #ifdef CAMOTICS_GUI
-  if (vbufs[0]) getGLFuncs().glDeleteBuffers(2, vbufs);
+  try {
+    if (vbufs[0]) getGLFuncs().glDeleteBuffers(2, vbufs);
+  } catch (...) {}
 #endif
 }
 

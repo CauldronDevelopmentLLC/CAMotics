@@ -67,7 +67,7 @@ ToolPathView::~ToolPathView() {
 
     if (colorVBuf) glFuncs.glDeleteBuffers(1, &colorVBuf);
     if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
-  } CATCH_ERROR;
+  } catch (...) {}
 }
 
 
