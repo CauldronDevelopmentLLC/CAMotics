@@ -393,7 +393,11 @@ void ControllerImpl::arc(int vars, bool clockwise) {
     Vector2D E =
       Vector2D(start.y() - finish.y(), finish.x() - start.x());
     double d = (finish - start).length() / 2;
-    double l = sqrt(radius * radius - d * d);
+    double l = radius * radius - d * d;
+
+    // Handle possible floating point error
+    if (fabs(l) < 1e-9) l = 0;
+    else l = sqrt(l);
 
     if (!clockwise) l = -l;
     if (0 < radius) l = -l;
@@ -439,6 +443,11 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
   if ((VT_P & vars) && 1 < getVar('P'))
     angle = angle + M_PI * 2 * (getVar('P') - 1) * (angle < 0 ? -1 : 1);
+
+  LOG_DEBUG(4, "Arc angle=" << angle << " startAngle=" << startAngle
+            << " finishAngle=" << finishAngle << " start=" << start
+            << " finish=" << finish << " center=" << center
+            << " radius=" << radius);
 
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
