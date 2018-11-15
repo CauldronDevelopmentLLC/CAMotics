@@ -289,12 +289,12 @@ void LinePlanner::move(const Axes &target, bool rapid) {
 
   // Handle rapid auto off
   if (rapid && !rapidAutoOff && config.rapidAutoOff) {
-    if (speed) pushSetCommand("speed", 0);
+    if (speed && !isnan(speed)) pushSetCommand("speed", 0);
     rapidAutoOff = true;
   }
 
   if (!rapid && rapidAutoOff) {
-    if (speed) pushSetCommand("speed", speed);
+    if (speed && !isnan(speed)) pushSetCommand("speed", speed);
     rapidAutoOff = false;
   }
 
