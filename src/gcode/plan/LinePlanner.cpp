@@ -116,18 +116,16 @@ void LinePlanner::stop() {
 
 
 bool LinePlanner::restart(uint64_t id, const Axes &position) {
-  // Find replan command in output
-  while (true) {
-    if (out.empty() || id < out.front()->getID())
-      THROWS("Planner ID " << id << " not found");
+  // Release commands up to this ID
+  setActive(id);
 
-    if (out.front()->getID() == id) break;
-
-    delete out.pop_front(); // Release any moves before the restart
-  }
-
-  // Reload previously output moves
+  // Reload any previously output moves
   while (!out.empty()) cmds.push_front(out.pop_back());
+
+  // Make sure we are now at the requested restart command
+  if (out.empty() || id != out.front()->getID())
+    THROWS("Planner ID " << id << " not found.  Next ID is "
+           << (out.empty() ? -1 : out.front()->getID()));
 
   // Reset last exit velocity
   lastExitVel = 0;
@@ -135,7 +133,7 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
   // Handle restart after seek
   PlannerCommand *cmd = cmds.front();
   if (cmd->isSeeking()) {
-    // Skip reset of current move
+    // Skip rest of current move
     cmd = cmd->next;
     delete cmds.pop_front();
     // Replan next move, if one has already been planned.  Its start position
@@ -151,6 +149,7 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
   // Check if the restart was at the end of the command
   if (!cmd->getLength()) delete cmds.pop_front();
 
+  // Replan
   for (cmd = cmds.front(); cmd->next; cmd = cmd->next)
     plan(cmd);
 

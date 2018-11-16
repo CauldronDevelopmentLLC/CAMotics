@@ -395,9 +395,8 @@ void ControllerImpl::arc(int vars, bool clockwise) {
     double d = (finish - start).length() / 2;
     double l = radius * radius - d * d;
 
-    // Handle possible floating point error
-    if (fabs(l) < 1e-9) l = 0;
-    else l = sqrt(l);
+    // Handle possible small negative caused by rounding errors
+    l = l < 0 ? 0 : sqrt(l);
 
     if (!clockwise) l = -l;
     if (0 < radius) l = -l;

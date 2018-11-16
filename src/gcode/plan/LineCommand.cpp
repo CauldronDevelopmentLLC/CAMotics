@@ -102,6 +102,18 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
 
 void LineCommand::restart(const Axes &position, const PlannerConfig &config) {
   restarted = true;
+
+  // Drop speeds that have been passed and adjust offsets of remaining speeds
+  double newLength = (target - position).length();
+  std::vector<Speed> newSpeeds;
+
+  for (unsigned i = 0; i < speeds.size(); i++)
+    if (newLength <= speeds[i].offset)
+      newSpeeds.push_back(Speed(speeds[i].offset - newLength, speeds[i].speed));
+
+  speeds = newSpeeds;
+
+  // Recompute limits
   start = position;
   computeLimits(config);
 }
