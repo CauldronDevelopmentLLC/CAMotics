@@ -116,16 +116,17 @@ void LinePlanner::stop() {
 
 
 bool LinePlanner::restart(uint64_t id, const Axes &position) {
-  // Release commands up to this ID
+  // Release commands before this ID
   setActive(id);
 
-  // Reload any previously output moves
+  // Reload previously output moves
   while (!out.empty()) cmds.push_front(out.pop_back());
 
   // Make sure we are now at the requested restart command
-  if (out.empty() || id != out.front()->getID())
-    THROWS("Planner ID " << id << " not found.  Next ID is "
-           << (out.empty() ? -1 : out.front()->getID()));
+  if (cmds.empty() || id != cmds.front()->getID())
+    THROWS("Planner ID " << id << " not found.  "
+           << (cmds.empty() ? String("Queue empty.") :
+               SSTR("Next ID is " << cmds.front()->getID())));
 
   // Reset last exit velocity
   lastExitVel = 0;
@@ -150,7 +151,7 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
   if (!cmd->getLength()) delete cmds.pop_front();
 
   // Replan
-  for (cmd = cmds.front(); cmd->next; cmd = cmd->next)
+  for (cmd = cmds.front(); cmd; cmd = cmd->next)
     plan(cmd);
 
   return true;
