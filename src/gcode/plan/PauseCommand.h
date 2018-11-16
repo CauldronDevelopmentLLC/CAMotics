@@ -31,10 +31,12 @@ namespace GCode {
 
   public:
     PauseCommand(uint64_t id, pause_t type) :
-      PlannerCommand(id), type(type) {setEntryVelocity(0);}
+      PlannerCommand(id), type(type) {}
 
     // From PlannerCommand
     const char *getType() const {return "pause";}
+    double getEntryVelocity() const {return 0;}
+    double getExitVelocity() const {return 0;}
     void insert(cb::JSON::Sink &sink) const;
   };
 }

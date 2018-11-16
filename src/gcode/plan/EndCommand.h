@@ -28,10 +28,12 @@
 namespace GCode {
   class EndCommand : public PlannerCommand {
   public:
-    EndCommand(uint64_t id) : PlannerCommand(id) {setEntryVelocity(0);}
+    EndCommand(uint64_t id) : PlannerCommand(id) {}
 
     // From PlannerCommand
     const char *getType() const {return "end";}
+    double getEntryVelocity() const {return 0;}
+    double getExitVelocity() const {return 0;}
     void insert(cb::JSON::Sink &sink) const {}
   };
 }
