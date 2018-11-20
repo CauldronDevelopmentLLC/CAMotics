@@ -53,8 +53,8 @@ void Planner::setPosition(const Axes &position) {
   for (unsigned axis = 0; axis < Axes::getSize(); axis++)
     if (!isnan(position[axis])) p[axis] = position[axis];
 
-  //setAbsolutePosition(position, METRIC);
   pipeline.setPosition(p);
+  setAbsolutePosition(p, METRIC);
 }
 
 
@@ -63,6 +63,7 @@ void Planner::setConfig(const PlannerConfig &config) {
   unitAdapter.setTargetUnits(config.outputUnits);
   linearizer.setMaxArcError(config.maxArcError);
   planner.setConfig(config);
+  setPosition(config.position);
 }
 
 
