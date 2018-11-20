@@ -22,9 +22,11 @@
 
 #include "PortType.h"
 
+#include <gcode/VarTypes.h>
+
 
 namespace GCode {
-  class MachineEnum : public PortType::Enum {
+  class MachineEnum : public PortType::Enum, public VarTypesEnumerationBase {
   public:
     typedef enum {
       DIR_OFF,
@@ -93,5 +95,37 @@ namespace GCode {
 
 
     typedef PortType::enum_t port_t;
+
+    static inline VarTypes::enum_t getVarType(char letter) {
+      switch (letter) {
+      case 'A': return VT_A;
+      case 'B': return VT_B;
+      case 'C': return VT_C;
+      case 'D': return VT_D;
+      case 'E': return VT_E;
+      case 'F': return VT_F;
+        // G
+      case 'H': return VT_H;
+      case 'I': return VT_I;
+      case 'J': return VT_J;
+      case 'K': return VT_K;
+      case 'L': return VT_L;
+        // M
+        // N
+        // O
+      case 'P': return VT_P;
+      case 'Q': return VT_Q;
+      case 'R': return VT_R;
+      case 'S': return VT_S;
+      case 'T': return VT_T;
+      case 'U': return VT_U;
+      case 'V': return VT_V;
+      case 'W': return VT_W;
+      case 'X': return VT_X;
+      case 'Y': return VT_Y;
+      case 'Z': return VT_Z;
+      default: THROWS("Invalid variable name " << letter);
+      }
+    }
   };
 }

@@ -105,8 +105,8 @@ void MachineMatrix::setPosition(const Axes &position) {
 }
 
 
-void MachineMatrix::move(const Axes &axes, bool rapid) {
-  MachineAdapter::move(transform(axes), rapid);
+void MachineMatrix::move(const Axes &position, int axes, bool rapid) {
+  MachineAdapter::move(transform(position), axes, rapid);
 }
 
 

@@ -26,6 +26,7 @@
 #include <camotics/Task.h>
 #include <gcode/ToolTable.h>
 #include <gcode/ToolPath.h>
+#include <gcode/VarTypes.h>
 
 #include <cbang/SmartPointer.h>
 
@@ -33,7 +34,7 @@
 namespace CAMotics {
   class AnnealState;
 
-  class Opt : public Task {
+  class Opt : public Task, public GCode::VarTypesEnumerationBase {
     unsigned cutCount;
 
     typedef std::vector<Path> paths_t;

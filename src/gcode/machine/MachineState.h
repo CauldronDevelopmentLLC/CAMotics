@@ -82,10 +82,11 @@ namespace GCode {
 
     Axes getPosition() const {return position;}
     cb::Vector3D getPosition(axes_t axes) const;
-    void setPosition(const Axes &position) {this->position = position;}
+    void setPosition(const Axes &position);
 
     void dwell(double seconds) {}
-    void move(const Axes &axes, bool rapid) {position = axes;}
+    void move(const Axes &position, int axes, bool rapid)
+    {setPosition(position);}
     void arc(const cb::Vector3D &offset, double angle, plane_t plane) {}
 
     const cb::Matrix4x4D &getMatrix(axes_t matrix) const;

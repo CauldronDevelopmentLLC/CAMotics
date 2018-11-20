@@ -37,8 +37,8 @@ void MoveSink::seek(port_t port, bool active, bool error) {
 }
 
 
-void MoveSink::move(const Axes &axes, bool rapid) {
-  if (getPosition() != axes) {
+void MoveSink::move(const Axes &position, int axes, bool rapid) {
+  if (getPosition() != position) {
     MoveType type = rapid ? Move::MOVE_RAPID :
       (probePending ? Move::MOVE_PROBE : Move::MOVE_CUTTING);
 
@@ -47,7 +47,7 @@ void MoveSink::move(const Axes &axes, bool rapid) {
       set(TOOL_NUMBER, 1, NO_UNITS);
     }
 
-    Move move(type, getPosition(), axes, time, get(TOOL_NUMBER, NO_UNITS),
+    Move move(type, getPosition(), position, time, get(TOOL_NUMBER, NO_UNITS),
               getFeed(), getSpeed(), getLocation().getStart().getLine());
 
     time += move.getTime();
@@ -57,7 +57,7 @@ void MoveSink::move(const Axes &axes, bool rapid) {
     probePending = false;
   }
 
-  MachineAdapter::move(axes, rapid);
+  MachineAdapter::move(position, axes, rapid);
 }
 
 

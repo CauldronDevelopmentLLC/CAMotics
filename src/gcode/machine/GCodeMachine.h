@@ -33,6 +33,7 @@ namespace GCode {
     Units units;
     int oldTool;
     cb::FileLocation location;
+    std::set<char> axisFirstMove;
 
   public:
     GCodeMachine(const cb::SmartPointer<std::ostream> &stream, Units units) :
@@ -55,7 +56,7 @@ namespace GCode {
     void output(port_t port, double value);
 
     void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
+    void move(const Axes &position, int axes, bool rapid);
     void pause(pause_t pause);
 
     void comment(const std::string &s) const;

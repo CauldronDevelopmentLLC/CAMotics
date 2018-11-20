@@ -160,14 +160,14 @@ namespace GCode {
     /***
      * Program a linear move.
      *
-     * Move to the position indicated by @param axes at the current feed rate if
-     * @param rapid is false, otherwise move at maximum speed.
+     * Move to the position indicated by @param position at the current feed
+     * rate if @param rapid is false, otherwise move at maximum speed.
      * This function may queue the operation and return immediately.
      *
      * @throw cb::Exception if there are any pending errors, the feed rate is
      * zero or the move would go beyond the limits of the machine.
      */
-    virtual void move(const Axes &axes, bool rapid = false) = 0;
+    virtual void move(const Axes &position, int axes, bool rapid) = 0;
 
     /***
      * Program a helical move.

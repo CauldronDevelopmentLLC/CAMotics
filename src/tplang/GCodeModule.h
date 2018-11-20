@@ -61,7 +61,7 @@ namespace tplang {
     void workpieceCB(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
-    void parseAxes(const cb::js::Value &args, GCode::Axes &axes,
-                   bool incremental = false);
+    int parseAxes(const cb::js::Value &args, GCode::Axes &position,
+                  bool incremental = false);
   };
 }

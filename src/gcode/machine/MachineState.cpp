@@ -90,6 +90,12 @@ Vector3D MachineState::getPosition(axes_t axes) const {
 }
 
 
+void MachineState::setPosition(const Axes &position) {
+  for (unsigned axis = 0; axis < Axes::getSize(); axis++)
+    if (!isnan(position[axis])) this->position[axis] = position[axis];
+}
+
+
 const Matrix4x4D &MachineState::getMatrix(axes_t matrix) const {
   if (AXES_COUNT <= matrix) THROWS("Invalid matrix " << matrix);
   return matrices[matrix];

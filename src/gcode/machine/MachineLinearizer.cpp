@@ -34,16 +34,19 @@ void MachineLinearizer::arc(const Vector3D &offset, double angle,
   default: THROWS("Invalid plane: " << plane);
   }
 
-  unsigned char axes[3];
+  unsigned axisIndex[3];
   for (unsigned i = 0; i < 3; i++)
-    axes[i] = Axes::toIndex(axesNames[i]);
+    axisIndex[i] = Axes::toIndex(axesNames[i]);
+
+  int axes = getVarType(axesNames[0]) | getVarType(axesNames[1]);
+  if (offset.z()) axes |= getVarType(axesNames[2]);
 
   Axes current = getPosition();
 
   // Initial point
-  double x = current[axes[0]];
-  double y = current[axes[1]];
-  double z = current[axes[2]];
+  double x = current[axisIndex[0]];
+  double y = current[axisIndex[1]];
+  double z = current[axisIndex[2]];
 
   // Center
   Vector2D center(x + offset.x(), y + offset.y());
@@ -68,7 +71,7 @@ void MachineLinearizer::arc(const Vector3D &offset, double angle,
   double deltaAngle = -angle / segments;
   double zDelta = offset.z() / segments;
 
-  // TODO The estimated arc should straddle the actual arc.  This one
+  // TODO The estimated arc should straddle the actual arc.
 
   // Create segments
   for (unsigned i = 0; i < segments; i++) {
@@ -79,9 +82,9 @@ void MachineLinearizer::arc(const Vector3D &offset, double angle,
     z += zDelta;
 
     // Move
-    current[axes[0]] = x;
-    current[axes[1]] = y;
-    current[axes[2]] = z;
-    move(current, false);
+    current[axisIndex[0]] = x;
+    current[axisIndex[1]] = y;
+    current[axisIndex[2]] = z;
+    move(current, axes, false);
   }
 }

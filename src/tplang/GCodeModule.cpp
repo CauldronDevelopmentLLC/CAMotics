@@ -140,16 +140,16 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
 
 
 void GCodeModule::rapidCB(const js::Value &args, js::Sink &sink) {
-  Axes axes = ctx.machine.getPosition();
-  parseAxes(args, axes, args.getBoolean("incremental"));
-  ctx.machine.move(axes, true);
+  Axes position = ctx.machine.getPosition();
+  int axes = parseAxes(args, position, args.getBoolean("incremental"));
+  ctx.machine.move(position, axes, true);
 }
 
 
 void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
-  Axes axes = ctx.machine.getPosition();
-  parseAxes(args, axes, args.getBoolean("incremental"));
-  ctx.machine.move(axes);
+  Axes position = ctx.machine.getPosition();
+  int axes = parseAxes(args, position, args.getBoolean("incremental"));
+  ctx.machine.move(position, axes, false);
 }
 
 
@@ -169,9 +169,9 @@ void GCodeModule::probeCB(const js::Value &args, js::Sink &sink) {
   ctx.machine.seek((MachineEnum::port_t)args.getInteger("port"),
                    args.getBoolean("active"), args.getBoolean("error"));
 
-  Axes axes = ctx.machine.getPosition();
-  parseAxes(args, axes);
-  ctx.machine.move(axes);
+  Axes position = ctx.machine.getPosition();
+  int axes = parseAxes(args, position);
+  ctx.machine.move(position, axes, false);
 }
 
 
@@ -349,15 +349,21 @@ void GCodeModule::workpieceCB(const js::Value &args, js::Sink &sink) {
 }
 
 
-void GCodeModule::parseAxes(const js::Value &args, Axes &axes,
-                            bool incremental) {
-  for (const char *axis = "xyzabcuvw"; *axis; axis++) {
-    string name = string(1, *axis);
+int GCodeModule::parseAxes(const js::Value &args, Axes &position,
+                           bool incremental) {
+  int axes = 0;
+
+  for (const char *axis = Axes::AXES; *axis; axis++) {
+    string name = string(1, tolower(*axis));
     if (!args.has(name)) continue;
 
-    double value = args.getNumber(name) + (incremental ? axes.get(*axis) : 0);
+    double value =
+      args.getNumber(name) + (incremental ? position.get(*axis) : 0);
     if (!Math::isfinite(value)) THROWS(*axis << " position is invalid");
 
-    axes.set(*axis, value);
+    position.set(*axis, value);
+    axes |= getVarType(*axis);
   }
+
+  return axes;
 }

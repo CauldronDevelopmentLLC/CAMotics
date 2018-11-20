@@ -69,8 +69,8 @@ void MachineUnitAdapter::setPosition(const Axes &position) {
 }
 
 
-void MachineUnitAdapter::move(const Axes &axes, bool rapid) {
-  MachineAdapter::move(axes * mmInchOut(), rapid);
+void MachineUnitAdapter::move(const Axes &position, int axes, bool rapid) {
+  MachineAdapter::move(position * mmInchOut(), axes, rapid);
 }
 
 

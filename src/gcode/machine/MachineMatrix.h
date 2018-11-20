@@ -49,7 +49,7 @@ namespace GCode {
     Axes getPosition() const;
     cb::Vector3D getPosition(axes_t axes) const;
     void setPosition(const Axes &position);
-    void move(const Axes &axes, bool rapid);
+    void move(const Axes &position, int axes, bool rapid);
     void arc(const cb::Vector3D &offset, double angle, plane_t plane);
 
     void setMatrix(const cb::Matrix4x4D &m, axes_t matrix);

@@ -94,39 +94,6 @@ string ControllerImpl::getVarGroupStr(const char *group) const {
 }
 
 
-VarTypes::enum_t ControllerImpl::getVarType(char letter) {
-  switch (letter) {
-  case 'A': return VT_A;
-  case 'B': return VT_B;
-  case 'C': return VT_C;
-  case 'D': return VT_D;
-  case 'E': return VT_E;
-  case 'F': return VT_F;
-    // G
-  case 'H': return VT_H;
-  case 'I': return VT_I;
-  case 'J': return VT_J;
-  case 'K': return VT_K;
-  case 'L': return VT_L;
-    // M
-    // N
-    // O
-  case 'P': return VT_P;
-  case 'Q': return VT_Q;
-  case 'R': return VT_R;
-  case 'S': return VT_S;
-  case 'T': return VT_T;
-  case 'U': return VT_U;
-  case 'V': return VT_V;
-  case 'W': return VT_W;
-  case 'X': return VT_X;
-  case 'Y': return VT_Y;
-  case 'Z': return VT_Z;
-  default: THROWS("Invalid variable name " << letter);
-  }
-}
-
-
 Units ControllerImpl::getUnits() const {return machine.getUnits();}
 
 
@@ -319,7 +286,8 @@ void ControllerImpl::setAbsolutePosition(const Axes &axes, Units units) {
   LOG_INFO(5, "Controller: Set absolute position to " << axes << units);
 
   for (const char *var = Axes::AXES; *var; var++)
-    setAxisAbsolutePosition(*var, axes.get(*var), units);
+    if (!isnan(axes.get(*var)))
+      setAxisAbsolutePosition(*var, axes.get(*var), units);
 }
 
 
@@ -343,21 +311,21 @@ Axes ControllerImpl::getNextAbsolutePosition(int vars, bool incremental) const {
 }
 
 
-void ControllerImpl::doMove(const Axes &pos, bool rapid) {
-  machine.move(pos, rapid);
+void ControllerImpl::move(const Axes &pos, int axes, bool rapid) {
+  machine.move(pos, axes, rapid);
   setAbsolutePosition(pos, getUnits());
 }
 
 
-void ControllerImpl::makeMove(int vars, bool rapid, bool incremental) {
-  doMove(getNextAbsolutePosition(vars, incremental), rapid);
+void ControllerImpl::makeMove(int axes, bool rapid, bool incremental) {
+  move(getNextAbsolutePosition(axes, incremental), axes, rapid);
 }
 
 
 void ControllerImpl::moveAxis(char axis, double value, bool rapid) {
   Axes pos = getAbsolutePosition();
   pos.set(axis, value);
-  doMove(pos, rapid);
+  move(pos, getVarType(axis), rapid);
 }
 
 
@@ -369,10 +337,10 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   if (state.plane == XZ) clockwise = !clockwise;
 
   // Compute start and end points
-  Axes current = getAbsolutePosition();
-  Axes target = getNextAbsolutePosition(vars, state.incrementalDistanceMode);
-  Vector2D start = Vector2D(current.get(axes[0]), current.get(axes[1]));
-  Vector2D finish = Vector2D(target.get(axes[0]), target.get(axes[1]));
+  Axes current(getAbsolutePosition());
+  Axes target(getNextAbsolutePosition(vars, state.incrementalDistanceMode));
+  Vector2D start(current.get(axes[0]), current.get(axes[1]));
+  Vector2D finish(target.get(axes[0]), target.get(axes[1]));
   Vector2D center;
   double radius;
 
@@ -384,14 +352,13 @@ void ControllerImpl::arc(int vars, bool clockwise) {
     if (fabs(radius) < a - 0.00001) {
       LOG_WARNING("Impossible radius format arc, replacing with line segment, "
                   "radius=" << fabs(radius) << " distance/2=" << a);
-      doMove(target, false);
+      move(target, vars, false);
       return;
     }
 
     // Compute arc center
-    Vector2D m = (start + finish) / 2;
-    Vector2D E =
-      Vector2D(start.y() - finish.y(), finish.x() - start.x());
+    Vector2D m((start + finish) / 2);
+    Vector2D E(start.y() - finish.y(), finish.x() - start.x());
     double d = (finish - start).length() / 2;
     double l = radius * radius - d * d;
 
@@ -450,9 +417,9 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
-  Vector2D offset = center - start;
+  Vector2D offset(center - start);
   machine.arc(Vector3D(offset.x(), offset.y(), deltaZ), -angle, state.plane);
-  doMove(target, false);
+  move(target, vars, false);
 
   LOG_INFO(3, "Controller: Arc");
 }
@@ -991,11 +958,11 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 210: setUnits(Units::METRIC);   break;
 
     case 280: case 300:
-      if (vars & VT_AXIS) makeMove(vars, true, true);
+      if (vars & VT_AXIS) makeMove(vars, true, state.incrementalDistanceMode);
       else vars = VT_AXIS; // All axes
 
       loadPredefined(code.number == 280, vars);
-      makeMove(0, true, false);
+      move(getAbsolutePosition(), vars, true);
       break;
 
     case 281: storePredefined(true);  break;

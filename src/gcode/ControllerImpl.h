@@ -21,7 +21,6 @@
 #pragma once
 
 #include "Controller.h"
-#include "VarTypes.h"
 #include "ModalGroup.h"
 #include "ToolTable.h"
 
@@ -30,8 +29,7 @@
 
 namespace GCode {
   class ControllerImpl :
-    public Controller, public VarTypesEnumerationBase,
-    public ModalGroupEnumerationBase, public MachineEnum,
+    public Controller, public ModalGroupEnumerationBase, public MachineEnum,
     public UnitsEnumerationBase {
 
     MachineUnitAdapter machine;
@@ -98,7 +96,6 @@ namespace GCode {
     // Vars
     double getVar(char c) const;
     std::string getVarGroupStr(const char *group) const;
-    static VarTypes::enum_t getVarType(char letter);
 
     // Units
     Units getUnits() const;
@@ -138,8 +135,8 @@ namespace GCode {
     Axes getNextAbsolutePosition(int vars, bool incremental) const;
 
     // Move
-    void doMove(const Axes &pos, bool rapid);
-    void makeMove(int vars, bool rapid, bool incremental);
+    void move(const Axes &pos, int axes, bool rapid);
+    void makeMove(int axes, bool rapid, bool incremental);
     void moveAxis(char axis, double value, bool rapid);
     void arc(int vars, bool clockwise);
     void straightProbe(int vars, bool towardWorkpiece, bool signalError);

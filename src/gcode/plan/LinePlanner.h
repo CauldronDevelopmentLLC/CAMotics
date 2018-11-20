@@ -72,7 +72,7 @@ namespace GCode {
     void seek(port_t port, bool active, bool error);
     void output(port_t port, double value);
     void dwell(double seconds);
-    void move(const Axes &axes, bool rapid);
+    void move(const Axes &position, int axes, bool rapid);
     //void arc(const Axes &offset, double angle, plane_t plane);
     void pause(pause_t type);
     void set(const std::string &name, double value, Units units);

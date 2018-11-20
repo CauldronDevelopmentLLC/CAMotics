@@ -199,30 +199,35 @@ bool is_near(double x, double y) {
 }
 
 
-void GCodeMachine::move(const Axes &axes, bool rapid) {
+void GCodeMachine::move(const Axes &nextPosition, int axes, bool rapid) {
   bool first = true;
   bool imperial = units == Units::IMPERIAL;
-  Axes position = getPosition();
+  Axes lastPosition = getPosition();
 
-  for (const char *axis = Axes::AXES; *axis; axis++)
-    if (!is_near(position.get(*axis), axes.get(*axis))) {
-      string last = dtos(position.get(*axis), imperial).toString();
-      string value = dtos(axes.get(*axis), imperial).toString();
+  for (const char *axis = Axes::AXES; *axis; axis++) {
+    if (!(getVarType(*axis) & axes)) continue;
 
-      if (last == value) continue;
+    bool axisFirst = !axisFirstMove.count(*axis);
+    if (axisFirst) axisFirstMove.insert(*axis);
 
-      if (first) {
-        beginLine();
-        *stream << 'G' << (rapid ? '0' : '1');
-        first = false;
-      }
+    string last = dtos(lastPosition.get(*axis), imperial).toString();
+    string next = dtos(nextPosition.get(*axis), imperial).toString();
 
-      *stream << ' ' << *axis << value;
+    // Always output axis the first time
+    if (!axisFirst && last == next) continue;
+
+    if (first) {
+      beginLine();
+      *stream << (rapid ? "G0" : "G1");
+      first = false;
     }
+
+    *stream << ' ' << *axis << next;
+  }
 
   if (!first) {
     *stream << '\n';
-    MachineAdapter::move(axes, rapid);
+    MachineAdapter::move(nextPosition, axes, rapid);
   }
 }
 
