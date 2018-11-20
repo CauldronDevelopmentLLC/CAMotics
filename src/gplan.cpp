@@ -9,6 +9,8 @@
 #include <boost/iostreams/categories.hpp>
 #include <boost/iostreams/stream.hpp>
 
+#include <limits>
+
 
 #define CATCH_PYTHON                                            \
   catch (const cb::Exception &e) {                              \
@@ -431,7 +433,7 @@ static PyObject *_set_position(PyPlanner *self, PyObject *args) {
 
     if (!PyArg_ParseTuple(args, "O", &_position)) return 0;
 
-    GCode::Axes position = self->planner->getPosition();
+    GCode::Axes position(std::numeric_limits<double>::quiet_NaN());
     position.read(*pyToJSON(_position));
 
     self->planner->setPosition(position);

@@ -61,7 +61,6 @@ namespace GCode {
   public:
     Planner();
 
-    Axes getPosition() const;
     void setPosition(const Axes &position);
 
     void setConfig(const PlannerConfig &config);

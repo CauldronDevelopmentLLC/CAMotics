@@ -47,12 +47,14 @@ Planner::Planner() : ControllerImpl(pipeline), started(false) {
 }
 
 
-Axes Planner::getPosition() const {return getAbsolutePosition();}
-
-
 void Planner::setPosition(const Axes &position) {
-  setAbsolutePosition(position, METRIC);
-  pipeline.setPosition(position);
+  Axes p = pipeline.getPosition();
+
+  for (unsigned axis = 0; axis < Axes::getSize(); axis++)
+    if (!isnan(position[axis])) p[axis] = position[axis];
+
+  //setAbsolutePosition(position, METRIC);
+  pipeline.setPosition(p);
 }
 
 
