@@ -129,11 +129,11 @@ const char *ToolPathView::getDirection() const {
 
 Color ToolPathView::getColor(GCode::MoveType type, double intensity) {
   switch (type) {
-  case GCode::MoveType::MOVE_RAPID:   return Color::RED;
+  case GCode::MoveType::MOVE_RAPID: return Color::RED;
   case GCode::MoveType::MOVE_CUTTING:
     return Color(0, intensity, 0.5 * (1 - intensity));
-  case GCode::MoveType::MOVE_PROBE:   return Color::BLUE;
-  case GCode::MoveType::MOVE_DRILL:   return Color::YELLOW;
+  case GCode::MoveType::MOVE_PROBE: return Color::BLUE;
+  case GCode::MoveType::MOVE_DRILL: return Color::YELLOW;
   }
   THROWS("Invalid move type " << type);
 }

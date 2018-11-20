@@ -55,16 +55,3 @@ Vector3D Move::getPtAtTime(double time) const {
   double delta = time - getStartTime();
   return getStartPt() + (getEndPt() - getStartPt()) * delta / getTime();
 }
-
-
-void Move::print(ostream &stream) const {
-  stream
-    << "type:" << type << ' '
-    << "x:" << end.getX() << ' '
-    << "y:" << end.getY() << ' '
-    << "z:" << end.getZ() << ' '
-    << "tool:" << tool << ' '
-    << "feed:" << feed << ' '
-    << "speed:" << speed << ' '
-    << "line:" << line;
-}

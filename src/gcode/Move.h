@@ -32,7 +32,7 @@
 
 
 namespace GCode {
-  class Move : public cb::Segment3D, public MoveType {
+  class Move : protected cb::Segment3D, public MoveType {
   protected:
     MoveType type;
     Axes start;
@@ -70,13 +70,7 @@ namespace GCode {
 
     cb::Vector3D getPtAtTime(double time) const;
 
-    void print(std::ostream &stream) const;
+    using cb::Segment3D::reverse;
+    using cb::Segment3D::distance;
   };
-
-
-  static inline
-  std::ostream &operator<<(std::ostream &stream, const Move &m) {
-    m.print(stream);
-    return stream;
-  }
 }
