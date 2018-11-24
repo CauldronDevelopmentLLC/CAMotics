@@ -74,6 +74,7 @@ void GCodeMachine::beginLine() {
 
 
 void GCodeMachine::start() {
+  axisFirstMove = 0;
   *stream << (units == Units::METRIC ? "G21" : "G20") << "\n";
   // TODO set other GCode state
 }
@@ -205,10 +206,11 @@ void GCodeMachine::move(const Axes &nextPosition, int axes, bool rapid) {
   Axes lastPosition = getPosition();
 
   for (const char *axis = Axes::AXES; *axis; axis++) {
-    if (!(getVarType(*axis) & axes)) continue;
+    int axisVT = getVarType(*axis);
+    if (!(axisVT & axes)) continue;
 
-    bool axisFirst = !axisFirstMove.count(*axis);
-    if (axisFirst) axisFirstMove.insert(*axis);
+    bool axisFirst = !(axisFirstMove & axisVT);
+    axisFirstMove |= axisVT;
 
     string last = dtos(lastPosition.get(*axis), imperial).toString();
     string next = dtos(nextPosition.get(*axis), imperial).toString();
