@@ -53,6 +53,7 @@ namespace GCode {
   public:
     LinePlanner();
 
+    void reset();
     void setConfig(const PlannerConfig &config);
     void checkSoftLimits(const Axes &p);
     bool isDone() const;

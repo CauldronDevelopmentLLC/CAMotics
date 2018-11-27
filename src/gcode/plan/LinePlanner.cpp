@@ -51,9 +51,17 @@ namespace {
 }
 
 
-LinePlanner::LinePlanner() :
-  lastExitVel(0), seeking(false), firstMove(true), nextID(1), line(-1),
-  speed(numeric_limits<double>::quiet_NaN()), rapidAutoOff(false) {}
+LinePlanner::LinePlanner() : nextID(1) {reset();}
+
+
+void LinePlanner::reset() {
+  lastExitVel = 0;
+  seeking = false;
+  firstMove = true;
+  line = -1;
+  speed = numeric_limits<double>::quiet_NaN();
+  rapidAutoOff = false;
+}
 
 
 void LinePlanner::setConfig(const PlannerConfig &config) {
@@ -106,10 +114,8 @@ void LinePlanner::setActive(uint64_t id) {
 
 
 void LinePlanner::stop() {
-  lastExitVel = 0;
-  seeking = false;
+  reset();
   nextID = 1;
-  line = -1;
   cmds.clear();
   out.clear();
 }
@@ -159,12 +165,7 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 
 
 void LinePlanner::start() {
-  lastExitVel = 0;
-  seeking = false;
-  firstMove = true;
-  rapidAutoOff = false;
-  speed = numeric_limits<double>::quiet_NaN();
-
+  reset();
   MachineState::start();
 }
 
