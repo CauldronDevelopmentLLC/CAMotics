@@ -245,6 +245,18 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   if (getFeedMode() != UNITS_PER_MINUTE)
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
+  // Handle rapid auto off
+  if (rapid && !rapidAutoOff && config.rapidAutoOff) {
+    if (speed) pushSetCommand("speed", 0);
+    rapidAutoOff = true;
+  }
+
+  if (!rapid && rapidAutoOff) {
+    if (speed && !isnan(speed)) pushSetCommand("speed", speed);
+    rapidAutoOff = false;
+  }
+
+  // Create line command
   LineCommand *lc = new LineCommand(nextID++, start, target, feed, rapid,
                                     seeking, firstMove, config);
 
@@ -288,17 +300,6 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
 
       break;
     }
-  }
-
-  // Handle rapid auto off
-  if (rapid && !rapidAutoOff && config.rapidAutoOff) {
-    if (speed) pushSetCommand("speed", 0);
-    rapidAutoOff = true;
-  }
-
-  if (!rapid && rapidAutoOff) {
-    if (speed && !isnan(speed)) pushSetCommand("speed", speed);
-    rapidAutoOff = false;
   }
 
   // Add move
