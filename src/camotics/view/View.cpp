@@ -62,6 +62,7 @@ void View::decSpeed() {
 
 void View::setToolPath(const SmartPointer<GCode::ToolPath> &toolPath) {
   path->setPath(toolPath, flags & PATH_VBOS_FLAG);
+  path->update(isFlagSet(View::PATH_INTENSITY_FLAG));
 }
 
 
