@@ -158,7 +158,7 @@ void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
 
   Vector3D
     offset(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
-  double angle = args.getNumber("angle");
+  double angle = args.has("angle") ? args.getNumber("angle") : (M_PI * 2);
   plane_t plane = args.has("plane") ? (plane_t)args.getInteger("plane") : XY;
 
   ctx.machine.arc(offset, angle, plane);
