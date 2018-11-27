@@ -160,8 +160,11 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 
 void LinePlanner::start() {
   lastExitVel = 0;
+  seeking = false;
   firstMove = true;
+  rapidAutoOff = false;
   speed = numeric_limits<double>::quiet_NaN();
+
   MachineState::start();
 }
 
@@ -258,11 +261,11 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   // Try to merge move with previous one
   if (!cmds.empty()) {
     int setCmdCount = 0;
-    double speed = numeric_limits<double>::quiet_NaN();
+    double lastSpeed = numeric_limits<double>::quiet_NaN();
 
     for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
       LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
-      if (prev && prev->merge(*lc, config, speed)) {
+      if (prev && prev->merge(*lc, config, lastSpeed)) {
         delete lc;
         for (int i = 0; i < setCmdCount; i++) delete cmds.pop_back();
         plan(prev);
@@ -279,7 +282,7 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
       if (name == "line") continue;
       if (name == "speed") {
         if (!rapid || !config.rapidAutoOff)
-          speed = sc->getValue().getNumber();
+          lastSpeed = sc->getValue().getNumber();
         continue;
       }
 
