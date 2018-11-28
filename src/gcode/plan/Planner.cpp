@@ -79,7 +79,6 @@ bool Planner::hasMore() {
     }
 
     if (planner.hasMove()) return true;
-
     if (ControllerImpl::isSynchronizing() || runners.empty()) return false;
 
     Runner &runner = *runners.front();
@@ -101,8 +100,7 @@ void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
 void Planner::stop() {
-  if (ControllerImpl::isSynchronizing())
-    ControllerImpl::synchronize(0); // 0 indicates probe was unsuccessful
+  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(0);
   planner.stop();
   runners.clear();
 }
@@ -110,6 +108,7 @@ void Planner::stop() {
 
 void Planner::restart(uint64_t id, const Axes &position) {
   if (!planner.restart(id, position)) setPosition(position);
+  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(1);
 }
 
 

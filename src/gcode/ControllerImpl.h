@@ -46,6 +46,7 @@ namespace GCode {
       SYNC_SEEK,
       SYNC_PROBE,
       SYNC_INPUT,
+      SYNC_PAUSE,
     } synchronize_state_t;
 
     synchronize_state_t syncState;
@@ -143,8 +144,9 @@ namespace GCode {
     void seek(int vars, bool active, bool error);
     void drill(int vars, bool dwell, bool feedOut, bool spindleStop);
 
-    // Dwell
+    // Dwell & Pause
     void dwell(double seconds);
+    void pause(pause_t type);
 
     // Tool
     Tool &getTool(unsigned tool) {return tools.get(tool);}

@@ -523,6 +523,12 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
 void ControllerImpl::dwell(double seconds) {machine.dwell(seconds);}
 
 
+void ControllerImpl::pause(pause_t type) {
+  syncState = SYNC_PAUSE;
+  machine.pause(type);
+}
+
+
 void ControllerImpl::setTools(int vars, bool relative) {
   Tool &tool = getTool(getVar('P'));
 
@@ -860,6 +866,7 @@ void ControllerImpl::synchronize(double result) {
     break;
 
   case SYNC_INPUT: set(USER_INPUT, result, NO_UNITS); break;
+  case SYNC_PAUSE: break;
   }
 
   syncState = SYNC_NONE;
@@ -1070,8 +1077,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
   case 'M':
     switch (code.number) {
-    case 0:  machine.pause(PAUSE_PROGRAM);        break; // Pause
-    case 10: machine.pause(PAUSE_OPTIONAL);       break; // Optional pause
+    case 0:  pause(PAUSE_PROGRAM);                break; // Pause
+    case 10: pause(PAUSE_OPTIONAL);               break; // Optional pause
     case 20: end();                               break; // End program
     case 30: setSpindleDir(DIR_CLOCKWISE);        break;
     case 40: setSpindleDir(DIR_COUNTERCLOCKWISE); break;
@@ -1086,10 +1093,10 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 300: end(); break; // TODO Exchange pallet shuttles and end program
 
-    case 600: machine.pause(PAUSE_PALLET_CHANGE); break; // Pallet change pause
+    case 600: pause(PAUSE_PALLET_CHANGE); break; // Pallet change pause
 
-    case 620: digitalOutput(getVar('P'), true,  true); break;
-    case 630: digitalOutput(getVar('P'), false, true); break;
+    case 620: digitalOutput(getVar('P'), true,  true);  break;
+    case 630: digitalOutput(getVar('P'), false, true);  break;
     case 640: digitalOutput(getVar('P'), true,  false); break;
     case 650: digitalOutput(getVar('P'), false, false); break;
 
@@ -1099,10 +1106,10 @@ bool ControllerImpl::execute(const Code &code, int vars) {
             (vars & VT_Q) ? getVar('Q') : 0);
       break;
 
-    case 700: saveModalState(false);   break;
+    case 700: saveModalState(false);  break;
     case 710: clearSavedModalState(); break;
-    case 720: restoreModalState();     break;
-    case 730: saveModalState(true);    break;
+    case 720: restoreModalState();    break;
+    case 730: saveModalState(true);   break;
 
       // TODO the following M-Codes
     case 190: // Orient spindle
