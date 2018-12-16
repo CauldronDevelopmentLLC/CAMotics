@@ -46,12 +46,19 @@ namespace GCode {
     cmd_t out;
 
     uint64_t nextID;
+
     int line;
     double speed;
     bool rapidAutoOff;
 
+    double time;
+    double distance;
+
   public:
     LinePlanner();
+
+    double getTime() const {return time;}
+    double getDistance() const {return distance;}
 
     void reset();
     void setConfig(const PlannerConfig &config);
@@ -81,6 +88,9 @@ namespace GCode {
     void message(const std::string &s);
 
   protected:
+    uint64_t getNextID();
+    bool idLess(uint64_t a, uint64_t b) const;
+
     template <typename T>
     void pushSetCommand(const std::string &name, const T &value);
     void push(PlannerCommand *cmd);

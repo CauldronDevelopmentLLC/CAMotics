@@ -54,6 +54,7 @@ namespace GCode {
     double maxMergeError;
     double maxCollinearAngle;
     bool rapidAutoOff;
+    unsigned idBits;
 
     std::string programStart;
     std::map<const Code, std::string> overrides;

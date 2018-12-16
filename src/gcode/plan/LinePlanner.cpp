@@ -61,11 +61,14 @@ void LinePlanner::reset() {
   line = -1;
   speed = numeric_limits<double>::quiet_NaN();
   rapidAutoOff = false;
+  time = 0;
+  distance = 0;
 }
 
 
 void LinePlanner::setConfig(const PlannerConfig &config) {
   this->config = config;
+  nextID &= (1U << config.idBits) - 1;
 }
 
 
@@ -103,12 +106,15 @@ uint64_t LinePlanner::next(JSON::Sink &sink) {
   out.push_back(cmds.pop_front());
   lastExitVel = cmd->getExitVelocity();
 
+  time += cmd->getTime();
+  distance += cmd->getLength();
+
   return cmd->getID();
 }
 
 
 void LinePlanner::setActive(uint64_t id) {
-  while (!out.empty() && out.front()->getID() < id)
+  while (!out.empty() && idLess(out.front()->getID(), id))
     delete out.pop_front();
 }
 
@@ -172,7 +178,7 @@ void LinePlanner::start() {
 
 void LinePlanner::end() {
   MachineState::end();
-  push(new EndCommand(nextID++));
+  push(new EndCommand(getNextID()));
 }
 
 
@@ -204,13 +210,13 @@ void LinePlanner::changeTool(unsigned tool) {pushSetCommand("tool", tool);}
 
 void LinePlanner::input(port_t port, input_mode_t mode, double timeout) {
   MachineState::input(port, mode, timeout);
-  push(new InputCommand(nextID++, port, mode, timeout));
+  push(new InputCommand(getNextID(), port, mode, timeout));
 }
 
 
 void LinePlanner::seek(port_t port, bool active, bool error) {
   MachineState::seek(port, active, error);
-  push(new SeekCommand(nextID++, port, active, error));
+  push(new SeekCommand(getNextID(), port, active, error));
   seeking = true;
 }
 
@@ -218,13 +224,13 @@ void LinePlanner::seek(port_t port, bool active, bool error) {
 
 void LinePlanner::output(port_t port, double value) {
   MachineState::output(port, value);
-  push(new OutputCommand(nextID++, port, value));
+  push(new OutputCommand(getNextID(), port, value));
 }
 
 
 void LinePlanner::dwell(double seconds) {
   MachineState::dwell(seconds);
-  push(new DwellCommand(nextID++, seconds));
+  push(new DwellCommand(getNextID(), seconds));
 }
 
 
@@ -258,7 +264,7 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   }
 
   // Create line command
-  LineCommand *lc = new LineCommand(nextID++, start, target, feed, rapid,
+  LineCommand *lc = new LineCommand(getNextID(), start, target, feed, rapid,
                                     seeking, firstMove, config);
 
   // Update state
@@ -310,7 +316,7 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
 
 void LinePlanner::pause(pause_t type) {
   MachineState::pause(type);
-  push(new PauseCommand(nextID++, type));
+  push(new PauseCommand(getNextID(), type));
 }
 
 
@@ -341,6 +347,19 @@ void LinePlanner::message(const string &s) {
 }
 
 
+uint64_t LinePlanner::getNextID() {
+  uint64_t id = nextID;
+  nextID = (nextID + 1) & ((1U << config.idBits) - 1);
+  return id;
+}
+
+
+bool LinePlanner::idLess(uint64_t a, uint64_t b) const {
+  // Compare IDs with wrap around
+  return (1U << (config.idBits - 1)) < ((a - b) & ((1U << config.idBits) - 1));
+}
+
+
 template <typename T>
 void LinePlanner::pushSetCommand(const string &name, const T &_value) {
   SmartPointer<JSON::Value> value = JSON::Factory::create(_value);
@@ -355,7 +374,7 @@ void LinePlanner::pushSetCommand(const string &name, const T &_value) {
     }
   }
 
-  push(new SetCommand(nextID++, name, value));
+  push(new SetCommand(getNextID(), name, value));
 }
 
 

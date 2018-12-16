@@ -35,6 +35,7 @@ namespace GCode {
     const char *getType() const {return "dwell";}
     double getEntryVelocity() const {return 0;}
     double getExitVelocity() const {return 0;}
+    double getTime() const {return seconds;}
     void insert(cb::JSON::Sink &sink) const;
   };
 }

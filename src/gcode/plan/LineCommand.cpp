@@ -49,6 +49,13 @@ LineCommand::LineCommand(uint64_t id, const Axes &start, const Axes &end,
 }
 
 
+double LineCommand::getTime() const {
+  double mins = 0;
+  for (int i = 0; i < 7; i++) mins += times[i];
+  return mins * 60;
+}
+
+
 bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
                         double speed) {
   // Check if moves are compatible
@@ -76,9 +83,7 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
         return false;
 
       // Check move time
-      double mins = 0;
-      for (int i = 0; i < 7; i++) mins += times[i];
-      if (config.minMoveSecs <= mins * 60) return false;
+      if (config.minMoveSecs <= getTime()) return false;
     }
 
     // Accumulate errors

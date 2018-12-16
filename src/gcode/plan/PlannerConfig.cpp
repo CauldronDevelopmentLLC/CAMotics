@@ -40,7 +40,8 @@ PlannerConfig::PlannerConfig() :
   minSoftLimit(numeric_limits<double>::quiet_NaN()),
   maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
   maxArcError(0.01), maxLookahead(4096), minMoveSecs(0.02), maxMergeLength(2),
-  maxMergeError(0.1), maxCollinearAngle(0.01), rapidAutoOff(false) {}
+  maxMergeError(0.1), maxCollinearAngle(0.01), rapidAutoOff(false), idBits(16)
+{}
 
 
 bool PlannerConfig::hasOverride(const Code &code) const {
@@ -83,6 +84,10 @@ void PlannerConfig::read(const JSON::Value &value) {
   maxMergeError = value.getNumber("max-merge-error", maxMergeError);
   maxCollinearAngle = value.getNumber("max-collinear-angle", maxCollinearAngle);
   rapidAutoOff = value.getBoolean("rapid-auto-off", rapidAutoOff);
+  idBits = value.getU32("id-bits", idBits);
+
+  if (idBits < 8 || 63 < idBits)
+    THROWS("'id-bits' cannot be less than 8 or greater than 63");
 
   programStart = value.getString("program-start", "");
 
@@ -129,6 +134,7 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.insert("max-merge-error", maxMergeError);
   sink.insert("max-collinear-angle", maxCollinearAngle);
   sink.insertBoolean("rapid-auto-off", rapidAutoOff);
+  sink.insert("id-bits", idBits);
 
   if (!programStart.empty()) sink.insert("program-start", programStart);
 

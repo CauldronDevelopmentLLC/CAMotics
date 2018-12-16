@@ -59,6 +59,7 @@ namespace GCode {
 
     virtual double getDeltaVelocity() const {return 0;}
     virtual double getLength() const {return 0;}
+    virtual double getTime() const {return 0;}
 
     virtual void restart(const Axes &position, const PlannerConfig &config) {}
 

@@ -27,6 +27,7 @@
 #include <cbang/json/Writer.h>
 #include <cbang/json/Reader.h>
 #include <cbang/io/StringInputSource.h>
+#include <cbang/time/TimeInterval.h>
 
 #include <iostream>
 
@@ -88,6 +89,8 @@ public:
     writer.endList();
 
     cout << endl;
+    cerr << "Total time: " << TimeInterval(planner.getTime()) << endl;
+    cerr << "Total dist: " << planner.getDistance() / 1000 << "m" << endl;
   }
 };
 

@@ -78,6 +78,7 @@ namespace GCode {
     void setExitVelocity(double exitVel) {this->exitVel = exitVel;}
     double getDeltaVelocity() const {return deltaV;}
     double getLength() const {return length;}
+    double getTime() const;
 
     bool merge(const LineCommand &lc, const PlannerConfig &config,
                double speed);

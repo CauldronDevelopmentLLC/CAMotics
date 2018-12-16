@@ -61,6 +61,9 @@ namespace GCode {
   public:
     Planner();
 
+    double getTime() const {return planner.getTime();}
+    double getDistance() const {return planner.getDistance();}
+
     void setPosition(const Axes &position);
 
     void setConfig(const PlannerConfig &config);
