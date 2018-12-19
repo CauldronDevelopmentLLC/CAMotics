@@ -63,12 +63,13 @@ namespace GCode {
     void reset();
     void setConfig(const PlannerConfig &config);
     void checkSoftLimits(const Axes &p);
-    bool isDone() const;
+    bool isEmpty() const;
     bool hasMove() const;
     uint64_t next(cb::JSON::Sink &sink);
     void setActive(uint64_t id);
     void stop();
     bool restart(uint64_t id, const Axes &position);
+    void dumpQueue(cb::JSON::Sink &sink);
 
     // From MachineInterface
     void start();

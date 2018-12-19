@@ -427,6 +427,26 @@ static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
 }
 
 
+static PyObject *_set_position(PyPlanner *self, PyObject *args) {
+  try {
+    GCode::Axes position(std::numeric_limits<double>::quiet_NaN());
+
+    PyObject *_position = 0;
+
+    if (!PyArg_ParseTuple(args, "O", &_position)) return 0;
+
+    // Convert Python object to JSON and read Axes
+    position.read(*pyToJSON(_position));
+
+    self->planner->setPosition(position);
+    Py_RETURN_NONE;
+
+  } CATCH_PYTHON;
+
+  return 0;
+}
+
+
 static PyObject *_load_string(PyPlanner *self, PyObject *args) {
   try {
     GCode::PlannerConfig config;
@@ -518,16 +538,15 @@ static PyObject *_stop(PyPlanner *self) {
 static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
   try {
     uint64_t id;
-    GCode::Axes position;
+    GCode::Axes position(std::numeric_limits<double>::quiet_NaN());
     PyObject *_position = 0;
-
-    static const char *kwlist[] = {"id", "position", 0};
+    const char *kwlist[] = {"id", "position", 0};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "KO", (char **)kwlist, &id,
                                      &_position))
       return 0;
 
-    // Convert Python object to JSON
+    // Convert Python object to JSON and read Axes
     position.read(*pyToJSON(_position));
 
     self->planner->restart(id, position);
@@ -542,7 +561,7 @@ static PyObject *_restart(PyPlanner *self, PyObject *args, PyObject *kwds) {
 static PyObject *_synchronize(PyPlanner *self, PyObject *args, PyObject *kwds) {
   try {
     double result = 0;
-    static const char *kwlist[] = {"result", 0};
+    const char *kwlist[] = {"result", 0};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "d", (char **)kwlist, &result))
       return 0;
@@ -550,6 +569,17 @@ static PyObject *_synchronize(PyPlanner *self, PyObject *args, PyObject *kwds) {
     self->planner->synchronize(result);
     Py_RETURN_NONE;
 
+  } CATCH_PYTHON;
+
+  return 0;
+}
+
+
+static PyObject *_get_queue(PyPlanner *self) {
+  try {
+    PyJSONSink sink;
+    self->planner->dumpQueue(sink);
+    return sink.getRoot();
   } CATCH_PYTHON;
 
   return 0;
@@ -565,6 +595,8 @@ static PyMethodDef _methods[] = {
    "Set name resolver callback"},
   {"set_logger", (PyCFunction)_set_logger, METH_VARARGS,
    "Set logger callback"},
+  {"set_position", (PyCFunction)_set_position, METH_VARARGS,
+   "Set planner position"},
   {"load_string", (PyCFunction)_load_string, METH_VARARGS, "Load GCode string"},
   {"load", (PyCFunction)_load, METH_VARARGS, "Load GCode by filename"},
   {"has_more", (PyCFunction)_has_more, METH_NOARGS,
@@ -577,6 +609,7 @@ static PyMethodDef _methods[] = {
    "Restart planner from given ID"},
   {"synchronize", (PyCFunction)_synchronize, METH_VARARGS | METH_KEYWORDS,
    "Continue with result synchronized command"},
+  {"get_queue", (PyCFunction)_get_queue, METH_NOARGS, "Dump planner queue"},
   {0}
 };
 

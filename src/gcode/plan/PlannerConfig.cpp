@@ -34,8 +34,7 @@ using namespace std;
 
 
 PlannerConfig::PlannerConfig() :
-  position(numeric_limits<double>::quiet_NaN()), maxVel(10000),
-  maxAccel(200000), maxJerk(50000000), junctionDeviation(0.05),
+  maxVel(10000), maxAccel(200000), maxJerk(50000000), junctionDeviation(0.05),
   junctionAccel(100000), minJunctionLength(0.01),
   minSoftLimit(numeric_limits<double>::quiet_NaN()),
   maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
@@ -58,8 +57,6 @@ const string &PlannerConfig::getOverride(const Code &code) const {
 
 
 void PlannerConfig::read(const JSON::Value &value) {
-  if (value.hasDict("position")) position.read(value.getDict("position"));
-
   defaultUnits = Units::parse(value.getString("default-units", "METRIC"));
   outputUnits = Units::parse(value.getString("output-units", "METRIC"));
 
@@ -101,9 +98,6 @@ void PlannerConfig::read(const JSON::Value &value) {
 
 void PlannerConfig::write(JSON::Sink &sink) const {
   sink.beginDict();
-
-  sink.beginInsert("position");
-  position.write(sink);
 
   sink.insert("default-units", defaultUnits.toString());
   sink.insert("output-units", outputUnits.toString());

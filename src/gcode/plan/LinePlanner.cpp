@@ -90,7 +90,7 @@ void LinePlanner::checkSoftLimits(const Axes &p) {
 }
 
 
-bool LinePlanner::isDone() const {return cmds.empty();}
+bool LinePlanner::isEmpty() const {return cmds.empty();}
 
 
 bool LinePlanner::hasMove() const {
@@ -149,24 +149,37 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
     // Skip rest of current move
     cmd = cmd->next;
     delete cmds.pop_front();
-    // Replan next move, if one has already been planned.  Its start position
-    // may have changed.
+    // Find next move, its start position may have changed
     while (cmd && !cmd->isMove()) cmd = cmd->next;
+    if (!cmd) return false; // Nothing to replan
   }
-
-  if (!cmd) return false; // Nothing to replan
 
   // Replan from zero velocity
   cmd->restart(position, config);
 
   // Check if the restart was at the end of the command
-  if (!cmd->getLength()) delete cmds.pop_front();
+  if (!cmd->getLength()) {
+    cmds.remove(cmd);
+    delete cmd;
+  }
 
   // Replan
   for (cmd = cmds.front(); cmd; cmd = cmd->next)
     plan(cmd);
 
-  return true;
+  return !cmds.empty();
+}
+
+
+void LinePlanner::dumpQueue(JSON::Sink &sink) {
+  sink.beginList();
+
+  for (PlannerCommand *cmd = cmds.front(); cmd; cmd = cmd->next) {
+    sink.beginAppend();
+    cmd->write(sink);
+  }
+
+  sink.endList();
 }
 
 
@@ -411,17 +424,20 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
 
 
 void LinePlanner::plan(PlannerCommand *cmd) {
-  if (planOne(cmd))
-    // Backplan
+  if (planOne(cmd)) {
+    LOG_DEBUG(3, "Backplanning from " << cmd->getID());
+
     while (true) {
-      if (!cmd->prev) THROWS("Cannot backplan, previous move unavailable");
+      if (!cmd->prev) THROW("Cannot backplan, previous move unavailable");
       cmd = cmd->prev;
       if (!planOne(cmd)) break;
     }
+  }
 }
 
 
 bool LinePlanner::planOne(PlannerCommand *cmd) {
+  LOG_DEBUG(3, "Planning " << cmd->getID());
   LOG_DEBUG(4, "Planning " << cmd->toString());
 
   // Set entry velocity when at begining

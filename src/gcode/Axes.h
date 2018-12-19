@@ -40,6 +40,7 @@ namespace GCode {
     Axes(const double data[9]) : Super_T(data) {}
     Axes(const cb::Vector<9, double> &v) : cb::Vector<9, double>(v) {}
 
+    void setFrom(const Axes &o);
     double get(char c) const {return getIndex(toIndex(c));}
     void set(char c, double value) {setIndex(toIndex(c), value);}
     double getIndex(unsigned i) const {return data[i];}

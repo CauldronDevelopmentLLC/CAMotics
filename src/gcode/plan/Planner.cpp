@@ -58,11 +58,10 @@ void Planner::setConfig(const PlannerConfig &config) {
   unitAdapter.setTargetUnits(config.outputUnits);
   linearizer.setMaxArcError(config.maxArcError);
   planner.setConfig(config);
-  setPosition(config.position);
 }
 
 
-bool Planner::isRunning() const {return !runners.empty() || !planner.isDone();}
+bool Planner::isRunning() const {return !runners.empty() || !planner.isEmpty();}
 
 
 void Planner::load(const InputSource &source, const PlannerConfig &config) {
@@ -95,7 +94,12 @@ bool Planner::hasMore() {
 }
 
 
-uint64_t Planner::next(JSON::Sink &sink) {return planner.next(sink);}
+uint64_t Planner::next(JSON::Sink &sink) {
+  if (!hasMore()) THROW("No more");
+  return planner.next(sink);
+}
+
+
 void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
@@ -115,3 +119,6 @@ void Planner::restart(uint64_t id, const Axes &position) {
 double Planner::resolve(const string &name, Units units) const {
   return resolver.isNull() ? 0 : resolver->get(name, units);
 }
+
+
+void Planner::dumpQueue(JSON::Sink &sink) {planner.dumpQueue(sink);}

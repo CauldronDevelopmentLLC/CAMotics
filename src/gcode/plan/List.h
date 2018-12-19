@@ -98,5 +98,21 @@ namespace GCode {
 
       length++;
     }
+
+
+    void remove(T *x) {
+      if (!x) THROW("Cannot remove null");
+      if (!x->next && x != tail) THROW("Item not at list tail");
+      if (!x->prev && x != head) THROW("Item not at list head");
+      if (!length) THROW("Cannot remove item from empty list");
+
+      if (head == x) head = x->next;
+      if (tail == x) tail = x->prev;
+
+      if (x->next) x->next->prev = x->prev;
+      if (x->prev) x->prev->next = x->next;
+      x->next = x->prev = 0;
+      length--;
+    }
   };
 }

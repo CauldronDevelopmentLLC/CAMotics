@@ -60,7 +60,6 @@ namespace GCode {
     bool seeking;
     bool first;
     double error;
-    bool restarted;
 
     LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
                 bool rapid, bool seeking, bool first,

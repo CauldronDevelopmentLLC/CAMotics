@@ -31,6 +31,12 @@ using namespace GCode;
 const char *Axes::AXES = "XYZABCUVW";
 
 
+void Axes::setFrom(const Axes &o) {
+  for (unsigned i = 0; i < 9; i++)
+    if (!isnan(o.data[i])) data[i] = o.data[i];
+}
+
+
 void Axes::applyXYZMatrix(const Matrix4x4D &m) {
   Vector4D v(m * Vector4D(getX(), getY(), getZ(), 1));
   setXYZ(v[0], v[1], v[2]);

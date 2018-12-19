@@ -91,8 +91,7 @@ Vector3D MachineState::getPosition(axes_t axes) const {
 
 
 void MachineState::setPosition(const Axes &position) {
-  for (unsigned axis = 0; axis < Axes::getSize(); axis++)
-    if (!isnan(position[axis])) this->position[axis] = position[axis];
+  this->position.setFrom(position);
 }
 
 

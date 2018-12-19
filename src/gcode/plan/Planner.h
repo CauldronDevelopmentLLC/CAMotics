@@ -81,5 +81,6 @@ namespace GCode {
     void stop();
     void restart(uint64_t id, const Axes &position);
     double resolve(const std::string &name, Units units) const;
+    void dumpQueue(cb::JSON::Sink &sink);
   };
 }

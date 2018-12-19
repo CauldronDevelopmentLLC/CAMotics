@@ -41,7 +41,7 @@ LineCommand::LineCommand(uint64_t id, const Axes &start, const Axes &end,
                          const PlannerConfig &config) :
   PlannerCommand(id), feed(feed), start(start), target(end), length(0),
   entryVel(0), exitVel(0), deltaV(0), maxVel(0), maxAccel(0), maxJerk(0),
-  rapid(rapid), seeking(seeking), first(first), error(0), restarted(false) {
+  rapid(rapid), seeking(seeking), first(first), error(0) {
 
   // Zero times
   for (int i = 0; i < 7; i++) times[i] = 0;
@@ -106,8 +106,6 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
 
 
 void LineCommand::restart(const Axes &position, const PlannerConfig &config) {
-  restarted = true;
-
   // Drop speeds that have been passed and adjust offsets of remaining speeds
   double newLength = (target - position).length();
   std::vector<Speed> newSpeeds;
@@ -118,8 +116,8 @@ void LineCommand::restart(const Axes &position, const PlannerConfig &config) {
 
   speeds = newSpeeds;
 
-  // Recompute limits
-  start = position;
+  // Recompute limits from new starting point
+  start.setFrom(position); // Copies non-NaN values
   computeLimits(config);
 }
 
@@ -139,7 +137,6 @@ void LineCommand::insert(JSON::Sink &sink) const {
   if (rapid) sink.insertBoolean("rapid", true);
   if (seeking) sink.insertBoolean("seeking", true);
   if (first) sink.insertBoolean("first", true);
-  if (restarted) sink.insertBoolean("restarted", true);
 
   sink.insertList("times", true);
   for (unsigned i = 0; i < 7; i++)
