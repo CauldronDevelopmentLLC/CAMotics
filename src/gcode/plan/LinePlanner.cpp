@@ -586,8 +586,8 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
 
         // Quit trying if we are really close to minVel
         if (peakVel < minVel + 0.0001) {
-          LOG_WARNING("peakVel=" << peakVel << " bodyLen=" << bodyLen
-                      << " length=" << length << " lc.length=" << lc.length);
+          LOG_DEBUG(3, "peakVel=" << peakVel << " bodyLen=" << bodyLen
+                    << " length=" << length << " lc.length=" << lc.length);
           peakVel = minVel;
           break;
         }
