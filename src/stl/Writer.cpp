@@ -32,9 +32,9 @@ void Writer::writeHeader(const string &name, uint32_t count,
                          const string &hash) {
   if (binary) {
     // Header
-    char header[80];
-    memset(header, 0, 80);
-    if (!hash.empty()) strncpy(header, hash.c_str(), 80);
+    char header[81];
+    memset(header, 0, 81);
+    if (!hash.empty()) memcpy(header, hash.c_str(), 80);
     stream.write(header, 80);
 
     // Count
