@@ -2048,7 +2048,7 @@ void QtWin::on_actionHelp_triggered() {
   QMessageBox msg(this);
   msg.setWindowTitle("CAMotics Help");
   msg.setTextFormat(Qt::RichText);
-  msg.setText("Help can be find in the online User's Manual at "
+  msg.setText("Help can be found in the online User's Manual at "
               "<a href='http://camotics.org/manual.html'"
               ">http://camotics.org/manual.html</a>.");
   msg.exec();
