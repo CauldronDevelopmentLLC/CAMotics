@@ -26,23 +26,26 @@
 #include <QDialog>
 
 
-namespace Ui {class DonateDialog;}
+namespace Ui {class UploadDialog;}
 
 
 namespace CAMotics {
-  class DonateDialog : public QDialog {
+  class UploadDialog : public QDialog {
     Q_OBJECT;
 
-    cb::SmartPointer<Ui::DonateDialog> ui;
+    cb::SmartPointer<Ui::UploadDialog> ui;
 
   public:
-    DonateDialog(QWidget *parent);
+    UploadDialog(QWidget *parent);
 
-    QString getVersion() const;
+    QString getFilename() const;
+    void setFilename(QString filename);
+    bool isAutomatic() const;
 
-    void onStartup();
-
-    // From QDialog
     int exec();
+
+  protected slots:
+    void on_cancelPushButton_clicked();
+    void on_uploadPushButton_clicked();
   };
 }

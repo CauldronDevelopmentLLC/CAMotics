@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>610</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>610</height>
+    <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>610</height>
+    <height>700</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -29,305 +29,40 @@
    <iconset resource="camotics.qrc">
     <normaloff>:/icons/camotics.png</normaloff>:/icons/camotics.png</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background: #fff</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>12</number>
    </property>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>CAMotics took a lot of time and hard work to create.  If you find it useful please consider donating.  Your donations will go towards fixing bugs and adding new features.</string>
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="styleSheet">
+      <string notr="true">background: transparent</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Let's Make CAMotics Even Better&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Hello, I'm Joseph Coffland.  I love creating CNC software and hardware and making it Open-Source.  In 2011, I started CAMotics as a side project.  Since then, many generous people have &lt;a href=&quot;https://camotics.org/#donations&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;donated&lt;/span&gt;&lt;/a&gt; money to help make CAMotics possible.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To support CAMotics:&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Buy a &lt;a href=&quot;https://store.buildbotics.com/&quot;&gt;&lt;img src=&quot;:/images/buildbotics_banner-125x20.png&quot; /&gt;&lt;/a&gt;&lt;a href=&quot;https://store.buildbotics.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt; CNC Controller&lt;/span&gt;&lt;/a&gt;.&lt;/li&gt;
+&lt;li style=&quot; margin-top:0px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;amp;hosted_button_id=FDP4SVEVT68NG&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Donate with &lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;amp;hosted_button_id=FDP4SVEVT68NG&quot;&gt;&lt;img src=&quot;:/images/paypal.png&quot; style=&quot;vertical-align: middle;&quot; /&gt;&lt;/a&gt;.&lt;/li&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:1; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;amp;hosted_button_id=FDP4SVEVT68NG&quot;&gt;&lt;img src=&quot;:/images/paypal_donate.png&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Or send &lt;a href=&quot;https://bitcoin.org/&quot;&gt;&lt;img src=&quot;:/images/bitcoin.png&quot; /&gt;&lt;/a&gt; to this address:&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:40px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/images/camotics-bitcoin-donations.png&quot; /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:12px; margin-left:40px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   182aJsBrnmcWxqZ9VCACJyFYNWSH7eKS9R&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Your donations go towards fixing bugs and adding new features.  If you're short on cash, you can also help by contributing bug reports or code on &lt;a href=&quot;https://github.com/cauldrondevelopment.com/camotics&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-     <property name="wordWrap">
+     <property name="openExternalLinks">
       <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Click the image below to donate with PayPal:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <spacer name="horizontalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="CAMotics::ClickWidget" name="paypalWidget1" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>215</width>
-         <height>39</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>215</width>
-         <height>39</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Click to open Paypal in your browser.</string>
-       </property>
-       <property name="statusTip">
-        <string>https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=FDP4SVEVT68NG</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QWidget {
-  background: url(:/images/paypal.png) no-repeat;
-  border: 1px solid transparent;
-}
-
-QWidget:hover {
-  border: 1px solid black;
-}</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_7">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <spacer name="horizontalSpacer_6">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="CAMotics::ClickWidget" name="paypalWidget2" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>151</width>
-         <height>51</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>151</width>
-         <height>51</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Click to open Paypal in your browser.</string>
-       </property>
-       <property name="statusTip">
-        <string>https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=FDP4SVEVT68NG</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QWidget {
-	background: url(:/images/paypal_donate.png) no-repeat;
-    border: 1px solid transparent;
-}
-
-QWidget:hover {
-    border: 1px solid black;
-}</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_8">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Send</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="CAMotics::ClickWidget" name="bitCoinWidget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>192</width>
-         <height>42</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>192</width>
-         <height>42</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Click to open a Web page about BitCoin.</string>
-       </property>
-       <property name="statusTip">
-        <string>http://bitcoin.org/</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QWidget {
-  background: url(:/images/bitcoin.png) no-repeat;
-  border: 1px solid transparent;
-}
-
-QWidget:hover {
-  border: 1px solid black;
-}</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>to</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>182aJsBrnmcWxqZ9VCACJyFYNWSH7eKS9R</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Or by QRCode</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QWidget" name="widget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>200</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>200</width>
-         <height>200</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Learn about BitCoin QRCodes.</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background: url(:/images/camotics-bitcoin-donations.png) no-repeat;
-</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -338,19 +73,12 @@ QWidget:hover {
       <set>QDialogButtonBox::Ok</set>
      </property>
      <property name="centerButtons">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CAMotics::ClickWidget</class>
-   <extends>QWidget</extends>
-   <header>camotics/qt/ClickWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="camotics.qrc"/>
  </resources>

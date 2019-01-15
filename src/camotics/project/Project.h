@@ -67,6 +67,7 @@ namespace CAMotics {
       const std::string &getFilename() const {return filename;}
       void setFilename(const std::string &filename);
       std::string getDirectory() const;
+      std::string getUploadFilename() const;
 
       const GCode::ToolTable &getTools() const {return tools;}
       GCode::ToolTable &getTools() {return tools;}

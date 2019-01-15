@@ -54,6 +54,12 @@ string Project::getDirectory() const {
 }
 
 
+string Project::getUploadFilename() const {
+  string filename = SystemUtilities::basename(getFilename());
+  return SystemUtilities::swapExtension(filename, "gc");
+}
+
+
 void Project::setUnits(GCode::Units units) {
   if (units == getUnits()) return;
   this->units = units;

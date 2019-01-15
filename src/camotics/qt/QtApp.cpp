@@ -127,6 +127,4 @@ void QtApp::run() {
 }
 
 
-void QtApp::requestExit() {
-  Application::requestExit();
-}
+void QtApp::requestExit() {Application::requestExit();}

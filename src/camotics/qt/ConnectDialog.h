@@ -39,14 +39,17 @@ namespace CAMotics {
     ConnectDialog(QWidget *parent);
 
     QString getAddress() const;
-
-    void setFilename(const QString &filename);
-    QString getFilename() const;
+    bool isSystemProxyEnabled() const;
+    void setNetworkStatus(const std::string &status);
 
     int exec();
 
+  signals:
+    void connect();
+    void disconnect();
+
   protected slots:
-    void on_cancelPushButton_clicked();
+    void on_disconnectPushButton_clicked();
     void on_connectPushButton_clicked();
   };
 }

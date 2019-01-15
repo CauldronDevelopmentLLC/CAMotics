@@ -20,12 +20,34 @@
 
 #include "DonateDialog.h"
 
+#include <cbang/Info.h>
+
 #include "ui_donate_dialog.h"
 
+#include <QSettings>
+
 using namespace CAMotics;
+using namespace cb;
 
 
 DonateDialog::DonateDialog(QWidget *parent) :
   QDialog(parent), ui(new Ui::DonateDialog) {
   ui->setupUi(this);
+}
+
+
+QString DonateDialog::getVersion() const {
+  return QString::fromUtf8(Info::instance().get("Build", "Version").c_str());
+}
+
+
+void DonateDialog::onStartup() {
+  if (QSettings().value("Donate/ShowVersion", "") != getVersion()) exec();
+}
+
+
+int DonateDialog::exec() {
+  int ret = QDialog::exec();
+  QSettings().setValue("Donate/ShowVersion", getVersion());
+  return ret;
 }

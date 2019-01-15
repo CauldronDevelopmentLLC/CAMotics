@@ -18,31 +18,48 @@
 
 \******************************************************************************/
 
-#pragma once
+#include "UploadDialog.h"
+
+#include "ui_upload_dialog.h"
+
+#include <QSettings>
+
+using namespace CAMotics;
 
 
-#include <cbang/SmartPointer.h>
-
-#include <QDialog>
-
-
-namespace Ui {class DonateDialog;}
+UploadDialog::UploadDialog(QWidget *parent) :
+  QDialog(parent), ui(new Ui::UploadDialog) {ui->setupUi(this);}
 
 
-namespace CAMotics {
-  class DonateDialog : public QDialog {
-    Q_OBJECT;
-
-    cb::SmartPointer<Ui::DonateDialog> ui;
-
-  public:
-    DonateDialog(QWidget *parent);
-
-    QString getVersion() const;
-
-    void onStartup();
-
-    // From QDialog
-    int exec();
-  };
+QString UploadDialog::getFilename() const {
+  return ui->filenameLineEdit->text();
 }
+
+
+void UploadDialog::setFilename(QString filename) {
+  ui->filenameLineEdit->setText(filename);
+}
+
+
+bool UploadDialog::isAutomatic() const {
+  return ui->automaticCheckBox->isChecked();
+}
+
+
+int UploadDialog::exec() {
+  QSettings settings;
+
+  bool automatic = settings.value("Upload/Automatic", true).toBool();
+  ui->automaticCheckBox->setChecked(automatic);
+
+  int ret = QDialog::exec();
+
+  if (ret == QDialog::Accepted)
+    settings.setValue("Upload/Automatic", isAutomatic());
+
+  return ret;
+}
+
+
+void UploadDialog::on_cancelPushButton_clicked() {reject();}
+void UploadDialog::on_uploadPushButton_clicked() {accept();}

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ConnectDialog</class>
- <widget class="QDialog" name="ConnectDialog">
+ <class>UploadDialog</class>
+ <widget class="QDialog" name="UploadDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>416</width>
-    <height>523</height>
+    <height>224</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Connect to Buildbotics CNC</string>
+   <string>Upload GCode to CNC</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -32,63 +32,24 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://buildbotics.com/&quot;&gt;&lt;img src=&quot;:images/buildbotics_banner-200x32.png&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Connect to a &lt;a href=&quot;https://buildbotics.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Buildbotics CNC Controller&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You can access the controller's network address on it's LCD screen by pushing the right arrow on the gamepad.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;img src=&quot;:/images/buildbotics_network_lcd-small.png&quot; /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Upload GCode to a &lt;a href=&quot;https://buildbotics.com/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Buildbotics CNC Controller&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <property name="leftMargin">
-      <number>5</number>
-     </property>
      <property name="topMargin">
       <number>10</number>
      </property>
-     <property name="rightMargin">
-      <number>5</number>
-     </property>
-     <property name="bottomMargin">
-      <number>10</number>
-     </property>
-     <property name="spacing">
-      <number>10</number>
-     </property>
-     <item row="1" column="1">
-      <widget class="QCheckBox" name="systemProxyCheckBox">
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="filenameLineEdit">
        <property name="text">
         <string/>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="addressLineEdit">
-       <property name="text">
-        <string>bbctrl.local</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="proxyLabel">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Use System Proxy</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="addressLabel">
+      <widget class="QLabel" name="filenameLabel">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -96,12 +57,15 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>Network Address</string>
+        <string>File name</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="statusLabel">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -109,18 +73,31 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>Status</string>
+        <string>Automatic</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="networkStatusLabel">
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="automaticCheckBox">
        <property name="text">
-        <string/>
+        <string>Enabled</string>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>18</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -138,16 +115,16 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="disconnectPushButton">
+      <widget class="QPushButton" name="cancelPushButton">
        <property name="text">
-        <string>Disconnect</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="connectPushButton">
+      <widget class="QPushButton" name="uploadPushButton">
        <property name="text">
-        <string>Connect</string>
+        <string>Upload</string>
        </property>
        <property name="default">
         <bool>true</bool>

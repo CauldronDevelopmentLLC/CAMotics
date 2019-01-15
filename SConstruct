@@ -157,7 +157,7 @@ src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
 if env['with_gui']:
     dialogs = '''
       export about donate find new tool settings new_project cam cam_layer
-      connect
+      connect upload
     '''.split()
     uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
     for dialog in dialogs:

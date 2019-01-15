@@ -33,6 +33,7 @@
 
 #include <QHttpMultiPart>
 #include <QNetworkAccessManager>
+#include <QNetworkProxy>
 #include <QNetworkReply>
 
 using namespace CAMotics;
@@ -58,13 +59,19 @@ BBCtrlAPI::BBCtrlAPI(QtWin *parent) :
 }
 
 
+string BBCtrlAPI::getStatus() const {
+  if (_connected) return "Connected";
+  if (active) return "Reconnecting";
+  return webSocket.state() == QAbstractSocket::UnconnectedState ?
+    "Disconnected" : "Connecting";
+}
+
+
 void BBCtrlAPI::connectCNC(const QString &address) {
   disconnectCNC();
 
   url = QString("ws://") + address + QString("/websocket");
   reconnect();
-
-  active = true;
 }
 
 
@@ -105,6 +112,10 @@ void BBCtrlAPI::uploadGCode(const char *data, unsigned length) {
 
   if (!netManager) netManager = new QNetworkAccessManager(this);
 
+  // Enable or disable proxy
+  netManager->setProxy
+    (useSystemProxy ? QNetworkProxy::DefaultProxy : QNetworkProxy::NoProxy);
+
   QNetworkReply *reply = netManager->put(request, multiPart);
   multiPart->setParent(reply); // delete the multiPart with the reply
   // here connect signals etc.
@@ -124,6 +135,7 @@ void BBCtrlAPI::onConnected() {
 
   if (!_connected) {
     _connected = true;
+    active = true;
     emit connected();
   }
 }
@@ -132,10 +144,8 @@ void BBCtrlAPI::onConnected() {
 void BBCtrlAPI::onDisconnected() {
   LOG_INFO(1, "CNC disconnected");
 
-  if (_connected) {
-    _connected = false;
-    emit disconnected();
-  }
+  _connected = false;
+  emit disconnected();
 
   if (active) reconnect();
 }
@@ -186,10 +196,13 @@ void BBCtrlAPI::onUpdate() {
 
 
 void BBCtrlAPI::onReconnect() {
-  if (!active) return;
-
   LOG_INFO(1, "Connecting to " << url.toString().toUtf8().data());
 
   if (webSocket.isValid()) webSocket.close();
+
+  // Enable or disable proxy
+  webSocket.setProxy
+    (useSystemProxy ? QNetworkProxy::DefaultProxy : QNetworkProxy::NoProxy);
+
   webSocket.open(url);
 }

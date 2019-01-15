@@ -39,6 +39,7 @@ namespace CAMotics {
 
     bool active;
     bool _connected;
+    bool useSystemProxy;
     uint64_t lastMessage;
     QTimer updateTimer;
     QTimer reconnectTimer;
@@ -53,11 +54,13 @@ namespace CAMotics {
     BBCtrlAPI(QtWin *parent);
 
     bool isConnected() const {return _connected;}
+    std::string getStatus() const;
+    void setUseSystemProxy(bool enabled) {useSystemProxy = enabled;}
+    void setFilename(const std::string &filename) {this->filename = filename;}
 
     void connectCNC(const QString &address);
     void disconnectCNC();
     void reconnect();
-    void setFilename(const std::string &filename) {this->filename = filename;}
     void uploadGCode(const char *data, unsigned length);
 
   signals:

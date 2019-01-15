@@ -25,6 +25,7 @@
 #include <QSettings>
 
 using namespace CAMotics;
+using namespace std;
 
 
 ConnectDialog::ConnectDialog(QWidget *parent) :
@@ -34,21 +35,30 @@ ConnectDialog::ConnectDialog(QWidget *parent) :
 QString ConnectDialog::getAddress() const {return ui->addressLineEdit->text();}
 
 
-void ConnectDialog::setFilename(const QString &filename) {
-  ui->filenameLineEdit->setText(filename);
-
-  ui->filenameLineEdit->setVisible(!filename.isEmpty());
-  ui->filenameLabel->setVisible(!filename.isEmpty());
-
-  if (filename.isEmpty())
-    ui->plainTextEdit->setPlainText("Connect to a Buildbotics CNC controller?");
-  else ui->plainTextEdit->setPlainText("Connect to a Buildbotics CNC "
-                                       "controller and upload GCode?");
+bool ConnectDialog::isSystemProxyEnabled() const {
+  return ui->systemProxyCheckBox->isChecked();
 }
 
 
-QString ConnectDialog::getFilename() const {
-  return ui->filenameLineEdit->text();
+void ConnectDialog::setNetworkStatus(const string &status) {
+  ui->networkStatusLabel->setText(status.c_str());
+
+  if (status == "Disconnected") {
+    ui->connectPushButton->setEnabled(true);
+    ui->disconnectPushButton->setEnabled(false);
+
+  } else {
+    ui->connectPushButton->setEnabled(false);
+    ui->disconnectPushButton->setEnabled(true);
+  }
+
+  string bg;
+  if (status == "Connected")    bg = "#00ff00";
+  else if (status == "Disconnected") bg = "#ff0000";
+  else bg = "#f2ad46";
+
+  string css ="padding: 3px; background: " + bg;
+  ui->networkStatusLabel->setStyleSheet(css.c_str());
 }
 
 
@@ -58,16 +68,27 @@ int ConnectDialog::exec() {
   QString addr = settings.value("Connect/Address", "bbctrl.local").toString();
   ui->addressLineEdit->setText(addr);
 
+  bool useProxy = settings.value("Connect/UseSystemProxy", true).toBool();
+  ui->systemProxyCheckBox->setChecked(useProxy);
+
   int ret = QDialog::exec();
 
-  if (ret == QDialog::Accepted)
+  if (ret == QDialog::Accepted) {
     settings.setValue("Connect/Address", ui->addressLineEdit->text());
+    settings.setValue("Connect/UseSystemProxy", isSystemProxyEnabled());
+  }
 
   return ret;
 }
 
 
-void ConnectDialog::on_cancelPushButton_clicked() {reject();}
+void ConnectDialog::on_disconnectPushButton_clicked() {
+  emit disconnect();
+  accept();
+}
 
 
-void ConnectDialog::on_connectPushButton_clicked() {accept();}
+void ConnectDialog::on_connectPushButton_clicked() {
+  setNetworkStatus("Connecting");
+  emit connect();
+}

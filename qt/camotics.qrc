@@ -72,5 +72,8 @@
         <file>icons/buildbotics.png</file>
         <file>icons/machine.png</file>
         <file>icons/intensity.png</file>
+        <file>images/buildbotics_banner-200x32.png</file>
+        <file>images/buildbotics_banner-125x20.png</file>
+        <file>images/buildbotics_network_lcd-small.png</file>
     </qresource>
 </RCC>

@@ -3058,9 +3058,6 @@
    </property>
   </action>
   <action name="actionConnect">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="camotics.qrc">
      <normaloff>:/icons/buildbotics.png</normaloff>:/icons/buildbotics.png</iconset>

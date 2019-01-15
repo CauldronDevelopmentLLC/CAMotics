@@ -32,6 +32,7 @@
 #include "ToolDialog.h"
 #include "CAMDialog.h"
 #include "ConnectDialog.h"
+#include "UploadDialog.h"
 #include "BBCtrlAPI.h"
 
 #include <camotics/ConcurrentTaskManager.h>
@@ -82,6 +83,7 @@ namespace CAMotics {
     ToolDialog toolDialog;
     CAMDialog camDialog;
     ConnectDialog connectDialog;
+    UploadDialog uploadDialog;
     FileDialog fileDialog;
     QTimer animationTimer;
     QByteArray fullLayoutState;
@@ -135,6 +137,7 @@ namespace CAMotics {
     void setAutoClose(bool x = true) {autoClose = x;}
 
     void init();
+    void show();
 
     void setUnitLabel(QLabel *label, double value, int precision = 2,
                       bool withUnit = false);
@@ -169,6 +172,7 @@ namespace CAMotics {
 
     void loadToolPath(const cb::SmartPointer<GCode::ToolPath> &toolPath,
                       bool simulate);
+    void uploadGCode();
 
     void toolPathComplete(ToolPathTask &task);
     void surfaceComplete(SurfaceTask &task);
@@ -182,8 +186,6 @@ namespace CAMotics {
     void optimize();
     void redraw(bool now = false);
     void snapshot();
-    void connectCNC();
-    void disconnectCNC();
     void exportData();
 
     bool runNewProjectDialog();
@@ -285,7 +287,10 @@ namespace CAMotics {
     void animate();
     void openRecentProjectsSlot(const QString path);
 
+    void on_bbctrlConnect();
+    void on_bbctrlDisconnect();
     void on_bbctrlConnected();
+    void on_bbctrlDisconnected();
     void on_machineChanged(QString machine, QString path);
 
     void on_fileTabManager_currentChanged(int index);

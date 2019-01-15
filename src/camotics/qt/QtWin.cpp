@@ -70,11 +70,12 @@ QtWin::QtWin(Application &app) :
   newProjectDialog(this), exportDialog(this), aboutDialog(this),
   settingsDialog(this), donateDialog(this), findDialog(this, false),
   findAndReplaceDialog(this, true), toolDialog(this), camDialog(this),
-  connectDialog(this), fileDialog(*this), taskCompleteEvent(0), app(app),
-  options(app.getOptions()), view(new View(valueSet)), viewer(new Viewer),
-  lastRedraw(0), dirty(false), simDirty(false), inUIUpdate(false),
-  lastProgress(0), lastStatusActive(false), autoPlay(false), autoClose(false),
-  sliderMoving(false), positionChanged(false) {
+  connectDialog(this), uploadDialog(this), fileDialog(*this),
+  taskCompleteEvent(0), app(app), options(app.getOptions()),
+  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0), dirty(false),
+  simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
+  autoPlay(false), autoClose(false), sliderMoving(false),
+  positionChanged(false) {
 
   ui->setupUi(this);
 
@@ -119,6 +120,11 @@ QtWin::QtWin(Application &app) :
           SIGNAL(replace(QString, QString, bool, int, bool)),
           ui->fileTabManager,
           SLOT(on_replace(QString, QString, bool, int, bool)));
+
+  // BBCtrl
+  connect(&connectDialog, SIGNAL(connect()), this, SLOT(on_bbctrlConnect()));
+  connect(&connectDialog, SIGNAL(disconnect()), this,
+          SLOT(on_bbctrlDisconnect()));
 
   // ConcurrentTaskManager
   taskMan.addObserver(this);
@@ -254,6 +260,12 @@ void QtWin::init() {
   valueSet["program_line"]->add(this, &QtWin::updateProgramLine);
 
   valueSet.updated();
+}
+
+
+void QtWin::show() {
+  QMainWindow::show();
+  donateDialog.onStartup();
 }
 
 
@@ -637,6 +649,29 @@ void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
 }
 
 
+void QtWin::uploadGCode() {
+  if (gcode.isNull() || bbCtrlAPI.isNull() || !bbCtrlAPI->isConnected())
+    return;
+
+  QString current = uploadDialog.getFilename();
+  QString filename = QString().fromUtf8(project->getUploadFilename().c_str());
+
+  if (filename != current || !uploadDialog.isAutomatic()) {
+    uploadDialog.setFilename(filename);
+
+    if (uploadDialog.exec() != QDialog::Accepted) {
+      uploadDialog.setFilename(current);
+      return;
+    }
+
+    filename = uploadDialog.getFilename();
+  }
+
+  bbCtrlAPI->setFilename(filename.toUtf8().data());
+  bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
+}
+
+
 void QtWin::toolPathComplete(ToolPathTask &task) {
   if (task.getErrorCount()) {
     const char *msg = "Errors were encountered during tool path generation.  "
@@ -649,9 +684,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
 
   gcode = task.getGCode();
   exportDialog.enableGCode(!gcode.isNull());
-  if (!bbCtrlAPI.isNull() && bbCtrlAPI->isConnected())
-    bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
-
+  uploadGCode();
   loadToolPath(task.getPath(), !task.getErrorCount());
 }
 
@@ -780,48 +813,6 @@ void QtWin::snapshot() {
   if (!pixmap.save(QString::fromUtf8(filename.c_str())))
     warning("Failed to save snapshot.");
   else showMessage("Snapshot saved.");
-}
-
-
-void QtWin::connectCNC() {
-  // Get GCode filename
-  string filename;
-
-  if (project.isNull() || gcode.isNull()) warning("No GCode to send");
-  else {
-    filename = SystemUtilities::basename(project->getFilename());
-    filename = SystemUtilities::swapExtension(filename, "gc");
-  }
-  connectDialog.setFilename(filename.c_str());
-
-  if (connectDialog.exec() == QDialog::Accepted) {
-    filename = connectDialog.getFilename().toUtf8().data();
-
-    if (!filename.empty()) {
-      if (!bbCtrlAPI) {
-        bbCtrlAPI = new BBCtrlAPI(this);
-        connect(bbCtrlAPI.get(), SIGNAL(connected()), this,
-                SLOT(on_bbctrlConnected()));
-      }
-
-      bbCtrlAPI->setFilename(filename);
-      bbCtrlAPI->connectCNC(connectDialog.getAddress());
-      return;
-    }
-  }
-
-  ui->actionConnect->setChecked(false);
-}
-
-
-void QtWin::disconnectCNC() {
-  int response =
-    QMessageBox::question(this, "Disconnect from CNC?", "Would you like to "
-                          "disconnect from the current CNC?",
-                          QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
-  if (response == QMessageBox::Yes) bbCtrlAPI->disconnectCNC();
-  else ui->actionConnect->setChecked(true);
 }
 
 
@@ -1792,8 +1783,35 @@ void QtWin::openRecentProjectsSlot(const QString path) {
 }
 
 
+void QtWin::on_bbctrlConnect() {
+  if (!bbCtrlAPI) {
+    bbCtrlAPI = new BBCtrlAPI(this);
+    connect(bbCtrlAPI.get(), SIGNAL(connected()), this,
+            SLOT(on_bbctrlConnected()));
+    connect(bbCtrlAPI.get(), SIGNAL(disconnected()), this,
+            SLOT(on_bbctrlDisconnected()));
+  }
+
+  bbCtrlAPI->setUseSystemProxy(connectDialog.isSystemProxyEnabled());
+  bbCtrlAPI->connectCNC(connectDialog.getAddress());
+}
+
+
+void QtWin::on_bbctrlDisconnect() {
+  bbCtrlAPI->disconnectCNC();
+  bbCtrlAPI->setFilename("");
+}
+
+
 void QtWin::on_bbctrlConnected() {
-  if (!gcode.isNull()) bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
+  connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
+  if (connectDialog.isVisible()) connectDialog.accept();
+  uploadGCode();
+}
+
+
+void QtWin::on_bbctrlDisconnected() {
+  connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
 }
 
 
@@ -2026,8 +2044,9 @@ void QtWin::on_actionSettings_triggered() {
 
 
 void QtWin::on_actionConnect_triggered(bool checked) {
-  if (checked) connectCNC();
-  else disconnectCNC();
+  string status = bbCtrlAPI.isNull() ? "Disconnected" : bbCtrlAPI->getStatus();
+  connectDialog.setNetworkStatus(status);
+  connectDialog.exec();
 }
 
 
