@@ -1,5 +1,23 @@
 # CAMotics Changelog
 
+## v1.2.0:
+ - Improved Buildbotics CNC controller connectivity.
+ - Revamped donation dialog.
+ - Show donation dialog once at start with each upgrade.
+ - S-Curve path planner.
+ - Ignore Program Number O-Codes used by some post processors.
+ - Added intensity view for LASER cuts.
+ - Added seek and homing G-Codes.
+ - Tabbing fixes. (hpmachining)
+ - Toggle console. (hpmachining)
+ - New tool menu option. (hpmachining)
+ - Zoom menu option. (hpmachining)
+ - Keyboard shortcuts. (hpmachining)
+ - More logical view button order. (hpmachining)
+ - Show feed in project units. (hpmachining)
+ - Handle long or even infinite GCode programs better.
+ - Implemented M70-M73
+
 ## v1.1.2:
  - Fixed ``Could not save project: Invalid file tab index 0``. #225
  - Fixed tool dialog editing problems.  #79
