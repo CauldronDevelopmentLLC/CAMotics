@@ -179,6 +179,7 @@ void ViewPort::updateRotation(int x, int y) {
   if (!rotationQuat.isReal()) resetView();
 
   rotationQuat.toAxisAngle().toGLRotation(rotation);
+  LOG_DEBUG(1, rotationQuat);
 }
 
 
@@ -196,7 +197,7 @@ void ViewPort::updateTranslation(int x, int y) {
 
 void ViewPort::resetView(char c) {
   switch (c) {
-  case 'p': rotationQuat = QuaternionD(-0.45, -0.25, -0.5, 0.71); break;
+  case 'p': rotationQuat = QuaternionD(-0.4, 0, 0, 0.9); break;
   case 't': rotationQuat = QuaternionD(0, 0, 0, 0.9999); break;
   case 'b': rotationQuat = QuaternionD(0, 1, 0, 0.0001); break;
   case 'F': rotationQuat = QuaternionD(-0.71, 0, 0, 0.71); break;
