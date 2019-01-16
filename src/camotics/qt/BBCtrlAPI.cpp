@@ -118,7 +118,6 @@ void BBCtrlAPI::uploadGCode(const char *data, unsigned length) {
 
   QNetworkReply *reply = netManager->put(request, multiPart);
   multiPart->setParent(reply); // delete the multiPart with the reply
-  // here connect signals etc.
 }
 
 

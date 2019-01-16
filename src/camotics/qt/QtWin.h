@@ -166,6 +166,8 @@ namespace CAMotics {
     void resizeGL(int w, int h);
     void paintGL();
 
+    void showMessage(const QString &msg, double timeout = 30);
+    void showMessage(const char *msg, double timeout = 30);
     void showMessage(const std::string &msg, double timeout = 30);
     void message(const std::string &msg);
     void warning(const std::string &msg);

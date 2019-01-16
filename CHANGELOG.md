@@ -33,6 +33,7 @@
  - Fixed Windows OpenGL problems.
  - Dropped support for Qt4.
  - Change from XML to JSON project file format and .camotics extension.
+ - Show 3D view of machine.
 
 ## v1.1.1:
  - Fixed bug preventing ``camsim`` from writing STL data.

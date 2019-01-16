@@ -583,8 +583,18 @@ void QtWin::paintGL() {
 }
 
 
+void QtWin::showMessage(const QString &msg, double timeout) {
+  ui->statusbar->showMessage(msg, timeout * 1000);
+}
+
+
+void QtWin::showMessage(const char *msg, double timeout) {
+  showMessage(QString::fromUtf8(msg), timeout);
+}
+
+
 void QtWin::showMessage(const string &msg, double timeout) {
-  ui->statusbar->showMessage(QString::fromUtf8(msg.c_str()), timeout * 1000);
+  showMessage(QString::fromUtf8(msg.c_str()), timeout);
 }
 
 
@@ -669,6 +679,8 @@ void QtWin::uploadGCode() {
 
   bbCtrlAPI->setFilename(filename.toUtf8().data());
   bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
+  showMessage(QString("Uploading ") + filename + QString(" to ") +
+              connectDialog.getAddress());
 }
 
 
@@ -1806,12 +1818,14 @@ void QtWin::on_bbctrlDisconnect() {
 void QtWin::on_bbctrlConnected() {
   connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
   if (connectDialog.isVisible()) connectDialog.accept();
+  showMessage(QString("Connected to ") + connectDialog.getAddress());
   uploadGCode();
 }
 
 
 void QtWin::on_bbctrlDisconnected() {
   connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
+  showMessage(QString("Disconnected from ") + connectDialog.getAddress());
 }
 
 
