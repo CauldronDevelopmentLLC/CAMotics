@@ -358,7 +358,7 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         app_id = 'org.camotics',
         app_resources = [['osx/Resources', '.'], ['tpl_lib', 'tpl_lib']],
-        app_copyright = 'Copyright 2011-2017, Cauldron Development LLC',
+        app_copyright = 'Copyright 2011-2019, Cauldron Development LLC',
         app_signature = 'camo',
         app_other_info = {
             'CFBundleExecutable': 'camotics', # Overrides 'programs'
