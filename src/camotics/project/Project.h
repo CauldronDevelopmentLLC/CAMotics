@@ -75,8 +75,12 @@ namespace CAMotics {
       const Workpiece &getWorkpiece() const {return workpiece;}
       Workpiece &getWorkpiece() {return workpiece;}
 
-      const Files &getFiles() const {return files;}
-      Files &getFiles() {return files;}
+      unsigned getFileCount() const {return files.size();}
+      const cb::SmartPointer<File> &getFile(unsigned i) const;
+      std::string getFileRelativePath(unsigned i) const;
+      cb::SmartPointer<File> findFile(const std::string &path) const;
+      void addFile(const std::string &filename);
+      void removeFile(unsigned i) {files.remove(i);}
 
       void setUnits(GCode::Units units);
       GCode::Units getUnits() const {return units;}

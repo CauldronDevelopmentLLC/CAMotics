@@ -105,7 +105,7 @@ namespace CAMotics {
       // Open project
       string ext = SystemUtilities::extension(input);
       if (ext == "xml" || ext == "camotics") project.load(input);
-      else project.getFiles().add(input); // Assume TPL or G-Code
+      else project.addFile(input); // Assume TPL or G-Code
 
       // Resolution
       if (!resolution.empty()) {

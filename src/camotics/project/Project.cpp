@@ -60,6 +60,30 @@ string Project::getUploadFilename() const {
 }
 
 
+const SmartPointer<File> &Project::getFile(unsigned i) const {
+  return files.get(i);
+}
+
+
+string Project::getFileRelativePath(unsigned i) const {
+  return files.getRelativePath(i);
+}
+
+
+SmartPointer<File> Project::findFile(const string &path) const {
+  return files.find(path);
+}
+
+
+void Project::addFile(const string &path) {
+  if (filename.empty()) {
+    filename = SystemUtilities::basename(path);
+    filename = SystemUtilities::swapExtension(filename, "camotics");
+  }
+  files.add(path);
+}
+
+
 void Project::setUnits(GCode::Units units) {
   if (units == getUnits()) return;
   this->units = units;

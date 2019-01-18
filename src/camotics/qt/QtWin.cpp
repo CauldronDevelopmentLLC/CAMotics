@@ -1087,7 +1087,7 @@ void QtWin::openProject(const string &_filename) {
       GCode::ToolTable toolTable = getNewToolTable();
       GCode::Units units = getNewUnits();
 
-      project->getFiles().add(filename);
+      project->addFile(filename);
       project->setUnits(units);
       project->getTools() = toolTable;
     }
@@ -1158,9 +1158,8 @@ GCode::Units QtWin::getDefaultUnits() const {
 void QtWin::updateFiles() {
   QStringList list;
 
-  const Project::Files &files = project->getFiles();
-  for (unsigned i = 0; i < files.size(); i++)
-    list.append(QString::fromUtf8(files.getRelativePath(i).c_str()));
+  for (unsigned i = 0; i < project->getFileCount(); i++)
+    list.append(QString::fromUtf8(project->getFileRelativePath(i).c_str()));
 
   ui->filesListView->setModel(new QStringListModel(list));
 }
@@ -1188,7 +1187,7 @@ void QtWin::newFile(bool tpl) {
     return;
   }
 
-  project->getFiles().add(filename);
+  project->addFile(filename);
   updateFiles();
 }
 
@@ -1204,19 +1203,19 @@ void QtWin::addFile() {
     // TODO handle CAM JSON
   }
 
-  project->getFiles().add(filename);
+  project->addFile(filename);
   updateFiles();
 }
 
 
 void QtWin::editFile(unsigned index) {
-  SmartPointer<Project::File> file = project->getFiles().get(index);
+  SmartPointer<Project::File> file = project->getFile(index);
   if (!file.isNull()) ui->fileTabManager->open(file);
 }
 
 
 void QtWin::removeFile(unsigned index) {
-  project->getFiles().remove(index);
+  project->removeFile(index);
   updateFiles();
 }
 
@@ -1239,7 +1238,7 @@ bool QtWin::checkSave(bool canCancel) {
 
 
 void QtWin::activateFile(const string &filename, int line, int col) {
-  SmartPointer<Project::File> file = project->getFiles().find(filename);
+  SmartPointer<Project::File> file = project->findFile(filename);
   if (!file.isNull()) ui->fileTabManager->open(file, line, col);
 }
 

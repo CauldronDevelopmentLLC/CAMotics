@@ -21,6 +21,7 @@
  - Fixed view reset during rotation bug.
  - Added Ctrl-R for reload/run.
  - Fixed recent projects list.
+ - Set default new project name from first file added.
 
 ## v1.1.2:
  - Fixed ``Could not save project: Invalid file tab index 0``. #225

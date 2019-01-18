@@ -47,7 +47,7 @@ void ProjectModel::setProject(const SmartPointer<Project::Project> &project) {
 
 
 string ProjectModel::getFile(unsigned i) const {
-  return project->getFiles().getRelativePath(i);
+  return project->getFileRelativePath(i);
 }
 
 
@@ -161,7 +161,7 @@ int ProjectModel::rowCount(const QModelIndex &parent) const {
   switch (getType(parent)) {
   case NULL_ITEM: return 1;
   case PROJECT_ITEM: return 2;
-  case PATHS_ITEM: return project->getFiles().size();
+  case PATHS_ITEM: return project->getFileCount();
   case TOOLS_ITEM: return project->getTools().size();
   default: return 0;
   }

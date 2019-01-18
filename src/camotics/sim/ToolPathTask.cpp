@@ -53,9 +53,8 @@ ToolPathTask::ToolPathTask(const Project::Project &project) :
   tools(project.getTools()), units(project.getUnits()),
   simJSON(project.toString()), errors(0) {
 
-  const Project::Files &files = project.getFiles();
-  for (unsigned i = 0; i < files.size(); i++)
-    this->files.push_back(files.get(i)->getPath());
+  for (unsigned i = 0; i < project.getFileCount(); i++)
+    files.push_back(project.getFile(i)->getPath());
 }
 
 
