@@ -173,13 +173,13 @@ void ViewPort::updateRotation(int x, int y) {
   Vector3D current = findBallVector(x, y);
   double angle = fmod((4 * rotationStartVec.angleBetween(current)), (2 * M_PI));
   QuaternionD delta(AxisAngleD(angle, rotationStartVec.crossProduct(current)));
-  rotationQuat =
+  QuaternionD newQuat =
     QuaternionD(delta.normalize()).multiply(rotationStart).normalize();
 
-  if (!rotationQuat.isReal()) resetView();
+  if (!newQuat.isReal()) return;
 
+  rotationQuat = newQuat;
   rotationQuat.toAxisAngle().toGLRotation(rotation);
-  LOG_DEBUG(1, rotationQuat);
 }
 
 

@@ -18,6 +18,7 @@
  - Handle long or even infinite GCode programs better.
  - Implemented M70-M73
  - More direct prespective view.
+ - Fixed view reset during rotation bug.
 
 ## v1.1.2:
  - Fixed ``Could not save project: Invalid file tab index 0``. #225
