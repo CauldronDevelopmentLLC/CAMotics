@@ -137,10 +137,9 @@ QtWin::QtWin(Application &app) :
   // Hide unfinished optimize
   ui->actionOptimize->setVisible(false);
 
-  // P.H.
   // Set action shortcuts
   ui->actionZoomIn->setShortcut(tr("Alt+-"));
-  ui->actionZoomOut->setShortcuts({ tr("Alt+="), tr("Alt++") });
+  ui->actionZoomOut->setShortcuts({tr("Alt+="), tr("Alt++")});
   ui->actionZoomAll->setShortcut(tr("Alt+A"));
   ui->actionToggleConsole->setShortcut(tr("Alt+C"));
   ui->actionTopView->setShortcut(tr("Alt+1"));
@@ -150,6 +149,7 @@ QtWin::QtWin(Application &app) :
   ui->actionRightView->setShortcut(tr("Alt+5"));
   ui->actionBottomView->setShortcut(tr("Alt+6"));
   ui->actionIsoView->setShortcut(tr("Alt+7"));
+  ui->actionRun->setShortcuts({tr("Ctrl+R"), tr("F5")});
 
   // Load icons
   playIcon.addFile(QString::fromUtf8(":/icons/play.png"), QSize(),
