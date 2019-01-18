@@ -417,8 +417,8 @@ void QtWin::loadExamples() {
 void QtWin::loadRecentProjects() {
   QSettings settings;
   int size = settings.beginReadArray("recentProjects");
-  bool hasRemoved = false;
   QStringList recents;
+  QSet<QString> unique;
 
   for (int i = 0; i < size; i++) {
     settings.setArrayIndex(i);
@@ -426,25 +426,27 @@ void QtWin::loadRecentProjects() {
     QFileInfo fi(recent);
 
     if (fi.exists() && fi.isReadable()) {
+      QString canonical = fi.canonicalFilePath();
+      if (unique.contains(canonical)) continue;
+      unique.insert(canonical);
+
       QAction *action = ui->menuRecent_projects->
         addAction(recent, &recentProjectsMapper, SLOT(map()));
       recentProjectsMapper.setMapping(action, recent);
       recents.append(recent);
-
-    } else hasRemoved = true; // file removed/inaccessible -> set the flag
+    }
   }
 
   settings.endArray();
 
-  // if any of the recent projects are inaccessible rewrite the whole list
-  if (hasRemoved) {
+  // If any of the recent projects are inaccessible, rewrite the whole list.
+  if (recents.size() != size) {
     settings.beginWriteArray("recentProjects", recents.size());
     int i = 0;
 
     foreach (QString recent, recents) {
-      settings.setArrayIndex(i);
+      settings.setArrayIndex(i++);
       settings.setValue("fileName", recent);
-      i++;
     }
 
     settings.endArray();
@@ -997,37 +999,37 @@ void QtWin::openProject(const string &_filename) {
     settings.setArrayIndex(i);
     QString recent = settings.value("fileName").toString();
 
-    // skip the currently opened project from the recents
-    // if it was already present in the recents projects list
+    // Skip the currently opened project from the recents
+    // if it was already present in the recents projects list.
     if (recent != QString::fromUtf8(filename.c_str()))
       recents.append(recent);
   }
   settings.endArray();
 
-  // reload the actions in the recent menu too to move the opened file to the
-  // first position
+  // Reload the actions in the recent menu too to move the opened file to the
+  // first position.
   foreach (QAction *action, ui->menuRecent_projects->actions()) {
     ui->menuRecent_projects->removeAction(action);
     delete action;
   }
 
-  // there is no way to remove an array item from QSettings
-  // rewrite the whole array if the order changed
+  // There is no way to remove an array item from QSettings
+  // rewrite the whole array if the order changed.
   recents.prepend(QString::fromUtf8(filename.c_str()));
 
   settings.beginWriteArray("recentProjects");
   const int maxRecentsSize = 20;
-  int skipIndex =
-    recents.size() < maxRecentsSize ? 0 : recents.size() - maxRecentsSize;
   int i = 0;
 
-  foreach (QString recent, recents.mid(skipIndex)) {
+  foreach (QString recent, recents) {
     QAction *action = ui->menuRecent_projects->
       addAction(recent, &recentProjectsMapper, SLOT(map()));
     recentProjectsMapper.setMapping(action, recent);
 
-    settings.setArrayIndex(i++);
+    settings.setArrayIndex(i);
     settings.setValue("fileName", recent);
+
+    if (++i == maxRecentsSize) break;
   }
 
   settings.endArray();
