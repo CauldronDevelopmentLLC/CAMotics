@@ -71,6 +71,8 @@ void Viewer::draw(const View &view) {
   if (view.isFlagSet(View::SHOW_AXES_FLAG))
     view.drawAxes(view.workpiece->getBounds());
 
+  view.setLighting(false);
+
   // Workpiece bounds
   if (!view.isFlagSet(View::SHOW_WORKPIECE_FLAG) &&
       view.isFlagSet(View::SHOW_WORKPIECE_BOUNDS_FLAG)) {
@@ -83,6 +85,8 @@ void Viewer::draw(const View &view) {
   // GCode::Tool path
   view.path->update(view.isFlagSet(View::PATH_INTENSITY_FLAG));
   if (view.isFlagSet(View::SHOW_PATH_FLAG)) view.path->draw();
+
+  view.setLighting(true);
 
   // Model
   if (view.isFlagSet(View::SHOW_WORKPIECE_FLAG | View::SHOW_SURFACE_FLAG)) {
