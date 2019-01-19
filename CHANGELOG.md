@@ -22,6 +22,7 @@
  - Added Ctrl-R for reload/run.
  - Fixed recent projects list.
  - Set default new project name from first file added.
+ - Several fixes for tool editor.
 
 ## v1.1.2:
  - Fixed ``Could not save project: Invalid file tab index 0``. #225

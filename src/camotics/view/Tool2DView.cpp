@@ -110,7 +110,7 @@ void Tool2DView::draw() {
   double diameter = tool.getDiameter();
   double snubDiameter =
     shape == GCode::ToolShape::TS_SNUBNOSE ? tool.getSnubDiameter() : 0;
-  string title = String::printf("GCode::Tool #%d", tool.getNumber());
+  string title = String::printf("Tool #%d", tool.getNumber());
   if (!simple) title = title + ": " + tool.getText();
 
   // Margin

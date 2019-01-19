@@ -94,6 +94,11 @@ double Tool::getAngle() const {
 }
 
 
+void Tool::setRadiusFromAngle(double angle) {
+  setRadius(getLength() / tan((1 - angle / 180.0) * M_PI / 2.0));
+}
+
+
 void Tool::setLengthFromAngle(double angle) {
   setLength(getRadius() * tan((1 - angle / 180.0) * M_PI / 2.0));
 }

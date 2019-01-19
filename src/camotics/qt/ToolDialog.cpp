@@ -22,15 +22,28 @@
 
 #include "ui_tool_dialog.h"
 
-using namespace std;
+#include <cbang/util/SmartToggle.h>
+
 using namespace CAMotics;
+using namespace cb;
+using namespace std;
 
 
 ToolDialog::ToolDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::ToolDialog), updating(false) {
+  QDialog(parent, Qt::WindowTitleHint | Qt::CustomizeWindowHint |
+          Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint),
+  ui(new Ui::ToolDialog), updating(false) {
   ui->setupUi(this);
   ui->toolView->setScene(&scene);
 }
+
+
+bool ToolDialog::isMetric() const {
+  return tool.getUnits() == GCode::Units::METRIC;
+}
+
+
+double ToolDialog::getScale() const {return isMetric() ? 1.0 : (1.0 / 25.4);}
 
 
 int ToolDialog::edit() {
@@ -39,61 +52,95 @@ int ToolDialog::edit() {
 }
 
 
-void ToolDialog::update() {
-  updating = true;
+void ToolDialog::updateNumber() {
+  ui->numberSpinBox->setValue((int)tool.getNumber());
+}
 
-  GCode::Units units = tool.getUnits();
-  double scale = units == GCode::Units::METRIC ? 1.0 : 1.0 / 25.4;
-  GCode::ToolShape shape = tool.getShape();
-  double length = tool.getLength();
-  double radius = tool.getRadius();
 
-  // Limits
-  if (shape == GCode::ToolShape::TS_BALLNOSE && length < radius)
-    tool.setLength(radius);
+void ToolDialog::updateUnits() {
+  // ComboBox
+  ui->unitsComboBox->setCurrentIndex(tool.getUnits());
 
   // Step
-  double step = units == GCode::Units::METRIC ? 1 : 0.125;
+  const double step = isMetric() ? 1 : 0.125;
   ui->lengthDoubleSpinBox->setSingleStep(step);
   ui->diameterDoubleSpinBox->setSingleStep(step);
   ui->snubDiameterDoubleSpinBox->setSingleStep(step);
 
   // Suffix
-  const char *suffix = units == GCode::Units::METRIC ? "mm" : "in";
+  const char *suffix = isMetric() ? "mm" : "in";
   ui->lengthDoubleSpinBox->setSuffix(suffix);
   ui->diameterDoubleSpinBox->setSuffix(suffix);
   ui->snubDiameterDoubleSpinBox->setSuffix(suffix);
+}
+
+
+void ToolDialog::updateShape() {
+  // ComboBox
+  GCode::ToolShape shape = tool.getShape();
+  ui->shapeComboBox->setCurrentIndex(shape);
 
   // Visibility
-  ui->angleDoubleSpinBox->setVisible(shape == GCode::ToolShape::TS_CONICAL);
-  ui->angleLabel->setVisible(shape == GCode::ToolShape::TS_CONICAL);
-  ui->snubDiameterDoubleSpinBox->
-    setVisible(shape == GCode::ToolShape::TS_SNUBNOSE);
-  ui->snubDiameterLabel->setVisible(shape == GCode::ToolShape::TS_SNUBNOSE);
+  ui->angleDoubleSpinBox->setVisible(shape == TS_CONICAL);
+  ui->angleLabel->setVisible(shape == TS_CONICAL);
+  ui->snubDiameterDoubleSpinBox-> setVisible(shape == TS_SNUBNOSE);
+  ui->snubDiameterLabel->setVisible(shape == TS_SNUBNOSE);
+}
 
-#define UPDATE(UI, GET, SET, VALUE)                 \
-  if (ui->UI->GET() != (VALUE)) ui->UI->SET(VALUE);
 
-  // Values
-  UPDATE(numberSpinBox, value, setValue, (int)tool.getNumber());
-  UPDATE(unitsComboBox, currentIndex, setCurrentIndex, tool.getUnits());
-  UPDATE(shapeComboBox, currentIndex, setCurrentIndex, tool.getShape());
-  UPDATE(angleDoubleSpinBox, value, setValue, tool.getAngle());
-  UPDATE(lengthDoubleSpinBox, value, setValue, tool.getLength() * scale);
-  UPDATE(diameterDoubleSpinBox, value, setValue, tool.getDiameter() * scale);
-  UPDATE(snubDiameterDoubleSpinBox, value, setValue,
-         tool.getSnubDiameter() * scale);
-  UPDATE(descriptionLineEdit, text, setText,
-         QString::fromUtf8(tool.getDescription().c_str()));
+void ToolDialog::updateAngle() {
+  ui->angleDoubleSpinBox->setValue(tool.getAngle());
+}
 
-  scene.update(tool, ui->toolView->frameSize());
-  updating = false;
+
+void ToolDialog::limitLength() {
+  if (tool.getShape() == TS_BALLNOSE && tool.getLength() < tool.getRadius()) {
+    tool.setLength(tool.getRadius());
+    updateLength();
+  }
+}
+
+
+void ToolDialog::updateLength() {
+  ui->lengthDoubleSpinBox->setValue(tool.getLength() * getScale());
+}
+
+
+void ToolDialog::updateDiameter() {
+  ui->diameterDoubleSpinBox->setValue(tool.getDiameter() * getScale());
+}
+
+
+void ToolDialog::updateSnubDiameter() {
+  ui->snubDiameterDoubleSpinBox->setValue(tool.getSnubDiameter() * getScale());
+}
+
+
+void ToolDialog::updateDescription() {
+  ui->descriptionLineEdit->
+    setText(QString::fromUtf8(tool.getDescription().c_str()));
+}
+
+
+void ToolDialog::updateScene() {scene.update(tool, ui->toolView->frameSize());}
+
+
+void ToolDialog::update() {
+  updateNumber();
+  updateUnits();
+  updateShape();
+  updateAngle();
+  updateLength();
+  updateDiameter();
+  updateSnubDiameter();
+  updateDescription();
+  updateScene();
 }
 
 
 void ToolDialog::resizeEvent(QResizeEvent *event) {
   QDialog::resizeEvent(event);
-  update();
+  updateScene();
 }
 
 
@@ -105,6 +152,8 @@ void ToolDialog::showEvent(QShowEvent *event) {
 
 void ToolDialog::on_numberSpinBox_valueChanged(int value) {
   if (updating) return;
+  SmartToggle toggle(updating);
+
   tool.setNumber((unsigned)value);
   update();
 }
@@ -112,61 +161,84 @@ void ToolDialog::on_numberSpinBox_valueChanged(int value) {
 
 void ToolDialog::on_unitsComboBox_currentIndexChanged(int value) {
   if (updating) return;
+  SmartToggle toggle(updating);
+
   tool.setUnits((GCode::Units::enum_t)value);
-  update();
+  updateUnits();
+  updateLength();
+  updateDiameter();
+  updateSnubDiameter();
+  updateScene();
 }
 
 
 void ToolDialog::on_shapeComboBox_currentIndexChanged(int value) {
   if (updating) return;
+  SmartToggle toggle(updating);
+
   tool.setShape((GCode::ToolShape::enum_t)value);
-  update();
+  updateShape();
+  limitLength();
+  updateScene();
 }
 
 
 void ToolDialog::on_angleDoubleSpinBox_valueChanged(double angle) {
   if (updating) return;
+  SmartToggle toggle(updating);
+
   tool.setLengthFromAngle(angle);
-  update();
+  updateLength();
+  updateScene();
 }
 
 
 void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double length) {
   if (updating) return;
+  SmartToggle toggle(updating);
 
-  double scale = tool.getUnits() == GCode::Units::METRIC ? 1.0 : 25.4;
-  tool.setLength(length * scale);
+  double angle = tool.getAngle(); // Get angle before length changes
+  tool.setLength(length * getScale());
+  limitLength();
 
-  update();
+  if (tool.getShape() == TS_CONICAL) {
+    tool.setRadiusFromAngle(angle);
+    updateDiameter();
+  }
+
+  updateScene();
 }
 
 
 void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double diameter) {
   if (updating) return;
+  SmartToggle toggle(updating);
 
-  double scale = tool.getUnits() == GCode::Units::METRIC ? 1.0 : 25.4;
-  double angle = tool.getAngle();
+  double angle = tool.getAngle(); // Get angle before diameter changes
+  tool.setDiameter(diameter * getScale());
 
-  tool.setDiameter(diameter * scale);
-  if (tool.getShape() == GCode::ToolShape::TS_CONICAL)
+  if (tool.getShape() == TS_CONICAL) {
     tool.setLengthFromAngle(angle);
+    updateLength();
+  }
 
-  update();
+  updateScene();
 }
 
 
 void ToolDialog::on_snubDiameterDoubleSpinBox_valueChanged(double value) {
   if (updating) return;
+  SmartToggle toggle(updating);
 
-  double scale = tool.getUnits() == GCode::Units::METRIC ? 1.0 : 25.4;
-
-  tool.setSnubDiameter(value * scale);
-  update();
+  tool.setSnubDiameter(value * getScale());
+  updateScene();
 }
 
 
 void ToolDialog::on_descriptionLineEdit_textChanged(const QString &value) {
   if (updating) return;
+  SmartToggle toggle(updating);
+
   tool.setDescription(value.toUtf8().data());
-  update();
+  updateScene();
 }

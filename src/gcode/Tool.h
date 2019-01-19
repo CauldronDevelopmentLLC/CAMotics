@@ -72,6 +72,7 @@ namespace GCode {
     double getAngle() const;
     double getLength() const {return getZ();}
     double getRadius() const {return vars[0];}
+    void setRadiusFromAngle(double angle);
     double getDiameter() const {return vars[0] * 2;}
     double getSnubDiameter() const {return snubDiameter;}
 

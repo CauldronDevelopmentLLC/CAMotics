@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>ToolDialog</class>
  <widget class="QDialog" name="ToolDialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -10,324 +13,323 @@
     <height>450</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>710</width>
+    <height>450</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>100000</width>
+    <height>100000</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Tool Editor</string>
   </property>
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>10</y>
-     <width>690</width>
-     <height>437</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <property name="spacing">
-     <number>6</number>
-    </property>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>6</number>
-      </property>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_45">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_45">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Number</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="numberSpinBox">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>999</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_49">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Units</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="unitsComboBox">
+           <item>
             <property name="text">
-             <string>Number</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="numberSpinBox">
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>999</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_49">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Units</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="unitsComboBox">
-            <item>
-             <property name="text">
-              <string>mm</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>inch</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_46">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Shape</string>
-            </property>
-            <property name="buddy">
-             <cstring>shapeComboBox</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="shapeComboBox">
-            <item>
-             <property name="text">
-              <string>Cylindrical</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Conical</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Ballnose</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Spheroid</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Snubnose</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="angleLabel">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Angle</string>
-            </property>
-            <property name="buddy">
-             <cstring>lengthDoubleSpinBox</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="angleDoubleSpinBox">
-            <property name="suffix">
-             <string>deg</string>
-            </property>
-            <property name="decimals">
-             <number>2</number>
-            </property>
-            <property name="minimum">
-             <double>0.010000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>180.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>90.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_47">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Length</string>
-            </property>
-            <property name="buddy">
-             <cstring>lengthDoubleSpinBox</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QDoubleSpinBox" name="lengthDoubleSpinBox">
-            <property name="suffix">
              <string>mm</string>
             </property>
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="minimum">
-             <double>0.000100000000000</double>
-            </property>
-            <property name="maximum">
-             <double>10000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_48">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
+           </item>
+           <item>
             <property name="text">
-             <string>Diameter</string>
+             <string>inch</string>
             </property>
-            <property name="buddy">
-             <cstring>diameterDoubleSpinBox</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QDoubleSpinBox" name="diameterDoubleSpinBox">
-            <property name="suffix">
-             <string>mm</string>
-            </property>
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="minimum">
-             <double>0.000100000000000</double>
-            </property>
-            <property name="maximum">
-             <double>10000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="snubDiameterLabel">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_46">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Shape</string>
+           </property>
+           <property name="buddy">
+            <cstring>shapeComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="shapeComboBox">
+           <item>
             <property name="text">
-             <string>Snub Diameter</string>
+             <string>Cylindrical</string>
             </property>
-            <property name="buddy">
-             <cstring>snubDiameterDoubleSpinBox</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QDoubleSpinBox" name="snubDiameterDoubleSpinBox">
-            <property name="suffix">
-             <string>mm</string>
-            </property>
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="minimum">
-             <double>0.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>10000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_50">
-            <property name="font">
-             <font>
-              <underline>true</underline>
-             </font>
-            </property>
+           </item>
+           <item>
             <property name="text">
-             <string>Description</string>
+             <string>Conical</string>
             </property>
-            <property name="buddy">
-             <cstring>descriptionLineEdit</cstring>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ballnose</string>
             </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QLineEdit" name="descriptionLineEdit"/>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QGraphicsView" name="toolView">
-        <property name="minimumSize">
-         <size>
-          <width>400</width>
-          <height>400</height>
-         </size>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QDialogButtonBox" name="buttonBox">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+           </item>
+           <item>
+            <property name="text">
+             <string>Spheroid</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Snubnose</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="angleLabel">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Angle</string>
+           </property>
+           <property name="buddy">
+            <cstring>lengthDoubleSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QDoubleSpinBox" name="angleDoubleSpinBox">
+           <property name="suffix">
+            <string>deg</string>
+           </property>
+           <property name="decimals">
+            <number>2</number>
+           </property>
+           <property name="minimum">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>180.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>90.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_47">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Length</string>
+           </property>
+           <property name="buddy">
+            <cstring>lengthDoubleSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QDoubleSpinBox" name="lengthDoubleSpinBox">
+           <property name="suffix">
+            <string>mm</string>
+           </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="minimum">
+            <double>0.000100000000000</double>
+           </property>
+           <property name="maximum">
+            <double>10000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_48">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Diameter</string>
+           </property>
+           <property name="buddy">
+            <cstring>diameterDoubleSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="diameterDoubleSpinBox">
+           <property name="suffix">
+            <string>mm</string>
+           </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="minimum">
+            <double>0.000100000000000</double>
+           </property>
+           <property name="maximum">
+            <double>10000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="snubDiameterLabel">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Snub Diameter</string>
+           </property>
+           <property name="buddy">
+            <cstring>snubDiameterDoubleSpinBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QDoubleSpinBox" name="snubDiameterDoubleSpinBox">
+           <property name="suffix">
+            <string>mm</string>
+           </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="minimum">
+            <double>0.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>10000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_50">
+           <property name="font">
+            <font>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Description</string>
+           </property>
+           <property name="buddy">
+            <cstring>descriptionLineEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLineEdit" name="descriptionLineEdit"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QGraphicsView" name="toolView">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <tabstops>
   <tabstop>numberSpinBox</tabstop>

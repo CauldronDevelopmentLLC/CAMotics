@@ -23,9 +23,7 @@
 using namespace CAMotics;
 
 
-ToolScene::ToolScene() {
-  QGraphicsScene::addItem(&item);
-}
+ToolScene::ToolScene() {QGraphicsScene::addItem(&item);}
 
 
 void ToolScene::update(const GCode::Tool &tool, const QSize &size) {

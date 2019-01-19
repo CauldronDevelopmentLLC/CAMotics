@@ -31,7 +31,7 @@ namespace Ui {class ToolDialog;}
 
 
 namespace CAMotics {
-  class ToolDialog : public QDialog {
+  class ToolDialog : public QDialog, public GCode::ToolShape {
     Q_OBJECT;
 
     cb::SmartPointer<Ui::ToolDialog> ui;
@@ -45,7 +45,21 @@ namespace CAMotics {
     void setTool(const GCode::Tool &tool) {this->tool = tool;}
     GCode::Tool &getTool() {return tool;}
 
+    bool isMetric() const;
+    double getScale() const;
+
     int edit();
+
+    void updateNumber();
+    void updateUnits();
+    void updateShape();
+    void updateAngle();
+    void limitLength();
+    void updateLength();
+    void updateDiameter();
+    void updateSnubDiameter();
+    void updateDescription();
+    void updateScene();
     void update();
 
     // From QDialog
