@@ -85,7 +85,8 @@ if not env.GetOption('clean'):
         # Qt
         qtmods = 'QtCore QtGui QtOpenGL QtNetwork QtWidgets QtWebSockets'
         env.EnableQtModules(qtmods.split())
-        env.CBDefine(['QT_NO_OPENGL_ES_2', 'GL_GLEXT_PROTOTYPES'])
+        env.CBDefine(['QT_NO_OPENGL_ES_2', 'GL_GLEXT_PROTOTYPES',
+                      'QT_COMPILING_QSTRING_COMPAT_CPP'])
 
         # OpenGL
         if env['PLATFORM'] == 'win32' or int(env.get('cross_mingw', 0)):
