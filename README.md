@@ -1,24 +1,19 @@
 ![CAMotics Logo][1]
 
-# [The Buildbotics CNC controller now on Kickstarter](http://buildbotics.com/kickstarter)
-![Now on Kickstarter](https://buildbotics.com/upload/controller_in_hand.gif)
-# [http://buildbotics.com/kickstarter](http://buildbotics.com/kickstarter)
-
 CAMotics is an Open-Source software which can simulate 3-axis NC
 machining. It is a fast, flexible and user friendly simulation
 software for the DIY and Open-Source community.  CAMotics works on
 Linux, OS-X and Windows.
 
-At home manufacturing is one of the next big technology
-revolutions. Much like the PC was 30 years ago. There have been major
-advances in desktop 3D printing (e.g. ​Maker Bot) yet uptake of desktop
-CNCs has lagged despite the availability of ​cheap CNC machines. One of
-the major reasons for this is a lack of Open-Source simulation and CAM
-(3D model to tool path conversion) software. CAM and NC machine
-simulation present some very difficult programming problems, as is
-evidenced by 30+ years of academic papers on these topics. Whereas, 3D
-printing simulation and tool path generation are much easier. Such
-software is essential to using a CNC.
+At home manufacturing is one of the next big technology revolutions. Much like
+the PC was 30 years ago. There have been major advances in desktop 3D printing
+yet uptake of desktop CNCs has lagged despite the availability of ​cheap CNC
+machines. One of the major reasons for this is a lack of Open-Source simulation
+and CAM (3D model to tool path conversion) software. CAM and NC machine
+simulation present some very difficult programming problems, as is evidenced by
+30+ years of academic papers on these topics. Whereas, 3D printing simulation
+and tool path generation are much easier. Such software is essential to using a
+CNC.
 
 Being able to simulate is a critical part of creating CNC tool
 paths. Programming a CNC with out a simulator is cutting with out
@@ -29,6 +24,12 @@ creative possibilities by allowing you to rapidly visualize and
 improve upon designs with out wasting material or breaking tools.
 
 See http://camotics.org/
+
+# Buildbotics Open-Source CNC Controller
+![Buildbotics CNC](https://buildbotics.com/upload/controller_in_hand.gif)
+
+You might also be interested in the Buildbotics CNC controller.  Check it out
+at https://buildbotics.com/.  Buildbotics purchases help support CAMotics.
 
 # License
 GNU General Public License version 2+.  See the file ``COPYING``.
