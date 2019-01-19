@@ -134,6 +134,7 @@ namespace GCode {
     Axes getAbsolutePosition() const;
     void setAbsolutePosition(const Axes &axes, Units units);
     Axes getNextAbsolutePosition(int vars, bool incremental) const;
+    bool isPositionChanging(int vars, bool incremental) const;
 
     // Move
     void move(const Axes &pos, int axes, bool rapid);

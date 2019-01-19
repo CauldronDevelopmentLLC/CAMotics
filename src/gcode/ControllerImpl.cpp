@@ -311,6 +311,12 @@ Axes ControllerImpl::getNextAbsolutePosition(int vars, bool incremental) const {
 }
 
 
+bool ControllerImpl::isPositionChanging(int vars, bool incremental) const {
+  Axes nextPos = getNextAbsolutePosition(vars, state.incrementalDistanceMode);
+  return nextPos != getAbsolutePosition();
+}
+
+
 void ControllerImpl::move(const Axes &pos, int axes, bool rapid) {
   machine.move(pos, axes, rapid);
   setAbsolutePosition(pos, getUnits());
@@ -427,6 +433,9 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
 void ControllerImpl::straightProbe(int vars, bool towardWorkpiece,
                                    bool signalError) {
+  if (!isPositionChanging(vars, state.incrementalDistanceMode))
+    THROW("Probe target position is same as current position");
+
   syncState = SYNC_PROBE; // Synchronize with found position
   machine.seek(PROBE, towardWorkpiece, signalError);
   makeMove(vars, false, state.incrementalDistanceMode);
@@ -465,6 +474,9 @@ void ControllerImpl::seek(int vars, bool active, bool error) {
     default: THROW("Seek requires axis");
     }
   }
+
+  if (!isPositionChanging(vars, true))
+    THROW("Seek target position is same as current position");
 
   syncState = SYNC_SEEK; // Synchronize with found position
   machine.seek(port, active, error);
