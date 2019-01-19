@@ -456,6 +456,52 @@ void QtWin::loadRecentProjects() {
 }
 
 
+void QtWin::updateRecentProjects(const string &_filename) {
+  QSettings settings;
+  QString filename = QString::fromUtf8(_filename.c_str());
+  int size = settings.beginReadArray("recentProjects");
+  QStringList recents;
+
+  for (int i = 0; i < size; i++) {
+    settings.setArrayIndex(i);
+    QString recent = settings.value("fileName").toString();
+
+    // Skip the currently opened project from the recents
+    // if it was already present in the recents projects list.
+    if (recent != filename) recents.append(recent);
+  }
+  settings.endArray();
+
+  // Reload the actions in the recent menu too to move the opened file to the
+  // first position.
+  foreach (QAction *action, ui->menuRecent_projects->actions()) {
+    ui->menuRecent_projects->removeAction(action);
+    delete action;
+  }
+
+  // There is no way to remove an array item from QSettings
+  // rewrite the whole array if the order changed.
+  recents.prepend(filename);
+
+  settings.beginWriteArray("recentProjects");
+  const int maxRecentsSize = 20;
+  int i = 0;
+
+  foreach (QString recent, recents) {
+    QAction *action = ui->menuRecent_projects->
+      addAction(recent, &recentProjectsMapper, SLOT(map()));
+    recentProjectsMapper.setMapping(action, recent);
+
+    settings.setArrayIndex(i);
+    settings.setValue("fileName", recent);
+
+    if (++i == maxRecentsSize) break;
+  }
+
+  settings.endArray();
+}
+
+
 void QtWin::saveAllState() {
   Settings settings;
   settings.set("MainWindow/State", saveState());
@@ -935,9 +981,8 @@ string QtWin::openFile(const string &title, const string &filters,
 
 
 void QtWin::loadProject() {
-  toolsChanged();
+  updateToolTables();
   updateFiles();
-  project->markClean();
 }
 
 
@@ -969,71 +1014,31 @@ void QtWin::newProject() {
 
   reload();
   loadProject();
+  project->markClean();
 }
 
 
 void QtWin::openProject(const string &_filename) {
   if (!checkSave()) return;
 
-  project = new Project::Project;
-
   string filename = _filename;
-  QSettings settings;
-  QString lastDir =
-    settings.value("Projects/lastDir", QDir::homePath()).toString();
 
   if (filename.empty()) {
+    QSettings settings;
+    QString lastDir =
+      settings.value("Projects/lastDir", QDir::homePath()).toString();
+
     filename = QFileDialog::getOpenFileName
       (this, tr("Open File"), lastDir,
        tr("Supported Files "
           "(*.camotics *.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;"
           "All Files (*.*)")).toUtf8().data();
+
     if (filename.empty()) return;
     settings.setValue("Projects/lastDir", QString::fromUtf8(filename.c_str()));
   }
 
-  int size = settings.beginReadArray("recentProjects");
-  QStringList recents;
-
-  for (int i = 0; i < size; i++) {
-    settings.setArrayIndex(i);
-    QString recent = settings.value("fileName").toString();
-
-    // Skip the currently opened project from the recents
-    // if it was already present in the recents projects list.
-    if (recent != QString::fromUtf8(filename.c_str()))
-      recents.append(recent);
-  }
-  settings.endArray();
-
-  // Reload the actions in the recent menu too to move the opened file to the
-  // first position.
-  foreach (QAction *action, ui->menuRecent_projects->actions()) {
-    ui->menuRecent_projects->removeAction(action);
-    delete action;
-  }
-
-  // There is no way to remove an array item from QSettings
-  // rewrite the whole array if the order changed.
-  recents.prepend(QString::fromUtf8(filename.c_str()));
-
-  settings.beginWriteArray("recentProjects");
-  const int maxRecentsSize = 20;
-  int i = 0;
-
-  foreach (QString recent, recents) {
-    QAction *action = ui->menuRecent_projects->
-      addAction(recent, &recentProjectsMapper, SLOT(map()));
-    recentProjectsMapper.setMapping(action, recent);
-
-    settings.setArrayIndex(i);
-    settings.setValue("fileName", recent);
-
-    if (++i == maxRecentsSize) break;
-  }
-
-  settings.endArray();
-
+  updateRecentProjects(filename);
   showMessage("Opening " + filename);
   LOG_INFO(1, "Opening " << filename);
 
@@ -1079,6 +1084,7 @@ void QtWin::openProject(const string &_filename) {
       if (!runNewProjectDialog()) return;
 
       if (String::toLower(SystemUtilities::extension(filename)) == "dxf") {
+        THROW("DXF supported not yet implemented");
         if (!runCAMDialog(filename)) return;
         // TODO handle CAM JSON
       }
@@ -1087,6 +1093,7 @@ void QtWin::openProject(const string &_filename) {
       GCode::ToolTable toolTable = getNewToolTable();
       GCode::Units units = getNewUnits();
 
+      project = new Project::Project;
       project->addFile(filename);
       project->setUnits(units);
       project->getTools() = toolTable;
@@ -1103,9 +1110,10 @@ bool QtWin::saveProject(bool saveAs) {
   string filename = project->getFilename();
   string ext = SystemUtilities::extension(filename);
 
-  if (saveAs || filename.empty() || ext != "camotics") {
-    if (!filename.empty())
-      filename = SystemUtilities::swapExtension(filename, "camotics");
+  if (saveAs || filename.empty() || ext != "camotics" ||
+      !project->wasLoaded()) {
+    if (filename.empty()) filename = "new-project.camotics";
+    else filename = SystemUtilities::swapExtension(filename, "camotics");
 
     filename =
       openFile("Save Project", "Projects (*.camotics)", filename, true);
@@ -1199,7 +1207,8 @@ void QtWin::addFile() {
   if (filename.empty()) return;
 
   if (String::toLower(SystemUtilities::extension(filename)) == "dxf") {
-    if (!runCAMDialog(filename)) return;
+    THROW("DXF supported not yet implemented");
+     if (!runCAMDialog(filename)) return;
     // TODO handle CAM JSON
   }
 
@@ -1232,8 +1241,7 @@ bool QtWin::checkSave(bool canCancel) {
                           QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 
   if (response == QMessageBox::Yes) return saveProject();
-  else if (response != QMessageBox::No) return false;
-  return true;
+  return response == QMessageBox::No;
 }
 
 

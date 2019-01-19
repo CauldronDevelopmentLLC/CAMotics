@@ -30,7 +30,7 @@ using namespace CAMotics::Project;
 
 
 Project::Project(const string &filename) :
-  dirty(false), filename(filename), files(getDirectory()),
+  dirty(false), filename(filename), loaded(false), files(getDirectory()),
   units(GCode::Units::METRIC),
   resolutionMode(ResolutionMode::RESOLUTION_MEDIUM), resolution(1) {
   if (!filename.empty()) load(filename);
@@ -77,10 +77,18 @@ SmartPointer<File> Project::findFile(const string &path) const {
 
 void Project::addFile(const string &path) {
   if (filename.empty()) {
-    filename = SystemUtilities::basename(path);
-    filename = SystemUtilities::swapExtension(filename, "camotics");
+    filename = SystemUtilities::swapExtension(path, "camotics");
+    files.setDirectory(SystemUtilities::dirname(path));
   }
+
   files.add(path);
+  markDirty();
+}
+
+
+void Project::removeFile(unsigned i) {
+  files.remove(i);
+  markDirty();
 }
 
 
@@ -143,6 +151,7 @@ void Project::load(const string &filename) {
     } else data = JSON::Reader::parse(filename);
 
     read(*data);
+    loaded = true;
   }
 
   markClean();

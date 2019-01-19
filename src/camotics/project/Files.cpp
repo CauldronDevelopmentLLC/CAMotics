@@ -51,13 +51,13 @@ SmartPointer<File> Files::find(const string &_path) const {
 
 
 void Files::add(const string &path) {
-  files.push_back(new File(SystemUtilities::absolute(directory, path)));
+  files.push_back(new File(SystemUtilities::absolute(path)));
 }
 
 
 void Files::read(const JSON::Value &value) {
   for (unsigned i = 0; i < value.size(); i++)
-    add(value.getString(i));
+    add(SystemUtilities::absolute(directory, value.getString(i)));
 }
 
 

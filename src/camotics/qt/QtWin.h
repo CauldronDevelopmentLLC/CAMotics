@@ -148,6 +148,8 @@ namespace CAMotics {
     void loadExamples();
     void loadRecentProjects();
 
+    void updateRecentProjects(const std::string &filename);
+
     void saveAllState();
     void restoreAllState();
     void setDefaultGeometry();

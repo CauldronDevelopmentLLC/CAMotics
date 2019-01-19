@@ -46,6 +46,7 @@ namespace CAMotics {
       bool dirty;
 
       std::string filename;
+      bool loaded;
 
       GCode::ToolTable tools;
       Workpiece workpiece;
@@ -69,6 +70,8 @@ namespace CAMotics {
       std::string getDirectory() const;
       std::string getUploadFilename() const;
 
+      bool wasLoaded() const {return loaded;}
+
       const GCode::ToolTable &getTools() const {return tools;}
       GCode::ToolTable &getTools() {return tools;}
 
@@ -80,7 +83,7 @@ namespace CAMotics {
       std::string getFileRelativePath(unsigned i) const;
       cb::SmartPointer<File> findFile(const std::string &path) const;
       void addFile(const std::string &filename);
-      void removeFile(unsigned i) {files.remove(i);}
+      void removeFile(unsigned i);
 
       void setUnits(GCode::Units units);
       GCode::Units getUnits() const {return units;}
