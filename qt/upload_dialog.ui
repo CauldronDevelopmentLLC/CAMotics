@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>416</width>
-    <height>224</height>
+    <width>400</width>
+    <height>225</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>225</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1000</width>
+    <height>225</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Upload GCode to CNC</string>
@@ -115,9 +127,15 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="cancelPushButton">
-       <property name="text">
-        <string>Cancel</string>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel</set>
        </property>
       </widget>
      </item>
@@ -138,5 +156,22 @@ p, li { white-space: pre-wrap; }
  <resources>
   <include location="camotics.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>UploadDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>272</x>
+     <y>200</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>195</x>
+     <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

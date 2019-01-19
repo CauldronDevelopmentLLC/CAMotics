@@ -45,7 +45,6 @@ namespace CAMotics {
     int exec();
 
   protected slots:
-    void on_cancelPushButton_clicked();
     void on_uploadPushButton_clicked();
   };
 }

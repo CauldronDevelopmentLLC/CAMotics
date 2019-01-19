@@ -61,5 +61,4 @@ int UploadDialog::exec() {
 }
 
 
-void UploadDialog::on_cancelPushButton_clicked() {reject();}
 void UploadDialog::on_uploadPushButton_clicked() {accept();}

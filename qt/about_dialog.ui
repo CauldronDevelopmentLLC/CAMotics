@@ -149,6 +149,19 @@ See software license for more information.</string>
       </spacer>
      </item>
      <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Close</set>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="creditsPushButton">
        <property name="text">
         <string>C&amp;redits</string>
@@ -159,13 +172,6 @@ See software license for more information.</string>
       <widget class="QPushButton" name="licensePushButton">
        <property name="text">
         <string>&amp;License</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Close</set>
        </property>
       </widget>
      </item>
