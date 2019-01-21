@@ -46,6 +46,7 @@ namespace CAMotics {
     unsigned getWidth() const {return width;}
     unsigned getHeight() const {return height;}
     double getZoom() const {return zoom;}
+    const double *getRotation() const {return rotation;}
 
     void zoomIn();
     void zoomOut();
