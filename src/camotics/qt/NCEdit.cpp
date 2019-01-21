@@ -366,6 +366,7 @@ bool NCEdit::isFolded(int line) const {
 
 bool NCEdit::findOnce(QString find, bool regex, int options) {
   QTextCursor cursor = textCursor();
+  QTextCursor savedCursor = cursor;
   QTextDocument::FindFlag opts = (QTextDocument::FindFlag)options;
 
   if (regex) cursor = document()->find(QRegExp(find), cursor, opts);
@@ -376,6 +377,7 @@ bool NCEdit::findOnce(QString find, bool regex, int options) {
     return true;
   }
 
+  setTextCursor(savedCursor);
   return false;
 }
 
@@ -384,8 +386,12 @@ void NCEdit::find(QString find, bool regex, int options) {
   bool found = true;
 
   if (!findOnce(find, regex, options)) {
+    QTextCursor savedCursor = textCursor();
     setTextCursor(QTextCursor()); // Wrap around
-    if (!findOnce(find, regex, options)) found = false;
+    if (!findOnce(find, regex, options)) {
+      found = false;
+      setTextCursor(savedCursor);
+    }
   }
 
   emit findResult(found);
