@@ -449,7 +449,7 @@ void ControllerImpl::straightProbe(int vars, bool towardWorkpiece,
 void ControllerImpl::seek(int vars, bool active, bool error) {
   port_t port;
 
-  if (vars & VT_P) port = (port_t)round(getVar('P'));
+  if (vars & VT_P) port = (port_t)(unsigned)round(getVar('P'));
   else {
     char targetAxis = 0;
     bool seekMin;
@@ -1114,7 +1114,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 660:
       input((vars & VT_P) ? getVar('P') : getVar('E'), vars & VT_P,
-            (input_mode_t)((vars & VT_L) ? getVar('L') : 0),
+            (input_mode_t)(unsigned)((vars & VT_L) ? getVar('L') : 0),
             (vars & VT_Q) ? getVar('Q') : 0);
       break;
 

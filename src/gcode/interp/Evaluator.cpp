@@ -124,9 +124,9 @@ double Evaluator::eval(NamedReference &e) {return lookupReference(e.getName());}
 
 
 double Evaluator::eval(Reference &e) {
-  double num = e.getExpression()->eval(*this);
+  unsigned num = (unsigned)round(e.getExpression()->eval(*this));
 
-  if (num < 1 || MAX_ADDRESS < num || ((unsigned)num) != num)
+  if (num < 1 || MAX_ADDRESS < num || (num) != num)
     THROWS(e.getLocation() << " Invalid reference number " << num);
 
   return lookupReference((address_t)num);
