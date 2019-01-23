@@ -99,7 +99,7 @@ void Project::setUnits(GCode::Units units) {
 }
 
 
-void Project::setResolutionMode(ResolutionMode x) {
+void Project::setResolutionMode(CAMotics::ResolutionMode x) {
   if (x == resolutionMode) return;
   resolutionMode = x;
   markDirty();
@@ -119,7 +119,8 @@ void Project::setResolution(double resolution) {
 }
 
 
-double Project::computeResolution(ResolutionMode mode, Rectangle3D bounds) {
+double Project::computeResolution(CAMotics::ResolutionMode mode,
+                                  Rectangle3D bounds) {
   if (mode == ResolutionMode::RESOLUTION_MANUAL || bounds == Rectangle3D())
     return 1;
 
