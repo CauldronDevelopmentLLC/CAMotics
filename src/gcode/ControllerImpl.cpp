@@ -708,6 +708,8 @@ void ControllerImpl::setHomed(int vars, bool homed) {
 void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
   LOG_WARNING("Cutter radius compensation not implemented"); // TODO
 
+  // NOTE, Fanuc may use ``D`` or ``H`` for the same purpose.
+
   try {
     if (dynamic) {
       state.toolDiameter = (left ? 1 : -1) * getVar('D');
@@ -1009,11 +1011,13 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 421: setCutterRadiusComp(vars, false, true);  break;
 
     case 430:
+      LOG_WARNING("Tool Length Offset not supported");
       state.toolLengthComp = true;
       loadToolOffsets((vars & VT_H) ? getVar('H') : getCurrentTool());
       break;
 
     case 431:
+      LOG_WARNING("Dynamic Tool Length Offset not supported");
       state.toolLengthComp = true;
       loadToolVarOffsets(vars);
       break;

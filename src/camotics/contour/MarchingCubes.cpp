@@ -52,8 +52,7 @@ void MarchingCubes::doCell(GridTreeRef &tree, const CubeSlice &slice,
     leaf->add(t);
   }
 
-  tree.insertLeaf(leaf.get(), offset);
-  leaf.adopt();
+  tree.insertLeaf(leaf.adopt(), offset);
 }
 
 
