@@ -1,38 +1,19 @@
 language: cpp
 compiler: gcc
-dist: trusty
-sudo: required
+dist: xenial
 
 env:
   global:
     - CBANG_HOME=$PWD/cbang
-    - CHAKRA_CORE_HOME=$PWD/ChakraCore
 
   matrix:
     - DEBUG_BUILD=1
     - DEBUG_BUILD=0
 
-install:
-  - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-  - echo deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main |
-      sudo tee -a /etc/apt/sources.list
-  - sudo apt-get update
-  - sudo apt-get install -y qt4-dev-tools libunwind8-dev clang-3.8
-  - sudo ln -s /usr/bin/clang-3.8 /usr/bin/clang
-  - sudo ln -s /usr/bin/clang++-3.8 /usr/bin/clang++
-
 before_script:
-  - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/ChakraCore.git
   - git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
 
 script:
-  - cd ChakraCore
-  - ./build.sh --static -j 8
-  - mkdir tmp
-  - cd tmp
-  - for i in $(find ../Build* -name \*.a); do ar x $i; done
-  - ar rcs ../libChakraCore.a *.o
-  - cd ../..
   - scons -C cbang debug=$DEBUG_BUILD -j 8
   - scons debug=$DEBUG_BUILD -j 8
 
@@ -41,17 +22,7 @@ addons:
     packages:
       - git
       - scons
-      - libbz2-dev
-      - zlib1g-dev
-      - libexpat1-dev
-      - libboost-iostreams-dev
-      - libboost-system-dev
-      - libboost-filesystem-dev
-      - libboost-regex-dev
-      - libsqlite3-dev
-      - libicu-dev
-      - libqt4-dev
-      - libqt4-opengl-dev
-      - libcairo2-dev
-      - libfreetype6-dev
       - libv8-dev
+      - qt5-default
+      - libqt5websockets5-dev
+      - libqt5opengl5-dev
