@@ -6,8 +6,7 @@
     "QTDIR": "$HOME/Qt/5.9.1/clang_64",
     "PKG_CONFIG_PATH": "$HOME/build/pkgconfig",
     "V8_HOME": "$HOME/build/v8",
-    "V8_LIBPATH": "$V8_HOME",
-    "OPENSSL_HOME": "$HOME/build/openssl-1.0.2i"
+    "V8_LIBPATH": "$V8_HOME"
   },
 
   "scons": {

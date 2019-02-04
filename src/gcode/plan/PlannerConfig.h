@@ -56,7 +56,7 @@ namespace GCode {
     unsigned idBits;
 
     std::string programStart;
-    std::map<const Code, std::string> overrides;
+    std::map<Code, std::string> overrides;
 
     PlannerConfig();
 
