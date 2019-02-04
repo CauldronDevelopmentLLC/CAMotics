@@ -20,18 +20,25 @@
 
 #include "Reference.h"
 
+#include <cbang/Math.h>
+
 using namespace std;
 using namespace GCode;
 
 
-double Reference::evalNumber(Evaluator &evaluator) {
-  return number = expr->eval(evaluator);
-  // TODO warn if ref value is not an integer
+address_t Reference::evalAddress(Evaluator &evaluator) {
+  double num = expr->eval(evaluator);
+
+  if (num < 1 || MAX_ADDRESS < num || !isfinite(num))
+    THROWS(getLocation() << " Invalid reference number " << num);
+
+  // NOTE MSVC does not allow direct conversion from double to address_t
+  return addr = (address_t)(unsigned)round(num);
 }
 
 
 double Reference::eval(Evaluator &evaluator) {
-  evalNumber(evaluator);
+  evalAddress(evaluator);
   return evaluator.eval(*this);
 }
 

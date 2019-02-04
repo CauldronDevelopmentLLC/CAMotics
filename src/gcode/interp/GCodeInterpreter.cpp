@@ -126,8 +126,7 @@ void GCodeInterpreter::operator()(const SmartPointer<Block> &block) {
       NamedReference *nameRef;
 
       if ((ref = assign->getReference()->instance<Reference>()))
-        setReference((address_t)(unsigned)ref->getNumber(),
-                     assign->getExprValue());
+        setReference(ref->getAddress(), assign->getExprValue());
 
       else if ((nameRef = assign->getReference()->instance<NamedReference>()))
         setReference(nameRef->getName(), assign->getExprValue());

@@ -20,23 +20,26 @@
 
 #pragma once
 
-
 #include "Entity.h"
 
+#include <gcode/Addresses.h>
+
 #include <cbang/SmartPointer.h>
+
 
 namespace GCode {
   class Reference : public Entity {
     cb::SmartPointer<Entity> expr;
-    double number;
+    address_t addr;
 
   public:
-    Reference(const cb::SmartPointer<Entity> &expr) : expr(expr), number(0) {}
+    Reference(const cb::SmartPointer<Entity> &expr) :
+      expr(expr), addr((address_t)0) {}
 
     cb::SmartPointer<Entity> getExpression() const {return expr;}
-    double getNumber() const {return number;}
+    address_t getAddress() const {return addr;}
 
-    double evalNumber(Evaluator &evaluator);  // Used by Assign
+    address_t evalAddress(Evaluator &evaluator);  // Used by Assign
 
     // From Entity
     double eval(Evaluator &evaluator);

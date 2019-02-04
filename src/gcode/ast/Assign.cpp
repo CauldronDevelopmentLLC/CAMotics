@@ -31,7 +31,7 @@ double Assign::eval(Evaluator &evaluator) {
 
   // Only eval numeric reference's number expression
   if (ref->instance<Reference>())
-    ref->instance<Reference>()->evalNumber(evaluator);
+    ref->instance<Reference>()->evalAddress(evaluator);
 
   return exprValue;
 }
