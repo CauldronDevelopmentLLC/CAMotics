@@ -32,13 +32,12 @@ namespace GCode {
   class GCodeMachine : public MachineAdapter {
     cb::SmartPointer<std::ostream> stream;
     Units units;
-    int oldTool;
     cb::FileLocation location;
     int axisFirstMove;
 
   public:
     GCodeMachine(const cb::SmartPointer<std::ostream> &stream, Units units) :
-      stream(stream), units(units), oldTool(-1), axisFirstMove(0) {}
+      stream(stream), units(units), axisFirstMove(0) {}
 
     void beginLine();
 

@@ -60,6 +60,7 @@ namespace CAMotics {
 
     void read(const cb::InputSource &source, const cb::Matrix4x4D &transform,
               bool reverseWinding);
+    using TriangleSurface::read;
 
 #ifdef CAMOTICS_GUI
     void drawLines(bool withVBOs);
