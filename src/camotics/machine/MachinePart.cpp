@@ -65,7 +65,8 @@ void MachinePart::read(const InputSource &source,
 
       int start = 1;
       while (line[start] == '0') start++;
-      unsigned n = String::parseU32(line.substr(start));
+      unsigned n = 0;
+      if (start != (int)equal) n = String::parseU32(line.substr(start));
 
       vector<string> nums;
       String::tokenize(line.substr(equal + 1), nums, ",");
