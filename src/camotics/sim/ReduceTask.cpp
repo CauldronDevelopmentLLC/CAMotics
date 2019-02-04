@@ -22,7 +22,7 @@
 
 #include <camotics/contour/Surface.h>
 
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 #include <cbang/time/TimeInterval.h>
 
 using namespace std;

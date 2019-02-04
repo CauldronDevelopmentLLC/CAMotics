@@ -20,7 +20,7 @@
 
 #include "QApplication.h"
 
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 
 using namespace cb;
 

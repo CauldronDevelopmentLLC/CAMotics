@@ -30,7 +30,7 @@
 
 #include <cbang/String.h>
 #include <cbang/Math.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 #include <cbang/util/HumanNumber.h>
 #include <cbang/time/HumanTime.h>
 

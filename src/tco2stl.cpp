@@ -27,7 +27,7 @@
 #include <cbang/ApplicationMain.h>
 #include <cbang/io/StringInputSource.h>
 #include <cbang/json/Reader.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 #include <cbang/geom/Vector.h>
 
 #include <vector>

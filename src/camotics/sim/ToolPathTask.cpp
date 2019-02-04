@@ -28,7 +28,7 @@
 #include <gcode/interp/Interpreter.h>
 #include <gcode/machine/Machine.h>
 
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 #include <cbang/util/SmartFunctor.h>
 
 #include <cbang/os/SystemUtilities.h>

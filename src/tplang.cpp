@@ -29,7 +29,7 @@
 #include <cbang/ApplicationMain.h>
 #include <cbang/io/StringInputSource.h>
 #include <cbang/json/Reader.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 
 #include <vector>
 
@@ -81,7 +81,7 @@ public:
 
 
 #ifdef HAVE_V8
-#include <cbang/v8/JSImpl.h>
+#include <cbang/js/v8/JSImpl.h>
 #endif
 
 

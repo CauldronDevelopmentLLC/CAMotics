@@ -42,7 +42,7 @@
 #include <cbang/os/DirectoryWalker.h>
 #include <cbang/log/Logger.h>
 #include <cbang/util/SmartInc.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 #include <cbang/time/TimeInterval.h>
 
 #include <QMouseEvent>

@@ -23,7 +23,7 @@
 #include <cbang/Info.h>
 #include <cbang/log/Logger.h>
 #include <cbang/os/SystemUtilities.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 
 using namespace std;
 using namespace CAMotics;

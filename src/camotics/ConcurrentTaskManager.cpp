@@ -22,7 +22,7 @@
 
 #include <cbang/util/SmartLock.h>
 #include <cbang/util/SmartUnlock.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 
 using namespace std;
 using namespace cb;

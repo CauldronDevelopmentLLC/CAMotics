@@ -24,7 +24,7 @@
 #include <cbang/Math.h>
 #include <cbang/Exception.h>
 #include <cbang/xml/XMLWriter.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 
 #include <string.h>
 

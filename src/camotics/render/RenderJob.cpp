@@ -25,7 +25,7 @@
 
 #include <cbang/Exception.h>
 #include <cbang/time/Timer.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 
 using namespace cb;
 using namespace CAMotics;

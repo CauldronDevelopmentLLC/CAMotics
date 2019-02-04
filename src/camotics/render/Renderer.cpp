@@ -30,7 +30,7 @@
 #include <cbang/time/TimeInterval.h>
 #include <cbang/time/Timer.h>
 #include <cbang/util/SmartLock.h>
-#include <cbang/util/DefaultCatch.h>
+#include <cbang/Catch.h>
 
 #include <cmath>
 #include <list>
