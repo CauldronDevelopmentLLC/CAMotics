@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <QOpenGLFunctions_1_1>
 #include <QOpenGLFunctions_2_1>
 
 #include <cbang/SStream.h>
@@ -34,12 +35,18 @@
 namespace CAMotics {
   void checkGLError(const std::string &message = std::string());
   bool haveVBOs();
+
+  QOpenGLContext &getGLCtx();
+
+  typedef QOpenGLFunctions_1_1 GLFuncs;
+  GLFuncs &getGLFuncs();
+
+  typedef QOpenGLFunctions_2_1 GLFuncs2_1;
+  GLFuncs2_1 &getGLFuncs2_1();
+
   void glDisk(double radius, unsigned segments);
   void glCylinder(double base, double top, double height, unsigned segments);
   void glSphere(double radius, unsigned slices, unsigned stacks);
-
-  typedef QOpenGLFunctions_2_1 GLFuncs;
-  GLFuncs &getGLFuncs();
 }
 
 #ifdef __DEBUG

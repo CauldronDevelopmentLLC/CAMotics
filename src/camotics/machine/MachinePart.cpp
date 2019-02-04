@@ -114,13 +114,15 @@ void MachinePart::drawLines(bool withVBOs) {
   GLFuncs &glFuncs = getGLFuncs();
 
   if (withVBOs && haveVBOs()) {
+    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+
     if (!vbuf) {
       glFuncs.glGenBuffers(1, &vbuf);
 
       // Vertices
       glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
       glFuncs.glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
-                            &lines[0], GL_STATIC_DRAW);
+                              &lines[0], GL_STATIC_DRAW);
     }
 
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);

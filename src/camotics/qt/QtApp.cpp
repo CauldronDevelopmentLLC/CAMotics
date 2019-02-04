@@ -103,6 +103,7 @@ void QtApp::run() {
   string org = Info::instance().get(getName(), "Organization");
   QCoreApplication::setOrganizationName(QString::fromUtf8(org.c_str()));
   QCoreApplication::setApplicationName(QString::fromUtf8(getName().c_str()));
+  QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 
   QtWin qtWin(*this);
   qtWin.init();

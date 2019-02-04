@@ -63,10 +63,8 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
 
 ToolPathView::~ToolPathView() {
   try {
-    GLFuncs &glFuncs = getGLFuncs();
-
-    if (colorVBuf) glFuncs.glDeleteBuffers(1, &colorVBuf);
-    if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
+    if (colorVBuf) getGLFuncs2_1().glDeleteBuffers(1, &colorVBuf);
+    if (vertexVBuf) getGLFuncs2_1().glDeleteBuffers(1, &vertexVBuf);
   } catch (...) {}
 }
 
@@ -219,11 +217,9 @@ void ToolPathView::update(bool intensity) {
   numColors = colors.size() / 3;
   numVertices = vertices.size() / 3;
 
-  // Setup GL Buffers
-  GLFuncs &glFuncs = getGLFuncs();
-
-  // Colors
+  // Setup color buffers
   if (useVBOs && !colors.empty()) {
+    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
     if (!colorVBuf) glFuncs.glGenBuffers(1, &colorVBuf);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glFuncs.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
@@ -231,8 +227,9 @@ void ToolPathView::update(bool intensity) {
     colors.clear();
   }
 
-  // Vertices
+  // Setup vertex buffers
   if (useVBOs && !vertices.empty()) {
+    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
     if (!vertexVBuf) glFuncs.glGenBuffers(1, &vertexVBuf);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glFuncs.glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
@@ -253,6 +250,7 @@ void ToolPathView::draw() {
   GLFuncs &glFuncs = getGLFuncs();
 
   if (useVBOs) {
+    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glFuncs.glColorPointer(3, GL_FLOAT, 0, 0);
 

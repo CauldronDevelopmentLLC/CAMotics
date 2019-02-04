@@ -85,7 +85,7 @@ TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
 TriangleSurface::~TriangleSurface() {
 #ifdef CAMOTICS_GUI
   try {
-    if (vbufs[0]) getGLFuncs().glDeleteBuffers(2, vbufs);
+    if (vbufs[0]) getGLFuncs2_1().glDeleteBuffers(2, vbufs);
   } catch (...) {}
 #endif
 }
@@ -95,10 +95,11 @@ void TriangleSurface::finalize(bool withVBOs) {
   if (finalized) return;
 
 #ifdef CAMOTICS_GUI
-  GLFuncs &glFuncs = getGLFuncs();
   useVBOs = haveVBOs() && withVBOs;
 
   if (useVBOs) {
+    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+
     if (!vbufs[0]) glFuncs.glGenBuffers(2, vbufs);
 
     // Vertices
@@ -168,6 +169,8 @@ void TriangleSurface::draw(bool withVBOs) {
   GLFuncs &glFuncs = getGLFuncs();
 
   if (useVBOs) {
+    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
     glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 

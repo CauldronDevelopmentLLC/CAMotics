@@ -53,9 +53,30 @@ namespace CAMotics {
 
 
   bool haveVBOs() {
-    if (!QOpenGLContext::currentContext()) return false;
-    QOpenGLFunctions *glFuncs = QOpenGLContext::currentContext()->functions();
-    return glFuncs && glFuncs->hasOpenGLFeature(QOpenGLFunctions::Buffers);
+    // Just check for an active context and OpenGL 2.1
+    return QOpenGLContext::currentContext() &&
+      getGLCtx().versionFunctions<GLFuncs2_1>();
+  }
+
+
+  QOpenGLContext &getGLCtx() {
+    QOpenGLContext *ctx = QOpenGLContext::currentContext();
+    if (!ctx) THROW("No active OpenGL context");
+    return *ctx;
+  }
+
+
+  GLFuncs &getGLFuncs() {
+    GLFuncs *glFuncs = getGLCtx().versionFunctions<GLFuncs>();
+    if (!glFuncs) THROW("Failed to access OpenGL 1.1 functions");
+    return *glFuncs;
+  }
+
+
+  GLFuncs2_1 &getGLFuncs2_1() {
+    GLFuncs2_1 *glFuncs = getGLCtx().versionFunctions<GLFuncs2_1>();
+    if (!glFuncs) THROW("Failed to access OpenGL 2.1 functions");
+    return *glFuncs;
   }
 
 
@@ -121,14 +142,5 @@ namespace CAMotics {
 
       glFuncs.glEnd();
     }
-  }
-
-
-  GLFuncs &getGLFuncs() {
-    QOpenGLContext *ctx = QOpenGLContext::currentContext();
-    if (!ctx) THROW("No active OpenGL context");
-    GLFuncs *glFuncs = ctx->versionFunctions<GLFuncs>();
-    if (!glFuncs) THROW("Failed to access OpenGL functions");
-    return *glFuncs;
   }
 }

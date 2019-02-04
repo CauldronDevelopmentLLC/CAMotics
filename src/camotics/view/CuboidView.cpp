@@ -29,7 +29,7 @@ using namespace CAMotics;
 CuboidView::~CuboidView() {
   try {
     if (haveVBOs()) {
-      GLFuncs &glFuncs = getGLFuncs();
+      GLFuncs2_1 &glFuncs = getGLFuncs2_1();
 
       if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
       if (normalVBuf) glFuncs.glDeleteBuffers(1, &normalVBuf);
@@ -66,6 +66,8 @@ void CuboidView::draw() {
   GLFuncs &glFuncs = getGLFuncs();
 
   if (haveVBOs()) {
+    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+
     if (!vertexVBuf) {
       glFuncs.glGenBuffers(1, &vertexVBuf);
       glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
