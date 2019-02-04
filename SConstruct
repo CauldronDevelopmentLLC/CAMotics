@@ -365,7 +365,7 @@ if 'package' in COMMAND_LINE_TARGETS:
             'CFBundleExecutable': 'camotics', # Overrides 'programs'
             'CFBundleIconFile': 'camotics.icns',
             },
-        app_finish_cmd = 'macdeployqt',
+        app_finish_cmd = 'osx/deployqt',
         pkg_scripts = 'osx/Scripts',
         pkg_resources = 'osx/Resources',
         pkg_distribution = 'osx/distribution.xml',
