@@ -133,7 +133,7 @@ void AABB::collisions(const Vector3D &p,
 #ifdef CAMOTICS_GUI
 void AABB::draw(bool leavesOnly, unsigned height, unsigned depth) {
   if (!(left || right) || !leavesOnly) {
-    glColor4f(0.5, 0, (height - depth) / (double)height, 1);
+    getGLFuncs().glColor3f(0.5, 0, (height - depth) / (double)height);
     BoundsView(*this).draw();
   }
 
