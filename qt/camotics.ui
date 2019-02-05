@@ -438,6 +438,12 @@
    <property name="windowTitle">
     <string>Project Toolbar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>22</width>
+     <height>22</height>
+    </size>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -456,6 +462,12 @@
   <widget class="QToolBar" name="viewToolBar">
    <property name="windowTitle">
     <string>View Toolbar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>22</width>
+     <height>22</height>
+    </size>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -479,6 +491,12 @@
    <property name="windowTitle">
     <string>Playback Toolbar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>22</width>
+     <height>22</height>
+    </size>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -498,6 +516,12 @@
   <widget class="QToolBar" name="perspectiveToolBar">
    <property name="windowTitle">
     <string>Perspective Toolbar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>22</width>
+     <height>22</height>
+    </size>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
