@@ -63,6 +63,8 @@ if not env.GetOption('clean'):
 
     conf.CBConfig('cbang')
     env.CBDefine('USING_CBANG') # Using CBANG macro namespace
+    for lib in 'mariadbclient snappy leveldb yaml re2 sqlite3 event'.split():
+        if lib in env['LIBS']: env['LIBS'].remove(lib)
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
@@ -99,6 +101,7 @@ if not env.GetOption('clean'):
 
         env.CBDefine(['CAMOTICS_GUI'])
 
+
     # DXFlib
     have_dxflib = conf.CBConfig('dxflib', False)
 
@@ -116,57 +119,38 @@ import re
 VariantDir('build', 'src', duplicate = False)
 env.AppendUnique(CPPPATH = ['#/build'])
 
-libs = []
-
 
 # libGCode
 src = []
 for subdir in ['', 'ast', 'parse', 'interp', 'machine', 'plan', 'plan/bbctrl']:
     src += Glob('src/gcode/%s/*.cpp' % subdir)
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
-lib = env.Library('libGCode', src)
+lib = env.Library('build/libGCode', src)
 libGCode = lib
-libs.append(lib)
+env.Prepend(LIBS = lib)
 
 
 # libSTL
 src = Glob('src/stl/*.cpp')
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
-lib = env.Library('libSTL', src)
-libs.append(lib)
+lib = env.Library('build/libSTL', src)
+env.Prepend(LIBS = lib)
 
 
 # libDXF
 src = Glob('src/dxf/*.cpp')
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
-lib = env.Library('libDXF', src)
-libs.append(lib)
+lib = env.Library('build/libDXF', src)
+env.Prepend(LIBS = lib)
 
 
 # Source
 src = []
-
-subdirs = ['', 'sim', 'probe', 'opt', 'project', 'contour', 'machine', 'render']
-if env['with_gui']: subdirs += ['view', 'qt', 'value']
+subdirs = ['', 'sim', 'probe', 'opt', 'project', 'contour', 'render']
 for subdir in subdirs: src += Glob('src/camotics/%s/*.cpp' % subdir)
 if env['with_tpl']: src += Glob('src/tplang/*.cpp')
 
 src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
-
-
-# Qt
-if env['with_gui']:
-    dialogs = '''
-      export about donate find new tool settings new_project cam cam_layer
-      connect upload
-    '''.split()
-    uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
-    for dialog in dialogs:
-        uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
-                           'qt/%s_dialog.ui' % dialog))
-
-    qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
-    src += qrc
 
 
 # Build Info
@@ -175,53 +159,83 @@ AlwaysBuild(info)
 src += info
 
 
-# Build lib
-lib = env.Library('libCAMotics', src)
-libs.append(lib)
-if env['with_gui']: Depends(lib, uic)
-
-
 # 3rd-party libs
 if env['with_tpl']:
-    libs.append(env.Library('clipper', Glob('build/clipper/*.cpp')))
-
-
-# Cairo
-if not have_cairo and env['with_gui']:
-    cairo = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
-    Depends(lib, cairo)
-    env.Append(_LIBFLAGS = [cairo]) # Force to end
+    lib = env.Library('build/clipper', Glob('build/clipper/*.cpp'))
+    env.Prepend(LIBS = lib)
 
 
 # DXFlib
 if not have_dxflib:
-    dxflib = SConscript('src/dxflib/SConscript', variant_dir = 'build/dxflib')
-    Depends(lib, dxflib)
-    env.Append(_LIBFLAGS = [dxflib]) # Force to end
+    lib = SConscript('src/dxflib/SConscript', variant_dir = 'build/dxflib')
+    env.Append(LIBS = lib)
 
 
-# Build programs
-docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
-progs = 'gcodetool camsim planner tco2stl'
+# Build GUI
 execs = []
+if env['with_gui']:
+    _env = env.Clone()
 
+    subdirs = ['qt', 'view', 'value', 'machine']
+    guiSrc = []
+    for subdir in subdirs:
+        guiSrc += Glob('src/camotics/%s/*.cpp' % subdir)
+    guiSrc = map(lambda path: re.sub(r'^src/', 'build/', str(path)), guiSrc)
+
+    # Qt
+    dialogs = '''
+      export about donate find new tool settings new_project cam cam_layer
+      connect upload
+    '''.split()
+    uic = [_env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
+    for dialog in dialogs:
+        uic.append(_env.Uic('build/ui_%s_dialog.h' % dialog,
+                           'qt/%s_dialog.ui' % dialog))
+
+    qrc = _env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
+
+    # Cairo
+    if not have_cairo:
+        lib = [SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')]
+        env.Append(LIBS = lib)
+
+    if int(_env.get('cross_mingw', 0)):
+        _env.AppendUnique(LINKFLAGS = ['-Wl,--subsystem,windows'])
+
+    # GUI lib
+    guiLib = env.Library('build/libCAMoticsGUI', src + guiSrc)
+    _env.Prepend(LIBS = [guiLib])
+    Depends(guiLib, uic)
+
+    # GUI progs
+    for prog in 'camotics camsim'.split():
+        p = _env.Program(prog, ['build/%s.cpp' % prog, qrc])
+        _env.Precious(p)
+        _env.Install(_env.get('install_prefix') + '/bin/', p)
+        Default(p)
+        execs.append(p)
+
+    # Remove GUI libs from remaining programs
+    for lib in list(env['LIBS']):
+        if str(lib).startswith('Qt'): env['LIBS'].remove(lib)
+    for lib in 'cairo GL opengl32'.split():
+        if str(lib) in env['LIBS']: env['LIBS'].remove(lib)
+
+
+# Build lib
+lib = env.Library('build/libCAMotics', src)
+env.Prepend(LIBS = lib)
+
+
+# Build other programs
+docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
+progs = 'gcodetool planner'
 if env['with_tpl']: progs += ' tplang'
 
-if env['with_gui']:
-    progs += ' camotics'
-    libs += [qrc]
-
 for prog in progs.split():
-    if prog == 'camotics' and int(env.get('cross_mingw', 0)):
-        _env = env.Clone()
-        _env.AppendUnique(LINKFLAGS = ['-Wl,--subsystem,windows'])
-    else: _env = env
-
-    p = _env.Program(prog, ['build/%s.cpp' % prog] + libs)
-    _env.Precious(p)
-    _env.Install(env.get('install_prefix') + '/bin/', p)
-    if not have_cairo and env['with_gui']: Depends(p, cairo)
-    if not have_dxflib: Depends(p, dxflib)
+    p = env.Program(prog, ['build/%s.cpp' % prog])
+    env.Precious(p)
+    env.Install(env.get('install_prefix') + '/bin/', p)
     Default(p)
     execs.append(p)
 
