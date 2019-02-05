@@ -6,66 +6,8 @@
         "1": {
           "units": "metric",
           "shape": "ballnose",
-          "length": 10,
+          "length": 10.25,
           "diameter": 2.5,
-          "description": ""
-        },
-        "2": {
-          "units": "metric",
-          "shape": "cylindrical",
-          "length": 10,
-          "diameter": 2,
-          "description": ""
-        },
-        "3": {
-          "units": "metric",
-          "shape": "cylindrical",
-          "length": 10,
-          "diameter": 2,
-          "description": ""
-        },
-        "4": {
-          "units": "metric",
-          "shape": "cylindrical",
-          "length": 1,
-          "diameter": 7,
-          "description": ""
-        },
-        "5": {
-          "units": "metric",
-          "shape": "snubnose",
-          "length": 10,
-          "diameter": 2,
-          "snub_diameter": 9,
-          "description": ""
-        },
-        "6": {
-          "units": "metric",
-          "shape": "cylindrical",
-          "length": 10,
-          "diameter": 2,
-          "description": ""
-        },
-        "7": {
-          "units": "metric",
-          "shape": "snubnose",
-          "length": 10,
-          "diameter": 5,
-          "snub_diameter": 2,
-          "description": ""
-        },
-        "8": {
-          "units": "metric",
-          "shape": "cylindrical",
-          "length": 10,
-          "diameter": 2,
-          "description": ""
-        },
-        "9": {
-          "units": "metric",
-          "shape": "cylindrical",
-          "length": 10,
-          "diameter": 2,
           "description": ""
         }
       },
