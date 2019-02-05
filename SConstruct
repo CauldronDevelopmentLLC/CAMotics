@@ -348,7 +348,8 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
         deb_depends =
-        'debconf | debconf-2.0, libc6, libglu1, libv8-3.14.5 ' + qt_pkgs,
+        'debconf | debconf-2.0, libc6, libglu1, libv8-3.14.5 | libv8-dev, ' +
+        'libglu1-mesa ' + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
