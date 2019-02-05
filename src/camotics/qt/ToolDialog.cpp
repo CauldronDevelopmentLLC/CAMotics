@@ -95,7 +95,7 @@ void ToolDialog::updateAngle() {
 
 void ToolDialog::limitLength() {
   if (tool.getShape() == TS_BALLNOSE && tool.getLength() < tool.getRadius()) {
-    tool.setLength(tool.getRadius());
+    tool.setLength(tool.getRadius() / getScale());
     updateLength();
   }
 }
@@ -198,7 +198,7 @@ void ToolDialog::on_lengthDoubleSpinBox_valueChanged(double length) {
   SmartToggle toggle(updating);
 
   double angle = tool.getAngle(); // Get angle before length changes
-  tool.setLength(length * getScale());
+  tool.setLength(length / getScale());
   limitLength();
 
   if (tool.getShape() == TS_CONICAL) {
@@ -215,7 +215,7 @@ void ToolDialog::on_diameterDoubleSpinBox_valueChanged(double diameter) {
   SmartToggle toggle(updating);
 
   double angle = tool.getAngle(); // Get angle before diameter changes
-  tool.setDiameter(diameter * getScale());
+  tool.setDiameter(diameter / getScale());
 
   if (tool.getShape() == TS_CONICAL) {
     tool.setLengthFromAngle(angle);
@@ -230,7 +230,7 @@ void ToolDialog::on_snubDiameterDoubleSpinBox_valueChanged(double value) {
   if (updating) return;
   SmartToggle toggle(updating);
 
-  tool.setSnubDiameter(value * getScale());
+  tool.setSnubDiameter(value / getScale());
   updateScene();
 }
 
