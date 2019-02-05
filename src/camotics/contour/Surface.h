@@ -38,7 +38,7 @@ namespace CAMotics {
     virtual uint64_t getCount() const = 0;
     virtual cb::Rectangle3D getBounds() const = 0;
 #ifdef CAMOTICS_GUI
-    virtual void draw(bool withVBOs) = 0;
+    virtual void draw() = 0;
 #endif
     virtual void write(STL::Sink &sink, Task *task = 0) const = 0;
     virtual void reduce(Task &task) = 0;

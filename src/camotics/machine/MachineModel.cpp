@@ -109,14 +109,14 @@ void MachineModel::read(const InputSource &source) {
 
 
 #ifdef CAMOTICS_GUI
-void MachineModel::draw(bool withVBOs, bool wire) {
+void MachineModel::draw(bool wire) {
   GLFuncs &glFuncs = getGLFuncs();
 
   glFuncs.glPushMatrix();
   glFuncs.glTranslatef(offset[0], offset[1], offset[2]);
 
   for (parts_t::const_iterator it = parts.begin(); it != parts.end(); it++)
-    it->second->draw(withVBOs, wire);
+    it->second->draw(wire);
 
   glFuncs.glPopMatrix();
 }

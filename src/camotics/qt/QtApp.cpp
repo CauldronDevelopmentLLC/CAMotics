@@ -103,7 +103,6 @@ void QtApp::run() {
   string org = Info::instance().get(getName(), "Organization");
   QCoreApplication::setOrganizationName(QString::fromUtf8(org.c_str()));
   QCoreApplication::setApplicationName(QString::fromUtf8(getName().c_str()));
-  QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 
   QtWin qtWin(*this);
   qtWin.init();
@@ -115,7 +114,7 @@ void QtApp::run() {
   if (projectFile.empty()) qtWin.loadDefaultExample();
   else qtWin.openProject(projectFile);
 
-  qtWin.getView()->setSpeed(options["play-speed"].toInteger());
+  qtWin.getView().setSpeed(options["play-speed"].toInteger());
 
   if (options["auto-play"].toBoolean()) {
     qtWin.setAutoPlay();

@@ -67,10 +67,8 @@ namespace CAMotics {
       SHOW_BBTREE_FLAG           = 1 << 9,
       BBTREE_LEAVES_FLAG         = 1 << 10,
       PLAY_FLAG                  = 1 << 11,
-      PATH_VBOS_FLAG             = 1 << 12,
-      SURFACE_VBOS_FLAG          = 1 << 13,
-      TRANSLUCENT_SURFACE_FLAG   = 1 << 14,
-      PATH_INTENSITY_FLAG        = 1 << 15,
+      TRANSLUCENT_SURFACE_FLAG   = 1 << 12,
+      PATH_INTENSITY_FLAG        = 1 << 13,
     };
 
     View(ValueSet &valueSet);
@@ -97,5 +95,6 @@ namespace CAMotics {
 
     bool update();
     void clear();
+    void draw();
   };
 }

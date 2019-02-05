@@ -28,12 +28,8 @@ using namespace CAMotics;
 
 CuboidView::~CuboidView() {
   try {
-    if (haveVBOs()) {
-      GLFuncs2_1 &glFuncs = getGLFuncs2_1();
-
-      if (vertexVBuf) glFuncs.glDeleteBuffers(1, &vertexVBuf);
-      if (normalVBuf) glFuncs.glDeleteBuffers(1, &normalVBuf);
-    }
+    if (vertexVBuf) getGLFuncs().glDeleteBuffers(1, &vertexVBuf);
+    if (normalVBuf) getGLFuncs().glDeleteBuffers(1, &normalVBuf);
   } catch (...) {}
 }
 
@@ -65,31 +61,23 @@ void CuboidView::draw() {
 
   GLFuncs &glFuncs = getGLFuncs();
 
-  if (haveVBOs()) {
-    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
-
-    if (!vertexVBuf) {
-      glFuncs.glGenBuffers(1, &vertexVBuf);
-      glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-      glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                           vertices, GL_STATIC_DRAW);
-
-      glFuncs.glGenBuffers(1, &normalVBuf);
-      glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
-      glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                           normals, GL_STATIC_DRAW);
-    }
-
+  if (!vertexVBuf) {
+    glFuncs.glGenBuffers(1, &vertexVBuf);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
+    glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
+                         vertices, GL_STATIC_DRAW);
 
+    glFuncs.glGenBuffers(1, &normalVBuf);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
-    glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
-
-  } else {
-    glFuncs.glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glFuncs.glNormalPointer(GL_FLOAT, 0, normals);
+    glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
+                         normals, GL_STATIC_DRAW);
   }
+
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
+
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
+  glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
 
   glFuncs.glEnable(GL_NORMALIZE);
   glFuncs.glEnableClientState(GL_VERTEX_ARRAY);

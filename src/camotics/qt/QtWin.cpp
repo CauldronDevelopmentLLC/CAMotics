@@ -24,8 +24,6 @@
 
 #include "ui_camotics.h"
 
-#include <camotics/view/Viewer.h>
-#include <camotics/view/GL.h>
 #include <camotics/project/Project.h>
 #include <camotics/sim/SimulationRun.h>
 #include <camotics/sim/CutWorkpiece.h>
@@ -72,7 +70,7 @@ QtWin::QtWin(Application &app) :
   findAndReplaceDialog(this, true), toolDialog(this), camDialog(this),
   connectDialog(this), uploadDialog(this), fileDialog(*this),
   taskCompleteEvent(0), app(app), options(app.getOptions()),
-  view(new View(valueSet)), viewer(new Viewer), lastRedraw(0), dirty(false),
+  view(new View(valueSet)), lastRedraw(0), dirty(false),
   simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
   autoPlay(false), autoClose(false), sliderMoving(false),
   positionChanged(false) {
@@ -582,55 +580,6 @@ void QtWin::snapView(char v) {
 }
 
 
-void QtWin::glViewMousePressEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton)
-    view->startRotation(event->x(), event->y());
-
-  else if (event->buttons() & (Qt::RightButton | Qt::MidButton))
-    view->startTranslation(event->x(), event->y());
-}
-
-
-void QtWin::glViewMouseMoveEvent(QMouseEvent *event) {
-  if (event->buttons() & Qt::LeftButton) {
-    view->updateRotation(event->x(), event->y());
-    redraw(true);
-
-  } else if (event->buttons() & (Qt::RightButton | Qt::MidButton)) {
-    view->updateTranslation(event->x(), event->y());
-    redraw(true);
-  }
-}
-
-
-void QtWin::glViewWheelEvent(QWheelEvent *event) {
-  if (event->delta() < 0) view->zoomIn();
-  else view->zoomOut();
-
-  redraw(true);
-}
-
-
-void QtWin::initializeGL() {
-  LOG_DEBUG(5, "initializeGL()");
-  view->glInit();
-}
-
-
-void QtWin::resizeGL(int w, int h) {
-  LOG_DEBUG(5, "resizeGL(" << w << ", " << h << ")");
-  view->resize(w, h);
-}
-
-
-void QtWin::paintGL() {
-  LOG_DEBUG(5, "paintGL()");
-
-  getGLFuncs().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  viewer->draw(*view);
-}
-
-
 void QtWin::showMessage(const QString &msg, double timeout) {
   ui->statusbar->showMessage(msg, timeout * 1000);
 }
@@ -666,8 +615,6 @@ void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
   project->getWorkpiece().update(*toolPath);
 
   // Setup view
-  view->setFlag(View::PATH_VBOS_FLAG,
-                Settings().get("Settings/VBO/Path", true).toBool());
   view->setToolPath(toolPath);
   view->setWorkpiece(project->getWorkpiece().getBounds());
 
@@ -757,8 +704,6 @@ void QtWin::surfaceComplete(SurfaceTask &task) {
 
   view->setSurface(surface);
   view->setMoveLookup(simRun->getMoveLookup());
-  view->setFlag(View::SURFACE_VBOS_FLAG,
-                Settings().get("Settings/VBO/Surface", true).toBool());
 
   redraw();
 
@@ -2258,22 +2203,20 @@ void QtWin::on_hideConsolePushButton_clicked() {
 void QtWin::on_clearConsolePushButton_clicked() {ui->console->clear();}
 
 
-// P.H.
-// Add zoom methods
-void QtWin::glViewZoomIn() {
+void QtWin::on_actionZoomIn_triggered() {
   view->zoomIn();
   redraw(true);
 }
 
 
-void QtWin::glViewZoomOut() {
+void QtWin::on_actionZoomOut_triggered() {
   view->zoomOut();
   redraw(true);
 }
 
 
-// TODO Calculate extents of all displayed geometry and scale accordingly.
-void QtWin::glViewZoomAll() {
+void QtWin::on_actionZoomAll_triggered() {
+  // TODO Calculate extents of all displayed geometry and scale accordingly.
   view->center();
   redraw(true);
 }

@@ -63,8 +63,8 @@ namespace CAMotics {
     using TriangleSurface::read;
 
 #ifdef CAMOTICS_GUI
-    void drawLines(bool withVBOs);
-    void draw(bool withVBOs, bool wire);
+    void drawLines();
+    void draw(bool wire);
     using TriangleSurface::draw;
 #endif
   };

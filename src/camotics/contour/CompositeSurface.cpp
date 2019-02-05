@@ -66,8 +66,9 @@ Rectangle3D CompositeSurface::getBounds() const {
 
 
 #ifdef CAMOTICS_GUI
-void CompositeSurface::draw(bool withVBOs) {
-  for (unsigned i = 0; i < surfaces.size(); i++) surfaces[i]->draw(withVBOs);
+void CompositeSurface::draw() {
+  for (unsigned i = 0; i < surfaces.size(); i++)
+    surfaces[i]->draw();
 }
 #endif // CAMOTICS_GUI
 

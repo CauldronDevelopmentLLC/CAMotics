@@ -27,39 +27,42 @@ using namespace CAMotics;
 
 
 void BoundsView::draw() {
+  const double v[] = {
+    // Top
+    rmin.x(), rmin.y(), rmin.z(),
+    rmax.x(), rmin.y(), rmin.z(),
+    rmax.x(), rmin.y(), rmin.z(),
+    rmax.x(), rmin.y(), rmax.z(),
+    rmax.x(), rmin.y(), rmax.z(),
+    rmin.x(), rmin.y(), rmax.z(),
+    rmin.x(), rmin.y(), rmax.z(),
+    rmin.x(), rmin.y(), rmin.z(),
+
+    // Bottom
+    rmin.x(), rmax.y(), rmin.z(),
+    rmax.x(), rmax.y(), rmin.z(),
+    rmax.x(), rmax.y(), rmin.z(),
+    rmax.x(), rmax.y(), rmax.z(),
+    rmax.x(), rmax.y(), rmax.z(),
+    rmin.x(), rmax.y(), rmax.z(),
+    rmin.x(), rmax.y(), rmax.z(),
+    rmin.x(), rmax.y(), rmin.z(),
+
+    // Sides
+    rmin.x(), rmin.y(), rmin.z(),
+    rmin.x(), rmax.y(), rmin.z(),
+    rmax.x(), rmin.y(), rmin.z(),
+    rmax.x(), rmax.y(), rmin.z(),
+    rmax.x(), rmin.y(), rmax.z(),
+    rmax.x(), rmax.y(), rmax.z(),
+    rmin.x(), rmin.y(), rmax.z(),
+    rmin.x(), rmax.y(), rmax.z(),
+  };
+
   GLFuncs &glFuncs = getGLFuncs();
 
-  glFuncs.glBegin(GL_LINES);
-
-  // Top
-  glFuncs.glVertex3f(rmin.x(), rmin.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmin.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmin.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmin.y(), rmax.z());
-  glFuncs.glVertex3f(rmax.x(), rmin.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmin.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmin.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmin.y(), rmin.z());
-
-  // Bottom
-  glFuncs.glVertex3f(rmin.x(), rmax.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmax.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmax.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmax.y(), rmax.z());
-  glFuncs.glVertex3f(rmax.x(), rmax.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmax.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmax.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmax.y(), rmin.z());
-
-  // Sides
-  glFuncs.glVertex3f(rmin.x(), rmin.y(), rmin.z());
-  glFuncs.glVertex3f(rmin.x(), rmax.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmin.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmax.y(), rmin.z());
-  glFuncs.glVertex3f(rmax.x(), rmin.y(), rmax.z());
-  glFuncs.glVertex3f(rmax.x(), rmax.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmin.y(), rmax.z());
-  glFuncs.glVertex3f(rmin.x(), rmax.y(), rmax.z());
-
-  glFuncs.glEnd();
+  glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v);
+  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glDrawArrays(GL_LINES, 0, 24);
+  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
 }

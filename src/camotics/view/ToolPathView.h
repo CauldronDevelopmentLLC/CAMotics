@@ -56,7 +56,6 @@ namespace CAMotics {
     unsigned numVertices;
     unsigned numColors;
 
-    bool useVBOs;
     bool lastIntensity;
 
   public:
@@ -66,8 +65,7 @@ namespace CAMotics {
     bool isEmpty() const {return path.isNull() || path->empty();}
 
     cb::SmartPointer<const GCode::ToolPath> getPath() const {return path;}
-    void setPath(const cb::SmartPointer<const GCode::ToolPath> &path,
-                 bool withVBOs);
+    void setPath(const cb::SmartPointer<const GCode::ToolPath> &path);
 
     cb::Rectangle3D getBounds() const
     {return path.isNull() ? cb::Rectangle3D() : path->getBounds();}

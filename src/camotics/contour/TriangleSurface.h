@@ -39,7 +39,6 @@ namespace CAMotics {
     bool finalized;
 
     unsigned vbufs[2];
-    bool useVBOs;
 
     cb::Rectangle3D bounds;
 
@@ -51,7 +50,7 @@ namespace CAMotics {
     TriangleSurface();
     virtual ~TriangleSurface();
 
-    void finalize(bool withVBOs);
+    void finalize();
     void add(const cb::Vector3F vertices[3]);
     void add(const cb::Vector3F vertices[3], const cb::Vector3F &normal);
     void add(const GridTree &tree);
@@ -61,7 +60,7 @@ namespace CAMotics {
     uint64_t getCount() const {return TriangleMesh::getCount();}
     cb::Rectangle3D getBounds() const {return bounds;}
 #ifdef CAMOTICS_GUI
-    void draw(bool withVBOs);
+    void draw();
 #endif
     void clear();
     void read(STL::Source &source, Task *task = 0);

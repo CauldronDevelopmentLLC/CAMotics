@@ -36,7 +36,7 @@ using namespace CAMotics;
 ToolPathView::ToolPathView(ValueSet &valueSet) :
   values(valueSet), byRemote(true), ratio(1), line(0), currentTime(0),
   currentDistance(0), currentLine(0), dirty(true), colorVBuf(0), vertexVBuf(0),
-  numVertices(0), numColors(0), useVBOs(true), lastIntensity(false) {
+  numVertices(0), numColors(0), lastIntensity(false) {
 
   values.add("x", currentPosition.x());
   values.add("y", currentPosition.y());
@@ -63,16 +63,14 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
 
 ToolPathView::~ToolPathView() {
   try {
-    if (colorVBuf) getGLFuncs2_1().glDeleteBuffers(1, &colorVBuf);
-    if (vertexVBuf) getGLFuncs2_1().glDeleteBuffers(1, &vertexVBuf);
+    if (colorVBuf) getGLFuncs().glDeleteBuffers(1, &colorVBuf);
+    if (vertexVBuf) getGLFuncs().glDeleteBuffers(1, &vertexVBuf);
   } catch (...) {}
 }
 
 
-void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path,
-                           bool withVBOs) {
+void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path) {
   this->path = path;
-  useVBOs = haveVBOs() && withVBOs;
 
   currentMove = GCode::Move();
   dirty = true;
@@ -217,9 +215,10 @@ void ToolPathView::update(bool intensity) {
   numColors = colors.size() / 3;
   numVertices = vertices.size() / 3;
 
+  GLFuncs &glFuncs = getGLFuncs();
+
   // Setup color buffers
-  if (useVBOs && !colors.empty()) {
-    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+  if (!colors.empty()) {
     if (!colorVBuf) glFuncs.glGenBuffers(1, &colorVBuf);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glFuncs.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
@@ -228,8 +227,7 @@ void ToolPathView::update(bool intensity) {
   }
 
   // Setup vertex buffers
-  if (useVBOs && !vertices.empty()) {
-    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+  if (!vertices.empty()) {
     if (!vertexVBuf) glFuncs.glGenBuffers(1, &vertexVBuf);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glFuncs.glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
@@ -249,20 +247,13 @@ void ToolPathView::draw() {
 
   GLFuncs &glFuncs = getGLFuncs();
 
-  if (useVBOs) {
-    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-    glFuncs.glColorPointer(3, GL_FLOAT, 0, 0);
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
+  glFuncs.glColorPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
+  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  } else {
-    glFuncs.glColorPointer(3, GL_FLOAT, 0, &colors[0]);
-    glFuncs.glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
-  }
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
   glFuncs.glEnableClientState(GL_COLOR_ARRAY);

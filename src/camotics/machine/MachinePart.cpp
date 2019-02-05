@@ -110,27 +110,22 @@ void MachinePart::read(const InputSource &source,
 
 
 #ifdef CAMOTICS_GUI
-void MachinePart::drawLines(bool withVBOs) {
+void MachinePart::drawLines() {
   GLFuncs &glFuncs = getGLFuncs();
 
-  if (withVBOs && haveVBOs()) {
-    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+  if (!vbuf) {
+    glFuncs.glGenBuffers(1, &vbuf);
 
-    if (!vbuf) {
-      glFuncs.glGenBuffers(1, &vbuf);
-
-      // Vertices
-      glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-      glFuncs.glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
-                              &lines[0], GL_STATIC_DRAW);
-    }
-
+    // Vertices
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
+    glFuncs.glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
+                         &lines[0], GL_STATIC_DRAW);
+  }
 
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
+  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 
-  } else glFuncs.glVertexPointer(3, GL_FLOAT, 0, &lines[0]);
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
   GLboolean light;
@@ -144,7 +139,7 @@ void MachinePart::drawLines(bool withVBOs) {
 }
 
 
-void MachinePart::draw(bool withVBOs, bool wire) {
+void MachinePart::draw(bool wire) {
   GLFuncs &glFuncs = getGLFuncs();
 
   glFuncs.glPushMatrix();
@@ -153,11 +148,11 @@ void MachinePart::draw(bool withVBOs, bool wire) {
 
   if (wire) glFuncs.glColor3ub(color[0], color[1], color[2]);
   else glFuncs.glColor3ub(color[0] * 0.8, color[1] * 0.8, color[2] * 0.8);
-  drawLines(withVBOs);
+  drawLines();
 
   if (!wire) {
     glFuncs.glColor3ub(color[0], color[1], color[2]);
-    TriangleSurface::draw(withVBOs);
+    TriangleSurface::draw();
   }
 
   glFuncs.glPopMatrix();

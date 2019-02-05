@@ -91,14 +91,6 @@ bool SettingsDialog::exec(Project::Project &project, View &view) {
   ui->aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
   ui->aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
-  ui->surfaceVBOsCheckBox->
-    setChecked(settings.get("Settings/VBO/Surface", true).toBool());
-  ui->pathVBOsCheckBox->
-    setChecked(settings.get("Settings/VBO/Path", true).toBool());
-
-  ui->surfaceVBOsCheckBox->setEnabled(haveVBOs());
-  ui->pathVBOsCheckBox->setEnabled(haveVBOs());
-
   if (QDialog::exec() != QDialog::Accepted) {
     if (selectedMachine != -1)
       ui->machineComboBox->setCurrentIndex(selectedMachine);
@@ -123,9 +115,6 @@ bool SettingsDialog::exec(Project::Project &project, View &view) {
 
   view.setFlag(View::SHOW_BBTREE_FLAG, ui->aabbCheckBox->isChecked());
   view.setFlag(View::BBTREE_LEAVES_FLAG, ui->aabbLeavesCheckBox->isChecked());
-
-  settings.set("Settings/VBO/Surface", ui->surfaceVBOsCheckBox->isChecked());
-  settings.set("Settings/VBO/Path", ui->pathVBOsCheckBox->isChecked());
 
   return true;
 }

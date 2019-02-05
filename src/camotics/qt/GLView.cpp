@@ -22,14 +22,19 @@
 
 #include "QtWin.h"
 
+#include <camotics/view/GL.h>
+#include <camotics/view/View.h>
+
+#include <cbang/Catch.h>
 #include <cbang/log/Logger.h>
 
 #include <QGLFormat>
+#include <QMessageBox>
 
 using namespace CAMotics;
 
 
-GLView::GLView(QWidget *parent) :QOpenGLWidget(parent) {
+GLView::GLView(QWidget *parent) : QOpenGLWidget(parent), enabled(true) {
   QSurfaceFormat format = QSurfaceFormat::defaultFormat();
   format.setSamples(4);
   setFormat(format);
@@ -43,21 +48,66 @@ QtWin &GLView::getQtWin() const {
 }
 
 
+View &GLView::getView() const {return getQtWin().getView();}
+void GLView::redraw(bool now) {getQtWin().redraw(now);}
+
+
 void GLView::mousePressEvent(QMouseEvent *event) {
-  getQtWin().glViewMousePressEvent(event);
+  if (event->buttons() & Qt::LeftButton)
+    getView().startRotation(event->x(), event->y());
+
+  else if (event->buttons() & (Qt::RightButton | Qt::MidButton))
+    getView().startTranslation(event->x(), event->y());
 }
 
 
 void GLView::mouseMoveEvent(QMouseEvent *event) {
-  getQtWin().glViewMouseMoveEvent(event);
+  if (event->buttons() & Qt::LeftButton) {
+    getView().updateRotation(event->x(), event->y());
+    redraw(true);
+
+  } else if (event->buttons() & (Qt::RightButton | Qt::MidButton)) {
+    getView().updateTranslation(event->x(), event->y());
+    redraw(true);
+  }
 }
 
 
 void GLView::wheelEvent(QWheelEvent *event) {
-  getQtWin().glViewWheelEvent(event);
+  if (event->delta() < 0) getView().zoomIn();
+  else getView().zoomOut();
+
+  redraw(true);
 }
 
 
-void GLView::initializeGL() {getQtWin().initializeGL();}
-void GLView::resizeGL(int w, int h) {getQtWin().resizeGL(w, h);}
-void GLView::paintGL() {getQtWin().paintGL();}
+void GLView::initializeGL() {
+  if (!enabled) return;
+
+  try {
+    LOG_DEBUG(5, "initializeGL()");
+    getView().glInit();
+    return;
+  } CATCH_ERROR;
+
+  QMessageBox::critical
+    (this, "CAMotics", "Failed to load OpenGL 3D graphics!\n\n"
+     "You may need to upgrade your graphics driver.", QMessageBox::Ok);
+
+  enabled = false;
+}
+
+
+void GLView::resizeGL(int w, int h) {
+  if (!enabled) return;
+  LOG_DEBUG(5, "resizeGL(" << w << ", " << h << ")");
+  getView().resize(w, h);
+}
+
+
+void GLView::paintGL() {
+  if (!enabled) return;
+  LOG_DEBUG(5, "paintGL()");
+  getGLFuncs().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  getView().draw();
+}

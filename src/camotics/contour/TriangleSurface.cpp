@@ -39,22 +39,21 @@ using namespace cb;
 using namespace CAMotics;
 
 
-TriangleSurface::TriangleSurface(const GridTree &tree) :
-  finalized(false), useVBOs(true) {
+TriangleSurface::TriangleSurface(const GridTree &tree) : finalized(false) {
   vbufs[0] = 0;
   add(tree);
 }
 
 
 TriangleSurface::TriangleSurface(STL::Source &source, Task *task) :
-  finalized(false), useVBOs(true) {
+  finalized(false) {
   vbufs[0] = 0;
   read(source, task);
 }
 
 
 TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
-  finalized(false), useVBOs(true) {
+  finalized(false) {
   vbufs[0] = 0;
 
   for (unsigned i = 0; i < surfaces.size(); i++) {
@@ -72,12 +71,12 @@ TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
 
 
 TriangleSurface::TriangleSurface(const TriangleSurface &o) :
-  TriangleMesh(o), finalized(false), useVBOs(o.useVBOs), bounds(o.bounds) {
+  TriangleMesh(o), finalized(false), bounds(o.bounds) {
   vbufs[0] = 0;
 }
 
 
-TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
+TriangleSurface::TriangleSurface() : finalized(false) {
   vbufs[0] = 0;
 }
 
@@ -85,33 +84,29 @@ TriangleSurface::TriangleSurface() : finalized(false), useVBOs(true) {
 TriangleSurface::~TriangleSurface() {
 #ifdef CAMOTICS_GUI
   try {
-    if (vbufs[0]) getGLFuncs2_1().glDeleteBuffers(2, vbufs);
+    if (vbufs[0]) getGLFuncs().glDeleteBuffers(2, vbufs);
   } catch (...) {}
 #endif
 }
 
 
-void TriangleSurface::finalize(bool withVBOs) {
+void TriangleSurface::finalize() {
   if (finalized) return;
 
 #ifdef CAMOTICS_GUI
-  useVBOs = haveVBOs() && withVBOs;
+  GLFuncs &glFuncs = getGLFuncs();
 
-  if (useVBOs) {
-    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+  if (!vbufs[0]) glFuncs.glGenBuffers(2, vbufs);
 
-    if (!vbufs[0]) glFuncs.glGenBuffers(2, vbufs);
+  // Vertices
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
+  glFuncs.glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+                       &vertices[0], GL_STATIC_DRAW);
 
-    // Vertices
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-    glFuncs.glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
-                          &vertices[0], GL_STATIC_DRAW);
-
-    // Normals
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
-    glFuncs.glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
-                         &normals[0], GL_STATIC_DRAW);
-  }
+  // Normals
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
+  glFuncs.glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
+                       &normals[0], GL_STATIC_DRAW);
 #endif // CAMOTICS_GUI
 
   finalized = true;
@@ -161,28 +156,20 @@ SmartPointer<Surface> TriangleSurface::copy() const {
 
 
 #ifdef CAMOTICS_GUI
-void TriangleSurface::draw(bool withVBOs) {
+void TriangleSurface::draw() {
   if (!getCount()) return; // Nothing to draw
 
-  finalize(withVBOs);
+  finalize();
 
   GLFuncs &glFuncs = getGLFuncs();
 
-  if (useVBOs) {
-    GLFuncs2_1 &glFuncs = getGLFuncs2_1();
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
+  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
 
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-    glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
+  glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
 
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
-    glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
-
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  } else {
-    glFuncs.glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
-    glFuncs.glNormalPointer(GL_FLOAT, 0, &normals[0]);
-  }
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
   glFuncs.glEnableClientState(GL_NORMAL_ARRAY);

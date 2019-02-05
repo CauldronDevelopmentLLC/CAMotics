@@ -179,7 +179,7 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
                       vars.getNumber("offset_y", 0),
                       vars.getNumber("offset_z", 0));
 
-      parent->getView()->path->setByRemote(position + offset, line);
+      parent->getView().path->setByRemote(position + offset, line);
       parent->redraw();
     }
   } CATCH_ERROR;

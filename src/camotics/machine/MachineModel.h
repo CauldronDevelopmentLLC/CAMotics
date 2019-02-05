@@ -56,7 +56,7 @@ namespace CAMotics {
     void readModel(const cb::InputSource &source);
     void read(const cb::InputSource &source);
 #ifdef CAMOTICS_GUI
-    void draw(bool withVBOs, bool wire);
+    void draw(bool wire);
 #endif
   };
 }

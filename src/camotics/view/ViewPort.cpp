@@ -252,14 +252,21 @@ void ViewPort::glDraw(const Rectangle3D &bbox,
   glFuncs.glLoadIdentity();
 
   // Background
-  glFuncs.glBegin(GL_QUADS);
-  glFuncs.glColor3ub(0x25, 0x30, 0x40);
-  glFuncs.glVertex2f(-1, -1);
-  glFuncs.glVertex2f(1, -1);
-  glFuncs.glColor3ub(0x5, 0x5, 0x5);
-  glFuncs.glVertex2f(1, 1);
-  glFuncs.glVertex2f(-1, 1);
-  glFuncs.glEnd();
+  const double colors[] = {
+    0.15, 0.19, 0.25,
+    0.15, 0.19, 0.25,
+    0.02, 0.02, 0.02,
+    0.02, 0.02, 0.02,
+  };
+  const double v[] = {-1, -1, 1, -1, 1, 1, -1, 1};
+
+  glFuncs.glVertexPointer(2, GL_DOUBLE, 0, v);
+  glFuncs.glColorPointer(3, GL_DOUBLE, 0, colors);
+  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glEnableClientState(GL_COLOR_ARRAY);
+  glFuncs.glDrawArrays(GL_QUADS, 0, 4);
+  glFuncs.glDisableClientState(GL_COLOR_ARRAY);
+  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
 
   // Compute "radius"
   Vector3D dims = bbox.getDimensions();

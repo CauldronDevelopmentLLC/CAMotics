@@ -26,15 +26,20 @@
 
 namespace CAMotics {
   class QtWin;
+  class View;
 
   class GLView : public QOpenGLWidget {
     Q_OBJECT;
+
+    bool enabled;
 
   public:
     GLView(QWidget *parent = 0);
     ~GLView() {}
 
     QtWin &getQtWin() const;
+    View &getView() const;
+    void redraw(bool now = false);
 
     // From QWidget
     void mousePressEvent(QMouseEvent *event);

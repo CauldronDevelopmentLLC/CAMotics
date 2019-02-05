@@ -52,13 +52,6 @@ namespace CAMotics {
   }
 
 
-  bool haveVBOs() {
-    // Just check for an active context and OpenGL 2.1
-    return QOpenGLContext::currentContext() &&
-      getGLCtx().versionFunctions<GLFuncs2_1>();
-  }
-
-
   QOpenGLContext &getGLCtx() {
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     if (!ctx) THROW("No active OpenGL context");
@@ -68,55 +61,79 @@ namespace CAMotics {
 
   GLFuncs &getGLFuncs() {
     GLFuncs *glFuncs = getGLCtx().versionFunctions<GLFuncs>();
-    if (!glFuncs) THROW("Failed to access OpenGL 1.1 functions");
-    return *glFuncs;
-  }
-
-
-  GLFuncs2_1 &getGLFuncs2_1() {
-    GLFuncs2_1 *glFuncs = getGLCtx().versionFunctions<GLFuncs2_1>();
-    if (!glFuncs) THROW("Failed to access OpenGL 2.1 functions");
+    if (!glFuncs) THROW("Failed to access OpenGL functions");
     return *glFuncs;
   }
 
 
   void glDisk(double radius, unsigned segments) {
-    GLFuncs &glFuncs = getGLFuncs();
+    const unsigned count = 1 + segments;
+    double v[count * 2];
 
-    glFuncs.glBegin(GL_TRIANGLE_FAN);
-
-    glFuncs.glVertex2f(0, 0);
+    v[0] = v[1] = 0;
 
     for (unsigned i = 0; i < segments; i++) {
       float a = i * 2 * M_PI / (segments - 1);
-      glFuncs.glVertex2f(sin(a) * radius, cos(a) * radius);
+      v[(i + 1) * 2 + 0] = sin(a) * radius;
+      v[(i + 1) * 2 + 1] = cos(a) * radius;
     }
 
-    glFuncs.glEnd();
+    GLFuncs &glFuncs = getGLFuncs();
+
+    glFuncs.glVertexPointer(2, GL_DOUBLE, 0, v);
+    glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+    glFuncs.glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+    glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
   }
 
 
   void glCylinder(double base, double top, double height, unsigned segments) {
     double b = sqrt((base - top) * (base - top) + height * height);
 
+    const unsigned count = segments * 2;
+    double v[count * 3];
+    double n[count * 3];
+
     GLFuncs &glFuncs = getGLFuncs();
-    glFuncs.glBegin(GL_QUAD_STRIP);
 
     for (unsigned i = 0; i < segments; i++) {
+      unsigned o = i * 3 * 2;
       float a = i * 2 * M_PI / (segments - 1);
 
-      glFuncs.glNormal3f(cos(a) * height / b, sin(a) * height / b,
-                         (base - top) / b);
-      glFuncs.glVertex3f(base * cos(a), base * sin(a), 0);
-      glFuncs.glVertex3f(top * cos(a), top * sin(a), height);
+      // Normals
+      n[o + 0] = n[o + 3] = cos(a) * height / b;
+      n[o + 1] = n[o + 4] = sin(a) * height / b;
+      n[o + 2] = n[o + 5] = (base - top) / b;
+
+      // Vertices
+      v[o + 0] = base * cos(a);
+      v[o + 1] = base * sin(a);
+      v[o + 2] = 0;
+      v[o + 3] = top * cos(a);
+      v[o + 4] = top * sin(a);
+      v[o + 5] = height;
     }
 
-    glFuncs.glEnd();
+    glFuncs.glNormalPointer(GL_DOUBLE, 0, n);
+    glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v);
+    glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
+    glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+    glFuncs.glDrawArrays(GL_QUAD_STRIP, 0, count);
+    glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
+    glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
   }
 
 
   void glSphere(double radius, unsigned lats, unsigned lngs) {
     GLFuncs &glFuncs = getGLFuncs();
+    unsigned count = lngs * 2;
+    double n[count * 3];
+    double v[count * 3];
+
+    glFuncs.glNormalPointer(GL_DOUBLE, 0, n);
+    glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v);
+    glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
+    glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
 
     for (unsigned i = 0; i < lats; i++) {
       double lat0 = M_PI * (-0.5 + (double)(i - 1) / (lats - 1));
@@ -127,20 +144,27 @@ namespace CAMotics {
       double z1 = sin(lat1);
       double zr1 = cos(lat1);
 
-      glFuncs.glBegin(GL_QUAD_STRIP);
-
       for (unsigned j = 0; j < lngs; j++) {
         double lng = 2 * M_PI * (double)(j - 1) / (lngs - 1);
         double x = cos(lng);
         double y = sin(lng);
+        unsigned o = j * 3 * 2;
 
-        glFuncs.glNormal3f(x * zr0, y * zr0, z0);
-        glFuncs.glVertex3f(x * zr0 * radius, y * zr0 * radius, z0 * radius);
-        glFuncs.glNormal3f(x * zr1, y * zr1, z1);
-        glFuncs.glVertex3f(x * zr1 * radius, y * zr1 * radius, z1 * radius);
+        n[o + 0] = x * zr0; n[o + 1] = y * zr0; n[o + 2] = z0;
+        n[o + 3] = x * zr1; n[o + 4] = y * zr1; n[o + 5] = z1;
+
+        v[o + 0] = x * zr0 * radius;
+        v[o + 1] = y * zr0 * radius;
+        v[o + 2] = z0 * radius;
+        v[o + 3] = x * zr1 * radius;
+        v[o + 4] = y * zr1 * radius;
+        v[o + 5] = z1 * radius;
       }
 
-      glFuncs.glEnd();
+      glFuncs.glDrawArrays(GL_QUAD_STRIP, 0, count);
     }
+
+    glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
+    glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
   }
 }

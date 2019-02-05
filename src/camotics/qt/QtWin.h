@@ -56,7 +56,6 @@ class QMdiSubWindow;
 
 
 namespace CAMotics {
-  class Viewer;
   namespace Project {class Project;}
   class Simulation;
   class SimulationRun;
@@ -104,7 +103,6 @@ namespace CAMotics {
     cb::SmartPointer<Project::Project> project;
     cb::SmartPointer<SimulationRun> simRun;
     cb::SmartPointer<View> view;
-    cb::SmartPointer<Viewer> viewer;
     cb::SmartPointer<GCode::ToolPath> toolPath;
     cb::SmartPointer<std::vector<char> > gcode;
     cb::SmartPointer<Surface> surface;
@@ -131,7 +129,7 @@ namespace CAMotics {
     QtWin(cb::Application &app);
     ~QtWin();
 
-    const cb::SmartPointer<View> &getView() const {return view;}
+    View &getView() const {return *view;}
 
     void setAutoPlay(bool x = true) {autoPlay = x;}
     void setAutoClose(bool x = true) {autoClose = x;}
@@ -159,14 +157,6 @@ namespace CAMotics {
     void minimalLayout();
 
     void snapView(char v);
-
-    void glViewMousePressEvent(QMouseEvent *event);
-    void glViewMouseMoveEvent(QMouseEvent *event);
-    void glViewWheelEvent(QWheelEvent *event);
-
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
 
     void showMessage(const QString &msg, double timeout = 30);
     void showMessage(const char *msg, double timeout = 30);
@@ -248,10 +238,6 @@ namespace CAMotics {
     void showConsole();
     void hideConsole();
     void appendConsole(const std::string &line);
-
-    void glViewZoomIn();
-    void glViewZoomOut();
-    void glViewZoomAll();
 
     // Value Observers
     void updatePlaySpeed(const std::string &name, unsigned value);
@@ -389,8 +375,8 @@ namespace CAMotics {
     void on_hideConsolePushButton_clicked();
     void on_clearConsolePushButton_clicked();
 
-    void on_actionZoomIn_triggered() {glViewZoomIn();}
-    void on_actionZoomOut_triggered() {glViewZoomOut();}
-    void on_actionZoomAll_triggered() {glViewZoomAll();}
+    void on_actionZoomIn_triggered();
+    void on_actionZoomOut_triggered();
+    void on_actionZoomAll_triggered();
   };
 }
