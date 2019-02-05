@@ -72,7 +72,7 @@ Section -Install
   File "CHANGELOG.md"
   %(NSIS_INSTALL_FILES)s
 
-  ExecWait '"$INSTDIR\%(VCREDIST)s"  /passive /norestart'
+  ExecWait '"$INSTDIR\%(VCREDIST)s" /quiet /norestart'
 
   ; TPL Libs
   SetOverwrite on
