@@ -931,7 +931,7 @@ void ControllerImpl::popScope() {
 
 void ControllerImpl::startBlock() {
   if (syncState != SYNC_NONE) {
-    LOG_WARNING("New block started without position of previous seek move");
+    LOG_WARNING("Position after synchronized command unknown in simulator.");
     syncState = SYNC_NONE;
   }
   state.moveInAbsoluteCoords = false;
