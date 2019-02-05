@@ -1689,6 +1689,7 @@ void QtWin::animate() {
     if (!ui->simulationView->isEnabled()) {
       QMessageBox::critical
         (this, "OpenGL Error", "Failed to load OpenGL 3D graphics!\n\n"
+         "CAMotics requires OpenGL 2.0 or newer.\n"
          "You may need to upgrade your graphics driver.", QMessageBox::Ok);
       app.requestExit();
     }
