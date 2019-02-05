@@ -70,7 +70,7 @@ namespace CAMotics {
     GLFuncs &glFuncs = getGLFuncs();
 
     unsigned count = 1 + segments;
-    double *v = new double[count * 2];
+    SmartPointer<double>::Array v = new double[count * 2];
 
     v[0] = v[1] = 0;
 
@@ -80,12 +80,10 @@ namespace CAMotics {
       v[(i + 1) * 2 + 1] = cos(a) * radius;
     }
 
-    glFuncs.glVertexPointer(2, GL_DOUBLE, 0, v);
+    glFuncs.glVertexPointer(2, GL_DOUBLE, 0, v.get());
     glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
     glFuncs.glDrawArrays(GL_TRIANGLE_FAN, 0, count);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
-
-    delete [] v;
   }
 
 
@@ -93,8 +91,8 @@ namespace CAMotics {
     GLFuncs &glFuncs = getGLFuncs();
 
     unsigned count = segments * 2;
-    double *v = new double[count * 3];
-    double *n = new double [count * 3];
+    SmartPointer<double>::Array v = new double[count * 3];
+    SmartPointer<double>::Array n = new double [count * 3];
 
     double b = sqrt((base - top) * (base - top) + height * height);
 
@@ -116,16 +114,13 @@ namespace CAMotics {
       v[o + 5] = height;
     }
 
-    glFuncs.glNormalPointer(GL_DOUBLE, 0, n);
-    glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v);
+    glFuncs.glNormalPointer(GL_DOUBLE, 0, n.get());
+    glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v.get());
     glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
     glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
     glFuncs.glDrawArrays(GL_QUAD_STRIP, 0, count);
     glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
-
-    delete [] v;
-    delete [] n;
   }
 
 
@@ -133,11 +128,11 @@ namespace CAMotics {
     GLFuncs &glFuncs = getGLFuncs();
 
     unsigned count = lngs * 2;
-    double *n = new double[count * 3];
-    double *v = new double[count * 3];
+    SmartPointer<double>::Array n = new double[count * 3];
+    SmartPointer<double>::Array v = new double[count * 3];
 
-    glFuncs.glNormalPointer(GL_DOUBLE, 0, n);
-    glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v);
+    glFuncs.glNormalPointer(GL_DOUBLE, 0, n.get());
+    glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v.get());
     glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
     glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -172,8 +167,5 @@ namespace CAMotics {
 
     glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
-
-    delete [] v;
-    delete [] n;
   }
 }

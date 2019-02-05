@@ -90,10 +90,6 @@ void GLView::initializeGL() {
     return;
   } CATCH_ERROR;
 
-  QMessageBox::critical
-    (this, "CAMotics", "Failed to load OpenGL 3D graphics!\n\n"
-     "You may need to upgrade your graphics driver.", QMessageBox::Ok);
-
   enabled = false;
 }
 

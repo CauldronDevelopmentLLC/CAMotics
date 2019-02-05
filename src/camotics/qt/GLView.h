@@ -37,6 +37,8 @@ namespace CAMotics {
     GLView(QWidget *parent = 0);
     ~GLView() {}
 
+    bool isEnabled() const {return enabled;}
+
     QtWin &getQtWin() const;
     View &getView() const;
     void redraw(bool now = false);

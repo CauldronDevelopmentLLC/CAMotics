@@ -1686,8 +1686,12 @@ void QtWin::resizeEvent(QResizeEvent *event) {
 void QtWin::animate() {
   try {
     // Check if OpenGL is initialized
-    if (!ui->simulationView->isValid() && ui->simulationView->isVisible())
+    if (!ui->simulationView->isEnabled()) {
+      QMessageBox::critical
+        (this, "OpenGL Error", "Failed to load OpenGL 3D graphics!\n\n"
+         "You may need to upgrade your graphics driver.", QMessageBox::Ok);
       app.requestExit();
+    }
 
     dirty = view->update() || dirty;
 
