@@ -67,8 +67,10 @@ namespace CAMotics {
 
 
   void glDisk(double radius, unsigned segments) {
-    const unsigned count = 1 + segments;
-    double v[count * 2];
+    GLFuncs &glFuncs = getGLFuncs();
+
+    unsigned count = 1 + segments;
+    double *v = new double[count * 2];
 
     v[0] = v[1] = 0;
 
@@ -78,23 +80,23 @@ namespace CAMotics {
       v[(i + 1) * 2 + 1] = cos(a) * radius;
     }
 
-    GLFuncs &glFuncs = getGLFuncs();
-
     glFuncs.glVertexPointer(2, GL_DOUBLE, 0, v);
     glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
     glFuncs.glDrawArrays(GL_TRIANGLE_FAN, 0, count);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+
+    delete [] v;
   }
 
 
   void glCylinder(double base, double top, double height, unsigned segments) {
-    double b = sqrt((base - top) * (base - top) + height * height);
-
-    const unsigned count = segments * 2;
-    double v[count * 3];
-    double n[count * 3];
-
     GLFuncs &glFuncs = getGLFuncs();
+
+    unsigned count = segments * 2;
+    double *v = new double[count * 3];
+    double *n = new double [count * 3];
+
+    double b = sqrt((base - top) * (base - top) + height * height);
 
     for (unsigned i = 0; i < segments; i++) {
       unsigned o = i * 3 * 2;
@@ -121,14 +123,18 @@ namespace CAMotics {
     glFuncs.glDrawArrays(GL_QUAD_STRIP, 0, count);
     glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+
+    delete [] v;
+    delete [] n;
   }
 
 
   void glSphere(double radius, unsigned lats, unsigned lngs) {
     GLFuncs &glFuncs = getGLFuncs();
+
     unsigned count = lngs * 2;
-    double n[count * 3];
-    double v[count * 3];
+    double *n = new double[count * 3];
+    double *v = new double[count * 3];
 
     glFuncs.glNormalPointer(GL_DOUBLE, 0, n);
     glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v);
@@ -166,5 +172,8 @@ namespace CAMotics {
 
     glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+
+    delete [] v;
+    delete [] n;
   }
 }
