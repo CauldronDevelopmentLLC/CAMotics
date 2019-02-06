@@ -174,7 +174,6 @@ if not have_dxflib:
 # Build GUI
 execs = []
 if env['with_gui']:
-    _env = env.Clone()
 
     subdirs = ['qt', 'view', 'value', 'machine']
     guiSrc = []
@@ -187,25 +186,27 @@ if env['with_gui']:
       export about donate find new tool settings new_project cam cam_layer
       connect upload
     '''.split()
-    uic = [_env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
+    uic = [env.Uic('build/ui_camotics.h', 'qt/camotics.ui')]
     for dialog in dialogs:
-        uic.append(_env.Uic('build/ui_%s_dialog.h' % dialog,
+        uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
                            'qt/%s_dialog.ui' % dialog))
 
-    qrc = _env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
+    qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
+
+    # GUI lib
+    guiLib = env.Library('build/libCAMoticsGUI', src + guiSrc)
+    env.Prepend(LIBS = [guiLib])
+    Depends(guiLib, uic)
+
+    _env = env.Clone()
 
     # Cairo
     if not have_cairo:
         lib = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
-        _env.Append(LIBS = [lib])
+        _env.Append(LIBS = [cairo])
 
     if int(_env.get('cross_mingw', 0)):
         _env.AppendUnique(LINKFLAGS = ['-Wl,--subsystem,windows'])
-
-    # GUI lib
-    guiLib = _env.Library('build/libCAMoticsGUI', src + guiSrc)
-    _env.Prepend(LIBS = [guiLib])
-    Depends(guiLib, uic)
 
     # GUI progs
     for prog in 'camotics camsim'.split():

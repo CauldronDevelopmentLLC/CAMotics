@@ -45,7 +45,7 @@ namespace CAMotics {
     QTimer reconnectTimer;
 
     QWebSocket webSocket;
-    QUrl url;
+    QString address;
     std::string filename;
 
     cb::JSON::Dict vars;

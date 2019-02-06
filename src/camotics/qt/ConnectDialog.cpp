@@ -54,7 +54,7 @@ void ConnectDialog::setNetworkStatus(const string &status) {
 
   string bg;
   if (status == "Connected")    bg = "#00ff00";
-  else if (status == "Disconnected") bg = "#ff0000";
+  else if (status == "Disconnected") bg = "#ffaa00";
   else bg = "#f2ad46";
 
   string css ="padding: 3px; background: " + bg;
@@ -65,7 +65,7 @@ void ConnectDialog::setNetworkStatus(const string &status) {
 int ConnectDialog::exec() {
   QSettings settings;
 
-  QString addr = settings.value("Connect/Address", "bbctrl.local").toString();
+  QString addr = settings.value("Connect/Address", "bbctrl").toString();
   ui->addressLineEdit->setText(addr);
 
   bool useProxy = settings.value("Connect/UseSystemProxy", true).toBool();

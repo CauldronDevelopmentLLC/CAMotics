@@ -44,6 +44,7 @@ using namespace std;
 BBCtrlAPI::BBCtrlAPI(QtWin *parent) :
   parent(parent), netManager(new QNetworkAccessManager(this)), active(false),
   _connected(false) {
+  // Connect web socket signals
   connect(&webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this,
           SLOT(onError(QAbstractSocket::SocketError)));
   connect(&webSocket, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -51,9 +52,11 @@ BBCtrlAPI::BBCtrlAPI(QtWin *parent) :
   connect(&webSocket, SIGNAL(textMessageReceived(QString)), this,
           SLOT(onTextMessageReceived(QString)));
 
+  // Configure timers
   updateTimer.setSingleShot(false);
   reconnectTimer.setSingleShot(true);
 
+  // Connect timer signals
   connect(&updateTimer, SIGNAL(timeout()), this, SLOT(onUpdate()));
   connect(&reconnectTimer, SIGNAL(timeout()), this, SLOT(onReconnect()));
 }
@@ -69,8 +72,7 @@ string BBCtrlAPI::getStatus() const {
 
 void BBCtrlAPI::connectCNC(const QString &address) {
   disconnectCNC();
-
-  url = QString("ws://") + address + QString("/websocket");
+  this->address = address;
   reconnect();
 }
 
@@ -107,7 +109,7 @@ void BBCtrlAPI::uploadGCode(const char *data, unsigned length) {
   multiPart->append(part);
 
   // Upload
-  QUrl url = QString("http://") + this->url.host() + QString("/api/file");
+  QUrl url = QString("http://") + address + QString("/api/file");
   QNetworkRequest request(url);
 
   if (!netManager) netManager = new QNetworkAccessManager(this);
@@ -146,7 +148,10 @@ void BBCtrlAPI::onDisconnected() {
   _connected = false;
   emit disconnected();
 
-  if (active) reconnect();
+  if (!active && address.endsWith(".local")) {
+    address = address.left(address.size() - 6);
+    reconnect();
+  } else if (active) reconnect();
 }
 
 
@@ -195,6 +200,7 @@ void BBCtrlAPI::onUpdate() {
 
 
 void BBCtrlAPI::onReconnect() {
+  QUrl url = QString("ws://") + address + QString("/websocket");
   LOG_INFO(1, "Connecting to " << url.toString().toUtf8().data());
 
   if (webSocket.isValid()) webSocket.close();

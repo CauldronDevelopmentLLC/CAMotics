@@ -454,6 +454,7 @@
    <addaction name="actionSave"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
+   <addaction name="actionDonate"/>
    <addaction name="separator"/>
    <addaction name="actionConnect"/>
    <addaction name="actionExport"/>
@@ -2734,10 +2735,10 @@
   <action name="actionDonate">
    <property name="icon">
     <iconset resource="camotics.qrc">
-     <normaloff>:/icons/donate.png</normaloff>:/icons/donate.png</iconset>
+     <normaloff>:/icons/welcome.png</normaloff>:/icons/welcome.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Donate</string>
+    <string>&amp;Welcome</string>
    </property>
    <property name="toolTip">
     <string>Please consider support this software.</string>
