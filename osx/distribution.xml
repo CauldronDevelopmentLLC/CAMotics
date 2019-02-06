@@ -2,9 +2,7 @@
 <installer-gui-script minSpecVersion="1">
   <pkg-ref id="%(pkg_id)s"/>
   <title>CAMotics</title>
-  <welcome file="Welcome.rtf"/>
   <license file="License.rtf"/>
-  <conclusion file="Conclusion.rtf"/>
   <options customize="never" require-scripts="false"/>
   <choices-outline>
     <line choice="default"><line choice="%(pkg_id)s"/></line>
