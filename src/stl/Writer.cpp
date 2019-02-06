@@ -66,7 +66,7 @@ void Writer::writeFacet(const Vector3F &v1, const Vector3F &v2,
       tri.v3[i] = v3[i];
     }
 
-    stream.write((char *)&tri, sizeof(tri));
+    stream.write((char *)&tri, 50);
 
   } else {
     stream << "facet normal ";
