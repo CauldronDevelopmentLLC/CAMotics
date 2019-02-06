@@ -79,10 +79,10 @@ bool Reader::hasMore() {
 
 
 void Reader::readFacet(Vector3F &v1, Vector3F &v2, Vector3F &v3,
-                          Vector3F &normal) {
+                       Vector3F &normal) {
   if (binary) {
     BinaryTriangle tri;
-    stream.read((char *)&tri, sizeof(tri));
+    stream.read((char *)&tri, 50);
 
     v1 = tri.v1;
     v2 = tri.v2;

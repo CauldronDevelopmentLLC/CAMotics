@@ -21,15 +21,12 @@
 #pragma once
 
 
-#include <cbang/Packed.h>
-
-
 namespace STL {
-  PACK(struct BinaryTriangle {
+  struct BinaryTriangle {
     float normal[3];
     float v1[3];
     float v2[3];
     float v3[3];
     uint16_t attrib;
-  });
+  };
 }
