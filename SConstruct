@@ -203,7 +203,7 @@ if env['with_gui']:
     # Cairo
     if not have_cairo:
         lib = SConscript('src/cairo/SConscript', variant_dir = 'build/cairo')
-        _env.Append(LIBS = [cairo])
+        _env.Append(LIBS = [lib])
 
     if int(_env.get('cross_mingw', 0)):
         _env.AppendUnique(LINKFLAGS = ['-Wl,--subsystem,windows'])
