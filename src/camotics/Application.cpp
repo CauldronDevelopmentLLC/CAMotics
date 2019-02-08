@@ -56,14 +56,9 @@ Application::Application(const string &name, hasFeature_t hasFeature) :
   cb::Logger::instance().setLogTime(false);
 
   if (hasFeature(FEATURE_INFO)) {
-    BuildInfo::addBuildInfo("Build");
-
-    // TODO move this stuff out to the build system
-    cb::Info &info = cb::Info::instance();
-    info.add(name, "Website", "https://camotics.org/", true);
-    info.add(name, "Copyright", "(c) 2011-2019");
-    info.add(name, "Author", "Joseph Coffland <joseph@camotics.org>");
-    info.add(name, "Organization", "Cauldron Development LLC");
+    cb::Info::instance().add(name, true);
+    BuildInfo::addBuildInfo(name.c_str());
+    setVersion(cb::Info::instance().get(name, "Version"));
   }
 
   cmdLine.setShowKeywordOpts(false);

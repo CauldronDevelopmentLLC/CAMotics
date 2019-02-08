@@ -37,7 +37,7 @@ DonateDialog::DonateDialog(QWidget *parent) :
 
 
 QString DonateDialog::getVersion() const {
-  return QString::fromUtf8(Info::instance().get("Build", "Version").c_str());
+  return QString::fromUtf8(Info::instance().get("CAMotics", "Version").c_str());
 }
 
 

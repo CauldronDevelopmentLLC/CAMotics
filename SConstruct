@@ -28,6 +28,7 @@ env.Replace(PACKAGE_VERSION = version)
 env.Replace(PACKAGE_AUTHOR = 'Joseph Coffland <joseph@cauldrondevelopment.com>')
 env.Replace(PACKAGE_COPYRIGHT = '2011-2019 Joseph Coffland')
 env.Replace(PACKAGE_HOMEPAGE = 'https://camotics.org/')
+env.Replace(PACKAGE_ORG = 'Cauldron Development LLC')
 env.Replace(PACKAGE_LICENSE = 'https://www.gnu.org/licenses/gpl-2.0.txt')
 env.Replace(BUILD_INFO_NS = 'CAMotics::BuildInfo')
 

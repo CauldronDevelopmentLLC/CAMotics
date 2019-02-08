@@ -97,13 +97,14 @@ void QtApp::run() {
     args.push_back(strdup(options["qt-style"].toString().c_str()));
   }
 
-  int argc = args.size();
-  QApplication qtApp(argc, (char **)&args[0]);
-
-  string org = Info::instance().get(getName(), "Organization");
+  // These must come before QApplication is constructed.
+  string org = Info::instance().get(getName(), "Org");
   QCoreApplication::setOrganizationName(QString::fromUtf8(org.c_str()));
   QCoreApplication::setApplicationName(QString::fromUtf8(getName().c_str()));
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+
+  int argc = args.size();
+  QApplication qtApp(argc, (char **)&args[0]);
 
   QtWin qtWin(*this);
   qtWin.init();

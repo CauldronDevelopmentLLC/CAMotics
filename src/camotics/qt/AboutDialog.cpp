@@ -36,10 +36,11 @@ AboutDialog::AboutDialog(QWidget *parent) :
   ui->setupUi(this);
 
   // Set version
-  string version   = Info::instance().get("Build", "Version");
-  string copyright = Info::instance().get("Build", "Copyright");
-  string author    = Info::instance().get("Build", "Author");
-  string license   = Info::instance().get("Build", "License");
+  string cat = "CAMotics";
+  string version   = Info::instance().get(cat, "Version");
+  string copyright = Info::instance().get(cat, "Copyright");
+  string author    = Info::instance().get(cat, "Author");
+  string license   = Info::instance().get(cat, "License");
 
   QString html = ui->textBrowser->toHtml();
   html.replace("$VERSION",   QString::fromUtf8(version.c_str()));
