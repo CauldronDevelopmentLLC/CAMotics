@@ -37,9 +37,5 @@ namespace CAMotics {
 
   public:
     AboutDialog(QWidget *parent);
-
-  protected slots:
-    void on_creditsPushButton_clicked();
-    void on_licensePushButton_clicked();
   };
 }

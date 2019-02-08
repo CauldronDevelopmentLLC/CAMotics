@@ -43,8 +43,6 @@
 #include <cbang/Catch.h>
 #include <cbang/time/TimeInterval.h>
 
-#include <QMouseEvent>
-#include <QWheelEvent>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QImageWriter>
@@ -580,18 +578,19 @@ void QtWin::snapView(char v) {
 }
 
 
-void QtWin::showMessage(const QString &msg, double timeout) {
-  ui->statusbar->showMessage(msg, timeout * 1000);
+void QtWin::showMessage(const QString &msg, bool log) {
+  if (log) LOG_INFO(1, msg.toStdString());
+  ui->statusbar->showMessage(msg, 30000);
 }
 
 
-void QtWin::showMessage(const char *msg, double timeout) {
-  showMessage(QString::fromUtf8(msg), timeout);
+void QtWin::showMessage(const char *msg, bool log) {
+  showMessage(QString::fromUtf8(msg), log);
 }
 
 
-void QtWin::showMessage(const string &msg, double timeout) {
-  showMessage(QString::fromUtf8(msg.c_str()), timeout);
+void QtWin::showMessage(const string &msg, bool log) {
+  showMessage(QString::fromUtf8(msg.c_str()), log);
 }
 
 
@@ -926,17 +925,17 @@ string QtWin::openFile(const string &title, const string &filters,
 
 
 void QtWin::loadProject() {
-  updateToolTables();
-  updateFiles();
-}
-
-
-void QtWin::resetProject() {
-  view->clear();
-
   // Close editor tabs
   ui->fileTabManager->closeAll(false, true);
   ui->fileTabManager->setCurrentIndex(0);
+
+  // Reset view
+  view->clear();
+  redraw();
+
+  reload();
+  updateToolTables();
+  updateFiles();
 }
 
 
@@ -952,12 +951,10 @@ void QtWin::newProject() {
   GCode::Units units = getNewUnits();
 
   // Create new project
-  resetProject();
   project = new Project::Project;
   project->setUnits(units);
   project->getTools() = toolTable;
 
-  reload();
   loadProject();
   project->markClean();
 }
@@ -985,7 +982,6 @@ void QtWin::openProject(const string &_filename) {
 
   updateRecentProjects(filename);
   showMessage("Opening " + filename);
-  LOG_INFO(1, "Opening " << filename);
 
   try {
     // Check for project file
@@ -1006,7 +1002,7 @@ void QtWin::openProject(const string &_filename) {
       if (!projectPath.empty()) {
         int response =
           QMessageBox::question
-          (this, "Project File Exists", "An CAMotics project file for the "
+          (this, "Project File Exists", "A CAMotics project file for the "
            "selected file exists.  It may contain important project settings.  "
            "Would you like to open it instead?",
            QMessageBox::Cancel  | QMessageBox::No | QMessageBox::Yes,
@@ -1020,12 +1016,9 @@ void QtWin::openProject(const string &_filename) {
       }
     }
 
-    resetProject();
-
     if (is_project) project = new Project::Project(filename);
     else {
       // Otherwise, create a new project with the file
-
       if (!runNewProjectDialog()) return;
 
       if (String::toLower(SystemUtilities::extension(filename)) == "dxf") {
@@ -1045,8 +1038,6 @@ void QtWin::openProject(const string &_filename) {
     }
   } CATCH_ERROR;
 
-  view->path->setByRatio(1);
-  reload();
   loadProject();
 }
 
@@ -1055,9 +1046,8 @@ bool QtWin::saveProject(bool saveAs) {
   string filename = project->getFilename();
   string ext = SystemUtilities::extension(filename);
 
-  if (saveAs || filename.empty() || ext != "camotics" ||
-      !project->wasLoaded()) {
-    if (filename.empty()) filename = "new-project.camotics";
+  if (saveAs || filename.empty() || ext != "camotics" || !project->isOnDisk()) {
+    if (filename.empty()) filename = "project.camotics";
     else filename = SystemUtilities::swapExtension(filename, "camotics");
 
     filename =
@@ -1120,7 +1110,8 @@ void QtWin::updateFiles() {
 
 void QtWin::newFile(bool tpl) {
   string filename = project->getFilename();
-  filename = SystemUtilities::swapExtension(filename, tpl ? "tpl" : "ngc");
+  if (filename.empty()) filename = "newfile";
+  filename = SystemUtilities::swapExtension(filename, tpl ? "tpl" : "nc");
 
   filename = openFile(tpl ? "New TPL file" : "New GCode file",
                       tpl ? "TPL (*.tpl);;All files (*.*)" :
@@ -1721,11 +1712,11 @@ void QtWin::animate() {
         if (progress) {
           double eta = taskMan.getETA();
           ui->progressBar->setValue(10000 * progress);
-          string s = String::printf("%.2f%% ", progress * 100);
-          if (eta) s += TimeInterval(eta).toString();
+          string s = status + String::printf(" %.2f%% ", progress * 100);
+          if (eta) s += "ETA " + TimeInterval(eta).toString();
           ui->progressBar->setFormat(QString::fromUtf8(s.c_str()));
 
-          showMessage("Progress: " + s);
+          showMessage(s, false);
 
         } else {
           ui->progressBar->setValue(0);

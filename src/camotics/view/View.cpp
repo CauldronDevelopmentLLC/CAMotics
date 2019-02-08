@@ -123,6 +123,7 @@ void View::clear() {
   setWorkpiece(Rectangle3D());
   setSurface(0);
   setMoveLookup(0);
+  path->setByRatio(1);
   resetView();
 }
 

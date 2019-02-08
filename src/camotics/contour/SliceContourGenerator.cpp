@@ -36,11 +36,13 @@ void SliceContourGenerator::run(FieldFunction &func, GridTreeRef &grid) {
   double resolution = grid.getResolution();
   Vector3D p;
 
-  for (unsigned z = 0; !shouldQuit() && z < steps.z(); z++) {
+  Task::begin("Contouring cut surface");
+
+  for (unsigned z = 0; z < steps.z(); z++) {
     p.z() = grid.getOffset().z() + resolution * z;
 
     if (z) slice.shift();
-    slice.compute(func);
+    slice.compute(*this, func);
     doSlice(func, slice, z);
 
     for (unsigned y = 0; y < steps.y(); y++) {
@@ -52,8 +54,8 @@ void SliceContourGenerator::run(FieldFunction &func, GridTreeRef &grid) {
         if (!func.cull(p, resolution * 1.1)) doCell(grid, slice, x, y);
 
         // Progress
-        if ((++completedCells & 7) == 0)
-          updateProgress((double)completedCells / totalCells);
+        if ((++completedCells & 7) == 0 &&
+            !Task::update((double)completedCells / totalCells)) return;
       }
     }
   }

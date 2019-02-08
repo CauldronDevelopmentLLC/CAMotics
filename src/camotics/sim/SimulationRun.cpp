@@ -28,6 +28,7 @@
 
 #include <cbang/log/Logger.h>
 #include <cbang/time/TimeInterval.h>
+#include <cbang/time/Timer.h>
 
 using namespace cb;
 using namespace CAMotics;
@@ -55,7 +56,7 @@ void SimulationRun::setEndTime(double endTime) {
 SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
   Rectangle3D bbox;
 
-  double start = task->getTime();
+  double start = Timer::now();
 
   if (sweep.isNull()) {
     // GCode::Tool sweep
@@ -86,7 +87,8 @@ SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
   Renderer renderer(task);
   renderer.render(cutWP, *tree, bbox, sim.threads, sim.mode);
 
-  LOG_DEBUG(1, "Render time " << TimeInterval(task->getTime() - start));
+  if (!task->shouldQuit())
+    LOG_DEBUG(1, "Render time " << TimeInterval(task->getTime() - start));
 
   // Extract surface
   if (!task->shouldQuit()) {

@@ -52,30 +52,23 @@ double Task::getTime() const {
 }
 
 
-void Task::begin() {
+void Task::begin(const string &status) {
   SmartLock lock(this);
-  status.clear();
+  this->status = status;
   progress = eta = 0;
   startTime = endTime = Timer::now();
 }
 
 
-void Task::update(double progress, const string &status) {
+bool Task::update(double progress) {
   SmartLock lock(this);
 
   this->progress = progress;
-  if (!status.empty()) this->status = status;
 
   endTime = Timer::now();
   double delta = endTime - startTime;
   if (progress && 1 < delta) eta = delta / progress - delta;
   else eta = 0;
-}
 
-
-double Task::end() {
-  SmartLock lock(this);
-  status = "Idle";
-  endTime = Timer::now();
-  return endTime - startTime;
+  return !shouldQuit();
 }

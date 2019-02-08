@@ -388,13 +388,13 @@
     <addaction name="actionAxes"/>
     <addaction name="actionMachine"/>
     <addaction name="separator"/>
-    <addaction name="actionTopView"/>
+    <addaction name="actionIsoView"/>
     <addaction name="actionFrontView"/>
     <addaction name="actionBackView"/>
     <addaction name="actionLeftView"/>
     <addaction name="actionRightView"/>
+    <addaction name="actionTopView"/>
     <addaction name="actionBottomView"/>
-    <addaction name="actionIsoView"/>
     <addaction name="separator"/>
     <addaction name="actionZoomOut"/>
     <addaction name="actionZoomIn"/>
@@ -407,6 +407,8 @@
     </property>
     <addaction name="actionStop"/>
     <addaction name="actionRun"/>
+    <addaction name="actionOptimize"/>
+    <addaction name="actionReduce"/>
     <addaction name="separator"/>
     <addaction name="actionPlay"/>
     <addaction name="actionSlower"/>
@@ -450,7 +452,9 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
+   <addaction name="actionAddFile"/>
    <addaction name="actionSave"/>
    <addaction name="separator"/>
    <addaction name="actionSettings"/>
@@ -506,7 +510,6 @@
    </attribute>
    <addaction name="actionStop"/>
    <addaction name="actionRun"/>
-   <addaction name="actionReduce"/>
    <addaction name="actionOptimize"/>
    <addaction name="separator"/>
    <addaction name="actionPlay"/>

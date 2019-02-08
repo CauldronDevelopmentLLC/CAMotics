@@ -25,6 +25,8 @@
 #include "FieldFunction.h"
 #include "GridTreeRef.h"
 
+#include <camotics/Task.h>
+
 #include <cbang/SmartPointer.h>
 #include <cbang/StdTypes.h>
 
@@ -46,7 +48,7 @@ namespace CAMotics {
     const GridTreeRef &getGrid() const {return grid;}
     unsigned getZ() const {return z;}
 
-    void compute(FieldFunction &func);
+    void compute(Task &task, FieldFunction &func);
     void shift();
     uint8_t getEdges(unsigned x, unsigned y, Edge edges[12]) const;
 

@@ -24,6 +24,7 @@
 #include <camotics/contour/Surface.h>
 
 #include <cbang/String.h>
+#include <cbang/time/Timer.h>
 #include <cbang/time/TimeInterval.h>
 #include <cbang/log/Logger.h>
 
@@ -43,19 +44,18 @@ SurfaceTask::~SurfaceTask() {}
 
 
 void SurfaceTask::run() {
-  Task::begin();
+  double startTime = Timer::now();
 
   surface = simRun->compute(SmartPointer<Task>::Phony(this));
 
   // Time
   if (shouldQuit()) {
-    Task::end();
     LOG_INFO(1, "Render aborted");
     return;
   }
 
   // Done
-  double delta = Task::end();
+  double delta = Timer::now() - startTime;
   LOG_INFO(1, "Time: " << TimeInterval(delta)
            << " Triangles: " << surface->getCount()
            << " Triangles/sec: "

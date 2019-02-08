@@ -46,7 +46,7 @@ namespace CAMotics {
       bool dirty;
 
       std::string filename;
-      bool loaded;
+      bool onDisk;
 
       GCode::ToolTable tools;
       Workpiece workpiece;
@@ -70,7 +70,7 @@ namespace CAMotics {
       std::string getDirectory() const;
       std::string getUploadFilename() const;
 
-      bool wasLoaded() const {return loaded;}
+      bool isOnDisk() const {return onDisk;}
 
       const GCode::ToolTable &getTools() const {return tools;}
       GCode::ToolTable &getTools() {return tools;}

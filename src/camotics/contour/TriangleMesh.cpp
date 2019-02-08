@@ -154,8 +154,10 @@ namespace {
 }
 
 
-void TriangleMesh::weld(float threshold) {
+void TriangleMesh::weld(Task &task, float threshold) {
   if (vertices.empty()) return;
+
+  task.begin("Welding triangle mesh");
 
   unsigned count = vertices.size() / 3;
 
@@ -163,6 +165,7 @@ void TriangleMesh::weld(float threshold) {
   for (unsigned i = 0; i < count; i++) vertexIndex[i] = i;
 
   for (unsigned axis = 0; axis < 3; axis++) {
+    if (!task.update((double)axis / 3)) return;
     sort(vertexIndex.begin(), vertexIndex.end(), AxisSort(vertices, axis));
 
     for (unsigned i = 0; i < count - 1; i++) {
@@ -187,8 +190,9 @@ void TriangleMesh::reduce(Task &task) {
   Vector3D v;
   unsigned index = 0;
 
+  task.begin("Reducing mesh: finding vertices");
   for (unsigned i = 0; i < count; i++) {
-    if (!update(task, 0, 4, i, count)) return;
+    if (!task.update((double)i / count)) return;
 
     Triangle &t = triangles[i];
 
@@ -208,8 +212,9 @@ void TriangleMesh::reduce(Task &task) {
   }
 
   // Collapse edges
+  task.begin("Reducing mesh: collapsing edges");
   for (unsigned i = 0; i < vertices.size(); i++) {
-    if (!update(task, 1, 4, i, vertices.size())) return;
+    if (!task.update((double)i / vertices.size())) return;
 
     Vertex &v = *vertices[i];
 
@@ -282,8 +287,9 @@ void TriangleMesh::reduce(Task &task) {
   }
 
   // Flip edges
+  task.begin("Reducing mesh: flipping edges");
   for (unsigned i = 0; i < vertices.size(); i++) {
-    if (!update(task, 2, 4, i, vertices.size())) return;
+    if (!task.update((double)i / vertices.size())) return;
 
     Vertex &v = *vertices[i];
 
@@ -338,8 +344,9 @@ void TriangleMesh::reduce(Task &task) {
   this->vertices.clear();
   this->normals.clear();
 
+  task.begin("Reducing mesh: reconstructing");
   for (unsigned i = 0; i < triangles.size(); i++) {
-    if (!update(task, 3, 4, i, triangles.size())) return;
+    if (!task.update((double)i / triangles.size())) return;
 
     Triangle &t = triangles[i];
     if (t.deleted) continue;
@@ -355,24 +362,6 @@ void TriangleMesh::reduce(Task &task) {
       }
     }
   }
-
-  task.update(1);
-}
-
-
-bool TriangleMesh::update(Task &task, unsigned step, unsigned steps,
-                          unsigned current, unsigned total) {
-  if (Timer::now() < lastUpdate + 0.25) return true;
-  lastUpdate = Timer::now();
-
-  if (task.shouldQuit()) {
-    LOG_INFO(1, "Reduce aborted");
-    return false;
-  }
-
-  task.update((double)step / steps + (double)current / total / steps);
-
-  return true;
 }
 
 

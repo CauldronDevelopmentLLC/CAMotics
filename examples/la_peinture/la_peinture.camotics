@@ -1,0 +1,25 @@
+{
+      "units": "metric",
+      "resolution-mode": "medium",
+      "resolution": 1,
+      "tools": {
+        "1": {
+          "units": "metric",
+          "shape": "cylindrical",
+          "length": 10,
+          "diameter": 2,
+          "description": ""
+        }
+      },
+      "workpiece": {
+        "automatic": true,
+        "margin": 5,
+        "bounds": {
+          "min": [-6.2, -7.95, -2.1],
+          "max": [108.2, 144.95, 0]
+        }
+      },
+      "files": [
+        "la_peinture.tpl"
+      ]
+    }

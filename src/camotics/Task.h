@@ -46,9 +46,8 @@ namespace CAMotics {
     virtual double getETA() const;
     virtual double getTime() const;
 
-    void begin();
-    void update(double progress, const std::string &status = std::string());
-    double end();
+    void begin(const std::string &status);
+    bool update(double progress);
 
     virtual void run() {};
   };

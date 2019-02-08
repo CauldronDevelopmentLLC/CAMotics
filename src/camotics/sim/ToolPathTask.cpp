@@ -29,7 +29,6 @@
 #include <gcode/machine/Machine.h>
 
 #include <cbang/Catch.h>
-#include <cbang/util/SmartFunctor.h>
 
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/os/Subprocess.h>
@@ -62,10 +61,6 @@ ToolPathTask::~ToolPathTask() {interrupt();}
 
 
 void ToolPathTask::run() {
-  // Task tracking
-  Task::begin();
-  SmartFunctor<Task, double (Task::*)()> endTask(this, &Task::end);
-
   // Setup
   path = new GCode::ToolPath(tools);
 
@@ -78,14 +73,16 @@ void ToolPathTask::run() {
     string filename = files[i];
 
     if (!SystemUtilities::exists(filename)) continue;
+    bool isTPL = String::endsWith(filename, ".tpl");
+    uint64_t fileSize = isTPL ? 0 : SystemUtilities::getFileSize(filename);
 
-    Task::update(0, "Running " + filename);
+    Task::begin("Running " + string(isTPL ? "TPL" : "GCode"));
 
     SmartPointer<istream> stream;
     io::filtering_istream filter;
 
     // Track the file load
-    TaskFilter taskFilter(*this);
+    TaskFilter taskFilter(*this, fileSize);
     filter.push(boost::ref(taskFilter));
 
     // Copy the GCode
@@ -95,7 +92,7 @@ void ToolPathTask::run() {
     filter.push(teeFilter);
 
     // Generate tool path
-    if (String::endsWith(filename, ".tpl")) {
+    if (isTPL) {
       // Get executable name
       string cmd =
         SystemUtilities::joinPath

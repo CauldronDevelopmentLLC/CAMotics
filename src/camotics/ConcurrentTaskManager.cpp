@@ -29,9 +29,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ConcurrentTaskManager::ConcurrentTaskManager() {
-  start();
-}
+ConcurrentTaskManager::ConcurrentTaskManager() {start();}
 
 
 ConcurrentTaskManager::~ConcurrentTaskManager() {
@@ -120,12 +118,7 @@ void ConcurrentTaskManager::run() {
 
     if (!shouldShutdown() && !current->shouldQuit()) {
       SmartUnlock unlock(this);
-      try {
-        current->begin();
-        current->run();
-      } CATCH_ERROR;
-
-      try {current->end();} CATCH_ERROR;
+      TRY_CATCH_ERROR(current->run());
     }
 
     complete(current);

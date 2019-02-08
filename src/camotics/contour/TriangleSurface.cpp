@@ -200,6 +200,8 @@ void TriangleSurface::read(STL::Source &source, Task *task) {
   Vector3F v[3];
   Vector3F n;
 
+  if (task) task->begin("Reading STL surface");
+
   for (unsigned i = 0; source.hasMore() && (!task || !task->shouldQuit());
        i++) {
     // Read facet
@@ -220,17 +222,16 @@ void TriangleSurface::read(STL::Source &source, Task *task) {
 
     if (task) {
       if (!facets && 100000 < i) i = 0;
-      task->update((double)i / (facets ? facets : 100000),
-                   "Reading STL surface");
+      if (!task->update((double)i / (facets ? facets : 100000))) return;
     }
   }
-
-  task->update(1, "Idle");
 }
 
 
 void TriangleSurface::write(STL::Sink &sink, Task *task) const {
   Vector3F p[3];
+
+  if (task) task->begin("Writing STL surface");
 
   for (unsigned i = 0; i < getCount() && (!task || !task->shouldQuit()); i++) {
     unsigned offset = i * 9;
@@ -246,18 +247,19 @@ void TriangleSurface::write(STL::Sink &sink, Task *task) const {
 
     sink.writeFacet(p[0], p[1], p[2], normal);
 
-    if (task) task->update((double)i / getCount(), "Writing STL surface");
+    if (task) task->update((double)i / getCount());
   }
 }
 
 
 void TriangleSurface::reduce(Task &task) {
-  weld();
+  weld(task);
   TriangleMesh::reduce(task);
 }
 
 
 void TriangleSurface::read(const JSON::Value &value) {
+  // TODO
 }
 
 

@@ -30,7 +30,7 @@ using namespace CAMotics::Project;
 
 
 Project::Project(const string &filename) :
-  dirty(false), filename(filename), loaded(false), files(getDirectory()),
+  dirty(false), filename(filename), onDisk(false), files(getDirectory()),
   units(GCode::Units::METRIC),
   resolutionMode(ResolutionMode::RESOLUTION_MEDIUM), resolution(1) {
   if (!filename.empty()) load(filename);
@@ -152,7 +152,7 @@ void Project::load(const string &filename) {
     } else data = JSON::Reader::parse(filename);
 
     read(*data);
-    loaded = true;
+    onDisk = true;
   }
 
   markClean();
@@ -164,6 +164,7 @@ void Project::save(const string &_filename) {
   SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::out);
   JSON::Writer writer(*stream, 2, false);
   write(writer);
+  onDisk = true;
   markClean();
 }
 

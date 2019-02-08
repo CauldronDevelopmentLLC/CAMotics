@@ -158,9 +158,9 @@ namespace CAMotics {
 
     void snapView(char v);
 
-    void showMessage(const QString &msg, double timeout = 30);
-    void showMessage(const char *msg, double timeout = 30);
-    void showMessage(const std::string &msg, double timeout = 30);
+    void showMessage(const QString &msg, bool log = true);
+    void showMessage(const char *msg, bool log = true);
+    void showMessage(const std::string &msg, bool log = true);
     void message(const std::string &msg);
     void warning(const std::string &msg);
 
@@ -195,7 +195,6 @@ namespace CAMotics {
     const cb::SmartPointer<Project::Project> &getProject() const
     {return project;}
     void loadProject();
-    void resetProject();
     void newProject();
     void openProject(const std::string &filename = std::string());
     bool saveProject(bool saveas = false);

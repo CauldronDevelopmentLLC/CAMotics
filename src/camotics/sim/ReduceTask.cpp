@@ -23,7 +23,9 @@
 #include <camotics/contour/Surface.h>
 
 #include <cbang/Catch.h>
+#include <cbang/time/Timer.h>
 #include <cbang/time/TimeInterval.h>
+#include <cbang/log/Logger.h>
 
 using namespace std;
 using namespace cb;
@@ -36,18 +38,14 @@ ReduceTask::ReduceTask(const Surface &surface) : surface(surface.copy()) {}
 void ReduceTask::run() {
   LOG_INFO(1, "Reducing mesh");
 
+  double startTime = Timer::now();
   double startCount = surface->getCount();
-
-  Task::begin();
-  Task::update(0, "Reducing mesh...");
 
   surface->reduce(*this);
 
   unsigned count = surface->getCount();
   double r = (double)(startCount - count) / startCount * 100;
 
-  double delta = Task::end();
-
-  LOG_INFO(1, "Time: " << TimeInterval(delta)
+  LOG_INFO(1, "Time: " << TimeInterval(Timer::now() - startTime)
            << String::printf(" Triangles: %u Reduction: %0.2f%%", count, r));
 }

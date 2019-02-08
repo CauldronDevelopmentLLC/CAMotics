@@ -27,20 +27,10 @@
 
 #include <camotics/Task.h>
 
-#include <cbang/SmartPointer.h>
-#include <cbang/os/Mutex.h>
-#include <cbang/util/SmartLock.h>
-
 
 namespace CAMotics {
   class ContourGenerator : public Task {
-    double lastTime;
-
   public:
-    ContourGenerator() : lastTime(0) {}
-
-    void updateProgress(double progress);
-
     using Task::run;
     virtual void run(FieldFunction &func, GridTreeRef &tree) = 0;
   };

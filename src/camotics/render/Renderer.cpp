@@ -53,6 +53,7 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
     // Divide work
     unsigned targetJobCount = pow(2, ceil(log(threads) / log(2)) + 2);
 
+    task->begin("Partitioning 3D space");
     tree.partition(jobGrids, bbox, targetJobCount);
     unsigned totalJobCount = jobGrids.size();
 
@@ -62,6 +63,7 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
 
     // Run jobs
     double lastUpdate = 0;
+    task->begin("Computing cut surface");
     while (!task->shouldQuit() && !(jobGrids.empty() && jobs.empty())) {
       // Start new jobs
       while (!jobGrids.empty() && jobs.size() < threads) {
@@ -92,7 +94,7 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
       progress += totalJobCount - jobGrids.size() - jobs.size();
       progress /= totalJobCount;
 
-      task->update(progress, "Rendering surface");
+      task->update(progress);
 
       // Log progress
       double now = Timer::now();

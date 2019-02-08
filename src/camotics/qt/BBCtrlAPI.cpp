@@ -93,8 +93,6 @@ void BBCtrlAPI::reconnect() {
 
 
 void BBCtrlAPI::uploadGCode(const char *data, unsigned length) {
-  LOG_INFO(1, "Uploading GCode '" << filename << "'");
-
   // Create multi-part MIME encoded message
   QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
@@ -129,7 +127,6 @@ void BBCtrlAPI::onError(QAbstractSocket::SocketError error) {
 
 
 void BBCtrlAPI::onConnected() {
-  LOG_INFO(1, "CNC connected");
   reconnectTimer.stop();
   updateTimer.start(1000);
   lastMessage = Time::now();
@@ -143,8 +140,6 @@ void BBCtrlAPI::onConnected() {
 
 
 void BBCtrlAPI::onDisconnected() {
-  LOG_INFO(1, "CNC disconnected");
-
   _connected = false;
   emit disconnected();
 
@@ -201,7 +196,6 @@ void BBCtrlAPI::onUpdate() {
 
 void BBCtrlAPI::onReconnect() {
   QUrl url = QString("ws://") + address + QString("/websocket");
-  LOG_INFO(1, "Connecting to " << url.toString().toUtf8().data());
 
   if (webSocket.isValid()) webSocket.close();
 

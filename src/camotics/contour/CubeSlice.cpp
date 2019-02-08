@@ -31,7 +31,7 @@ CubeSlice::CubeSlice(const GridTreeRef &grid) :
   grid(grid), z(0), shifted(false) {}
 
 
-void CubeSlice::compute(FieldFunction &func) {
+void CubeSlice::compute(Task &task, FieldFunction &func) {
   // Vertices
   if (!shifted) {
     left = new VertexSlice(grid, z);
@@ -66,6 +66,7 @@ void CubeSlice::compute(FieldFunction &func) {
     p.x() = grid.getOffset().x() + resolution * x;
 
     for (unsigned y = 0; y <= steps.y(); y++) {
+      if (task.shouldQuit()) return;
       p.y() = grid.getOffset().y() + resolution * y;
 
       Vector3D a = p;
