@@ -37,5 +37,8 @@ namespace CAMotics {
 
   public:
     AboutDialog(QWidget *parent);
+
+    // From QWidget
+    void showEvent(QShowEvent *event);
   };
 }

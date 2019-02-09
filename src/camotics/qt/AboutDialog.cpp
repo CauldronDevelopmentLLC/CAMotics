@@ -23,8 +23,11 @@
 #include "ui_about_dialog.h"
 
 #include <cbang/Info.h>
+#include <cbang/log/Logger.h>
 
 #include <QMessageBox>
+#include <QApplication>
+#include <QDesktopWidget>
 
 using namespace std;
 using namespace cb;
@@ -48,4 +51,19 @@ AboutDialog::AboutDialog(QWidget *parent) :
   html.replace("$AUTHOR",    QString::fromUtf8(author.c_str()));
   html.replace("$LICENSE",   QString::fromUtf8(license.c_str()));
   ui->textBrowser->setHtml(html);
+}
+
+
+void AboutDialog::showEvent(QShowEvent *event) {
+  QDialog::showEvent(event);
+
+  // Resize dialog to fit content up to screen height
+  double h = ui->textBrowser->document()->size().height();
+  h += height() - ui->textBrowser->size().height() + 5;
+
+  double maxH = QApplication::desktop()->screenGeometry().height() - 5;
+  if (maxH < h) h = maxH;
+
+  setMaximumSize(width(), h);
+  setMinimumSize(width(), h);
 }

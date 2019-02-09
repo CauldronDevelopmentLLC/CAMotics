@@ -25,6 +25,8 @@
 #include "ui_donate_dialog.h"
 
 #include <QSettings>
+#include <QApplication>
+#include <QDesktopWidget>
 
 using namespace CAMotics;
 using namespace cb;
@@ -50,4 +52,19 @@ int DonateDialog::exec() {
   int ret = QDialog::exec();
   QSettings().setValue("Donate/ShowVersion", getVersion());
   return ret;
+}
+
+
+void DonateDialog::showEvent(QShowEvent *event) {
+  QDialog::showEvent(event);
+
+  // Resize dialog to fit content up to screen height
+  double h = ui->textBrowser->document()->size().height();
+  h += height() - ui->textBrowser->size().height() + 5;
+
+  double maxH = QApplication::desktop()->screenGeometry().height() - 5;
+  if (maxH < h) h = maxH;
+
+  setMaximumSize(width(), h);
+  setMinimumSize(width(), h);
 }

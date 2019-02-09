@@ -10,16 +10,22 @@
     <height>700</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
     <width>490</width>
-    <height>700</height>
+    <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>490</width>
-    <height>700</height>
+    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -29,10 +35,7 @@
    <iconset resource="camotics.qrc">
     <normaloff>:/icons/camotics.png</normaloff>:/icons/camotics.png</iconset>
   </property>
-  <property name="styleSheet">
-   <string notr="true">background: #fff</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <property name="spacing">
     <number>12</number>
    </property>

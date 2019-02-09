@@ -44,5 +44,8 @@ namespace CAMotics {
 
     // From QDialog
     int exec();
+
+    // From QWidget
+    void showEvent(QShowEvent *event);
   };
 }
