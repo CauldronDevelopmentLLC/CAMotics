@@ -872,7 +872,13 @@ void QtWin::exportData() {
     surface->writeSTL(*stream, binary, "CAMotics Surface", hash);
 
   } else if (exportDialog.gcodeSelected()) {
-    stream->write(&gcode->front(), gcode->size());
+    if (exportDialog.crlfSelected()) {
+      for (unsigned i = 0; i < gcode->size(); i++) {
+        if ((*gcode)[i] == '\n') stream->put('\r');
+        stream->put((*gcode)[i]);
+      }
+
+    } else stream->write(&gcode->front(), gcode->size());
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());

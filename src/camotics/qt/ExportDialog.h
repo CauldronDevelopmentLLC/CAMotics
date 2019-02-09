@@ -50,6 +50,7 @@ namespace CAMotics {
     bool gcodeSelected() const;
     bool simDataSelected() const;
 
+    bool crlfSelected() const;
     bool binarySTLSelected() const;
     bool compactJSONSelected() const;
     bool withCutSurfaceSelected() const;

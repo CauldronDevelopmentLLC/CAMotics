@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Donate</string>
+   <string>Welcome</string>
   </property>
   <property name="windowIcon">
    <iconset resource="camotics.qrc">

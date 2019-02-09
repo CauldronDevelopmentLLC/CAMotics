@@ -22,12 +22,22 @@
 
 #include "ui_export_dialog.h"
 
+#include <QSettings>
+
 using namespace CAMotics;
 
 
 ExportDialog::ExportDialog(QWidget *parent) :
   QDialog(parent), ui(new Ui::ExportDialog) {
   ui->setupUi(this);
+#ifdef _WIN32
+  bool crlf = true;
+#else
+  bool crlf = false;
+#endif
+
+  crlf = QSettings().value("Settings/GCode/CRLF", crlf).toBool();
+  ui->crlfCheckBox->setChecked(crlf);
 }
 
 
@@ -53,7 +63,12 @@ int ExportDialog::exec() {
     }
   }
 
-  return QDialog::exec();
+  int ret = QDialog::exec();
+
+  if (ret == QDialog::Accepted)
+    QSettings().setValue("Settings/GCode/CRLF", crlfSelected());
+
+  return ret;
 }
 
 
@@ -73,6 +88,11 @@ void ExportDialog::enableGCode(bool enable) {
 void ExportDialog::enableSimData(bool enable) {
   ui->simDataFrame->setEnabled(enable && simDataSelected());
   ui->simDataRadioButton->setEnabled(enable);
+}
+
+
+bool ExportDialog::crlfSelected() const {
+  return ui->crlfCheckBox->isChecked();
 }
 
 
