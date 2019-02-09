@@ -3,7 +3,6 @@
   "root": "/Users/buildbot/camotics",
 
   "env": {
-    "QTDIR": "$HOME/Qt/5.9.1/clang_64",
     "PKG_CONFIG_PATH": "$HOME/build/pkgconfig",
     "V8_HOME": "$HOME/build/v8",
     "V8_LIBPATH": "$V8_HOME"
@@ -11,7 +10,7 @@
 
   "scons": {
     "compiler": "clang",
-    "ccflags": "-Wno-unused-local-typedef",
+    "ccflags": "-Wno-unused-local-typedef -DQT_INIT_METAOBJECT=''",
     "cxxflags": "-stdlib=libc++",
     "linkflags": "-stdlib=libc++",
     "cxxstd": "c++11",

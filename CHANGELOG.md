@@ -24,6 +24,13 @@
  - Set default new project name from first file added.
  - Several fixes for tool editor.
  - Several project file handling fixes.
+ - Allow outputting GCode with CRLF Windows line endings. #286
+ - Improved about, welcome and help dialogs.
+ - Improved status messages and progress bar.
+ - Automatically scale GUI for high-res monitors.
+ - Require mesa OpenGL in Debian package.
+ - Fixed problem with real-time simulation. #264
+ - Added LASER example La Peinture.
 
 ## v1.1.2:
  - Fixed ``Could not save project: Invalid file tab index 0``. #225

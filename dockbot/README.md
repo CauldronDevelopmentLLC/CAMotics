@@ -7,15 +7,17 @@ Configuration files for building [CAMotics][0] on multiple platforms using
 
 
 # Release procedure
+Using code signing key for Windows.
 
 ```
 dockbot publish --key <key> -v
 
-rsync -av releases/alpha/* root@camotics.org:/var/www/camotics.org/http/releases/public/
+rsync -av --progress releases/alpha/* root@camotics.org:/var/www/camotics.org/http/releases/public/
 
 github-release upload -c -v <version> -m release -u jcoffland -o CauldronDevelopmentLLC -r CAMotics $(find releases/alpha/release/camotics/ -name 'camotics*<version>*.*')
 github-release upload -c -v <version> -m debug -u jcoffland -o CauldronDevelopmentLLC -r CAMotics $(find releases/alpha/debug/camotics/ -name 'camotics*<version>*.*')
 ```
 
-Replace ``<key>`` and ``<version>`` above.  Then update version in camotics/web,
-update banner in ``web/jade/header.jade``, regenerate Webpages and publish.
+Replace ``<key>`` and ``<version>`` above.  Then update version in
+``camotics/web/config.json`` and possibly ``jade\mixins.jade``, update banner
+in ``web/jade/header.jade``, regenerate Webpages and publish.
