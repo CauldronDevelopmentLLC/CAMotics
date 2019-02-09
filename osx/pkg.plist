@@ -7,7 +7,7 @@
       <key>BundleHasStrictIdentifier</key>
       <true/>
       <key>BundleIsRelocatable</key>
-      <true/>
+      <false/>
       <key>BundleIsVersionChecked</key>
       <true/>
       <key>BundleOverwriteAction</key>
