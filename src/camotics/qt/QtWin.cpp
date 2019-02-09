@@ -37,6 +37,7 @@
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>
+#include <cbang/os/SystemInfo.h>
 #include <cbang/os/DirectoryWalker.h>
 #include <cbang/log/Logger.h>
 #include <cbang/util/SmartInc.h>
@@ -702,7 +703,7 @@ void QtWin::surfaceComplete(SurfaceTask &task) {
   exportDialog.enableSurface(!surface.isNull());
 
   view->setSurface(surface);
-  view->setMoveLookup(simRun->getMoveLookup());
+  if (simRun.isSet()) view->setMoveLookup(simRun->getMoveLookup());
 
   redraw();
 
@@ -933,9 +934,14 @@ void QtWin::loadProject() {
   view->clear();
   redraw();
 
+  // Free old sim
+  surface.release();
+  simRun.release();
+
   reload();
   updateToolTables();
   updateFiles();
+  updateUnits();
 }
 
 
@@ -1442,6 +1448,7 @@ void QtWin::updateBounds() {
 
 
 void QtWin::updateToolPathBounds() {
+  if (toolPath.isNull()) return;
   Rectangle3D bounds = *toolPath;
   Vector3D bMin = bounds.getMin();
   Vector3D bMax = bounds.getMax();
@@ -1493,7 +1500,7 @@ void QtWin::setStatusActive(bool active) {
     statusLabel->setMovie(movie);
     movie->start();
 
-    statusLabel->setToolTip("Simulation is running");
+    statusLabel->setToolTip("Running");
     ui->actionStop->setEnabled(true);
 
   } else {
@@ -1504,7 +1511,7 @@ void QtWin::setStatusActive(bool active) {
     }
 
     statusLabel->setPixmap(QPixmap(":/icons/idle.png"));
-    statusLabel->setToolTip("Simulation has ended");
+    statusLabel->setToolTip("Idle");
     ui->actionStop->setEnabled(false);
   }
 }
@@ -1525,7 +1532,7 @@ void QtWin::hideConsole() {
 
 
 void QtWin::updatePlaySpeed(const string &name, unsigned value) {
-  showMessage(String::printf("Playback speed %dx", view->getSpeed()));
+  showMessage(String::printf("Playback speed %dx", view->getSpeed()), false);
 }
 
 
@@ -1694,7 +1701,7 @@ void QtWin::animate() {
     if (dirty) redraw(true);
     if (simDirty) reload(true);
 
-    if (!simRun.isNull() && positionChanged && !lastStatusActive &&
+    if (!simRun.isNull() && positionChanged && !isActive() &&
         view->isFlagSet(View::SHOW_SURFACE_FLAG)) {
       positionChanged = false;
       setStatusActive(true);
@@ -1799,7 +1806,7 @@ void QtWin::on_positionSlider_valueChanged(int position) {
   redraw();
 
   if (sliderMoving) return;
-  if (!simRun.isNull()) simRun->setEndTime(ratio * view->path->getTotalTime());
+  if (simRun.isSet()) simRun->setEndTime(ratio * view->path->getTotalTime());
 
   positionChanged = true;
 }
@@ -2031,9 +2038,20 @@ void QtWin::on_actionHelp_triggered() {
   QMessageBox msg(this);
   msg.setWindowTitle("CAMotics Help");
   msg.setTextFormat(Qt::RichText);
-  msg.setText("Help can be found in the online User's Manual at "
-              "<a href='https://camotics.org/manual.html'"
-              ">https://camotics.org/manual.html</a>.");
+  msg.setText
+    ("<h2>CAMotics Help Resources</h2>"
+     "<ul>"
+     "<li><a href='https://camotics.org/manual.html'>User Manual</a></li>"
+     "<li><a href='https://camotics.org/gcode.html'>Supported GCodes</a></li>"
+     "<li><a href='https://github.com/CauldronDevelopmentLLC/camotics'>"
+     "GitHub Project</a></li>"
+     "<li><a href='https://github.com/CauldronDevelopmentLLC/camotics/issues'>"
+     "GitHub Issues</a></li>"
+     "<li><a href='http://groups.google.com/group/camotics-users/boxsubscribe'>"
+     "Discussion Group</a></li>"
+     "<li><a href='mailto:joseph@camotics.org'>joseph@camotics.org</a></li>"
+     "</ul>"
+     "<p>The above links should open in your browser.</p>");
   msg.exec();
 }
 

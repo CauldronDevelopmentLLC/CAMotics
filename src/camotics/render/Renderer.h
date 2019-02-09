@@ -33,11 +33,11 @@ namespace CAMotics {
   class CutWorkpiece;
   class GridTree;
 
-  class Renderer : public Task {
-    cb::SmartPointer<Task> task;
+  class Renderer : cb::Condition {
+    Task &task;
 
   public:
-    Renderer(const cb::SmartPointer<Task> &task = new Task) : task(task) {}
+    Renderer(Task &task) : task(task) {}
 
     void render(CutWorkpiece &cutWorkpiece, GridTree &tree,
                 const cb::Rectangle3D &bbox, unsigned threads,

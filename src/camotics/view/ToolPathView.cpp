@@ -223,6 +223,7 @@ void ToolPathView::update(bool intensity) {
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glFuncs.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
                           &colors[0], GL_STATIC_DRAW);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
     colors.clear();
   }
 
@@ -232,6 +233,7 @@ void ToolPathView::update(bool intensity) {
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
     glFuncs.glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
                           &vertices[0], GL_STATIC_DRAW);
+    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
     vertices.clear();
   }
 

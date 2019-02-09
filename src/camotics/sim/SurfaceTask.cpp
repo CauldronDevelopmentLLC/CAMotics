@@ -46,7 +46,7 @@ SurfaceTask::~SurfaceTask() {}
 void SurfaceTask::run() {
   double startTime = Timer::now();
 
-  surface = simRun->compute(SmartPointer<Task>::Phony(this));
+  surface = simRun->compute(*this);
 
   // Time
   if (shouldQuit()) {

@@ -66,10 +66,8 @@ namespace GCode {
     using path_t::begin;
     using path_t::end;
     using path_t::const_iterator;
-    const Move &operator[](int i) const
-    {return (*static_cast<const path_t *>(this))[i];}
-    const Move &at(int i) const
-    {return static_cast<const path_t *>(this)->at(i);}
+    const Move &operator[](int i) const {return path_t::operator[](i);}
+    const Move &at(int i) const {return path_t::at(i);}
 
     // From cb::JSON::Serializable
     using cb::JSON::Serializable::read;

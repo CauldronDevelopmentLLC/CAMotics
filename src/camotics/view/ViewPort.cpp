@@ -252,7 +252,7 @@ void ViewPort::glDraw(const Rectangle3D &bbox,
   glFuncs.glLoadIdentity();
 
   // Background
-  const double colors[] = {
+   double colors[] = {
     0.15, 0.19, 0.25,
     0.15, 0.19, 0.25,
     0.02, 0.02, 0.02,

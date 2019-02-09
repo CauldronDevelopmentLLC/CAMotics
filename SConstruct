@@ -26,7 +26,7 @@ conf = env.CBConfigure()
 # Config vars
 env.Replace(PACKAGE_VERSION = version)
 env.Replace(PACKAGE_AUTHOR = 'Joseph Coffland <joseph@cauldrondevelopment.com>')
-env.Replace(PACKAGE_COPYRIGHT = '2011-2019 Joseph Coffland')
+env.Replace(PACKAGE_COPYRIGHT = '2011-2019, Joseph Coffland')
 env.Replace(PACKAGE_HOMEPAGE = 'https://camotics.org/')
 env.Replace(PACKAGE_ORG = 'Cauldron Development LLC')
 env.Replace(PACKAGE_LICENSE = 'https://www.gnu.org/licenses/gpl-2.0.txt')
@@ -342,11 +342,11 @@ if 'package' in COMMAND_LINE_TARGETS:
     pkg = env.Packager(
         'CAMotics',
         version = version,
-        maintainer = 'Joseph Coffland <joseph@cauldrondevelopment.com>',
-        vendor = 'Cauldron Development LLC',
-        url = 'http://camotics.com/',
+        maintainer = env['PACKAGE_AUTHOR'],
+        vendor = env['PACKAGE_ORG'],
+        url = env['PACKAGE_HOMEPAGE'],
         license = 'COPYING',
-        bug_url = 'http://camotics.com/',
+        bug_url = 'https://github.com/CauldronDevelopmentLLC/CAMotics/issues/',
         summary = 'Open-Source Simulation & Computer Aided Machining',
         description = description,
         prefix = '/usr',
@@ -380,7 +380,7 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         app_id = 'org.camotics',
         app_resources = [['osx/Resources', '.'], ['tpl_lib', 'tpl_lib']],
-        app_copyright = 'Copyright 2011-2019, Cauldron Development LLC',
+        app_copyright = env['PACKAGE_COPYRIGHT'],
         app_signature = 'camo',
         app_other_info = {
             'CFBundleExecutable': 'camotics', # Overrides 'programs'

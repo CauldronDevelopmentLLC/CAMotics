@@ -53,7 +53,7 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
     // Divide work
     unsigned targetJobCount = pow(2, ceil(log(threads) / log(2)) + 2);
 
-    task->begin("Partitioning 3D space");
+    task.begin("Partitioning 3D space");
     tree.partition(jobGrids, bbox, targetJobCount);
     unsigned totalJobCount = jobGrids.size();
 
@@ -63,8 +63,8 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
 
     // Run jobs
     double lastUpdate = 0;
-    task->begin("Computing cut surface");
-    while (!task->shouldQuit() && !(jobGrids.empty() && jobs.empty())) {
+    task.begin("Computing cut surface");
+    while (!task.shouldQuit() && !(jobGrids.empty() && jobs.empty())) {
       // Start new jobs
       while (!jobGrids.empty() && jobs.size() < threads) {
         SmartPointer<RenderJob> job =
@@ -76,7 +76,7 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
 
       // Reap completed jobs
       jobs_t::iterator it;
-      for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit();)
+      for (it = jobs.begin(); it != jobs.end() && !task.shouldQuit();)
         if ((*it)->getState() == Thread::THREAD_DONE) {
           (*it)->join();
           it = jobs.erase(it);
@@ -87,22 +87,22 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
       double progress = 0;
 
       // Add running jobs
-      for (it = jobs.begin(); it != jobs.end() && !task->shouldQuit(); it++)
+      for (it = jobs.begin(); it != jobs.end() && !task.shouldQuit(); it++)
         progress += (*it)->getProgress();
 
       // Add completed jobs
       progress += totalJobCount - jobGrids.size() - jobs.size();
       progress /= totalJobCount;
 
-      task->update(progress);
+      task.update(progress);
 
       // Log progress
       double now = Timer::now();
       if (lastUpdate + 1 < now) {
         lastUpdate = now;
         LOG_INFO(2, String::printf("Progress: %0.2f%%", progress * 100)
-                 << " Time: " << TimeInterval(task->getTime())
-                 << " ETA: " << TimeInterval(task->getETA()));
+                 << " Time: " << TimeInterval(task.getTime())
+                 << " ETA: " << TimeInterval(task.getETA()));
       }
 
       // Wait

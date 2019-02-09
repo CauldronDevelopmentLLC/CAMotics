@@ -232,6 +232,7 @@ namespace CAMotics {
     void updateToolPathBounds();
     void updateWorkpieceBounds();
 
+    bool isActive() {return lastStatusActive;}
     void setStatusActive(bool active);
 
     void showConsole();

@@ -71,10 +71,8 @@ ToolSweep::ToolSweep(const SmartPointer<GCode::ToolPath> &path,
       int tool = move.getTool();
 
       if (tool < 0) continue;
-
       if (sweeps.size() <= (unsigned)tool) sweeps.resize(tool + 1);
-      if (sweeps[tool].isNull())
-        sweeps[tool] = getSweep(tools.get(tool));
+      if (sweeps[tool].isNull()) sweeps[tool] = getSweep(tools.get(tool));
 
       Vector3D startPt = move.getPtAtTime(startTime);
       Vector3D endPt = move.getPtAtTime(endTime);
@@ -89,7 +87,7 @@ ToolSweep::ToolSweep(const SmartPointer<GCode::ToolPath> &path,
     }
   }
 
-  finalize(); // Finalize MoveLookup
+  AABBTree::finalize(); // Finalize MoveLookup
 
   LOG_DEBUG(1, "AABBTree boxes=" << boxes << " height=" << getHeight());
 }

@@ -107,6 +107,8 @@ void TriangleSurface::finalize() {
   glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
   glFuncs.glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
                        &normals[0], GL_STATIC_DRAW);
+
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif // CAMOTICS_GUI
 
   finalized = true;

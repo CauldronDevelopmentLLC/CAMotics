@@ -34,8 +34,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SimulationRun::SimulationRun(const Simulation &sim) :
-  sim(sim), minTime(-1), maxTime(-1) {}
+SimulationRun::SimulationRun(const Simulation &sim) : sim(sim), lastTime(-1) {}
 
 
 SimulationRun::~SimulationRun() {}
@@ -48,15 +47,14 @@ SmartPointer<MoveLookup> SimulationRun::getMoveLookup() const {
 }
 
 
-void SimulationRun::setEndTime(double endTime) {
-  sim.time = endTime;
-}
+void SimulationRun::setEndTime(double endTime) {sim.time = endTime;}
 
 
-SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
+SmartPointer<Surface> SimulationRun::compute(Task &task) {
   Rectangle3D bbox;
 
   double start = Timer::now();
+  double simTime = sim.time;
 
   if (sweep.isNull()) {
     // GCode::Tool sweep
@@ -69,8 +67,11 @@ SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
     tree = new GridTree(Grid(bbox, sim.resolution));
 
   } else {
-    if (sim.time < minTime) minTime = sim.time;
-    if (maxTime < sim.time) maxTime = sim.time;
+    double minTime = simTime;
+    double maxTime = simTime;
+
+    if (lastTime < minTime) minTime = lastTime;
+    if (maxTime < lastTime) maxTime = lastTime;
 
     SmartPointer<MoveLookup> change = new ToolSweep(sim.path, minTime, maxTime);
     sweep->setChange(change);
@@ -78,7 +79,7 @@ SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
   }
 
   // Set target time
-  sweep->setEndTime(sim.time);
+  sweep->setEndTime(simTime);
 
   // Setup cut simulation
   CutWorkpiece cutWP(sweep, sim.workpiece);
@@ -87,14 +88,15 @@ SmartPointer<Surface> SimulationRun::compute(const SmartPointer<Task> &task) {
   Renderer renderer(task);
   renderer.render(cutWP, *tree, bbox, sim.threads, sim.mode);
 
-  if (!task->shouldQuit())
-    LOG_DEBUG(1, "Render time " << TimeInterval(task->getTime() - start));
-
-  // Extract surface
-  if (!task->shouldQuit()) {
-    minTime = maxTime = sim.time;
-    return new TriangleSurface(*tree);
+  if (task.shouldQuit()) {
+    sweep.release();
+    tree.release();
+    return 0;
   }
 
-  return 0;
+  LOG_DEBUG(1, "Render time " << TimeInterval(Timer::now() - start));
+
+  // Extract surface
+  lastTime = simTime;
+  return new TriangleSurface(*tree);
 }

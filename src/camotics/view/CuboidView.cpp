@@ -79,6 +79,8 @@ void CuboidView::draw() {
   glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
   glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
 
+  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
   glFuncs.glEnable(GL_NORMALIZE);
   glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
   glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
