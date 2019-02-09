@@ -1,5 +1,6 @@
 #!/bin/bash
 
-su $USER -c 'open -a CAMotics.app'
+USER="$(/usr/bin/who | /usr/bin/awk '/console/{print $1; exit}')"
+su $USER -c 'open -a /Applications/CAMotics.app'
 
 exit 0
