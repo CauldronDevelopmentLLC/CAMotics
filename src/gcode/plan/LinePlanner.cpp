@@ -822,6 +822,7 @@ double LinePlanner::planVelocityTransition(double Vi, double Vt,
   // Constant acceleration segment
   if (isAccelLimited(Vi, Vt, peakAccel, maxJerk)) {
     times[1] = (Vt - Vi) / peakAccel - times[0];
+    if (times[1] < 1e-12) times[1] = 0; // Handle floating-point rounding errors
     length += SCurve::distance(times[1], vel, peakAccel, 0);
     vel += SCurve::velocity(times[1], peakAccel, 0);
 
