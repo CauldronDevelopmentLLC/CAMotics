@@ -1053,12 +1053,23 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 800:                                   break; // Cancel canned cycle
     case 810: drill(vars, false, false, false); break; // Drill cycle
     case 820: drill(vars, true, false, false);  break; // Drill cycle w/ dwell
-    case 830: implemented = false;              break; // Peck drill
-    case 840: implemented = false;              break; // Right-hand tap
+    case 830: // TODO Peck drill
+      drill(vars, false, false, false); // Better than nothing
+      implemented = false;
+      break;
+    case 840: // TODO Right-hand tap
+      implemented = false;
+      break;
     case 850: drill(vars, false, true, false);  break; // No dwell, feed out
     case 860: drill(vars, false, false, true);  break; // Spin stop rapid out
-    case 870: implemented = false;              break; // Back boring
-    case 880: implemented = false;              break; // Spin stop manual out
+    case 870: // TODO Back boring
+      drill(vars, false, false, false); // Better than nothing
+      implemented = false;
+      break;
+    case 880: // TODO Spin stop manual out
+      drill(vars, false, false, false); // Better than nothing
+      implemented = false;
+      break;
     case 890: drill(vars, true, true, false);   break; // Dwell, feed out
 
     case 900: state.incrementalDistanceMode    = false; break;
