@@ -24,6 +24,9 @@
 
 #include <cbang/log/Logger.h>
 
+#include <QOpenGLExtraFunctions>
+#include <QtGui/qopenglext.h>
+
 using namespace std;
 using namespace cb;
 using namespace CAMotics;

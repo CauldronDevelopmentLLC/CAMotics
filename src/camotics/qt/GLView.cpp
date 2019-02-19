@@ -30,15 +30,25 @@
 
 #include <QGLFormat>
 #include <QMessageBox>
+#include <QOpenGLDebugLogger>
 
 using namespace CAMotics;
+using namespace cb;
 
 
 GLView::GLView(QWidget *parent) : QOpenGLWidget(parent), enabled(true) {
   QSurfaceFormat format = QSurfaceFormat::defaultFormat();
   format.setSamples(4);
+
+#ifdef DEBUG
+  format.setOption(QSurfaceFormat::DebugContext);
+#endif // DEBUG
+
   setFormat(format);
 }
+
+
+GLView::~GLView() {}
 
 
 QtWin &GLView::getQtWin() const {
@@ -86,6 +96,17 @@ void GLView::initializeGL() {
 
   try {
     LOG_DEBUG(5, "initializeGL()");
+
+#ifdef DEBUG
+    if (logger.isNull()) {
+      logger = new QOpenGLDebugLogger(this);
+      logger->initialize();
+      connect(logger.get(), &QOpenGLDebugLogger::messageLogged, this,
+              &GLView::handleLoggedMessage);
+    }
+#endif
+
+    SmartLog log = startLog();
     getView().glInit();
     return;
   } CATCH_ERROR;
@@ -97,6 +118,8 @@ void GLView::initializeGL() {
 void GLView::resizeGL(int w, int h) {
   if (!enabled) return;
   LOG_DEBUG(5, "resizeGL(" << w << ", " << h << ")");
+
+  SmartLog log = startLog();
   getView().resize(w, h);
 }
 
@@ -104,6 +127,69 @@ void GLView::resizeGL(int w, int h) {
 void GLView::paintGL() {
   if (!enabled) return;
   LOG_DEBUG(5, "paintGL()");
+
+  SmartLog log = startLog();
   getGLFuncs().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   getView().draw();
+}
+
+
+namespace {
+  int glDebugLevel(QOpenGLDebugMessage::Severity severity) {
+    switch (severity) {
+    case QOpenGLDebugMessage::MediumSeverity: return CBANG_LOG_WARNING_LEVEL;
+    case QOpenGLDebugMessage::LowSeverity:    return CBANG_LOG_DEBUG_LEVEL(1);
+    case QOpenGLDebugMessage::NotificationSeverity:
+      return CBANG_LOG_DEBUG_LEVEL(3);
+    default: return CBANG_LOG_ERROR_LEVEL;
+    }
+  }
+
+
+  const char *glDebugSource(QOpenGLDebugMessage::Source source) {
+    switch (source) {
+    case QOpenGLDebugMessage::APISource:            return "API";
+    case QOpenGLDebugMessage::WindowSystemSource:   return "GUI";
+    case QOpenGLDebugMessage::ShaderCompilerSource: return "Shader";
+    case QOpenGLDebugMessage::ThirdPartySource:     return "3rd";
+    case QOpenGLDebugMessage::ApplicationSource:    return "App";
+    case QOpenGLDebugMessage::OtherSource:          return "Other";
+    default:                                        return "Unknown";
+    }
+  }
+
+
+  const char *glDebugType(QOpenGLDebugMessage::Type type)  {
+    switch (type) {
+    case QOpenGLDebugMessage::ErrorType:              return "Error";
+    case QOpenGLDebugMessage::DeprecatedBehaviorType: return "Deprecated";
+    case QOpenGLDebugMessage::UndefinedBehaviorType:  return "Undefined";
+    case QOpenGLDebugMessage::PortabilityType:        return "Portability";
+    case QOpenGLDebugMessage::PerformanceType:        return "Performance";
+    case QOpenGLDebugMessage::MarkerType:             return "Marker";
+    case QOpenGLDebugMessage::GroupPushType:          return "Group Push";
+    case QOpenGLDebugMessage::GroupPopType:           return "Group Pop";
+    case QOpenGLDebugMessage::OtherType:              return "Other";
+    default:                                          return "Unknown";
+    }
+  }
+}
+
+
+GLView::SmartLog GLView::startLog() {
+  if (logger.isSet()) logger->startLogging();
+  return new SmartFunctor<GLView>(this, &GLView::logErrors);
+}
+
+
+void GLView::logErrors() {
+  if (logger.isSet()) logger->stopLogging();
+  logGLErrors();
+}
+
+
+void GLView::handleLoggedMessage(const QOpenGLDebugMessage &msg) {
+  LOG_LEVEL(glDebugLevel(msg.severity()), "GL:"
+            << glDebugSource(msg.source()) << ':'
+            << glDebugType(msg.type()) << ':' << msg.message().toStdString());
 }

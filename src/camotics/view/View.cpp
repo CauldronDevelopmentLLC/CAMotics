@@ -229,6 +229,4 @@ void View::draw() {
 
   // Disable Lighting
   setLighting(false);
-
-  CHECK_GL_ERROR("");
 }

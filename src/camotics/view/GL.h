@@ -32,7 +32,7 @@
 #endif
 
 namespace CAMotics {
-  void checkGLError(const std::string &message = std::string());
+  void logGLErrors();
 
   QOpenGLContext &getGLCtx();
 
@@ -43,9 +43,3 @@ namespace CAMotics {
   void glCylinder(double base, double top, double height, unsigned segments);
   void glSphere(double radius, unsigned slices, unsigned stacks);
 }
-
-#ifdef __DEBUG
-#define CHECK_GL_ERROR(msg) checkGLError(SSTR(__FUNCTION__ << "() " << msg))
-#else
-#define CHECK_GL_ERROR(msg)
-#endif

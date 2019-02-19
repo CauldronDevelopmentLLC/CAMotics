@@ -45,10 +45,13 @@ namespace CAMotics {
   }
 
 
-  void checkGLError(const string &message) {
-    GLenum err = getGLFuncs().glGetError();
-    if (err != GL_NO_ERROR)
-      LOG_ERROR(message << "GL error: " << err << ": " << glErrorString(err));
+  void logGLErrors() {
+    GLenum err;
+    do {
+      err = getGLFuncs().glGetError();
+      if (err == GL_NO_ERROR) break;
+      LOG_ERROR("GL error: " << err << ": " << glErrorString(err));
+    } while (err != GL_CONTEXT_LOST);
   }
 
 

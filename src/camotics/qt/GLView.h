@@ -20,8 +20,14 @@
 
 #pragma once
 
+#include <cbang/SmartPointer.h>
+#include <cbang/util/SmartFunctor.h>
 
 #include <QOpenGLWidget>
+
+
+class QOpenGLDebugLogger;
+class QOpenGLDebugMessage;
 
 
 namespace CAMotics {
@@ -31,11 +37,12 @@ namespace CAMotics {
   class GLView : public QOpenGLWidget {
     Q_OBJECT;
 
+    cb::SmartPointer<QOpenGLDebugLogger> logger;
     bool enabled;
 
   public:
     GLView(QWidget *parent = 0);
-    ~GLView() {}
+    ~GLView();
 
     bool isEnabled() const {return enabled;}
 
@@ -43,14 +50,21 @@ namespace CAMotics {
     View &getView() const;
     void redraw(bool now = false);
 
+  protected:
     // From QWidget
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+    void destroy(bool destroyWindow, bool destroySubWindows);
 
-    // From QGLWidget
+    // From OpenGLWidget
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
+
+    typedef cb::SmartPointer<cb::SmartFunctor<GLView> > SmartLog;
+    SmartLog startLog();
+    void logErrors();
+    void handleLoggedMessage(const QOpenGLDebugMessage &msg);
   };
 }
