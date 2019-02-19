@@ -246,14 +246,12 @@ for prog in progs.split():
     execs.append(p)
 
 
-# Python modules
+# Python module
 if have_python:
     pyenv['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
-    pymods = 'gplan'
-    for name in pymods.split():
-        mod = pyenv.SharedLibrary(name, ['build/%s.cpp' % name, libGCode],
-                                  SHLIBPREFIX = '')
-        Default(mod)
+    mod = pyenv.SharedLibrary('gplan', ['build/gplan.cpp', libGCode],
+                              SHLIBPREFIX = '')
+    Default(mod)
 
 # Clean
 Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])
