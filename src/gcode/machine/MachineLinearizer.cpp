@@ -74,7 +74,7 @@ void MachineLinearizer::arc(const Vector3D &offset, double angle,
   // TODO The estimated arc should straddle the actual arc.
 
   // Create segments
-  for (unsigned i = 0; i < segments; i++) {
+  for (unsigned i = 0; i < segments - 1; i++) {
     double currentAngle = startAngle + deltaAngle * (i + 1);
 
     x = center.x() + radius * cos(currentAngle);
