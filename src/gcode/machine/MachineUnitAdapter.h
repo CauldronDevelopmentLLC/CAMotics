@@ -64,7 +64,8 @@ namespace GCode {
     void setPosition(const Axes &position);
 
     void move(const Axes &position, int axes, bool rapid);
-    void arc(const cb::Vector3D &offset, double angle, plane_t plane);
+    void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
+             double angle, plane_t plane);
 
     double mmInchIn() const;
     double mmInchOut() const;

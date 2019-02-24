@@ -20,7 +20,7 @@
 
 #include "ControllerImpl.h"
 
-#include <gcode/Codes.h>
+#include "Codes.h"
 
 #include <cbang/SStream.h>
 #include <cbang/Math.h>
@@ -196,32 +196,6 @@ void ControllerImpl::setPlane(plane_t plane) {
 }
 
 
-const char *ControllerImpl::getPlaneAxes() const {
-  switch (state.plane) {
-  case XY: return "XYZ";
-  case XZ: return "XZY";
-  case YZ: return "YZX";
-  case UV: return "UVW";
-  case UW: return "UWV";
-  case VW: return "VZU";
-  default: THROWS("Invalid plane: " << state.plane);
-  }
-}
-
-
-const char *ControllerImpl::getPlaneOffsets() const {
-  switch (state.plane) {
-  case XY: return "IJ";
-  case XZ: return "IK";
-  case YZ: return "JK";
-  case UV: return "IJ";
-  case UW: return "IK";
-  case VW: return "JK";
-  default: THROWS("Invalid plane: " << state.plane);
-  }
-}
-
-
 double ControllerImpl::getAxisOffset(char axis) const {
   if (absoluteCoords) return 0; // Only set with G0 and G1 moves
 
@@ -341,7 +315,7 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   // TODO Affected by cutter radius compensation
   // TODO Make sure this is correct for planes XZ and YZ
 
-  const char *axes = getPlaneAxes();
+  const char *axes = getPlane().getAxes();
   if (state.plane == XZ) clockwise = !clockwise;
 
   // Compute start and end points
@@ -384,7 +358,7 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
   } else {
     // Get arc center
-    const char *offsets = getPlaneOffsets();
+    const char *offsets = getPlane().getOffsets();
     Vector2D offset;
 
     if (state.arcIncrementalDistanceMode) {
@@ -399,11 +373,11 @@ void ControllerImpl::arc(int vars, bool clockwise) {
     // Check that the radius matches
     radius = start.distance(center);
     double radiusDiff = fabs(radius - finish.distance(center));
-    if ((machine.isImperial() && 0.0002 < radiusDiff) ||
-        (machine.isMetric() && 0.002 < radiusDiff)) {
+    if ((machine.isImperial() && 0.0005 < radiusDiff) ||
+        (machine.isMetric() && 0.005 < radiusDiff)) {
       LOG_WARNING("Arc radiuses differ by " << radiusDiff << "mm");
-      LOG_DEBUG(1, "center=" << center << "start=" << start
-                << "finish=" << finish << "offset=" << offset);
+      LOG_DEBUG(1, " center=" << center << " start=" << start
+                << " finish=" << finish << " offset=" << offset);
     }
   }
 
@@ -425,10 +399,14 @@ void ControllerImpl::arc(int vars, bool clockwise) {
 
   // Do arc
   double deltaZ = target.get(axes[2]) - current.get(axes[2]);
-  Vector2D offset(center - start);
-  machine.arc(Vector3D(offset.x(), offset.y(), deltaZ), -angle, state.plane);
-  move(target, vars, false);
+  Axes offset;
+  offset.set(axes[0], center[0] - start[0]);
+  offset.set(axes[1], center[1] - start[1]);
+  offset.set(axes[2], deltaZ);
 
+  machine.arc(offset.getXYZ(), target.getXYZ(), -angle, state.plane);
+
+  setAbsolutePosition(target, getUnits());
   LOG_INFO(3, "Controller: Arc");
 }
 
@@ -488,8 +466,9 @@ void ControllerImpl::seek(int vars, bool active, bool error) {
 
 void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
                            bool spindleStop) {
-  unsigned xyVars = vars & (getPlaneXVarType() | getPlaneYVarType());
-  unsigned zVar = getPlaneZVarType();
+  Plane plane = getPlane();
+  unsigned xyVars = vars & (plane.getXVarType() | plane.getYVarType());
+  unsigned zVar = plane.getZVarType();
   double r = getVar('R');
   unsigned L = (vars & VT_L) ? (unsigned)getVar('L') : 1;
 
@@ -497,7 +476,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
   switch (state.returnMode) {
   case RETURN_TO_R: zClear = r; break;
   case RETURN_TO_OLD_Z: {
-    double oldZ = getAxisPosition(getPlaneZAxis());
+    double oldZ = getAxisPosition(plane.getZAxis());
     zClear = (r < oldZ) ? oldZ : r;
     break;
   }
@@ -505,15 +484,15 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
 
   for (unsigned i = 0; i < L; i++) {
     // Z is below R
-    double z = getAxisPosition(getPlaneZAxis());
-    if (!i && z < r) moveAxis(getPlaneZAxis(), r, true);
+    double z = getAxisPosition(plane.getZAxis());
+    if (!i && z < r) moveAxis(plane.getZAxis(), r, true);
 
     // Traverse to XY
     makeMove(xyVars, true, state.incrementalDistanceMode);
 
     // Traverse to Z if above
-    z = getAxisPosition(getPlaneZAxis());
-    if (z != r) moveAxis(getPlaneZAxis(), r, true);
+    z = getAxisPosition(plane.getZAxis());
+    if (z != r) moveAxis(plane.getZAxis(), r, true);
 
     // Drill
     makeMove(zVar, false, state.incrementalDistanceMode);
@@ -526,7 +505,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
     if (spindleStop) setSpindleDir(DIR_OFF);
 
     // Retract
-    moveAxis(getPlaneZAxis(), zClear, !feedOut);
+    moveAxis(plane.getZAxis(), zClear, !feedOut);
 
     // Restart Spindle
     if (spindleStop) setSpindleDir(spindleDir);

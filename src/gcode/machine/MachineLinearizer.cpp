@@ -24,8 +24,8 @@ using namespace cb;
 using namespace GCode;
 
 
-void MachineLinearizer::arc(const Vector3D &offset, double angle,
-                            plane_t plane) {
+void MachineLinearizer::arc(const Vector3D &offset, const Vector3D &target,
+                            double angle, plane_t plane) {
   const char *axesNames;
   switch (plane) {
   case XY: axesNames = "XYZ"; break;
@@ -38,25 +38,29 @@ void MachineLinearizer::arc(const Vector3D &offset, double angle,
   for (unsigned i = 0; i < 3; i++)
     axisIndex[i] = Axes::toIndex(axesNames[i]);
 
-  int axes = getVarType(axesNames[0]) | getVarType(axesNames[1]);
-  if (offset.z()) axes |= getVarType(axesNames[2]);
-
-  Axes current = getPosition();
+  // Offset point
+  double xOff = offset[axisIndex[0]];
+  double yOff = offset[axisIndex[1]];
+  double zOff = offset[axisIndex[2]];
 
   // Initial point
+  Axes current = getPosition();
   double x = current[axisIndex[0]];
   double y = current[axisIndex[1]];
   double z = current[axisIndex[2]];
 
+  // Axis vars
+  int axes = getVarType(axesNames[0]) | getVarType(axesNames[1]);
+  if (zOff) axes |= getVarType(axesNames[2]);
+
   // Center
-  Vector2D center(x + offset.x(), y + offset.y());
+  Vector2D center(x + xOff, y + yOff);
 
   // Start angle
-  double startAngle =
-    Vector2D(-offset.x(), -offset.y()).angleBetween(Vector2D(1, 0));
+  double startAngle = Vector2D(-xOff, -yOff).angleBetween(Vector2D(1, 0));
 
   // Radius
-  double radius = Vector2D(offset.x(), offset.y()).length();
+  double radius = Vector2D(xOff, yOff).length();
 
   // Allowed error cannot be greater than arc radius
   double error = std::min(maxArcError, radius);
@@ -69,7 +73,7 @@ void MachineLinearizer::arc(const Vector3D &offset, double angle,
   // Segments
   unsigned segments = (unsigned)ceil(fabs(angle) / errorAngle);
   double deltaAngle = -angle / segments;
-  double zDelta = offset.z() / segments;
+  double zDelta = zOff / segments;
 
   // TODO The estimated arc should straddle the actual arc.
 
@@ -87,4 +91,7 @@ void MachineLinearizer::arc(const Vector3D &offset, double angle,
     current[axisIndex[2]] = z;
     move(current, axes, false);
   }
+
+  current.setXYZ(target);
+  move(current, axes, false);
 }

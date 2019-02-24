@@ -31,6 +31,7 @@
 namespace GCode {
   class GCodeMachine : public MachineAdapter {
     cb::SmartPointer<std::ostream> stream;
+    Axes position;
     Units units;
     cb::FileLocation location;
     int axisSeen;
@@ -55,8 +56,12 @@ namespace GCode {
     void seek(port_t port, bool active, bool error);
     void output(port_t port, double value);
 
+    void setPosition(const Axes &position);
+
     void dwell(double seconds);
     void move(const Axes &position, int axes, bool rapid);
+    void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
+             double angle, plane_t plane);
     void pause(pause_t pause);
 
     void comment(const std::string &s) const;

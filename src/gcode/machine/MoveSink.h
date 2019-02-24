@@ -41,6 +41,7 @@ namespace GCode {
     // From MachineInterface
     void seek(port_t port, bool active, bool error);
     void move(const Axes &position, int axes, bool rapid);
-    void arc(const cb::Vector3D &offset, double degrees, plane_t plane);
+    void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
+             double degrees, plane_t plane);
   };
 }

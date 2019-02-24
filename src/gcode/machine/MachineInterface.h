@@ -135,8 +135,8 @@ namespace GCode {
      * @param port the port number.  Valid values depend on the machine.
      * @param value An analog or digital value.
      *
-     * @throw cb::Exception if there are any pending errors, the port is invalid
-     * or the operation is invalid for the specified port.
+     * @throw cb::Exception if the port is invalid or the operation is invalid 
+     * for the specified port.
      */
     virtual void output(port_t port, double value) = 0;
 
@@ -150,8 +150,7 @@ namespace GCode {
     /***
      * Delay the next move for @param seconds.
      *
-     * @throw cb::Exception if there are any pending errors or @parm seconds
-     * is less than zero.
+     * @throw cb::Exception if @parm seconds is less than zero.
      */
     virtual void dwell(double seconds) = 0;
 
@@ -162,8 +161,8 @@ namespace GCode {
      * rate if @param rapid is false, otherwise move at maximum speed.
      * This function may queue the operation and return immediately.
      *
-     * @throw cb::Exception if there are any pending errors, the feed rate is
-     * zero or the move would go beyond the limits of the machine.
+     * @throw cb::Exception if the feed rate is zero or the move would go 
+     * beyond the limits of the machine.
      */
     virtual void move(const Axes &position, int axes, bool rapid) = 0;
 
@@ -171,22 +170,18 @@ namespace GCode {
      * Program a helical move.
      *
      * @param offset the offset from the current position to the far center of
-     * the helicial move in the selected plane.  If the third value is zero then
-     * them move is a simple arc in the selected plane, otherwise it is
-     * a true helical move with an axis with length equal to the absolute value
-     * of the third value either above or below the selected plane through the
-     * current control point depending on the sign.
+     * the helicial move.
+     * @param target the end point of the arc.
      * @param angle radians of rotation.  A positive value
      * indicates a clockwise rotation, negative a counter-clockwise rotation.
      * @param plane the plane to which the helical axis is perpendicular.
-     * Valid values are XY (the default), XZ or YZ.
+     * Valid values are XY, XZ or YZ.
      *
-     * @throw cb::Exception if there are any pending errors, the feed rate is
-     * zero, the move would go beyond the limits of the machine or the plane
-     * is invalid.
+     * @throw cb::Exception if the feed rate is zero, the move would go beyond
+     * the limits of the machine or the plane is invalid.
      */
-    virtual void arc(const cb::Vector3D &offset, double angle,
-                     plane_t plane = XY) = 0;
+    virtual void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
+                     double angle, plane_t plane) = 0;
 
     virtual Transforms &getTransforms() = 0;
 

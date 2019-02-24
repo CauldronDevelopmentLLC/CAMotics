@@ -23,6 +23,7 @@
 #include "Controller.h"
 #include "ModalGroup.h"
 #include "ToolTable.h"
+#include "Plane.h"
 
 #include <gcode/machine/MachineUnitAdapter.h>
 
@@ -118,14 +119,7 @@ namespace GCode {
 
     // Plane
     void setPlane(plane_t plane);
-    const char *getPlaneAxes() const;
-    const char *getPlaneOffsets() const;
-    char getPlaneXAxis() const {return getPlaneAxes()[0];}
-    char getPlaneYAxis() const {return getPlaneAxes()[1];}
-    char getPlaneZAxis() const {return getPlaneAxes()[2];}
-    unsigned getPlaneXVarType() const {return getVarType(getPlaneXAxis());}
-    unsigned getPlaneYVarType() const {return getVarType(getPlaneYAxis());}
-    unsigned getPlaneZVarType() const {return getVarType(getPlaneZAxis());}
+    Plane getPlane() {return Plane(state.plane);}
 
     // Position
     double getAxisOffset(char axis) const;

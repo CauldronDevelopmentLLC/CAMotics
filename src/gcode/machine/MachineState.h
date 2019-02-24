@@ -87,7 +87,8 @@ namespace GCode {
     void dwell(double seconds) {}
     void move(const Axes &position, int axes, bool rapid)
     {setPosition(position);}
-    void arc(const cb::Vector3D &offset, double angle, plane_t plane) {}
+    void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
+             double angle, plane_t plane) {position.setXYZ(target);}
 
     Transforms &getTransforms() {return transforms;}
 

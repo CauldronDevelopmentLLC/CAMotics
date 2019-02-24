@@ -74,9 +74,9 @@ void MachineUnitAdapter::move(const Axes &position, int axes, bool rapid) {
 }
 
 
-void MachineUnitAdapter::arc(const Vector3D &offset, double angle,
-                             plane_t plane) {
-  MachineAdapter::arc(offset * mmInchOut(), angle, plane);
+void MachineUnitAdapter::arc(const Vector3D &offset, const Vector3D &target,
+                             double angle, plane_t plane) {
+  MachineAdapter::arc(offset * mmInchOut(), target * mmInchOut(), angle, plane);
 }
 
 

@@ -64,7 +64,8 @@ void MoveSink::move(const Axes &position, int axes, bool rapid) {
 }
 
 
-void MoveSink::arc(const Vector3D &offset, double angle, plane_t plane) {
-  MachineAdapter::arc(offset, angle, plane);
+void MoveSink::arc(const Vector3D &offset, const Vector3D &target, double angle,
+                   plane_t plane) {
+  MachineAdapter::arc(offset, target, angle, plane);
   probePending = false;
 }

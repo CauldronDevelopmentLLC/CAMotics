@@ -82,8 +82,9 @@ namespace GCode {
     void dwell(double seconds) {parent->dwell(seconds);}
     void move(const Axes &position, int axes, bool rapid)
     {parent->move(position, axes, rapid);}
-    void arc(const cb::Vector3D &offset, double angle, plane_t plane = XY)
-    {parent->arc(offset, angle, plane);}
+    void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
+             double angle, plane_t plane)
+    {parent->arc(offset, target, angle, plane);}
 
     Transforms &getTransforms() {return parent->getTransforms();}
 

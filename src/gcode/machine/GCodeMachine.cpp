@@ -20,9 +20,10 @@
 
 #include "GCodeMachine.h"
 
+#include <gcode/Plane.h>
+
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
-#include <cbang/net/URI.h>
 #include <cbang/log/Logger.h>
 
 #include <limits>
@@ -47,7 +48,7 @@ namespace {
     }
 
 
-    string toString() const {return String(x, imperial ? 3 : 2);}
+    string toString() const {return String(x, imperial ? 4 : 3);}
   };
 
 
@@ -188,6 +189,11 @@ void GCodeMachine::output(port_t port, double value) {
 }
 
 
+void GCodeMachine::setPosition(const Axes &position) {
+  this->position = getTransforms().transform(position);
+}
+
+
 void GCodeMachine::dwell(double seconds) {
   beginLine();
   *stream << "G4 P" << dtos(seconds, false) << '\n';
@@ -200,11 +206,12 @@ bool is_near(double x, double y) {
 }
 
 
-void GCodeMachine::move(const Axes &position, int axes, bool rapid) {
+void GCodeMachine::move(const Axes &_target, int axes, bool rapid) {
+  MachineAdapter::move(_target, axes, rapid);
+
   bool first = true;
   bool imperial = units == Units::IMPERIAL;
-  Axes lastPosition = getTransforms().transform(getPosition());
-  Axes nextPosition = getTransforms().transform(position);
+  Axes target = getTransforms().transform(_target);
 
   for (const char *axis = Axes::AXES; *axis; axis++) {
     int axisVT = getVarType(*axis);
@@ -214,8 +221,8 @@ void GCodeMachine::move(const Axes &position, int axes, bool rapid) {
 
     axisSeen |= axisVT;
 
-    string last = dtos(lastPosition.get(*axis), imperial).toString();
-    string next = dtos(nextPosition.get(*axis), imperial).toString();
+    string last = dtos(position.get(*axis), imperial).toString();
+    string next = dtos(target.get(*axis), imperial).toString();
 
     // Always output axis the first time
     if (wasSeen && last == next) continue;
@@ -231,8 +238,61 @@ void GCodeMachine::move(const Axes &position, int axes, bool rapid) {
 
   if (!first) {
     *stream << '\n';
-    MachineAdapter::move(position, axes, rapid);
+    position = target;
   }
+}
+
+
+void GCodeMachine::arc(const Vector3D &_offset, const Vector3D &_target,
+                       double angle, plane_t _plane) {
+  Plane plane(_plane);
+  Transform &t = getTransforms().get(XYZ).top();
+  Vector3D offset = t.transform(_offset + getPosition(XYZ)) - position.getXYZ();
+  Vector3D target = t.transform(_target);
+
+  MachineAdapter::arc(_offset, _target, angle, _plane);
+
+  if (!angle) return;
+
+  // Angle
+  bool clockwise = 0 < angle;
+  unsigned p = 0;
+  if (2 * M_PI < fabs(angle)) {
+    p = (unsigned)floor(fabs(angle) / (2 * M_PI));
+    angle = fmod(angle, 2 * M_PI);
+  }
+
+  // Print it
+  beginLine();
+  *stream << 'G' << (clockwise ? 2 : 3);
+  if (p) *stream << " P" << p;
+
+  // Target
+  bool imperial = units == Units::IMPERIAL;
+  for (unsigned axis = 0; axis < 3; axis++) {
+    int axisVT = getVarType(Axes::AXES[axis]);
+    bool wasSeen = axisSeen & axisVT;
+
+    string last = dtos(position[axis], imperial).toString();
+    string next = dtos(target[axis], imperial).toString();
+
+    // Always output axis the first time
+    if (wasSeen && last == next) continue;
+    axisSeen |= axisVT;
+
+    *stream << ' ' << Axes::AXES[axis] << next;
+  }
+
+  // Offsets
+  const unsigned *axisIndex = plane.getAxisIndex();
+  const char *offsets = plane.getOffsets();
+  for (unsigned axis = 0; axis < 2; axis++) {
+    double off = offset[axisIndex[axis]];
+    if (off) *stream << ' ' << offsets[axis] << off;
+  }
+
+  *stream << '\n';
+  position.setXYZ(target);
 }
 
 
@@ -241,8 +301,8 @@ void GCodeMachine::pause(pause_t type) {
 
   string code;
   switch (type) {
-  case PAUSE_PROGRAM:       code = "M0"; break;
-  case PAUSE_OPTIONAL:      code = "M1"; break;
+  case PAUSE_PROGRAM:       code = "M0";  break;
+  case PAUSE_OPTIONAL:      code = "M1";  break;
   case PAUSE_PALLET_CHANGE: code = "M60"; break;
   }
 

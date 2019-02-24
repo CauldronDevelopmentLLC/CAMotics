@@ -22,6 +22,7 @@
 #include "TPLContext.h"
 
 #include <gcode/ToolTable.h>
+#include <gcode/Arc.h>
 #include <gcode/ControllerImpl.h>
 #include <gcode/interp/Interpreter.h>
 
@@ -158,14 +159,18 @@ void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
 
 
 void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
-  // TODO Handle 'incremental=false'
-
   Vector3D
     offset(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
   double angle = args.has("angle") ? args.getNumber("angle") : (M_PI * 2);
   plane_t plane = args.has("plane") ? (plane_t)args.getInteger("plane") : XY;
+  Vector3D start = ctx.machine.getPosition().getXYZ();
 
-  ctx.machine.arc(offset, angle, plane);
+  // Handle incremental=false
+  if (!args.getBoolean("incremental")) offset -= start;
+
+  Arc arc(start, offset, angle, plane);
+
+  ctx.machine.arc(offset, arc.getTarget(), angle, plane);
 }
 
 
