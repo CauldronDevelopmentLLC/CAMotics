@@ -18,35 +18,33 @@
 
 \******************************************************************************/
 
-#include "Machine.h"
+#include "Transforms.h"
 
-#include "MachineState.h"
-#include "MoveSink.h"
-#include "MachineLinearizer.h"
-#include "MachineUnitAdapter.h"
+#include <cbang/Exception.h>
 
-#include <gcode/Move.h>
-
-#include <cbang/log/Logger.h>
-
-using namespace cb;
-using namespace std;
 using namespace GCode;
+using namespace cb;
 
 
-Machine::Machine(MoveStream &stream, double rapidFeed, double maxArcError) :
-  stream(stream), rapidFeed(rapidFeed) {
-  add(new MachineUnitAdapter);
-  add(new MachineLinearizer(maxArcError));
-  add(new MoveSink(*this));
-  add(new MachineState);
+TransformStack &Transforms::get(axes_t axes) {
+  if (AXES_COUNT <= axes) THROWS("Invalid transform " << axes);
+  return stacks[axes];
 }
 
 
-void Machine::move(Move &move) {
-  if (move.getType() == Move::MOVE_RAPID) move.setFeed(rapidFeed);
+const TransformStack &Transforms::get(axes_t axes) const {
+  if (AXES_COUNT <= axes) THROWS("Invalid transform " << axes);
+  return stacks[axes];
+}
 
-  stream.move(move);
 
-  LOG_INFO(3, "Machine: Move to " << move.getEndPt() << "mm");
+Axes Transforms::transform(const Axes &axes) const {
+  Axes trans(axes);
+
+  // TODO this is inefficient
+  trans.applyXYZMatrix(get(XYZ).top());
+  trans.applyABCMatrix(get(ABC).top());
+  trans.applyUVWMatrix(get(UVW).top());
+
+  return trans;
 }

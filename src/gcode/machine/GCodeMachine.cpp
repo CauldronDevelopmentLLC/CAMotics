@@ -74,7 +74,7 @@ void GCodeMachine::beginLine() {
 
 
 void GCodeMachine::start() {
-  axisFirstMove = 0;
+  axisSeen = 0;
   *stream << (units == Units::METRIC ? "G21" : "G20") << "\n";
   // TODO set other GCode state
 }
@@ -200,23 +200,25 @@ bool is_near(double x, double y) {
 }
 
 
-void GCodeMachine::move(const Axes &nextPosition, int axes, bool rapid) {
+void GCodeMachine::move(const Axes &position, int axes, bool rapid) {
   bool first = true;
   bool imperial = units == Units::IMPERIAL;
-  Axes lastPosition = getPosition();
+  Axes lastPosition = getTransforms().transform(getPosition());
+  Axes nextPosition = getTransforms().transform(position);
 
   for (const char *axis = Axes::AXES; *axis; axis++) {
     int axisVT = getVarType(*axis);
-    if (!(axisVT & axes)) continue;
+    bool wasSeen = axisSeen & axisVT;
 
-    bool axisFirst = !(axisFirstMove & axisVT);
-    axisFirstMove |= axisVT;
+    if (!wasSeen && !(axisVT & axes)) continue;
+
+    axisSeen |= axisVT;
 
     string last = dtos(lastPosition.get(*axis), imperial).toString();
     string next = dtos(nextPosition.get(*axis), imperial).toString();
 
     // Always output axis the first time
-    if (!axisFirst && last == next) continue;
+    if (wasSeen && last == next) continue;
 
     if (first) {
       beginLine();
@@ -229,7 +231,7 @@ void GCodeMachine::move(const Axes &nextPosition, int axes, bool rapid) {
 
   if (!first) {
     *stream << '\n';
-    MachineAdapter::move(nextPosition, axes, rapid);
+    MachineAdapter::move(position, axes, rapid);
   }
 }
 

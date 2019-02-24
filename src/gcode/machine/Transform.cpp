@@ -18,38 +18,13 @@
 
 \******************************************************************************/
 
-#include "TransMatrix.h"
+#include "Transform.h"
 
 using namespace GCode;
 using namespace cb;
 
 
-TransMatrix::TransMatrix() {
-  identity();
-}
-
-
-void TransMatrix::setMatrix(const Matrix4x4D &m) {
-  this->m = m;
-  i = m;
-  i.inverse();
-}
-
-
-void TransMatrix::setInverse(const Matrix4x4D &i) {
-  this->i = i;
-  m = i;
-  m.inverse();
-}
-
-
-void TransMatrix::identity() {
-  m.toIdentity();
-  i.toIdentity();
-}
-
-
-void TransMatrix::scale(const Vector3D &o) {
+void Transform::scale(const Vector3D &o) {
   Matrix4x4D t;
 
   for (unsigned j = 0; j < 3; j++) {
@@ -58,16 +33,11 @@ void TransMatrix::scale(const Vector3D &o) {
   }
   t[3][3] = 1;
 
-  m = t * m;
-
-  for (unsigned j = 0; j < 3; j++)
-    t[j][j] = 1.0 / o[j];
-
-  i = i * t;
+  *this = t * *this;
 }
 
 
-void TransMatrix::translate(const Vector3D &o) {
+void Transform::translate(const Vector3D &o) {
   Matrix4x4D t;
 
   for (unsigned j = 0; j < 3; j++) {
@@ -76,12 +46,7 @@ void TransMatrix::translate(const Vector3D &o) {
   }
   t[3][3] = 1;
 
-  m = m * t;
-
-  for (unsigned j = 0; j < 3; j++)
-    t[j][3] = -o[j];
-
-  i = t * i;
+  *this = *this * t;
 }
 
 
@@ -121,8 +86,7 @@ namespace {
 }
 
 
-void TransMatrix::rotate(double angle, const Vector3D &_v,
-                         const Vector3D &_u) {
+void Transform::rotate(double angle, const Vector3D &_v, const Vector3D &_u) {
   if (!angle) return;
   if (!_v[0] && !_v[1] && !_v[2]) THROW("Invalid rotation axis (0,0,0)");
 
@@ -133,13 +97,11 @@ void TransMatrix::rotate(double angle, const Vector3D &_v,
   Matrix4x4D t;
 
   makeRotationMatrix(t, angle, v, u);
-  m = t * m;
-  makeRotationMatrix(t, -angle, v, u);
-  i = i * t;
+  *this = t * *this;
 }
 
 
-void TransMatrix::reflect(const Vector3D &_o) {
+void Transform::reflect(const Vector3D &_o) {
   Matrix4x4D t;
 
   Vector3D o = transform(_o);
@@ -152,16 +114,56 @@ void TransMatrix::reflect(const Vector3D &_o) {
   t[2][2] = 1 - 2 * o[2] * o[2];
   t[3][3] = 1;
 
-  m = t * m;
-  i = i * t;
+  *this = t * *this;
 }
 
 
-Vector3D TransMatrix::transform(const Vector3D &p) const {
-  return (m * Vector4D(p, 1)).slice<3>();
+Vector3D Transform::transform(const Vector3D &p) const {
+  return (*this * Vector4D(p, 1)).slice<3>();
 }
 
 
-Vector3D TransMatrix::invert(const Vector3D &p) const {
-  return (i * Vector4D(p, 1)).slice<3>();
+void Transform::read(const js::Value &value) {
+  if (!value.isArray() || value.length() != 4)
+    THROW("Transform expected 4 rows");
+
+  for (unsigned i = 0; i < 4; i++) {
+    SmartPointer<js::Value> row = value.get(i);
+    if (!row->isArray() || row->length() != 4)
+      THROW("Transform expected row with 4 columns");
+
+    for (unsigned j = 0; j < 4; j++)
+      data[i][j] = row->getNumber(j);
+  }
+}
+
+
+void Transform::read(const JSON::Value &value) {
+  const JSON::List &rows = value.getList();
+
+  if (rows.size() != 4) THROW("Transform expected 4 rows");
+
+  for (unsigned i = 0; i < 4; i++) {
+    const JSON::List &row = rows.getList(i);
+    if (row.size() != 4) THROW("Transform expected row with 4 columns");
+
+    for (unsigned j = 0; j < 4; j++)
+      data[i][j] = row.getNumber(j);
+  }
+}
+
+
+void Transform::write(JSON::Sink &sink) const {
+  sink.beginList();
+
+  for (unsigned i = 0; i < 4; i++) {
+    sink.appendList();
+
+    for (unsigned j = 0; j < 4; j++)
+      sink.append(data[i][j]);
+
+    sink.endList();
+  }
+
+  sink.endList();
 }

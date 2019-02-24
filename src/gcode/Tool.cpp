@@ -40,11 +40,10 @@ Tool Tool::null;
 
 Tool::Tool(unsigned number, unsigned pocket, Units units) :
   number(number), pocket(pocket), units(units),
-  shape(ToolShape::TS_CYLINDRICAL) {
+  shape(ToolShape::TS_CYLINDRICAL), snubDiameter(0) {
 
   Axes::clear();
   memset(vars, 0, sizeof(vars));
-  setShape(ToolShape::TS_CYLINDRICAL);
 
   if (units == Units::METRIC) {
     setLength(10);
@@ -54,8 +53,6 @@ Tool::Tool(unsigned number, unsigned pocket, Units units) :
     setLength(25.4);
     setRadius(25.4 / 16);
   }
-
-  setSnubDiameter(0);
 }
 
 

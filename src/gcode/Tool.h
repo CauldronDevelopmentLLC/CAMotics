@@ -37,6 +37,7 @@ namespace GCode {
     Units units;
     ToolShape shape;
     double vars[4];
+    double length;
     double snubDiameter;
     std::string description;
 
@@ -70,13 +71,13 @@ namespace GCode {
     std::string getText() const;
 
     double getAngle() const;
-    double getLength() const {return getZ();}
+    double getLength() const {return length;}
     double getRadius() const {return vars[0];}
     void setRadiusFromAngle(double angle);
     double getDiameter() const {return vars[0] * 2;}
     double getSnubDiameter() const {return snubDiameter;}
 
-    void setLength(double value) {setZ(value);}
+    void setLength(double value) {length = value;}
     void setLengthFromAngle(double angle);
     void setRadius(double value) {vars[0] = value;}
     void setDiameter(double value) {vars[0] = value / 2;}

@@ -21,6 +21,7 @@
 #pragma once
 
 #include "MachineEnum.h"
+#include "Transforms.h"
 
 #include <gcode/Axes.h>
 #include <gcode/Units.h>
@@ -28,12 +29,9 @@
 
 #include <cbang/Exception.h>
 #include <cbang/LocationRange.h>
-#include <cbang/geom/Matrix.h>
 
 
 namespace GCode {
-  class MachineMatrix;
-
   class MachineInterface : public MachineEnum, public UnitsEnumerationBase {
   public:
     virtual ~MachineInterface() {}
@@ -190,9 +188,7 @@ namespace GCode {
     virtual void arc(const cb::Vector3D &offset, double angle,
                      plane_t plane = XY) = 0;
 
-    virtual const cb::Matrix4x4D &getMatrix(axes_t matrix = XYZ) const = 0;
-
-    virtual void setMatrix(const cb::Matrix4x4D &m, axes_t matrix = XYZ) = 0;
+    virtual Transforms &getTransforms() = 0;
 
     virtual void pause(pause_t type) = 0;
 

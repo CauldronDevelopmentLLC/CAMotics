@@ -18,35 +18,23 @@
 
 \******************************************************************************/
 
-#include "Machine.h"
+#pragma once
 
-#include "MachineState.h"
-#include "MoveSink.h"
-#include "MachineLinearizer.h"
-#include "MachineUnitAdapter.h"
+#include "TransformStack.h"
+#include "MachineEnum.h"
 
-#include <gcode/Move.h>
+#include <gcode/Axes.h>
 
-#include <cbang/log/Logger.h>
-
-using namespace cb;
-using namespace std;
-using namespace GCode;
+#include <vector>
 
 
-Machine::Machine(MoveStream &stream, double rapidFeed, double maxArcError) :
-  stream(stream), rapidFeed(rapidFeed) {
-  add(new MachineUnitAdapter);
-  add(new MachineLinearizer(maxArcError));
-  add(new MoveSink(*this));
-  add(new MachineState);
-}
+namespace GCode {
+  class Transforms : public MachineEnum {
+    TransformStack stacks[AXES_COUNT];
 
-
-void Machine::move(Move &move) {
-  if (move.getType() == Move::MOVE_RAPID) move.setFeed(rapidFeed);
-
-  stream.move(move);
-
-  LOG_INFO(3, "Machine: Move to " << move.getEndPt() << "mm");
+  public:
+    TransformStack &get(axes_t axes = XYZ);
+    const TransformStack &get(axes_t axes = XYZ) const;
+    Axes transform(const Axes &axes) const;
+  };
 }

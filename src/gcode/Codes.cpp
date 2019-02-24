@@ -113,9 +113,9 @@ const Code Codes::gcodes[] = {
    "VW Plane Selection"},
 
   {'G', 200, PRI_UNITS, MG::MG_UNITS, VT::VT_NONE,
-   "Use Inches"},
+   "Inches Mode"},
   {'G', 210, PRI_UNITS, MG::MG_UNITS, VT::VT_NONE,
-   "Use Millimeters"},
+   "Millimeters Mode"},
 
   // Used for homing on 3D printers
   {'G', 280, PRI_OFFSETS, MG::MG_ZERO, VT::VT_NONE,
@@ -166,11 +166,13 @@ const Code Codes::gcodes[] = {
    "Right Dynamic Cutter Radius Compensation"},
 
   {'G', 430, PRI_LENGTH_COMP, MG::MG_TOOL_OFFSET, VT::VT_H,
-   "Activate Tool Length Compensation"},
+   "Activate Tool Length Offset"},
   {'G', 431, PRI_LENGTH_COMP, MG::MG_TOOL_OFFSET, VT::VT_AXIS,
-   "Activate Dynamic Tool Length Compensation"},
+   "Dynamic Tool Length Offset"},
+  {'G', 432, PRI_LENGTH_COMP, MG::MG_TOOL_OFFSET, VT::VT_H,
+   "Additional Tool Length Offset"},
   {'G', 490, PRI_LENGTH_COMP, MG::MG_TOOL_OFFSET, VT::VT_NONE,
-   "Cancel Tool Length Compensation"},
+   "Cancel Tool Length Offset"},
 
   {'G', 520, PRI_OFFSETS, MG::MG_ZERO, VT::VT_AXIS,
    "Set Coordinate System Offsets"},
@@ -203,13 +205,18 @@ const Code Codes::gcodes[] = {
   {'G', 640, PRI_PATH, MG::MG_ZERO, VT::VT_P | VT::VT_Q,
    "Set Best Possible Speed Control Mode"},
 
+  {'G', 700, PRI_UNITS, MG::MG_UNITS, VT::VT_NONE,
+   "Inches Mode, use G20 instead"},
+  {'G', 710, PRI_UNITS, MG::MG_UNITS, VT::VT_NONE,
+   "Millimeters Mode, use G21 instead"},
+
   {'G', 730, PRI_MOTION, MG::MG_MOTION, VT::VT_XYZ | VT::VT_ABC | VT::VT_RLQ,
    "Drilling Cycle with Chip Breaking"},
   {'G', 760, PRI_MOTION, MG::MG_MOTION, VT::VT_P | VT::VT_Z | VT::VT_IJK |
    VT::VT_RLQ | VT::VT_H | VT::VT_E,
    "Threading Cycle"},
   {'G', 800, PRI_MOTION, MG::MG_MOTION, VT::VT_NONE,
-   "Cancel Modal Motion"},
+   "Cancel Canned Cycle"},
   {'G', 810, PRI_MOTION, MG::MG_MOTION, VT::VT_CANNED,
    "Drilling Cycle"},
   {'G', 820, PRI_MOTION, MG::MG_MOTION, VT::VT_CANNED | VT::VT_P,
@@ -270,15 +277,18 @@ const Code Codes::gcodes[] = {
 const Code Codes::g10codes[] = {
   {'G', 10, PRI_OFFSETS, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R |
    VT::VT_AXIS | VT::VT_I | VT::VT_J | VT::VT_Q,
-   "Set Tool Table"},
+   "L1 Set Tool Table"},
   {'G', 20, PRI_OFFSETS, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R |
    VT::VT_AXIS,
-   "Set Coordinate System"},
+   "L2 Set Coordinate System"},
   {'G', 100, PRI_OFFSETS, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R |
    VT::VT_X | VT::VT_Z | VT::VT_Q,
-   "Set Tool Table To Current Offsets"},
+   "L10 Set Tool Table To Current Offsets"},
+  {'G', 110, PRI_OFFSETS, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_R |
+   VT::VT_X | VT::VT_Z | VT::VT_Q,
+   "L11 Set Tool Table To Current Coordinates"},
   {'G', 200, PRI_OFFSETS, MG::MG_ZERO, VT::VT_L | VT::VT_P | VT::VT_AXIS,
-   "Set Coordinate System To Current Offsets"},
+   "L20 Set Coordinate System To Current Offsets"},
   {0},
 };
 

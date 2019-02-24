@@ -41,7 +41,7 @@ namespace GCode {
 
     Axes position;
 
-    cb::Matrix4x4D matrices[AXES_COUNT];
+    Transforms transforms;
 
     // Numbered and named parameters
     typedef struct {
@@ -89,8 +89,7 @@ namespace GCode {
     {setPosition(position);}
     void arc(const cb::Vector3D &offset, double angle, plane_t plane) {}
 
-    const cb::Matrix4x4D &getMatrix(axes_t matrix) const;
-    void setMatrix(const cb::Matrix4x4D &m, axes_t matrix);
+    Transforms &getTransforms() {return transforms;}
 
     void pause(pause_t type) {}
 

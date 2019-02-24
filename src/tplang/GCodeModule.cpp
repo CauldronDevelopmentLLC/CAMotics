@@ -133,7 +133,11 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
   ctx.pushPath(path);
   SmartFunctor<TPLContext> popPath(&ctx, &TPLContext::popPath);
 
-  Options options;
+  // Push XYZ matrix so GCode coordinate rotations work correctly
+  TransformStack &stack = ctx.machine.getTransforms().get(MachineEnum::XYZ);
+  stack.push();
+  SmartFunctor<TransformStack> pop(&stack, &TransformStack::pop);
+
   ControllerImpl controller(ctx.machine);
   Interpreter(controller).read(path);
 }

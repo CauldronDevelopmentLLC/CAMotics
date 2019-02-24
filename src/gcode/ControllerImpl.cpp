@@ -40,7 +40,7 @@ using namespace GCode;
 ControllerImpl::ControllerImpl(MachineInterface &machine,
                                const ToolTable &tools) :
   tools(tools), syncState(SYNC_NONE), offsetParamChanged(false),
-  currentMotionMode(10) {
+  currentMotionMode(10), absoluteCoords(false) {
 
   state.units                      = this->machine.getUnits();
   state.plane                      = XY;
@@ -223,24 +223,19 @@ const char *ControllerImpl::getPlaneOffsets() const {
 
 
 double ControllerImpl::getAxisOffset(char axis) const {
-  // TODO could this affect non-move ops?
-  if (state.moveInAbsoluteCoords) return 0;
+  if (absoluteCoords) return 0; // Only set with G0 and G1 moves
 
   unsigned axisIndex = Axes::toIndex(axis);
 
   // Coordinate system offset
-  unsigned cs = get(CURRENT_COORD_SYSTEM);
-  double offset = get(COORD_SYSTEM_ADDR(cs, axisIndex));
+  double offset = get(COORD_SYSTEM_ADDR(get(CURRENT_COORD_SYSTEM), axisIndex));
 
-  // Coordinate system rotation
-  address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
-  if (get(addr)) {
-    // TODO XY plane rotation
-  }
+  // Tool offset
+  if (state.toolLengthComp)
+    offset += get(TOOL_OFFSET_ADDR(axisIndex), getUnits());
 
-  // Global offset (after CS offsets above)
-  if (get(GLOBAL_OFFSETS_ENABLED))
-    offset += get(GLOBAL_OFFSET_ADDR(axisIndex));
+  // Global offset
+  if (get(GLOBAL_OFFSETS_ENABLED)) offset += get(GLOBAL_OFFSET_ADDR(axisIndex));
 
   return offset;
 }
@@ -332,6 +327,13 @@ void ControllerImpl::moveAxis(char axis, double value, bool rapid) {
   Axes pos = getAbsolutePosition();
   pos.set(axis, value);
   move(pos, getVarType(axis), rapid);
+}
+
+
+void ControllerImpl::linear(int vars, bool rapid) {
+  absoluteCoords = state.moveInAbsoluteCoords;
+  makeMove(vars, rapid, state.incrementalDistanceMode);
+  absoluteCoords = false;
 }
 
 
@@ -541,15 +543,19 @@ void ControllerImpl::pause(pause_t type) {
 }
 
 
-void ControllerImpl::setTools(int vars, bool relative) {
+void ControllerImpl::setTools(int vars, bool relative, bool coords) {
   Tool &tool = getTool(getVar('P'));
 
   for (const char *v = Tool::VARS; *v; v++)
     if (vars & getVarType(*v)) {
-      double value = getVar(*v);
-      if (relative && (getVarType(*v) & VT_AXIS))
-        value -= getAxisOffset(*v); // TODO What about R, I, J, Q offsets?
-      tool.set(*v, value);
+      double offset = getVar(*v);
+
+      if (getVarType(*v) & VT_AXIS) {
+        if (relative) offset -= getAxisOffset(*v);
+        else if (coords) offset -= getAxisPosition(*v);
+      }
+
+      tool.set(*v, offset);
     }
 
   LOG_INFO(3, "Controller: Set Tool Table" << getVarGroupStr("PRXYZABCUVWIJQ"));
@@ -564,14 +570,17 @@ void ControllerImpl::toolChange() {
 }
 
 
-void ControllerImpl::loadToolOffsets(unsigned number) {
+void ControllerImpl::loadToolOffsets(unsigned number, bool add) {
   try {
     const Tool &tool = getTool(number);
 
     for (const char *axis = Axes::AXES; *axis; axis++) {
       address_t addr = TOOL_OFFSET_ADDR(Axes::toIndex(*axis));
-      set(addr, tool.get(*axis), getUnits());
+      double offset = tool.get(*axis) + (add ? get(addr, getUnits()) : 0);
+      set(addr, offset, getUnits());
     }
+
+    state.toolLengthComp = true;
   } CATCH_WARNING; // Tool may not exist
 }
 
@@ -579,10 +588,11 @@ void ControllerImpl::loadToolOffsets(unsigned number) {
 void ControllerImpl::loadToolVarOffsets(int vars) {
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (vars & getVarType(*axis)) {
-      // TODO do these need to be offset?
       address_t addr = TOOL_OFFSET_ADDR(Axes::toIndex(*axis));
       set(addr, getVar(*axis), getUnits());
     }
+
+  state.toolLengthComp = true;
 }
 
 
@@ -614,7 +624,6 @@ void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
   if (!cs) cs = get(CURRENT_COORD_SYSTEM);
 
   if (vars & VarTypes::VT_R) {
-    LOG_WARNING("Coordinate system rotation not supported"); // TODO
     address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
     set(addr, getVar('R'), NO_UNITS);
   }
@@ -683,6 +692,13 @@ void ControllerImpl::updateOffsetParams() {
       set("_" + string(1, tolower(*axis)), position, getUnits());
     }
   }
+
+  // Apply rotation
+  unsigned cs = get(CURRENT_COORD_SYSTEM);
+  address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
+  double r = get(addr) * M_PI / 180;
+  Transform &t = machine.getTransforms().get(XYZ).pull();
+  t.rotate(r, Vector3D(0, 0, 1), Vector3D(0, 0, 0));
 }
 
 
@@ -736,6 +752,9 @@ void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
 void ControllerImpl::end() {
   // TODO replace this with GCode override
   // See http://linuxcnc.org/docs/html/gcode/m-code.html#mcode:m2-m30
+
+  // Axis offsets are set to zero (G92.2)
+  resetGlobalOffsets(true);
 
   // Origin offsets are set to the default (G54)
   setCoordSystem(1);
@@ -944,13 +963,13 @@ bool ControllerImpl::execute(const Code &code, int vars) {
   switch (code.type) {
   case 'G':
     switch (code.number) {
-    case 0:  makeMove(vars, true,  state.incrementalDistanceMode); break;
-    case 10: makeMove(vars, false, state.incrementalDistanceMode); break;
+    case 0:  linear(vars, true);  break;
+    case 10: linear(vars, false); break;
 
-    case 20: arc(vars, true);    break;
-    case 30: arc(vars, false);   break;
+    case 20: arc(vars, true);     break;
+    case 30: arc(vars, false);    break;
 
-    case 40: dwell(getVar('P')); break;
+    case 40: dwell(getVar('P'));  break;
 
     case 51: implemented = false; break; // TODO Quadratic B-spline
     case 52: implemented = false; break; // TODO NURBS Block Start
@@ -961,9 +980,10 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 100:
       switch ((unsigned)getVar('L')) {
-      case 1:  setTools(vars, false); break;
+      case 1:  setTools(vars, false, false); break;
       case 2:  setCoordSystemOffsets(vars, false); break;
-      case 10: setTools(vars, true);  break;
+      case 10: setTools(vars, true, false); break;
+      case 11: setTools(vars, false, true); break;
       case 20: setCoordSystemOffsets(vars, true);  break;
       }
       break;
@@ -1011,17 +1031,11 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 421: setCutterRadiusComp(vars, false, true);  break;
 
     case 430:
-      LOG_WARNING("Tool Length Offset not supported");
-      state.toolLengthComp = true;
-      loadToolOffsets((vars & VT_H) ? getVar('H') : getCurrentTool());
+      loadToolOffsets((vars & VT_H) ? getVar('H') : getCurrentTool(), false);
       break;
 
-    case 431:
-      LOG_WARNING("Dynamic Tool Length Offset not supported");
-      state.toolLengthComp = true;
-      loadToolVarOffsets(vars);
-      break;
-
+    case 431: loadToolVarOffsets(vars); break;
+    case 432: loadToolOffsets(getVar('H'), true); break;
     case 490: state.toolLengthComp = false; break;
 
     case 520: setGlobalOffsets(vars); break; // Same as G92
@@ -1046,6 +1060,9 @@ bool ControllerImpl::execute(const Code &code, int vars) {
       if (vars & VT_Q) state.naiveCamTolerance = getVar('Q');
       else state.naiveCamTolerance = 0;
       break;
+
+    case 700: implemented = false; break;
+    case 710: implemented = false; break;
 
     case 730: implemented = false; break; // Drill cycle w/ chip breaking
     case 760: implemented = false; break; // Thread cycle
@@ -1164,4 +1181,11 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     LOG_INFO(3, "Controller: " << code);
 
   return implemented;
+}
+
+
+void ControllerImpl::endBlock() {
+  if (state.moveInAbsoluteCoords && currentMotionMode != 0 &&
+      currentMotionMode != 10)
+    LOG_WARNING(Codes::find('G', 53) << " used without G0 or G1");
 }

@@ -28,7 +28,6 @@
 
 namespace GCode {
   class Move;
-  class MachineMatrix;
 
   class Machine : public MachinePipeline, public MoveStream {
     MoveStream &stream;

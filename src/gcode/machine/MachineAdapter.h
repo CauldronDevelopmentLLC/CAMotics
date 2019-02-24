@@ -85,10 +85,7 @@ namespace GCode {
     void arc(const cb::Vector3D &offset, double angle, plane_t plane = XY)
     {parent->arc(offset, angle, plane);}
 
-    const cb::Matrix4x4D &getMatrix(axes_t matrix) const
-    {return parent->getMatrix(matrix);}
-    void setMatrix(const cb::Matrix4x4D &m, axes_t matrix)
-    {parent->setMatrix(m, matrix);}
+    Transforms &getTransforms() {return parent->getTransforms();}
 
     void pause(pause_t type) {parent->pause(type);}
 

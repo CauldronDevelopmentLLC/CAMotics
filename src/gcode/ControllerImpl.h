@@ -54,6 +54,7 @@ namespace GCode {
 
     // State variables
     unsigned currentMotionMode;
+    bool absoluteCoords;
 
     typedef struct {
       bool autoRestore;
@@ -66,7 +67,7 @@ namespace GCode {
       bool incrementalDistanceMode;    // G90, G91
       feed_mode_t feedMode;            // G93, G94, G95
       unsigned coordSystem;            // G54-G59.3 CURRENT_COORD_SYSTEM
-      bool toolLengthComp;             // G43, G43.1, G49 TODO unsupported
+      bool toolLengthComp;             // G43, G43.1, G49
       return_mode_t returnMode;        // G98, G99
       spin_mode_t spinMode;            // G96, G97
       double spinMax;
@@ -140,6 +141,7 @@ namespace GCode {
     void move(const Axes &pos, int axes, bool rapid);
     void makeMove(int axes, bool rapid, bool incremental);
     void moveAxis(char axis, double value, bool rapid);
+    void linear(int vars, bool rapid);
     void arc(int vars, bool clockwise);
     void straightProbe(int vars, bool towardWorkpiece, bool signalError);
     void seek(int vars, bool active, bool error);
@@ -152,9 +154,9 @@ namespace GCode {
     // Tool
     Tool &getTool(unsigned tool) {return tools.get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
-    void setTools(int vars, bool relative);
+    void setTools(int vars, bool relative, bool coords);
     void toolChange();
-    void loadToolOffsets(unsigned tool);
+    void loadToolOffsets(unsigned tool, bool add);
     void loadToolVarOffsets(int vars);
 
     // Predefined locations
@@ -218,6 +220,6 @@ namespace GCode {
 
     void startBlock();
     bool execute(const Code &code, int vars);
-    void endBlock() {}
+    void endBlock();
   };
 }

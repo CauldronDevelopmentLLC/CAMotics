@@ -20,33 +20,30 @@
 
 #pragma once
 
-
 #include <cbang/geom/Matrix.h>
+#include <cbang/json/Serializable.h>
+#include <cbang/js/Value.h>
 
 
 namespace GCode {
-  class TransMatrix {
-    cb::Matrix4x4D m;
-    cb::Matrix4x4D i;
-
+  class Transform : public cb::Matrix4x4D, public cb::JSON::Serializable {
   public:
-    TransMatrix();
+    Transform(const cb::Matrix4x4D &m) : cb::Matrix4x4D(m) {}
+    Transform(const cb::js::Value &value) {read(value);}
+    Transform(const cb::JSON::Value &value) {read(value);}
+    Transform() {toIdentity();}
 
-    const cb::Matrix4x4D &getMatrix() const {return m;}
-    void setMatrix(const cb::Matrix4x4D &m);
-
-    const cb::Matrix4x4D &getInverse() const {return i;}
-    void setInverse(const cb::Matrix4x4D &i);
-
-    void identity();
     void scale(const cb::Vector3D &o);
     void translate(const cb::Vector3D &o);
     void rotate(double angle, const cb::Vector3D &o, const cb::Vector3D &u);
     void reflect(const cb::Vector3D &o);
 
     cb::Vector3D transform(const cb::Vector3D &p) const;
-    cb::Vector3D invert(const cb::Vector3D &p) const;
+
+    void read(const cb::js::Value &value);
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
   };
 }
-
-

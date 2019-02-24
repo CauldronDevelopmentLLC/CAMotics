@@ -26,7 +26,7 @@ using namespace tplang;
 
 
 MatrixModule::MatrixModule(TPLContext &ctx) :
-  js::NativeModule("matrix"), ctx(ctx), matrix(0) {}
+  js::NativeModule("matrix"), ctx(ctx) {}
 
 
 void MatrixModule::define(js::Sink &exports) {
@@ -49,58 +49,61 @@ void MatrixModule::define(js::Sink &exports) {
 }
 
 
-GCode::MachineMatrix &MatrixModule::getMatrix() {
-  if (!matrix) matrix = &ctx.find<GCode::MachineMatrix>();
-  return *matrix;
+GCode::TransformStack &MatrixModule::getTransformStack(const js::Value &args) {
+  return ctx.machine.getTransforms().get(parseAxes(args));
+}
+
+
+GCode::Transform &MatrixModule::getTransform(const js::Value &args) {
+  return getTransformStack(args).top();
 }
 
 
 void MatrixModule::pushMatrixCB(const js::Value &args, js::Sink &sink) {
-  getMatrix().pushMatrix(parseMatrix(args));
+  getTransformStack(args).push();
 }
 
 
 void MatrixModule::popMatrixCB(const js::Value &args, js::Sink &sink) {
-  getMatrix().popMatrix(parseMatrix(args));
+  getTransformStack(args).pop();
 }
 
 
 void MatrixModule::loadIdentityCB(const js::Value &args, js::Sink &sink) {
-  getMatrix().loadIdentity(parseMatrix(args));
+  getTransform(args).toIdentity();
 }
 
 
 void MatrixModule::scaleCB(const js::Value &args, js::Sink &sink) {
-  getMatrix().scale(args.getNumber("x"), args.getNumber("y"),
-                    args.getNumber("z"), parseMatrix(args));
+  Vector3D v(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
+  getTransform(args).scale(v);
 }
 
 
 void MatrixModule::translateCB(const js::Value &args, js::Sink &sink) {
-  getMatrix().translate(args.getNumber("x"), args.getNumber("y"),
-                        args.getNumber("z"), parseMatrix(args));
+  Vector3D v(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
+  getTransform(args).translate(v);
 }
 
 
 void MatrixModule::rotateCB(const js::Value &args, js::Sink &sink) {
-  getMatrix().rotate(args.getNumber("angle"), args.getNumber("x"),
-                     args.getNumber("y"), args.getNumber("z"),
-                     args.getNumber("a"), args.getNumber("b"),
-                     args.getNumber("c"), parseMatrix(args));
+  Vector3D v1(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
+  Vector3D v2(args.getNumber("a"), args.getNumber("b"), args.getNumber("c"));
+  getTransform(args).rotate(args.getNumber("angle"), v1, v2);
 }
 
 
 void MatrixModule::setMatrixCB(const js::Value &args, js::Sink &sink) {
-  THROW("Not yet implemented");
+  getTransform(args) = GCode::Transform(*args.get("m"));
 }
 
 
 void MatrixModule::getMatrixCB(const js::Value &args, js::Sink &sink) {
-  THROW("Not yet implemented");
+  getTransform(args).write(sink);
 }
 
 
-MatrixModule::axes_t MatrixModule::parseMatrix(const js::Value &args) {
+MatrixModule::axes_t MatrixModule::parseAxes(const js::Value &args) {
   if (!args.has("matrix")) return XYZ;
 
   axes_t matrix = (axes_t)args.getInteger("matrix");

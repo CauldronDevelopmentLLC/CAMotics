@@ -47,7 +47,10 @@ void MoveSink::move(const Axes &position, int axes, bool rapid) {
       set(TOOL_NUMBER, 1, NO_UNITS);
     }
 
-    Move move(type, getPosition(), position, time, get(TOOL_NUMBER, NO_UNITS),
+    Axes start = getTransforms().transform(getPosition());
+    Axes end = getTransforms().transform(position);
+
+    Move move(type, start, end, time, get(TOOL_NUMBER, NO_UNITS),
               getFeed(), getSpeed(), getLocation().getStart().getLine());
 
     time += move.getTime();

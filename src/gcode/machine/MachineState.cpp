@@ -34,9 +34,6 @@ MachineState::MachineState() :
   started(false), feed(0), feedMode(UNITS_PER_MINUTE), speed(0),
   spinMode(REVOLUTIONS_PER_MINUTE), maxSpeed(0) {
 
-  for (unsigned i = 0; i < AXES_COUNT; i++)
-    matrices[i].toIdentity();
-
   // Init numbered parameters
   memset(params, 0, sizeof(params));
 
@@ -92,18 +89,6 @@ Vector3D MachineState::getPosition(axes_t axes) const {
 
 void MachineState::setPosition(const Axes &position) {
   this->position.setFrom(position);
-}
-
-
-const Matrix4x4D &MachineState::getMatrix(axes_t matrix) const {
-  if (AXES_COUNT <= matrix) THROWS("Invalid matrix " << matrix);
-  return matrices[matrix];
-}
-
-
-void MachineState::setMatrix(const Matrix4x4D &m, axes_t matrix) {
-  if (AXES_COUNT <= matrix) THROWS("Invalid matrix " << matrix);
-  matrices[matrix] = m;
 }
 
 

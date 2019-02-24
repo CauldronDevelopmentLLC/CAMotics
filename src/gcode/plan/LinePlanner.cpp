@@ -863,8 +863,8 @@ double LinePlanner::computeJunctionVelocity(const Axes &unitA,
   if (!aDelta || !bDelta) return 0; // A unit vector is null
 
   double delta = (sqrt(aDelta) + sqrt(bDelta)) / 2;
-  double theta2 = acos(cosTheta) / 2;
-  double radius = delta * sin(theta2) / (1 - sin(theta2));
+  double halfTheta = acos(cosTheta) / 2;
+  double radius = delta * sin(halfTheta) / (1 - sin(halfTheta));
 
   return sqrt(radius * accel);
 }

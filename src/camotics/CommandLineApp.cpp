@@ -21,7 +21,6 @@
 #include "CommandLineApp.h"
 
 #include <gcode/machine/MachineState.h>
-#include <gcode/machine/MachineMatrix.h>
 #include <gcode/machine/MachineLinearizer.h>
 #include <gcode/machine/MachineUnitAdapter.h>
 #include <gcode/machine/GCodeMachine.h>
@@ -122,7 +121,6 @@ void CommandLineApp::run() {
 void CommandLineApp::build(GCode::MachinePipeline &pipeline) {
   pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
   if (linearize) pipeline.add(new MachineLinearizer(maxArcError));
-  pipeline.add(new MachineMatrix);
   pipeline.add(new GCodeMachine(stream, outputUnits));
   pipeline.add(new MachineState);
 }

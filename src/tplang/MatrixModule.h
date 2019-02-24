@@ -21,8 +21,8 @@
 #pragma once
 
 
-#include <gcode/machine/MachineMatrix.h>
 #include <gcode/machine/MachineEnum.h>
+#include <gcode/machine/Transforms.h>
 
 #include <cbang/js/NativeModule.h>
 
@@ -33,7 +33,6 @@ namespace tplang {
   class MatrixModule :
     public cb::js::NativeModule, public GCode::MachineEnum {
     TPLContext &ctx;
-    GCode::MachineMatrix *matrix;
 
   public:
     MatrixModule(TPLContext &ctx);
@@ -41,7 +40,8 @@ namespace tplang {
     // From cb::js::NativeModule
     void define(cb::js::Sink &exports);
 
-    GCode::MachineMatrix &getMatrix();
+    GCode::TransformStack &getTransformStack(const cb::js::Value &args);
+    GCode::Transform &getTransform(const cb::js::Value &args);
 
     // Javascript call backs
     void pushMatrixCB(const cb::js::Value &args, cb::js::Sink &sink);
@@ -59,6 +59,6 @@ namespace tplang {
     void getZ(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
-    axes_t parseMatrix(const cb::js::Value &args);
+    axes_t parseAxes(const cb::js::Value &args);
   };
 }
