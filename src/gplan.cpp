@@ -418,7 +418,9 @@ static PyObject *_set_resolver(PyPlanner *self, PyObject *args) {
 
     if (!PyArg_ParseTuple(args, "O", &cb)) return 0;
 
-    self->planner->setResolver(new PyNameResolver(cb));
+    if (cb == Py_None) self->planner->setResolver(0);
+    else self->planner->setResolver(new PyNameResolver(cb));
+
     Py_RETURN_NONE;
 
   } CATCH_PYTHON;
@@ -435,7 +437,9 @@ static PyObject *_set_logger(PyPlanner *self, PyObject *args) {
 
     if (!PyArg_ParseTuple(args, "O|is", &cb, &level, &domainLevels)) return 0;
 
-    cb::Logger::instance().setScreenStream(new PyLoggerStream(cb));
+    if (cb == Py_None) cb::Logger::instance().setScreenStream(0);
+    else cb::Logger::instance().setScreenStream(new PyLoggerStream(cb));
+
     if (0 <= level) cb::Logger::instance().setVerbosity(level);
     if (domainLevels) cb::Logger::instance().setLogDomainLevels(domainLevels);
 
