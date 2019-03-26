@@ -50,7 +50,7 @@ void MatrixModule::define(js::Sink &exports) {
 
 
 GCode::TransformStack &MatrixModule::getTransformStack(const js::Value &args) {
-  return ctx.machine.getTransforms().get(parseAxes(args));
+  return ctx.getMachine().getTransforms().get(parseAxes(args));
 }
 
 
@@ -114,7 +114,7 @@ MatrixModule::axes_t MatrixModule::parseAxes(const js::Value &args) {
 
 
 void MatrixModule::getXYZ(const js::Value &args, js::Sink &sink) {
-  Vector3D v = ctx.machine.getPosition(XYZ);
+  Vector3D v = ctx.getMachine().getPosition(XYZ);
 
   sink.beginList();
   sink.append(v.x());
@@ -125,15 +125,15 @@ void MatrixModule::getXYZ(const js::Value &args, js::Sink &sink) {
 
 
 void MatrixModule::getX(const js::Value &args, js::Sink &sink) {
-  sink.write(ctx.machine.getPosition(XYZ).x());
+  sink.write(ctx.getMachine().getPosition(XYZ).x());
 }
 
 
 void MatrixModule::getY(const js::Value &args, js::Sink &sink) {
-  sink.write(ctx.machine.getPosition(XYZ).y());
+  sink.write(ctx.getMachine().getPosition(XYZ).y());
 }
 
 
 void MatrixModule::getZ(const js::Value &args, js::Sink &sink) {
-  sink.write(ctx.machine.getPosition(XYZ).z());
+  sink.write(ctx.getMachine().getPosition(XYZ).z());
 }

@@ -135,26 +135,27 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
   SmartFunctor<TPLContext> popPath(&ctx, &TPLContext::popPath);
 
   // Push XYZ matrix so GCode coordinate rotations work correctly
-  TransformStack &stack = ctx.machine.getTransforms().get(MachineEnum::XYZ);
+  TransformStack &stack =
+    ctx.getMachine().getTransforms().get(MachineEnum::XYZ);
   stack.push();
   SmartFunctor<TransformStack> pop(&stack, &TransformStack::pop);
 
-  ControllerImpl controller(ctx.machine);
+  ControllerImpl controller(ctx.getMachine());
   Interpreter(controller).read(path);
 }
 
 
 void GCodeModule::rapidCB(const js::Value &args, js::Sink &sink) {
-  Axes position = ctx.machine.getPosition();
+  Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position, args.getBoolean("incremental"));
-  ctx.machine.move(position, axes, true);
+  ctx.getMachine().move(position, axes, true);
 }
 
 
 void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
-  Axes position = ctx.machine.getPosition();
+  Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position, args.getBoolean("incremental"));
-  ctx.machine.move(position, axes, false);
+  ctx.getMachine().move(position, axes, false);
 }
 
 
@@ -163,29 +164,29 @@ void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
     offset(args.getNumber("x"), args.getNumber("y"), args.getNumber("z"));
   double angle = args.has("angle") ? args.getNumber("angle") : (M_PI * 2);
   plane_t plane = args.has("plane") ? (plane_t)args.getInteger("plane") : XY;
-  Vector3D start = ctx.machine.getPosition().getXYZ();
+  Vector3D start = ctx.getMachine().getPosition().getXYZ();
 
   // Handle incremental=false
   if (!args.getBoolean("incremental")) offset -= start;
 
   Arc arc(start, offset, angle, plane);
 
-  ctx.machine.arc(offset, arc.getTarget(), angle, plane);
+  ctx.getMachine().arc(offset, arc.getTarget(), angle, plane);
 }
 
 
 void GCodeModule::probeCB(const js::Value &args, js::Sink &sink) {
-  ctx.machine.seek((MachineEnum::port_t)args.getInteger("port"),
+  ctx.getMachine().seek((MachineEnum::port_t)args.getInteger("port"),
                    args.getBoolean("active"), args.getBoolean("error"));
 
-  Axes position = ctx.machine.getPosition();
+  Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position);
-  ctx.machine.move(position, axes, false);
+  ctx.getMachine().move(position, axes, false);
 }
 
 
 void GCodeModule::dwellCB(const js::Value &args, js::Sink &sink) {
-  ctx.machine.dwell(args.getNumber("seconds"));
+  ctx.getMachine().dwell(args.getNumber("seconds"));
 }
 
 
@@ -193,15 +194,15 @@ void GCodeModule::feedCB(const js::Value &args, js::Sink &sink) {
   // Return feed info if no arguments were given
   if (!args.has("rate")) {
     sink.beginList();
-    sink.append(ctx.machine.getFeed());
-    sink.append(ctx.machine.getFeedMode());
+    sink.append(ctx.getMachine().getFeed());
+    sink.append(ctx.getMachine().getFeedMode());
     sink.endList();
 
     return;
   }
 
   // Otherwise set feed
-  ctx.machine.setFeed(args.getNumber("rate"));
+  ctx.getMachine().setFeed(args.getNumber("rate"));
 
   if (args.has("mode")) {
     feed_mode_t mode = (feed_mode_t)args.getInteger("mode");
@@ -212,10 +213,10 @@ void GCodeModule::feedCB(const js::Value &args, js::Sink &sink) {
                    "FEED_UNITS_PER_REV");
     }
 
-    ctx.machine.setFeedMode(mode);
+    ctx.getMachine().setFeedMode(mode);
   }
 
-  sink.write(ctx.machine.getFeed());
+  sink.write(ctx.getMachine().getFeed());
 }
 
 
@@ -225,8 +226,8 @@ void GCodeModule::speedCB(const js::Value &args, js::Sink &sink) {
     double max = 0;
 
     sink.beginList();
-    sink.append(ctx.machine.getSpeed());
-    sink.append(ctx.machine.getSpinMode(&max));
+    sink.append(ctx.getMachine().getSpeed());
+    sink.append(ctx.getMachine().getSpinMode(&max));
     if (max) sink.append(max);
     sink.endList();
 
@@ -237,13 +238,13 @@ void GCodeModule::speedCB(const js::Value &args, js::Sink &sink) {
   if (args.has("surface")) {
     double max = 0;
     if (args.has("max")) max = args.getNumber("max");
-    ctx.machine.setSpinMode(CONSTANT_SURFACE_SPEED, max);
+    ctx.getMachine().setSpinMode(CONSTANT_SURFACE_SPEED, max);
 
-  } else ctx.machine.setSpinMode(REVOLUTIONS_PER_MINUTE);
+  } else ctx.getMachine().setSpinMode(REVOLUTIONS_PER_MINUTE);
 
-  ctx.machine.setSpeed(args.getNumber("rate"));
+  ctx.getMachine().setSpeed(args.getNumber("rate"));
 
-  sink.write(ctx.machine.getSpeed());
+  sink.write(ctx.getMachine().getSpeed());
 }
 
 
@@ -252,16 +253,16 @@ void GCodeModule::toolCB(const js::Value &args, js::Sink &sink) {
 
   if (args.has("number")) {
     number = args.getInteger("number");
-    ctx.machine.changeTool(number);
+    ctx.getMachine().changeTool(number);
 
-  } else number = ctx.machine.get(TOOL_NUMBER, Units::NO_UNITS);
+  } else number = ctx.getMachine().get(TOOL_NUMBER, Units::NO_UNITS);
 
   if (number < 0) return;
 
-  if (!ctx.sim->hasDict("tools")) return;
+  if (!ctx.getSim().hasDict("tools")) return;
 
   ToolTable tools;
-  tools.read(ctx.sim->getDict("tools"));
+  tools.read(ctx.getSim().getDict("tools"));
 
   if (!tools.has(number)) return;
 
@@ -302,12 +303,12 @@ void GCodeModule::unitsCB(const js::Value &args, js::Sink &sink) {
 
 void GCodeModule::pauseCB(const js::Value &args, js::Sink &sink) {
   bool optional = args.getBoolean("optional");
-  ctx.machine.pause(optional ? PAUSE_OPTIONAL : PAUSE_PROGRAM);
+  ctx.getMachine().pause(optional ? PAUSE_OPTIONAL : PAUSE_PROGRAM);
 }
 
 
 void GCodeModule::positionCB(const js::Value &args, js::Sink &sink) {
-  Axes axes = ctx.machine.getPosition();
+  Axes axes = ctx.getMachine().getPosition();
 
   sink.beginDict();
 
@@ -320,19 +321,19 @@ void GCodeModule::positionCB(const js::Value &args, js::Sink &sink) {
 
 void GCodeModule::commentCB(const js::Value &args, js::Sink &sink) {
   for (unsigned i = 0; i < args.length(); i++)
-    ctx.machine.comment(args.getString(i)); // TODO Call JSON.stringify()
+    ctx.getMachine().comment(args.getString(i)); // TODO Call JSON.stringify()
 }
 
 
 void GCodeModule::messageCB(const js::Value &args, js::Sink &sink) {
   for (unsigned i = 0; i < args.length(); i++)
-    ctx.machine.message(args.getString(i)); // TODO Call JSON.stringify()
+    ctx.getMachine().message(args.getString(i)); // TODO Call JSON.stringify()
 }
 
 
 void GCodeModule::workpieceCB(const js::Value &args, js::Sink &sink) {
   Rectangle3D workpiece;
-  workpiece.read(*ctx.sim->get("workpiece")->get("bounds"));
+  workpiece.read(*ctx.getSim().get("workpiece")->get("bounds"));
 
   if (getUnitAdapter().getUnits() == Units::IMPERIAL)
     workpiece = workpiece / 25.4;

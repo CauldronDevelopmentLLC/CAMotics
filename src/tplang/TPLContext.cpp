@@ -22,6 +22,7 @@
 
 #include <cbang/Exception.h>
 #include <cbang/os/SystemUtilities.h>
+#include <cbang/json/Dict.h>
 
 using namespace std;
 using namespace cb;
@@ -31,7 +32,7 @@ using namespace tplang;
 TPLContext::TPLContext(const SmartPointer<ostream> &stream,
                        GCode::MachineInterface &machine, const string &jsImpl) :
   js::Javascript(jsImpl, stream), gcodeMod(*this), matrixMod(*this),
-  dxfMod(*this), stlMod(*this), machine(machine) {
+  dxfMod(*this), stlMod(*this), machine(machine), sim(new JSON::Dict) {
 
   // Add modules
   define(gcodeMod);

@@ -61,7 +61,7 @@ public:
     build(pipeline);
 
     if (!simJSON.empty())
-      ctx.sim = JSON::Reader::parse(StringInputSource(simJSON));
+      ctx.setSim(JSON::Reader::parse(StringInputSource(simJSON)));
 
     CommandLineApp::run();
   }

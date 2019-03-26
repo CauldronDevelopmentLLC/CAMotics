@@ -42,13 +42,17 @@ namespace tplang {
     DXFModule dxfMod;
     STLModule stlMod;
 
-  public:
     GCode::MachineInterface &machine;
     cb::JSON::ValuePtr sim;
 
+  public:
     TPLContext(const cb::SmartPointer<std::ostream> &stream,
                GCode::MachineInterface &machine,
                const std::string &jsImpl = std::string());
+
+    GCode::MachineInterface &getMachine() {return machine;}
+    void setSim(const cb::JSON::ValuePtr &sim) {this->sim = sim;}
+    const cb::JSON::Value &getSim() const {return *sim;}
 
     template <typename T>
     T &find() {
