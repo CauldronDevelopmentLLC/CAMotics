@@ -45,10 +45,9 @@ var steps = Math.ceil(depth / maxStep);
 var delta = depth / steps;
 
 rapid(-radius, 0);
-for (var i = 0; i < steps; i++) {
-    cut({z: -delta * (i + 1)});
-    arc({x: radius, y: 0, z: 0, angle: 2 * Math.PI, plane: XY});
-}
+cut({z: 0});
+arc({x: radius, y: 0, z: -depth, angle: 2 * Math.PI * steps});
+arc({x: radius});
 rapid({z: 5});
 
 speed(0);
