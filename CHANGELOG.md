@@ -1,5 +1,11 @@
 # CAMotics Changelog
 
+## v1.2.1:
+ - Implemented tool offsets (G43, G43.1, G43.2, G49)
+ - Implmented coord XY rotation (G10 L2)
+ - Added warning for G70 & G71
+ - Fixes for TPL arc()
+
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.
  - Revamped donation dialog.
