@@ -950,6 +950,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 40: dwell(getVar('P'));  break;
 
+    case 50: implemented = false; break; // TODO Cubic B-spline
     case 51: implemented = false; break; // TODO Quadratic B-spline
     case 52: implemented = false; break; // TODO NURBS Block Start
     case 53: implemented = false; break; // TODO NURBS Block End
@@ -1087,9 +1088,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
       setSpinMode(CONSTANT_SURFACE_SPEED, (vars & VT_D) ? getVar('D') : 0);
       break;
 
-    case 970:
-      setSpinMode(REVOLUTIONS_PER_MINUTE);
-      break;
+    case 970: setSpinMode(REVOLUTIONS_PER_MINUTE); break;
 
     case 980: state.returnMode = RETURN_TO_R;     break;
     case 990: state.returnMode = RETURN_TO_OLD_Z; break;

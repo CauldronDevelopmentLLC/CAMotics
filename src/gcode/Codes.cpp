@@ -82,6 +82,9 @@ const Code Codes::gcodes[] = {
   {'G', 40, PRI_DWELL, MG::MG_ZERO, VT::VT_P,
    "Dwell"},
 
+  {'G', 50, PRI_MOTION, MG::MG_MOTION, VT::VT_X | VT::VT_Y | VT::VT_I |
+   VT::VT_J | VT::VT_P | VT::VT_Q,
+   "Cubic B-spline"},
   {'G', 51, PRI_MOTION, MG::MG_MOTION, VT::VT_X | VT::VT_Y | VT::VT_I |
    VT::VT_J,
    "Quadratic B-spline"},
