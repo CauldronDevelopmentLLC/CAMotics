@@ -140,6 +140,15 @@ function bounds_dims(bounds) {
 }
 
 
+function bounds_center(bounds) {
+  return {
+    x: (bounds.max.x - bounds.min.x) / 2 + bounds.min.x,
+    y: (bounds.max.y - bounds.min.y) / 2 + bounds.min.y,
+    z: (bounds.max.z - bounds.min.z) / 2 + bounds.min.z
+  }
+}
+
+
 function quad_bezier(p, t) {
   var c = [sqr(1 - t), 2 * (1 - t) * t, sqr(t)];
 
@@ -978,6 +987,11 @@ module.exports = extend({
   },
 
 
+  poly_center: function (poly) {
+    return bounds_center(this.poly_bounds(poly));
+  },
+
+
   layer_bounds: function (layer) {
     var bounds = bounds_new();
 
@@ -986,6 +1000,11 @@ module.exports = extend({
       bounds = bounds_add(bounds, this.poly_bounds(polys[i]));
 
     return bounds;
+  },
+
+
+  layer_center: function (poly) {
+    return bounds_center(this.layer_bounds(poly));
   },
 
 
