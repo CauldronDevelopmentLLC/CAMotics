@@ -38,6 +38,7 @@ namespace {
     double x;
     bool imperial;
 
+
     dtos(double x, bool imperial) : x(x), imperial(imperial) {
       if (Math::isnan(x))
         THROW("Numerical error in GCode stream:  NaN, caused by a divide by "
@@ -48,7 +49,18 @@ namespace {
     }
 
 
-    string toString() const {return String(x, imperial ? 4 : 3);}
+    string toString() const {
+      // TODO Get precision from config
+      string s = String::printf("%.*f", imperial ? 4 : 3, x);
+
+      int chop = 0;
+      for (auto it = s.rbegin(); it != s.rend() && *it == '0'; it++)
+        chop++;
+
+      if (chop) s = s.substr(0, s.length() - chop);
+
+      return s == "-0." ? "0." : s;
+    }
   };
 
 

@@ -5,6 +5,7 @@
  - Implmented coord XY rotation (G10 L2)
  - Added warning for G70 & G71
  - Fixes for TPL arc()
+ - Always output a decimal point for compatibility with Haas and Fanuc. #298
 
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.
