@@ -64,7 +64,7 @@ void ClipperModule::offsetCB(const js::Value &args, js::Sink &sink) {
         poly.push_back(IntPoint(jsPoint->getNumber(0) * scale,
                                 jsPoint->getNumber(1) * scale));
 
-      else THROWS("Expected 2D point");
+      else THROW("Expected 2D point");
     }
   }
 

@@ -29,7 +29,7 @@ using namespace CAMotics;
 
 const SmartPointer<Value> &ValueSet::get(const string &name) const {
   iterator it = find(name);
-  if (it == end()) THROWS("Value '" << name << "' not found");
+  if (it == end()) THROW("Value '" << name << "' not found");
   return it->second;
 }
 

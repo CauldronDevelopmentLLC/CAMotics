@@ -37,7 +37,7 @@ RenderJob::RenderJob(Condition &condition, FieldFunction &func, RenderMode mode,
   switch (mode) {
   case RenderMode::MCUBES_MODE: generator = new MarchingCubes; break;
   case RenderMode::CMS_MODE: generator = new CubicalMarchingSquares; break;
-  default: THROWS("Invalid or unsupported render mode " << mode);
+  default: THROW("Invalid or unsupported render mode " << mode);
   }
 }
 

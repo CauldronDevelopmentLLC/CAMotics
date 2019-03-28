@@ -58,7 +58,7 @@ vector<ProbePoint *> ProbeGrid::find(const Vector2D &p) {
   int y = floor(yA);
 
   if (y < 0 || (int)size() <= y || x < 0 || (int)(*this)[y].size() <= x)
-    THROWS("Point " << p << " not in grid (" << x << ", " << y << ')'
+    THROW("Point " << p << " not in grid (" << x << ", " << y << ')'
            << " (" << (*this)[y].size() << ", " << size() << ')');
 
   if (y == yA && y == (int)size() - 1) y--;

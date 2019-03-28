@@ -106,7 +106,7 @@ SmartPointer<Block> Parser::block() {
 
     default:
       if (!tokenizer->isType(TokenType::ID_TOKEN))
-        THROWS("Expected word or assignment, found "
+        THROW("Expected word or assignment, found "
                << tokenizer->advance().getType());
 
       children.push_back(word());
@@ -140,7 +140,7 @@ SmartPointer<Word> Parser::word() {
   ParseScope scope(tokenizer->getScanner());
 
   string name = tokenizer->match(TokenType::ID_TOKEN).getValue();
-  if (name.length() != 1) THROWS("Invalid word '" << name << "'");
+  if (name.length() != 1) THROW("Invalid word '" << name << "'");
 
   return scope.set(new Word(toupper(name[0]), numberRefOrExpr()));
 }
@@ -198,7 +198,7 @@ SmartPointer<Entity> Parser::numberRefOrExpr() {
   case TokenType::ADD_TOKEN:
   case TokenType::SUB_TOKEN: return unaryOp();
   default:
-    THROWS("Expected number, reference, or bracked expression, found "
+    THROW("Expected number, reference, or bracked expression, found "
            << tokenizer->advance().getType());
   }
 }
@@ -328,7 +328,7 @@ SmartPointer<Entity> Parser::unaryOp() {
   case TokenType::ADD_TOKEN: op = Operator::ADD_OP; break;
   case TokenType::SUB_TOKEN: op = Operator::SUB_OP; break;
   default:
-    THROWS("Expected unary - or + operator, found "
+    THROW("Expected unary - or + operator, found "
            << tokenizer->advance().getType());
   }
 

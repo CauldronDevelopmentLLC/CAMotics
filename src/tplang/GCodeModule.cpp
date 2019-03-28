@@ -294,7 +294,7 @@ void GCodeModule::unitsCB(const js::Value &args, js::Sink &sink) {
     case Units::METRIC:
       getUnitAdapter().setUnits(Units::METRIC);
       break;
-    default: THROWS("Units type must be one of IMPERIAL or METRIC");
+    default: THROW("Units type must be one of IMPERIAL or METRIC");
     }
 
   } else sink.write(units);
@@ -369,7 +369,7 @@ int GCodeModule::parseAxes(const js::Value &args, Axes &position,
 
     double value =
       args.getNumber(name) + (incremental ? position.get(*axis) : 0);
-    if (!Math::isfinite(value)) THROWS(*axis << " position is invalid");
+    if (!Math::isfinite(value)) THROW(*axis << " position is invalid");
 
     position.set(*axis, value);
     axes |= getVarType(*axis);

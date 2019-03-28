@@ -131,7 +131,7 @@ Color ToolPathView::getColor(GCode::MoveType type, double intensity) {
   case GCode::MoveType::MOVE_PROBE: return Color::BLUE;
   case GCode::MoveType::MOVE_DRILL: return Color::YELLOW;
   }
-  THROWS("Invalid move type " << type);
+  THROW("Invalid move type " << type);
 }
 
 

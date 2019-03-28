@@ -101,7 +101,7 @@ int CommandLineApp::init(int argc, char *argv[]) {
   } else if (out == "-") stream = SmartPointer<ostream>::Phony(&cout);
   else {
     if (SystemUtilities::exists(out) && !force)
-      THROWS("File '" << out << "' already exists");
+      THROW("File '" << out << "' already exists");
     stream = SystemUtilities::oopen(out);
   }
 

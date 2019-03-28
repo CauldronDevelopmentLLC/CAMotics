@@ -45,7 +45,7 @@ double Evaluator::eval(UnaryOp &e) {
   switch (e.getType()) {
   case Operator::ADD_OP: return value;
   case Operator::SUB_OP: return -value;
-  default: THROWS(e.getLocation() << " Invalid unary operator");
+  default: THROW(e.getLocation() << " Invalid unary operator");
   }
 }
 
@@ -78,7 +78,7 @@ double Evaluator::eval(BinaryOp &e) {
   case Operator::AND_OP: return left && right;
   case Operator::OR_OP:  return left || right;
   case Operator::XOR_OP: return (bool)left ^ (bool)right;
-  default: THROWS(e.getLocation() << " Invalid binary operator");
+  default: THROW(e.getLocation() << " Invalid binary operator");
   }
 }
 
@@ -116,7 +116,7 @@ double Evaluator::eval(FunctionCall &e) {
     if (name == "ATAN") return atan2(arg1, arg2) * 180.0 / M_PI;
   }
 
-  THROWS(e.getLocation() << " Unsupported function '" << name << "'");
+  THROW(e.getLocation() << " Unsupported function '" << name << "'");
 }
 
 

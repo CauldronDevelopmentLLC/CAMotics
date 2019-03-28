@@ -32,7 +32,7 @@ using namespace CAMotics;
 Vector3D FieldFunction::linearIntersect(Vector3D &a, double &aDepth,
                                         Vector3D &b, double &bDepth) {
   if ((aDepth < 0) == (bDepth < 0))
-    THROWS("There is no intersection between points " << a << " & " << b);
+    THROW("There is no intersection between points " << a << " & " << b);
 
   Vector3D mid;
 

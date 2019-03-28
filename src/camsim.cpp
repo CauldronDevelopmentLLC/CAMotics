@@ -89,7 +89,7 @@ namespace CAMotics {
 
       vector<string> args = cmdLine.getPositionalArgs();
       if (2 < args.size())
-        THROWS("Too many (" << args.size() << ") positional arguments.");
+        THROW("Too many (" << args.size() << ") positional arguments.");
       if (args.size() < 1)
         THROW("Missing project, GCode or TPL input argument.");
       if (args.size() < 2) THROW("Missing STL output argument.");

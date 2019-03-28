@@ -33,26 +33,26 @@ AABBTree::~AABBTree() {
 
 
 Rectangle3D AABBTree::getBounds() const {
-  if (!finalized) THROWS("AABBTree not yet finalized");
+  if (!finalized) THROW("AABBTree not yet finalized");
   return root ? root->getBounds() : Rectangle3D();
 }
 
 
 void AABBTree::insert(const GCode::Move *move, const Rectangle3D &bbox) {
-  if (finalized) THROWS("Cannot insert into AABBTree after partitioning");
+  if (finalized) THROW("Cannot insert into AABBTree after partitioning");
   root = (new AABB(move, bbox))->prepend(root);
 }
 
 
 bool AABBTree::intersects(const Rectangle3D &r) const {
-  if (!finalized) THROWS("AABBTree not yet finalized");
+  if (!finalized) THROW("AABBTree not yet finalized");
   return root && root->intersects(r);
 }
 
 
 void AABBTree::collisions(const Vector3D &p,
                           vector<const GCode::Move *> &moves) const {
-  if (!finalized) THROWS("AABBTree not yet finalized");
+  if (!finalized) THROW("AABBTree not yet finalized");
   if (root) root->collisions(p, moves);
 }
 

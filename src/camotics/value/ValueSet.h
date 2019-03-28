@@ -48,7 +48,7 @@ namespace CAMotics {
       iterator it = find(value->getName());
 
       if (it != end())
-        THROWS("Value with name '" << value->getName() << "' already in set");
+        THROW("Value with name '" << value->getName() << "' already in set");
 
       values.insert(values_t::value_type(value->getName(), value));
 

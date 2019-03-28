@@ -211,7 +211,7 @@ void PyThrowIfError(const std::string &msg) {
   std::string errStr = _errStr ? _errStr : "";
   Py_DECREF(err);
 
-  THROWS(msg << errStr);
+  THROW(msg << errStr);
 }
 
 

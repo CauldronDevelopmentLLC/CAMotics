@@ -107,7 +107,7 @@ MatrixModule::axes_t MatrixModule::parseAxes(const js::Value &args) {
   if (!args.has("matrix")) return XYZ;
 
   axes_t matrix = (axes_t)args.getInteger("matrix");
-  if (AXES_COUNT <= matrix) THROWS("Invalid matrix number " << matrix);
+  if (AXES_COUNT <= matrix) THROW("Invalid matrix number " << matrix);
 
   return matrix;
 }

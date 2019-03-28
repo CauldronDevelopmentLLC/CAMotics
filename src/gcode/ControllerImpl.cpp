@@ -79,7 +79,7 @@ ControllerImpl::ControllerImpl(MachineInterface &machine,
 
 double ControllerImpl::getVar(char c) const {
   if (c < 'A' || 'Z' < c)
-    THROWS("Invalid var '" << String::escapeC(string(1, c)) << "'");
+    THROW("Invalid var '" << String::escapeC(string(1, c)) << "'");
   return varValues[c - 'A'];
 }
 
@@ -191,7 +191,7 @@ void ControllerImpl::input(unsigned index, bool digital, input_mode_t mode,
 
 
 void ControllerImpl::setPlane(plane_t plane) {
-  if (VW < plane) THROWS("Invalid plane: " << plane);
+  if (VW < plane) THROW("Invalid plane: " << plane);
   state.plane = plane;
 }
 
@@ -599,7 +599,7 @@ void ControllerImpl::setCoordSystem(unsigned cs) {
 
 void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
   unsigned cs = getVar('P');
-  if (9 < cs) THROWS("Invalid coordinate system number " << cs);
+  if (9 < cs) THROW("Invalid coordinate system number " << cs);
   if (!cs) cs = get(CURRENT_COORD_SYSTEM);
 
   if (vars & VarTypes::VT_R) {
@@ -851,7 +851,7 @@ void ControllerImpl::clear(const string &name) {machine.clear(name);}
 
 void ControllerImpl::setVar(char c, double value) {
   if (c < 'A' || 'Z' < c)
-    THROWS("Invalid var '" << String::escapeC(string(1, c)) << "'");
+    THROW("Invalid var '" << String::escapeC(string(1, c)) << "'");
   varValues[c - 'A'] = value;
 }
 

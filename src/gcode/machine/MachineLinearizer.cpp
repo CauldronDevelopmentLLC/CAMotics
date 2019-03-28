@@ -31,7 +31,7 @@ void MachineLinearizer::arc(const Vector3D &offset, const Vector3D &target,
   case XY: axesNames = "XYZ"; break;
   case XZ: axesNames = "XZY"; break;
   case YZ: axesNames = "YZX"; break;
-  default: THROWS("Invalid plane: " << plane);
+  default: THROW("Invalid plane: " << plane);
   }
 
   unsigned axisIndex[3];

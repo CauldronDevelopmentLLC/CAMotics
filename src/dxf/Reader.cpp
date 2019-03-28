@@ -37,7 +37,7 @@ void Reader::read(const InputSource &source) {
   SmartPointer<DL_Dxf> dxf = new DL_Dxf;
 
   if (!dxf->in(source.getStream(), this))
-    THROWS("Failed to read '" << source << "' as DXF");
+    THROW("Failed to read '" << source << "' as DXF");
 }
 
 
@@ -46,7 +46,7 @@ void Reader::addEntity(const SmartPointer<Entity> &entity) {
 
   layers_t::iterator it = layers.find(attributes.getLayer());
   if (it == layers.end())
-    THROWS("DXF Undefined layer '" << attributes.getLayer() << "'");
+    THROW("DXF Undefined layer '" << attributes.getLayer() << "'");
 
   it->second.push_back(entity);
 }

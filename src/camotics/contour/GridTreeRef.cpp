@@ -37,7 +37,7 @@ GridTreeRef::GridTreeRef(GridTree *ref, const Vector3U &offset,
 
 
 unsigned GridTreeRef::getCount() const {
-  THROWS("Cannot call " << __func__ << " on GridTreeRef");
+  THROW("Cannot call " << __func__ << " on GridTreeRef");
 }
 
 
@@ -48,5 +48,5 @@ void GridTreeRef::insertLeaf(GridTreeLeaf *leaf, const Vector3U &offset) {
 
 void GridTreeRef::gather(vector<float> &vertices,
                          vector<float> &normals) const {
-  THROWS("Cannot call " << __func__ << " on GridTreeRef");
+  THROW("Cannot call " << __func__ << " on GridTreeRef");
 }

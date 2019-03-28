@@ -52,7 +52,7 @@ const string &PlannerConfig::getOverride(const Code &code) const {
   const auto it = overrides.find(code);
   if (it != overrides.end()) return it->second;
 
-  THROWS("Override code " << code << " not found");
+  THROW("Override code " << code << " not found");
 }
 
 
@@ -84,7 +84,7 @@ void PlannerConfig::read(const JSON::Value &value) {
   idBits = value.getU32("id-bits", idBits);
 
   if (idBits < 8 || 63 < idBits)
-    THROWS("'id-bits' cannot be less than 8 or greater than 63");
+    THROW("'id-bits' cannot be less than 8 or greater than 63");
 
   programStart = value.getString("program-start", "");
 

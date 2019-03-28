@@ -30,7 +30,7 @@ using namespace std;
 
 
 const SmartPointer<File> &Files::get(unsigned i) const {
-  if (files.size() <= i) THROWS("Invalid file index " << i);
+  if (files.size() <= i) THROW("Invalid file index " << i);
   return files[i];
 }
 

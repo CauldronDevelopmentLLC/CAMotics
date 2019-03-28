@@ -124,7 +124,7 @@ namespace GCode {
       case 'X': return VT_X;
       case 'Y': return VT_Y;
       case 'Z': return VT_Z;
-      default: THROWS("Invalid variable name " << letter);
+      default: THROW("Invalid variable name " << letter);
       }
     }
   };

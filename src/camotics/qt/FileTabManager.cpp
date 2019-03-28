@@ -224,7 +224,7 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
   QString content = editor->toPlainText();
   QFile qFile(QString::fromUtf8(path.c_str()));
   if (!qFile.open(QFile::WriteOnly | QIODevice::Truncate))
-    THROWS("Could not save '" << path << "'");
+    THROW("Could not save '" << path << "'");
   qFile.write(content.toUtf8());
   qFile.close();
 
@@ -304,7 +304,7 @@ void FileTabManager::closeAll(bool canSave, bool removeTab) {
 
 void FileTabManager::validateTabIndex(unsigned tab) const {
   if (tab < offset || (unsigned)QTabWidget::count() <= tab)
-    THROWS("Invalid file tab index " << tab);
+    THROW("Invalid file tab index " << tab);
 }
 
 

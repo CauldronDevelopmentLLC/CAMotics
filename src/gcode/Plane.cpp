@@ -30,7 +30,7 @@ Plane::Plane(plane_t plane) : plane(plane) {
   switch (plane) {
   case XY: case XZ: case YZ: break;
   case UV: case UW: case VW: default:
-    THROWS("Unsupported plane: " << plane);
+    THROW("Unsupported plane: " << plane);
   }
 }
 
@@ -44,7 +44,7 @@ const char *Plane::getAxes() const {
   case UW: return "UWV";
   case VW: return "VWU";
   }
-  THROWS("Unsupported plane: " << plane);
+  THROW("Unsupported plane: " << plane);
 }
 
 
@@ -57,7 +57,7 @@ const char *Plane::getOffsets() const {
   case UW: return "IK";
   case VW: return "JK";
   }
-  THROWS("Unsupported plane: " << plane);
+  THROW("Unsupported plane: " << plane);
 }
 
 
@@ -79,5 +79,5 @@ const unsigned *Plane::getAxisIndex() const {
   case UW: return indices[4];
   case VW: return indices[5];
   }
-  THROWS("Unsupported plane: " << plane);
+  THROW("Unsupported plane: " << plane);
 }

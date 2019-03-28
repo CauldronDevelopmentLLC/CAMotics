@@ -56,7 +56,7 @@ string SettingsDialog::getMachineName() const {
 
 string SettingsDialog::getMachinePath(const string &machine) const {
   int i = ui->machineComboBox->findText(QString::fromUtf8(machine.c_str()));
-  if (i == -1) THROWS("Machine '" << machine << "' not found");
+  if (i == -1) THROW("Machine '" << machine << "' not found");
   return ui->machineComboBox->itemData(i).toString().toUtf8().data();
 }
 

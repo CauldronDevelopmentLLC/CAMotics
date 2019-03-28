@@ -81,13 +81,13 @@ namespace GCode {
       double maxD = distance(maxT, v, a, j);
 
       if (isnan(d) || isnan(maxD))
-        THROWS("Invalid input to timeAtDistance: d=" << d << " v=" << v
+        THROW("Invalid input to timeAtDistance: d=" << d << " v=" << v
                << " a=" << a << " j=" << j << " maxT=" << maxT);
 
       if (near(maxD, d, tolerance)) return maxT;
 
       if (maxD < d)
-        THROWS("Distance " << d << " beyond max time " << maxT <<
+        THROW("Distance " << d << " beyond max time " << maxT <<
                " with max distance " << maxD);
 
       // Newton–Raphson method to find solution within tolerance
@@ -115,7 +115,7 @@ namespace GCode {
           if (isnan(t) || solutions[i].real() < t) t = solutions[i].real();
 
       if (isnan(t))
-        THROWS("Invalid time at velocity: iV=" << iV << " tV=" << tV << " a="
+        THROW("Invalid time at velocity: iV=" << iV << " tV=" << tV << " a="
                << a << " j=" << j);
 
       return t;

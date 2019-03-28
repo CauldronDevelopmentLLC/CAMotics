@@ -71,7 +71,7 @@ void TriangleMesh::Triangle::replace(Vertex &a, Vertex &b) {
       return;
     }
 
-  THROWS("Vertex " << a << " not found in triangle");
+  THROW("Vertex " << a << " not found in triangle");
 }
 
 
@@ -328,7 +328,7 @@ void TriangleMesh::reduce(Task &task) {
         if (v.triangles[j]->has(neighbor)) triangles.push_back(v.triangles[j]);
 
       if (triangles.size() != 2)
-        THROWS("Wrong number of matching triangles " << triangles.size());
+        THROW("Wrong number of matching triangles " << triangles.size());
 
       // Flip edge
       for (unsigned j = 0; j < triangles.size(); j++) {

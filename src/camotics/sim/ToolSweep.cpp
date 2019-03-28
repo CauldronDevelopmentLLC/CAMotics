@@ -160,5 +160,5 @@ SmartPointer<Sweep> ToolSweep::getSweep(const GCode::Tool &tool) {
                           tool.getSnubDiameter() / 2);
   }
 
-  THROWS("Invalid tool shape " << tool.getShape());
+  THROW("Invalid tool shape " << tool.getShape());
 }

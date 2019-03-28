@@ -82,7 +82,7 @@ Vector3D MachineState::getPosition(axes_t axes) const {
   case XYZ: return position.getXYZ();
   case ABC: return position.getABC();
   case UVW: return position.getUVW();
-  default: THROWS("Invalid axes " << axes);
+  default: THROW("Invalid axes " << axes);
   }
 }
 

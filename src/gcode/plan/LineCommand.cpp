@@ -167,7 +167,7 @@ void LineCommand::computeLimits(const PlannerConfig &config) {
   length = delta.length();
 
   if (!length) return; // Ignore null move
-  if (!isfinite(length)) THROWS("Invalid length " << length);
+  if (!isfinite(length)) THROW("Invalid length " << length);
 
   // Compute unit vector
   unit = delta / length;

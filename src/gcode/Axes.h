@@ -46,7 +46,7 @@ namespace GCode {
     double getIndex(unsigned i) const {return data[i];}
     void setIndex(unsigned i, double value) {
       if (!cb::Math::isfinite(value))
-        THROWS(toAxis(i) << " position is invalid");
+        THROW(toAxis(i) << " position is invalid");
       data[i] = value;
     }
 
@@ -119,7 +119,7 @@ namespace GCode {
       case 'U': return 6;
       case 'V': return 7;
       case 'W': return 8;
-      default: THROWS("Invalid axis " << axis);
+      default: THROW("Invalid axis " << axis);
       }
     }
 
@@ -134,7 +134,7 @@ namespace GCode {
       case 6: return lower ? 'u' : 'U';
       case 7: return lower ? 'v' : 'V';
       case 8: return lower ? 'w' : 'W';
-      default: THROWS("Invalid axis index " << i);
+      default: THROW("Invalid axis index " << i);
       }
     }
 

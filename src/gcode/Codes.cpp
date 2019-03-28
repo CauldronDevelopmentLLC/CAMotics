@@ -45,7 +45,7 @@ Code Code::parse(const string &s) {
     if (isalpha(code)) return {code, number};
   }
 
-  THROWS("Invalid code '" << s << "'");
+  THROW("Invalid code '" << s << "'");
 }
 
 

@@ -92,7 +92,7 @@ void Tokenizer::number(bool positive) {
 
 
   if (foundDot && value.length() == 1)
-    THROWS("Invalid decimal point, expected number");
+    THROW("Invalid decimal point, expected number");
 
   if (!positive) value = string("-") + value;
 
@@ -169,7 +169,7 @@ void Tokenizer::next() {
 
     } else {
       scanner->advance();
-      THROWS("Invalid character: '" << cb::String::escapeC(c) << "'");
+      THROW("Invalid character: '" << cb::String::escapeC(c) << "'");
     }
   }
 

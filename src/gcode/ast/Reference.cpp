@@ -30,7 +30,7 @@ address_t Reference::evalAddress(Evaluator &evaluator) {
   double num = expr->eval(evaluator);
 
   if (num < 1 || MAX_ADDRESS < num || !isfinite(num))
-    THROWS(getLocation() << " Invalid reference number " << num);
+    THROW(getLocation() << " Invalid reference number " << num);
 
   // NOTE MSVC does not allow direct conversion from double to address_t
   return addr = (address_t)(unsigned)round(num);

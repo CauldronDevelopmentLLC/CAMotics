@@ -77,13 +77,13 @@ void LinePlanner::checkSoftLimits(const Axes &p) {
     if (isfinite(p[axis])) {
       if (isfinite(config.minSoftLimit[axis]) &&
           p[axis] < config.minSoftLimit[axis])
-        THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
+        THROW(Axes::toAxisName(axis) << " axis position " << p[axis]
                << "mm is less than minimum soft limit "
                << config.minSoftLimit[axis] << "mm");
 
       if (isfinite(config.maxSoftLimit[axis]) &&
           config.maxSoftLimit[axis] < p[axis])
-        THROWS(Axes::toAxisName(axis) << " axis position " << p[axis]
+        THROW(Axes::toAxisName(axis) << " axis position " << p[axis]
                << "mm is greater than maximum soft limit "
                << config.maxSoftLimit[axis] << "mm");
     }
@@ -136,7 +136,7 @@ bool LinePlanner::restart(uint64_t id, const Axes &position) {
 
   // Make sure we are now at the requested restart command
   if (cmds.empty() || id != cmds.front()->getID())
-    THROWS("Planner ID " << id << " not found.  "
+    THROW("Planner ID " << id << " not found.  "
            << (cmds.empty() ? String("Queue empty.") :
                SSTR("Next ID is " << cmds.front()->getID())));
 
@@ -259,7 +259,7 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   MachineState::move(target, axes, rapid);
 
   double feed = rapid ? numeric_limits<double>::max() : getFeed();
-  if (!feed) THROWS("Non-rapid move with zero feed rate");
+  if (!feed) THROW("Non-rapid move with zero feed rate");
 
   // TODO Handle feed rate mode
   if (getFeedMode() != UNITS_PER_MINUTE)
@@ -416,7 +416,7 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
     velocity -= cmd->getDeltaVelocity();
     if (velocity <= Math::nextUp(0)) return true;
     if (config.maxLookahead <= ++count)
-      THROWS("Planner exceeded max lookahead (" << config.maxLookahead << ")");
+      THROW("Planner exceeded max lookahead (" << config.maxLookahead << ")");
   }
 
   return false;
@@ -520,7 +520,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
       backplan = true;
 
       if (!cmd->prev)
-        THROWS("Cannot backplan, previous move unavailable");
+        THROW("Cannot backplan, previous move unavailable");
 
       LOG_DEBUG(3, "Backplan: entryVel=" << lc.entryVel
                 << " prev.exitVel=" << cmd->prev->getExitVelocity()
@@ -547,7 +547,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
       planVelocityTransition(Vi, Vt, lc.maxAccel, lc.maxJerk, lc.times);
 
     if (lengthRemain < -config.minTravel)
-      THROWS("Velocity transition exceeds length by " << -lengthRemain
+      THROW("Velocity transition exceeds length by " << -lengthRemain
              << "mm required=" << lc.length << "mm computed=" << length
              << "mm Vt=" << Vt);
 

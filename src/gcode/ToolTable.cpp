@@ -39,7 +39,7 @@ const Tool &ToolTable::at(unsigned index) const {
   for (const_iterator it = begin(); it != end(); it++)
     if (!index--) return it->second;
 
-  THROWS("No tool at index " << index);
+  THROW("No tool at index " << index);
 }
 
 
@@ -47,7 +47,7 @@ const Tool &ToolTable::get(unsigned tool) const {
   const_iterator it = find(tool);
   if (it != end()) return it->second;
 
-  THROWS("Missing tool " << tool);
+  THROW("Missing tool " << tool);
 }
 
 
@@ -67,7 +67,7 @@ void ToolTable::set(const Tool &tool) {
 
 void ToolTable::add(const Tool &tool) {
   if (!insert(value_type(tool.getNumber(), tool)).second)
-    THROWS("Tool with number " << tool.getNumber()
+    THROW("Tool with number " << tool.getNumber()
            << " already in tool table");
 
   LOG_INFO(3, "Added tool " << tool.getNumber() << " with radius "

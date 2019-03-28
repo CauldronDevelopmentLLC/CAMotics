@@ -45,7 +45,7 @@ OCodeInterpreter::OCodeInterpreter(Controller &controller) :
 const SmartPointer<Program> &
 OCodeInterpreter::lookupSubroutine(const string &name) const {
   auto it = sub.named.find(name);
-  if (it == sub.named.end()) THROWS("Subroutine " << name << " not found");
+  if (it == sub.named.end()) THROW("Subroutine " << name << " not found");
   return it->second;
 }
 
@@ -81,7 +81,7 @@ void OCodeInterpreter::downScope() {
 void OCodeInterpreter::doSub(OCode *ocode) {
   checkExpressions(ocode, "sub");
 
-  if (!sub.current.isNull()) THROWS("Nested subroutines not allowed");
+  if (!sub.current.isNull()) THROW("Nested subroutines not allowed");
   sub.current = new Program;
 
   if (ocode->getFilename().empty()) {
@@ -156,7 +156,7 @@ void OCodeInterpreter::doCall(OCode *ocode) {
     auto it = sub.numbered.find(number);
 
     if (it == sub.numbered.end())
-      THROWS("Subroutine " << number << " not found");
+      THROW("Subroutine " << number << " not found");
     subroutineCall->setProgram(it->second);
 
   } else {
@@ -171,12 +171,12 @@ void OCodeInterpreter::doCall(OCode *ocode) {
       const char *scriptPath = SystemUtilities::getenv("GCODE_SCRIPT_PATH");
       if (!scriptPath) {
         LOG_WARNING("Environment variable GCODE_SCRIPT_PATH not set");
-        THROWS("Subroutine " << name << " not found");
+        THROW("Subroutine " << name << " not found");
 
       } else if (sub.loadedFiles.insert(name).second) {
         string path = SystemUtilities::findInPath(scriptPath, name);
         if (path.empty())
-          THROWS("Subroutine \"" << name
+          THROW("Subroutine \"" << name
                  << "\" file not found in GCODE_SCRIPT_PATH");
 
         ProducerStack::push(new SubroutineLoader(name, subroutineCall, *this));
@@ -443,7 +443,7 @@ double OCodeInterpreter::lookupReference(const string &name) {
     auto &nameMap = stack.back().names;
     auto it = nameMap.find(name);
     if (it != nameMap.end()) return it->second;
-    THROWS("Local reference to '" << name << "' not found");
+    THROW("Local reference to '" << name << "' not found");
   }
 
   return GCodeInterpreter::lookupReference(name);

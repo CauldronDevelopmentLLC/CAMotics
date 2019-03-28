@@ -207,7 +207,7 @@ void Probe::operator()(const SmartPointer<GCode::Block> &block) {
 
       for (int i = 0; i < 4; i++) {
         if (!pt[i]->address)
-          THROWS("Point " << pt[i] << " does not have address");
+          THROW("Point " << pt[i] << " does not have address");
 
         SmartPointer<GCode::Entity> ref =
           new GCode::Reference(new GCode::Number(pt[i]->address));

@@ -43,7 +43,7 @@ namespace GCode {
 
 
     T *pop_front() {
-      if (empty()) THROWS("Empty list");
+      if (empty()) THROW("Empty list");
 
       T *x = head;
       if (head == tail) tail = 0;
@@ -57,7 +57,7 @@ namespace GCode {
 
 
     T *pop_back() {
-      if (empty()) THROWS("Empty list");
+      if (empty()) THROW("Empty list");
 
       T *x = tail;
       if (tail == head) head = 0;
@@ -72,7 +72,7 @@ namespace GCode {
 
     void push_front(T *x) {
       if (!x) THROW("Cannot push null");
-      if (x->next || x->prev) THROWS("Item already in list");
+      if (x->next || x->prev) THROW("Item already in list");
 
       if (empty()) head = tail = x;
       else {

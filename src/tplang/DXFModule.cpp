@@ -157,7 +157,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         break;
       }
 
-      default: THROWS("Invalid DXF entity type " << entity.getType());
+      default: THROW("Invalid DXF entity type " << entity.getType());
       }
 
       sink.insert("type", entity.getType());

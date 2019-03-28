@@ -27,13 +27,13 @@ using namespace cb;
 
 
 TransformStack &Transforms::get(axes_t axes) {
-  if (AXES_COUNT <= axes) THROWS("Invalid transform " << axes);
+  if (AXES_COUNT <= axes) THROW("Invalid transform " << axes);
   return stacks[axes];
 }
 
 
 const TransformStack &Transforms::get(axes_t axes) const {
-  if (AXES_COUNT <= axes) THROWS("Invalid transform " << axes);
+  if (AXES_COUNT <= axes) THROW("Invalid transform " << axes);
   return stacks[axes];
 }
 
