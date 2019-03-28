@@ -2,7 +2,7 @@
 
 ## v1.2.1:
  - Implemented tool offsets (G43, G43.1, G43.2, G49)
- - Implmented coord XY rotation (G10 L2)
+ - Implemented coord XY rotation (G10 L2)
  - Added warning for G70 & G71
  - Fixes for TPL arc()
  - Always output a decimal point for compatibility with Haas and Fanuc. #298
