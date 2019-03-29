@@ -423,6 +423,7 @@ def _detect(env):
         p = subprocess.Popen('%s -v' % moc, shell = True,
                              stdout = subprocess.PIPE, close_fds = True)
         vernumber = p.stdout.read()
+        if isinstance(vernumber, bytes): vernumber = vernumber.decode()
         vernumber = mocver_re.match(vernumber)
 
         if vernumber:
