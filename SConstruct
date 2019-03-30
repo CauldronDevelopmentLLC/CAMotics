@@ -48,7 +48,7 @@ if 'dist' in COMMAND_LINE_TARGETS:
     lines += os.popen('svn status -v cbang').readlines()
     lines = filter(lambda l: len(l) and l[0] in 'MA ', lines)
     files = map(lambda l: l.split()[-1], lines)
-    files = filter(lambda f: not os.path.isdir(f), files)
+    files = list(filter(lambda f: not os.path.isdir(f), files))
 
     tar = env.TarBZ2Dist('camotics', files)
     Alias('dist', tar)
@@ -129,7 +129,7 @@ env.AppendUnique(CPPPATH = ['#/build'])
 src = []
 for subdir in ['', 'ast', 'parse', 'interp', 'machine', 'plan', 'plan/bbctrl']:
     src += Glob('src/gcode/%s/*.cpp' % subdir)
-src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
 lib = env.Library('build/libGCode', src)
 libGCode = lib
 env.Prepend(LIBS = lib)
@@ -137,14 +137,14 @@ env.Prepend(LIBS = lib)
 
 # libSTL
 src = Glob('src/stl/*.cpp')
-src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
 lib = env.Library('build/libSTL', src)
 env.Prepend(LIBS = lib)
 
 
 # libDXF
 src = Glob('src/dxf/*.cpp')
-src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
 lib = env.Library('build/libDXF', src)
 env.Prepend(LIBS = lib)
 
@@ -155,7 +155,7 @@ subdirs = ['', 'sim', 'probe', 'opt', 'project', 'contour', 'render']
 for subdir in subdirs: src += Glob('src/camotics/%s/*.cpp' % subdir)
 if env['with_tpl']: src += Glob('src/tplang/*.cpp')
 
-src = map(lambda path: re.sub(r'^src/', 'build/', str(path)), src)
+src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
 
 
 # Build Info
@@ -185,6 +185,7 @@ if env['with_gui']:
     for subdir in subdirs:
         guiSrc += Glob('src/camotics/%s/*.cpp' % subdir)
     guiSrc = map(lambda path: re.sub(r'^src/', 'build/', str(path)), guiSrc)
+    guiSrc = list(guiSrc)
 
     # Qt
     dialogs = '''
@@ -292,13 +293,15 @@ if 'package' in COMMAND_LINE_TARGETS:
     cmd = 'git ls-files examples/'
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     examples = p.communicate()[0]
-    examples = map(lambda x: [x, x], examples.split())
+    if isinstance(examples, bytes): examples = examples.decode()
+    examples = list(map(lambda x: [x, x], examples.split()))
 
     # Machines
     cmd = 'git ls-files machines/'
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     machines = p.communicate()[0]
-    machines = map(lambda x: [x, x], machines.split())
+    if isinstance(machines, bytes): machines = machines.decode()
+    machines = list(map(lambda x: [x, x], machines.split()))
 
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
@@ -353,7 +356,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         platform_independent = ('tpl_lib'),
 
         documents = ['README.md', 'CHANGELOG.md'] + examples + machines,
-        programs = map(lambda x: str(x[0]), execs),
+        programs = list(map(lambda x: str(x[0]), execs)),
         desktop_menu = ['CAMotics.desktop'],
         changelog = 'CHANGELOG.md',
 
