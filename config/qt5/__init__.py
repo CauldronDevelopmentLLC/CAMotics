@@ -42,6 +42,11 @@ import SCons.Tool
 import SCons.Util
 
 
+def _bytes_to_str(s):
+    if isinstance(s, bytes): return s.decode()
+    return s
+
+
 class ToolQt5Warning(SCons.Warnings.Warning): pass
 class GeneratedMocFileNotIncluded(ToolQt5Warning): pass
 class QtdirNotFound(ToolQt5Warning): pass
@@ -187,7 +192,7 @@ class _Automoc:
                 if moc_options['debug']:
                     print("scons: qt5: Scanning '%s' (header of '%s')" %
                           (h, cpp))
-                h_contents = h.get_contents()
+                h_contents = _bytes_to_str(h.get_contents())
 
                 if moc_options['gobble_comments']:
                     h_contents = self.ccomment.sub('', h_contents)
@@ -271,7 +276,7 @@ class _Automoc:
                             print("scons: qt5: Scanning '%s' (header of '%s')" %
                                   (h, cpp))
 
-                        h_contents = h.get_contents()
+                        h_contents = _bytes_to_str(h.get_contents())
                         if moc_options['gobble_comments']:
                             h_contents = self.ccomment.sub('', h_contents)
                             h_contents = self.cxxcomment.sub('', h_contents)
@@ -370,7 +375,7 @@ class _Automoc:
                 continue
 
             try:
-                cpp_contents = cpp.get_contents()
+                cpp_contents = _bytes_to_str(cpp.get_contents())
                 if moc_options['gobble_comments']:
                     cpp_contents = self.ccomment.sub('', cpp_contents)
                     cpp_contents = self.cxxcomment.sub('', cpp_contents)
@@ -458,7 +463,7 @@ def __scanResources(node, env, path, arg):
             else: result.append(itemPath)
         return result
 
-    contents = node.get_contents()
+    contents = _bytes_to_str(node.get_contents())
     includes = qrcinclude_re.findall(contents)
     qrcpath = os.path.dirname(node.path)
     dirs = [included for included in includes if
@@ -933,7 +938,7 @@ def enable_modules(self, modules, debug = False, crosscompiling = False) :
         except: pass
 
     debugSuffix = ''
-    if sys.platform in ["darwin", "linux2"] and not crosscompiling :
+    if sys.platform in ["darwin", "linux2", "linux"] and not crosscompiling:
         if debug : debugSuffix = '_debug'
         for module in modules :
             if module not in pclessModules : continue

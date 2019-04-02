@@ -353,7 +353,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         prefix = '/usr',
         icons = ('osx/camotics.icns', 'images/camotics.png'),
         mime = [['mime.xml', 'camotics.xml']],
-        platform_independent = ('tpl_lib'),
+        platform_independent = ['tpl_lib'],
 
         documents = ['README.md', 'CHANGELOG.md'] + examples + machines,
         programs = list(map(lambda x: str(x[0]), execs)),
