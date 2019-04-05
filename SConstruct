@@ -370,7 +370,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_section = 'miscellaneous',
         deb_depends =
         'debconf | debconf-2.0, libc6, libglu1, libv8-3.14.5 | libv8-dev, ' +
-        'libglu1-mesa ' + qt_pkgs,
+        'libglu1-mesa libssl1.1' + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
