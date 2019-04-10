@@ -318,7 +318,7 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     install_files = []
     if env.get('qt_deps'):
-        qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5'
+        qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5, libqt5websockets5'
 
         if env['PLATFORM'] == 'win32':
             import shutil
@@ -337,8 +337,7 @@ if 'package' in COMMAND_LINE_TARGETS:
                 if 'vcredist' in name: env['VCREDIST'] = name
                 install_files.append('build\\win32\\' + name)
 
-    else:
-        qt_pkgs = ''
+    else: qt_pkgs = ''
 
     pkg = env.Packager(
         'CAMotics',
