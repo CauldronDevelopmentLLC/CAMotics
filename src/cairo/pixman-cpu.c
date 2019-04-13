@@ -466,6 +466,7 @@ detect_cpu_features (void)
 	    features |= SSE2;
 	if ((features & MMX) && !(features & SSE) &&
 	    (strcmp (vendor, "AuthenticAMD") == 0 ||
+	     strcmp (vendor, "HygonGenuine") == 0 ||
 	     strcmp (vendor, "Geode by NSC") == 0))
 	{
 	    /* check for AMD MMX extensions */
