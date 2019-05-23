@@ -299,7 +299,7 @@ void ControllerImpl::makeMove(int axes, bool rapid, bool incremental) {
 
 void ControllerImpl::moveAxis(char axis, double value, bool rapid) {
   Axes pos = getAbsolutePosition();
-  pos.set(axis, value);
+  pos.set(axis, value - getAxisOffset(axis));
   move(pos, getVarType(axis), rapid);
 }
 
@@ -490,7 +490,7 @@ void ControllerImpl::drill(int vars, bool dwell, bool feedOut,
     // Traverse to XY
     makeMove(xyVars, true, state.incrementalDistanceMode);
 
-    // Traverse to Z if above
+    // Move to Z if above
     z = getAxisPosition(plane.getZAxis());
     if (z != r) moveAxis(plane.getZAxis(), r, true);
 
