@@ -89,7 +89,7 @@ void PlannerConfig::read(const JSON::Value &value) {
   programStart = value.getString("program-start", "");
 
   if (value.hasDict("overrides")) {
-    const JSON::Dict &dict = value.getDict("overrides");
+    auto &dict = value.getDict("overrides");
     for (unsigned i = 0; i < dict.size(); i++)
       overrides[Code::parse(dict.keyAt(i))] = dict.getString(i);
   }

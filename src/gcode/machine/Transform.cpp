@@ -139,12 +139,12 @@ void Transform::read(const js::Value &value) {
 
 
 void Transform::read(const JSON::Value &value) {
-  const JSON::List &rows = value.getList();
+  auto &rows = value.getList();
 
   if (rows.size() != 4) THROW("Transform expected 4 rows");
 
   for (unsigned i = 0; i < 4; i++) {
-    const JSON::List &row = rows.getList(i);
+    auto &row = rows.getList(i);
     if (row.size() != 4) THROW("Transform expected row with 4 columns");
 
     for (unsigned j = 0; j < 4; j++)

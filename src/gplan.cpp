@@ -345,7 +345,8 @@ cb::SmartPointer<cb::JSON::Value> pyToJSON(PyObject *o) {
     return list;
   }
 
-  if (PyBool_Check(o)) return new cb::JSON::Boolean(o == Py_True);
+  if (PyBool_Check(o)) return o == Py_True ? cb::JSON::True::instancePtr() :
+                         cb::JSON::False::instancePtr();
   if (PyUnicode_Check(o)) return new cb::JSON::String(PyUnicode_ToStdString(o));
   if (PyLong_Check(o)) return new cb::JSON::Number(PyLong_AsDouble(o));
   if (PyFloat_Check(o)) return new cb::JSON::Number(PyFloat_AsDouble(o));

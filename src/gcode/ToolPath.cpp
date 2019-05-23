@@ -68,7 +68,7 @@ void ToolPath::read(const JSON::Value &value) {
   double time = 0;
 
   for (unsigned i = 0; i < value.size(); i++) {
-    const JSON::Dict &dict = value.getDict(i);
+    auto &dict = value.getDict(i);
 
     GCode::Axes end;
     for (int j = 0; j < 9; j++)

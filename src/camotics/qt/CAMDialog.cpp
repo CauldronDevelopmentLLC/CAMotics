@@ -82,31 +82,31 @@ void CAMDialog::read(const JSON::Value &value) {
   double scale = metric ? 1 : 25.4;
 
   if (value.hasDict("translate")) {
-    const JSON::Dict &d = value.getDict("translate");
+    auto &d = value.getDict("translate");
     ui->xTranslateDoubleSpinBox->setValue(d.getNumber("x", 0) * scale);
     ui->yTranslateDoubleSpinBox->setValue(d.getNumber("y", 0) * scale);
   }
 
   if (value.hasDict("scale")) {
-    const JSON::Dict &d = value.getDict("scale");
+    auto &d = value.getDict("scale");
     ui->xScaleDoubleSpinBox->setValue(d.getNumber("x", 0));
     ui->yScaleDoubleSpinBox->setValue(d.getNumber("y", 0));
   }
 
   if (value.hasDict("shrink")) {
-    const JSON::Dict &d = value.getDict("shrink");
+    auto &d = value.getDict("shrink");
     ui->xShrinkCheckBox->setChecked(d.getBoolean("x", false));
     ui->yShrinkCheckBox->setChecked(d.getBoolean("y", false));
   }
 
   if (value.hasDict("flip")) {
-    const JSON::Dict &d = value.getDict("flip");
+    auto &d = value.getDict("flip");
     ui->xFlipCheckBox->setChecked(d.getBoolean("x", false));
     ui->yFlipCheckBox->setChecked(d.getBoolean("y", false));
   }
 
   if (value.hasDict("array")) {
-    const JSON::Dict &d = value.getDict("array");
+    auto &d = value.getDict("array");
     ui->xArraySpinBox->setValue(d.getNumber("x", 0));
     ui->yArraySpinBox->setValue(d.getNumber("y", 0));
   }

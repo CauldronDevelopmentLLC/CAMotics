@@ -1165,5 +1165,5 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 void ControllerImpl::endBlock() {
   if (state.moveInAbsoluteCoords && currentMotionMode != 0 &&
       currentMotionMode != 10)
-    LOG_WARNING(Codes::find('G', 53) << " used without G0 or G1");
+    LOG_WARNING(*Codes::find('G', 53) << " used without G0 or G1");
 }
