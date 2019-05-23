@@ -762,6 +762,9 @@ void ControllerImpl::end() {
   setMistCoolant(false);
   setFloodCoolant(false);
 
+  // Update offsets after changes above
+  updateOffsetParams();
+
   throw EndProgram();
 }
 
