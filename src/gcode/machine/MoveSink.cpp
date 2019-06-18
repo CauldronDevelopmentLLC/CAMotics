@@ -42,9 +42,9 @@ void MoveSink::move(const Axes &position, int axes, bool rapid) {
     MoveType type = rapid ? Move::MOVE_RAPID :
       (probePending ? Move::MOVE_PROBE : Move::MOVE_CUTTING);
 
-    if (get(TOOL_NUMBER, NO_UNITS) < 0 && !rapid) {
-      LOG_WARNING("Cutting move but no current tool, selecting tool 1");
-      set(TOOL_NUMBER, 1, NO_UNITS);
+    if (!rapid && !getFeed()) {
+      setFeed(10);
+      LOG_ERROR("Cutting move with zero feed, set feed rate to 10mm/min");
     }
 
     Axes start = getTransforms().transform(getPosition());

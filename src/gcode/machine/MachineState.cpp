@@ -94,7 +94,14 @@ void MachineState::setPosition(const Axes &position) {
 
 double MachineState::get(address_t addr, Units units) const {
   if (MAX_ADDRESS <= addr) return 0;
+
   double value = convert(params[addr].units, units, params[addr].value);
+
+  if (addr == TOOL_NUMBER && value == -1) {
+    LOG_ERROR("No tool selected, selecting tool 1");
+    const_cast<MachineState *>(this)->set(TOOL_NUMBER, value = 1, NO_UNITS);
+  }
+
   LOG_DEBUG(5, "get(" << addr << ", " << units << ") = " << value);
   return value;
 }
