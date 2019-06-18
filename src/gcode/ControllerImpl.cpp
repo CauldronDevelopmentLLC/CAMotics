@@ -702,6 +702,10 @@ void ControllerImpl::setHomed(int vars, bool homed) {
 
 void ControllerImpl::setCutterRadiusComp(int vars, bool left, bool dynamic) {
   LOG_WARNING("Cutter radius compensation not implemented"); // TODO
+  if (getCurrentTool() < 0) {
+    LOG_ERROR("Tool not set, cannot set cutter radius compensation");
+    return;
+  }
 
   // NOTE, Fanuc may use ``D`` or ``H`` for the same purpose.
 
@@ -1014,6 +1018,10 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 421: setCutterRadiusComp(vars, false, true);  break;
 
     case 430:
+      if (getCurrentTool() < 0) {
+        LOG_ERROR("Tool not set, cannot load tool offsets");
+        break;
+      }
       loadToolOffsets((vars & VT_H) ? getVar('H') : getCurrentTool(), false);
       break;
 
