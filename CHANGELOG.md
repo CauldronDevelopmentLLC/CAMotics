@@ -6,8 +6,10 @@
  - Added warning for G70 & G71
  - Fixes for TPL arc()
  - Always output a decimal point for compatibility with Haas and Fanuc. #298
+ - Respect offsets in canned cycle moves.
  - Emit error on any tool operation with no tool selected.
  - Emit error but set default when feed rate not set and cutting move is made.
+ - Allow dot in GCode variable reference names.
 
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.
