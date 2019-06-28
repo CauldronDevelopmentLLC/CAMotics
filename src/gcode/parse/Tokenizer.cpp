@@ -92,7 +92,7 @@ void Tokenizer::number(bool positive) {
 
 
   if (foundDot && value.length() == 1)
-    THROW("Invalid decimal point, expected number");
+    return current.set(DOT_TOKEN, '.');
 
   if (!positive) value = string("-") + value;
 
