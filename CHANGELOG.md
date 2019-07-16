@@ -10,6 +10,7 @@
  - Emit error on any tool operation with no tool selected.
  - Emit error but set default when feed rate not set and cutting move is made.
  - Allow dot in GCode variable reference names.
+ - Warn about rendering empty workpiece.
 
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.

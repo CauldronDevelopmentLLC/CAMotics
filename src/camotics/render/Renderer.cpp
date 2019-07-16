@@ -43,6 +43,13 @@ using namespace CAMotics;
 void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
                       const Rectangle3D &bbox, unsigned threads,
                       RenderMode mode) {
+  // Check for empty workpiece
+  auto bounds = tree.getBounds();
+  if (!bounds.isValid()) {
+    LOG_WARNING("Empty workpiece, nothing to simulate");
+    return;
+  }
+
   typedef list<SmartPointer<RenderJob> > jobs_t;
   jobs_t jobs;
   vector<GridTreeRef> jobGrids;
@@ -58,7 +65,7 @@ void Renderer::render(CutWorkpiece &cutWorkpiece, GridTree &tree,
     unsigned totalJobCount = jobGrids.size();
 
     LOG_DEBUG(1, "Partitioned in to " << totalJobCount << " jobs");
-    LOG_INFO(1, "Computing surface bounded by " << tree.getBounds() << " at "
+    LOG_INFO(1, "Computing surface bounded by " << bounds << " at "
              << tree.getResolution() << " grid resolution");
 
     // Run jobs
