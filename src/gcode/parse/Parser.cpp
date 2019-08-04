@@ -38,6 +38,36 @@ using namespace cb;
 using namespace GCode;
 
 
+namespace {
+  string tokenDescription(GCode::Token t) {
+    typedef GCode::TokenType T;
+
+    switch (t.getType()) {
+    case T::EOF_TOKEN:           return "End of input";
+    case T::COMMENT_TOKEN:       return "Comment";
+    case T::PAREN_COMMENT_TOKEN: return "'('";
+    case T::NUMBER_TOKEN:        return "Number '" + t.getValue() + "'";
+    case T::ID_TOKEN:            return "ID '" + t.getValue() + "'";
+    case T::EXP_TOKEN:           return "'**'";
+    case T::MUL_TOKEN:           return "'*'";
+    case T::DIV_TOKEN:           return "'/'";
+    case T::ADD_TOKEN:           return "'+'";
+    case T::SUB_TOKEN:           return "'-'";
+    case T::OBRACKET_TOKEN:      return "'['";
+    case T::CBRACKET_TOKEN:      return "']'";
+    case T::OANGLE_TOKEN:        return "'<'";
+    case T::CANGLE_TOKEN:        return "'>'";
+    case T::ASSIGN_TOKEN:        return "'='";
+    case T::POUND_TOKEN:         return "'#'";
+    case T::DOT_TOKEN:           return "'.'";
+    case T::EOL_TOKEN:           return "End of line";
+    }
+
+    return t.getType().toString();
+  }
+}
+
+
 Parser::Parser(const InputSource &source) :
   tokenizer(new GCode::Tokenizer(source)) {}
 
@@ -107,7 +137,7 @@ SmartPointer<Block> Parser::block() {
     default:
       if (!tokenizer->isType(TokenType::ID_TOKEN))
         THROW("Expected word or assignment, found "
-               << tokenizer->advance().getType());
+              << tokenDescription(tokenizer->advance()));
 
       children.push_back(word());
       break;
@@ -199,7 +229,7 @@ SmartPointer<Entity> Parser::numberRefOrExpr() {
   case TokenType::SUB_TOKEN: return unaryOp();
   default:
     THROW("Expected number, reference, or bracked expression, found "
-           << tokenizer->advance().getType());
+          << tokenDescription(tokenizer->advance()));
   }
 }
 
