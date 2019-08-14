@@ -55,11 +55,10 @@ On Debian based systems all the prerequisites, including thoese needed
 by C!, can be installed with the following command line:
 
     sudo apt-get update
-    sudo apt-get -y install scons build-essential qt5-default \
-      libqt5websockets5-dev libqt5opengl5-dev libv8-dev libglu1-mesa-dev git
+    sudo apt-get -y install scons build-essential qt5-default python-six \
+      libqt5websockets5-dev libqt5opengl5-dev libnode-dev libglu1-mesa-dev git
 
-## Building C!
-
+## Building C! (cbang)
 Clone the C! git repository, build the software using scons and set the
 environment variable CBANG_HOME so the CAMotics build system can find it
 later.  **You must install V8 or ChakraCore before this step.**
@@ -69,7 +68,6 @@ later.  **You must install V8 or ChakraCore before this step.**
     export CBANG_HOME=$PWD/cbang
 
 ## Building CAMotics
-
 Clone the CAMotics git repository and build the software using scons:
 
     git clone https://github.com/CauldronDevelopmentLLC/CAMotics.git
@@ -77,7 +75,6 @@ Clone the CAMotics git repository and build the software using scons:
     scons
 
 ## Building & Installing the Debian Package
-
 In the CAMotics source code directory run:
 
     scons package
