@@ -736,9 +736,6 @@ void ControllerImpl::end() {
   // TODO replace this with GCode override
   // See http://linuxcnc.org/docs/html/gcode/m-code.html#mcode:m2-m30
 
-  // Axis offsets are set to zero (G92.2)
-  resetGlobalOffsets(true);
-
   // Origin offsets are set to the default (G54)
   setCoordSystem(1);
 
