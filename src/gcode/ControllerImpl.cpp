@@ -983,11 +983,16 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 210: setUnits(Units::METRIC);   break;
 
     case 280: case 300:
-      if (vars & VT_AXIS) makeMove(vars, true, state.incrementalDistanceMode);
-      else vars = VT_AXIS; // All axes
+      // See RS274/NGC v3.0 section 3.5.8
+      // Note, at the time of this writing LinuxCNC says only the specified axes
+      // should move but this contradicts RS274/NGC.
 
-      loadPredefined(code.number == 280, vars);
-      move(getAbsolutePosition(), vars, true);
+      // Intermediate move
+      if (vars & VT_AXIS) makeMove(vars, true, state.incrementalDistanceMode);
+
+      // Move all axes to predefined position
+      loadPredefined(code.number == 280, VT_AXIS);
+      move(getAbsolutePosition(), VT_AXIS, true);
       break;
 
     case 281: storePredefined(true);  break;
