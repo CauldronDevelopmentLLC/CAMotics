@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.2.0'
+version = '1.2.1'
 major, minor, revision = version.split('.')
 
 # Setup
@@ -368,8 +368,9 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
         deb_depends =
-        'debconf | debconf-2.0, libc6, libglu1, libv8-3.14.5 | libv8-dev, ' +
-        'libglu1-mesa libssl1.1' + qt_pkgs,
+        'debconf | debconf-2.0, libc6, libglu1, ' +
+        'libv8-3.14.5 | libv8-dev | libnode-dev, ' +
+        'libglu1-mesa, libssl1.1' + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 

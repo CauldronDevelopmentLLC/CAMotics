@@ -14,7 +14,7 @@
  - Move all axes on "G28/G30 <axes>" as specified in RS274/NGC section 3.5.8.
 
 ## v1.2.0:
-- Improved Buildbotics CNC controller connectivity.
+ - Improved Buildbotics CNC controller connectivity.
  - Revamped donation dialog.
  - Show donation dialog once at start with each upgrade.
  - S-Curve path planner.

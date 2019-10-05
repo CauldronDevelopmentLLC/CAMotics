@@ -65,3 +65,5 @@ build.ninja
 *.log
 *.pdf
 *.toc
+
+/examples
