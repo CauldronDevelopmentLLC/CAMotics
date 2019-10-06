@@ -20,43 +20,19 @@
 
 #pragma once
 
+#include "JSONMachine.h"
 
-#include "Application.h"
-
-#include <gcode/Units.h>
-#include <gcode/machine/MachinePipeline.h>
-
-#include <iostream>
+#include <cbang/json/Writer.h>
 
 
-namespace CAMotics {
-  class CommandLineApp : public Application {
-    std::string out = "-";
-    bool force = false;
-
-  protected:
-    GCode::Units outputUnits = GCode::Units::METRIC;
-    GCode::Units defaultUnits = GCode::Units::METRIC;
-    double maxArcError = 0.01;
-    bool linearize = false;
-    bool jsonOut = false;
-    int jsonPrecision = 3;
-    bool jsonLocation = false;
-
-    cb::SmartPointer<std::ostream> stream;
-
+namespace GCode {
+  class JSONMachineWriter : cb::JSON::Writer, public JSONMachine {
   public:
-    CommandLineApp(const std::string &name,
-                   hasFeature_t hasFeature = CommandLineApp::_hasFeature);
-
-    // From cb::Application
-    static bool _hasFeature(int feature);
-    int init(int argc, char *argv[]);
-    void run();
-
-    void build(GCode::MachinePipeline &pipeline);
-
-    int metricAction(cb::Option &opt);
-    int imperialAction(cb::Option &opt);
+    JSONMachineWriter(std::ostream &stream, Units units,
+                      bool withLocation = false, unsigned indentStart = 0,
+                      bool compact = false, unsigned indentSpace = 2,
+                      int precision = 6) :
+      cb::JSON::Writer(stream, indentStart, compact, indentSpace, precision),
+      JSONMachine(*this, units, withLocation) {}
   };
 }

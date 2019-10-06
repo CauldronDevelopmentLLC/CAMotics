@@ -24,6 +24,7 @@
 #include <gcode/machine/MachineLinearizer.h>
 #include <gcode/machine/MachineUnitAdapter.h>
 #include <gcode/machine/GCodeMachine.h>
+#include <gcode/machine/JSONMachineWriter.h>
 
 #include <cbang/config/MinConstraint.h>
 #include <cbang/os/SystemUtilities.h>
@@ -46,9 +47,7 @@ using namespace std;
 
 
 CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
-  Application(name, hasFeature), out("-"), force(false),
-  outputUnits(GCode::Units::METRIC), defaultUnits(GCode::Units::METRIC),
-  maxArcError(0.01), linearize(true) {
+  Application(name, hasFeature) {
   cmdLine.addTarget("out", out, "Output filename or '-' to write "
                     "to the standard output stream");
   cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
@@ -68,6 +67,12 @@ CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
                     "in mm.");
   cmdLine.addTarget("linearize", linearize,
                     "Convert all moves to straight line movements.");
+
+  cmdLine.addTarget("json-out", jsonOut, "Output in JSON format.");
+  cmdLine.addTarget("json-precision", jsonPrecision,
+                    "JSON output numerical precision.");
+  cmdLine.addTarget("json-location", jsonLocation,
+                    "Output source location information in JSON.");
 
   Option &opt = *cmdLine.add("pipe", "Specify a output file descriptor, "
                              "overrides the 'out' option");
@@ -121,7 +126,10 @@ void CommandLineApp::run() {
 void CommandLineApp::build(GCode::MachinePipeline &pipeline) {
   pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
   if (linearize) pipeline.add(new MachineLinearizer(maxArcError));
-  pipeline.add(new GCodeMachine(stream, outputUnits));
+  if (jsonOut) pipeline.add(new JSONMachineWriter
+                            (*stream, outputUnits, jsonLocation, 0, false, 2,
+                             jsonPrecision));
+  else pipeline.add(new GCodeMachine(stream, outputUnits));
   pipeline.add(new MachineState);
 }
 

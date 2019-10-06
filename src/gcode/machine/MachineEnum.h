@@ -96,36 +96,12 @@ namespace GCode {
 
     typedef PortType::enum_t port_t;
 
-    static inline VarTypes::enum_t getVarType(char letter) {
-      switch (letter) {
-      case 'A': return VT_A;
-      case 'B': return VT_B;
-      case 'C': return VT_C;
-      case 'D': return VT_D;
-      case 'E': return VT_E;
-      case 'F': return VT_F;
-        // G
-      case 'H': return VT_H;
-      case 'I': return VT_I;
-      case 'J': return VT_J;
-      case 'K': return VT_K;
-      case 'L': return VT_L;
-        // M
-        // N
-        // O
-      case 'P': return VT_P;
-      case 'Q': return VT_Q;
-      case 'R': return VT_R;
-      case 'S': return VT_S;
-      case 'T': return VT_T;
-      case 'U': return VT_U;
-      case 'V': return VT_V;
-      case 'W': return VT_W;
-      case 'X': return VT_X;
-      case 'Y': return VT_Y;
-      case 'Z': return VT_Z;
-      default: THROW("Invalid variable name " << letter);
-      }
-    }
+    static VarTypes::enum_t getVarType(char letter);
+    static const char *toString(feed_mode_t mode);
+    static const char *toString(spin_mode_t mode);
+    static const char *toString(input_mode_t mode);
+    static const char *toString(plane_t plane);
+    static const char *toString(pause_t pause);
+    static const char *toString(port_t port);
   };
 }

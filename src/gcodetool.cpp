@@ -40,13 +40,12 @@ class GCodeTool : public CAMotics::CommandLineApp {
   MachinePipeline pipeline;
   SmartPointer<Controller> controller;
 
-  bool parseOnly;
-  bool annotate;
+  bool parseOnly = false;
+  bool annotate = false;
 
 public:
   GCodeTool() :
-    CAMotics::CommandLineApp("CAMotics GCode Tool"), parseOnly(false),
-    annotate(false) {
+    CAMotics::CommandLineApp("CAMotics GCode Tool") {
     cmdLine.addTarget("parse", parseOnly,
                       "Only parse the GCode, don't evaluate it.");
     cmdLine.addTarget("annotate", annotate, "Annotate parsed GCode.");
