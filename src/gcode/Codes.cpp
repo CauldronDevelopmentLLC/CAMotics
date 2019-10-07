@@ -209,9 +209,9 @@ const Code Codes::gcodes[] = {
    "Set Best Possible Speed Control Mode"},
 
   {'G', 700, PRI_UNITS, MG::MG_UNITS, VT::VT_NONE,
-   "Inches Mode, use G20 instead"},
+   "Mach3/4 Inches Mode, use G20 instead"},
   {'G', 710, PRI_UNITS, MG::MG_UNITS, VT::VT_NONE,
-   "Millimeters Mode, use G21 instead"},
+   "Mach3/4 Millimeters Mode, use G21 instead"},
 
   {'G', 730, PRI_MOTION, MG::MG_MOTION, VT::VT_XYZ | VT::VT_ABC | VT::VT_RLQ,
    "Drilling Cycle with Chip Breaking"},

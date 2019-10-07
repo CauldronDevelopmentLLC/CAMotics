@@ -1054,8 +1054,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
       else state.naiveCamTolerance = 0;
       break;
 
-    case 700: implemented = false; break;
-    case 710: implemented = false; break;
+    case 700: implemented = false; break; // Mach3/4 Inches mode
+    case 710: implemented = false; break; // Mach3/4 MM mode
 
     case 730: implemented = false; break; // Drill cycle w/ chip breaking
     case 760: implemented = false; break; // Thread cycle
