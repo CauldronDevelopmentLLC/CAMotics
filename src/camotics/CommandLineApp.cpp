@@ -110,9 +110,6 @@ int CommandLineApp::init(int argc, char *argv[]) {
     stream = SystemUtilities::oopen(out);
   }
 
-  // Convert to mm
-  if (outputUnits == GCode::Units::IMPERIAL) maxArcError /= 25.4;
-
   return ret;
 }
 
@@ -125,12 +122,14 @@ void CommandLineApp::run() {
 
 void CommandLineApp::build(GCode::MachinePipeline &pipeline) {
   pipeline.add(new MachineUnitAdapter(defaultUnits, outputUnits));
-  if (linearize) pipeline.add(new MachineLinearizer(maxArcError));
+  if (linearize) pipeline.add(new MachineLinearizer);
   if (jsonOut) pipeline.add(new JSONMachineWriter
                             (*stream, outputUnits, jsonLocation, 0, false, 2,
                              jsonPrecision));
   else pipeline.add(new GCodeMachine(stream, outputUnits));
   pipeline.add(new MachineState);
+
+  pipeline.set("_max_arc_error", maxArcError, outputUnits);
 }
 
 

@@ -20,6 +20,8 @@
 
 #include "MachineLinearizer.h"
 
+#include <gcode/Helix.h>
+
 using namespace cb;
 using namespace GCode;
 
@@ -34,6 +36,7 @@ void MachineLinearizer::arc(const Vector3D &offset, const Vector3D &target,
   default: THROW("Invalid plane: " << plane);
   }
 
+  // Get axis indices
   unsigned axisIndex[3];
   for (unsigned i = 0; i < 3; i++)
     axisIndex[i] = Axes::toIndex(axesNames[i]);
@@ -45,53 +48,29 @@ void MachineLinearizer::arc(const Vector3D &offset, const Vector3D &target,
 
   // Initial point
   Axes current = getPosition();
-  double x = current[axisIndex[0]];
-  double y = current[axisIndex[1]];
-  double z = current[axisIndex[2]];
+  Vector3D start(current[axisIndex[0]],
+                 current[axisIndex[1]],
+                 current[axisIndex[2]]);
 
   // Axis vars
   int axes = getVarType(axesNames[0]) | getVarType(axesNames[1]);
   if (zOff) axes |= getVarType(axesNames[2]);
 
-  // Center
-  Vector2D center(x + xOff, y + yOff);
-
-  // Start angle
-  double startAngle = Vector2D(-xOff, -yOff).angleBetween(Vector2D(1, 0));
-
-  // Radius
-  double radius = Vector2D(xOff, yOff).length();
-
-  // Allowed error cannot be greater than arc radius
-  double error = std::min(maxArcError, radius);
-  double errorAngle = 2 * acos(1 - error / radius);
-
-  // Error angle cannot be greater than 2Pi/3 because we need at least 3
-  // segments in a full circle
-  errorAngle = std::min(2 * M_PI / 3, errorAngle);
-
-  // Segments
-  unsigned segments = (unsigned)ceil(fabs(angle) / errorAngle);
-  double deltaAngle = -angle / segments;
-  double zDelta = zOff / segments;
-
-  // TODO The estimated arc should straddle the actual arc.
+  double maxArcError = get("_max_arc_error", Units::METRIC);
+  Helix helix(start, Vector2D(xOff, yOff), target, angle, maxArcError);
 
   // Create segments
-  for (unsigned i = 0; i < segments - 1; i++) {
-    double currentAngle = startAngle + deltaAngle * (i + 1);
-
-    x = center.x() + radius * cos(currentAngle);
-    y = center.y() + radius * sin(currentAngle);
-    z += zDelta;
+  for (unsigned i = 1; i < helix.size() - 1; i++) {
+    Vector3D p = helix.get(i);
 
     // Move
-    current[axisIndex[0]] = x;
-    current[axisIndex[1]] = y;
-    current[axisIndex[2]] = z;
+    current[axisIndex[0]] = p.x();
+    current[axisIndex[1]] = p.y();
+    current[axisIndex[2]] = p.z();
     move(current, axes, false);
   }
 
+  // Last segment, move to target exactly
   current.setXYZ(target);
   move(current, axes, false);
 }
