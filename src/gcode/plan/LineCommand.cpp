@@ -39,14 +39,8 @@ using namespace std;
 LineCommand::LineCommand(uint64_t id, const Axes &start, const Axes &end,
                          double feed, bool rapid, bool seeking, bool first,
                          const PlannerConfig &config) :
-  PlannerCommand(id), feed(feed), start(start), target(end), length(0),
-  entryVel(0), exitVel(0), deltaV(0), maxVel(0), maxAccel(0), maxJerk(0),
-  rapid(rapid), seeking(seeking), first(first), error(0) {
-
-  // Zero times
-  for (int i = 0; i < 7; i++) times[i] = 0;
-  computeLimits(config);
-}
+  PlannerCommand(id), feed(feed), start(start), target(end), rapid(rapid),
+  seeking(seeking), first(first) {computeLimits(config);}
 
 
 double LineCommand::getTime() const {
@@ -56,48 +50,50 @@ double LineCommand::getTime() const {
 }
 
 
+namespace {
+  double mergeError(const Axes &A, const Axes &B, const Axes &C) {
+    double a = (B - A).lengthSquared();
+    double b = (C - B).lengthSquared();
+    double c = (C - A).lengthSquared();
+
+    if (!c) return sqrt(a);
+
+    // Using Heron's formula simplified with squared side lengths to compute
+    // area and from that, triangle height.
+    return 2 * sqrt((-a * a + 2 * a * (b + c) - (b - c) * (b - c)) / c);
+  }
+}
+
+
 bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
                         double speed) {
   // Check if moves are compatible
   if (lc.rapid != rapid || lc.seeking != seeking || lc.first != first)
     return false;
 
-  // Compute angle
-  const double theta = unit.angleBetween(lc.unit);
-  const double a = length;
-  const double b = lc.length;
+  // Check if too many merges have already been made
+  if (63 < merged.size()) return false;
 
-  // Don't merge lines that point in the opposite direction
-  if (isnan(theta) || 3.14 < theta) return false;
+  // Compute error if lines were merged
+  double maxError =
+    config.pathMode == PathMode::CONTINUOUS_MODE ? config.maxMergeError : 0;
+  double error = mergeError(start, target, lc.target);
+  if (maxError < error) return false;
 
-  if (theta && a && b) {
-    // Compute error if moves are merged
-    const double c = sqrt(a * a + b * b - 2 * a * b * cos(theta));
-    const double error = a * b * sin(theta) / c;
+  // Check errors of previously merged points
+  for (unsigned i = 0; i < merged.size(); i++)
+    if (maxError < mergeError(start, merged[i], lc.target))
+      return false;
 
-    if (config.maxMergeError < error + this->error) return false;
-
-    if (config.maxCollinearAngle < theta) {
-      // Check if move is too long for merge
-      if (config.maxMergeLength < lc.length || config.maxMergeLength < length)
-        return false;
-
-      // Check move time
-      if (config.minMoveSecs <= getTime()) return false;
-    }
-
-    // Accumulate errors
-    this->error += error;
-  }
-
-  LOG_DEBUG(3, "Merging moves length=" << a << " + " << b
+  LOG_DEBUG(3, "Merging moves length=" << length << " + " << lc.length
             << " target=" << target << " -> " << lc.target
-            << " start=" << start << " theta=" << theta);
+            << " start=" << start << " error=" << error);
 
   // Handle speed
   if (!std::isnan(speed)) speeds.push_back(Speed(length, speed));
 
   // Merge
+  merged.push_back(target);
   target = lc.target;
   computeLimits(config);
 
@@ -161,6 +157,11 @@ void LineCommand::computeLimits(const PlannerConfig &config) {
   entryVel = exitVel = maxVel = feed;
   maxAccel = numeric_limits<double>::max();
   maxJerk = numeric_limits<double>::max();
+
+  // Handle path mode
+  if (config.pathMode == MachineEnum::EXACT_PATH_MODE ||
+      config.pathMode == MachineEnum::EXACT_STOP_MODE)
+    entryVel = exitVel = 0;
 
   // Compute delta vector and length
   Axes delta = target - start;

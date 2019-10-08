@@ -218,6 +218,18 @@ void LinePlanner::setSpinMode(spin_mode_t mode, double max) {
 }
 
 
+void LinePlanner::setPathMode(path_mode_t mode, double motionBlending,
+                              double naiveCAM) {
+  config.pathMode = mode;
+
+  if (mode == CONTINUOUS_MODE) {
+    // Note, naiveCAM < 0 means keep previous value
+    if (0 <= naiveCAM) config.maxMergeError = naiveCAM;
+    // TODO Motion blending
+  }
+}
+
+
 void LinePlanner::changeTool(unsigned tool) {pushSetCommand("tool", tool);}
 
 
@@ -291,21 +303,36 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   }
 
   // Try to merge move with previous one
-  if (!cmds.empty()) {
+  if (!cmds.empty() && config.pathMode != EXACT_STOP_MODE) {
     int setCmdCount = 0;
     double lastSpeed = numeric_limits<double>::quiet_NaN();
 
     for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
       LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
       if (prev && prev->merge(*lc, config, lastSpeed)) {
+        // Merged
         delete lc;
         for (int i = 0; i < setCmdCount; i++) delete cmds.pop_back();
-        plan(prev);
+
+        // Check for short move
+        if (prev->length < config.minTravel) {
+          // Save last speed
+          lastSpeed = numeric_limits<double>::quiet_NaN();
+          if (prev->speeds.size()) lastSpeed = prev->speeds.back().speed;
+
+          // Delete degenerate move
+          delete cmds.pop_back();
+
+          // Restore last speed
+          if (!std::isnan(lastSpeed)) pushSetCommand("speed", lastSpeed);
+          else if (!cmds.empty()) plan(cmds.back());
+
+        } else plan(prev);
         return;
       }
 
       SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
-      if (!sc) break;
+      if (!sc) break; // Abort merge
       setCmdCount++;
 
       // We can safely drop line set commands and speed commands can be
@@ -318,7 +345,7 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
         continue;
       }
 
-      break;
+      break; // Non line or speed set command, abort merge
     }
   }
 

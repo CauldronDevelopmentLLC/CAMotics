@@ -74,7 +74,7 @@ namespace GCode {
       double spinMax;
       bool arcIncrementalDistanceMode; // G90.1, G91.1
       bool latheDiameterMode;          // G7, G8 TODO unsupported
-      path_mode_t pathMode;            // G61, G61.1, G64 TODO unsupported
+      path_mode_t pathMode;            // G61, G61.1, G64
       double feed;                     // F
       double speed;                    // S
       dir_t spindleDir;                // M3-M5
@@ -85,7 +85,7 @@ namespace GCode {
       bool adaptiveFeed;               // M52 TODO unsupported
       bool feedHold;                   // M53 TODO unsupported
       double motionBlendingTolerance;  // G64 TODO unsupported
-      double naiveCamTolerance;        // G64 TODO unsupported
+      double naiveCamTolerance;        // G64
       bool moveInAbsoluteCoords;       // G53
     } state_t;
 
@@ -120,6 +120,10 @@ namespace GCode {
     // Plane
     void setPlane(plane_t plane);
     Plane getPlane() {return Plane(state.plane);}
+
+    // Path mode
+    void setPathMode(path_mode_t mode, double motionBlending = 0,
+                     double naiveCAM = 0);
 
     // Position
     double getAxisOffset(char axis) const;

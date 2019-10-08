@@ -196,6 +196,15 @@ void ControllerImpl::setPlane(plane_t plane) {
 }
 
 
+void ControllerImpl::setPathMode(path_mode_t mode, double motionBlending,
+                                 double naiveCAM) {
+  state.pathMode = mode;
+  state.motionBlendingTolerance = motionBlending;
+  state.naiveCamTolerance = naiveCAM;
+  machine.setPathMode(mode, motionBlending, naiveCAM);
+}
+
+
 double ControllerImpl::getAxisOffset(char axis) const {
   if (absoluteCoords) return 0; // Only set with G0 and G1 moves
 
@@ -825,6 +834,8 @@ void ControllerImpl::restoreModalState() {
   setSpeed(state.speed);
   setMistCoolant(state.mist);
   setFloodCoolant(state.flood);
+  setPathMode(state.pathMode, state.motionBlendingTolerance,
+              state.naiveCamTolerance);
 }
 
 
@@ -1043,16 +1054,18 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 592: setCoordSystem(8); break;
     case 593: setCoordSystem(9); break;
 
-    case 610: state.pathMode = EXACT_PATH_MODE; break;
-    case 611: state.pathMode = EXACT_STOP_MODE; break;
+    case 610: setPathMode(EXACT_PATH_MODE); break;
+    case 611: setPathMode(EXACT_STOP_MODE); break;
 
-    case 640:
-      state.pathMode = CONTINUOUS_MODE;
-      if (vars & VT_P) state.motionBlendingTolerance = getVar('P');
-      else state.motionBlendingTolerance = 0;
-      if (vars & VT_Q) state.naiveCamTolerance = getVar('Q');
-      else state.naiveCamTolerance = 0;
+    case 640: {
+      double p = vars & VT_P ? getVar('P') : 0;
+      double q = vars & VT_Q ? getVar('Q') : 0;
+      if ((vars & VT_P) && !(vars & VT_Q)) q = p;
+      if (!(vars & VT_P) && !(vars & VT_Q)) q = -1; // Not controlled
+
+      setPathMode(CONTINUOUS_MODE, p, q);
       break;
+    }
 
     case 700: implemented = false; break; // Mach3/4 Inches mode
     case 710: implemented = false; break; // Mach3/4 MM mode

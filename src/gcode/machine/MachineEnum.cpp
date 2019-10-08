@@ -56,6 +56,11 @@ VarTypes::enum_t MachineEnum::getVarType(char letter) {
 }
 
 
+const char *MachineEnum::toString(path_mode_t mode) {
+  return PathMode(mode).toString();
+}
+
+
 const char *MachineEnum::toString(feed_mode_t mode) {
   switch (mode) {
   case INVERSE_TIME:         return "INVERSE_TIME";

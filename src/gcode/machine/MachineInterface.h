@@ -102,6 +102,16 @@ namespace GCode {
                              double max = 0) = 0;
 
     /***
+     * Set path mode.
+     *
+     * @param mode EXACT_PATH_MODE, EXACT_STOP_MODE or CONTINUOUS_MODE.
+     * @param motionBlending Motion blending tolerance.
+     * @param naiveCAM Niave CAM tolerance.
+     */
+    virtual void setPathMode(path_mode_t mode, double motionBlending,
+                             double naiveCAM) = 0;
+
+    /***
      * Select the active tool.
      * This may cause some machines to run a tool change routine and return to
      * the current location.
@@ -135,7 +145,7 @@ namespace GCode {
      * @param port the port number.  Valid values depend on the machine.
      * @param value An analog or digital value.
      *
-     * @throw cb::Exception if the port is invalid or the operation is invalid 
+     * @throw cb::Exception if the port is invalid or the operation is invalid
      * for the specified port.
      */
     virtual void output(port_t port, double value) = 0;
@@ -161,7 +171,7 @@ namespace GCode {
      * rate if @param rapid is false, otherwise move at maximum speed.
      * This function may queue the operation and return immediately.
      *
-     * @throw cb::Exception if the feed rate is zero or the move would go 
+     * @throw cb::Exception if the feed rate is zero or the move would go
      * beyond the limits of the machine.
      */
     virtual void move(const Axes &position, int axes, bool rapid) = 0;

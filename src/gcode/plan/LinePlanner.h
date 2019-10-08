@@ -76,6 +76,7 @@ namespace GCode {
     void end();
     void setSpeed(double speed);
     void setSpinMode(spin_mode_t mode, double max);
+    void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
     void changeTool(unsigned tool);
     void input(port_t port, input_mode_t mode, double timeout);
     void seek(port_t port, bool active, bool error);

@@ -48,6 +48,9 @@ MachineState::MachineState() :
   // Units
   set("_metric", 1, NO_UNITS);
   set("_imperial", 0, NO_UNITS);
+
+  // Arc error
+  set("_max_arc_error", 0.01, METRIC);
 }
 
 
@@ -69,6 +72,17 @@ void MachineState::setFeed(double feed) {
 void MachineState::setSpeed(double speed) {
   this->speed = speed;
   set("_speed", speed, NO_UNITS);
+}
+
+
+void MachineState::setPathMode(path_mode_t mode, double motionBlending,
+                               double naiveCAM) {
+  set("_path_mode", (unsigned)mode, NO_UNITS);
+
+  if (mode == CONTINUOUS_MODE) {
+    set("_motion_blending_tolerance", motionBlending, METRIC);
+    set("_naive_cam_tolerance", naiveCAM, METRIC);
+  }
 }
 
 

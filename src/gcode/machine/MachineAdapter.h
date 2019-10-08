@@ -66,6 +66,10 @@ namespace GCode {
     void setSpinMode(spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
                      double max = 0) {parent->setSpinMode(mode, max);}
 
+    void setPathMode(path_mode_t mode, double motionBlending = 0,
+                     double naiveCAM = 0)
+    {parent->setPathMode(mode, motionBlending, naiveCAM);}
+
     void changeTool(unsigned tool) {parent->changeTool(tool);}
 
     void input(port_t port, input_mode_t mode, double timeout)

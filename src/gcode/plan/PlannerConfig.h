@@ -23,42 +23,44 @@
 #include <gcode/Axes.h>
 #include <gcode/Units.h>
 #include <gcode/Codes.h>
+#include <gcode/machine/MachineEnum.h>
 
 #include <cbang/json/Serializable.h>
 
 #include <map>
+#include <limits>
 
 
 namespace GCode {
-  class PlannerConfig : public cb::JSON::Serializable {
+  class PlannerConfig :
+    public cb::JSON::Serializable, public MachineEnum {
   public:
-    Axes maxVel;
-    Axes maxAccel;
-    Axes maxJerk;
+    Axes maxVel   = 10000;
+    Axes maxAccel = 200000;
+    Axes maxJerk  = 50000000;
 
-    double junctionDeviation;
-    double junctionAccel;
-    double minJunctionLength;
+    double junctionDeviation = 0.05;
+    double junctionAccel     = 100000;
+    double minJunctionLength = 0.01;
 
-    Axes minSoftLimit;
-    Axes maxSoftLimit;
+    Axes minSoftLimit = std::numeric_limits<double>::quiet_NaN();
+    Axes maxSoftLimit = std::numeric_limits<double>::quiet_NaN();
 
     Units defaultUnits;
     Units outputUnits;
-    double minTravel;
-    double maxArcError;
-    unsigned maxLookahead;
-    double minMoveSecs;
-    double maxMergeLength;
-    double maxMergeError;
-    double maxCollinearAngle;
-    bool rapidAutoOff;
-    unsigned idBits;
+    double minTravel         = 0.000001;
+    double maxArcError       = 0.01;
+    unsigned maxLookahead    = 4096;
+    double minMoveSecs       = 0.02;
+    path_mode_t pathMode     = CONTINUOUS_MODE;
+    double maxMergeError     = 0.1;
+    bool rapidAutoOff        = false;
+    unsigned idBits          = 16;
 
     std::string programStart;
     std::map<Code, std::string> overrides;
 
-    PlannerConfig();
+    PlannerConfig() {}
 
     bool hasOverride(const Code &code) const;
     const std::string &getOverride(const Code &code) const;

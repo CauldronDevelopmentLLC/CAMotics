@@ -160,6 +160,29 @@ void GCodeMachine::setSpinMode(spin_mode_t mode, double max) {
 }
 
 
+void GCodeMachine::setPathMode(path_mode_t mode, double motionBlending,
+                               double naiveCAM) {
+  MachineAdapter::setPathMode(mode, motionBlending, naiveCAM);
+
+  beginLine();
+
+  switch (mode) {
+  case EXACT_PATH_MODE: *stream << "G61\n";   return;
+  case EXACT_STOP_MODE: *stream << "G61.1\n"; return;
+  case CONTINUOUS_MODE: {
+    *stream << "G64";
+    bool imperial = units == Units::IMPERIAL;
+    if (0 < motionBlending) *stream << " P" << dtos(motionBlending, imperial);
+    if (0 < naiveCAM) *stream << " Q" << dtos(naiveCAM, imperial);
+    *stream << '\n';
+    return;
+  }
+  }
+
+  THROW("Invalid path mode " << mode);
+}
+
+
 void GCodeMachine::changeTool(unsigned tool) {
   unsigned currentTool = get(TOOL_NUMBER, NO_UNITS);
 

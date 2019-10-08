@@ -54,6 +54,13 @@ void MachineUnitAdapter::setSpeed(double speed) {
 }
 
 
+void MachineUnitAdapter::setPathMode(path_mode_t mode, double motionBlending,
+                                     double naiveCAM) {
+  MachineAdapter::setPathMode(mode, motionBlending * mmInchOut(),
+                              naiveCAM * mmInchOut());
+}
+
+
 Axes MachineUnitAdapter::getPosition() const {
   return MachineAdapter::getPosition() * mmInchIn();
 }

@@ -59,6 +59,8 @@ namespace GCode {
     double getSpeed() const;
     void setSpeed(double speed);
 
+    void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
+
     Axes getPosition() const;
     cb::Vector3D getPosition(axes_t axes) const;
     void setPosition(const Axes &position);

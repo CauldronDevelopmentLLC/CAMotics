@@ -34,17 +34,17 @@ namespace GCode {
 
     Axes start;
     Axes target;
-    double length;
+    double length   = 0;
 
-    double entryVel;
-    double exitVel;
-    double deltaV;
+    double entryVel = 0;
+    double exitVel  = 0;
+    double deltaV   = 0;
 
-    double maxVel;
-    double maxAccel;
-    double maxJerk;
+    double maxVel   = 0;
+    double maxAccel = 0;
+    double maxJerk  = 0;
 
-    double times[7];
+    double times[7] = {0};
 
     struct Speed {
       double offset;
@@ -52,6 +52,7 @@ namespace GCode {
       Speed(double offset, double speed) : offset(offset), speed(speed) {}
     };
 
+    std::vector<Axes> merged;
     std::vector<Speed> speeds;
 
     Axes unit;
@@ -59,7 +60,6 @@ namespace GCode {
     bool rapid;
     bool seeking;
     bool first;
-    double error;
 
     LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
                 bool rapid, bool seeking, bool first,

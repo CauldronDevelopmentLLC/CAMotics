@@ -25,22 +25,11 @@
 #include <cbang/log/Logger.h>
 #include <cbang/json/JSON.h>
 
-#include <limits>
 #include <cctype>
 
 using namespace GCode;
 using namespace cb;
 using namespace std;
-
-
-PlannerConfig::PlannerConfig() :
-  maxVel(10000), maxAccel(200000), maxJerk(50000000), junctionDeviation(0.05),
-  junctionAccel(100000), minJunctionLength(0.01),
-  minSoftLimit(numeric_limits<double>::quiet_NaN()),
-  maxSoftLimit(numeric_limits<double>::quiet_NaN()), minTravel(0.000001),
-  maxArcError(0.01), maxLookahead(4096), minMoveSecs(0.02), maxMergeLength(2),
-  maxMergeError(0.1), maxCollinearAngle(0.01), rapidAutoOff(false), idBits(16)
-{}
 
 
 bool PlannerConfig::hasOverride(const Code &code) const {
@@ -77,9 +66,9 @@ void PlannerConfig::read(const JSON::Value &value) {
   maxArcError = value.getNumber("max-arc-error", maxArcError);
   maxLookahead = value.getNumber("max-lookahead", maxLookahead);
   minMoveSecs = value.getNumber("min-move-seconds", minMoveSecs);
-  maxMergeLength = value.getNumber("max-merge-length", maxMergeLength);
+  if (value.hasString("path-mode"))
+    pathMode = PathMode::parse(value.getString("path-mode"));
   maxMergeError = value.getNumber("max-merge-error", maxMergeError);
-  maxCollinearAngle = value.getNumber("max-collinear-angle", maxCollinearAngle);
   rapidAutoOff = value.getBoolean("rapid-auto-off", rapidAutoOff);
   idBits = value.getU32("id-bits", idBits);
 
@@ -125,8 +114,8 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.insert("max-arc-error", maxArcError);
   sink.insert("max-lookahead", maxLookahead);
   sink.insert("min-move-seconds", minMoveSecs);
+  sink.insert("path-mode", PathMode(pathMode).toString());
   sink.insert("max-merge-error", maxMergeError);
-  sink.insert("max-collinear-angle", maxCollinearAngle);
   sink.insertBoolean("rapid-auto-off", rapidAutoOff);
   sink.insert("id-bits", idBits);
 

@@ -73,6 +73,7 @@ namespace GCode {
     {if (max) *max = maxSpeed; return spinMode;}
     void setSpinMode(spin_mode_t mode, double max)
     {spinMode = mode; maxSpeed = max;}
+    void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
 
     void changeTool(unsigned tool);
 

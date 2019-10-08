@@ -103,6 +103,23 @@ void JSONMachine::setSpinMode(spin_mode_t mode, double max) {
 }
 
 
+void JSONMachine::setPathMode(path_mode_t mode, double motionBlending,
+                              double naiveCAM) {
+  MachineAdapter::setPathMode(mode, motionBlending, naiveCAM);
+
+  sink.appendDict(true);
+  sink.insert("type", "path-mode");
+  sink.insert("value", MachineEnum::toString(mode));
+
+  if (mode == CONTINUOUS_MODE) {
+    if (0 < motionBlending) sink.insert("blend", motionBlending);
+    if (0 < naiveCAM) sink.insert("naive-cam", naiveCAM);
+  }
+
+  sink.endDict();
+}
+
+
 void JSONMachine::changeTool(unsigned tool) {
   unsigned currentTool = get(TOOL_NUMBER, NO_UNITS);
 

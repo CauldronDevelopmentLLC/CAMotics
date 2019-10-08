@@ -14,6 +14,7 @@
  - Move all axes on "G28/G30 <axes>" as specified in RS274/NGC section 3.5.8.
  - Segments straddle arc in linearization.
  - Control max-arc-error with GCode var.
+ - Implemented path modes G61, G61.1 & G64 with naive CAM but not blending, yet.
 
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.

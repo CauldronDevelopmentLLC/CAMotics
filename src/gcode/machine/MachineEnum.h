@@ -21,25 +21,20 @@
 #pragma once
 
 #include "PortType.h"
+#include "PathMode.h"
 
 #include <gcode/VarTypes.h>
 
 
 namespace GCode {
-  class MachineEnum : public PortType::Enum, public VarTypesEnumerationBase {
+  class MachineEnum :
+    public PortType::Enum, public PathMode::Enum, public VarTypes::Enum {
   public:
     typedef enum {
       DIR_OFF,
       DIR_CLOCKWISE,
       DIR_COUNTERCLOCKWISE,
     } dir_t;
-
-
-    typedef enum {
-      EXACT_PATH_MODE,
-      EXACT_STOP_MODE,
-      CONTINUOUS_MODE,
-    } path_mode_t;
 
 
     typedef enum {
@@ -66,6 +61,7 @@ namespace GCode {
       PAUSE_OPTIONAL,
       PAUSE_PALLET_CHANGE,
     } pause_t;
+
 
     typedef enum {
       XY = 170,
@@ -95,8 +91,10 @@ namespace GCode {
 
 
     typedef PortType::enum_t port_t;
+    typedef PathMode::enum_t path_mode_t;
 
     static VarTypes::enum_t getVarType(char letter);
+    static const char *toString(path_mode_t mode);
     static const char *toString(feed_mode_t mode);
     static const char *toString(spin_mode_t mode);
     static const char *toString(input_mode_t mode);

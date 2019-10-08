@@ -56,7 +56,7 @@ void Planner::setPosition(const Axes &position) {
 void Planner::setConfig(const PlannerConfig &config) {
   setUnits(config.defaultUnits);
   unitAdapter.setTargetUnits(config.outputUnits);
-  linearizer.setMaxArcError(config.maxArcError);
+  set("_max_arc_error", config.maxArcError, METRIC);
   planner.setConfig(config);
 }
 
