@@ -22,7 +22,7 @@
 
 #include <cbang/json/JSON.h>
 
-#include <clipper/clipper.hpp>
+#include <clipper/Clipper.h>
 
 using namespace cb;
 using namespace ClipperLib;
@@ -74,7 +74,7 @@ void ClipperModule::offsetCB(const js::Value &args, js::Sink &sink) {
   double limit = args.getNumber("limit") * scale;
   bool autoFix = args.getBoolean("autoFix");
 
-  OffsetPolygons(polys, polys, delta, join, limit, autoFix);
+  polys.Offset(delta, join, limit, autoFix);
 
   // Convert Clipper result back to JavaScript
   sink.beginList();
