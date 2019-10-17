@@ -301,8 +301,7 @@ void QtWin::loadMachines() {
     };
 
     string root = ".";
-    string appPath =
-      QCoreApplication::applicationFilePath().toUtf8().data();
+    string appPath = QCoreApplication::applicationFilePath().toUtf8().data();
     if (appPath.empty()) LOG_WARNING("Couldn't get application path");
     else root = SystemUtilities::dirname(appPath);
 
@@ -330,8 +329,11 @@ void QtWin::loadMachines() {
       }
     }
 
-    loadMachine(Settings().get("Settings/Machine", "Taig Mini Mill")
-                .toString().toUtf8().data());
+    // Load machine
+    string machine =
+      Settings().get("Settings/Machine", "").toString().toUtf8().data();
+    if (machine.empty()) machine = "Taig Mini Mill";
+    loadMachine(machine);
   } CATCH_ERROR;
 }
 
