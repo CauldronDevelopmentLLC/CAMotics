@@ -28,6 +28,7 @@
 #include <cbang/json/Reader.h>
 #include <cbang/io/StringInputSource.h>
 #include <cbang/time/TimeInterval.h>
+#include <cbang/log/Logger.h>
 
 #include <iostream>
 
@@ -38,12 +39,19 @@ using namespace GCode;
 
 class PlannerApp : public CAMotics::Application {
   PlannerConfig config;
+  bool gcode = false;
+  unsigned precision = 4;
 
 public:
   PlannerApp() :
     CAMotics::Application("CAMotics GCode Path Planner") {
     cmdLine.add("json", "JSON configuration or configuration file"
                 )->setType(Option::STRING_TYPE);
+    cmdLine.addTarget("gcode", gcode, "Output GCode instead of plan JSON");
+    cmdLine.addTarget("precision", precision,
+                      "Decimal places in output numbers");
+
+    Logger::instance().setScreenStream(cerr);
   }
 
 
@@ -74,19 +82,57 @@ public:
     Planner planner;
     planner.load(source, config);
 
-    JSON::Writer writer(cout);
+    SmartPointer<JSON::Writer> writer;
+    if (!gcode) writer = new JSON::Writer(cout, 0, false, 2, precision);
 
-    writer.beginList();
+    if (writer.isSet()) writer->beginList();
 
     while (!shouldQuit() && planner.hasMore()) {
-      writer.beginAppend();
-      planner.setActive(planner.next(writer));
+      uint64_t id;
+
+      if (writer.isSet()) {
+        writer->beginAppend();
+        id = planner.next(*writer);
+
+      } else {
+        auto e = planner.next();
+        id = e->getNumber("id");
+
+        string type = e->getString("type");
+        if (type == "line") {
+          if (e->getBoolean("rapid", false)) cout << "G0";
+          else cout << "G1";
+
+          auto t = e->get("target");
+          for (const char *axis = Axes::AXES; *axis; axis++) {
+            string axisName = string(1, tolower(*axis));
+            if (t->hasNumber(axisName))
+              cout << ' ' << *axis << String(t->getNumber(axisName), precision);
+          }
+
+          cout << '\n';
+
+        } else if (type == "set") {
+          string name = e->getString("name");
+          double value = e->getNumber("value");
+
+          if (name == "_feed")
+            cout << 'F' << String(value, precision) << '\n';
+          else if (name == "tool") cout << "M6 T" << (unsigned)value << '\n';
+          else if (name == "speed")
+            cout << 'S' << String(value, precision) << '\n';
+        }
+
+        // TODO support other GCode output
+      }
+
+      planner.setActive(id);
 
       // Cannot synchronize with actual machine so fake it.
       if (planner.isSynchronizing()) planner.synchronize(0);
     }
 
-    writer.endList();
+    if (writer.isSet()) writer->endList();
 
     cout << endl;
     cerr << "Total time: " << TimeInterval(planner.getTime()) << endl;

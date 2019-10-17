@@ -21,6 +21,8 @@
 #include "Planner.h"
 #include "Runner.h"
 
+#include <cbang/json/Builder.h>
+
 using namespace cb;
 using namespace std;
 using namespace GCode;
@@ -97,6 +99,11 @@ bool Planner::hasMore() {
 uint64_t Planner::next(JSON::Sink &sink) {
   if (!hasMore()) THROW("No more");
   return planner.next(sink);
+}
+
+
+SmartPointer<JSON::Value> Planner::next() {
+  return JSON::Builder::build([this] (JSON::Sink &sink) {next(sink);});
 }
 
 

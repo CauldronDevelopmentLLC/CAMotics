@@ -157,7 +157,7 @@ void Transform::write(JSON::Sink &sink) const {
   sink.beginList();
 
   for (unsigned i = 0; i < 4; i++) {
-    sink.appendList();
+    sink.appendList(true);
 
     for (unsigned j = 0; j < 4; j++)
       sink.append(data[i][j]);

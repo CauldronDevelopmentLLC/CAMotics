@@ -33,6 +33,9 @@ namespace cb {namespace JSON {class Sink;}}
 
 
 namespace GCode {
+  class LineCommand;
+
+
   class LinePlanner : public MachineState {
     PlannerConfig config;
 
@@ -42,6 +45,7 @@ namespace GCode {
     bool firstMove;
 
     typedef List<PlannerCommand> cmd_t;
+    cmd_t pre;
     cmd_t cmds;
     cmd_t out;
 
@@ -96,6 +100,13 @@ namespace GCode {
     template <typename T>
     void pushSetCommand(const std::string &name, const T &value);
     void push(PlannerCommand *cmd);
+    bool merge(LineCommand *next, LineCommand *prev, double lastSpeed);
+    double computeMaxAccel(const cb::Vector3D &v) const;
+    double computeJunctionVelocity(const cb::Vector3D &v, double radius) const;
+    unsigned blendSegments(double arcError, double arcAngle, double radius);
+    void blend(LineCommand *next, LineCommand *prev, double lastSpeed,
+               int lastLine);
+    void enqueue(LineCommand *lc, bool rapid);
     bool isFinal(PlannerCommand *cmd) const;
     void plan(PlannerCommand *cmd);
     bool planOne(PlannerCommand *cmd);

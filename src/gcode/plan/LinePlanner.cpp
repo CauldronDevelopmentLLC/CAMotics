@@ -30,6 +30,9 @@
 #include "SetCommand.h"
 #include "EndCommand.h"
 
+#include <gcode/Helix.h>
+#include <gcode/machine/Transform.h>
+
 #include <cbang/Exception.h>
 #include <cbang/Math.h>
 #include <cbang/log/Logger.h>
@@ -302,55 +305,8 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
     return;
   }
 
-  // Try to merge move with previous one
-  if (!cmds.empty() && config.pathMode != EXACT_STOP_MODE) {
-    int setCmdCount = 0;
-    double lastSpeed = numeric_limits<double>::quiet_NaN();
-
-    for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
-      LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
-      if (prev && prev->merge(*lc, config, lastSpeed)) {
-        // Merged
-        delete lc;
-        for (int i = 0; i < setCmdCount; i++) delete cmds.pop_back();
-
-        // Check for short move
-        if (prev->length < config.minTravel) {
-          // Save last speed
-          lastSpeed = numeric_limits<double>::quiet_NaN();
-          if (prev->speeds.size()) lastSpeed = prev->speeds.back().speed;
-
-          // Delete degenerate move
-          delete cmds.pop_back();
-
-          // Restore last speed
-          if (!std::isnan(lastSpeed)) pushSetCommand("speed", lastSpeed);
-          else if (!cmds.empty()) plan(cmds.back());
-
-        } else plan(prev);
-        return;
-      }
-
-      SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
-      if (!sc) break; // Abort merge
-      setCmdCount++;
-
-      // We can safely drop line set commands and speed commands can be
-      // synchronized with the move.
-      const string &name = sc->getName();
-      if (name == "line") continue;
-      if (name == "speed") {
-        if (!rapid || !config.rapidAutoOff)
-          lastSpeed = sc->getValue().getNumber();
-        continue;
-      }
-
-      break; // Non line or speed set command, abort merge
-    }
-  }
-
-  // Add move
-  push(lc);
+  // Add it
+  enqueue(lc, rapid);
 }
 
 
@@ -419,8 +375,250 @@ void LinePlanner::pushSetCommand(const string &name, const T &_value) {
 
 
 void LinePlanner::push(PlannerCommand *cmd) {
-  cmds.push_back(cmd);
-  plan(cmd);
+  bool flush = true;
+
+  // Check if this is a non-flushing SetCommand
+  SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
+  if (sc) {
+    const string &name = sc->getName();
+    flush = name != "line" && name != "speed";
+  }
+
+  // Flush pre-plan queue
+  while (flush && !pre.empty()) {
+    PlannerCommand *cmd = pre.pop_front();
+    cmds.push_back(cmd);
+    plan(cmd);
+  }
+
+  // Flush all commands when in exact stop mode
+  if (config.pathMode != EXACT_STOP_MODE &&
+      (!flush || dynamic_cast<LineCommand *>(cmd)))
+    pre.push_back(cmd);
+
+  else {
+    cmds.push_back(cmd);
+    plan(cmd);
+  }
+}
+
+
+bool LinePlanner::merge(LineCommand *next, LineCommand *prev,
+                        double lastSpeed) {
+  if (!prev->merge(*next, config, lastSpeed)) return false;
+
+  // Delete new line and intervening commands from pre-plan queue
+  delete next;
+  while (pre.back() != prev) delete pre.pop_back();
+
+  // Check if newly merged command is too short
+  if (prev->length < config.minTravel) {
+    // Save last speed
+    lastSpeed = prev->speeds.size() ? prev->speeds.back().speed :
+      numeric_limits<double>::quiet_NaN();
+
+    // Delete degenerate move
+    delete pre.pop_back();
+
+    // Restore last speed
+    if (!std::isnan(lastSpeed)) pushSetCommand("speed", lastSpeed);
+  }
+
+  return true;
+}
+
+
+double LinePlanner::computeMaxAccel(const Vector3D &v) const {
+  Vector3D unit = v.normalize();
+  double maxAccel = numeric_limits<double>::max();
+
+  for (unsigned axis = 0; axis < 3; axis++)
+    if (config.maxAccel[axis] && isfinite(config.maxAccel[axis])) {
+      double a = fabs(config.maxAccel[axis] / unit[axis]);
+      if (a < maxAccel) maxAccel = a;
+    }
+
+  return maxAccel;
+}
+
+
+double LinePlanner::computeJunctionVelocity(const Vector3D &v,
+                                            double radius) const {
+  return sqrt(computeMaxAccel(v) * radius);
+}
+
+
+unsigned LinePlanner::blendSegments(double arcError, double arcAngle,
+                                    double radius) {
+  // Compute segment angle from allowed error
+  // See "Algorithm for circle approximation and generation" - L Yong-Kui.
+  double segAngle = 4 * atan(sqrt(arcError / radius));
+
+  // Segment angle cannot be greater than 2Pi/3 because we need at least 3
+  // segments in a full circle
+  segAngle = std::min(2 * M_PI / 3, segAngle);
+
+  // Compute integer number of segments that meets the error bound
+  unsigned segments = (unsigned)ceil(arcAngle / segAngle);
+
+  // Enforce a minimum segment length
+  double cordLength = arcAngle * radius;
+  double segLength = cordLength / segments;
+  if (segLength < 0.1) segments = (unsigned)floor(cordLength / 0.1);
+
+  return segments;
+}
+
+
+void LinePlanner::blend(LineCommand *next, LineCommand *prev,
+                        double lastSpeed, int lastLine) {
+  if (!next->isCompatible(*prev)) return;
+
+  // Compute arc between segments given the allowed error
+  double error = config.maxMergeError * 0.99;
+  double intersectAngle = fabs(next->unit.angleBetween(-prev->unit));
+  double sinHalfAngle = sin(intersectAngle / 2);
+  double cosHalfAngle = cos(intersectAngle / 2);
+  double radius = error * (sinHalfAngle / (1 - sinHalfAngle));
+  double length = error * (cosHalfAngle / (1 - sinHalfAngle));
+
+  // Recompute error if arc is too large
+  if (next->length < length * 2 || prev->length < length * 2) {
+    length = min(next->length, prev->length) / 2;
+    error = length * (1 - sinHalfAngle) / cosHalfAngle;
+    radius = error * (sinHalfAngle / (1 - sinHalfAngle));
+  }
+
+  if (length < config.minTravel) return;
+
+  // Delete intervening commands from pre-plan queue
+  while (pre.back() != prev) delete pre.pop_back();
+
+  // Get parameters
+  Vector3D p = next->start.slice<3>(); // Intersection point
+  Vector3D a = -prev->unit.slice<3>(); // Unit vector
+  Vector3D b = next->unit.slice<3>();  // Unit vector
+
+  // Adjust move endpoints, must be after getting intersection point above
+  vector<LineCommand::Speed> speeds;
+  prev->cut(length, speeds, 0, true);
+  if (!std::isnan(lastSpeed))
+    speeds.push_back(LineCommand::Speed(length, lastSpeed));
+  next->cut(length, speeds, length, false);
+
+  // Scale offsets
+  for (unsigned i = 0; i < speeds.size(); i++)
+    speeds[i].offset /= 2 * length;
+
+  // Compute angle of the arc
+  double arcAngle = M_PI - intersectAngle;
+
+  // Arc error cannot be greater than arc radius
+  const double arcError = std::min(config.maxMergeError * 0.01, radius);
+
+  // Compute segments and segment angle
+  unsigned segments = blendSegments(arcError, arcAngle, radius);
+  double segAngle = arcAngle / segments;
+
+  // Find arc center
+  Vector3D q1 = p + a * length;
+  Vector3D q2 = p + b * length;
+  Vector3D v = a.cross(b).cross(a).normalize() * radius;
+  Vector3D c1 = q1 + v;
+  Vector3D c2 = q1 - v;
+  Vector3D center;
+  if ((q2 - c1).lengthSquared() < (q2 - c2).lengthSquared())
+    center = c1;
+  else center = c2;
+
+  // Increase the radius so the line segments straddle the actual helix
+  double alpha = cos(segAngle / 2);
+  double epsilon = 1 + (1 - alpha) / (1 + alpha);
+
+  // Compute arc
+  Vector3D arcStart = (q1 - center) * epsilon;
+  Vector3D arcEnd   = (q2 - center) * epsilon;
+  Axes start = prev->target;
+  Axes target = start;
+  double sinAngle = sin(arcAngle);
+  double lastFract = 0;
+  unsigned speedIdx = 0;
+
+  // We want to start and end on the actual arc so we offset by half a segment
+  double offsetAngle = segAngle / 2;
+
+  prev->targetJunctionVel =
+    computeJunctionVelocity(center - target.getXYZ(), radius * epsilon);
+
+  for (unsigned i = 0; i < segments; i++) {
+    double a = i * segAngle + offsetAngle;
+
+    Vector3D v = arcStart * (sin(arcAngle - a) / sinAngle) +
+      arcEnd * (sin(a) / sinAngle) + center;
+    target.setXYZ(v);
+
+    LineCommand *lc =
+      new LineCommand(getNextID(), start, target, prev->feed, prev->rapid,
+                      prev->seeking, false, config);
+
+    lc->targetJunctionVel =
+      computeJunctionVelocity(center - v, radius * epsilon);
+
+    double fract = a / arcAngle;
+    double segFract = fract - lastFract;
+
+    // Insert intervening line set command in middle
+    if (lastFract < 0.5 && 0.5 <= fract && 0 <= lastLine)
+      pushSetCommand("line", lastLine);
+
+    // Insert speeds at correct offsets
+    for (unsigned i = speedIdx; i < speeds.size(); i++)
+      if (speeds[i].offset <= fract) {
+        LineCommand::Speed s(0, speeds[i].speed);
+        s.offset = lc->length * (speeds[i].offset - lastFract) / segFract;
+        lc->speeds.push_back(s);
+        speedIdx = i;
+      }
+
+    push(lc);
+    start = target;
+    lastFract = fract;
+  }
+
+  // Handle last speed, if any
+  if (speedIdx < speeds.size()) {
+    LineCommand::Speed s(0, speeds.back().speed);
+    next->speeds.insert(next->speeds.begin(), s);
+  }
+
+  // Fix planner ID of new move
+  next->setID(getNextID());
+}
+
+
+void LinePlanner::enqueue(LineCommand *lc, bool rapid) {
+  // Search for previous move in pre-plan queue and record last speed change
+  double lastSpeed = numeric_limits<double>::quiet_NaN();
+  int lastLine = -1;
+
+  for (PlannerCommand *cmd = pre.back(); cmd; cmd = cmd->prev) {
+    LineCommand *prev = dynamic_cast<LineCommand *>(cmd);
+
+    if (prev) {
+      if (merge(lc, prev, lastSpeed)) return; // Merged
+      blend(lc, prev, lastSpeed, lastLine);
+      break;
+    }
+
+    // Save last speed to synchronize with merged move
+    SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
+    if (sc && sc->getName() == "speed" && (!rapid || !config.rapidAutoOff))
+      lastSpeed = sc->getValue().getNumber();
+    if (sc && sc->getName() == "line") lastLine = sc->getValue().getS32();
+  }
+
+  // Add the move
+  push(lc);
 }
 
 
@@ -429,6 +627,7 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
   if (dynamic_cast<SetCommand *>(cmd)) {
     for (PlannerCommand *c = cmd; c; c = c->next)
       if (!dynamic_cast<SetCommand *>(c)) return true;
+
     return false;
   }
 
@@ -441,6 +640,7 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
   while (cmd->next) {
     cmd = cmd->next;
     velocity -= cmd->getDeltaVelocity();
+
     if (velocity <= Math::nextUp(0)) return true;
     if (config.maxLookahead <= ++count)
       THROW("Planner exceeded max lookahead (" << config.maxLookahead << ")");
@@ -491,16 +691,17 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
   double Vt = lc.getExitVelocity();
 
   // Apply junction velocity limit
-  if (Vi && cmd->prev && config.minJunctionLength <= lc.length)
+  if (Vi && cmd->prev)
     for (PlannerCommand *last = cmd->prev; last; last = last->prev) {
       if (!dynamic_cast<LineCommand *>(last)) continue;
       const LineCommand &lastLC = *dynamic_cast<LineCommand *>(last);
 
-      if (lastLC.length < config.minJunctionLength) continue;
+      double jv;
 
-      double jv = computeJunctionVelocity(lc.unit, lastLC.unit,
-                                          config.junctionDeviation,
-                                          config.junctionAccel);
+      if (lastLC.targetJunctionVel) jv = lastLC.targetJunctionVel;
+      else jv = computeJunctionVelocity(lc.unit, lastLC.unit,
+                                        config.junctionDeviation,
+                                        config.junctionAccel);
       if (jv < Vi) {
 #if DEBUG
         double cosTheta = -lc.unit.dot(lastLC.unit);
@@ -546,8 +747,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
       // Backplaning  necessary
       backplan = true;
 
-      if (!cmd->prev)
-        THROW("Cannot backplan, previous move unavailable");
+      if (!cmd->prev) THROW("Cannot backplan, previous move unavailable");
 
       LOG_DEBUG(3, "Backplan: entryVel=" << lc.entryVel
                 << " prev.exitVel=" << cmd->prev->getExitVelocity()
@@ -866,32 +1066,17 @@ double LinePlanner::planVelocityTransition(double Vi, double Vt,
 }
 
 
-double LinePlanner::computeJunctionVelocity(const Axes &unitA,
-                                            const Axes &unitB,
-                                            double deviation,
-                                            double accel) const {
-  // TODO this probably does not make sense for axes A, B, C, U, V or W
+double LinePlanner::computeJunctionVelocity
+(const Axes &unitA, const Axes &unitB, double deviation, double accel) const {
+  // TODO this does not make sense for axes A, B, C, U, V or W
   double cosTheta = -unitA.dot(unitB);
 
   if (cosTheta < -0.99) return numeric_limits<double>::max(); // Straight line
   if (0.99 < cosTheta) return 0; // Reversal
 
-  // Fuse the junction deviations into a vector sum
-  double aDelta = 0;
-  double bDelta = 0;
-
-  for (unsigned axis = 0; axis < Axes::getSize(); axis++) {
-    aDelta += square(unitA[axis] * deviation);
-    bDelta += square(unitB[axis] * deviation);
-  }
-
-  LOG_DEBUG(3, "delta A=" << aDelta << " delta B=" << bDelta);
-
-  if (!aDelta || !bDelta) return 0; // A unit vector is null
-
-  double delta = (sqrt(aDelta) + sqrt(bDelta)) / 2;
-  double halfTheta = acos(cosTheta) / 2;
-  double radius = delta * sin(halfTheta) / (1 - sin(halfTheta));
+  double theta = acos(cosTheta);
+  double sinHalfTheta = sin(theta / 2);
+  double radius = deviation * sinHalfTheta / (1 - sinHalfTheta);
 
   return sqrt(radius * accel);
 }

@@ -35,16 +35,15 @@ namespace GCode {
   class PlannerConfig :
     public cb::JSON::Serializable, public MachineEnum {
   public:
-    Axes maxVel   = 10000;
-    Axes maxAccel = 200000;
-    Axes maxJerk  = 50000000;
+    Axes maxVel              = 10000;
+    Axes maxAccel            = 200000;
+    Axes maxJerk             = 50000000;
 
     double junctionDeviation = 0.05;
     double junctionAccel     = 100000;
-    double minJunctionLength = 0.01;
 
-    Axes minSoftLimit = std::numeric_limits<double>::quiet_NaN();
-    Axes maxSoftLimit = std::numeric_limits<double>::quiet_NaN();
+    Axes minSoftLimit        = std::numeric_limits<double>::quiet_NaN();
+    Axes maxSoftLimit        = std::numeric_limits<double>::quiet_NaN();
 
     Units defaultUnits;
     Units outputUnits;

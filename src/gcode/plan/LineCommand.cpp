@@ -50,6 +50,15 @@ double LineCommand::getTime() const {
 }
 
 
+bool LineCommand::isCompatible(const LineCommand &lc) const {
+  // Not compatible for merge or blend if any of the ABC or UVW axes are moving
+  for (unsigned i = 3; i < 9; i++)
+    if (unit[i] != lc.unit[i]) return false;
+
+  return lc.rapid == rapid && lc.seeking == seeking && lc.first == first;
+}
+
+
 namespace {
   double mergeError(const Axes &A, const Axes &B, const Axes &C) {
     double a = (B - A).lengthSquared();
@@ -68,8 +77,7 @@ namespace {
 bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
                         double speed) {
   // Check if moves are compatible
-  if (lc.rapid != rapid || lc.seeking != seeking || lc.first != first)
-    return false;
+  if (!isCompatible(lc)) return false;
 
   // Check if too many merges have already been made
   if (63 < merged.size()) return false;
@@ -149,6 +157,29 @@ void LineCommand::insert(JSON::Sink &sink) const {
     }
     sink.endList();
   }
+}
+
+
+void LineCommand::cut(double length, vector<Speed> &speeds, double offset,
+                      bool fromEnd) {
+  this->length -= length;
+  if (fromEnd) target = start + unit * this->length;
+  else start = start + unit * length;
+
+  // Get removed offset speeds
+  vector<Speed> newSpeeds;
+  for (unsigned i = 0; i < this->speeds.size(); i++) {
+    const auto &s = this->speeds[i];
+
+    if (fromEnd && this->length < s.offset)
+      speeds.push_back(Speed(offset + s.offset - this->length, s.speed));
+    else if (!fromEnd && s.offset < length)
+      speeds.push_back(Speed(offset + s.offset, s.speed));
+    else if (fromEnd) newSpeeds.push_back(s);
+    else newSpeeds.push_back(Speed(s.offset - length, s.speed));
+  }
+
+  this->speeds = newSpeeds;
 }
 
 

@@ -48,6 +48,7 @@ namespace GCode {
     virtual const char *getType() const = 0;
 
     uint64_t getID() const {return id;}
+    void setID(uint64_t id) {this->id = id;}
 
     virtual bool isSeeking() const {return false;}
     virtual bool isMove() const {return false;}

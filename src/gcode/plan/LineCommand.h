@@ -44,6 +44,8 @@ namespace GCode {
     double maxAccel = 0;
     double maxJerk  = 0;
 
+    double targetJunctionVel = 0;
+
     double times[7] = {0};
 
     struct Speed {
@@ -65,6 +67,8 @@ namespace GCode {
                 bool rapid, bool seeking, bool first,
                 const PlannerConfig &config);
 
+    bool isCompatible(const LineCommand &lc) const;
+
     // From PlannerCommand
     const char *getType() const {return "line";}
     bool isRapid() const {return rapid;}
@@ -83,6 +87,8 @@ namespace GCode {
                double speed);
     void restart(const Axes &position, const PlannerConfig &config);
     void insert(cb::JSON::Sink &sink) const;
+    void cut(double length, std::vector<Speed> &speeds, double offset = 0,
+             bool fromEnd = true);
 
   protected:
     void computeLimits(const PlannerConfig &config);

@@ -55,7 +55,6 @@ void PlannerConfig::read(const JSON::Value &value) {
 
   junctionDeviation = value.getNumber("junction-deviation", junctionDeviation);
   junctionAccel = value.getNumber("junction-accel", junctionAccel);
-  minJunctionLength = value.getNumber("min-junction-length", minJunctionLength);
 
   if (value.hasDict("min-soft-limit"))
     minSoftLimit.read(value.getDict("min-soft-limit"));
@@ -102,7 +101,6 @@ void PlannerConfig::write(JSON::Sink &sink) const {
 
   sink.insert("junction-deviation", junctionDeviation);
   sink.insert("junction-accel", junctionAccel);
-  sink.insert("min-junction-length", minJunctionLength);
 
   sink.beginInsert("min-soft-limit");
   minSoftLimit.write(sink);
