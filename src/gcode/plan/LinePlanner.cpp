@@ -472,7 +472,7 @@ unsigned LinePlanner::blendSegments(double arcError, double arcAngle,
 
 void LinePlanner::blend(LineCommand *next, LineCommand *prev,
                         double lastSpeed, int lastLine) {
-  if (!next->isCompatible(*prev)) return;
+  if (!next->isCompatible(*prev) || !prev->getExitVelocity()) return;
 
   // Compute arc between segments given the allowed error
   double error = config.maxMergeError * 0.99;
@@ -559,7 +559,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
 
     LineCommand *lc =
       new LineCommand(getNextID(), start, target, prev->feed, prev->rapid,
-                      prev->seeking, false, config);
+                      false, false, config);
 
     lc->targetJunctionVel =
       computeJunctionVelocity(center - v, radius * epsilon);
