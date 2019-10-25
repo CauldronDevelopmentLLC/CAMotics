@@ -33,22 +33,25 @@ namespace GCode {
 
   class PlannerCommand : public cb::JSON::Serializable {
   public:
-    PlannerCommand *next;
-    PlannerCommand *prev;
+    PlannerCommand *next = 0;
+    PlannerCommand *prev = 0;
 
   protected:
     uint64_t id;
-    double velocity;
+    double velocity = std::numeric_limits<double>::max();
+    bool finalized = false;
 
   public:
-    PlannerCommand(uint64_t id) :
-      next(0), prev(0), id(id), velocity(std::numeric_limits<double>::max()) {}
+    PlannerCommand(uint64_t id) : id(id) {}
     virtual ~PlannerCommand() {}
 
     virtual const char *getType() const = 0;
 
     uint64_t getID() const {return id;}
     void setID(uint64_t id) {this->id = id;}
+
+    bool isFinal() const {return finalized;}
+    void setFinal() {finalized = true;}
 
     virtual bool isSeeking() const {return false;}
     virtual bool isMove() const {return false;}

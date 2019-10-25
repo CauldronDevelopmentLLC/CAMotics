@@ -117,6 +117,7 @@ namespace GCode {
     double peakAccelFromLength(double Vi, double jerk, double length) const;
     double peakVelocity(double Vi, double maxAccel, double maxJerk,
                         double length) const;
+    double speedUp(PlannerCommand *cmd, double Vi) const;
     double computeLength(double Vi, double Vt, double maxAccel,
                          double maxJerk) const;
     double planVelocityTransition(double Vi, double Vt, double maxAccel,

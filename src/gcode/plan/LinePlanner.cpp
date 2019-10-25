@@ -623,6 +623,9 @@ void LinePlanner::enqueue(LineCommand *lc, bool rapid) {
 
 
 bool LinePlanner::isFinal(PlannerCommand *cmd) const {
+  if (cmd->isFinal()) return true;
+  PlannerCommand *start = cmd;
+
   // Set commands are only final if they are followed by a non-set command
   if (dynamic_cast<SetCommand *>(cmd)) {
     for (PlannerCommand *c = cmd; c; c = c->next)
@@ -632,18 +635,45 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
   }
 
   double velocity = cmd->getExitVelocity();
-  if (!velocity) return true;
+  if (velocity <= Math::nextUp(0)) return true;
 
   // Check if there is enough velocity change in the following blocks to
   // deccelerate to zero if necessary.
   unsigned count = 0;
   while (cmd->next) {
     cmd = cmd->next;
-    velocity -= cmd->getDeltaVelocity();
 
+    velocity -= cmd->getDeltaVelocity();
     if (velocity <= Math::nextUp(0)) return true;
-    if (config.maxLookahead <= ++count)
+
+    if (config.maxLookahead <= ++count) {
+      // We reached our limit, try to plan speed up from zero back to start
+      velocity = 0;
+      count = 0;
+
+      while (cmd != start) {
+        velocity = speedUp(cmd, velocity);
+        cmd = cmd->prev;
+        count++;
+
+        if (cmd->getExitVelocity() <= velocity) {
+          LOG_DEBUG(3, "Hit lookahead limit but successfuly planed reverse "
+                    "speed up from zero to " << cmd->getExitVelocity()
+                    << " in " << count << " moves");
+
+          // Mark intervening commands final
+          while (cmd != start) {
+            cmd->setFinal();
+            cmd = cmd->prev;
+          }
+
+          cmd->setFinal();
+          return true;
+        }
+      }
+
       THROW("Planner exceeded max lookahead (" << config.maxLookahead << ")");
+    }
   }
 
   return false;
@@ -1006,6 +1036,49 @@ double LinePlanner::peakVelocity(double Vi, double maxAccel, double maxJerk,
             << (maxAccel < peakAccel ? "" : " out") << " constant accel");
 
   return Vp;
+}
+
+
+double LinePlanner::speedUp(PlannerCommand *cmd, double Vi) const {
+  auto *lc = dynamic_cast<LineCommand *>(cmd);
+  if (!lc) return Vi;
+
+  double length = lc->length;
+  double jerk = lc->maxJerk;
+  double maxAccel = lc->maxAccel;
+  double peakAccel = peakAccelFromLength(Vi, jerk, length);
+
+  if (fabs(maxAccel) < Math::nextDown(fabs(peakAccel))) {
+    // With constant accel period
+    double t = maxAccel / jerk;
+    double v = Vi + SCurve::velocity(t, 0, jerk);
+    length -= SCurve::distance(t, Vi, 0, jerk);
+
+    // Find time of constant accel period (T) by solving:
+    //
+    //  v * T + 1/2 * a * T^2 + vh * T + 1/2 * a * t^2 - 1/6 * j * t^3 = L
+    //
+    // Where:
+    //
+    //  a  = maxAccel
+    //  j  = jerk;
+    //  vh = t * a
+    //
+    // This reduces to the quadratic equation:
+    //
+    //  A * T^2 + B * T + C = 0
+
+    double A = 0.5 * maxAccel;
+    double B = v + maxAccel * t;
+    double C = 2.0 / 3.0 * maxAccel * t * t - length;
+    double T = (-B + sqrt(B * B - 4 * A * C)) / (2 * A);
+
+    return v + SCurve::velocity(T, maxAccel, 0);
+  }
+
+  double t = peakAccel / jerk;
+  return
+    Vi + SCurve::velocity(t, 0, jerk) + SCurve::velocity(t, peakAccel, -jerk);
 }
 
 
