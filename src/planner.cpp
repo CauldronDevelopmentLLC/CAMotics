@@ -114,13 +114,12 @@ public:
 
         } else if (type == "set") {
           string name = e->getString("name");
-          double value = e->getNumber("value");
 
           if (name == "_feed")
-            cout << 'F' << String(value, precision) << '\n';
-          else if (name == "tool") cout << "M6 T" << (unsigned)value << '\n';
+            cout << 'F' << String(e->getNumber("value"), precision) << '\n';
+          else if (name == "tool") cout << "M6 T" << e->getU32("value") << '\n';
           else if (name == "speed")
-            cout << 'S' << String(value, precision) << '\n';
+            cout << 'S' << String(e->getNumber("value"), precision) << '\n';
         }
 
         // TODO support other GCode output
