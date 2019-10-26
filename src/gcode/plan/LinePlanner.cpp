@@ -612,9 +612,11 @@ void LinePlanner::enqueue(LineCommand *lc, bool rapid) {
 
     // Save last speed to synchronize with merged move
     SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
-    if (sc && sc->getName() == "speed" && (!rapid || !config.rapidAutoOff))
+    if (!sc) break;
+    if (sc->getName() == "speed" && (!rapid || !config.rapidAutoOff))
       lastSpeed = sc->getValue().getNumber();
-    if (sc && sc->getName() == "line") lastLine = sc->getValue().getS32();
+    else if (sc->getName() == "line") lastLine = sc->getValue().getS32();
+    else break;
   }
 
   // Add the move
