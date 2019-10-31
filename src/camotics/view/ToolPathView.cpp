@@ -153,7 +153,7 @@ void ToolPathView::update(bool intensity) {
   double maxSpeed = 0;
   if (intensity && !path.isNull())
     for (auto it = path->begin(); it != path->end(); it++)
-      if (maxSpeed < it->getSpeed()) maxSpeed = it->getSpeed();
+      if (maxSpeed < fabs(it->getSpeed())) maxSpeed = fabs(it->getSpeed());
 
   // Find position on path
   if (!path.isNull())
@@ -197,7 +197,7 @@ void ToolPathView::update(bool intensity) {
       currentDistance += moveDistance;
 
       // Store GL data
-      double s = (intensity && maxSpeed) ? move.getSpeed() / maxSpeed : 1;
+      double s = (intensity && maxSpeed) ? fabs(move.getSpeed()) / maxSpeed : 1;
       Color color = getColor(move.getType(), s);
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
@@ -222,7 +222,7 @@ void ToolPathView::update(bool intensity) {
     if (!colorVBuf) glFuncs.glGenBuffers(1, &colorVBuf);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
     glFuncs.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
-                          &colors[0], GL_STATIC_DRAW);
+                         &colors[0], GL_STATIC_DRAW);
     glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
     colors.clear();
   }
