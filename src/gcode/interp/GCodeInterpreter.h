@@ -39,6 +39,8 @@ namespace GCode {
   protected:
     Controller &controller;
 
+    std::vector<cb::SmartPointer<std::ostream> > log;
+
   public:
     GCodeInterpreter(Controller &controller);
 
@@ -49,6 +51,8 @@ namespace GCode {
     virtual void execute(const Code &code, int vars);
 
     void specialComment(const std::string text);
+    std::string interpolate(const std::string &s);
+    std::string canonical(const std::string &name) const;
 
     // From Processor
     void operator()(const cb::SmartPointer<Block> &block);

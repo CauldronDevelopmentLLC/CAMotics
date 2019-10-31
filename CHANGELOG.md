@@ -16,6 +16,8 @@
  - Control max-arc-error with GCode var.
  - Implemented path modes G61, G61.1 & G64 with naive CAM but not blending, yet.
  - Handle LASER intensity correctly for M4 as well as M3.
+ - Implemented ``(DEBUG,)``, ``(PRINT,)`` & ``(LOG,)`` comments.
+ - Better handling of spaces in GCode named reference.
 
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.

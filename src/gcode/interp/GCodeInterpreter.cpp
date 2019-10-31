@@ -32,6 +32,7 @@
 
 #include <cbang/log/Logger.h>
 #include <cbang/util/SmartFunctor.h>
+#include <cbang/os/SystemUtilities.h>
 
 #include <cctype>
 
@@ -78,8 +79,13 @@ void GCodeInterpreter::specialComment(const string text) {
 
   // Look for special comment code
   string code;
-  while (it != end && *it != ',' && !isspace(*it) && code.length() < 3)
+  while (it != end && *it != ',' && !isspace(*it) && code.length() < 9)
     code.append(1, tolower(*it++));
+
+  // TODO handle PROBE*
+  // See http://linuxcnc.org/docs/html/gcode/overview.html#gcode:comments
+  if (code == "probeopen" && isspace(*it))
+    LOG_WARNING("PROBEOPEN not supported");
 
   // Skip space
   while (it != end && isspace(*it)) it++;
@@ -94,9 +100,96 @@ void GCodeInterpreter::specialComment(const string text) {
     string content(it, end);
 
     if (code == "msg") controller.message(content);
-    // TODO handle DEBUG, PRINT, PROBE* and LOG*
-    // See http://linuxcnc.org/docs/html/gcode/overview.html#gcode:comments
+    else if (code == "debug") controller.message(interpolate(content));
+    else if (code == "print") LOG_INFO(1, interpolate(content));
+    else if (code == "logopen") {
+      try {
+        log.push_back(SystemUtilities::oopen(String::trim(content)));
+      } CATCH_ERROR;
+
+    } else if (code == "logappend") {
+      try {
+        log.push_back(SystemUtilities::open(String::trim(content),
+                                            ios::out | ios::ate));
+      } CATCH_ERROR;
+
+    } else if (code == "logclose") {
+      if (!log.empty()) log.pop_back();
+
+    } else if (code == "log") {
+      if (!log.empty()) *log.back() << interpolate(content) << endl;
+    }
   }
+}
+
+
+string GCodeInterpreter::interpolate(const string &s) {
+  string result;
+
+  enum {
+    SCAN_STATE,
+    HASH_STATE,
+    NUM_STATE,
+    NAME_STATE,
+  } state = SCAN_STATE;
+
+  string::const_iterator refStart;
+
+  for (auto it = s.begin(); it != s.end(); it++)
+    switch (state) {
+    case SCAN_STATE:
+      if (*it == '#') {
+        state = HASH_STATE;
+        refStart = it;
+
+      } else result.append(1, *it);
+      break;
+
+    case HASH_STATE:
+      if ('0' <= *it && *it <= '9') state = NUM_STATE;
+      else if (*it == '<') state = NAME_STATE;
+      else {
+        result.append(1, '#');
+
+        if (*it != '#') {
+          result.append(1, *it);
+          state = SCAN_STATE;
+        }
+      }
+      break;
+
+    case NUM_STATE:
+      if (*it < '0' || '9' < *it) {
+        address_t addr = (address_t)String::parseU32(string(refStart + 1, it));
+        result += String(lookupReference(addr));
+        state = SCAN_STATE;
+      }
+      break;
+
+    case NAME_STATE:
+      if (*it == '>') {
+        string name(refStart + 2, it);
+
+        if (hasReference(name)) result += String(lookupReference(name));
+        else result.append(1, '#');
+
+        state = SCAN_STATE;
+      }
+      break;
+    }
+
+  if (state == NUM_STATE) {
+    address_t addr = (address_t)String::parseU32(string(refStart + 1, s.end()));
+    result += String(lookupReference(addr));
+
+  } else if (state != SCAN_STATE) result += string(refStart, s.end());
+
+  return result;
+}
+
+
+string GCodeInterpreter::canonical(const string &name) const {
+  return String::replace(String::toLower(name), " ", "");
 }
 
 
@@ -272,10 +365,10 @@ double GCodeInterpreter::lookupReference(address_t addr) {
 
 
 double GCodeInterpreter::lookupReference(const string &name) {
-  return controller.get(name);
+  return controller.get(canonical(name));
 }
 
 
 bool GCodeInterpreter::hasReference(const string &name) {
-  return controller.has(name);
+  return controller.has(canonical(name));
 }

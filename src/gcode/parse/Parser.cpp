@@ -423,9 +423,6 @@ SmartPointer<Entity> Parser::reference() {
     while (tokenizer->getType() != TokenType::CANGLE_TOKEN)
       id += tokenizer->advance().getValue();
 
-    id = String::replace(String::toLower(id), " ", "");
-    if (id.empty()) THROW("Reference name cannot be empty");
-
     tokenizer->match(TokenType::CANGLE_TOKEN);
 
     return scope.set(new NamedReference(id));

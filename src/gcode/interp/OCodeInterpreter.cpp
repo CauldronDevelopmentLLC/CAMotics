@@ -424,7 +424,7 @@ void OCodeInterpreter::setReference(const string &name, double value) {
 
   else {
     LOG_DEBUG(3, "Set local variable #<" << name << "> = " << value);
-    stack.back().names[name] = value; // Local variable assignment
+    stack.back().names[canonical(name)] = value; // Local variable assignment
   }
 }
 
@@ -441,7 +441,7 @@ double OCodeInterpreter::lookupReference(address_t addr) {
 double OCodeInterpreter::lookupReference(const string &name) {
   if (name[0] != '_' && !stack.empty()) {
     auto &nameMap = stack.back().names;
-    auto it = nameMap.find(name);
+    auto it = nameMap.find(canonical(name));
     if (it != nameMap.end()) return it->second;
     THROW("Local reference to '" << name << "' not found");
   }
