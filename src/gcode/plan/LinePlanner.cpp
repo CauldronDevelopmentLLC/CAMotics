@@ -474,11 +474,15 @@ unsigned LinePlanner::blendSegments(double arcError, double arcAngle,
 
 void LinePlanner::blend(LineCommand *next, LineCommand *prev,
                         double lastSpeed, int lastLine) {
-  if (!next->canBlend() || !prev->canBlend()) return;
+  if (!next->canBlend() || !prev->canBlend() || next->rapid != prev->rapid)
+    return;
+
+  // Don't blend nearly colinear segments
+  double intersectAngle = fabs(next->unit.angleBetween(-prev->unit));
+  if (M_PI * 0.95 < intersectAngle) return;
 
   // Compute arc between segments given the allowed error
   double error = config.maxMergeError * 0.99;
-  double intersectAngle = fabs(next->unit.angleBetween(-prev->unit));
   double sinHalfAngle = sin(intersectAngle / 2);
   double cosHalfAngle = cos(intersectAngle / 2);
   double radius = error * (sinHalfAngle / (1 - sinHalfAngle));
