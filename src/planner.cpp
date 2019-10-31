@@ -37,10 +37,34 @@ using namespace cb;
 using namespace GCode;
 
 
+namespace {
+  void readJSONPosition(const JSON::Value &data, Axes &p) {
+    for (const char *axis = Axes::AXES; *axis; axis++) {
+      string axisName = string(1, tolower(*axis));
+
+      if (data.hasNumber(axisName))
+        p.set(*axis, data.getNumber(axisName));
+    }
+  }
+
+
+  void printMove(const char *code, const JSON::Value &data, const Axes &p,
+                 double precision) {
+    cout << code;
+
+    for (const char *axis = Axes::AXES; *axis; axis++)
+      if (data.hasNumber(string(1, tolower(*axis))))
+        cout << ' ' << *axis << String(p.get(*axis), precision);
+  }
+}
+
+
 class PlannerApp : public CAMotics::Application {
   PlannerConfig config;
   bool gcode = false;
   unsigned precision = 4;
+
+  double lastSpeed = 0;
 
 public:
   PlannerApp() :
@@ -77,6 +101,18 @@ public:
   }
 
 
+  void updateSpeed(double speed) {
+    if (speed == lastSpeed) return;
+
+    if (0 < speed && lastSpeed <= 0) cout << "M3 ";
+    else if (speed < 0 && 0 <= lastSpeed) cout << "M4 ";
+    else if (speed == 0 && lastSpeed) cout << "M5";
+    lastSpeed = speed;
+
+    if (speed) cout << 'S' << String(fabs(speed), precision);
+  }
+
+
   // From cb::Reader
   void read(const InputSource &source) {
     Planner planner;
@@ -86,6 +122,9 @@ public:
     if (!gcode) writer = new JSON::Writer(cout, 0, false, 2, precision);
 
     if (writer.isSet()) writer->beginList();
+
+    Axes position;
+    lastSpeed = 0;
 
     while (!shouldQuit() && planner.hasMore()) {
       uint64_t id;
@@ -100,16 +139,28 @@ public:
 
         string type = e->getString("type");
         if (type == "line") {
-          if (e->getBoolean("rapid", false)) cout << "G0";
-          else cout << "G1";
-
+          const char *code = e->getBoolean("rapid", false) ? "G0" : "G1";
           auto t = e->get("target");
-          for (const char *axis = Axes::AXES; *axis; axis++) {
-            string axisName = string(1, tolower(*axis));
-            if (t->hasNumber(axisName))
-              cout << ' ' << *axis << String(t->getNumber(axisName), precision);
+          Axes target = position;
+          readJSONPosition(*t, target);
+
+          if (e->hasList("speeds")) {
+            Axes unit = (target - position).normalize();
+            auto speeds = e->get("speeds");
+
+            for (unsigned i = 0; i < speeds->size(); i++) {
+              double offset = speeds->get(i)->getNumber(0);
+              double speed = speeds->get(i)->getNumber(1);
+
+              printMove(code, *t, position + unit * offset, precision);
+              cout << '\n';
+              updateSpeed(speed);
+              cout << '\n';
+            }
           }
 
+          position = target;
+          printMove(code, *t, position, precision);
           cout << '\n';
 
         } else if (type == "set") {
@@ -118,8 +169,11 @@ public:
           if (name == "_feed")
             cout << 'F' << String(e->getNumber("value"), precision) << '\n';
           else if (name == "tool") cout << "M6 T" << e->getU32("value") << '\n';
-          else if (name == "speed")
-            cout << 'S' << String(e->getNumber("value"), precision) << '\n';
+
+          else if (name == "speed") {
+            updateSpeed(e->getNumber("value"));
+            cout << '\n';
+          }
         }
 
         // TODO support other GCode output

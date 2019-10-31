@@ -126,6 +126,7 @@ void LinePlanner::stop() {
   reset();
   nextID = 1;
   cmds.clear();
+  pre.clear();
   out.clear();
 }
 
@@ -361,8 +362,9 @@ template <typename T>
 void LinePlanner::pushSetCommand(const string &name, const T &_value) {
   SmartPointer<JSON::Value> value = JSON::Factory().create(_value);
 
-  // Merge with previous command if possible
-  for (PlannerCommand *cmd = cmds.back(); cmd; cmd = cmd->prev) {
+  // Merge with previous set command if possible
+  auto cmd = pre.empty() ? cmds.back() : pre.back();
+  for (; cmd; cmd = cmd->prev) {
     SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
     if (!sc) break;
     if (sc->getName() == name) {
@@ -392,10 +394,10 @@ void LinePlanner::push(PlannerCommand *cmd) {
     plan(cmd);
   }
 
-  // Flush command when in exact stop mode, exit velocity is zero or unmergable.
+  // Flush command when in exact stop mode, exit velocity is zero or unmergable
   auto lc = dynamic_cast<LineCommand *>(cmd);
   if (config.pathMode != EXACT_STOP_MODE && cmd->getExitVelocity() &&
-      (!lc || lc->canMerge()) && (lc || !flush))
+      (!lc || lc->canMerge()) && (lc || !flush) && (!sc || !pre.empty()))
     pre.push_back(cmd);
 
   else {
@@ -619,9 +621,13 @@ void LinePlanner::enqueue(LineCommand *lc, bool rapid) {
     // Save last speed to synchronize with merged move
     SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
     if (!sc) break;
-    if (sc->getName() == "speed" && (!rapid || !config.rapidAutoOff))
+    if (sc->getName() == "speed" && isnan(lastSpeed) &&
+        (!rapid || !config.rapidAutoOff))
       lastSpeed = sc->getValue().getNumber();
-    else if (sc->getName() == "line") lastLine = sc->getValue().getS32();
+
+    else if (sc->getName() == "line" && lastLine == -1)
+      lastLine = sc->getValue().getS32();
+
     else break;
   }
 
