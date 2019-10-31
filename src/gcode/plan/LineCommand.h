@@ -67,7 +67,8 @@ namespace GCode {
                 bool rapid, bool seeking, bool first,
                 const PlannerConfig &config);
 
-    bool isCompatible(const LineCommand &lc) const;
+    bool canBlend() const;
+    bool canMerge() const;
 
     // From PlannerCommand
     const char *getType() const {return "line";}

@@ -296,11 +296,12 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
                                     seeking, firstMove, config);
 
   // Update state
-  firstMove = false;
   seeking = false;
+  firstMove = false;
 
   // Null or short move
   if (lc->length < config.minTravel) {
+    if (lc->seeking) THROW("Seeking move too short");
     delete lc;
     return;
   }
@@ -391,9 +392,10 @@ void LinePlanner::push(PlannerCommand *cmd) {
     plan(cmd);
   }
 
-  // Flush all commands when in exact stop mode
-  if (config.pathMode != EXACT_STOP_MODE &&
-      (!flush || dynamic_cast<LineCommand *>(cmd)))
+  // Flush command when in exact stop mode, exit velocity is zero or unmergable.
+  auto lc = dynamic_cast<LineCommand *>(cmd);
+  if (config.pathMode != EXACT_STOP_MODE && cmd->getExitVelocity() &&
+      (!lc || lc->canMerge()) && (lc || !flush))
     pre.push_back(cmd);
 
   else {
@@ -472,7 +474,7 @@ unsigned LinePlanner::blendSegments(double arcError, double arcAngle,
 
 void LinePlanner::blend(LineCommand *next, LineCommand *prev,
                         double lastSpeed, int lastLine) {
-  if (!next->isCompatible(*prev) || !prev->getExitVelocity()) return;
+  if (!next->canBlend() || !prev->canBlend()) return;
 
   // Compute arc between segments given the allowed error
   double error = config.maxMergeError * 0.99;

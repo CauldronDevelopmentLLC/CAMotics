@@ -50,13 +50,16 @@ double LineCommand::getTime() const {
 }
 
 
-bool LineCommand::isCompatible(const LineCommand &lc) const {
-  // Not compatible for merge or blend if any of the ABC or UVW axes are moving
+bool LineCommand::canBlend() const {
+  // Not compatible for blend if any of the ABC or UVW axes are moving
   for (unsigned i = 3; i < 9; i++)
-    if (unit[i] != lc.unit[i]) return false;
+    if (unit[i]) return false;
 
-  return lc.rapid == rapid && lc.seeking == seeking && lc.first == first;
+  return !seeking;
 }
+
+
+bool LineCommand::canMerge() const {return !seeking;}
 
 
 namespace {
@@ -76,8 +79,8 @@ namespace {
 
 bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
                         double speed) {
-  // Check if moves are compatible
-  if (!isCompatible(lc)) return false;
+  // Check if merge is possible
+  if (rapid != lc.rapid || !canMerge() || !lc.canMerge()) return false;
 
   // Check if too many merges have already been made
   if (63 < merged.size()) return false;
