@@ -69,6 +69,7 @@ namespace GCode {
 
   public:
     OCodeInterpreter(Controller &controller);
+    ~OCodeInterpreter() {ProducerStack::unwind();}
 
     const cb::SmartPointer<Program> &
     lookupSubroutine(const std::string &name) const;
