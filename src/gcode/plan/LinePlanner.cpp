@@ -539,7 +539,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
     center = c1;
   else center = c2;
 
-  // Increase the radius so the line segments straddle the actual helix
+  // Increase the radius so the line segments straddle the actual arc
   double alpha = cos(segAngle / 2);
   double epsilon = 1 + (1 - alpha) / (1 + alpha);
 
