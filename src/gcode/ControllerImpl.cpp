@@ -205,27 +205,33 @@ void ControllerImpl::setPathMode(path_mode_t mode, double motionBlending,
 }
 
 
+double ControllerImpl::getAxisCSOffset(char axis, unsigned cs) const {
+  if (!cs) cs = get(CURRENT_COORD_SYSTEM);
+  return get(COORD_SYSTEM_ADDR(cs, Axes::toIndex(axis)));
+}
+
+
+double ControllerImpl::getAxisToolOffset(char axis) const {
+  return state.toolLengthComp ? get(TOOL_OFFSET_ADDR(Axes::toIndex(axis))) : 0;
+}
+
+
+double ControllerImpl::getAxisGlobalOffset(char axis) const {
+  return get(GLOBAL_OFFSETS_ENABLED) ?
+    get(GLOBAL_OFFSET_ADDR(Axes::toIndex(axis))) : 0;
+}
+
+
 double ControllerImpl::getAxisOffset(char axis) const {
   if (absoluteCoords) return 0; // Only set with G0 and G1 moves
 
-  unsigned axisIndex = Axes::toIndex(axis);
-
-  // Coordinate system offset
-  double offset = get(COORD_SYSTEM_ADDR(get(CURRENT_COORD_SYSTEM), axisIndex));
-
-  // Tool offset
-  if (state.toolLengthComp)
-    offset += get(TOOL_OFFSET_ADDR(axisIndex), getUnits());
-
-  // Global offset
-  if (get(GLOBAL_OFFSETS_ENABLED)) offset += get(GLOBAL_OFFSET_ADDR(axisIndex));
-
-  return offset;
+  return getAxisCSOffset(axis) + getAxisToolOffset(axis) +
+    getAxisGlobalOffset(axis);
 }
 
 
 double ControllerImpl::getAxisPosition(char axis) const {
-  return getAxisAbsolutePosition(axis) + getAxisOffset(axis);
+  return getAxisAbsolutePosition(axis) - getAxisOffset(axis);
 }
 
 
@@ -234,15 +240,15 @@ double ControllerImpl::getAxisAbsolutePosition(char axis) const {
 }
 
 
-void ControllerImpl::setAxisAbsolutePosition(char axis, double pos,
+void ControllerImpl::setAxisAbsolutePosition(char axis, double abs,
                                              Units units) {
   double scale = 1;
   if (units == METRIC && getUnits() == IMPERIAL) scale = 1.0 / 25.4;
   else if (units == IMPERIAL && getUnits() == METRIC) scale = 25.4;
 
-  position.set(axis, pos * scale);
+  position.set(axis, abs * scale);
 
-  pos += getAxisOffset(axis);
+  double pos = abs - getAxisOffset(axis);
   set(CURRENT_COORD_ADDR(Axes::toIndex(axis)), pos, units);
   set("_" + string(1, tolower(axis)), pos, units);
 }
@@ -277,7 +283,7 @@ Axes ControllerImpl::getNextAbsolutePosition(int vars, bool incremental) const {
       double pos = getVar(*axis);
 
       if (incremental) pos += getAxisAbsolutePosition(*axis);
-      else pos -= getAxisOffset(*axis);
+      else pos += getAxisOffset(*axis);
 
       position.set(*axis, pos);
 
@@ -308,7 +314,7 @@ void ControllerImpl::makeMove(int axes, bool rapid, bool incremental) {
 
 void ControllerImpl::moveAxis(char axis, double value, bool rapid) {
   Axes pos = getAbsolutePosition();
-  pos.set(axis, value - getAxisOffset(axis));
+  pos.set(axis, value + getAxisOffset(axis));
   move(pos, getVarType(axis), rapid);
 }
 
@@ -376,8 +382,8 @@ void ControllerImpl::arc(int vars, bool clockwise) {
                  (vars & getVarType(offsets[1])) ? getVar(offsets[1]) : 0);
       center = start + offset;
 
-    } else center = Vector2D(getVar(offsets[0]) + getAxisOffset(axes[0]),
-                             getVar(offsets[1]) + getAxisOffset(axes[1]));
+    } else center = Vector2D(getVar(offsets[0]) - getAxisOffset(axes[0]),
+                             getVar(offsets[1]) - getAxisOffset(axes[1]));
 
     // Check that the radius matches
     radius = start.distance(center);
@@ -531,16 +537,19 @@ void ControllerImpl::pause(pause_t type) {
 }
 
 
-void ControllerImpl::setTools(int vars, bool relative, bool coords) {
+void ControllerImpl::setTools(int vars, bool relative, bool cs9) {
   Tool &tool = getTool(getVar('P'));
 
   for (const char *v = Tool::VARS; *v; v++)
     if (vars & getVarType(*v)) {
       double offset = getVar(*v);
 
-      if (getVarType(*v) & VT_AXIS) {
-        if (relative) offset -= getAxisOffset(*v);
-        else if (coords) offset -= getAxisPosition(*v);
+      // G10 L10 & L11
+      if (relative && (getVarType(*v) & VT_AXIS)) {
+        unsigned cs = cs9 ? 9 : get(CURRENT_COORD_SYSTEM);
+
+        offset = getAxisAbsolutePosition(*v) - getAxisCSOffset(*v, cs) -
+          (cs9 ? 0 : getAxisGlobalOffset(*v)) - offset;
       }
 
       tool.set(*v, offset);
@@ -612,23 +621,23 @@ void ControllerImpl::setCoordSystemOffsets(int vars, bool relative) {
   if (!cs) cs = get(CURRENT_COORD_SYSTEM);
 
   if (vars & VarTypes::VT_R) {
-    address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
-    set(addr, getVar('R'), NO_UNITS);
+    if (relative) LOG_WARNING("R not allowed in G10 L20");
+    else {
+      address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
+      set(addr, getVar('R'), NO_UNITS);
+    }
   }
 
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (vars & getVarType(*axis)) {
-      double offset = getVar(*axis);
-      if (relative) offset -= getAxisPosition(*axis);
-
       address_t addr = COORD_SYSTEM_ADDR(cs, Axes::toIndex(*axis));
+      double offset = getVar(*axis);
+
+      if (relative)
+        offset = getAxisPosition(*axis) + getAxisCSOffset(*axis) - offset;
+
       set(addr, offset, getUnits());
     }
-}
-
-
-double ControllerImpl::getAxisGlobalOffset(char axis) const {
-  return get(GLOBAL_OFFSET_ADDR(Axes::toIndex(axis)));
 }
 
 
@@ -637,14 +646,16 @@ void ControllerImpl::setAxisGlobalOffset(char axis, double offset) {
 }
 
 
-void ControllerImpl::setGlobalOffsets(int vars) {
+void ControllerImpl::setGlobalOffsets(int vars, bool relative) {
   set(GLOBAL_OFFSETS_ENABLED, 1, NO_UNITS);
 
   // Make the current point have the coordinates specified, without motion
   for (const char *axis = Axes::AXES; *axis; axis++)
     if (getVarType(*axis) & vars) {
-      double diff = getAxisPosition(*axis) - getVar(*axis);
-      setAxisGlobalOffset(*axis, getAxisGlobalOffset(*axis) - diff);
+      double offset = getVar(*axis);
+      if (relative)
+        offset = getAxisPosition(*axis) + getAxisGlobalOffset(*axis) - offset;
+      setAxisGlobalOffset(*axis, offset);
     }
 }
 
@@ -674,7 +685,7 @@ void ControllerImpl::updateOffsetParams() {
     if (!has(name) || offset != get(name)) {
       set(name, offset, getUnits());
 
-      double position = getAxisAbsolutePosition(*axis) + offset;
+      double position = getAxisPosition(*axis);
       address_t addr = CURRENT_COORD_ADDR(Axes::toIndex(*axis));
       set(addr, position, getUnits());
       set("_" + string(1, tolower(*axis)), position, getUnits());
@@ -974,13 +985,17 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 80: state.latheDiameterMode = false; break; // Radius mode
 
     case 100:
-      switch ((unsigned)getVar('L')) {
-      case 1:  setTools(vars, false, false); break;
-      case 2:  setCoordSystemOffsets(vars, false); break;
-      case 10: setTools(vars, true, false); break;
-      case 11: setTools(vars, false, true); break;
-      case 20: setCoordSystemOffsets(vars, true);  break;
-      }
+      if (VT_L & vars)
+        switch ((unsigned)getVar('L')) {
+        case 1:  setTools(vars, false, false); break;
+        case 2:  setCoordSystemOffsets(vars, false); break;
+        case 10: setTools(vars, true, false); break;
+        case 11: setTools(vars, true, true); break;
+        case 20: setCoordSystemOffsets(vars, true); break;
+        default: LOG_WARNING("G10 with unsupported L code " << getVar('L'));
+        }
+
+      else LOG_WARNING("G10 with out L code");
       break;
 
     case 170: setPlane(XY); break;
@@ -1042,7 +1057,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 432: loadToolOffsets(getVar('H'), true); break;
     case 490: state.toolLengthComp = false; break;
 
-    case 520: setGlobalOffsets(vars); break; // Same as G92
+    case 520: setGlobalOffsets(vars, false); break;
     case 530: state.moveInAbsoluteCoords = true;  break;
     case 540: setCoordSystem(1); break;
     case 550: setCoordSystem(2); break;
@@ -1100,10 +1115,10 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 910: state.incrementalDistanceMode    = true;  break;
     case 911: state.arcIncrementalDistanceMode = true;  break;
 
-    case 920: setGlobalOffsets(vars);    break;
-    case 921: resetGlobalOffsets(true);  break;
-    case 922: resetGlobalOffsets(false); break;
-    case 923: restoreGlobalOffsets();    break;
+    case 920: setGlobalOffsets(vars, true); break;
+    case 921: resetGlobalOffsets(true);     break;
+    case 922: resetGlobalOffsets(false);    break;
+    case 923: restoreGlobalOffsets();       break;
 
     case 930: setFeedMode(INVERSE_TIME);         break;
     case 940: setFeedMode(UNITS_PER_MINUTE);     break;

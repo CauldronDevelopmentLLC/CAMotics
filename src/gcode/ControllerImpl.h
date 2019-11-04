@@ -126,6 +126,9 @@ namespace GCode {
                      double naiveCAM = 0);
 
     // Position
+    double getAxisCSOffset(char axis, unsigned cs = 0) const;
+    double getAxisToolOffset(char axis) const;
+    double getAxisGlobalOffset(char axis) const;
     double getAxisOffset(char axis) const;
     double getAxisPosition(char axis) const;
     double getAxisAbsolutePosition(char axis) const;
@@ -152,7 +155,7 @@ namespace GCode {
     // Tool
     Tool &getTool(unsigned tool) {return tools.get(tool);}
     unsigned getCurrentTool() const {return (unsigned)get(TOOL_NUMBER);}
-    void setTools(int vars, bool relative, bool coords);
+    void setTools(int vars, bool relative, bool cs9);
     void toolChange();
     void loadToolOffsets(unsigned tool, bool add);
     void loadToolVarOffsets(int vars);
@@ -164,9 +167,8 @@ namespace GCode {
     // Offsets
     void setCoordSystem(unsigned cs);
     void setCoordSystemOffsets(int vars, bool relative);
-    double getAxisGlobalOffset(char axis) const;
     void setAxisGlobalOffset(char axis, double offset);
-    void setGlobalOffsets(int vars);
+    void setGlobalOffsets(int vars, bool relative);
     void resetGlobalOffsets(bool clear);
     void restoreGlobalOffsets();
     void updateOffsetParams();
