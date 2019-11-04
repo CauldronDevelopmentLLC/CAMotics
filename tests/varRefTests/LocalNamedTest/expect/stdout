@@ -1,0 +1,5 @@
+G21
+(File: <stdin>)
+N6 G0 X10. Y15.
+N11 G0 Z0.
+M2

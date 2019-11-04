@@ -1,0 +1,3 @@
+{
+  "command": "%(suite-dir)s/../../tplang"
+}

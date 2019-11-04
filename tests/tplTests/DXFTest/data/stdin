@@ -1,3 +1,5 @@
+var dxf = require('dxf')
+
 zSafe = 5;
 zCut = -5;
 feed(50);
@@ -15,9 +17,9 @@ function cut_layer(layer) {
     entity = layer[entity];
 
     switch (entity.type) {
-    case POINT: print('point\n'); break;
+    case dxf.POINT: print('point\n'); break;
 
-    case LINE:
+    case dxf.LINE:
       print('(line)\n');
       if (samePos(entity.end.x, entity.end.y))
         cut(entity.start.x, entity.start.y);
@@ -33,9 +35,9 @@ function cut_layer(layer) {
       }
       break;
 
-    case ARC: print('(arc)\n'); break;
+    case dxf.ARC: print('(arc)\n'); break;
 
-    case POLYLINE:
+    case dxf.POLYLINE:
       if (!entity.vertices.length) break;
       print('(polyline)\n');
       v = entity.vertices[0];
@@ -53,16 +55,15 @@ function cut_layer(layer) {
 
       break;
 
-    case SPLINE: print('(spline)\n'); break;
+    case dxf.SPLINE: print('(spline)\n'); break;
     }
   }
 }
 
 
-dxf = open('pattern.dxf');
+layers = dxf.open('pattern.dxf');
 
-for (name in dxf) {
+for (name in layers) {
   print('(Layer: ', name, ')\n');
-  cut_layer(dxf[name]);
+  cut_layer(layers[name]);
 }
-
