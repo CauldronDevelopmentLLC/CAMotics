@@ -1,0 +1,9 @@
+G21
+(File: <stdin>)
+N2 G0 X10. Y10.
+(MSG,CS2.X=-10, CS2.Y=-10)
+(MSG,CS=1, X=10, Y=10)
+(MSG,CS=2, X=20, Y=20)
+N8 G0 X0. Y0.
+N9 G0 X5. Y5.
+M2

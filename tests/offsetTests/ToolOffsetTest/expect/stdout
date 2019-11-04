@@ -1,0 +1,7 @@
+G21
+(File: <stdin>)
+N2 M6 T1
+N3 G0 Z10.
+(MSG,TO.Z=1.5, Z=10)
+N7 G0 Z1.5
+M2
