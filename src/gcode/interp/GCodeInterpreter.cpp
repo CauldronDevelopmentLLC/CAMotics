@@ -162,7 +162,11 @@ string GCodeInterpreter::interpolate(const string &s) {
       if (*it < '0' || '9' < *it) {
         address_t addr = (address_t)String::parseU32(string(refStart + 1, it));
         result += String(lookupReference(addr));
-        state = SCAN_STATE;
+        if (*it == '#') state = HASH_STATE;
+        else {
+          result.append(1, *it);
+          state = SCAN_STATE;
+        }
       }
       break;
 
