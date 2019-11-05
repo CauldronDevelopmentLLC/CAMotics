@@ -25,6 +25,7 @@
 #include <tplang/TPLContext.h>
 #include <tplang/Interpreter.h>
 
+#include <cbang/config.h>
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
 #include <cbang/io/StringInputSource.h>
