@@ -68,6 +68,7 @@ void PlannerConfig::read(const JSON::Value &value) {
   if (value.hasString("path-mode"))
     pathMode = PathMode::parse(value.getString("path-mode"));
   maxMergeError = value.getNumber("max-merge-error", maxMergeError);
+  maxMergeLength = value.getNumber("max-merge-length", maxMergeLength);
   rapidAutoOff = value.getBoolean("rapid-auto-off", rapidAutoOff);
   idBits = value.getU32("id-bits", idBits);
 
@@ -114,6 +115,7 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.insert("min-move-seconds", minMoveSecs);
   sink.insert("path-mode", PathMode(pathMode).toString());
   sink.insert("max-merge-error", maxMergeError);
+  sink.insert("max-merge-length", maxMergeLength);
   sink.insertBoolean("rapid-auto-off", rapidAutoOff);
   sink.insert("id-bits", idBits);
 

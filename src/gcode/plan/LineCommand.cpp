@@ -82,6 +82,9 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
   // Check if merge is possible
   if (rapid != lc.rapid || !canMerge() || !lc.canMerge()) return false;
 
+  if (config.maxMergeLength < lc.length || config.maxMergeLength < length)
+    return false;
+
   // Check if too many merges have already been made
   if (63 < merged.size()) return false;
 

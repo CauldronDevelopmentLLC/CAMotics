@@ -497,7 +497,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
     radius = error * (sinHalfAngle / (1 - sinHalfAngle));
   }
 
-  if (length < config.minTravel) return;
+  if (std::isnan(length) || length < config.minTravel) return;
 
   // Delete intervening commands from pre-plan queue
   while (pre.back() != prev) delete pre.pop_back();
@@ -1015,7 +1015,8 @@ double LinePlanner::peakAccelFromLength(double Vi, double jerk,
   LOG_DEBUG(3, "peakAccelFromLength(" << Vi << ", " << jerk << ", "
             << length << ") = " << Ap);
 
-  if (!isfinite(Ap.real()) || Ap.imag()) THROW("Invalid peak acceleration");
+  if (!isfinite(Ap.real()) || Ap.imag())
+    THROW("Invalid peak acceleration length=" << length);
 
   return Ap.real();
 }
