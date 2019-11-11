@@ -37,12 +37,12 @@ namespace GCode {
     PlannerCommand *prev = 0;
 
   protected:
-    uint64_t id;
+    uint64_t id = ~0;
     double velocity = std::numeric_limits<double>::max();
     bool finalized = false;
 
   public:
-    PlannerCommand(uint64_t id) : id(id) {}
+    PlannerCommand() {}
     virtual ~PlannerCommand() {}
 
     virtual const char *getType() const = 0;

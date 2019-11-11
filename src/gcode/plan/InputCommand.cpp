@@ -24,9 +24,8 @@ using namespace GCode;
 using namespace cb;
 
 
-InputCommand::InputCommand(uint64_t id, port_t port, input_mode_t mode,
-                         double timeout) :
-  PlannerCommand(id), port(port), mode(mode), timeout(timeout) {
+InputCommand::InputCommand(port_t port, input_mode_t mode, double timeout) :
+  port(port), mode(mode), timeout(timeout) {
   if (timeout) setEntryVelocity(0);
 }
 

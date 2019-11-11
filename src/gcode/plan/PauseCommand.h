@@ -30,8 +30,7 @@ namespace GCode {
     pause_t type;
 
   public:
-    PauseCommand(uint64_t id, pause_t type) :
-      PlannerCommand(id), type(type) {}
+    PauseCommand(pause_t type) : type(type) {}
 
     // From PlannerCommand
     const char *getType() const {return "pause";}

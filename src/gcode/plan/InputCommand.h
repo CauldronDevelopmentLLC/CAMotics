@@ -32,7 +32,7 @@ namespace GCode {
     double timeout;
 
   public:
-    InputCommand(uint64_t id, port_t port, input_mode_t mode, double timeout);
+    InputCommand(port_t port, input_mode_t mode, double timeout);
 
     // From PlannerCommand
     const char *getType() const {return "input";}

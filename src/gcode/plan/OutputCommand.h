@@ -31,8 +31,8 @@ namespace GCode {
     double value;
 
   public:
-    OutputCommand(uint64_t id, MachineEnum::port_t port, double value) :
-      PlannerCommand(id), port(port), value(value) {}
+    OutputCommand(MachineEnum::port_t port, double value) :
+      port(port), value(value) {}
 
     // From PlannerCommand
     const char *getType() const {return "output";}

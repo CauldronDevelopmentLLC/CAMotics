@@ -195,7 +195,7 @@ void LinePlanner::start() {
 
 void LinePlanner::end() {
   MachineState::end();
-  push(new EndCommand(getNextID()));
+  push(new EndCommand);
 }
 
 
@@ -239,13 +239,13 @@ void LinePlanner::changeTool(unsigned tool) {pushSetCommand("tool", tool);}
 
 void LinePlanner::input(port_t port, input_mode_t mode, double timeout) {
   MachineState::input(port, mode, timeout);
-  push(new InputCommand(getNextID(), port, mode, timeout));
+  push(new InputCommand(port, mode, timeout));
 }
 
 
 void LinePlanner::seek(port_t port, bool active, bool error) {
   MachineState::seek(port, active, error);
-  push(new SeekCommand(getNextID(), port, active, error));
+  push(new SeekCommand(port, active, error));
   seeking = true;
 }
 
@@ -253,13 +253,13 @@ void LinePlanner::seek(port_t port, bool active, bool error) {
 
 void LinePlanner::output(port_t port, double value) {
   MachineState::output(port, value);
-  push(new OutputCommand(getNextID(), port, value));
+  push(new OutputCommand(port, value));
 }
 
 
 void LinePlanner::dwell(double seconds) {
   MachineState::dwell(seconds);
-  push(new DwellCommand(getNextID(), seconds));
+  push(new DwellCommand(seconds));
 }
 
 
@@ -293,8 +293,8 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   }
 
   // Create line command
-  LineCommand *lc = new LineCommand(getNextID(), start, target, feed, rapid,
-                                    seeking, firstMove, config);
+  LineCommand *lc =
+    new LineCommand(start, target, feed, rapid, seeking, firstMove, config);
 
   // Update state
   seeking = false;
@@ -314,7 +314,7 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
 
 void LinePlanner::pause(pause_t type) {
   MachineState::pause(type);
-  push(new PauseCommand(getNextID(), type));
+  push(new PauseCommand(type));
 }
 
 
@@ -373,7 +373,7 @@ void LinePlanner::pushSetCommand(const string &name, const T &_value) {
     }
   }
 
-  push(new SetCommand(getNextID(), name, value));
+  push(new SetCommand(name, value));
 }
 
 
@@ -390,6 +390,7 @@ void LinePlanner::push(PlannerCommand *cmd) {
   // Flush pre-plan queue
   while (flush && !pre.empty()) {
     PlannerCommand *cmd = pre.pop_front();
+    cmd->setID(getNextID());
     cmds.push_back(cmd);
     plan(cmd);
   }
@@ -401,6 +402,7 @@ void LinePlanner::push(PlannerCommand *cmd) {
     pre.push_back(cmd);
 
   else {
+    cmd->setID(getNextID());
     cmds.push_back(cmd);
     plan(cmd);
   }
@@ -543,7 +545,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
   double alpha = cos(segAngle / 2);
   double epsilon = 1 + (1 - alpha) / (1 + alpha);
 
-  // Compute arc
+  // Compute arc using SLERP
   Vector3D arcStart = (q1 - center) * epsilon;
   Vector3D arcEnd   = (q2 - center) * epsilon;
   Axes start = prev->target;
@@ -566,8 +568,8 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
     target.setXYZ(v);
 
     LineCommand *lc =
-      new LineCommand(getNextID(), start, target, prev->feed, prev->rapid,
-                      false, false, config);
+      new LineCommand(start, target, prev->feed, prev->rapid, false, false,
+                      config);
 
     lc->targetJunctionVel =
       computeJunctionVelocity(center - v, radius * epsilon);
@@ -598,9 +600,6 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
     LineCommand::Speed s(0, speeds.back().speed);
     next->speeds.insert(next->speeds.begin(), s);
   }
-
-  // Fix planner ID of new move
-  next->setID(getNextID());
 }
 
 

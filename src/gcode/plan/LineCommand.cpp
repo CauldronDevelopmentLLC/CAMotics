@@ -36,11 +36,11 @@ using namespace cb;
 using namespace std;
 
 
-LineCommand::LineCommand(uint64_t id, const Axes &start, const Axes &end,
-                         double feed, bool rapid, bool seeking, bool first,
+LineCommand::LineCommand(const Axes &start, const Axes &end, double feed,
+                         bool rapid, bool seeking, bool first,
                          const PlannerConfig &config) :
-  PlannerCommand(id), feed(feed), start(start), target(end), rapid(rapid),
-  seeking(seeking), first(first) {computeLimits(config);}
+  feed(feed), start(start), target(end), rapid(rapid), seeking(seeking),
+  first(first) {computeLimits(config);}
 
 
 double LineCommand::getTime() const {

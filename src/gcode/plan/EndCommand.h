@@ -28,8 +28,6 @@
 namespace GCode {
   class EndCommand : public PlannerCommand {
   public:
-    EndCommand(uint64_t id) : PlannerCommand(id) {}
-
     // From PlannerCommand
     const char *getType() const {return "end";}
     double getEntryVelocity() const {return 0;}

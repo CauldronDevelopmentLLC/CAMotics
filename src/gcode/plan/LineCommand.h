@@ -63,9 +63,8 @@ namespace GCode {
     bool seeking;
     bool first;
 
-    LineCommand(uint64_t id, const Axes &start, const Axes &end, double feed,
-                bool rapid, bool seeking, bool first,
-                const PlannerConfig &config);
+    LineCommand(const Axes &start, const Axes &end, double feed, bool rapid,
+                bool seeking, bool first, const PlannerConfig &config);
 
     bool canBlend() const;
     bool canMerge() const;

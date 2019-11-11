@@ -32,9 +32,8 @@ namespace GCode {
     bool error;
 
   public:
-    SeekCommand(uint64_t id, MachineEnum::port_t port, bool active,
-                bool error) :
-      PlannerCommand(id), port(port), active(active), error(error) {}
+    SeekCommand(MachineEnum::port_t port, bool active, bool error) :
+      port(port), active(active), error(error) {}
 
     // From PlannerCommand
     const char *getType() const {return "seek";}

@@ -31,9 +31,9 @@ namespace GCode {
     cb::SmartPointer<cb::JSON::Value> value;
 
   public:
-    SetCommand(uint64_t id, const std::string &name,
+    SetCommand(const std::string &name,
                const cb::SmartPointer<cb::JSON::Value> &value) :
-      PlannerCommand(id), name(name), value(value) {}
+      name(name), value(value) {}
 
     const std::string &getName() const {return name;}
     const cb::JSON::Value &getValue() const {return *value;}
