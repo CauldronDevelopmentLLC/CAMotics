@@ -108,16 +108,12 @@ void MachineState::setPosition(const Axes &position) {
 
 
 double MachineState::get(address_t addr, Units units) const {
-  if (MAX_ADDRESS <= addr) return 0;
-  double value = convert(params[addr].units, units, params[addr].value);
-  LOG_DEBUG(5, "get(" << addr << ", " << units << ") = " << value);
-  return value;
+  return MAX_ADDRESS <= addr ? 0 : params[addr].get(units);
 }
 
 
 void MachineState::set(address_t addr, double value, Units units) {
-  LOG_DEBUG(5, "set(" << addr << ", " << value << ", " << units << ')');
-  if (addr < MAX_ADDRESS) params[addr] = {value, units};
+  if (addr < MAX_ADDRESS) params[addr].set(value, units);
 }
 
 
@@ -127,21 +123,14 @@ bool MachineState::has(const string &name) const {
 
 
 double MachineState::get(const string &name, Units units) const {
-  named_t::const_iterator it = named.find(name);
-  if (it == named.end()) return 0;
-  double value = convert(it->second.units, units, it->second.value);
-  LOG_DEBUG(5, "get(" << name << ", " << units << ") = " << value);
-  return value;
+  auto it = named.find(name);
+  return it == named.end() ? 0 : it->second.get(units);
 }
 
 
 void MachineState::set(const string &name, double value, Units units) {
-  LOG_DEBUG(5, "set(" << name << ", " << value << ", " << units << ')');
-  named[name] = {value, units};
+  named[name] = Parameter(value, units);
 }
 
 
-void MachineState::clear(const string &name) {
-  LOG_DEBUG(5, "clear(" << name << ')');
-  named.erase(name);
-}
+void MachineState::clear(const string &name) {named.erase(name);}

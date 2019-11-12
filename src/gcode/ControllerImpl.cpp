@@ -38,10 +38,7 @@ using namespace GCode;
 
 
 ControllerImpl::ControllerImpl(MachineInterface &machine,
-                               const ToolTable &tools) :
-  tools(tools), syncState(SYNC_NONE), offsetParamChanged(false),
-  currentMotionMode(10), absoluteCoords(false) {
-
+                               const ToolTable &tools) : tools(tools) {
   state.units                      = this->machine.getUnits();
   state.plane                      = XY;
   state.cutterRadiusComp           = false;
@@ -65,8 +62,8 @@ ControllerImpl::ControllerImpl(MachineInterface &machine,
   state.feedOverride               = 0;
   state.adaptiveFeed               = false;
   state.feedHold                   = false;
-  state.motionBlendingTolerance    = 0;
-  state.naiveCamTolerance          = 0;
+  state.motionBlendingTolerance    = -1;
+  state.naiveCamTolerance          = -1;
   state.moveInAbsoluteCoords       = false;
 
   this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
@@ -845,8 +842,8 @@ void ControllerImpl::restoreModalState() {
   setSpeed(state.speed);
   setMistCoolant(state.mist);
   setFloodCoolant(state.flood);
-  //setPathMode(state.pathMode, state.motionBlendingTolerance,
-  //            state.naiveCamTolerance);
+  setPathMode(state.pathMode, state.motionBlendingTolerance,
+              state.naiveCamTolerance);
 }
 
 
@@ -1073,11 +1070,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 611: setPathMode(EXACT_STOP_MODE); break;
 
     case 640: {
-      double p = vars & VT_P ? getVar('P') : 0;
-      double q = vars & VT_Q ? getVar('Q') : 0;
-      if ((vars & VT_P) && !(vars & VT_Q)) q = p;
-      if (!(vars & VT_P) && !(vars & VT_Q)) q = -1; // Not controlled
-
+      double p = vars & VT_P ? getVar('P') : -1;
+      double q = vars & VT_Q ? getVar('Q') : p;
       setPathMode(CONTINUOUS_MODE, p, q);
       break;
     }

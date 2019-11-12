@@ -135,7 +135,8 @@ void LineCommand::restart(const Axes &position, const PlannerConfig &config) {
 void LineCommand::insert(JSON::Sink &sink) const {
   sink.insertDict("target", true);
   for (unsigned i = 0; i < target.getSize(); i++)
-    if (unit[i]) sink.insert(Axes::toAxisName(i, true), target[i]);
+    if (target[i] != start[i])
+      sink.insert(Axes::toAxisName(i, true), target[i]);
   sink.endDict();
 
   sink.insert("entry-vel", entryVel);

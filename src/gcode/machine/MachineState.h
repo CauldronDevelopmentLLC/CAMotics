@@ -24,6 +24,7 @@
 #include "MachineInterface.h"
 
 #include <gcode/Addresses.h>
+#include <gcode/Parameter.h>
 
 #include <map>
 
@@ -44,14 +45,8 @@ namespace GCode {
     Transforms transforms;
 
     // Numbered and named parameters
-    typedef struct {
-      double value;
-      Units::enum_t units;
-    } param_t;
-
-    param_t params[MAX_ADDRESS];
-    typedef std::map<std::string, param_t> named_t;
-    named_t named;
+    Parameter params[MAX_ADDRESS];
+    std::map<std::string, Parameter> named;
 
     cb::LocationRange location;
 

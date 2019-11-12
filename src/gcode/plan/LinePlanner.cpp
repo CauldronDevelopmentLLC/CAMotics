@@ -109,8 +109,10 @@ uint64_t LinePlanner::next(JSON::Sink &sink) {
   out.push_back(cmds.pop_front());
   lastExitVel = cmd->getExitVelocity();
 
-  time += cmd->getTime();
-  distance += cmd->getLength();
+  if (!cmd->isSeeking()) {
+    time += cmd->getTime();
+    distance += cmd->getLength();
+  }
 
   return cmd->getID();
 }
@@ -227,9 +229,11 @@ void LinePlanner::setPathMode(path_mode_t mode, double motionBlending,
   config.pathMode = mode;
 
   if (mode == CONTINUOUS_MODE) {
-    // Note, naiveCAM < 0 means keep previous value
-    if (0 <= naiveCAM) config.maxMergeError = naiveCAM;
-    // TODO Motion blending
+    // Note, value < 0 means keep previous value
+    if (0 <= naiveCAM)
+      config.maxMergeError =
+        naiveCAM < config.minMergeError ? config.minMergeError : naiveCAM;
+    if (0 <= motionBlending) config.maxBlendError = motionBlending;
   }
 }
 
@@ -493,7 +497,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
   if (M_PI * 0.95 < intersectAngle) return;
 
   // Compute arc between segments given the allowed error
-  double error = config.maxMergeError * 0.99;
+  double error = config.maxBlendError * 0.99;
   double sinHalfAngle = sin(intersectAngle / 2);
   double cosHalfAngle = cos(intersectAngle / 2);
   double radius = error * (sinHalfAngle / (1 - sinHalfAngle));
@@ -531,7 +535,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
   double arcAngle = M_PI - intersectAngle;
 
   // Arc error cannot be greater than arc radius
-  const double arcError = std::min(config.maxMergeError * 0.01, radius);
+  const double arcError = std::min(config.maxBlendError * 0.01, radius);
 
   // Compute segments and segment angle
   unsigned segments = blendSegments(arcError, arcAngle, radius);
@@ -569,9 +573,12 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
 
   for (unsigned i = 0; i < segments; i++) {
     double a = i * segAngle + offsetAngle;
+    Vector3D v;
 
-    Vector3D v = arcStart * (sin(arcAngle - a) / sinAngle) +
-      arcEnd * (sin(a) / sinAngle) + center;
+    if (i == segments - 1) v = next->start.getXYZ(); // Exact end
+    else v = arcStart * (sin(arcAngle - a) / sinAngle) +
+           arcEnd * (sin(a) / sinAngle) + center;
+
     target.setXYZ(v);
 
     LineCommand *lc =

@@ -52,8 +52,10 @@ namespace GCode {
     unsigned maxLookahead    = 4096;
     double minMoveSecs       = 0.02;
     path_mode_t pathMode     = CONTINUOUS_MODE;
-    double maxMergeError     = 0.1; // mm
-    double maxMergeLength    = 10;  // mm
+    double maxBlendError     = 0.1;   // mm
+    double minMergeError     = 0.001; // mm
+    double maxMergeError     = 0.1;   // mm
+    double maxMergeLength    = 10;    // mm
     bool rapidAutoOff        = false;
     unsigned idBits          = 16;
 

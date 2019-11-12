@@ -50,12 +50,12 @@ namespace GCode {
       SYNC_PAUSE,
     } synchronize_state_t;
 
-    synchronize_state_t syncState;
-    bool offsetParamChanged;
+    synchronize_state_t syncState = SYNC_NONE;
+    bool offsetParamChanged       = false;
 
     // State variables
-    unsigned currentMotionMode;
-    bool absoluteCoords;
+    unsigned currentMotionMode    = 10;
+    bool absoluteCoords           = false;
 
     typedef struct {
       bool autoRestore;
