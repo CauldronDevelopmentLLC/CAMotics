@@ -442,6 +442,13 @@ double LinePlanner::computeMaxAccel(const Vector3D &v) const {
     if (config.maxAccel[axis] && isfinite(config.maxAccel[axis])) {
       double a = fabs(config.maxAccel[axis] / unit[axis]);
       if (a < maxAccel) maxAccel = a;
+
+      // Compute implied max accel from max jerk and max velocity
+      double j = fabs(config.maxJerk[axis] / unit[axis]);
+      double v = fabs(config.maxVel[axis] / unit[axis]);
+      a = sqrt(2 * v * j);
+
+      if (a < maxAccel) maxAccel = a;
     }
 
   return maxAccel;

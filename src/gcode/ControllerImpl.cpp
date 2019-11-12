@@ -55,7 +55,7 @@ ControllerImpl::ControllerImpl(MachineInterface &machine,
   state.spinMode                   = REVOLUTIONS_PER_MINUTE;
   state.arcIncrementalDistanceMode = true;
   state.latheDiameterMode          = true;
-  state.pathMode                   = EXACT_PATH_MODE;
+  state.pathMode                   = CONTINUOUS_MODE;
   state.feed                       = 0;
   state.speed                      = 0;
   state.spindleDir                 = DIR_OFF;
@@ -845,8 +845,8 @@ void ControllerImpl::restoreModalState() {
   setSpeed(state.speed);
   setMistCoolant(state.mist);
   setFloodCoolant(state.flood);
-  setPathMode(state.pathMode, state.motionBlendingTolerance,
-              state.naiveCamTolerance);
+  //setPathMode(state.pathMode, state.motionBlendingTolerance,
+  //            state.naiveCamTolerance);
 }
 
 
