@@ -41,9 +41,9 @@ using namespace CAMotics;
 
 namespace CAMotics {
   class SimApp : public Application {
-    double time;
-    bool reduce;
-    bool binary;
+    double time = 0;
+    bool reduce = false;
+    bool binary = true;
     RenderMode renderMode;
     string resolution;
     unsigned threads;
@@ -56,7 +56,7 @@ namespace CAMotics {
 
   public:
     SimApp() :
-      Application("CAMotics Sim"), time(0), reduce(true), binary(true),
+      Application("CAMotics Sim"),
       threads(SystemInfo::instance().getCPUCount()) {
 
       cmdLine.setUsageArgs
