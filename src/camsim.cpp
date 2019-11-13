@@ -137,7 +137,7 @@ namespace CAMotics {
       if (!shouldQuit()) surface = cutSim.computeSurface(sim);
 
       // Reduce
-      if (reduce && !shouldQuit()) cutSim.reduceSurface(*surface);
+      if (reduce && !shouldQuit()) cutSim.reduceSurface(surface);
 
       // Export surface
       if (!shouldQuit())

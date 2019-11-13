@@ -33,7 +33,7 @@ namespace CAMotics {
     cb::SmartPointer<Surface> surface;
 
   public:
-    ReduceTask(const Surface &surface);
+    ReduceTask(const cb::SmartPointer<Surface> &surface);
 
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
 

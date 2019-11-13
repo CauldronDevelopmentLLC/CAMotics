@@ -50,7 +50,7 @@ SmartPointer<Surface> CutSim::computeSurface(const Simulation &sim) {
 
 
 
-void CutSim::reduceSurface(Surface &surface) {
+void CutSim::reduceSurface(const SmartPointer<Surface> &surface) {
   task = new ReduceTask(surface);
   task->run();
 }

@@ -32,7 +32,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ReduceTask::ReduceTask(const Surface &surface) : surface(surface.copy()) {}
+ReduceTask::ReduceTask(const SmartPointer<Surface> &surface) :
+  surface(surface) {}
 
 
 void ReduceTask::run() {

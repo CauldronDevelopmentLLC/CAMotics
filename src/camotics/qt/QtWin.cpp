@@ -768,7 +768,7 @@ void QtWin::reduce() {
 
   try {
     // Queue reduce task
-    taskMan.addTask(new ReduceTask(*surface));
+    taskMan.addTask(new ReduceTask(surface->copy()));
     setStatusActive(true);
   } CATCH_ERROR;
 }
