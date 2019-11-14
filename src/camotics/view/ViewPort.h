@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include "GLProgram.h"
+#include "GLUniform.h"
+
 #include <cbang/geom/Quaternion.h>
 #include <cbang/geom/Rectangle.h>
 
@@ -32,12 +35,14 @@ namespace CAMotics {
 
     cb::Vector3D rotationStartVec;
     cb::QuaternionD rotationStart;
-    cb::QuaternionD rotationQuat;
-    double rotation[4];
+    cb::QuaternionD rotation;
 
     cb::Vector2D translationStart;
     cb::Vector2D translationStartPt;
     cb::Vector2D translation;
+
+    cb::SmartPointer<GLProgram> glProgram;
+    GLUniform mvp;
 
   public:
     ViewPort();
@@ -46,7 +51,7 @@ namespace CAMotics {
     unsigned getWidth() const {return width;}
     unsigned getHeight() const {return height;}
     double getZoom() const {return zoom;}
-    const double *getRotation() const {return rotation;}
+    const cb::QuaternionD &getRotation() const {return rotation;}
 
     void zoomIn();
     void zoomOut();
@@ -65,7 +70,7 @@ namespace CAMotics {
 
     void resetView(char c = 'p');
 
-    virtual void glInit() const;
+    virtual void glInit();
     virtual void glDraw(const cb::Rectangle3D &bounds,
                         const cb::Vector3D &center) const;
 

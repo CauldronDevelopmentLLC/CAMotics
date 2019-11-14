@@ -249,21 +249,21 @@ void ToolPathView::draw() {
 
   GLFuncs &glFuncs = getGLFuncs();
 
+  glFuncs.glEnableVertexAttribArray(GL_ATTR_COLOR);
   glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-  glFuncs.glColorPointer(3, GL_FLOAT, 0, 0);
+  glFuncs.glVertexAttribPointer(GL_ATTR_COLOR, 3, GL_FLOAT, false, 0, 0);
 
+  glFuncs.glEnableVertexAttribArray(GL_ATTR_POSITION);
   glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
+  glFuncs.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_FLOAT, false, 0, 0);
 
   glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
-  glFuncs.glEnableClientState(GL_COLOR_ARRAY);
 
   // Draw
   glFuncs.glLineWidth(1);
   glFuncs.glDrawArrays(GL_LINES, 0, numVertices);
 
-  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
-  glFuncs.glDisableClientState(GL_COLOR_ARRAY);
+  // Clean up
+  glFuncs.glDisableVertexAttribArray(GL_ATTR_POSITION);
+  glFuncs.glDisableVertexAttribArray(GL_ATTR_COLOR);
 }

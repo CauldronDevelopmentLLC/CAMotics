@@ -33,95 +33,116 @@ using namespace CAMotics;
 
 
 namespace {
-  void gluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear,
-                      GLdouble zFar) {
-    GLdouble ymax = zNear * tan(fovy * M_PI / 360.0);
-    GLdouble ymin = -ymax;
+  Matrix4x4F perspective(float fovy, float aspect, float zNear, float zFar) {
+    float a = fovy * M_PI / 180 / 2;
+    float f = cos(a) / sin(a);
+    Matrix4x4F m;
 
-    GLdouble xmin = ymin * aspect;
-    GLdouble xmax = ymax * aspect;
+    m[0][0] = f / aspect;
+    m[0][1] = 0;
+    m[0][2] = 0;
+    m[0][3] = 0;
 
-    getGLFuncs().glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+    m[1][0] = 0;
+    m[1][1] = f;
+    m[1][2] = 0;
+    m[1][3] = 0;
+
+    m[2][0] = 0;
+    m[2][1] = 0;
+    m[2][2] = (zFar + zNear) / (zNear - zFar);
+    m[2][3] = 2 * zFar * zNear / (zNear - zFar);
+
+    m[3][0] = 0;
+    m[3][1] = 0;
+    m[3][2] = -1;
+    m[3][3] = 0;
+
+    return m;
   }
 
 
-  void gluLookAt(GLdouble eyex, GLdouble eyey, GLdouble eyez, GLdouble centerx,
-                 GLdouble centery, GLdouble centerz, GLdouble upx, GLdouble upy,
-                 GLdouble upz) {
-    GLdouble m[16];
-    GLdouble x[3], y[3], z[3];
-    GLdouble mag;
+  Matrix4x4F translate(const Vector3F &v) {
+    Matrix4x4F m;
 
-    // Make rotation matrix
+    m.toIdentity();
+    m[0][3] = v[0];
+    m[1][3] = v[1];
+    m[2][3] = v[2];
 
-    // Z vector
-    z[0] = eyex - centerx;
-    z[1] = eyey - centery;
-    z[2] = eyez - centerz;
-    mag = sqrt(z[0] * z[0] + z[1] * z[1] + z[2] * z[2]);
-    if (mag) { // mpichler, 19950515
-      z[0] /= mag;
-      z[1] /= mag;
-      z[2] /= mag;
-    }
+    return m;
+  }
 
-    // Y vector
-    y[0] = upx;
-    y[1] = upy;
-    y[2] = upz;
 
-    // X vector = Y cross Z
-    x[0] = y[1] * z[2] - y[2] * z[1];
-    x[1] = -y[0] * z[2] + y[2] * z[0];
-    x[2] = y[0] * z[1] - y[1] * z[0];
+  Matrix4x4F rotate(const QuaternionD &q) {
+    Matrix4x4F m;
+    AxisAngleD a = q.toAxisAngle();
+    Vector3D v = a.getVector().normalize();
+    double x = v.x();
+    double y = v.y();
+    double z = v.z();
+    double c = cos(a.angle());
+    double s = sin(a.angle());
 
-    // Recompute Y = Z cross X
-    y[0] = z[1] * x[2] - z[2] * x[1];
-    y[1] = -z[0] * x[2] + z[2] * x[0];
-    y[2] = z[0] * x[1] - z[1] * x[0];
+    m.toIdentity();
+    if (!v.isReal()) return m;
 
-    // mpichler, 19950515
-    // cross product gives area of parallelogram, which is < 1.0 for
-    // non-perpendicular unit-length vectors; so normalize x, y here
+    m[0][0] = x * x * (1 - c) + c;
+    m[0][1] = x * y * (1 - c) - x * s;
+    m[0][2] = x * z * (1 - c) + y * s;
+    m[0][3] = 0;
 
-    mag = sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
-    if (mag) {
-      x[0] /= mag;
-      x[1] /= mag;
-      x[2] /= mag;
-    }
+    m[1][0] = y * x * (1 - c) + z * s;
+    m[1][1] = y * y * (1 - c) + c;
+    m[1][2] = y * z * (1 - c) - x * s;
+    m[1][3] = 0;
 
-    mag = sqrt(y[0] * y[0] + y[1] * y[1] + y[2] * y[2]);
-    if (mag) {
-      y[0] /= mag;
-      y[1] /= mag;
-      y[2] /= mag;
-    }
+    m[2][0] = x * z * (1 - c) - y * s;
+    m[2][1] = y * z * (1 - c) + x * s;
+    m[2][2] = z * z * (1 - c) + c;
+    m[2][3] = 0;
 
-#define M(row, col) m[col * 4 + row]
-    M(0, 0) = x[0];
-    M(0, 1) = x[1];
-    M(0, 2) = x[2];
-    M(0, 3) = 0.0;
-    M(1, 0) = y[0];
-    M(1, 1) = y[1];
-    M(1, 2) = y[2];
-    M(1, 3) = 0.0;
-    M(2, 0) = z[0];
-    M(2, 1) = z[1];
-    M(2, 2) = z[2];
-    M(2, 3) = 0.0;
-    M(3, 0) = 0.0;
-    M(3, 1) = 0.0;
-    M(3, 2) = 0.0;
-    M(3, 3) = 1.0;
-#undef M
-    getGLFuncs().glMultMatrixd(m);
+    m[3][0] = 0;
+    m[3][1] = 0;
+    m[3][2] = 0;
+    m[3][3] = 1;
 
-    // Translate Eye to Origin
-    getGLFuncs().glTranslated(-eyex, -eyey, -eyez);
+    return m;
+  }
+
+
+  Matrix4x4F lookAt(const Vector3F &eye, const Vector3F &center,
+                    const Vector3F &up) {
+    Vector3F f = (center - eye).normalize();
+    Vector3F s = f.cross(up.normalize()).normalize();
+    Vector3F u = s.normalize().cross(f).normalize();
+
+    Matrix4x4F m;
+    m[0][0] = s[0];
+    m[0][1] = s[1];
+    m[0][2] = s[2];
+    m[0][3] = 0;
+
+    m[1][0] = u[0];
+    m[1][1] = u[1];
+    m[1][2] = u[2];
+    m[1][3] = 0;
+
+    m[2][0] = -f[0];
+    m[2][1] = -f[1];
+    m[2][2] = -f[2];
+    m[2][3] = 0;
+
+    m[3][0] = 0;
+    m[3][1] = 0;
+    m[3][2] = 0;
+    m[3][3] = 1;
+
+    // Translate eye to origin
+    return m * translate(-eye);
   }
 }
+
 
 ViewPort::ViewPort() : width(1024), height(768), zoom(1) {resetView();}
 
@@ -168,7 +189,7 @@ Vector3D ViewPort::findBallVector(int px, int py) const {
 
 void ViewPort::startRotation(int x, int y) {
   rotationStartVec = findBallVector(x, y);
-  rotationStart = rotationQuat;
+  rotationStart = rotation;
 }
 
 
@@ -181,8 +202,7 @@ void ViewPort::updateRotation(int x, int y) {
 
   if (!newQuat.isReal()) return;
 
-  rotationQuat = newQuat;
-  rotationQuat.toAxisAngle().toGLRotation(rotation);
+  rotation = newQuat;
 }
 
 
@@ -200,99 +220,95 @@ void ViewPort::updateTranslation(int x, int y) {
 
 void ViewPort::resetView(char c) {
   switch (c) {
-  case 'p': rotationQuat = QuaternionD(-0.4, 0, 0, 0.9); break;
-  case 't': rotationQuat = QuaternionD(0, 0, 0, 0.9999); break;
-  case 'b': rotationQuat = QuaternionD(0, 1, 0, 0.0001); break;
-  case 'F': rotationQuat = QuaternionD(-0.71, 0, 0, 0.71); break;
-  case 'B': rotationQuat = QuaternionD(0, -0.71, -0.71, 0.0001); break;
-  case 'l': rotationQuat = QuaternionD(-0.5, 0.5, 0.5, 0.5); break;
-  case 'r': rotationQuat = QuaternionD(-0.5, -0.5, -0.5, 0.5); break;
+  case 'p': rotation = QuaternionD(-0.4,   0,     0,    0.9);   break;
+  case 't': rotation = QuaternionD( 0,     0,     0,    0.999); break;
+  case 'b': rotation = QuaternionD( 0,     1,     0,    0.001); break;
+  case 'F': rotation = QuaternionD(-0.71,  0,     0,    0.71);  break;
+  case 'B': rotation = QuaternionD( 0,    -0.71, -0.71, 0.001); break;
+  case 'l': rotation = QuaternionD(-0.5,   0.5,   0.5,  0.5);   break;
+  case 'r': rotation = QuaternionD(-0.5,  -0.5,  -0.5,  0.5);   break;
   }
-
-  rotationQuat.toAxisAngle().toGLRotation(rotation);
 
   center();
 }
 
 
-void ViewPort::glInit() const {
-  static const float ambient[]          = {0.50, 0.50, 0.50, 1.00};
-  static const float diffuse[]          = {0.75, 0.75, 0.75, 1.00};
-  static const float specular[]         = {1.00, 1.00, 1.00, 1.00};
-  static const float materialSpecular[] = {0.25, 0.25, 0.25, 0.70};
+void ViewPort::glInit() {
+  glProgram = new GLProgram;
+  glProgram->attach("shaders/tool_path_vert.glsl", GL_VERTEX_SHADER);
+  glProgram->attach("shaders/tool_path_frag.glsl", GL_FRAGMENT_SHADER);
+  glProgram->bindAttribute("position", GL_ATTR_POSITION);
+  glProgram->bindAttribute("color",    GL_ATTR_COLOR);
+  glProgram->link();
+  mvp = glProgram->getUniform("mvp");
 
   GLFuncs &glFuncs = getGLFuncs();
 
-  glFuncs.glColor4f(1, 1, 1, 1);
   glFuncs.glClearColor(0, 0, 0, 0);
-  glFuncs.glClearDepth(1);
 
   glFuncs.glEnable(GL_LINE_SMOOTH);
   glFuncs.glEnable(GL_POINT_SMOOTH);
-  glFuncs.glShadeModel(GL_SMOOTH);
   glFuncs.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glFuncs.glEnable(GL_BLEND);
-  glFuncs.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-  glFuncs.glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-  glFuncs.glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-  glFuncs.glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-  glFuncs.glEnable(GL_LIGHT0);
-
-  glFuncs.glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
-  glFuncs.glMaterialf(GL_FRONT, GL_SHININESS, 25);
 }
 
 
-void ViewPort::glDraw(const Rectangle3D &bbox,
-                      const Vector3D &center) const {
+void ViewPort::glDraw(const Rectangle3D &bbox, const Vector3D &center) const {
+  glProgram->use();
+
   GLFuncs &glFuncs = getGLFuncs();
 
-  glFuncs.glMatrixMode(GL_MODELVIEW);
-  glFuncs.glLoadIdentity();
-
-  glFuncs.glMatrixMode(GL_PROJECTION);
-  glFuncs.glLoadIdentity();
+  Matrix4x4F m;
+  m.toIdentity();
+  mvp.set(m);
 
   // Background
-   double colors[] = {
+  float colors[] = {
     0.15, 0.19, 0.25,
+    0.15, 0.19, 0.25,
+    0.02, 0.02, 0.02,
+
     0.15, 0.19, 0.25,
     0.02, 0.02, 0.02,
     0.02, 0.02, 0.02,
   };
-  const double v[] = {-1, -1, 1, -1, 1, 1, -1, 1};
+  const float v[] = {
+    -1, -1, 0, 1, -1, 0, -1, 1, 0,
+     1, -1, 0, 1,  1, 0, -1, 1, 0,
+  };
 
-  glFuncs.glVertexPointer(2, GL_DOUBLE, 0, v);
-  glFuncs.glColorPointer(3, GL_DOUBLE, 0, colors);
-  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
-  glFuncs.glEnableClientState(GL_COLOR_ARRAY);
-  glFuncs.glDrawArrays(GL_QUADS, 0, 4);
-  glFuncs.glDisableClientState(GL_COLOR_ARRAY);
-  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glEnableVertexAttribArray(GL_ATTR_POSITION);
+  glFuncs.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_FLOAT, false, 0, v);
+
+  glFuncs.glEnableVertexAttribArray(GL_ATTR_COLOR);
+  glFuncs.glVertexAttribPointer(GL_ATTR_COLOR, 3, GL_FLOAT, false, 0, colors);
+
+  glFuncs.glDrawArrays(GL_TRIANGLES, 0, 6);
+
+  glFuncs.glDisableVertexAttribArray(GL_ATTR_POSITION);
+  glFuncs.glDisableVertexAttribArray(GL_ATTR_COLOR);
 
   // Compute "radius"
   Vector3D dims = bbox.getDimensions();
   double radius = dims.x() < dims.y() ? dims.y() : dims.x();
   radius = dims.z() < radius ? radius : dims.z();
 
-  // Perspective
-  gluPerspective(45, (float)width / height, 1, 100000);
+  // Projection
+  m *= perspective(45, (float)width / height, 1, 100000);
 
   // Translate
-  glFuncs.glTranslatef(translation.x() * radius / zoom,
-                       translation.y() * radius / zoom, 0);
+  m *= translate(Vector3F(translation.x(), translation.y(), 0) * radius / zoom);
 
-  // Scale
-  gluLookAt(0, 0, radius / zoom, 0, 0, 0, 0, 1, 0);
-
-  glFuncs.glMatrixMode(GL_MODELVIEW);
+  // View
+  m *= lookAt(Vector3F(0, 0, radius / zoom), Vector3F(), Vector3F(0, 1, 0));
 
   // Rotate
-  glFuncs.glRotated(rotation[0], rotation[1], rotation[2], rotation[3]);
+  m *= rotate(rotation);
 
   // Center
-  glFuncs.glTranslatef(-center.x(), -center.y(), -center.z());
+  m *= translate(-center);
+
+  mvp.set(m);
 }
 
 
@@ -308,6 +324,7 @@ void ViewPort::drawAxes(const Rectangle3D &bbox) const {
 
 
 void ViewPort::drawAxis(int axis, bool up, double length, double radius) const {
+#if 0 // TODO GL
   GLFuncs &glFuncs = getGLFuncs();
 
   glFuncs.glPushMatrix();
@@ -338,10 +355,12 @@ void ViewPort::drawAxis(int axis, bool up, double length, double radius) const {
   glCylinder(1.5 * radius, 0, 2 * radius, 128);
 
   glFuncs.glPopMatrix();
+#endif
 }
 
 
 void ViewPort::setLighting(bool x) const {
+#if 0 // TODO GL
   GLFuncs &glFuncs = getGLFuncs();
 
   if (x) {
@@ -354,10 +373,12 @@ void ViewPort::setLighting(bool x) const {
     glFuncs.glDisable(GL_LIGHTING);
     glFuncs.glDisable(GL_DEPTH_TEST);
   }
+#endif
 }
 
 
 void ViewPort::setWire(bool x) const {
+#if 0 // TODO GL
   GLFuncs &glFuncs = getGLFuncs();
 
   if (x) {
@@ -369,4 +390,5 @@ void ViewPort::setWire(bool x) const {
     glFuncs.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glFuncs.glEnable(GL_LINE_SMOOTH);
   }
+#endif
 }

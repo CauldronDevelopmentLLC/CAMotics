@@ -35,6 +35,7 @@ CuboidView::~CuboidView() {
 
 
 void CuboidView::draw() {
+#if 0 // TODO GL
   if (bounds == Rectangle3D()) return;
 
   static float vertices[] = {
@@ -98,4 +99,5 @@ void CuboidView::draw() {
 
   glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
   glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+#endif
 }

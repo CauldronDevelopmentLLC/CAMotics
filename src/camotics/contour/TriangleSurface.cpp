@@ -163,6 +163,7 @@ void TriangleSurface::draw() {
 
   finalize();
 
+#if 0 // TODO GL
   GLFuncs &glFuncs = getGLFuncs();
 
   glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
@@ -180,6 +181,7 @@ void TriangleSurface::draw() {
 
   glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
   glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+#endif
 }
 #endif // CAMOTICS_GUI
 

@@ -24,31 +24,8 @@
 using namespace CAMotics;
 
 
-namespace {
-  void drawCylinder(double radiusA, double radiusB, double length) {
-    GLFuncs &glFuncs = getGLFuncs();
-
-    // Body
-    glCylinder(radiusA, radiusB, length, 128);
-
-    // End caps
-    if (radiusA) {
-      glFuncs.glNormal3f(0, 0, -1);
-      glDisk(radiusA, 128);
-    }
-
-    if (radiusB) {
-      glFuncs.glPushMatrix();
-      glFuncs.glTranslatef(0, 0, length);
-      glFuncs.glNormal3f(0, 0, 1);
-      glDisk(radiusB, 128);
-      glFuncs.glPopMatrix();
-    }
-  }
-}
-
-
 void ToolView::draw() {
+#if 0 // TODO GL
   double diameter = tool.getDiameter();
   double radius = tool.getRadius();
   double length = tool.getLength();
@@ -85,19 +62,20 @@ void ToolView::draw() {
     glFuncs.glPushMatrix();
     glFuncs.glTranslatef(0, 0, radius);
     glSphere(radius, 128, 128);
-    drawCylinder(radius, radius, length - radius);
+    glConic(radius, radius, length - radius);
     glFuncs.glPopMatrix();
     break;
 
   case GCode::ToolShape::TS_SNUBNOSE:
-    drawCylinder(tool.getSnubDiameter() / 2, radius, length);
+    glConic(tool.getSnubDiameter() / 2, radius, length);
     break;
 
-  case GCode::ToolShape::TS_CONICAL: drawCylinder(0, radius, length); break;
+  case GCode::ToolShape::TS_CONICAL: glConic(0, radius, length); break;
 
   case GCode::ToolShape::TS_CYLINDRICAL:
-  default: drawCylinder(radius, radius, length); break;
+  default: glConic(radius, radius, length); break;
   }
 
   glFuncs.glPopMatrix();
+#endif
 }

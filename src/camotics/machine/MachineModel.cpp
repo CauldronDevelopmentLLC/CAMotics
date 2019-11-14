@@ -110,6 +110,7 @@ void MachineModel::read(const InputSource &source) {
 
 #ifdef CAMOTICS_GUI
 void MachineModel::draw(bool wire) {
+#if 0 // TODO GL
   GLFuncs &glFuncs = getGLFuncs();
 
   glFuncs.glPushMatrix();
@@ -119,5 +120,6 @@ void MachineModel::draw(bool wire) {
     it->second->draw(wire);
 
   glFuncs.glPopMatrix();
+#endif
 }
 #endif

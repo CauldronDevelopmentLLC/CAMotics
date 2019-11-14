@@ -63,13 +63,14 @@ namespace CAMotics {
 
 
   GLFuncs &getGLFuncs() {
-    GLFuncs *glFuncs = getGLCtx().versionFunctions<GLFuncs>();
+    GLFuncs *glFuncs = getGLCtx().functions();
     if (!glFuncs) THROW("Failed to access OpenGL functions");
     return *glFuncs;
   }
 
 
   void glDisk(double radius, unsigned segments) {
+#if 0 // TODO GL
     GLFuncs &glFuncs = getGLFuncs();
 
     unsigned count = 1 + segments;
@@ -87,10 +88,12 @@ namespace CAMotics {
     glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
     glFuncs.glDrawArrays(GL_TRIANGLE_FAN, 0, count);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+#endif
   }
 
 
   void glCylinder(double base, double top, double height, unsigned segments) {
+#if 0 // TODO GL
     GLFuncs &glFuncs = getGLFuncs();
 
     unsigned count = segments * 2;
@@ -124,10 +127,37 @@ namespace CAMotics {
     glFuncs.glDrawArrays(GL_QUAD_STRIP, 0, count);
     glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+#endif
+  }
+
+
+  void glConic(double radiusA, double radiusB, double length,
+               unsigned segments) {
+#if 0 // TODO GL
+    GLFuncs &glFuncs = getGLFuncs();
+
+    // Body
+    glCylinder(radiusA, radiusB, length, segments);
+
+    // End caps
+    if (radiusA) {
+      glFuncs.glNormal3f(0, 0, -1);
+      glDisk(radiusA, segments);
+    }
+
+    if (radiusB) {
+      glFuncs.glPushMatrix();
+      glFuncs.glTranslatef(0, 0, length);
+      glFuncs.glNormal3f(0, 0, 1);
+      glDisk(radiusB, segments);
+      glFuncs.glPopMatrix();
+    }
+#endif
   }
 
 
   void glSphere(double radius, unsigned lats, unsigned lngs) {
+#if 0 // TODO GL
     GLFuncs &glFuncs = getGLFuncs();
 
     unsigned count = lngs * 2;
@@ -170,5 +200,6 @@ namespace CAMotics {
 
     glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
     glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+#endif
   }
 }

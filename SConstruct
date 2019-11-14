@@ -13,7 +13,8 @@ env = Environment(ENV = os.environ,
                   TARGET_ARCH = os.environ.get('TARGET_ARCH', 'x86'))
 Export('env')
 env.Tool('config', toolpath = [cbang])
-env.CBLoadTools('compiler cbang dist opengl dxflib python build_info packager')
+env.CBLoadTools(
+    'compiler cbang dist opengl dxflib python build_info packager resources')
 env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
@@ -31,6 +32,7 @@ env.Replace(PACKAGE_HOMEPAGE = 'https://camotics.org/')
 env.Replace(PACKAGE_ORG = 'Cauldron Development LLC')
 env.Replace(PACKAGE_LICENSE = 'https://www.gnu.org/licenses/gpl-2.0.txt')
 env.Replace(BUILD_INFO_NS = 'CAMotics::BuildInfo')
+env.Replace(RESOURCES_NS = 'CAMotics')
 
 # Qt5 tool
 if env['with_gui']:
@@ -198,6 +200,11 @@ if env['with_gui']:
                            'qt/%s_dialog.ui' % dialog))
 
     qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
+
+    # Resources
+    res = env.Resources('build/resources.cpp', ['#/src/resources'])
+    Precious(res)
+    guiSrc.append(res)
 
     # GUI lib
     guiLib = env.Library('build/libCAMoticsGUI', src + guiSrc)

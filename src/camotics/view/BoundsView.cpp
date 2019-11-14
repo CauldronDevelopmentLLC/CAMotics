@@ -59,10 +59,19 @@ void BoundsView::draw() {
     rmin.x(), rmax.y(), rmax.z(),
   };
 
+  float c[24 * 3];
+  for (unsigned i = 0; i < 24 * 3; i++) c[i] = 1;
+
   GLFuncs &glFuncs = getGLFuncs();
 
-  glFuncs.glVertexPointer(3, GL_DOUBLE, 0, v);
-  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
+  glFuncs.glEnableVertexAttribArray(GL_ATTR_POSITION);
+  glFuncs.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_DOUBLE, false, 0, v);
+
+  glFuncs.glEnableVertexAttribArray(GL_ATTR_COLOR);
+  glFuncs.glVertexAttribPointer(GL_ATTR_COLOR, 3, GL_FLOAT, false, 0, c);
+
   glFuncs.glDrawArrays(GL_LINES, 0, 24);
-  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+
+  glFuncs.glDisableVertexAttribArray(GL_ATTR_POSITION);
+  glFuncs.glDisableVertexAttribArray(GL_ATTR_COLOR);
 }

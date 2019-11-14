@@ -144,11 +144,11 @@ void View::draw() {
   setLighting(true);
 
   Vector3D currentPosition = path->getPosition();
-  glFuncs.glPushMatrix();
+  // glFuncs.glPushMatrix();
 
   if (showMachine) {
-    Vector3D v = machine->getWorkpiece() * currentPosition;
-    glFuncs.glTranslatef(v.x(), v.y(), v.z());
+    //Vector3D v = machine->getWorkpiece() * currentPosition;
+    //glFuncs.glTranslatef(v.x(), v.y(), v.z());
   }
 
   // Axes
@@ -156,14 +156,14 @@ void View::draw() {
     drawAxes(workpiece->getBounds());
 
   // Line normals relative to camera rotation
-  const double *rotation = getRotation();
-  glFuncs.glNormal3f(rotation[1], rotation[2], rotation[3]);
+  //const double *rotation = getRotation();
+  //glFuncs.glNormal3f(rotation[1], rotation[2], rotation[3]);
 
   // Workpiece bounds
   if (!isFlagSet(View::SHOW_WORKPIECE_FLAG) &&
       isFlagSet(View::SHOW_WORKPIECE_BOUNDS_FLAG)) {
     glFuncs.glLineWidth(1);
-    glFuncs.glColor4f(1, 1, 1, 0.5); // White
+    //glFuncs.glColor4f(1, 1, 1, 0.5); // White
 
     BoundsView(workpiece->getBounds()).draw();
   }
@@ -174,14 +174,14 @@ void View::draw() {
 
   // Model
   if (isFlagSet(View::SHOW_WORKPIECE_FLAG | View::SHOW_SURFACE_FLAG)) {
-    const float alpha =
-      isFlagSet(View::TRANSLUCENT_SURFACE_FLAG) ? 0.8f : 1.0f;
-    const float ambient[] = {12.0f / 255, 45.0f / 255,  83.0f / 255, alpha};
-    const float diffuse[] = {16.0f / 255, 59.0f / 255, 108.0f / 255, alpha};
+    //const float alpha =
+    //  isFlagSet(View::TRANSLUCENT_SURFACE_FLAG) ? 0.8f : 1.0f;
+    //const float ambient[] = {12.0f / 255, 45.0f / 255,  83.0f / 255, alpha};
+    //const float diffuse[] = {16.0f / 255, 59.0f / 255, 108.0f / 255, alpha};
 
-    glFuncs.glDisable(GL_COLOR_MATERIAL);
-    glFuncs.glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-    glFuncs.glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    //glFuncs.glDisable(GL_COLOR_MATERIAL);
+    //glFuncs.glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    //glFuncs.glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
 
     setWire(isFlagSet(View::WIRE_FLAG));
 
@@ -190,7 +190,7 @@ void View::draw() {
 
     if (isFlagSet(View::SHOW_WORKPIECE_FLAG)) workpiece->draw();
 
-    glFuncs.glEnable(GL_COLOR_MATERIAL);
+    //glFuncs.glEnable(GL_COLOR_MATERIAL);
 
     setWire(false);
   }
@@ -199,19 +199,19 @@ void View::draw() {
   if (isFlagSet(View::SHOW_BBTREE_FLAG) && !moveLookup.isNull())
     moveLookup->draw(isFlagSet(View::BBTREE_LEAVES_FLAG));
 
-  glFuncs.glPopMatrix();
+  //glFuncs.glPopMatrix();
 
   // Machine
   if (showMachine) {
-    glFuncs.glPushMatrix();
+    //glFuncs.glPushMatrix();
 
     // TODO Work offsets should be configurable
-    glFuncs.glTranslatef(0, 0, -workpiece->getBounds().getDimensions().z());
+    //glFuncs.glTranslatef(0, 0, -workpiece->getBounds().getDimensions().z());
 
     machine->setPosition(currentPosition);
     machine->draw(isFlagSet(View::WIRE_FLAG));
 
-    glFuncs.glPopMatrix();
+    //glFuncs.glPopMatrix();
   }
 
   // GCode::Tool

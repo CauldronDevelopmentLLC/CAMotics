@@ -111,6 +111,7 @@ void MachinePart::read(const InputSource &source,
 
 #ifdef CAMOTICS_GUI
 void MachinePart::drawLines() {
+#if 0 // TODO GL
   GLFuncs &glFuncs = getGLFuncs();
 
   if (!vbuf) {
@@ -136,10 +137,12 @@ void MachinePart::drawLines() {
 
   if (light) glFuncs.glEnable(GL_LIGHTING);
   glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
+#endif
 }
 
 
 void MachinePart::draw(bool wire) {
+#if 0 // TODO GL
   GLFuncs &glFuncs = getGLFuncs();
 
   glFuncs.glPushMatrix();
@@ -156,5 +159,6 @@ void MachinePart::draw(bool wire) {
   }
 
   glFuncs.glPopMatrix();
+#endif
 }
 #endif // CAMOTICS_GUI
