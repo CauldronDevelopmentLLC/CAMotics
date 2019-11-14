@@ -512,13 +512,25 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
 
   if (std::isnan(length) || length < config.minTravel) return;
 
-  // Delete intervening commands from pre-plan queue
-  while (pre.back() != prev) delete pre.pop_back();
+  // Compute angle of the arc
+  double arcAngle = M_PI - intersectAngle;
+
+  // Arc error cannot be greater than arc radius
+  const double arcError = std::min(config.maxBlendError * 0.01, radius);
+
+  // Compute segments and segment angle
+  unsigned segments = blendSegments(arcError, arcAngle, radius);
+  double segAngle = arcAngle / segments;
+
+  if (!segments) return;
 
   // Get parameters
   Vector3D p = next->start.slice<3>(); // Intersection point
   Vector3D a = -prev->unit.slice<3>(); // Unit vector
   Vector3D b = next->unit.slice<3>();  // Unit vector
+
+  // Delete intervening commands from pre-plan queue
+  while (pre.back() != prev) delete pre.pop_back();
 
   // Adjust move endpoints, must be after getting intersection point above
   vector<LineCommand::Speed> speeds;
@@ -530,16 +542,6 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
   // Scale offsets
   for (unsigned i = 0; i < speeds.size(); i++)
     speeds[i].offset /= 2 * length;
-
-  // Compute angle of the arc
-  double arcAngle = M_PI - intersectAngle;
-
-  // Arc error cannot be greater than arc radius
-  const double arcError = std::min(config.maxBlendError * 0.01, radius);
-
-  // Compute segments and segment angle
-  unsigned segments = blendSegments(arcError, arcAngle, radius);
-  double segAngle = arcAngle / segments;
 
   // Find arc center
   Vector3D q1 = p + a * length;
