@@ -597,7 +597,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
         LineCommand::Speed s(0, speeds[i].speed);
         s.offset = lc->length * (speeds[i].offset - lastFract) / segFract;
         lc->speeds.push_back(s);
-        speedIdx = i;
+        speedIdx = i + 1;
       }
 
     push(lc);
