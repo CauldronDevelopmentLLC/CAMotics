@@ -455,7 +455,7 @@ double LinePlanner::computeMaxAccel(const Vector3D &v) const {
       if (a < maxAccel) maxAccel = a;
     }
 
-  return maxAccel;
+  return std::min(config.junctionAccel, maxAccel);
 }
 
 
@@ -468,8 +468,7 @@ double LinePlanner::computeJunctionVelocity(const Vector3D &v,
 unsigned LinePlanner::blendSegments(double arcError, double arcAngle,
                                     double radius) {
   // Compute segment angle from allowed error
-  // See "Algorithm for circle approximation and generation" - L Yong-Kui.
-  double segAngle = 4 * atan(sqrt(arcError / radius));
+  double segAngle = 2 * acos(1 - arcError / radius);
 
   // Segment angle cannot be greater than 2Pi/3 because we need at least 3
   // segments in a full circle
@@ -492,45 +491,47 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
   if (!next->canBlend() || !prev->canBlend() || next->rapid != prev->rapid)
     return;
 
+  // Get unit vectors
+  Vector3D unitA = -prev->unit.slice<3>();
+  Vector3D unitB = next->unit.slice<3>();
+
   // Don't blend nearly colinear segments
-  double intersectAngle = fabs(next->unit.angleBetween(-prev->unit));
-  if (M_PI * 0.95 < intersectAngle) return;
+  double cosTheta = unitA.dot(unitB);
+  if (cosTheta < -0.99) return;
 
   // Compute arc between segments given the allowed error
   double error = config.maxBlendError * 0.99;
+  double intersectAngle = acos(cosTheta);
   double sinHalfAngle = sin(intersectAngle / 2);
   double cosHalfAngle = cos(intersectAngle / 2);
-  double radius = error * (sinHalfAngle / (1 - sinHalfAngle));
-  double length = error * (cosHalfAngle / (1 - sinHalfAngle));
+  double length = error * cosHalfAngle / (1 - sinHalfAngle);
 
   // Recompute error if arc is too large
   if (next->length < length * 2 || prev->length < length * 2) {
     length = min(next->length, prev->length) / 2;
     error = length * (1 - sinHalfAngle) / cosHalfAngle;
-    radius = error * (sinHalfAngle / (1 - sinHalfAngle));
   }
 
-  if (std::isnan(length) || length < config.minTravel) return;
+  if (!std::isfinite(length) || length < config.minTravel) return;
 
-  // Compute angle of the arc
+  // Compute radius and angle of arc
+  double radius = error * sinHalfAngle / (1 - sinHalfAngle);
   double arcAngle = M_PI - intersectAngle;
 
   // Arc error cannot be greater than arc radius
-  const double arcError = std::min(config.maxBlendError * 0.01, radius);
+  const double arcError =
+    std::min(std::min(config.maxBlendError * 0.01, radius), config.maxArcError);
 
   // Compute segments and segment angle
   unsigned segments = blendSegments(arcError, arcAngle, radius);
-  double segAngle = arcAngle / segments;
 
   if (!segments) return;
 
-  // Get parameters
-  Vector3D p = next->start.slice<3>(); // Intersection point
-  Vector3D a = -prev->unit.slice<3>(); // Unit vector
-  Vector3D b = next->unit.slice<3>();  // Unit vector
-
   // Delete intervening commands from pre-plan queue
   while (pre.back() != prev) delete pre.pop_back();
+
+  // Get intersection point before making cut
+  Vector3D p = next->start.getXYZ();
 
   // Adjust move endpoints, must be after getting intersection point above
   vector<LineCommand::Speed> speeds;
@@ -544,9 +545,9 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
     speeds[i].offset /= 2 * length;
 
   // Find arc center
-  Vector3D q1 = p + a * length;
-  Vector3D q2 = p + b * length;
-  Vector3D v = a.cross(b).cross(a).normalize() * radius;
+  Vector3D q1 = p + unitA * length;
+  Vector3D q2 = p + unitB * length;
+  Vector3D v = unitA.cross(unitB).cross(unitA).normalize() * radius;
   Vector3D c1 = q1 + v;
   Vector3D c2 = q1 - v;
   Vector3D center;
@@ -554,27 +555,21 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
     center = c1;
   else center = c2;
 
-  // Increase the radius so the line segments straddle the actual arc
-  double alpha = cos(segAngle / 2);
-  double epsilon = 1 + (1 - alpha) / (1 + alpha);
-
   // Compute arc using SLERP
-  Vector3D arcStart = (q1 - center) * epsilon;
-  Vector3D arcEnd   = (q2 - center) * epsilon;
+  Vector3D arcStart = q1 - center;
+  Vector3D arcEnd   = q2 - center;
   Axes start = prev->target;
   Axes target = start;
   double sinAngle = sin(arcAngle);
   double lastFract = 0;
   unsigned speedIdx = 0;
 
-  // We want to start and end on the actual arc so we offset by half a segment
-  double offsetAngle = segAngle / 2;
-
   prev->targetJunctionVel =
-    computeJunctionVelocity(center - target.getXYZ(), radius * epsilon);
+    computeJunctionVelocity(center - target.getXYZ(), radius);
 
+  double segAngle = arcAngle / segments;
   for (unsigned i = 0; i < segments; i++) {
-    double a = i * segAngle + offsetAngle;
+    double a = (1 + i) * segAngle;
     Vector3D v;
 
     if (i == segments - 1) v = next->start.getXYZ(); // Exact end
@@ -587,8 +582,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
       new LineCommand(start, target, prev->feed, prev->rapid, false, false,
                       config);
 
-    lc->targetJunctionVel =
-      computeJunctionVelocity(center - v, radius * epsilon);
+    lc->targetJunctionVel = computeJunctionVelocity(center - v, radius);
 
     double fract = a / arcAngle;
     double segFract = fract - lastFract;

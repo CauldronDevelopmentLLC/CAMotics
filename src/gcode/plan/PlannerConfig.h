@@ -40,7 +40,7 @@ namespace GCode {
     Axes maxJerk             = 50000000;
 
     double junctionDeviation = 0.05;
-    double junctionAccel     = 100000;
+    double junctionAccel     = 200000;
 
     Axes minSoftLimit        = std::numeric_limits<double>::quiet_NaN();
     Axes maxSoftLimit        = std::numeric_limits<double>::quiet_NaN();
