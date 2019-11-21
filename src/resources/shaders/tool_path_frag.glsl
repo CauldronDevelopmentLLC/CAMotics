@@ -1,6 +1,7 @@
-//precision mediump float;
-attribute vec3 fragColor;
+precision mediump float;
+attribute vec4 fragColor;
+
 
 void main() {
-  gl_FragColor = vec4(fragColor.r, fragColor.g, fragColor.b, 1.0);
+  gl_FragColor = fragColor;
 }

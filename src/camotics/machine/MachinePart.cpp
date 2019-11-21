@@ -20,10 +20,6 @@
 
 #include "MachinePart.h"
 
-#ifdef CAMOTICS_GUI
-#include <camotics/view/GL.h>
-#endif
-
 using namespace CAMotics;
 using namespace cb;
 using namespace std;
@@ -112,7 +108,7 @@ void MachinePart::read(const InputSource &source,
 #ifdef CAMOTICS_GUI
 void MachinePart::drawLines() {
 #if 0 // TODO GL
-  GLFuncs &glFuncs = getGLFuncs();
+  GLContext &glFuncs = getGLContext();
 
   if (!vbuf) {
     glFuncs.glGenBuffers(1, &vbuf);
@@ -143,7 +139,7 @@ void MachinePart::drawLines() {
 
 void MachinePart::draw(bool wire) {
 #if 0 // TODO GL
-  GLFuncs &glFuncs = getGLFuncs();
+  GLContext &glFuncs = getGLContext();
 
   glFuncs.glPushMatrix();
   glFuncs.glTranslatef(offset[0], offset[1], offset[2]);

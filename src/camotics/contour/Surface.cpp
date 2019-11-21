@@ -31,7 +31,7 @@ void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
                        const string &hash) const {
   STL::Writer writer(sink, binary);
 
-  writer.writeHeader(name, getCount(), hash);
+  writer.writeHeader(name, getTriangleCount(), hash);
   write(writer);
   writer.writeFooter(name, hash);
 }

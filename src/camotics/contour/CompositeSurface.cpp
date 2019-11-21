@@ -49,10 +49,10 @@ SmartPointer<Surface> CompositeSurface::copy() const {
 }
 
 
-uint64_t CompositeSurface::getCount() const {
+uint64_t CompositeSurface::getTriangleCount() const {
   uint64_t triangles = 0;
   for (unsigned i = 0; i < surfaces.size(); i++)
-    triangles += surfaces[i]->getCount();
+    triangles += surfaces[i]->getTriangleCount();
   return triangles;
 }
 
@@ -65,12 +65,10 @@ Rectangle3D CompositeSurface::getBounds() const {
 }
 
 
-#ifdef CAMOTICS_GUI
-void CompositeSurface::draw() {
+void CompositeSurface::getVertices(vert_cb_t cb) const {
   for (unsigned i = 0; i < surfaces.size(); i++)
-    surfaces[i]->draw();
+    surfaces[i]->getVertices(cb);
 }
-#endif // CAMOTICS_GUI
 
 
 void CompositeSurface::write(STL::Sink &sink, Task *task) const {

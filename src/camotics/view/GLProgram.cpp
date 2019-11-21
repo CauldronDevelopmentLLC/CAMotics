@@ -20,7 +20,7 @@
 
 #include "GLProgram.h"
 #include "GLShader.h"
-#include "GL.h"
+#include "GLContext.h"
 
 #include <cbang/Exception.h>
 #include <cbang/Catch.h>
@@ -32,22 +32,23 @@ using namespace std;
 
 
 GLProgram::GLProgram() {
-  program = getGLFuncs().glCreateProgram();
+  program = GLContext().glCreateProgram();
   if (!program) THROW("Failed to create GL program");
 }
 
 
 GLProgram::~GLProgram() {
   try {
-  //if (program) getGLFuncs().glDeleteProgram(program); TODO
+    if (program && GLContext::isActive()) GLContext().glDeleteProgram(program);
   } CATCH_ERROR;
 }
 
 
 void GLProgram::attach(const GLShader &shader) {
-  getGLFuncs().glAttachShader(program, shader.get());
+  GLContext gl;
+  gl.glAttachShader(program, shader.get());
 
-  GLenum err = getGLFuncs().glGetError();
+  GLenum err = gl.glGetError();
 
   if (err == GL_INVALID_VALUE) THROW("Invalid GL program or shader");
   if (err == GL_INVALID_OPERATION)
@@ -61,49 +62,50 @@ void GLProgram::attach(const string &resource, int type) {
 
 
 void GLProgram::bindAttribute(const string &name, unsigned id) {
-  getGLFuncs().glBindAttribLocation(program, id, (GLchar *)name.c_str());
+  GLContext().glBindAttribLocation(program, id, (GLchar *)name.c_str());
 }
 
 
 void GLProgram::link() {
-  GLFuncs &glFuncs = getGLFuncs();
+  GLContext gl;
 
-  glFuncs.glLinkProgram(program);
+  gl.glLinkProgram(program);
 
   GLint success = 0;
-  glFuncs.glGetProgramiv(program, GL_LINK_STATUS, &success);
+  gl.glGetProgramiv(program, GL_LINK_STATUS, &success);
 
   if (success == GL_FALSE) {
     GLint len = 0;
-    glFuncs.glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+    gl.glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
 
     // The len includes the NULL character
     vector<GLchar> error(len);
-    glFuncs.glGetProgramInfoLog(program, len, &len, &error[0]);
+    gl.glGetProgramInfoLog(program, len, &len, &error[0]);
 
     THROW("Failed to link GL program: " << &error[0]);
   }
 
   // Detatch all shaders
   GLint count;
-  glFuncs.glGetProgramiv(program, GL_ATTACHED_SHADERS, &count);
+  gl.glGetProgramiv(program, GL_ATTACHED_SHADERS, &count);
 
   vector<GLuint> shaders(count);
-  glFuncs.glGetAttachedShaders(program, count, 0, &shaders[0]);
+  gl.glGetAttachedShaders(program, count, 0, &shaders[0]);
 
   for (unsigned i = 0; i < shaders.size(); i++)
-    glFuncs.glDetachShader(program, shaders[i]);
+    gl.glDetachShader(program, shaders[i]);
 }
 
 
 void GLProgram::use() const {
-  getGLFuncs().glUseProgram(program);
-  logGLErrors();
+  GLContext gl;
+  gl.glUseProgram(program);
+  gl.logErrors();
 }
 
 
 GLUniform GLProgram::getUniform(const string &name) const {
-  GLint loc = glGetUniformLocation(program, (GLchar *)name.c_str());
+  GLint loc = GLContext().glGetUniformLocation(program, (GLchar *)name.c_str());
   if (loc == -1) THROW("GL uniform '" << name << "' not found");
 
   return GLUniform(program, (unsigned)loc);

@@ -20,84 +20,44 @@
 
 #include "CuboidView.h"
 
-#include "GL.h"
+#include "Transform.h"
 
 using namespace cb;
 using namespace CAMotics;
 
 
-CuboidView::~CuboidView() {
-  try {
-    if (vertexVBuf) getGLFuncs().glDeleteBuffers(1, &vertexVBuf);
-    if (normalVBuf) getGLFuncs().glDeleteBuffers(1, &normalVBuf);
-  } catch (...) {}
-}
-
-
-void CuboidView::draw() {
-#if 0 // TODO GL
-  if (bounds == Rectangle3D()) return;
-
+CuboidView::CuboidView() : Mesh(12) {
   static float vertices[] = {
-    1, 0, 0,  1, 0, 1,  1, 1, 1,  1, 1, 0,
-    0, 0, 0,  0, 0, 1,  0, 1, 1,  0, 1, 0,
+    1, 0, 0,  1, 0, 1,  1, 1, 0,   1, 0, 1,  1, 1, 1,  1, 1, 0,
+    0, 0, 0,  0, 0, 1,  0, 1, 0,   0, 0, 1,  0, 1, 1,  0, 1, 0,
 
-    0, 1, 0,  1, 1, 0,  1, 1, 1,  0, 1, 1,
-    0, 0, 0,  1, 0, 0,  1, 0, 1,  0, 0, 1,
+    0, 1, 0,  0, 1, 1,  1, 1, 0,   0, 1, 1,  1, 1, 1,  1, 1, 0,
+    0, 0, 0,  0, 0, 1,  1, 0, 0,   0, 0, 1,  1, 0, 1,  1, 0, 0,
 
-    0, 0, 1,  1, 0, 1,  1, 1, 1,  0, 1, 1,
-    0, 0, 0,  1, 0, 0,  1, 1, 0,  0, 1, 0,
+    0, 0, 1,  0, 1, 1,  1, 0, 1,   0, 1, 1,  1, 1, 1,  1, 0, 1,
+    0, 0, 0,  0, 1, 0,  1, 0, 0,   0, 1, 0,  1, 1, 0,  1, 0, 0,
   };
 
   static float normals[] = {
-     1,  0,  0,   1,  0,  0,   1,  0,  0,   1,  0,  0,
-    -1,  0,  0,  -1,  0,  0,  -1,  0,  0,  -1,  0,  0,
+     1,  0,  0,   1,  0,  0,   1,  0,  0,   1,  0,  0,   1,  0,  0,   1,  0,  0,
+    -1,  0,  0,  -1,  0,  0,  -1,  0,  0,  -1,  0,  0,  -1,  0,  0,  -1,  0,  0,
 
-     0,  1,  0,   0,  1,  0,   0,  1,  0,   0,  1,  0,
-     0, -1,  0,   0, -1,  0,   0, -1,  0,   0, -1,  0,
+     0,  1,  0,   0,  1,  0,   0,  1,  0,   0,  1,  0,   0,  1,  0,   0,  1,  0,
+     0, -1,  0,   0, -1,  0,   0, -1,  0,   0, -1,  0,   0, -1,  0,   0, -1,  0,
 
-     0,  0,  1,   0,  0,  1,   0,  0,  1,   0,  0,  1,
-     0,  0, -1,   0,  0, -1,   0,  0, -1,   0,  0, -1,
+     0,  0,  1,   0,  0,  1,   0,  0,  1,   0,  0,  1,   0,  0,  1,   0,  0,  1,
+     0,  0, -1,   0,  0, -1,   0,  0, -1,   0,  0, -1,   0,  0, -1,   0,  0, -1,
   };
 
-  GLFuncs &glFuncs = getGLFuncs();
+  Mesh::add(36, vertices, normals);
+}
 
-  if (!vertexVBuf) {
-    glFuncs.glGenBuffers(1, &vertexVBuf);
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                         vertices, GL_STATIC_DRAW);
 
-    glFuncs.glGenBuffers(1, &normalVBuf);
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
-    glFuncs.glBufferData(GL_ARRAY_BUFFER, 24 * 3 * sizeof(float),
-                         normals, GL_STATIC_DRAW);
-  }
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, normalVBuf);
-  glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glFuncs.glEnable(GL_NORMALIZE);
-  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
-  glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
-
-  glFuncs.glPushMatrix();
-
+void CuboidView::setBounds(const Rectangle3D &bounds) {
   Vector3D bMin = bounds.getMin();
   Vector3D bDim = bounds.getDimensions();
-  glFuncs.glTranslated(bMin.x(), bMin.y(), bMin.z());
-  glFuncs.glScaled(bDim.x(), bDim.y(), bDim.z());
 
-  glFuncs.glDrawArrays(GL_QUADS, 0, 24);
-
-  glFuncs.glPopMatrix();
-
-  glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
-  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
-#endif
+  getTransform().toIdentity();
+  getTransform().translate(bMin.x(), bMin.y(), bMin.z());
+  getTransform().scale(bDim.x(), bDim.y(), bDim.z());
 }

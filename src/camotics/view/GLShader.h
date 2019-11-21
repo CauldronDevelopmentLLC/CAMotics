@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "GLContext.h"
+
 #include <string>
 
 

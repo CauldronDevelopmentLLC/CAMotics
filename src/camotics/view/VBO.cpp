@@ -19,19 +19,20 @@
 \******************************************************************************/
 
 #include "VBO.h"
-#include "GL.h"
+#include "GLContext.h"
 
 using namespace CAMotics;
 
 
 VBO::~VBO() {
   try {
-    if (buffer) getGLFuncs().glDeleteBuffers(1, &buffer);
+    if (buffer && GLContext().isActive())
+      GLContext().glDeleteBuffers(1, &buffer);
   } catch (...) {}
 }
 
 
 unsigned VBO::get() {
-  if (!buffer) getGLFuncs().glGenBuffers(1, &buffer);
+  if (!buffer) GLContext().glGenBuffers(1, &buffer);
   return buffer;
 }

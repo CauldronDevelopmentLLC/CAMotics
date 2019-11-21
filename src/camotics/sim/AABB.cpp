@@ -20,12 +20,6 @@
 
 #include "AABB.h"
 
-#ifdef CAMOTICS_GUI
-#include <camotics/view/GL.h>
-#endif
-
-#include <camotics/view/BoundsView.h>
-
 #include <cbang/Zap.h>
 
 #include <algorithm>
@@ -134,9 +128,9 @@ void AABB::collisions(const Vector3D &p,
 void AABB::draw(bool leavesOnly, unsigned height, unsigned depth) {
   if (!(left || right) || !leavesOnly) {
 #if 0 // TODO GL
-    getGLFuncs().glColor3f(0.5, 0, (height - depth) / (double)height);
-#endif
+    GLContext().setColor(0.5, 0, (height - depth) / (double)height);
     BoundsView(*this).draw();
+#endif
   }
 
   if (left) left->draw(leavesOnly, height, depth + 1);

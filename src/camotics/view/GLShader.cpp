@@ -19,7 +19,6 @@
 \******************************************************************************/
 
 #include "GLShader.h"
-#include "GL.h"
 
 #include <cbang/Exception.h>
 #include <cbang/Catch.h>
@@ -37,28 +36,27 @@ namespace CAMotics {
 
 
 GLShader::GLShader(const string &source, int type) {
-  GLFuncs &glFuncs = getGLFuncs();
-
-  shader = glFuncs.glCreateShader((GLenum)type);
+  GLContext gl;
+  shader = gl.glCreateShader((GLenum)type);
   if (!shader) THROW("Failed to create GL shader");
 
   // Load source
   const GLchar *str = (const GLchar *)source.c_str();
-  glFuncs.glShaderSource(shader, 1, &str, 0);
+  gl.glShaderSource(shader, 1, &str, 0);
 
   // Compile
-  glFuncs.glCompileShader(shader);
+  gl.glCompileShader(shader);
 
   GLint success = 0;
-  glFuncs.glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+  gl.glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
   if (success == GL_FALSE) {
     GLint len = 0;
-    glFuncs.glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
+    gl.glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
 
     // The len includes the NULL character
     vector<GLchar> error(len);
-    glFuncs.glGetShaderInfoLog(shader, len, &len, &error[0]);
+    gl.glGetShaderInfoLog(shader, len, &len, &error[0]);
 
     THROW("Failed to compile GL shader: " << &error[0]);
   }
@@ -67,7 +65,7 @@ GLShader::GLShader(const string &source, int type) {
 
 GLShader::~GLShader() {
   try {
-    if (shader) getGLFuncs().glDeleteShader(shader);
+    if (shader) GLContext().glDeleteShader(shader);
   } CATCH_ERROR;
 }
 

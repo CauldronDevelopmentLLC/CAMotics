@@ -56,8 +56,8 @@ void SurfaceTask::run() {
 
   // Done
   double delta = Timer::now() - startTime;
+  unsigned triangles = surface->getTriangleCount();
   LOG_INFO(1, "Time: " << TimeInterval(delta)
-           << " Triangles: " << surface->getCount()
-           << " Triangles/sec: "
-           << String::printf("%0.2f", surface->getCount() / delta));
+           << " Triangles: " << triangles
+           << " Triangles/sec: " << String::printf("%0.2f", triangles / delta));
 }

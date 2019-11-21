@@ -20,24 +20,18 @@
 
 #pragma once
 
+#include "Mesh.h"
+
 #include <cbang/geom/Rectangle.h>
 
 
 namespace CAMotics {
-  class CuboidView {
-    cb::Rectangle3D bounds;
-
-    unsigned vertexVBuf;
-    unsigned normalVBuf;
-
+  class CuboidView : public Mesh {
   public:
-    CuboidView(const cb::Rectangle3D &bounds = cb::Rectangle3D()) :
-      bounds(bounds), vertexVBuf(0), normalVBuf(0) {}
-    ~CuboidView();
+    CuboidView();
+    CuboidView(const cb::Rectangle3D &bounds) :
+      CuboidView() {setBounds(bounds);}
 
-    const cb::Rectangle3D &getBounds() const {return bounds;}
-    void setBounds(const cb::Rectangle3D &bounds) {this->bounds = bounds;}
-
-    void draw();
+    void setBounds(const cb::Rectangle3D &bounds);
   };
 }

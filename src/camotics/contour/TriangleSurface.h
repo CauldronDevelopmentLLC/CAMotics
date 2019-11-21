@@ -36,10 +36,6 @@ namespace CAMotics {
   class GridTree;
 
   class TriangleSurface : public Surface, public TriangleMesh {
-    bool finalized;
-
-    unsigned vbufs[2];
-
     cb::Rectangle3D bounds;
 
   public:
@@ -47,23 +43,20 @@ namespace CAMotics {
     TriangleSurface(STL::Source &source, Task *task = 0);
     TriangleSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
     TriangleSurface(const TriangleSurface &o);
-    TriangleSurface();
-    virtual ~TriangleSurface();
+    TriangleSurface() {}
 
-    void finalize();
     void add(const cb::Vector3F vertices[3]);
     void add(const cb::Vector3F vertices[3], const cb::Vector3F &normal);
     void add(const GridTree &tree);
 
-    // From Surface
-    cb::SmartPointer<Surface> copy() const;
-    uint64_t getCount() const {return TriangleMesh::getCount();}
-    cb::Rectangle3D getBounds() const {return bounds;}
-#ifdef CAMOTICS_GUI
-    void draw();
-#endif
     void clear();
     void read(STL::Source &source, Task *task = 0);
+
+    // From Surface
+    cb::SmartPointer<Surface> copy() const;
+    uint64_t getTriangleCount() const {return TriangleMesh::getTriangleCount();}
+    cb::Rectangle3D getBounds() const {return bounds;}
+    void getVertices(vert_cb_t cb) const;
     void write(STL::Sink &sink, Task *task = 0) const;
     void reduce(Task &task);
 

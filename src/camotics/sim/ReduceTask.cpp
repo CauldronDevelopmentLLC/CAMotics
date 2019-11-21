@@ -40,11 +40,11 @@ void ReduceTask::run() {
   LOG_INFO(1, "Reducing mesh");
 
   double startTime = Timer::now();
-  double startCount = surface->getCount();
+  double startCount = surface->getTriangleCount();
 
   surface->reduce(*this);
 
-  unsigned count = surface->getCount();
+  unsigned count = surface->getTriangleCount();
   double r = (double)(startCount - count) / startCount * 100;
 
   LOG_INFO(1, "Time: " << TimeInterval(Timer::now() - startTime)

@@ -102,6 +102,7 @@ void QtApp::run() {
   QCoreApplication::setOrganizationName(QString::fromUtf8(org.c_str()));
   QCoreApplication::setApplicationName(QString::fromUtf8(getName().c_str()));
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+  QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
 
   int argc = args.size();
   QApplication qtApp(argc, (char **)&args[0]);

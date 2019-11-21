@@ -23,8 +23,6 @@
 
 #include "ui_settings_dialog.h"
 
-#include <camotics/view/GL.h>
-
 using namespace std;
 using namespace cb;
 using namespace CAMotics;

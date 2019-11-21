@@ -20,8 +20,6 @@
 
 #include "ToolPathView.h"
 
-#include "GL.h"
-
 #include <cbang/Exception.h>
 #include <cbang/log/Logger.h>
 #include <cbang/Catch.h>
@@ -33,11 +31,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ToolPathView::ToolPathView(ValueSet &valueSet) :
-  values(valueSet), byRemote(true), ratio(1), line(0), currentTime(0),
-  currentDistance(0), currentLine(0), dirty(true), colorVBuf(0), vertexVBuf(0),
-  numVertices(0), numColors(0), lastIntensity(false) {
-
+ToolPathView::ToolPathView(ValueSet &valueSet) : values(valueSet) {
   values.add("x", currentPosition.x());
   values.add("y", currentPosition.y());
   values.add("z", currentPosition.z());
@@ -58,14 +52,6 @@ ToolPathView::ToolPathView(ValueSet &valueSet) :
   values.add("speed", this, &ToolPathView::getSpeed);
   values.add("direction", this, &ToolPathView::getDirection);
   values.add("program_line", this, &ToolPathView::getProgramLine);
-}
-
-
-ToolPathView::~ToolPathView() {
-  try {
-    if (colorVBuf) getGLFuncs().glDeleteBuffers(1, &colorVBuf);
-    if (vertexVBuf) getGLFuncs().glDeleteBuffers(1, &vertexVBuf);
-  } catch (...) {}
 }
 
 
@@ -117,6 +103,13 @@ void ToolPathView::decTime(double amount) {
 }
 
 
+void ToolPathView::setShowIntensity(bool show) {
+  if (show == showIntensity) return;
+  showIntensity = show;
+  dirty = true;
+}
+
+
 const char *ToolPathView::getDirection() const {
   if (!getMove().getSpeed()) return "Idle";
   return getMove().getSpeed() < 0 ? "Counterclockwise" : "Clockwise";
@@ -135,11 +128,9 @@ Color ToolPathView::getColor(GCode::MoveType type, double intensity) {
 }
 
 
-void ToolPathView::update(bool intensity) {
-  if ((!dirty && intensity == lastIntensity) ||
-      !QOpenGLContext::currentContext()) return;
+void ToolPathView::update(GLContext &gl) {
+  if (!dirty) return;
 
-  lastIntensity = intensity;
   currentTime = 0;
   currentDistance = 0;
   currentPosition = byRemote ? position : Vector3D();
@@ -151,7 +142,7 @@ void ToolPathView::update(bool intensity) {
 
   // Find maximum speed
   double maxSpeed = 0;
-  if (intensity && !path.isNull())
+  if (showIntensity && !path.isNull())
     for (auto it = path->begin(); it != path->end(); it++)
       if (maxSpeed < fabs(it->getSpeed())) maxSpeed = fabs(it->getSpeed());
 
@@ -197,7 +188,8 @@ void ToolPathView::update(bool intensity) {
       currentDistance += moveDistance;
 
       // Store GL data
-      double s = (intensity && maxSpeed) ? fabs(move.getSpeed()) / maxSpeed : 1;
+      double s =
+        (showIntensity && maxSpeed) ? fabs(move.getSpeed()) / maxSpeed : 1;
       Color color = getColor(move.getType(), s);
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
@@ -215,25 +207,21 @@ void ToolPathView::update(bool intensity) {
   numColors = colors.size() / 3;
   numVertices = vertices.size() / 3;
 
-  GLFuncs &glFuncs = getGLFuncs();
-
   // Setup color buffers
   if (!colors.empty()) {
-    if (!colorVBuf) glFuncs.glGenBuffers(1, &colorVBuf);
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-    glFuncs.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
-                         &colors[0], GL_STATIC_DRAW);
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gl.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf.get());
+    gl.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float), &colors[0],
+                    GL_STATIC_DRAW);
+    gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
     colors.clear();
   }
 
   // Setup vertex buffers
   if (!vertices.empty()) {
-    if (!vertexVBuf) glFuncs.glGenBuffers(1, &vertexVBuf);
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-    glFuncs.glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
-                          &vertices[0], GL_STATIC_DRAW);
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gl.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf.get());
+    gl.glBufferData(GL_ARRAY_BUFFER, numVertices * 3 * sizeof(float),
+                    &vertices[0], GL_STATIC_DRAW);
+    gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
     vertices.clear();
   }
 
@@ -242,28 +230,29 @@ void ToolPathView::update(bool intensity) {
 }
 
 
-void ToolPathView::draw() {
+void ToolPathView::glDraw(GLContext &gl) {
   if (path.isNull()) return;
+
+  update(gl);
 
   if (!numColors || !numVertices) return;
 
-  GLFuncs &glFuncs = getGLFuncs();
+  // Color
+  gl.glEnableVertexAttribArray(GL_ATTR_COLOR);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf.get());
+  gl.glVertexAttribPointer(GL_ATTR_COLOR, 3, GL_FLOAT, false, 0, 0);
 
-  glFuncs.glEnableVertexAttribArray(GL_ATTR_COLOR);
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf);
-  glFuncs.glVertexAttribPointer(GL_ATTR_COLOR, 3, GL_FLOAT, false, 0, 0);
+  // Position
+  gl.glEnableVertexAttribArray(GL_ATTR_POSITION);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf.get());
+  gl.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_FLOAT, false, 0, 0);
 
-  glFuncs.glEnableVertexAttribArray(GL_ATTR_POSITION);
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vertexVBuf);
-  glFuncs.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_FLOAT, false, 0, 0);
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   // Draw
-  glFuncs.glLineWidth(1);
-  glFuncs.glDrawArrays(GL_LINES, 0, numVertices);
+  gl.glDrawArrays(GL_LINES, 0, numVertices);
 
   // Clean up
-  glFuncs.glDisableVertexAttribArray(GL_ATTR_POSITION);
-  glFuncs.glDisableVertexAttribArray(GL_ATTR_COLOR);
+  gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
+  gl.glDisableVertexAttribArray(GL_ATTR_COLOR);
 }

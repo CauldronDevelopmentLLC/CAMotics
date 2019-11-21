@@ -27,9 +27,6 @@
 #include <cbang/log/Logger.h>
 
 #include <camotics/Task.h>
-#ifdef CAMOTICS_GUI
-#include <camotics/view/GL.h>
-#endif
 
 #include <stl/Source.h>
 #include <stl/Sink.h>
@@ -39,22 +36,15 @@ using namespace cb;
 using namespace CAMotics;
 
 
-TriangleSurface::TriangleSurface(const GridTree &tree) : finalized(false) {
-  vbufs[0] = 0;
-  add(tree);
-}
+TriangleSurface::TriangleSurface(const GridTree &tree) {add(tree);}
 
 
-TriangleSurface::TriangleSurface(STL::Source &source, Task *task) :
-  finalized(false) {
-  vbufs[0] = 0;
+TriangleSurface::TriangleSurface(STL::Source &source, Task *task) {
   read(source, task);
 }
 
 
-TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
-  finalized(false) {
-  vbufs[0] = 0;
+TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) {
 
   for (unsigned i = 0; i < surfaces.size(); i++) {
     TriangleSurface *s = dynamic_cast<TriangleSurface *>(surfaces[i].get());
@@ -71,48 +61,7 @@ TriangleSurface::TriangleSurface(vector<SmartPointer<Surface> > &surfaces) :
 
 
 TriangleSurface::TriangleSurface(const TriangleSurface &o) :
-  TriangleMesh(o), finalized(false), bounds(o.bounds) {
-  vbufs[0] = 0;
-}
-
-
-TriangleSurface::TriangleSurface() : finalized(false) {
-  vbufs[0] = 0;
-}
-
-
-TriangleSurface::~TriangleSurface() {
-#ifdef CAMOTICS_GUI
-  try {
-    if (vbufs[0]) getGLFuncs().glDeleteBuffers(2, vbufs);
-  } catch (...) {}
-#endif
-}
-
-
-void TriangleSurface::finalize() {
-  if (finalized) return;
-
-#ifdef CAMOTICS_GUI
-  GLFuncs &glFuncs = getGLFuncs();
-
-  if (!vbufs[0]) glFuncs.glGenBuffers(2, vbufs);
-
-  // Vertices
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-  glFuncs.glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
-                       &vertices[0], GL_STATIC_DRAW);
-
-  // Normals
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
-  glFuncs.glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
-                       &normals[0], GL_STATIC_DRAW);
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif // CAMOTICS_GUI
-
-  finalized = true;
-}
+  TriangleMesh(o), bounds(o.bounds) {}
 
 
 void TriangleSurface::add(const Vector3F vertices[3]) {
@@ -143,7 +92,7 @@ void TriangleSurface::add(const Vector3F vertices[3], const Vector3F &normal) {
 
 
 void TriangleSurface::add(const GridTree &tree) {
-  unsigned start = getCount();
+  unsigned start = getTriangleCount();
 
   tree.gather(vertices, normals);
 
@@ -152,43 +101,7 @@ void TriangleSurface::add(const GridTree &tree) {
 }
 
 
-SmartPointer<Surface> TriangleSurface::copy() const {
-  return new TriangleSurface(*this);
-}
-
-
-#ifdef CAMOTICS_GUI
-void TriangleSurface::draw() {
-  if (!getCount()) return; // Nothing to draw
-
-  finalize();
-
-#if 0 // TODO GL
-  GLFuncs &glFuncs = getGLFuncs();
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[0]);
-  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbufs[1]);
-  glFuncs.glNormalPointer(GL_FLOAT, 0, 0);
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
-  glFuncs.glEnableClientState(GL_NORMAL_ARRAY);
-
-  glFuncs.glDrawArrays(GL_TRIANGLES, 0, getCount() * 3);
-
-  glFuncs.glDisableClientState(GL_NORMAL_ARRAY);
-  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
-#endif
-}
-#endif // CAMOTICS_GUI
-
-
 void TriangleSurface::clear() {
-  finalized = false;
-
   vertices.clear();
   normals.clear();
 
@@ -232,12 +145,21 @@ void TriangleSurface::read(STL::Source &source, Task *task) {
 }
 
 
+SmartPointer<Surface> TriangleSurface::copy() const {
+  return new TriangleSurface(*this);
+}
+
+
+void TriangleSurface::getVertices(vert_cb_t cb) const {cb(vertices, normals);}
+
+
 void TriangleSurface::write(STL::Sink &sink, Task *task) const {
   Vector3F p[3];
 
   if (task) task->begin("Writing STL surface");
 
-  for (unsigned i = 0; i < getCount() && (!task || !task->shouldQuit()); i++) {
+  for (unsigned i = 0; i < getTriangleCount() &&
+         (!task || !task->shouldQuit()); i++) {
     unsigned offset = i * 9;
 
     // In an STL file, there's only one normal per facet.
@@ -251,7 +173,7 @@ void TriangleSurface::write(STL::Sink &sink, Task *task) const {
 
     sink.writeFacet(p[0], p[1], p[2], normal);
 
-    if (task) task->update((double)i / getCount());
+    if (task) task->update((double)i / getTriangleCount());
   }
 }
 
@@ -264,6 +186,7 @@ void TriangleSurface::reduce(Task &task) {
 
 void TriangleSurface::read(const JSON::Value &value) {
   // TODO
+  THROW("NYI");
 }
 
 

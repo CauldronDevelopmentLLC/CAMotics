@@ -45,5 +45,6 @@ namespace CAMotics {
     void set(int v0, int v1, int v2, int v3) const;
 
     void set(const cb::Matrix4x4F &m) const;
+    void set(const cb::Matrix4x4D &m) const;
   };
 }

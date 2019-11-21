@@ -20,19 +20,15 @@
 
 #pragma once
 
+#include "GLComposite.h"
+#include "Color.h"
 
 #include <gcode/Tool.h>
 
 
 namespace CAMotics {
-  class ToolView {
-    const GCode::Tool &tool;
-    const cb::Vector3D &position;
-
+  class ToolView : public GLComposite {
   public:
-    ToolView(const GCode::Tool &tool,
-             const cb::Vector3D &position) : tool(tool), position(position) {}
-
-    void draw();
+    void set(const GCode::Tool &tool);
   };
 }

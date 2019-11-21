@@ -65,7 +65,6 @@ namespace CAMotics {
 #ifdef CAMOTICS_GUI
     void drawLines();
     void draw(bool wire);
-    using TriangleSurface::draw;
 #endif
   };
 }

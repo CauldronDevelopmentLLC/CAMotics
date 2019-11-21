@@ -19,7 +19,7 @@
 \******************************************************************************/
 
 #include "GLUniform.h"
-#include "GL.h"
+#include "GLContext.h"
 
 #include <vector>
 
@@ -29,48 +29,48 @@ using namespace std;
 
 
 void GLUniform::set(float v0) const {
-  getGLFuncs().glUniform1f(location, v0);
+  GLContext().glUniform1f(location, v0);
 }
 
 
 void GLUniform::set(float v0, float v1) const {
-  getGLFuncs().glUniform2f(location, v0, v1);
+  GLContext().glUniform2f(location, v0, v1);
 }
 
 
 
 void GLUniform::set(float v0, float v1, float v2) const {
-  getGLFuncs().glUniform3f(location, v0, v1, v2);
+  GLContext().glUniform3f(location, v0, v1, v2);
 }
 
 
 
 void GLUniform::set(float v0, float v1, float v2, float v3) const {
-  getGLFuncs().glUniform4f(location, v0, v1, v2, v3);
+  GLContext().glUniform4f(location, v0, v1, v2, v3);
 }
 
 
 
 void GLUniform::set(int v0) const {
-  getGLFuncs().glUniform1i(location, v0);
+  GLContext().glUniform1i(location, v0);
 }
 
 
 
 void GLUniform::set(int v0, int v1) const {
-  getGLFuncs().glUniform2i(location, v0, v1);
+  GLContext().glUniform2i(location, v0, v1);
 }
 
 
 
 void GLUniform::set(int v0, int v1, int v2) const {
-  getGLFuncs().glUniform3i(location, v0, v1, v2);
+  GLContext().glUniform3i(location, v0, v1, v2);
 }
 
 
 
 void GLUniform::set(int v0, int v1, int v2, int v3) const {
-  getGLFuncs().glUniform4i(location, v0, v1, v2, v3);
+  GLContext().glUniform4i(location, v0, v1, v2, v3);
 }
 
 
@@ -81,5 +81,16 @@ void GLUniform::set(const Matrix4x4F &m) const {
     for (unsigned row = 0; row < 4; row++)
       v[col * 4 + row] = m[row][col];
 
-  getGLFuncs().glUniformMatrix4fv(location, 1, false, v);
+  GLContext().glUniformMatrix4fv(location, 1, false, v);
+}
+
+
+void GLUniform::set(const Matrix4x4D &m) const {
+  float v[16];
+
+  for (unsigned col = 0; col < 4; col++)
+    for (unsigned row = 0; row < 4; row++)
+      v[col * 4 + row] = m[row][col];
+
+  GLContext().glUniformMatrix4fv(location, 1, false, v);
 }

@@ -20,10 +20,6 @@
 
 #include "MachineModel.h"
 
-#ifdef CAMOTICS_GUI
-#include <camotics/view/GL.h>
-#endif
-
 #include <cbang/json/JSON.h>
 #include <cbang/os/SystemUtilities.h>
 
@@ -85,7 +81,7 @@ void MachineModel::readModel(const InputSource &source) {
       SmartPointer<MachinePart> part = new MachinePart(name, partConfig);
       part->read(source, transform, reverseWinding);
 
-      if (!part->getCount()) continue;
+      if (!part->getTriangleCount()) continue;
 
       parts[name] = part;
       bounds.add(part->getBounds());
@@ -111,7 +107,7 @@ void MachineModel::read(const InputSource &source) {
 #ifdef CAMOTICS_GUI
 void MachineModel::draw(bool wire) {
 #if 0 // TODO GL
-  GLFuncs &glFuncs = getGLFuncs();
+  GLContext &glFuncs = getGLContext();
 
   glFuncs.glPushMatrix();
   glFuncs.glTranslatef(offset[0], offset[1], offset[2]);

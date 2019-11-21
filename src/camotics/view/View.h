@@ -24,6 +24,9 @@
 #include "ViewPort.h"
 #include "ToolPathView.h"
 #include "CuboidView.h"
+#include "GLBox.h"
+#include "ToolView.h"
+#include "Mesh.h"
 
 #include <camotics/contour/Surface.h>
 #include <camotics/value/ValueGroup.h>
@@ -43,17 +46,26 @@ namespace CAMotics {
 
     unsigned flags;
 
-    unsigned speed;
-    bool reverse;
+    unsigned speed = 1;
+    bool reverse = false;
 
-    double lastTime;
+    double lastTime = 0;
 
   public:
+    cb::SmartPointer<GLObject> axes;
+    cb::SmartPointer<GLBox> bounds;
     cb::SmartPointer<ToolPathView> path;
+    cb::SmartPointer<ToolView> tool;
     cb::SmartPointer<CuboidView> workpiece;
+    cb::SmartPointer<Mesh> mesh;
     cb::SmartPointer<Surface> surface;
     cb::SmartPointer<MoveLookup> moveLookup;
     cb::SmartPointer<MachineModel> machine;
+
+    cb::Rectangle3D workpieceBounds;
+    cb::Rectangle3D surfaceBounds;
+
+    bool surfaceChanged = false;
 
     enum {
       WIRE_FLAG                  = 1 << 0,
@@ -95,6 +107,12 @@ namespace CAMotics {
 
     bool update();
     void clear();
-    void draw();
+
+    void updateVisibility();
+    void updateBounds();
+
+    // From GLScene
+    void glInit(GLContext &gl);
+    void glDraw(GLContext &gl);
   };
 }

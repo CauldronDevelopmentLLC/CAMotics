@@ -83,7 +83,7 @@ namespace CAMotics {
     TriangleMesh() {}
     TriangleMesh(const TriangleMesh &o);
 
-    unsigned getCount() const {return vertices.size() / 9;}
+    unsigned getTriangleCount() const {return vertices.size() / 9;}
 
     void weld(Task &task,
               float threshold = std::numeric_limits<float>::epsilon() * 10);

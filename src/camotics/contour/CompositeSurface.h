@@ -43,11 +43,9 @@ namespace CAMotics {
 
     // From Surface
     cb::SmartPointer<Surface> copy() const;
-    uint64_t getCount() const;
+    uint64_t getTriangleCount() const;
     cb::Rectangle3D getBounds() const;
-#ifdef CAMOTICS_GUI
-    void draw();
-#endif
+    void getVertices(vert_cb_t cb) const;
     void write(STL::Sink &sink, Task *task = 0) const;
     void reduce(Task &task);
 

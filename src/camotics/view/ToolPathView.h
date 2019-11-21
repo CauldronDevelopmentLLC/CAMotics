@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "GLObject.h"
+#include "VBO.h"
 #include "Color.h"
 
 #include <gcode/ToolPath.h>
@@ -31,36 +33,34 @@
 #include <vector>
 
 namespace CAMotics {
-  class ToolPathView {
+  class ToolPathView : public GLObject {
     ValueGroup values;
     cb::SmartPointer<const GCode::ToolPath> path;
 
-    bool byRemote;
-    double ratio;
+    bool byRemote = true;
+    double ratio = 1;
     cb::Vector3D position;
-    unsigned line;
+    unsigned line = 0;
 
-    double currentTime;
-    double currentDistance;
+    double currentTime = 0;
+    double currentDistance = 0;
     cb::Vector3D currentPosition;
-    unsigned currentLine;
+    unsigned currentLine = 0;
     GCode::Move currentMove;
 
-    bool dirty;
+    bool dirty = true;
+    bool showIntensity = false;
 
     std::vector<float> vertices;
     std::vector<float> colors;
 
-    unsigned colorVBuf;
-    unsigned vertexVBuf;
-    unsigned numVertices;
-    unsigned numColors;
-
-    bool lastIntensity;
+    VBO colorVBuf;
+    VBO vertexVBuf;
+    unsigned numVertices = 0;
+    unsigned numColors = 0;
 
   public:
     ToolPathView(ValueSet &valueSet);
-    ~ToolPathView();
 
     bool isEmpty() const {return path.isNull() || path->empty();}
 
@@ -96,6 +96,8 @@ namespace CAMotics {
     unsigned getProgramLine() const {return currentLine;}
     const GCode::Move &getMove() const {return currentMove;}
 
+    void setShowIntensity(bool show);
+
     unsigned getTool() const {return getMove().getTool();}
     double getFeed() const {return getMove().getFeed();}
     double getSpeed() const {return getMove().getSpeed();}
@@ -103,7 +105,9 @@ namespace CAMotics {
 
     Color getColor(GCode::MoveType type, double intensity);
 
-    void update(bool intensity);
-    void draw();
+    void update(GLContext &gl);
+
+    // From GLObject
+    void glDraw(GLContext &gl);
   };
 }

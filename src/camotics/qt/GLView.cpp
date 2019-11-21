@@ -22,7 +22,7 @@
 
 #include "QtWin.h"
 
-#include <camotics/view/GL.h>
+#include <camotics/view/GLContext.h>
 #include <camotics/view/View.h>
 
 #include <cbang/Catch.h>
@@ -107,7 +107,8 @@ void GLView::initializeGL() {
 #endif
 
     SmartLog log = startLog();
-    getView().glInit();
+    GLContext gl;
+    getView().glInit(gl);
     return;
   } CATCH_ERROR;
 
@@ -120,7 +121,8 @@ void GLView::resizeGL(int w, int h) {
   LOG_DEBUG(5, "resizeGL(" << w << ", " << h << ")");
 
   SmartLog log = startLog();
-  getView().resize(w, h);
+  GLContext gl;
+  getView().glResize(gl, w, h);
 }
 
 
@@ -129,8 +131,9 @@ void GLView::paintGL() {
   LOG_DEBUG(5, "paintGL()");
 
   SmartLog log = startLog();
-  getGLFuncs().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  getView().draw();
+  GLContext gl;
+  gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  getView().glDraw(gl);
 }
 
 
@@ -184,7 +187,7 @@ GLView::SmartLog GLView::startLog() {
 
 void GLView::logErrors() {
   if (logger.isSet()) logger->stopLogging();
-  logGLErrors();
+  GLContext().logErrors();
 }
 
 

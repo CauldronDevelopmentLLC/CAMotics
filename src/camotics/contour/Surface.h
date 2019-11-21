@@ -24,6 +24,9 @@
 #include <cbang/io/OutputSink.h>
 #include <cbang/json/Serializable.h>
 
+#include <functional>
+#include <vector>
+
 
 namespace STL {class Sink;}
 
@@ -35,11 +38,11 @@ namespace CAMotics {
     virtual ~Surface() {}
 
     virtual cb::SmartPointer<Surface> copy() const = 0;
-    virtual uint64_t getCount() const = 0;
+    virtual uint64_t getTriangleCount() const = 0;
     virtual cb::Rectangle3D getBounds() const = 0;
-#ifdef CAMOTICS_GUI
-    virtual void draw() = 0;
-#endif
+    typedef std::function<void (const std::vector<float> &vertices,
+                                const std::vector<float> &normals)> vert_cb_t;
+    virtual void getVertices(vert_cb_t cb) const = 0;
     virtual void write(STL::Sink &sink, Task *task = 0) const = 0;
     virtual void reduce(Task &task) = 0;
 

@@ -19,63 +19,57 @@
 \******************************************************************************/
 
 #include "ToolView.h"
-#include "GL.h"
+
+#include "GLSphere.h"
+#include "GLConic.h"
 
 using namespace CAMotics;
+using namespace cb;
 
 
-void ToolView::draw() {
-#if 0 // TODO GL
+void ToolView::set(const GCode::Tool &tool) {
+  clear();
+
   double diameter = tool.getDiameter();
   double radius = tool.getRadius();
   double length = tool.getLength();
   GCode::ToolShape shape = tool.getShape();
 
-  GLFuncs &glFuncs = getGLFuncs();
-
-  glFuncs.glPushMatrix();
-  glFuncs.glTranslatef(position.x(), position.y(), position.z());
+  // TODO semitransparent tool
 
   if (radius <= 0) {
     // Default tool specs
     radius = 25.4 / 8;
     shape = GCode::ToolShape::TS_CONICAL;
+    setColor(1, 0, 0); // Red
 
-    glFuncs.glColor4f(1, 0, 0, 1); // Red
-
-  } else glFuncs.glColor4f(1, 0.5, 0, 1); // Orange
+  } else setColor(1, 0.5, 0); // Orange
 
   if (length <= 0) length = 50;
 
   switch (shape) {
   case GCode::ToolShape::TS_SPHEROID: {
-    glFuncs.glMatrixMode(GL_MODELVIEW);
-    glFuncs.glPushMatrix();
-    glFuncs.glTranslatef(0, 0, length / 2);
-    glFuncs.glScaled(1, 1, length / diameter);
-    glSphere(radius, 128, 128);
-    glFuncs.glPopMatrix();
+    getTransform().translate(0, 0, length / 2);
+    getTransform().scale(1, 1, length / diameter);
+    add(new GLSphere(radius, 128, 128));
     break;
   }
 
   case GCode::ToolShape::TS_BALLNOSE:
-    glFuncs.glPushMatrix();
-    glFuncs.glTranslatef(0, 0, radius);
-    glSphere(radius, 128, 128);
-    glConic(radius, radius, length - radius);
-    glFuncs.glPopMatrix();
+    getTransform().translate(0, 0, radius);
+    add(new GLSphere(radius, 128, 128));
+    add(new GLConic(radius, radius, length - radius));
     break;
 
   case GCode::ToolShape::TS_SNUBNOSE:
-    glConic(tool.getSnubDiameter() / 2, radius, length);
+    add(new GLConic(tool.getSnubDiameter() / 2, radius, length));
     break;
 
-  case GCode::ToolShape::TS_CONICAL: glConic(0, radius, length); break;
+  case GCode::ToolShape::TS_CONICAL:
+    add(new GLConic(0, radius, length));
+    break;
 
   case GCode::ToolShape::TS_CYLINDRICAL:
-  default: glConic(radius, radius, length); break;
+  default: add(new GLConic(radius, radius, length)); break;
   }
-
-  glFuncs.glPopMatrix();
-#endif
 }

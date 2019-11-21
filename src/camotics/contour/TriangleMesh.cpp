@@ -179,7 +179,7 @@ void TriangleMesh::weld(Task &task, float threshold) {
 
 
 void TriangleMesh::reduce(Task &task) {
-  unsigned count = getCount();
+  unsigned count = getTriangleCount();
 
   // Build triangles and find unique vertices
   vector<SmartPointer<Vertex> > vertices;
