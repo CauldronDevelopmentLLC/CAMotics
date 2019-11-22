@@ -51,13 +51,16 @@ void MachineLinearizer::arc(const Vector3D &offset, const Vector3D &target,
   Vector3D start(current[axisIndex[0]],
                  current[axisIndex[1]],
                  current[axisIndex[2]]);
+  Vector3D end(target[axisIndex[0]],
+               target[axisIndex[1]],
+               target[axisIndex[2]]);
 
   // Axis vars
   int axes = getVarType(axesNames[0]) | getVarType(axesNames[1]);
   if (zOff) axes |= getVarType(axesNames[2]);
 
   double maxArcError = get("_max_arc_error", Units::METRIC);
-  Helix helix(start, Vector2D(xOff, yOff), target, angle, maxArcError);
+  Helix helix(start, Vector2D(xOff, yOff), end, angle, maxArcError);
 
   // Create segments
   for (unsigned i = 1; i < helix.size() - 1; i++) {
