@@ -21,18 +21,21 @@
 #pragma once
 
 #include "GLObject.h"
+#include "VBO.h"
 
 
 namespace CAMotics {
   class GLCylinder : public GLObject {
-    double base;
-    double top;
-    double height;
+    float base;
+    float top;
+    float height;
     unsigned segments;
 
+    VBO vertices = GL_ATTR_POSITION;
+    VBO normals = GL_ATTR_NORMAL;
+
   public:
-    GLCylinder(double base, double top, double height, unsigned segments) :
-      base(base), top(top), height(height), segments(segments) {}
+    GLCylinder(float base, float top, float height, unsigned segments);
 
     // From GLObject
     void glDraw(GLContext &gl);

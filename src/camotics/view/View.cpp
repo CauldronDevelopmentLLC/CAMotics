@@ -149,6 +149,7 @@ void View::updateVisibility() {
   path->setShowIntensity(isFlagSet(View::PATH_INTENSITY_FLAG));
   path->setVisible(isFlagSet(View::SHOW_PATH_FLAG));
   model->setVisible(isFlagSet(View::SHOW_SURFACE_FLAG));
+  model->setWire(isFlagSet(View::WIRE_FLAG));
   workpiece->setVisible(isFlagSet(View::SHOW_WORKPIECE_FLAG));
   machineView->setVisible(isFlagSet(View::SHOW_MACHINE_FLAG));
   machineView->setWire(isFlagSet(View::WIRE_FLAG));
@@ -188,17 +189,17 @@ void View::glInit() {
   group->add(axes = new AxesView);
   group->add(bounds = new GLBox);
   bounds->setColor(1, 1, 1, 0.5); // White
-  group->add(tool = new ToolView);
   group->add(path);
   group->add(aabbView);
 
   // Model
-  SmartPointer<Material> material =
-    new Material(Color(0.05, 0.18, 0.33, 1), Color(0.06, 0.23, 0.42, 1));
+  Color c(0.06, 0.23, 0.42);
   group->add(model = new Mesh(0));
   group->add(workpiece = new CuboidView);
-  model->setMaterial(material);
-  workpiece->setMaterial(material);
+  model->setColor(c);
+  workpiece->setColor(c);
+
+  group->add(tool = new ToolView);
 }
 
 
@@ -211,8 +212,7 @@ void View::glDraw() {
 
   // Model
   const float alpha = isFlagSet(View::TRANSLUCENT_SURFACE_FLAG) ? 0.8f : 1.0f;
-  model->getMaterial()->ambient.setAlpha(alpha);
-  model->getMaterial()->diffuse.setAlpha(alpha);
+  model->getColor().setAlpha(alpha);
 
   // Tool
   if (path.isSet() && path->getPath().isSet()) {
@@ -276,8 +276,6 @@ void View::glDraw() {
     moveLookupChanged = false;
     aabbView->load(*moveLookup.cast<AABBTree>());
   }
-
-  //setWire(isFlagSet(View::WIRE_FLAG));
 
   GLScene::glDraw();
 }

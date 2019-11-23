@@ -36,3 +36,43 @@ unsigned VBO::get() {
   if (!buffer) GLContext().glGenBuffers(1, &buffer);
   return buffer;
 }
+
+
+void VBO::allocate(unsigned size) {
+  this->size = size;
+  fill = 0;
+
+  GLContext gl;
+
+  gl.glBindBuffer(GL_ARRAY_BUFFER, get());
+  gl.glBufferData(GL_ARRAY_BUFFER, size, 0, GL_STATIC_DRAW);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+void VBO::add(unsigned count, const float *data) {
+  unsigned bytes = count * sizeof(float);
+  unsigned newFill = fill + bytes;
+  if (size < newFill) THROW("VBO overflow " << size << " < " << newFill);
+
+  GLContext gl;
+
+  gl.glBindBuffer(GL_ARRAY_BUFFER, get());
+  gl.glBufferSubData(GL_ARRAY_BUFFER, fill, bytes, data);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  fill = newFill;
+}
+
+
+void VBO::enable(unsigned stride) {
+  GLContext gl;
+
+  gl.glEnableVertexAttribArray(id);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, get());
+  gl.glVertexAttribPointer(id, stride, GL_FLOAT, false, 0, 0);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+void VBO::disable() {GLContext().glDisableVertexAttribArray(id);}

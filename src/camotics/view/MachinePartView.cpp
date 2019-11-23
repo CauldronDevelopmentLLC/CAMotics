@@ -39,7 +39,7 @@ MachinePartView::MachinePartView(MachinePart &part) :
 
   // Mesh
   add(mesh = new Mesh(part.getTriangleCount()));
-  mesh->setMaterial(new Material(color, color));
+  mesh->setColor(color);
 
   auto cb =
     [this] (const vector<float> &vertices, const vector<float> &normals) {

@@ -21,6 +21,7 @@
 #pragma once
 
 #include "GLObject.h"
+#include "GLEnum.h"
 #include "VBO.h"
 
 #include <vector>
@@ -28,16 +29,25 @@
 
 namespace CAMotics {
   class Lines : public GLObject {
-    unsigned size;
-    bool haveColors;
+    unsigned lines    = 0;
+    unsigned vertFill = 0;
+    bool withColors   = false;
 
-    VBO vertices;
-    VBO colors;
+    VBO vertices = GL_ATTR_POSITION;
+    VBO colors   = GL_ATTR_COLOR;
 
   public:
-    Lines(unsigned size, const float *vertices, const float *colors = 0);
+    Lines(unsigned lines, bool withColors);
+    Lines(unsigned count, const float *vertices, const float *colors = 0);
     Lines(const std::vector<float> &vertices, const std::vector<float> &colors);
     Lines(const std::vector<float> &vertices);
+
+    void reset(unsigned lines, bool withColors = false);
+
+    void add(unsigned lines, const float *vertices, const float *colors = 0);
+    void add(const std::vector<float> &vertices,
+             const std::vector<float> &colors);
+    void add(const std::vector<float> &vertices);
 
     // From GLObject
     void glDraw(GLContext &gl);

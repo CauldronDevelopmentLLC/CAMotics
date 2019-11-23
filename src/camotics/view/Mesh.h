@@ -29,13 +29,15 @@
 namespace CAMotics {
   class Mesh : public GLObject {
     unsigned triangles;
-    unsigned fill = 0;
+    unsigned vertFill = 0;
 
-    VBO vertices;
-    VBO normals;
+    VBO vertices = GL_ATTR_POSITION;
+    VBO normals = GL_ATTR_NORMAL;
 
   public:
     Mesh(unsigned triangles);
+
+    void setWire(bool wire);
 
     void reset(unsigned triangles);
 

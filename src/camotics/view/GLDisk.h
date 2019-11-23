@@ -21,16 +21,17 @@
 #pragma once
 
 #include "GLObject.h"
+#include "VBO.h"
 
 
 namespace CAMotics {
   class GLDisk : public GLObject {
     double radius;
     unsigned segments;
+    VBO vertices = GL_ATTR_POSITION;
 
   public:
-    GLDisk(double radius, unsigned segments) :
-      radius(radius), segments(segments) {}
+    GLDisk(double radius, unsigned segments);
 
     // From GLObject
     void glDraw(GLContext &gl);

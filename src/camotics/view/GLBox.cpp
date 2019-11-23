@@ -24,7 +24,7 @@ using namespace CAMotics;
 using namespace cb;
 
 
-GLBox::GLBox() {
+GLBox::GLBox() : Lines(12, false) {
   const float v[] = {
     // Top
     0, 0, 0,  1, 0, 0,
@@ -45,10 +45,7 @@ GLBox::GLBox() {
     0, 0, 1,  0, 1, 1,
   };
 
-  GLContext gl;
-  gl.glBindBuffer(GL_ARRAY_BUFFER, vbo.get());
-  gl.glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 24 * 3, v, GL_STATIC_DRAW);
-  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  add(24, v);
 }
 
 
@@ -59,16 +56,4 @@ void GLBox::setBounds(const Rectangle3D &bounds) {
   getTransform().toIdentity();
   getTransform().translate(bMin.x(), bMin.y(), bMin.z());
   getTransform().scale(bDim.x(), bDim.y(), bDim.z());
-}
-
-
-void GLBox::glDraw(GLContext &gl) {
-  gl.glEnableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glBindBuffer(GL_ARRAY_BUFFER, vbo.get());
-  gl.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_FLOAT, false, 0, 0);
-  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  gl.glDrawArrays(GL_LINES, 0, 24);
-
-  gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
 }

@@ -39,7 +39,6 @@ GLConic::GLConic(double radiusA, double radiusB, double length,
   if (radiusB) {
     SmartPointer<GLObject> o = new GLDisk(radiusB, segments);
     o->getTransform().translate(0, 0, length);
-    o->getTransform().scale(1, 1, -1);
     add(o);
   }
 }

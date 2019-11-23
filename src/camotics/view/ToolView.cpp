@@ -22,6 +22,8 @@
 
 #include "GLSphere.h"
 #include "GLConic.h"
+#include "GLCylinder.h"
+#include "GLDisk.h"
 
 using namespace CAMotics;
 using namespace cb;
@@ -35,15 +37,13 @@ void ToolView::set(const GCode::Tool &tool) {
   double length = tool.getLength();
   GCode::ToolShape shape = tool.getShape();
 
-  // TODO semitransparent tool
-
   if (radius <= 0) {
     // Default tool specs
     radius = 25.4 / 8;
     shape = GCode::ToolShape::TS_CONICAL;
     setColor(1, 0, 0); // Red
 
-  } else setColor(1, 0.5, 0); // Orange
+  } else setColor(1, 0.5, 0, 0.5); // Orange
 
   if (length <= 0) length = 50;
 
@@ -55,11 +55,17 @@ void ToolView::set(const GCode::Tool &tool) {
     break;
   }
 
-  case GCode::ToolShape::TS_BALLNOSE:
+  case GCode::ToolShape::TS_BALLNOSE: {
     getTransform().translate(0, 0, radius);
-    add(new GLSphere(radius, 128, 128));
-    add(new GLConic(radius, radius, length - radius));
+    add(new GLSphere(radius, 128, 128, true));
+    add(new GLCylinder(radius, radius, length - radius, 128));
+
+    // Top
+    SmartPointer<GLObject> o = new GLDisk(radius, 128);
+    o->getTransform().translate(0, 0, length - radius);
+    add(o);
     break;
+  }
 
   case GCode::ToolShape::TS_SNUBNOSE:
     add(new GLConic(tool.getSnubDiameter() / 2, radius, length));

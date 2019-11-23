@@ -20,23 +20,17 @@
 
 #pragma once
 
-#include "GLObject.h"
-#include "VBO.h"
+#include "Lines.h"
 
 #include <cbang/geom/Rectangle.h>
 
 
 namespace CAMotics {
-  class GLBox : public GLObject {
-    VBO vbo;
-
+  class GLBox : public Lines {
   public:
     GLBox();
     GLBox(const cb::Rectangle3D &bounds) : GLBox() {setBounds(bounds);}
 
     void setBounds(const cb::Rectangle3D &bounds);
-
-    // From GLObject
-    void glDraw(GLContext &gl);
   };
 }

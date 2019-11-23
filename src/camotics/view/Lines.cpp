@@ -26,56 +26,69 @@ using namespace CAMotics;
 using namespace std;
 
 
-Lines::Lines(unsigned size, const float *vertices, const float *colors) :
-  size(size), haveColors(colors) {
-  if (!size) return;
-  if (size % 3) THROW("Vertices array size not a multiple of 3");
+Lines::Lines(unsigned lines, bool withColors) {reset(lines, withColors);}
 
-  GLContext gl;
-  gl.glBindBuffer(GL_ARRAY_BUFFER, this->vertices.get());
-  gl.glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), vertices,
-                  GL_STATIC_DRAW);
 
+Lines::Lines(unsigned count, const float *vertices, const float *colors) {
+  reset(count / 3, colors);
+  add(lines, vertices, colors);
+}
+
+
+Lines::Lines(const vector<float> &vertices, const vector<float> &colors) {
+  reset(vertices.size() / 3, !colors.empty());
+  add(vertices, colors);
+}
+
+
+Lines::Lines(const vector<float> &vertices) {
+  reset(vertices.size() / 3, false);
+  add(vertices);
+}
+
+
+void Lines::reset(unsigned lines, bool withColors) {
+  this->lines = lines;
+  this->withColors = withColors;
+  setLight(false);
+
+  unsigned size = lines * 6 * sizeof(float);
+  vertices.allocate(size);
+  if (withColors) colors.allocate(size);
+}
+
+
+void Lines::add(unsigned count, const float *vertices, const float *colors) {
+  if (count % 2) THROW("Lines vertices array size not a multiple of 2");
   if (colors) {
-    gl.glBindBuffer(GL_ARRAY_BUFFER, this->colors.get());
-    gl.glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), colors,
-                    GL_STATIC_DRAW);
-  }
+    if (!withColors) THROW("Cannot add colors");
+  } else if (withColors) THROW("Missing colors");
 
-  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  this->vertices.add(3 * count, vertices);
+  if (colors) this->colors.add(3 * count, colors);
 }
 
 
-Lines::Lines(const vector<float> &vertices, const vector<float> &colors) :
-  Lines(vertices.size(), &vertices[0], colors.size() ? &colors[0] : 0) {
+void Lines::add(const vector<float> &vertices, const vector<float> &colors) {
   if (colors.size() && vertices.size() != colors.size())
-    THROW("Vertices array size much match colors");
+    THROW("Vertices array size must match colors");
+  add(vertices.size() / 3, &vertices[0], &colors[0]);
 }
 
 
-Lines::Lines(const vector<float> &vertices) :
-  Lines(vertices.size(), &vertices[0], 0) {}
+void Lines::add(const vector<float> &vertices) {
+  add(vertices.size() / 3, &vertices[0]);
+}
 
 
 void Lines::glDraw(GLContext &gl) {
-  // Color
-  if (haveColors) {
-    gl.glEnableVertexAttribArray(GL_ATTR_COLOR);
-    gl.glBindBuffer(GL_ARRAY_BUFFER, colors.get());
-    gl.glVertexAttribPointer(GL_ATTR_COLOR, 3, GL_FLOAT, false, 0, 0);
-  }
+  if (!lines) return;
 
-  // Position
-  gl.glEnableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glBindBuffer(GL_ARRAY_BUFFER, vertices.get());
-  gl.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_FLOAT, false, 0, 0);
+  vertices.enable(3);
+  if (withColors) colors.enable(3);
 
-  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  gl.glDrawArrays(GL_LINES, 0, lines * 2);
 
-  // Draw
-  gl.glDrawArrays(GL_LINES, 0, size / 3);
-
-  // Clean up
-  gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
-  if (haveColors) gl.glDisableVertexAttribArray(GL_ATTR_COLOR);
+  vertices.disable();
+  if (withColors) colors.disable();
 }

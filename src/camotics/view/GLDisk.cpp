@@ -24,10 +24,11 @@ using namespace CAMotics;
 using namespace cb;
 
 
-void GLDisk::glDraw(GLContext &gl) {
-  // TODO use VBO
-  unsigned count = 1 + segments;
-  SmartPointer<double>::Array v = new double[count * 2];
+GLDisk::GLDisk(double radius, unsigned segments) :
+  radius(radius), segments(segments) {
+
+  const unsigned count = (1 + segments) * 2;
+  float v[count];
 
   v[0] = v[1] = 0;
 
@@ -37,13 +38,16 @@ void GLDisk::glDraw(GLContext &gl) {
     v[(i + 1) * 2 + 1] = cos(a) * radius;
   }
 
+  vertices.allocate(count * sizeof(float));
+  vertices.add(count, v);
+}
+
+
+void GLDisk::glDraw(GLContext &gl) {
   float n[3] = {0, 0, 1};
   gl.glVertexAttrib3fv(GL_ATTR_NORMAL, n);
 
-  gl.glEnableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glVertexAttribPointer(GL_ATTR_POSITION, 2, GL_DOUBLE, false, 0, v.get());
-
-  gl.glDrawArrays(GL_TRIANGLE_FAN, 0, count);
-
-  gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
+  vertices.enable(2);
+  gl.glDrawArrays(GL_TRIANGLE_FAN, 0, 1 + segments);
+  vertices.disable();
 }

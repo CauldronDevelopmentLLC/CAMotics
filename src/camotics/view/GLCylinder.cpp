@@ -23,14 +23,14 @@
 using namespace CAMotics;
 using namespace cb;
 
+GLCylinder::GLCylinder(float base, float top, float height, unsigned segments) :
+  base(base), top(top), height(height), segments(segments) {
 
-void GLCylinder::glDraw(GLContext &gl) {
-  // TODO use VBO
-  unsigned count = segments * 2;
-  SmartPointer<double>::Array v = new double[count * 3];
-  SmartPointer<double>::Array n = new double[count * 3];
+  const unsigned count = segments * 6;
+  float v[count];
+  float n[count];
 
-  double b = sqrt((base - top) * (base - top) + height * height);
+  float b = sqrt((base - top) * (base - top) + height * height);
 
   for (unsigned i = 0; i < segments; i++) {
     unsigned o = i * 3 * 2;
@@ -50,14 +50,17 @@ void GLCylinder::glDraw(GLContext &gl) {
     v[o + 5] = height;
   }
 
-  gl.glEnableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_DOUBLE, false, 0, v.get());
+  vertices.allocate(count * sizeof(float));
+  normals.allocate(count  * sizeof(float));
+  vertices.add(count, v);
+  normals.add(count,  n);
+}
 
-  gl.glEnableVertexAttribArray(GL_ATTR_NORMAL);
-  gl.glVertexAttribPointer(GL_ATTR_NORMAL, 3, GL_DOUBLE, false, 0, n.get());
 
-  gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
-
-  gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glDisableVertexAttribArray(GL_ATTR_NORMAL);
+void GLCylinder::glDraw(GLContext &gl) {
+  vertices.enable(3);
+  normals.enable(3);
+  gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, segments * 2);
+  vertices.disable();
+  normals.disable();
 }

@@ -22,10 +22,19 @@
 
 namespace CAMotics {
   class VBO {
+    unsigned id;
     unsigned buffer = 0;
+    unsigned size = 0;
+    unsigned fill = 0;
 
   public:
+    VBO(unsigned id = 0) : id(id) {}
     ~VBO();
+
     unsigned get();
+    void allocate(unsigned size);
+    void add(unsigned count, const float *data);
+    void enable(unsigned stride);
+    void disable();
   };
 }

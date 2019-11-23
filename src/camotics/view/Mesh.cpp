@@ -29,46 +29,25 @@ using namespace std;
 Mesh::Mesh(unsigned triangles) {reset(triangles);}
 
 
+void Mesh::setWire(bool wire) {
+  // GL TODO
+}
+
+
 void Mesh::reset(unsigned triangles) {
   this->triangles = triangles;
-  fill = 0;
-
   unsigned size = triangles * 9 * sizeof(float);
-  GLContext gl;
 
-  // Vertices
-  gl.glBindBuffer(GL_ARRAY_BUFFER, vertices.get());
-  gl.glBufferData(GL_ARRAY_BUFFER, size, 0, GL_STATIC_DRAW);
-
-  // Normals
-  gl.glBindBuffer(GL_ARRAY_BUFFER, normals.get());
-  gl.glBufferData(GL_ARRAY_BUFFER, size, 0, GL_STATIC_DRAW);
-
-  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  vertices.allocate(size);
+  normals.allocate(size);
 }
 
 
 void Mesh::add(unsigned count, const float *vertices, const float *normals) {
   if (count % 3) THROW("Mesh vertices array size not a multiple of 3");
-  if (triangles * 3 < count + fill)
-    THROW("Mesh buffer overflow " << (triangles * 3) << " < "
-          << (count + fill));
 
-  unsigned size   = sizeof(float) * count * 3;
-  unsigned offset = sizeof(float) * fill * 3;
-  fill += count;
-
-  GLContext gl;
-
-  // Vertices
-  gl.glBindBuffer(GL_ARRAY_BUFFER, this->vertices.get());
-  gl.glBufferSubData(GL_ARRAY_BUFFER, offset, size, vertices);
-
-  // Normals
-  gl.glBindBuffer(GL_ARRAY_BUFFER, this->normals.get());
-  gl.glBufferSubData(GL_ARRAY_BUFFER, offset, size, normals);
-
-  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  this->vertices.add(3 * count, vertices);
+  this->normals.add(3 * count, normals);
 }
 
 
@@ -80,20 +59,11 @@ void Mesh::add(const vector<float> &vertices, const vector<float> &normals) {
 
 
 void Mesh::glDraw(GLContext &gl) {
-  // Vertices
-  gl.glEnableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glBindBuffer(GL_ARRAY_BUFFER, vertices.get());
-  gl.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_FLOAT, false, 0, 0);
-
-  // Normals
-  gl.glEnableVertexAttribArray(GL_ATTR_NORMAL);
-  gl.glBindBuffer(GL_ARRAY_BUFFER, normals.get());
-  gl.glVertexAttribPointer(GL_ATTR_NORMAL, 3, GL_FLOAT, false, 0, 0);
-
-  gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+  vertices.enable(3);
+  normals.enable(3);
 
   gl.glDrawArrays(GL_TRIANGLES, 0, triangles * 3);
 
-  gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glDisableVertexAttribArray(GL_ATTR_NORMAL);
+  vertices.disable();
+  normals.disable();
 }

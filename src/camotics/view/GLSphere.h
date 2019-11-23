@@ -21,17 +21,20 @@
 #pragma once
 
 #include "GLObject.h"
+#include "VBO.h"
 
 
 namespace CAMotics {
   class GLSphere : public GLObject {
-    double radius;
+    float radius;
     unsigned lats;
     unsigned lngs;
 
+    VBO vertices = GL_ATTR_POSITION;
+    VBO normals = GL_ATTR_NORMAL;
+
   public:
-    GLSphere(double radius, unsigned lats, unsigned lngs) :
-      radius(radius), lats(lats), lngs(lngs) {}
+    GLSphere(float radius, unsigned lats, unsigned lngs, bool hemi = false);
 
     // From GLObject
     void glDraw(GLContext &gl);

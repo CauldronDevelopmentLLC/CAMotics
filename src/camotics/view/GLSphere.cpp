@@ -24,32 +24,34 @@ using namespace CAMotics;
 using namespace cb;
 
 
-void GLSphere::glDraw(GLContext &gl) {
-  // TODO Use VBO
-  unsigned count = lngs * 2;
-  SmartPointer<double>::Array n = new double[count * 3];
-  SmartPointer<double>::Array v = new double[count * 3];
+namespace {
+  float getLat(float ratio, bool hemi) {
+    return M_PI * (hemi ? -0.5 * ratio : (-0.5 + ratio));
+  }
+}
 
-  gl.glEnableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glVertexAttribPointer(GL_ATTR_POSITION, 3, GL_DOUBLE, false, 0, v.get());
 
-  gl.glEnableVertexAttribArray(GL_ATTR_NORMAL);
-  gl.glVertexAttribPointer(GL_ATTR_NORMAL, 3, GL_DOUBLE, false, 0, n.get());
+GLSphere::GLSphere(float radius, unsigned lats, unsigned lngs, bool hemi) :
+  radius(radius), lats(lats), lngs(lngs) {
+
+  unsigned count = lats * lngs * 6;
+  float n[count];
+  float v[count];
 
   for (unsigned i = 0; i < lats; i++) {
-    double lat0 = M_PI * (-0.5 + (double)(i - 1) / (lats - 1));
-    double z0 = sin(lat0);
-    double zr0 = cos(lat0);
+    float lat0 = getLat((float)i / lats, hemi);
+    float z0   = sin(lat0);
+    float zr0  = cos(lat0);
 
-    double lat1 = M_PI * (-0.5 + (double)i / (lats - 1));
-    double z1 = sin(lat1);
-    double zr1 = cos(lat1);
+    float lat1 = getLat((float)(i + 1) / lats, hemi);
+    float z1   = sin(lat1);
+    float zr1  = cos(lat1);
 
     for (unsigned j = 0; j < lngs; j++) {
-      double lng = 2 * M_PI * (double)(j - 1) / (lngs - 1);
-      double x = cos(lng);
-      double y = sin(lng);
-      unsigned o = j * 3 * 2;
+      float lng  = 2 * M_PI * (float)j / (lngs - 1);
+      float x    = cos(lng);
+      float y    = sin(lng);
+      unsigned o = ((i * lngs) + j) * 6;
 
       n[o + 0] = x * zr0; n[o + 1] = y * zr0; n[o + 2] = z0;
       n[o + 3] = x * zr1; n[o + 4] = y * zr1; n[o + 5] = z1;
@@ -61,10 +63,20 @@ void GLSphere::glDraw(GLContext &gl) {
       v[o + 4] = y * zr1 * radius;
       v[o + 5] = z1 * radius;
     }
-
-    gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, count);
   }
 
-  gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
-  gl.glDisableVertexAttribArray(GL_ATTR_NORMAL);
+  vertices.allocate(count * sizeof(float));
+  normals.allocate(count  * sizeof(float));
+  vertices.add(count, v);
+  normals.add(count,  n);
+}
+
+
+void GLSphere::glDraw(GLContext &gl) {
+
+  vertices.enable(3);
+  normals.enable(3);
+  gl.glDrawArrays(GL_TRIANGLE_STRIP, 0, lats * lngs * 2);
+  vertices.disable();
+  normals.disable();
 }

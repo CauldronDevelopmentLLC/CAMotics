@@ -52,6 +52,8 @@ ToolPathView::ToolPathView(ValueSet &valueSet) : values(valueSet) {
   values.add("speed", this, &ToolPathView::getSpeed);
   values.add("direction", this, &ToolPathView::getDirection);
   values.add("program_line", this, &ToolPathView::getProgramLine);
+
+  setLight(false);
 }
 
 

@@ -9,18 +9,12 @@ struct Light {
   vec4 diffuse;
 };
 
-struct Material {
-  vec4 ambient;
-  vec4 diffuse;
-};
-
 uniform Light light;
-uniform Material material;
 
 
 vec4 phong_color() {
-  vec4 ambient  = material.ambient  * light.ambient;
-  vec4 diffuse  = material.diffuse  * light.diffuse;
+  vec4 ambient  = fColor * light.ambient;
+  vec4 diffuse  = fColor * light.diffuse;
 
   // Diffuse
   vec3 norm     = normalize(fNormal);
