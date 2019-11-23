@@ -22,6 +22,7 @@
 
 #include "GLContext.h"
 #include "Color.h"
+#include "Material.h"
 #include "Transform.h"
 
 
@@ -29,6 +30,7 @@ namespace CAMotics {
   class GLObject {
     Transform t;
     Color color;
+    cb::SmartPointer<Material> material;
     bool visible = true;
 
   public:
@@ -41,6 +43,10 @@ namespace CAMotics {
     void setColor(const Color &color) {this->color = color;}
     void setColor(float r, float g, float b, float a = 1)
       {setColor(Color(r, g, b, a));}
+
+    const cb::SmartPointer<Material> &getMaterial() const {return material;}
+    void setMaterial(const cb::SmartPointer<Material> &material)
+      {this->material = material;}
 
     void setVisible(bool visible) {this->visible = visible;}
     bool isVisible() const {return visible;}

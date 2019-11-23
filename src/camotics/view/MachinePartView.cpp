@@ -18,33 +18,48 @@
 
 \******************************************************************************/
 
-#pragma once
+#include "MachinePartView.h"
 
-#include <cbang/geom/Matrix.h>
+#include <camotics/machine/MachinePart.h>
+
+using namespace CAMotics;
+using namespace std;
+using namespace cb;
 
 
-namespace CAMotics {
-  class GLProgram;
+MachinePartView::MachinePartView(MachinePart &part) :
+  movement(part.getMovement()), offset(part.getOffset()) {
 
-  class GLUniform {
-    unsigned program;
-    unsigned location;
+  // Color
+  const Vector3U &c = part.getColor();
+  color = Color(c[0] / 255.0, c[1] / 255.0, c[2] / 255.0);
 
-  public:
-    GLUniform(unsigned program = 0, unsigned location = 0) :
-      program(program), location(location) {}
+  // Lines
+  add(lines = new Lines(part.getLines()));
 
-    void set(float v0) const;
-    void set(float v0, float v1) const;
-    void set(float v0, float v1, float v2) const;
-    void set(float v0, float v1, float v2, float v3) const;
+  // Mesh
+  add(mesh = new Mesh(part.getTriangleCount()));
+  mesh->setMaterial(new Material(color, color));
 
-    void set(int v0) const;
-    void set(int v0, int v1) const;
-    void set(int v0, int v1, int v2) const;
-    void set(int v0, int v1, int v2, int v3) const;
+  auto cb =
+    [this] (const vector<float> &vertices, const vector<float> &normals) {
+      mesh->add(vertices, normals);
+    };
 
-    void set(const cb::Matrix4x4F &m) const;
-    void set(const cb::Matrix4x4D &m) const;
-  };
+  part.getVertices(cb);
+}
+
+
+void MachinePartView::setWire(bool wire) {
+  if (wire) lines->setColor(color);
+  else lines->setColor(color * 0.8);
+  mesh->setVisible(!wire);
+}
+
+
+void MachinePartView::setPosition(const Vector3D &position) {
+  auto &t = getTransform();
+  t.toIdentity();
+  t.translate(offset);
+  t.translate(position * movement);
 }

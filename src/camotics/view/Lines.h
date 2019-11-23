@@ -18,21 +18,28 @@
 
 \******************************************************************************/
 
+#pragma once
+
+#include "GLObject.h"
 #include "VBO.h"
-#include "GLContext.h"
 
-using namespace CAMotics;
-
-
-VBO::~VBO() {
-  try {
-    if (buffer && GLContext::isActive())
-      GLContext().glDeleteBuffers(1, &buffer);
-  } catch (...) {}
-}
+#include <vector>
 
 
-unsigned VBO::get() {
-  if (!buffer) GLContext().glGenBuffers(1, &buffer);
-  return buffer;
+namespace CAMotics {
+  class Lines : public GLObject {
+    unsigned size;
+    bool haveColors;
+
+    VBO vertices;
+    VBO colors;
+
+  public:
+    Lines(unsigned size, const float *vertices, const float *colors = 0);
+    Lines(const std::vector<float> &vertices, const std::vector<float> &colors);
+    Lines(const std::vector<float> &vertices);
+
+    // From GLObject
+    void glDraw(GLContext &gl);
+  };
 }

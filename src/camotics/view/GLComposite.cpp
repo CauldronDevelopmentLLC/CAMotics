@@ -19,6 +19,7 @@
 \******************************************************************************/
 
 #include "GLComposite.h"
+#include "GLProgram.h"
 
 #include <cbang/Catch.h>
 
@@ -34,7 +35,19 @@ void GLComposite::glDraw(GLContext &gl) {
 
     if (!identity) gl.pushMatrix(o.getTransform());
 
-    if (o.getColor() != Color()) gl.setColor(o.getColor());
+    GLProgram &program = gl.getProgram();
+
+    if (o.getMaterial().isSet()) {
+      const Material &m = *o.getMaterial();
+
+      program.set("light.enabled", 1);
+      program.set("material.ambient",  m.ambient);
+      program.set("material.diffuse",  m.diffuse);
+
+    } else {
+      program.set("light.enabled", 0);
+      if (o.getColor() != Color()) gl.setColor(o.getColor());
+    }
 
     TRY_CATCH_ERROR(o.glDraw(gl));
 

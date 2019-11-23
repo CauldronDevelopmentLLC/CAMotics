@@ -122,18 +122,3 @@ void AABB::collisions(const Vector3D &p,
   if (left) left->collisions(p, moves);
   if (right) right->collisions(p, moves);
 }
-
-
-#ifdef CAMOTICS_GUI
-void AABB::draw(bool leavesOnly, unsigned height, unsigned depth) {
-  if (!(left || right) || !leavesOnly) {
-#if 0 // TODO GL
-    GLContext().setColor(0.5, 0, (height - depth) / (double)height);
-    BoundsView(*this).draw();
-#endif
-  }
-
-  if (left) left->draw(leavesOnly, height, depth + 1);
-  if (right) right->draw(leavesOnly, height, depth + 1);
-}
-#endif

@@ -18,21 +18,34 @@
 
 \******************************************************************************/
 
-#include "VBO.h"
-#include "GLContext.h"
+#include "MachineView.h"
+
+#include <camotics/machine/MachineModel.h>
 
 using namespace CAMotics;
+using namespace cb;
+using namespace std;
 
 
-VBO::~VBO() {
-  try {
-    if (buffer && GLContext::isActive())
-      GLContext().glDeleteBuffers(1, &buffer);
-  } catch (...) {}
+void MachineView::load(MachineModel &model) {
+  clear();
+  parts.clear();
+
+  for (auto it = model.begin(); it != model.end(); it++) {
+    SmartPointer<MachinePartView> part = new MachinePartView(*it->second);
+    add(part);
+    parts.push_back(part);
+  }
 }
 
 
-unsigned VBO::get() {
-  if (!buffer) GLContext().glGenBuffers(1, &buffer);
-  return buffer;
+void MachineView::setWire(bool wire) {
+  for (unsigned i = 0; i < parts.size(); i++)
+    parts[i]->setWire(wire);
+}
+
+
+void MachineView::setPosition(const Vector3D &position) {
+  for (unsigned i = 0; i < parts.size(); i++)
+    parts[i]->setPosition(position);
 }

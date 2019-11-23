@@ -44,7 +44,8 @@ using namespace CAMotics;
 View::View(ValueSet &valueSet) :
   values(valueSet), flags(SHOW_PATH_FLAG | SHOW_TOOL_FLAG | SHOW_SURFACE_FLAG |
                           SHOW_WORKPIECE_BOUNDS_FLAG | SHOW_AXES_FLAG),
-  path(new ToolPathView(valueSet)) {
+  path(new ToolPathView(valueSet)), aabbView(new AABBView),
+  machineView(new MachineView) {
 
   setBackground(new GradientBackground(Color(0.15, 0.19, 0.25),
                                        Color(0.02, 0.02, 0.02)));
@@ -72,7 +73,7 @@ void View::decSpeed() {
 
 void View::setToolPath(const SmartPointer<GCode::ToolPath> &toolPath) {
   path->setPath(toolPath);
-  path->setShowIntensity(isFlagSet(View::PATH_INTENSITY_FLAG));
+  path->update(); // Needed to compute simulation time
 }
 
 
@@ -88,7 +89,14 @@ void View::setSurface(const SmartPointer<Surface> &surface) {
 
 
 void View::setMoveLookup(const SmartPointer<MoveLookup> &moveLookup) {
+  moveLookupChanged = true;
   this->moveLookup = moveLookup;
+}
+
+
+void View::setMachine(const SmartPointer<MachineModel> &machine) {
+  machineChanged = true;
+  this->machine = machine;
 }
 
 
@@ -140,8 +148,12 @@ void View::updateVisibility() {
   tool->setVisible(isFlagSet(View::SHOW_TOOL_FLAG) && !path->isEmpty());
   path->setShowIntensity(isFlagSet(View::PATH_INTENSITY_FLAG));
   path->setVisible(isFlagSet(View::SHOW_PATH_FLAG));
-  mesh->setVisible(isFlagSet(View::SHOW_SURFACE_FLAG));
+  model->setVisible(isFlagSet(View::SHOW_SURFACE_FLAG));
   workpiece->setVisible(isFlagSet(View::SHOW_WORKPIECE_FLAG));
+  machineView->setVisible(isFlagSet(View::SHOW_MACHINE_FLAG));
+  machineView->setWire(isFlagSet(View::WIRE_FLAG));
+  aabbView->setVisible(isFlagSet(View::SHOW_BBTREE_FLAG));
+  aabbView->showNodes(!isFlagSet(View::BBTREE_LEAVES_FLAG));
 }
 
 
@@ -150,7 +162,8 @@ void View::updateBounds() {
   Rectangle3D bbox = path->getBounds();
   if (surface.isSet()) bbox.add(surface->getBounds());
   bbox.add(workpieceBounds);
-  //if (showMachine) bbox.add(machine->getBounds());
+  if (machine.isSet() && machineView->isVisible())
+    bbox.add(machine->getBounds());
 
   workpiece->setBounds(workpieceBounds);
   bounds->setBounds(workpieceBounds);
@@ -166,30 +179,40 @@ void View::updateBounds() {
 }
 
 
-void View::glInit(GLContext &gl) {
-  GLScene::glInit(gl);
+void View::glInit() {
+  GLScene::glInit();
 
-  add(axes = new AxesView);
-  add(bounds = new GLBox);
+  add(group = new GLComposite);
+  add(machineView);
+
+  group->add(axes = new AxesView);
+  group->add(bounds = new GLBox);
   bounds->setColor(1, 1, 1, 0.5); // White
-  add(workpiece = new CuboidView);
-  add(tool = new ToolView);
-  add(path);
-  add(mesh = new Mesh(0));
+  group->add(tool = new ToolView);
+  group->add(path);
+  group->add(aabbView);
+
+  // Model
+  SmartPointer<Material> material =
+    new Material(Color(0.05, 0.18, 0.33, 1), Color(0.06, 0.23, 0.42, 1));
+  group->add(model = new Mesh(0));
+  group->add(workpiece = new CuboidView);
+  model->setMaterial(material);
+  workpiece->setMaterial(material);
 }
 
 
-void View::glDraw(GLContext &gl) {
+void View::glDraw() {
   updateVisibility();
   updateBounds();
 
-  // Machine
-  bool showMachine = !machine.isNull() && isFlagSet(View::SHOW_MACHINE_FLAG);
-
   // Path
+  path->update();
+
+  // Model
   const float alpha = isFlagSet(View::TRANSLUCENT_SURFACE_FLAG) ? 0.8f : 1.0f;
-  path->setColor(12.0f / 255, 45.0f / 255,  83.0f / 255, alpha);
-  path->update(gl);
+  model->getMaterial()->ambient.setAlpha(alpha);
+  model->getMaterial()->diffuse.setAlpha(alpha);
 
   // Tool
   if (path.isSet() && path->getPath().isSet()) {
@@ -199,7 +222,8 @@ void View::glDraw(GLContext &gl) {
 
     if (tools.has(toolID)) {
       Vector3D position = path->getPosition();
-      if (showMachine) position *= machine->getTool();
+      if (machine.isSet() && machineView->isVisible())
+        position *= machine->getTool();
 
       tool->set(tools.get(toolID));
       tool->getTransform().toIdentity();
@@ -213,54 +237,47 @@ void View::glDraw(GLContext &gl) {
     surfaceChanged = false;
 
     if (surface.isSet()) {
-      mesh->reset(surface->getTriangleCount());
+      model->reset(surface->getTriangleCount());
 
       auto cb =
         [this] (const vector<float> &vertices, const vector<float> &normals) {
-          mesh->add(vertices, normals);
+          model->add(vertices, normals);
         };
 
       surface->getVertices(cb);
 
-    } else mesh->reset(0);
+    } else model->reset(0);
   }
 
-#if 0 // TODO GL
+  // Machine
+  group->getTransform().toIdentity();
 
-  //Vector3D currentPosition = path->getPosition();
+  if (machineView->isVisible()) {
+    if (machineChanged) {
+      machineChanged = false;
+      machineView->load(*machine);
+    }
 
-  if (showMachine) {
-    //Vector3D v = machine->getWorkpiece() * currentPosition;
-    //gl.glTranslatef(v.x(), v.y(), v.z());
+    Vector3D currentPosition = path->getPosition();
+    Vector3D offset = machine->getWorkpiece() * currentPosition;
+    group->getTransform().translate(offset);
+
+    // TODO Work offsets should be configurable
+    double z = -workpieceBounds.getDimensions().z();
+    auto &t = machineView->getTransform();
+    t.toIdentity();
+    t.translate(0, 0, z);
+
+    machineView->setPosition(currentPosition);
   }
 
-  // Line normals relative to camera rotation
-  //const double *rotation = getRotation();
-  //gl.glNormal3f(rotation[1], rotation[2], rotation[3]);
-
-  // Model
-  //const float ambient[] = {12.0f / 255, 45.0f / 255,  83.0f / 255, alpha};
-  //const float diffuse[] = {16.0f / 255, 59.0f / 255, 108.0f / 255, alpha};
-
-  //gl.glDisable(GL_COLOR_MATERIAL);
-  //gl.glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-  //gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+  // AABB
+  if (moveLookup.isSet() && aabbView->isVisible() && moveLookupChanged) {
+    moveLookupChanged = false;
+    aabbView->load(*moveLookup.cast<AABBTree>());
+  }
 
   //setWire(isFlagSet(View::WIRE_FLAG));
 
-  // Bounding box tree
-  if (isFlagSet(View::SHOW_BBTREE_FLAG) && !moveLookup.isNull())
-    moveLookup->draw(isFlagSet(View::BBTREE_LEAVES_FLAG));
-
-  // Machine
-  if (showMachine) {
-    // TODO Work offsets should be configurable
-    //gl.glTranslatef(0, 0, -workpieceBounds.getDimensions().z());
-
-    machine->setPosition(currentPosition);
-    machine->draw(isFlagSet(View::WIRE_FLAG));
-  }
-#endif
-
-  GLScene::glDraw(gl);
+  GLScene::glDraw();
 }

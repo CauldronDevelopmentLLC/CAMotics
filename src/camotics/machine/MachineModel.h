@@ -48,15 +48,15 @@ namespace CAMotics {
     MachineModel(const cb::InputSource &source) {read(source);}
 
     const std::string &getName() const {return name;}
-    void setPosition(const cb::Vector3D &p);
     const cb::Rectangle3D &getBounds() const {return bounds;}
     const cb::Vector3D &getTool() const {return tool;}
     const cb::Vector3D &getWorkpiece() const {return workpiece;}
 
     void readModel(const cb::InputSource &source);
     void read(const cb::InputSource &source);
-#ifdef CAMOTICS_GUI
-    void draw(bool wire);
-#endif
+
+    typedef parts_t::const_iterator iterator;
+    iterator begin() const {return parts.begin();}
+    iterator end() const {return parts.end();}
   };
 }

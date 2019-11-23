@@ -107,8 +107,7 @@ void GLView::initializeGL() {
 #endif
 
     SmartLog log = startLog();
-    GLContext gl;
-    getView().glInit(gl);
+    getView().glInit();
     return;
   } CATCH_ERROR;
 
@@ -121,8 +120,7 @@ void GLView::resizeGL(int w, int h) {
   LOG_DEBUG(5, "resizeGL(" << w << ", " << h << ")");
 
   SmartLog log = startLog();
-  GLContext gl;
-  getView().glResize(gl, w, h);
+  getView().glResize(w, h);
 }
 
 
@@ -131,9 +129,7 @@ void GLView::paintGL() {
   LOG_DEBUG(5, "paintGL()");
 
   SmartLog log = startLog();
-  GLContext gl;
-  gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  getView().glDraw(gl);
+  getView().glDraw();
 }
 
 
@@ -192,6 +188,8 @@ void GLView::logErrors() {
 
 
 void GLView::handleLoggedMessage(const QOpenGLDebugMessage &msg) {
+  if (msg.id() == 131218) return; // Annoying NVidia warning
+
   LOG_LEVEL(glDebugLevel(msg.severity()), "GL:"
             << glDebugSource(msg.source()) << ':'
             << glDebugType(msg.type()) << ':' << msg.message().toStdString());

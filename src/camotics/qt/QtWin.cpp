@@ -284,8 +284,7 @@ void QtWin::loadMachine(const string &machine) {
   if (view->machine.isNull() || machine != view->machine->getName()) {
     string machineFile = settingsDialog.getMachinePath(machine);
     LOG_DEBUG(1, "Loading machine " << machine << " from " << machineFile);
-    view->machine.release();
-    view->machine = new MachineModel(machineFile);
+    view->setMachine(new MachineModel(machineFile));
     redraw();
   }
 }
@@ -1695,7 +1694,7 @@ void QtWin::animate() {
     if (!ui->simulationView->isEnabled()) {
       QMessageBox::critical
         (this, "OpenGL Error", "Failed to load OpenGL 3D graphics!\n\n"
-         "CAMotics requires OpenGL 2.0 or newer.\n"
+         "CAMotics requires OpenGL ES 2.0 or newer.\n"
          "You may need to upgrade your graphics driver.", QMessageBox::Ok);
       app.requestExit();
     }

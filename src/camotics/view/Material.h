@@ -18,21 +18,17 @@
 
 \******************************************************************************/
 
-#include "VBO.h"
-#include "GLContext.h"
+#pragma once
 
-using namespace CAMotics;
-
-
-VBO::~VBO() {
-  try {
-    if (buffer && GLContext::isActive())
-      GLContext().glDeleteBuffers(1, &buffer);
-  } catch (...) {}
-}
+#include "Color.h"
 
 
-unsigned VBO::get() {
-  if (!buffer) GLContext().glGenBuffers(1, &buffer);
-  return buffer;
+namespace CAMotics {
+  struct Material {
+    Color ambient;
+    Color diffuse;
+
+    Material(const Color &ambient, const Color &diffuse) :
+      ambient(ambient), diffuse(diffuse) {}
+  };
 }

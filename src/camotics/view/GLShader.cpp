@@ -65,7 +65,7 @@ GLShader::GLShader(const string &source, int type) {
 
 GLShader::~GLShader() {
   try {
-    if (shader) GLContext().glDeleteShader(shader);
+    if (shader && GLContext::isActive()) GLContext().glDeleteShader(shader);
   } CATCH_ERROR;
 }
 

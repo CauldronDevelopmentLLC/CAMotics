@@ -22,7 +22,6 @@
 
 #include "GLContext.h"
 #include "GLProgram.h"
-#include "GLUniform.h"
 #include "GLComposite.h"
 
 #include <cbang/SmartPointer.h>
@@ -44,12 +43,7 @@ namespace CAMotics {
     cb::Vector3D center;
 
     cb::SmartPointer<GLObject> background;
-
-    cb::SmartPointer<GLProgram> glProgram;
-    GLUniform projection;
-    GLUniform view;
-    GLUniform model;
-
+    cb::SmartPointer<GLProgram> program;
 
   public:
     virtual ~GLScene() {}
@@ -75,10 +69,10 @@ namespace CAMotics {
     void setBackground(const cb::SmartPointer<GLObject> &background)
       {this->background = background;}
 
-    virtual void glResize(GLContext &gl, unsigned width, unsigned height);
+    GLProgram &getProgram() {return *program;}
 
-    // From GLObject
-    void glInit(GLContext &gl);
-    void glDraw(GLContext &gl);
+    virtual void glResize(unsigned width, unsigned height);
+    virtual void glInit();
+    virtual void glDraw();
   };
 }

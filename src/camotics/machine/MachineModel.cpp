@@ -28,12 +28,6 @@ using namespace cb;
 using namespace std;
 
 
-void MachineModel::setPosition(const Vector3D &p) {
-  for (parts_t::const_iterator it = parts.begin(); it != parts.end(); it++)
-    it->second->setPosition(p);
-}
-
-
 namespace {
   Vector3U getDefaultColor(const string &name) {
     if (name == "x") return Vector3U(25, 25, 200);
@@ -102,20 +96,3 @@ void MachineModel::read(const InputSource &source) {
     SystemUtilities::absolute(source.getName(), config->getString("model"));
   readModel(path);
 }
-
-
-#ifdef CAMOTICS_GUI
-void MachineModel::draw(bool wire) {
-#if 0 // TODO GL
-  GLContext &glFuncs = getGLContext();
-
-  glFuncs.glPushMatrix();
-  glFuncs.glTranslatef(offset[0], offset[1], offset[2]);
-
-  for (parts_t::const_iterator it = parts.begin(); it != parts.end(); it++)
-    it->second->draw(wire);
-
-  glFuncs.glPopMatrix();
-#endif
-}
-#endif

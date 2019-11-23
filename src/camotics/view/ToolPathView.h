@@ -105,7 +105,7 @@ namespace CAMotics {
 
     Color getColor(GCode::MoveType type, double intensity);
 
-    void update(GLContext &gl);
+    void update();
 
     // From GLObject
     void glDraw(GLContext &gl);

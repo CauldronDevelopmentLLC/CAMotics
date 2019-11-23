@@ -18,21 +18,37 @@
 
 \******************************************************************************/
 
-#include "VBO.h"
-#include "GLContext.h"
+#include "AABBView.h"
+#include "GLBox.h"
 
 using namespace CAMotics;
+using namespace cb;
 
 
-VBO::~VBO() {
-  try {
-    if (buffer && GLContext::isActive())
-      GLContext().glDeleteBuffers(1, &buffer);
-  } catch (...) {}
+AABBView::AABBView() : leaves(new GLComposite), nodes(new GLComposite) {
+  add(leaves);
+  add(nodes);
 }
 
 
-unsigned VBO::get() {
-  if (!buffer) GLContext().glGenBuffers(1, &buffer);
-  return buffer;
+void AABBView::load(const AABBTree &tree) {
+  leaves->clear();
+  nodes->clear();
+  if (tree.getRoot()) load(*tree.getRoot(), tree.getHeight(), 0);
+}
+
+
+void AABBView::showNodes(bool show) {nodes->setVisible(show);}
+
+
+void AABBView::load(const AABB &aabb, unsigned height, unsigned depth) {
+  SmartPointer<GLBox> box = new GLBox;
+  box->setBounds(aabb);
+  box->setColor(0.5, 0, (height - depth) / (double)height);
+
+  if (aabb.isLeaf()) leaves->add(box);
+  else nodes->add(box);
+
+  if (aabb.getLeft()) load(*aabb.getLeft(), height, depth + 1);
+  if (aabb.getRight()) load(*aabb.getRight(), height, depth + 1);
 }

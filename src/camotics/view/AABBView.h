@@ -18,21 +18,25 @@
 
 \******************************************************************************/
 
-#include "VBO.h"
-#include "GLContext.h"
+#pragma once
 
-using namespace CAMotics;
+#include "GLComposite.h"
 
-
-VBO::~VBO() {
-  try {
-    if (buffer && GLContext::isActive())
-      GLContext().glDeleteBuffers(1, &buffer);
-  } catch (...) {}
-}
+#include <camotics/sim/AABBTree.h>
 
 
-unsigned VBO::get() {
-  if (!buffer) GLContext().glGenBuffers(1, &buffer);
-  return buffer;
+namespace CAMotics {
+  class AABBView : public GLComposite {
+    cb::SmartPointer<GLComposite> leaves;
+    cb::SmartPointer<GLComposite> nodes;
+
+  public:
+    AABBView();
+
+    void load(const AABBTree &tree);
+    void showNodes(bool show);
+
+  protected:
+    void load(const AABB &aabb, unsigned height, unsigned depth);
+  };
 }

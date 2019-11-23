@@ -39,6 +39,9 @@ namespace CAMotics {
       cb::Rectangle3D(bbox), left(0), right(0), move(move) {}
     ~AABB();
 
+    const AABB *getLeft() const {return left;}
+    const AABB *getRight() const {return right;}
+
     AABB *prepend(AABB *list);
     AABB *split(unsigned count);
 
@@ -50,8 +53,5 @@ namespace CAMotics {
     bool intersects(const cb::Rectangle3D &r);
     void collisions(const cb::Vector3D &p,
                     std::vector<const GCode::Move *> &moves);
-#ifdef CAMOTICS_GUI
-    void draw(bool leavesOnly = true, unsigned height = 1, unsigned depth = 0);
-#endif
   };
 }

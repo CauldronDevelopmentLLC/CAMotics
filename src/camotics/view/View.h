@@ -27,6 +27,8 @@
 #include "GLBox.h"
 #include "ToolView.h"
 #include "Mesh.h"
+#include "MachineView.h"
+#include "AABBView.h"
 
 #include <camotics/contour/Surface.h>
 #include <camotics/value/ValueGroup.h>
@@ -42,6 +44,8 @@ namespace CAMotics {
 
 
   class View : public ViewPort {
+    cb::SmartPointer<GLComposite> group;
+
     ValueGroup values;
 
     unsigned flags;
@@ -57,15 +61,19 @@ namespace CAMotics {
     cb::SmartPointer<ToolPathView> path;
     cb::SmartPointer<ToolView> tool;
     cb::SmartPointer<CuboidView> workpiece;
-    cb::SmartPointer<Mesh> mesh;
+    cb::SmartPointer<Mesh> model;
     cb::SmartPointer<Surface> surface;
     cb::SmartPointer<MoveLookup> moveLookup;
+    cb::SmartPointer<AABBView> aabbView;
     cb::SmartPointer<MachineModel> machine;
+    cb::SmartPointer<MachineView> machineView;
 
     cb::Rectangle3D workpieceBounds;
     cb::Rectangle3D surfaceBounds;
 
     bool surfaceChanged = false;
+    bool machineChanged = false;
+    bool moveLookupChanged = false;
 
     enum {
       WIRE_FLAG                  = 1 << 0,
@@ -103,6 +111,7 @@ namespace CAMotics {
     void setWorkpiece(const cb::Rectangle3D &bounds);
     void setSurface(const cb::SmartPointer<Surface> &surface);
     void setMoveLookup(const cb::SmartPointer<MoveLookup> &moveLookup);
+    void setMachine(const cb::SmartPointer<MachineModel> &machine);
     double getTime() const {return path.isNull() ? 0 : path->getTime();}
 
     bool update();
@@ -112,7 +121,7 @@ namespace CAMotics {
     void updateBounds();
 
     // From GLScene
-    void glInit(GLContext &gl);
-    void glDraw(GLContext &gl);
+    void glInit();
+    void glDraw();
   };
 }

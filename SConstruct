@@ -106,9 +106,6 @@ if not env.GetOption('clean'):
         have_cairo = \
             conf.CBCheckCHeader('cairo/cairo.h') and conf.CBCheckLib('cairo')
 
-        env.CBDefine(['CAMOTICS_GUI'])
-
-
     # DXFlib
     have_dxflib = conf.CBConfig('dxflib', False)
 
@@ -181,7 +178,6 @@ if not have_dxflib:
 # Build GUI
 execs = []
 if env['with_gui']:
-
     subdirs = ['qt', 'view', 'value', 'machine']
     guiSrc = []
     for subdir in subdirs:

@@ -27,9 +27,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-AABBTree::~AABBTree() {
-  zap(root);
-}
+AABBTree::~AABBTree() {zap(root);}
 
 
 Rectangle3D AABBTree::getBounds() const {
@@ -55,13 +53,6 @@ void AABBTree::collisions(const Vector3D &p,
   if (!finalized) THROW("AABBTree not yet finalized");
   if (root) root->collisions(p, moves);
 }
-
-
-#ifdef CAMOTICS_GUI
-void AABBTree::draw(bool leavesOnly) {
-  if (root) root->draw(leavesOnly, root->getTreeHeight());
-}
-#endif // CAMOTICS_GUI
 
 
 void AABBTree::finalize() {

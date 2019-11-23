@@ -20,11 +20,11 @@
 
 #pragma once
 
-
 #include <cbang/geom/Vector.h>
 
+
 namespace CAMotics {
-  class Color : public cb::Vector<4, float> {
+  class Color : public cb::Vector4F {
     typedef cb::Vector<4, float> Super_T;
 
   public:

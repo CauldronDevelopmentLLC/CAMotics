@@ -22,22 +22,24 @@
 
 #include "Color.h"
 #include "GLEnum.h"
-#include "GLUniform.h"
 #include "Transform.h"
 
 #include <QOpenGLFunctions>
 
 
 namespace CAMotics {
-  class GLContext : public QOpenGLFunctions {
-    GLUniform modelMat;
+  class GLScene;
+  class GLProgram;
 
+  class GLContext : public QOpenGLFunctions {
+    GLScene *scene;
     std::vector<Transform> stack;
 
   public:
-    GLContext(QOpenGLContext *ctx = 0);
+    GLContext(GLScene *scene = 0);
 
-    void setModelMatrix(const GLUniform &m) {modelMat = m;}
+    GLScene &getScene();
+    GLProgram &getProgram();
 
     unsigned matrixDepth() const {return stack.size() - 1;}
     void pushMatrix();

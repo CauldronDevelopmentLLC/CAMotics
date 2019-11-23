@@ -19,6 +19,7 @@
 \******************************************************************************/
 
 #include "GLContext.h"
+#include "GLScene.h"
 
 #include <cbang/Exception.h>
 #include <cbang/log/Logger.h>
@@ -29,12 +30,12 @@ using namespace CAMotics;
 namespace {
   const char *glErrorString(GLenum err) {
     switch (err) {
-    case GL_NO_ERROR: return "No error";
-    case GL_INVALID_ENUM: return "Invalid enum";
-    case GL_INVALID_VALUE: return "Invalid value";
-    case GL_INVALID_OPERATION: return "Invalid operation";
+    case GL_NO_ERROR:                      return "No error";
+    case GL_INVALID_ENUM:                  return "Invalid enum";
+    case GL_INVALID_VALUE:                 return "Invalid value";
+    case GL_INVALID_OPERATION:             return "Invalid operation";
     case GL_INVALID_FRAMEBUFFER_OPERATION: return "Invalid framebuffer op";
-    case GL_OUT_OF_MEMORY: return "Out of memory";
+    case GL_OUT_OF_MEMORY:                 return "Out of memory";
     }
     return "Unknown error";
   }
@@ -48,10 +49,19 @@ namespace {
 }
 
 
-GLContext::GLContext(QOpenGLContext *ctx) :
-  QOpenGLFunctions(ctx ? ctx : getOpenGLContext()) {
+GLContext::GLContext(GLScene *scene) :
+  QOpenGLFunctions(getOpenGLContext()), scene(scene) {
   stack.push_back(Transform());
 }
+
+
+GLScene &GLContext::getScene() {
+  if (!scene) THROW("GL scene not set on context");
+  return *scene;
+}
+
+
+GLProgram &GLContext::getProgram() {return getScene().getProgram();}
 
 
 void GLContext::pushMatrix() {stack.push_back(stack.back());}
@@ -65,20 +75,20 @@ void GLContext::pushMatrix(const Transform &t) {
 
 void GLContext::setMatrix(const Transform &t) {
   stack.back() = t;
-  modelMat.set(stack.back());
+  getProgram().set("model", stack.back());
 }
 
 
 void GLContext::applyMatrix(const Transform &t) {
   stack.back() *= t;
-  modelMat.set(stack.back());
+  getProgram().set("model", stack.back());
 }
 
 
 void GLContext::popMatrix() {
   if (stack.size() == 1) THROW("Matrix stack underrun");
   stack.pop_back();
-  modelMat.set(stack.back());
+  getProgram().set("model", stack.back());
 }
 
 

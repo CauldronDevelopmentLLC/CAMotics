@@ -20,9 +20,10 @@
 
 #pragma once
 
-#include "GLUniform.h"
-
 #include <string>
+#include <map>
+
+#include <cbang/geom/Matrix.h>
 
 
 namespace CAMotics {
@@ -30,10 +31,13 @@ namespace CAMotics {
 
   class GLProgram {
     unsigned program = 0;
+    std::map<std::string, unsigned> uniforms;
 
   public:
     GLProgram();
     ~GLProgram();
+
+    bool inUse() const;
 
     unsigned get() const {return program;}
 
@@ -43,7 +47,27 @@ namespace CAMotics {
 
     void link();
     void use() const;
+    void unuse() const;
 
-    GLUniform getUniform(const std::string &name) const;
+    unsigned getUniform(const std::string &name);
+
+    void set(const std::string &name, double v0);
+    void set(const std::string &name, double v0, double v1);
+    void set(const std::string &name, double v0, double v1, double v2);
+    void set
+    (const std::string &name, double v0, double v1, double v2, double v3);
+
+    void set(const std::string &name, const cb::Vector3F &v);
+    void set(const std::string &name, const cb::Vector4F &v);
+    void set(const std::string &name, const cb::Vector3D &v);
+    void set(const std::string &name, const cb::Vector4D &v);
+
+    void set(const std::string &name, int v0);
+    void set(const std::string &name, int v0, int v1);
+    void set(const std::string &name, int v0, int v1, int v2);
+    void set(const std::string &name, int v0, int v1, int v2, int v3);
+
+    void set(const std::string &name, const cb::Matrix4x4F &m);
+    void set(const std::string &name, const cb::Matrix4x4D &m);
   };
 }

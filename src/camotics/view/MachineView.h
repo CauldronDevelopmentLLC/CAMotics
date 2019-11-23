@@ -18,6 +18,25 @@
 
 \******************************************************************************/
 
-#include "GLObject.h"
+#pragma once
 
-using namespace CAMotics;
+#include "MachinePartView.h"
+
+#include <cbang/SmartPointer.h>
+
+#include <vector>
+
+
+namespace CAMotics {
+  class MachineModel;
+
+  class MachineView : public GLComposite {
+    std::vector<cb::SmartPointer<MachinePartView> > parts;
+
+  public:
+    void load(MachineModel &model);
+
+    void setWire(bool wire);
+    void setPosition(const cb::Vector3D &position);
+  };
+}

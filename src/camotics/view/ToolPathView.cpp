@@ -128,7 +128,7 @@ Color ToolPathView::getColor(GCode::MoveType type, double intensity) {
 }
 
 
-void ToolPathView::update(GLContext &gl) {
+void ToolPathView::update() {
   if (!dirty) return;
 
   currentTime = 0;
@@ -187,7 +187,7 @@ void ToolPathView::update(GLContext &gl) {
       currentTime += moveTime;
       currentDistance += moveDistance;
 
-      // Store GL data
+      // Store vertex and color data
       double s =
         (showIntensity && maxSpeed) ? fabs(move.getSpeed()) / maxSpeed : 1;
       Color color = getColor(move.getType(), s);
@@ -207,6 +207,18 @@ void ToolPathView::update(GLContext &gl) {
   numColors = colors.size() / 3;
   numVertices = vertices.size() / 3;
 
+  values.updated();
+  dirty = false;
+}
+
+
+void ToolPathView::glDraw(GLContext &gl) {
+  if (path.isNull()) return;
+
+  update();
+
+  if (!numColors || !numVertices) return;
+
   // Setup color buffers
   if (!colors.empty()) {
     gl.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf.get());
@@ -224,18 +236,6 @@ void ToolPathView::update(GLContext &gl) {
     gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
     vertices.clear();
   }
-
-  values.updated();
-  dirty = false;
-}
-
-
-void ToolPathView::glDraw(GLContext &gl) {
-  if (path.isNull()) return;
-
-  update(gl);
-
-  if (!numColors || !numVertices) return;
 
   // Color
   gl.glEnableVertexAttribArray(GL_ATTR_COLOR);

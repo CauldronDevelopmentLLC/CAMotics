@@ -40,31 +40,25 @@ namespace CAMotics {
     cb::Vector3D min;
     cb::Vector3D max;
     cb::Vector3D movement;
-
-    cb::Vector3D position;
     cb::Vector3D offset;
-
     std::vector<float> lines;
-    unsigned vbuf;
 
   public:
     MachinePart(const std::string &name,
                 cb::SmartPointer<cb::JSON::Value> &config);
 
+    const cb::Vector3U &getColor() const {return color;}
     const cb::Vector3D &getInit() const {return init;}
     const cb::Vector3D &getHome() const {return home;}
     const cb::Vector3D &getMin() const {return min;}
     const cb::Vector3D &getMax() const {return max;}
 
-    void setPosition(const cb::Vector3D &position);
+    const cb::Vector3D &getMovement() const {return movement;}
+    const cb::Vector3D &getOffset() const {return offset;}
+    const std::vector<float> getLines() const {return lines;}
 
     void read(const cb::InputSource &source, const cb::Matrix4x4D &transform,
               bool reverseWinding);
     using TriangleSurface::read;
-
-#ifdef CAMOTICS_GUI
-    void drawLines();
-    void draw(bool wire);
-#endif
   };
 }

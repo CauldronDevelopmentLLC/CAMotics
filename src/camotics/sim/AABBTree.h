@@ -41,6 +41,7 @@ namespace CAMotics {
     AABBTree() : root(0), finalized(false) {}
     virtual ~AABBTree();
 
+    const AABB *getRoot() const {return root;}
     unsigned getHeight() const {return root ? root->getTreeHeight() : 0;}
 
     // From MoveLookup
@@ -50,8 +51,5 @@ namespace CAMotics {
     void collisions(const cb::Vector3D &p,
                     std::vector<const GCode::Move *> &moves) const;
     void finalize();
-#ifdef CAMOTICS_GUI
-    void draw(bool leavesOnly = false);
-#endif
   };
 }

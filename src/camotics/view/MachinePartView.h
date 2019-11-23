@@ -18,21 +18,31 @@
 
 \******************************************************************************/
 
-#include "VBO.h"
-#include "GLContext.h"
+#pragma once
 
-using namespace CAMotics;
+#include "GLComposite.h"
+#include "Color.h"
+#include "Lines.h"
+#include "Mesh.h"
 
-
-VBO::~VBO() {
-  try {
-    if (buffer && GLContext::isActive())
-      GLContext().glDeleteBuffers(1, &buffer);
-  } catch (...) {}
-}
+#include <cbang/geom/Vector.h>
 
 
-unsigned VBO::get() {
-  if (!buffer) GLContext().glGenBuffers(1, &buffer);
-  return buffer;
+namespace CAMotics {
+  class MachinePart;
+
+  class MachinePartView : public GLComposite {
+    Color color;
+    cb::Vector3D movement;
+    cb::Vector3D offset;
+
+    cb::SmartPointer<Lines> lines;
+    cb::SmartPointer<Mesh> mesh;
+
+  public:
+    MachinePartView(MachinePart &part);
+
+    void setWire(bool wire);
+    void setPosition(const cb::Vector3D &position);
+  };
 }

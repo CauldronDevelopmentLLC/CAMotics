@@ -56,6 +56,8 @@ SmartPointer<Surface> SimulationRun::compute(Task &task) {
   double start = Timer::now();
   double simTime = sim.time;
 
+  LOG_INFO(1, "Computing surface at " << TimeInterval(simTime));
+
   if (sweep.isNull()) {
     // GCode::Tool sweep
     sweep = new ToolSweep(sim.path); // Build sweep for entire time period

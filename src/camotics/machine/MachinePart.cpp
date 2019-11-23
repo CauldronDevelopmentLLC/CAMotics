@@ -27,7 +27,7 @@ using namespace std;
 
 MachinePart::MachinePart(const string &name,
                          SmartPointer<JSON::Value> &config) :
-  name(name), vbuf(0) {
+  name(name) {
   if (config->hasList("color")) color.read(config->getList("color"));
   if (config->hasList("init")) init.read(config->getList("init"));
   if (config->hasList("home")) home.read(config->getList("home"));
@@ -37,11 +37,6 @@ MachinePart::MachinePart(const string &name,
 
   // Offset to home
   offset = home - init;
-}
-
-
-void MachinePart::setPosition(const Vector3D &position) {
-  this->position = position * movement;
 }
 
 
@@ -103,58 +98,3 @@ void MachinePart::read(const InputSource &source,
     add(v);
   }
 }
-
-
-#ifdef CAMOTICS_GUI
-void MachinePart::drawLines() {
-#if 0 // TODO GL
-  GLContext &glFuncs = getGLContext();
-
-  if (!vbuf) {
-    glFuncs.glGenBuffers(1, &vbuf);
-
-    // Vertices
-    glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-    glFuncs.glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(float),
-                         &lines[0], GL_STATIC_DRAW);
-  }
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-  glFuncs.glVertexPointer(3, GL_FLOAT, 0, 0);
-
-  glFuncs.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glFuncs.glEnableClientState(GL_VERTEX_ARRAY);
-  GLboolean light;
-  glFuncs.glGetBooleanv(GL_LIGHTING, &light);
-  glFuncs.glDisable(GL_LIGHTING);
-
-  glFuncs.glDrawArrays(GL_LINES, 0, lines.size() / 3);
-
-  if (light) glFuncs.glEnable(GL_LIGHTING);
-  glFuncs.glDisableClientState(GL_VERTEX_ARRAY);
-#endif
-}
-
-
-void MachinePart::draw(bool wire) {
-#if 0 // TODO GL
-  GLContext &glFuncs = getGLContext();
-
-  glFuncs.glPushMatrix();
-  glFuncs.glTranslatef(offset[0], offset[1], offset[2]);
-  glFuncs.glTranslatef(position[0], position[1], position[2]);
-
-  if (wire) glFuncs.glColor3ub(color[0], color[1], color[2]);
-  else glFuncs.glColor3ub(color[0] * 0.8, color[1] * 0.8, color[2] * 0.8);
-  drawLines();
-
-  if (!wire) {
-    glFuncs.glColor3ub(color[0], color[1], color[2]);
-    TriangleSurface::draw();
-  }
-
-  glFuncs.glPopMatrix();
-#endif
-}
-#endif // CAMOTICS_GUI

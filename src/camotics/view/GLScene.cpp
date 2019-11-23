@@ -20,6 +20,8 @@
 
 #include "GLScene.h"
 
+#include <cbang/log/Logger.h>
+
 using namespace CAMotics;
 using namespace cb;
 using namespace std;
@@ -30,76 +32,84 @@ namespace {
 }
 
 
-void GLScene::glResize(GLContext &gl, unsigned width, unsigned height) {
+void GLScene::glResize(unsigned width, unsigned height) {
   if (!height) height = 1; // Avoid div by 0
 
   this->width = width;
   this->height = height;
 
-  gl.glViewport(0, 0, width, height);
+  GLContext().glViewport(0, 0, width, height);
 }
 
 
-void GLScene::glInit(GLContext &gl) {
-  glProgram = new GLProgram;
-  glProgram->attach("shaders/tool_path_vert.glsl", GL_VERTEX_SHADER);
-  glProgram->attach("shaders/tool_path_frag.glsl", GL_FRAGMENT_SHADER);
-  glProgram->bindAttribute("position", GL_ATTR_POSITION);
-  glProgram->bindAttribute("normal",   GL_ATTR_NORMAL);
-  glProgram->bindAttribute("color",    GL_ATTR_COLOR);
-  glProgram->link();
+void GLScene::glInit() {
+  GLContext gl;
 
-  projection = glProgram->getUniform("projection");
-  model      = glProgram->getUniform("model");
-  view       = glProgram->getUniform("view");
-
-  gl.glClearColor(0, 0, 0, 0);
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glClearDepthf(1);
-  glDepthFunc(GL_LEQUAL);
-
+  // OpenGL config
+  gl.glEnable(GL_DEPTH_TEST);
   gl.glEnable(GL_LINE_SMOOTH);
-  gl.glEnable(GL_POINT_SMOOTH);
   gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   gl.glEnable(GL_BLEND);
-
   gl.glLineWidth(1);
+
+  // Shaders
+  program = new GLProgram;
+  program->attach("shaders/phong.vert", GL_VERTEX_SHADER);
+  program->attach("shaders/phong.frag", GL_FRAGMENT_SHADER);
+  program->bindAttribute("position",    GL_ATTR_POSITION);
+  program->bindAttribute("normal",      GL_ATTR_NORMAL);
+  program->bindAttribute("color",       GL_ATTR_COLOR);
+  program->link();
+
+  // Light
+  program->use();
+  program->set("light.direction", 0.0,  0.0, -1.0);
+  program->set("light.ambient",   0.5,  0.5,  0.5,  1.0);
+  program->set("light.diffuse",   0.75, 0.75, 0.75, 1.0);
 }
 
 
-void GLScene::glDraw(GLContext &gl) {
-  glProgram->use();
+void GLScene::glDraw() {
+  GLContext gl(this);
+
+  gl.glClearColor(0, 0, 0, 0);
+  gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  program->use();
+  program->set("light.enabled", 0);
 
   Transform t;
-  projection.set(t);
-  view.set(t);
-  model.set(t);
+  program->set("projection", t);
+  program->set("view",       t);
+  program->set("model",      t);
 
   if (background.isSet()) background->glDraw(gl);
+
+  // Projection
+  t.perspective(toRadians(45), getAspect(), 1, 100000);
+  program->set("projection", t);
 
   // Compute camera Z
   Vector3D dims = bbox.getDimensions();
   double maxDim = dims.x() < dims.y() ? dims.y() : dims.x();
   maxDim = dims.z() < maxDim ? maxDim : dims.z();
   double cameraZ = maxDim / zoom;
-
-  // Projection
-  t.perspective(toRadians(45), getAspect(), 1, 100000);
-  projection.set(t);
+  Vector3D camera(0, 0, cameraZ);
 
   // View
   t.toIdentity();
-  t.lookAt(Vector3D(0, 0, cameraZ), Vector3D(), Vector3D(0, 1, 0));
+  t.lookAt(camera, Vector3D(), Vector3D(0, 1, 0));
+  program->set("view", t);
 
   // Rotate
+  t.toIdentity();
   t.rotate(rotation);
 
   // Translate
   Vector3D trans(translation.x(), translation.y(), 0);
   t.translate(trans * cameraZ - center);
 
-  view.set(t);
-
+  gl.pushMatrix(t);
   GLComposite::glDraw(gl);
+  gl.popMatrix();
 }

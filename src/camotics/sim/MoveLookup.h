@@ -37,6 +37,5 @@ namespace CAMotics {
     virtual void collisions(const cb::Vector3D &p,
                             std::vector<const GCode::Move *> &moves) const = 0;
     virtual void finalize() {}
-    virtual void draw(bool leavesOnly = false) {}
   };
 }

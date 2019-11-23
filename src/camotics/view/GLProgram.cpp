@@ -28,6 +28,7 @@
 #include <vector>
 
 using namespace CAMotics;
+using namespace cb;
 using namespace std;
 
 
@@ -41,6 +42,13 @@ GLProgram::~GLProgram() {
   try {
     if (program && GLContext::isActive()) GLContext().glDeleteProgram(program);
   } CATCH_ERROR;
+}
+
+
+bool GLProgram::inUse() const {
+  GLint current = 0;
+  GLContext().glGetIntegerv(GL_CURRENT_PROGRAM, &current);
+  return program == (unsigned)current;
 }
 
 
@@ -98,15 +106,111 @@ void GLProgram::link() {
 
 
 void GLProgram::use() const {
+  if (inUse()) return;
   GLContext gl;
   gl.glUseProgram(program);
   gl.logErrors();
 }
 
 
-GLUniform GLProgram::getUniform(const string &name) const {
-  GLint loc = GLContext().glGetUniformLocation(program, (GLchar *)name.c_str());
+void GLProgram::unuse() const {GLContext().glUseProgram(0);}
+
+
+unsigned GLProgram::getUniform(const string &name) {
+  auto it = uniforms.find(name);
+  if (it != uniforms.end()) return it->second;
+
+  GLchar *n = (GLchar *)name.c_str();
+  GLint loc = GLContext().glGetUniformLocation(program, n);
   if (loc == -1) THROW("GL uniform '" << name << "' not found");
 
-  return GLUniform(program, (unsigned)loc);
+  return uniforms[name] = (unsigned)loc;
+}
+
+
+void GLProgram::set(const string &name, double v0) {
+  GLContext().glUniform1f(getUniform(name), v0);
+}
+
+
+void GLProgram::set(const string &name, double v0, double v1) {
+  GLContext().glUniform2f(getUniform(name), v0, v1);
+}
+
+
+
+void GLProgram::set(const string &name, double v0, double v1, double v2) {
+  GLContext().glUniform3f(getUniform(name), v0, v1, v2);
+}
+
+
+
+void GLProgram::set
+(const string &name, double v0, double v1, double v2, double v3) {
+  GLContext().glUniform4f(getUniform(name), v0, v1, v2, v3);
+}
+
+
+void GLProgram::set(const string &name, const Vector3F &v) {
+  set(name, v[0], v[1], v[2]);
+}
+
+
+void GLProgram::set(const string &name, const Vector4F &v) {
+  set(name, v[0], v[1], v[2], v[3]);
+}
+
+
+void GLProgram::set(const string &name, const Vector3D &v) {
+  set(name, v[0], v[1], v[2]);
+}
+
+
+void GLProgram::set(const string &name, const Vector4D &v) {
+  set(name, v[0], v[1], v[2], v[3]);
+}
+
+
+void GLProgram::set(const string &name, int v0) {
+  GLContext().glUniform1i(getUniform(name), v0);
+}
+
+
+
+void GLProgram::set(const string &name, int v0, int v1) {
+  GLContext().glUniform2i(getUniform(name), v0, v1);
+}
+
+
+
+void GLProgram::set(const string &name, int v0, int v1, int v2) {
+  GLContext().glUniform3i(getUniform(name), v0, v1, v2);
+}
+
+
+
+void GLProgram::set(const string &name, int v0, int v1, int v2, int v3) {
+  GLContext().glUniform4i(getUniform(name), v0, v1, v2, v3);
+}
+
+
+void GLProgram::set(const string &name, const Matrix4x4F &m) {
+  float v[16];
+
+  for (unsigned col = 0; col < 4; col++)
+    for (unsigned row = 0; row < 4; row++)
+      v[col * 4 + row] = m[row][col];
+
+  GLContext().glUniformMatrix4fv(getUniform(name), 1, false, v);
+}
+
+
+void GLProgram::set(const string &name, const Matrix4x4D &m) {
+  float v[16];
+
+  for (unsigned col = 0; col < 4; col++)
+    for (unsigned row = 0; row < 4; row++)
+      v[col * 4 + row] = m[row][col];
+
+  GLContext().glUniformMatrix4fv(getUniform(name), 1, false, v);
 }
