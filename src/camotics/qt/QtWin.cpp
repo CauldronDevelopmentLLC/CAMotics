@@ -702,6 +702,7 @@ void QtWin::surfaceComplete(SurfaceTask &task) {
   surface = task.getSurface();
   if (surface.isNull()) simRun.release();
   exportDialog.enableSurface(!surface.isNull());
+  exportDialog.enableSimData(true);
 
   view->setSurface(surface);
   if (simRun.isSet()) view->setMoveLookup(simRun->getMoveLookup());
@@ -824,14 +825,14 @@ void QtWin::snapshot() {
 
 void QtWin::exportData() {
   // Check what we have to export
-  if (surface.isNull() && gcode.isNull() && project.isNull()) {
+  if (surface.isNull() && gcode.isNull() && simRun.isNull()) {
     warning("Nothing to export.\nRun a simulation first.");
     return;
   }
 
-  exportDialog.enableSurface(!surface.isNull());
-  exportDialog.enableGCode(!gcode.isNull());
-  exportDialog.enableSimData(!project.isNull());
+  exportDialog.enableSurface(surface.isSet());
+  exportDialog.enableGCode(gcode.isSet());
+  exportDialog.enableSimData(simRun.isSet());
 
   // Run dialog
   if (exportDialog.exec() != QDialog::Accepted) return;

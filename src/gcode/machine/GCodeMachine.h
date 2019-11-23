@@ -34,11 +34,11 @@ namespace GCode {
     Axes position;
     Units units;
     cb::FileLocation location;
-    int axisSeen;
+    int axisSeen = 0;
 
   public:
     GCodeMachine(const cb::SmartPointer<std::ostream> &stream, Units units) :
-      stream(stream), units(units), axisSeen(0) {}
+      stream(stream), units(units) {}
 
     void beginLine();
 

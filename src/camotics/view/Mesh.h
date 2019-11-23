@@ -21,6 +21,7 @@
 #pragma once
 
 #include "GLObject.h"
+#include "Lines.h"
 #include "VBO.h"
 
 #include <vector>
@@ -30,6 +31,7 @@ namespace CAMotics {
   class Mesh : public GLObject {
     unsigned triangles;
     unsigned vertFill = 0;
+    cb::SmartPointer<Lines> lines;
 
     VBO vertices = GL_ATTR_POSITION;
     VBO normals = GL_ATTR_NORMAL;
@@ -37,7 +39,7 @@ namespace CAMotics {
   public:
     Mesh(unsigned triangles);
 
-    void setWire(bool wire);
+    bool empty() const {return !triangles;}
 
     void reset(unsigned triangles);
 

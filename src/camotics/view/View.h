@@ -62,6 +62,7 @@ namespace CAMotics {
     cb::SmartPointer<ToolView> tool;
     cb::SmartPointer<CuboidView> workpiece;
     cb::SmartPointer<Mesh> model;
+    cb::SmartPointer<Lines> wireModel;
     cb::SmartPointer<Surface> surface;
     cb::SmartPointer<MoveLookup> moveLookup;
     cb::SmartPointer<AABBView> aabbView;
@@ -119,6 +120,11 @@ namespace CAMotics {
 
     void updateVisibility();
     void updateBounds();
+    void updateTool();
+    void loadWireModel();
+    void updateModel();
+    void updateMachine();
+    void updateAABB();
 
     // From GLScene
     void glInit();

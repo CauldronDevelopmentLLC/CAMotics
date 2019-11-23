@@ -29,15 +29,11 @@ using namespace std;
 Mesh::Mesh(unsigned triangles) {reset(triangles);}
 
 
-void Mesh::setWire(bool wire) {
-  // GL TODO
-}
-
-
 void Mesh::reset(unsigned triangles) {
   this->triangles = triangles;
   unsigned size = triangles * 9 * sizeof(float);
 
+  lines.release();
   vertices.allocate(size);
   normals.allocate(size);
 }
@@ -46,6 +42,7 @@ void Mesh::reset(unsigned triangles) {
 void Mesh::add(unsigned count, const float *vertices, const float *normals) {
   if (count % 3) THROW("Mesh vertices array size not a multiple of 3");
 
+  lines.release();
   this->vertices.add(3 * count, vertices);
   this->normals.add(3 * count, normals);
 }

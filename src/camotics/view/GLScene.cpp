@@ -101,13 +101,15 @@ void GLScene::glDraw() {
   t.lookAt(camera, Vector3D(), Vector3D(0, 1, 0));
   program->set("view", t);
 
-  // Rotate
+  // Translate
   t.toIdentity();
+  t.translate(Vector3D(translation.x(), translation.y(), 0) * cameraZ);
+
+  // Rotate
   t.rotate(rotation);
 
-  // Translate
-  Vector3D trans(translation.x(), translation.y(), 0);
-  t.translate(trans * cameraZ - center);
+  // Center
+  t.translate(-center);
 
   gl.pushMatrix(t);
   GLComposite::glDraw(gl);

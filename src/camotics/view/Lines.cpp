@@ -26,12 +26,22 @@ using namespace CAMotics;
 using namespace std;
 
 
-Lines::Lines(unsigned lines, bool withColors) {reset(lines, withColors);}
+Lines::Lines(unsigned lines, bool withColors, bool withNormals) {
+  reset(lines, withColors, withNormals);
+}
 
 
-Lines::Lines(unsigned count, const float *vertices, const float *colors) {
-  reset(count / 3, colors);
-  add(lines, vertices, colors);
+Lines::Lines(unsigned count, const float *vertices, const float *colors,
+             const float *normals) {
+  reset(count / 3, colors, normals);
+  add(lines, vertices, colors, normals);
+}
+
+
+Lines::Lines(const vector<float> &vertices, const vector<float> &colors,
+             const vector<float> &normals) {
+  reset(vertices.size() / 3, !colors.empty(), !normals.empty());
+  add(vertices, colors, normals);
 }
 
 
@@ -47,25 +57,43 @@ Lines::Lines(const vector<float> &vertices) {
 }
 
 
-void Lines::reset(unsigned lines, bool withColors) {
+void Lines::reset(unsigned lines, bool withColors, bool withNormals) {
   this->lines = lines;
   this->withColors = withColors;
-  setLight(false);
+  this->withNormals = withNormals;
+  setLight(withNormals);
 
   unsigned size = lines * 6 * sizeof(float);
   vertices.allocate(size);
   if (withColors) colors.allocate(size);
+  if (withNormals) normals.allocate(size);
 }
 
 
-void Lines::add(unsigned count, const float *vertices, const float *colors) {
+void Lines::add(unsigned count, const float *vertices, const float *colors,
+                const float *normals) {
   if (count % 2) THROW("Lines vertices array size not a multiple of 2");
   if (colors) {
     if (!withColors) THROW("Cannot add colors");
   } else if (withColors) THROW("Missing colors");
+  if (normals) {
+    if (!withNormals) THROW("Cannot add normals");
+  } else if (withNormals) THROW("Missing normals");
 
   this->vertices.add(3 * count, vertices);
   if (colors) this->colors.add(3 * count, colors);
+  if (normals) this->normals.add(3 * count, normals);
+}
+
+
+void Lines::add(const vector<float> &vertices, const vector<float> &colors,
+                const vector<float> &normals) {
+  if (colors.size() && vertices.size() != colors.size())
+    THROW("Vertices array size must match colors");
+  if (normals.size() && vertices.size() != normals.size())
+    THROW("Vertices array size must match normals");
+
+  add(vertices.size() / 3, &vertices[0], &colors[0], &normals[0]);
 }
 
 
@@ -86,9 +114,11 @@ void Lines::glDraw(GLContext &gl) {
 
   vertices.enable(3);
   if (withColors) colors.enable(3);
+  if (withNormals) normals.enable(3);
 
   gl.glDrawArrays(GL_LINES, 0, lines * 2);
 
   vertices.disable();
   if (withColors) colors.disable();
+  if (withNormals) normals.disable();
 }

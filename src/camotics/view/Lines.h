@@ -32,19 +32,31 @@ namespace CAMotics {
     unsigned lines    = 0;
     unsigned vertFill = 0;
     bool withColors   = false;
+    bool withNormals  = false;
 
     VBO vertices = GL_ATTR_POSITION;
     VBO colors   = GL_ATTR_COLOR;
+    VBO normals  = GL_ATTR_NORMAL;
 
   public:
-    Lines(unsigned lines, bool withColors);
-    Lines(unsigned count, const float *vertices, const float *colors = 0);
+    Lines(unsigned lines, bool withColors, bool withNormals);
+    Lines(unsigned count, const float *vertices, const float *colors = 0,
+          const float *normals = 0);
+    Lines(const std::vector<float> &vertices, const std::vector<float> &colors,
+          const std::vector<float> &normals);
     Lines(const std::vector<float> &vertices, const std::vector<float> &colors);
     Lines(const std::vector<float> &vertices);
 
-    void reset(unsigned lines, bool withColors = false);
+    bool empty() const {return !lines;}
 
-    void add(unsigned lines, const float *vertices, const float *colors = 0);
+    void reset(unsigned lines, bool withColors = false,
+               bool withNormals = false);
+
+    void add(unsigned lines, const float *vertices, const float *colors = 0,
+             const float *normals = 0);
+    void add(const std::vector<float> &vertices,
+             const std::vector<float> &colors,
+             const std::vector<float> &normals);
     void add(const std::vector<float> &vertices,
              const std::vector<float> &colors);
     void add(const std::vector<float> &vertices);

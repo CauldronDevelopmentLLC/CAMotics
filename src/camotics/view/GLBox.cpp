@@ -24,7 +24,7 @@ using namespace CAMotics;
 using namespace cb;
 
 
-GLBox::GLBox() : Lines(12, false) {
+GLBox::GLBox() : Lines(12, false, false) {
   const float v[] = {
     // Top
     0, 0, 0,  1, 0, 0,

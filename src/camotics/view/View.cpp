@@ -142,17 +142,19 @@ void View::clear() {
 
 
 void View::updateVisibility() {
+  bool wire = isFlagSet(View::WIRE_FLAG);
+
   axes->setVisible(isFlagSet(View::SHOW_AXES_FLAG));
   bounds->setVisible(!isFlagSet(View::SHOW_WORKPIECE_FLAG) &&
                      isFlagSet(View::SHOW_WORKPIECE_BOUNDS_FLAG));
   tool->setVisible(isFlagSet(View::SHOW_TOOL_FLAG) && !path->isEmpty());
   path->setShowIntensity(isFlagSet(View::PATH_INTENSITY_FLAG));
   path->setVisible(isFlagSet(View::SHOW_PATH_FLAG));
-  model->setVisible(isFlagSet(View::SHOW_SURFACE_FLAG));
-  model->setWire(isFlagSet(View::WIRE_FLAG));
+  model->setVisible(isFlagSet(View::SHOW_SURFACE_FLAG) && !wire);
+  wireModel->setVisible(isFlagSet(View::SHOW_SURFACE_FLAG) && wire);
   workpiece->setVisible(isFlagSet(View::SHOW_WORKPIECE_FLAG));
   machineView->setVisible(isFlagSet(View::SHOW_MACHINE_FLAG));
-  machineView->setWire(isFlagSet(View::WIRE_FLAG));
+  machineView->setWire(wire);
   aabbView->setVisible(isFlagSet(View::SHOW_BBTREE_FLAG));
   aabbView->showNodes(!isFlagSet(View::BBTREE_LEAVES_FLAG));
 }
@@ -180,41 +182,7 @@ void View::updateBounds() {
 }
 
 
-void View::glInit() {
-  GLScene::glInit();
-
-  add(group = new GLComposite);
-  add(machineView);
-
-  group->add(axes = new AxesView);
-  group->add(bounds = new GLBox);
-  bounds->setColor(1, 1, 1, 0.5); // White
-  group->add(path);
-  group->add(aabbView);
-
-  // Model
-  Color c(0.06, 0.23, 0.42);
-  group->add(model = new Mesh(0));
-  group->add(workpiece = new CuboidView);
-  model->setColor(c);
-  workpiece->setColor(c);
-
-  group->add(tool = new ToolView);
-}
-
-
-void View::glDraw() {
-  updateVisibility();
-  updateBounds();
-
-  // Path
-  path->update();
-
-  // Model
-  const float alpha = isFlagSet(View::TRANSLUCENT_SURFACE_FLAG) ? 0.8f : 1.0f;
-  model->getColor().setAlpha(alpha);
-
-  // Tool
+void View::updateTool() {
   if (path.isSet() && path->getPath().isSet()) {
     const GCode::ToolTable &tools = path->getPath()->getTools();
     const GCode::Move &move = path->getMove();
@@ -231,10 +199,50 @@ void View::glDraw() {
 
     } else tool->clear();
   } else tool->clear();
+}
 
-  // Surface
+
+void View::loadWireModel() {
+  wireModel->reset(surface->getTriangleCount() * 3, false, true);
+
+  auto cb =
+    [this] (const vector<float> &vertices, const vector<float> &normals) {
+      unsigned triangles = vertices.size() / 9;
+      vector<float> v(triangles * 18);
+      vector<float> n(triangles * 18);
+
+      for (unsigned i = 0; i < triangles; i++)
+        for (unsigned j = 0; j < 2; j++) {
+          const float *t = j ? &normals[i * 9] : &vertices[i * 9];
+          vector<float> &out = j ? n : v;
+          const float *v0 = t;
+          const float *v1 = &t[3];
+          const float *v2 = &t[6];
+
+          memcpy(&out[i * 18 +  0], v0, sizeof(float) * 6);
+          memcpy(&out[i * 18 +  6], v1, sizeof(float) * 6);
+          memcpy(&out[i * 18 + 12], v2, sizeof(float) * 3);
+          memcpy(&out[i * 18 + 15], v0, sizeof(float) * 3);
+        }
+
+      wireModel->add(triangles * 6, &v[0], 0, &n[0]);
+    };
+
+  surface->getVertices(cb);
+  wireModel->setLight(true);
+}
+
+
+void View::updateModel() {
+  // Color
+  const float alpha = isFlagSet(View::TRANSLUCENT_SURFACE_FLAG) ? 0.5f : 1.0f;
+  model->getColor().setAlpha(alpha);
+
+  bool wire = isFlagSet(View::WIRE_FLAG);
+
   if (surfaceChanged) {
     surfaceChanged = false;
+    wireModel->reset(0, false, false);
 
     if (surface.isSet()) {
       model->reset(surface->getTriangleCount());
@@ -245,17 +253,23 @@ void View::glDraw() {
         };
 
       surface->getVertices(cb);
+      model->setVisible(!wire);
 
     } else model->reset(0);
   }
 
-  // Machine
+  if (surface.isSet() && wire && wireModel->empty()) loadWireModel();
+}
+
+
+void View::updateMachine() {
   group->getTransform().toIdentity();
 
   if (machineView->isVisible()) {
     if (machineChanged) {
       machineChanged = false;
       machineView->load(*machine);
+      machineView->setWire(isFlagSet(View::WIRE_FLAG));
     }
 
     Vector3D currentPosition = path->getPosition();
@@ -270,12 +284,49 @@ void View::glDraw() {
 
     machineView->setPosition(currentPosition);
   }
+}
 
-  // AABB
+
+void View::updateAABB() {
   if (moveLookup.isSet() && aabbView->isVisible() && moveLookupChanged) {
     moveLookupChanged = false;
     aabbView->load(*moveLookup.cast<AABBTree>());
   }
+}
+
+
+void View::glInit() {
+  GLScene::glInit();
+
+  // Build scene
+  add(machineView);
+  add(group = new GLComposite);
+  group->add(axes = new AxesView);
+  group->add(bounds = new GLBox);
+  group->add(path);
+  group->add(aabbView);
+  group->add(model = new Mesh(0));
+  group->add(wireModel = new Lines(0, false, false));
+  group->add(workpiece = new CuboidView);
+  group->add(tool = new ToolView); // Last for transparency
+
+  // Colors
+  Color modelColor(0.06, 0.23, 0.42);
+  model->setColor(modelColor);
+  wireModel->setColor(modelColor);
+  workpiece->setColor(modelColor);
+  bounds->setColor(1, 1, 1, 0.5); // White
+}
+
+
+void View::glDraw() {
+  updateVisibility();
+  updateBounds();
+  path->update();
+  updateTool();
+  updateModel();
+  updateMachine();
+  updateAABB();
 
   GLScene::glDraw();
 }
