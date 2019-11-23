@@ -29,6 +29,7 @@ namespace CAMotics {
   class Transform : public cb::Matrix4x4D {
   public:
     Transform() {toIdentity();}
+    Transform(const cb::Matrix4x4D &m) : cb::Matrix4x4D(m) {}
 
     void perspective(double fovy, double aspect, double zNear, double zFar);
     void translate(double x, double y, double z);
@@ -40,6 +41,8 @@ namespace CAMotics {
     void scale(const cb::Vector3D &v);
     void lookAt(const cb::Vector3D &eye, const cb::Vector3D &center,
                 const cb::Vector3D &up);
-
+    void invert();
+    void transpose() {inplaceTranspose();}
+    cb::Matrix3x3D upper3x3() const;
   };
 }

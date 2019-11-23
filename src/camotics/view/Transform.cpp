@@ -164,3 +164,59 @@ void Transform::lookAt(const Vector3D &eye, const Vector3D &center,
   // Translate eye to origin
   translate(-eye);
 }
+
+
+void Transform::invert() {
+  const Matrix4x4D &n = *this;
+  double s0 = n[0][0] * n[1][1] - n[1][0] * n[0][1];
+  double s1 = n[0][0] * n[1][2] - n[1][0] * n[0][2];
+  double s2 = n[0][0] * n[1][3] - n[1][0] * n[0][3];
+  double s3 = n[0][1] * n[1][2] - n[1][1] * n[0][2];
+  double s4 = n[0][1] * n[1][3] - n[1][1] * n[0][3];
+  double s5 = n[0][2] * n[1][3] - n[1][2] * n[0][3];
+
+  double c5 = n[2][2] * n[3][3] - n[3][2] * n[2][3];
+  double c4 = n[2][1] * n[3][3] - n[3][1] * n[2][3];
+  double c3 = n[2][1] * n[3][2] - n[3][1] * n[2][2];
+  double c2 = n[2][0] * n[3][3] - n[3][0] * n[2][3];
+  double c1 = n[2][0] * n[3][2] - n[3][0] * n[2][2];
+  double c0 = n[2][0] * n[3][1] - n[3][0] * n[2][1];
+
+  // Should check for 0 determinant
+  double det = 1 / (s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0);
+
+  Matrix4x4D m;
+  m[0][0] = ( n[1][1] * c5 - n[1][2] * c4 + n[1][3] * c3) * det;
+  m[0][1] = (-n[0][1] * c5 + n[0][2] * c4 - n[0][3] * c3) * det;
+  m[0][2] = ( n[3][1] * s5 - n[3][2] * s4 + n[3][3] * s3) * det;
+  m[0][3] = (-n[2][1] * s5 + n[2][2] * s4 - n[2][3] * s3) * det;
+
+  m[1][0] = (-n[1][0] * c5 + n[1][2] * c2 - n[1][3] * c1) * det;
+  m[1][1] = ( n[0][0] * c5 - n[0][2] * c2 + n[0][3] * c1) * det;
+  m[1][2] = (-n[3][0] * s5 + n[3][2] * s2 - n[3][3] * s1) * det;
+  m[1][3] = ( n[2][0] * s5 - n[2][2] * s2 + n[2][3] * s1) * det;
+
+  m[2][0] = ( n[1][0] * c4 - n[1][1] * c2 + n[1][3] * c0) * det;
+  m[2][1] = (-n[0][0] * c4 + n[0][1] * c2 - n[0][3] * c0) * det;
+  m[2][2] = ( n[3][0] * s4 - n[3][1] * s2 + n[3][3] * s0) * det;
+  m[2][3] = (-n[2][0] * s4 + n[2][1] * s2 - n[2][3] * s0) * det;
+
+  m[3][0] = (-n[1][0] * c3 + n[1][1] * c1 - n[1][2] * c0) * det;
+  m[3][1] = ( n[0][0] * c3 - n[0][1] * c1 + n[0][2] * c0) * det;
+  m[3][2] = (-n[3][0] * s3 + n[3][1] * s1 - n[3][2] * s0) * det;
+  m[3][3] = ( n[2][0] * s3 - n[2][1] * s1 + n[2][2] * s0) * det;
+
+  *this = m;
+}
+
+
+Matrix3x3D Transform::upper3x3() const {
+  const Matrix4x4D &n = *this;
+  Matrix3x3D m;
+
+  for (unsigned i = 0; i < 3; i++)
+    for (unsigned j = 0; j < 3; j++)
+      m[i][j] = n[i][j];
+
+  return m;
+}

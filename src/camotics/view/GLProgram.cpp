@@ -214,3 +214,25 @@ void GLProgram::set(const string &name, const Matrix4x4D &m) {
 
   GLContext().glUniformMatrix4fv(getUniform(name), 1, false, v);
 }
+
+
+void GLProgram::set(const string &name, const Matrix3x3F &m) {
+  float v[9];
+
+  for (unsigned col = 0; col < 3; col++)
+    for (unsigned row = 0; row < 3; row++)
+      v[col * 3 + row] = m[row][col];
+
+  GLContext().glUniformMatrix3fv(getUniform(name), 1, false, v);
+}
+
+
+void GLProgram::set(const string &name, const Matrix3x3D &m) {
+  float v[9];
+
+  for (unsigned col = 0; col < 3; col++)
+    for (unsigned row = 0; row < 3; row++)
+      v[col * 3 + row] = m[row][col];
+
+  GLContext().glUniformMatrix3fv(getUniform(name), 1, false, v);
+}

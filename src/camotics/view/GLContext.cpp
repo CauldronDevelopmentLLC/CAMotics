@@ -75,20 +75,20 @@ void GLContext::pushMatrix(const Transform &t) {
 
 void GLContext::setMatrix(const Transform &t) {
   stack.back() = t;
-  getProgram().set("model", stack.back());
+  updateMatrix();
 }
 
 
 void GLContext::applyMatrix(const Transform &t) {
   stack.back() *= t;
-  getProgram().set("model", stack.back());
+  updateMatrix();
 }
 
 
 void GLContext::popMatrix() {
   if (stack.size() == 1) THROW("Matrix stack underrun");
   stack.pop_back();
-  getProgram().set("model", stack.back());
+  updateMatrix();
 }
 
 
@@ -113,4 +113,13 @@ void GLContext::setColor(const Color &color) {
 
 void GLContext::setColor(float r, float g, float b, float a) {
   setColor(Color(r, g, b, a));
+}
+
+
+void GLContext::updateMatrix() {
+  Transform t = stack.back();
+  getProgram().set("model", t);
+  t.invert();
+  t.transpose();
+  getProgram().set("normalMat", t.upper3x3());
 }

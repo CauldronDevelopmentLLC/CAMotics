@@ -69,5 +69,7 @@ namespace CAMotics {
 
     void set(const std::string &name, const cb::Matrix4x4F &m);
     void set(const std::string &name, const cb::Matrix4x4D &m);
+    void set(const std::string &name, const cb::Matrix3x3F &m);
+    void set(const std::string &name, const cb::Matrix3x3D &m);
   };
 }
