@@ -63,7 +63,7 @@ void GLScene::glInit() {
 
   // Light
   program->use();
-  program->set("light.direction", 0.0,  0.0,  -1.0);
+  program->set("light.direction", 0.0,  0.25, -1.0);
   program->set("light.ambient",   0.75, 0.75,  0.75, 1.0);
   program->set("light.diffuse",   0.75, 0.75,  0.75, 1.0);
 }

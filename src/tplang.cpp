@@ -43,18 +43,13 @@ using namespace GCode;
 class TPLangApp : public CAMotics::CommandLineApp {
   MachinePipeline pipeline;
   string simJSON;
-  string jsImpl;
   tplang::TPLContext ctx;
 
 public:
   TPLangApp() : CommandLineApp("Tool Path Language Interpreter"),
-                ctx(SmartPointer<ostream>::Phony(&cout), pipeline, jsImpl) {
+                ctx(SmartPointer<ostream>::Phony(&cout), pipeline) {
     cmdLine.addTarget("sim-json", simJSON,
                       "Simulation information in JSON format");
-    cmdLine.addTarget("js", jsImpl,
-                      "Specify which Javascript implementation to use.  "
-                      "Possible values are 'v8' or 'chakra' but which are "
-                      "actually available depends on the build.");
   }
 
   // From CommandLineApp
