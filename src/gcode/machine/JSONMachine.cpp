@@ -179,8 +179,10 @@ void JSONMachine::dwell(double seconds) {
 }
 
 
-void JSONMachine::move(const Axes &target, int axes, bool rapid) {
-  MachineAdapter::move(target, axes, rapid);
+void JSONMachine::move(const Axes &_target, int axes, bool rapid) {
+  MachineAdapter::move(_target, axes, rapid);
+
+  Axes target = getTransforms().transform(_target);
 
   sink.appendDict(true);
   sink.insert("type", "move");

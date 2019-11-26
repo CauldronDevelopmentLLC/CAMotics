@@ -21,15 +21,23 @@
 #include <camotics/qt/QtApp.h>
 
 #include <cbang/ApplicationMain.h>
+#include <cbang/config.h>
 
 // This causes Windows to not automatically create a console
 #if defined(_WIN32) && !defined(__MINGW32__) && !defined(DEBUG)
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 #endif
 
+#ifdef HAVE_V8
+#include <cbang/js/v8/JSImpl.h>
+#endif
+
 using namespace std;
 
 
 int main(int argc, char *argv[]) {
+#ifdef HAVE_V8
+  cb::gv8::JSImpl::init(0, 0);
+#endif
   return cb::doApplication<CAMotics::QtApp>(argc, argv);
 }

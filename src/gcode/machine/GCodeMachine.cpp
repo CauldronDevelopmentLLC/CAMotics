@@ -87,13 +87,15 @@ void GCodeMachine::beginLine() {
 
 
 void GCodeMachine::start() {
+  MachineAdapter::start();
   axisSeen = 0;
-  *stream << (units == Units::METRIC ? "G21" : "G20") << "\n";
+  *stream << (units == Units::METRIC ? "G21" : "G20") << '\n';
   // TODO set other GCode state
 }
 
 
 void GCodeMachine::end() {
+  MachineAdapter::end();
   // Probably should be part of the machine description.
   *stream << "M2\n";
 }
@@ -196,11 +198,13 @@ void GCodeMachine::changeTool(unsigned tool) {
 
 
 void GCodeMachine::input(port_t port, input_mode_t mode, double timeout) {
+  MachineAdapter::input(port, mode, timeout);
   // TODO Output GCode for machine.input()
 }
 
 
 void GCodeMachine::seek(port_t port, bool active, bool error) {
+  MachineAdapter::seek(port, active, error);
   // TODO Output GCode for machine.seek()
 }
 
@@ -225,6 +229,7 @@ void GCodeMachine::output(port_t port, double value) {
 
 
 void GCodeMachine::setPosition(const Axes &position) {
+  MachineAdapter::setPosition(position);
   this->position = getTransforms().transform(position);
 }
 
@@ -347,6 +352,8 @@ void GCodeMachine::pause(pause_t type) {
 
 
 void GCodeMachine::comment(const string &s) const {
+  MachineAdapter::comment(s);
+
   vector<string> lines;
   String::tokenize(s, lines, "\n\r", true);
 
@@ -356,5 +363,7 @@ void GCodeMachine::comment(const string &s) const {
 
 
 void GCodeMachine::message(const string &s) {
+  MachineAdapter::message(s);
+
   *stream << "(MSG," << String::escapeC(s) << ")\n";
 }

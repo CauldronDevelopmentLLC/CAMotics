@@ -22,18 +22,30 @@
 
 
 #include <camotics/Task.h>
+
 #include <gcode/Units.h>
 #include <gcode/ToolPath.h>
 #include <gcode/ToolTable.h>
+#include <gcode/ControllerImpl.h>
+#include <gcode/machine/MachinePipeline.h>
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 
 namespace cb {
   class Subprocess;
   class Thread;
+  class InputSource;
 }
+
+namespace GCode {
+  class Controller;
+  class MachineInterface;
+}
+
+namespace tplang {class TPLContext;}
 
 namespace CAMotics {
   namespace Project {class Project;}
@@ -44,12 +56,17 @@ namespace CAMotics {
     std::vector<std::string> files;
     std::string simJSON;
 
-    unsigned errors;
+    GCode::MachinePipeline machine;
+    GCode::ControllerImpl controller;
+
+    unsigned errors = 0;
     cb::SmartPointer<GCode::ToolPath> path;
-    cb::SmartPointer<std::vector<char> > gcode;
+    std::ostringstream gcode;
 
     cb::SmartPointer<cb::Subprocess> proc;
     cb::SmartPointer<cb::Thread> logCopier;
+
+    cb::SmartPointer<tplang::TPLContext> tplCtx;
 
     public:
     ToolPathTask(const Project::Project &project);
@@ -57,7 +74,13 @@ namespace CAMotics {
 
     unsigned getErrorCount() const {return errors;}
     const cb::SmartPointer<GCode::ToolPath> &getPath() const {return path;}
-    const cb::SmartPointer<std::vector<char> > &getGCode() const {return gcode;}
+    std::string getGCode() const {return gcode.str();}
+
+    void interpGCode(const cb::InputSource &src);
+
+    void runTPL(const std::string &filename);
+    void runTPLInProcess(const std::string &filename);
+    void runGCode(const std::string &filename);
 
     // From Task
     void run();

@@ -70,6 +70,8 @@ namespace CAMotics {
   class QtWin : public QMainWindow, public TaskObserver {
     Q_OBJECT;
 
+    int taskCompleteEvent = 0; // Must be before creating UI elements below
+
     cb::SmartPointer<Ui::CAMoticsWindow> ui;
     NewDialog newDialog;
     NewProjectDialog newProjectDialog;
@@ -87,7 +89,6 @@ namespace CAMotics {
     QTimer animationTimer;
     QByteArray fullLayoutState;
     ConcurrentTaskManager taskMan;
-    int taskCompleteEvent;
 
     QIcon playIcon;
     QIcon pauseIcon;
@@ -104,24 +105,24 @@ namespace CAMotics {
     cb::SmartPointer<SimulationRun> simRun;
     cb::SmartPointer<View> view;
     cb::SmartPointer<GCode::ToolPath> toolPath;
-    cb::SmartPointer<std::vector<char> > gcode;
+    std::string gcode;
     cb::SmartPointer<Surface> surface;
 
     QSignalMapper recentProjectsMapper;
     cb::SmartPointer<BBCtrlAPI> bbCtrlAPI;
 
-    double lastRedraw;
-    bool dirty;
-    bool simDirty;
-    unsigned inUIUpdate;
-    double lastProgress;
+    double lastRedraw     = 0;
+    bool dirty            = false;
+    bool simDirty         = false;
+    unsigned inUIUpdate   = 0;
+    double lastProgress   = 0;
     std::string lastStatus;
-    bool lastStatusActive;
-    bool autoPlay;
-    bool autoClose;
+    bool lastStatusActive = false;
+    bool autoPlay         = false;
+    bool autoClose        = false;
     std::string defaultExample;
-    bool sliderMoving;
-    bool positionChanged;
+    bool sliderMoving     = false;
+    bool positionChanged  = false;
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 

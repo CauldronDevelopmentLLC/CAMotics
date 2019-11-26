@@ -48,7 +48,7 @@ namespace CAMotics {
     template<typename Source>
     std::streamsize read(Source &src, char *s, std::streamsize n) {
       n = boost::iostreams::read(src, s, n);
-      if (n > 0) {
+      if (0 < n) {
         count += n;
         if (total) task.update((double)count / total);
       }
@@ -58,7 +58,7 @@ namespace CAMotics {
     template<typename Sink>
     std::streamsize write(Sink &dest, const char *s, std::streamsize n) {
       n = boost::iostreams::write(dest, s, n);
-      if (n > 0) {
+      if (0 < n) {
         count += n;
         if (total) task.update((double)count / total);
       }

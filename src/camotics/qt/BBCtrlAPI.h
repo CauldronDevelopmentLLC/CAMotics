@@ -62,6 +62,7 @@ namespace CAMotics {
     void disconnectCNC();
     void reconnect();
     void uploadGCode(const char *data, unsigned length);
+    void uploadGCode(const std::string &gcode);
 
   signals:
     void connected();

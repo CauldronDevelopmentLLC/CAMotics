@@ -67,12 +67,8 @@ QtWin::QtWin(Application &app) :
   newProjectDialog(this), exportDialog(this), aboutDialog(this),
   settingsDialog(this), donateDialog(this), findDialog(this, false),
   findAndReplaceDialog(this, true), toolDialog(this), camDialog(this),
-  connectDialog(this), uploadDialog(this), fileDialog(*this),
-  taskCompleteEvent(0), app(app), options(app.getOptions()),
-  view(new View(valueSet)), lastRedraw(0), dirty(false),
-  simDirty(false), inUIUpdate(false), lastProgress(0), lastStatusActive(false),
-  autoPlay(false), autoClose(false), sliderMoving(false),
-  positionChanged(false) {
+  connectDialog(this), uploadDialog(this), fileDialog(*this), app(app),
+  options(app.getOptions()), view(new View(valueSet)) {
 
   ui->setupUi(this);
 
@@ -656,7 +652,7 @@ void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
 
 
 void QtWin::uploadGCode() {
-  if (gcode.isNull() || bbCtrlAPI.isNull() || !bbCtrlAPI->isConnected())
+  if (gcode.empty() || bbCtrlAPI.isNull() || !bbCtrlAPI->isConnected())
     return;
 
   QString current = uploadDialog.getFilename();
@@ -674,7 +670,7 @@ void QtWin::uploadGCode() {
   }
 
   bbCtrlAPI->setFilename(filename.toUtf8().data());
-  bbCtrlAPI->uploadGCode(&gcode->front(), gcode->size());
+  bbCtrlAPI->uploadGCode(gcode);
   showMessage(QString("Uploading ") + filename + QString(" to ") +
               connectDialog.getAddress());
 }
@@ -691,7 +687,7 @@ void QtWin::toolPathComplete(ToolPathTask &task) {
   }
 
   gcode = task.getGCode();
-  exportDialog.enableGCode(!gcode.isNull());
+  exportDialog.enableGCode(!gcode.empty());
   uploadGCode();
   loadToolPath(task.getPath(), !task.getErrorCount());
 }
@@ -825,13 +821,13 @@ void QtWin::snapshot() {
 
 void QtWin::exportData() {
   // Check what we have to export
-  if (surface.isNull() && gcode.isNull() && simRun.isNull()) {
+  if (surface.isNull() && gcode.empty() && simRun.isNull()) {
     warning("Nothing to export.\nRun a simulation first.");
     return;
   }
 
   exportDialog.enableSurface(surface.isSet());
-  exportDialog.enableGCode(gcode.isSet());
+  exportDialog.enableGCode(!gcode.empty());
   exportDialog.enableSimData(simRun.isSet());
 
   // Run dialog
@@ -875,12 +871,12 @@ void QtWin::exportData() {
 
   } else if (exportDialog.gcodeSelected()) {
     if (exportDialog.crlfSelected()) {
-      for (unsigned i = 0; i < gcode->size(); i++) {
-        if ((*gcode)[i] == '\n') stream->put('\r');
-        stream->put((*gcode)[i]);
+      for (unsigned i = 0; i < gcode.length(); i++) {
+        if (gcode[i] == '\n') stream->put('\r');
+        stream->put(gcode[i]);
       }
 
-    } else stream->write(&gcode->front(), gcode->size());
+    } else *stream << gcode << flush;
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());

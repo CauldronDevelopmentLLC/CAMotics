@@ -121,6 +121,11 @@ void BBCtrlAPI::uploadGCode(const char *data, unsigned length) {
 }
 
 
+void BBCtrlAPI::uploadGCode(const string &gcode) {
+  uploadGCode(gcode.c_str(), gcode.length());
+}
+
+
 void BBCtrlAPI::onError(QAbstractSocket::SocketError error) {
   LOG_WARNING("CNC: " << webSocket.errorString().toUtf8().data());
 }
