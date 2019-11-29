@@ -50,7 +50,8 @@ namespace CAMotics {
 
     void compute(Task &task, FieldFunction &func);
     void shift();
-    uint8_t getEdges(unsigned x, unsigned y, Edge edges[12]) const;
+    uint8_t getEdges(unsigned x, unsigned y, Edge edges[12],
+                     double *depths = 0) const;
 
   protected:
     double depth(int x, int y, const cb::Vector3U &offset) const;

@@ -108,7 +108,8 @@ void CubeSlice::shift() {
 }
 
 
-uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
+uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12],
+                            double *depths) const {
   // This table maps vertices to the index needed for the marching cubes table.
   static const Vector3U vOffset[8] = {
     Vector3U(0, 0, 0), Vector3U(1, 0, 0),
@@ -118,9 +119,11 @@ uint8_t CubeSlice::getEdges(unsigned x, unsigned y, Edge edges[12]) const {
   };
 
   uint8_t vertexFlags = 0;
-  for (unsigned i = 0; i < 8; i++)
-    if (depth(x, y, vOffset[i]) < 0)
-      vertexFlags |= 1 << i;
+  for (unsigned i = 0; i < 8; i++) {
+    double d = depth(x, y, vOffset[i]);
+    if (depths) depths[i] = d;
+    if (d < 0) vertexFlags |= 1 << i;
+  }
 
   // eOffset[] maps cube indices to the 12 edges and edge flags as laid out in
   // the marching cubes tables.
