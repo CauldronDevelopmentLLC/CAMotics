@@ -1,0 +1,20 @@
+o1 sub
+  (msg, sub)
+
+  o2 if [ #1 eq 0 ]
+    (msg, zero)
+
+  o2 elseif [ #1 eq 1 ]
+    (msg, one)
+
+  o2 else
+    (msg, other)
+  o2 endif
+
+  (msg, endsub)
+  (msg, -------------)
+o1 endsub
+
+o1 call [0]
+o1 call [1]
+o1 call [2]

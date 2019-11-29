@@ -265,7 +265,7 @@ void GCodeMachine::move(const Axes &_target, int axes, bool rapid) {
     string next = dtos(target.get(*axis), imperial).toString();
 
     // Always output axis the first time
-    if (wasSeen && (!(axes & axisVT) || last == next)) continue;
+    if (wasSeen && last == next) continue;
 
     if (first) {
       beginLine();
