@@ -307,7 +307,8 @@ void OCodeInterpreter::doElseIf(OCode *ocode) {
   if (conditions.empty() || conditions.back() != ocode->getNumber())
     LOG_WARNING("Mismatched elseif");
 
-  else if (!ifSatisfied) {
+  else if (ifSatisfied) condition = false;
+  else {
     const OCode::expressions_t &expressions = ocode->getExpressions();
     condition = expressions.empty() || expressions[0]->eval(*this);
     ifSatisfied = condition;
