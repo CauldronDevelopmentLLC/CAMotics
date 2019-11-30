@@ -288,20 +288,19 @@ void QtWin::loadMachine(const string &machine) {
 
 void QtWin::loadMachines() {
   try {
-    const char *paths[] = {
-      "/usr/share/doc/camotics/machines",
-      "../SharedSupport/machines",
-      "machines",
-      0
-    };
+    vector<string> paths;
+    paths.push_back(SystemUtilities::getPathPrefix() +
+                    "/share/doc/camotics/machines");
+    paths.push_back("../SharedSupport/machines");
+    paths.push_back("machines");
 
     string root = ".";
     string appPath = QCoreApplication::applicationFilePath().toUtf8().data();
     if (appPath.empty()) LOG_WARNING("Couldn't get application path");
     else root = SystemUtilities::dirname(appPath);
 
-    for (const char **p = paths; *p; p++) {
-      string path = *p;
+    for (unsigned i = 0; i < paths.size(); i++) {
+      string path = paths[i];
       if (path[0] != '/') path = root + "/" + path;
 
       if (SystemUtilities::isDirectory(path)) {
@@ -344,12 +343,11 @@ void QtWin::loadDefaultExample() {
 
 void QtWin::loadExamples() {
   try {
-    const char *paths[] = {
-      "/usr/share/doc/camotics/examples",
-      "../SharedSupport/examples",
-      "examples",
-      0
-    };
+    vector<string> paths;
+    paths.push_back(SystemUtilities::getPathPrefix() +
+                    "/share/doc/camotics/examples");
+    paths.push_back("../SharedSupport/examples");
+    paths.push_back("examples");
 
     string root = ".";
     string appPath =
@@ -357,8 +355,8 @@ void QtWin::loadExamples() {
     if (appPath.empty()) LOG_WARNING("Couldn't get application path");
     else root = SystemUtilities::dirname(appPath);
 
-    for (const char **p = paths; *p; p++) {
-      string path = *p;
+    for (unsigned i = 0; i < paths.size(); i++) {
+      string path = paths[i];
       if (path[0] != '/') path = root + "/" + path;
 
       if (SystemUtilities::isDirectory(path)) {
