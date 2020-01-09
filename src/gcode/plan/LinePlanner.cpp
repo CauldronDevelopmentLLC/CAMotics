@@ -421,7 +421,7 @@ bool LinePlanner::merge(LineCommand *next, LineCommand *prev,
   delete next;
   while (pre.back() != prev) delete pre.pop_back();
 
-  // Check if newly merged command is too short
+  // Check if newly merged move is too short
   if (prev->length < config.minTravel) {
     // Save last speed
     lastSpeed = prev->speeds.size() ? prev->speeds.back().speed :

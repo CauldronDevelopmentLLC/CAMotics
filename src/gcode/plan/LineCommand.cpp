@@ -27,6 +27,7 @@
 
 #include <cbang/json/Sink.h>
 #include <cbang/log/Logger.h>
+#include <cbang/geom/Segment.h>
 
 #include <limits>
 #include <cmath>
@@ -64,15 +65,7 @@ bool LineCommand::canMerge() const {return !seeking;}
 
 namespace {
   double mergeError(const Axes &A, const Axes &B, const Axes &C) {
-    double a = (B - A).lengthSquared();
-    double b = (C - B).lengthSquared();
-    double c = (C - A).lengthSquared();
-
-    if (!c) return sqrt(a);
-
-    // Using Heron's formula simplified with squared side lengths to compute
-    // area and from that, triangle height.
-    return 2 * sqrt((-a * a + 2 * a * (b + c) - (b - c) * (b - c)) / c);
+    return Segment<9, double>(A, C).distance(B);
   }
 }
 
