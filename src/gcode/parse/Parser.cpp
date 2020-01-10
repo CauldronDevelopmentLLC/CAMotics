@@ -222,11 +222,11 @@ SmartPointer<OCode> Parser::ocode() {
 
 SmartPointer<Entity> Parser::numberRefOrExpr() {
   switch (tokenizer->getType()) {
-  case TokenType::POUND_TOKEN: return reference();
+  case TokenType::POUND_TOKEN:    return reference();
   case TokenType::OBRACKET_TOKEN: return quotedExpr();
-  case TokenType::NUMBER_TOKEN: return number();
+  case TokenType::NUMBER_TOKEN:   return number();
   case TokenType::ADD_TOKEN:
-  case TokenType::SUB_TOKEN: return unaryOp();
+  case TokenType::SUB_TOKEN:      return unaryOp();
   default:
     THROW("Expected number, reference, or bracked expression, found "
           << tokenDescription(tokenizer->advance()));
@@ -247,13 +247,14 @@ SmartPointer<Entity> Parser::boolOp() {
       Operator op;
 
       string id = String::toUpper(tokenizer->getValue());
-      if (id == "AND") op = Operator::AND_OP;
-      else if (id == "OR") op = Operator::OR_OP;
+      if      (id == "AND") op = Operator::AND_OP;
+      else if (id == "OR")  op = Operator::OR_OP;
       else if (id == "XOR") op = Operator::XOR_OP;
 
       if (op != Operator::NO_OP) {
         tokenizer->advance();
         entity = new BinaryOp(op, entity, compareOp());
+        continue;
       }
     }
     break;
@@ -271,7 +272,7 @@ SmartPointer<Entity> Parser::compareOp() {
       Operator op;
 
       string id = String::toUpper(tokenizer->getValue());
-      if (id == "EQ") op = Operator::EQ_OP;
+      if      (id == "EQ") op = Operator::EQ_OP;
       else if (id == "NE") op = Operator::NE_OP;
       else if (id == "GT") op = Operator::GT_OP;
       else if (id == "GE") op = Operator::GE_OP;
@@ -302,11 +303,10 @@ SmartPointer<Entity> Parser::addOp() {
     default: break;
     }
 
-    if (op != Operator::NO_OP) {
-      tokenizer->advance();
-      entity = new BinaryOp(op, entity, mulOp());
+    if (op == Operator::NO_OP) break;
 
-    } else break;
+    tokenizer->advance();
+    entity = new BinaryOp(op, entity, mulOp());
   }
 
   return entity;
@@ -328,11 +328,10 @@ SmartPointer<Entity> Parser::mulOp() {
     default: break;
     }
 
-    if (op != Operator::NO_OP) {
-      tokenizer->advance();
-      entity = new BinaryOp(op, entity, expOp());
+    if (op == Operator::NO_OP) break;
 
-    } else break;
+    tokenizer->advance();
+    entity = new BinaryOp(op, entity, expOp());
   }
 
   return entity;
@@ -342,11 +341,10 @@ SmartPointer<Entity> Parser::mulOp() {
 SmartPointer<Entity> Parser::expOp() {
   SmartPointer<Entity> entity = primary();
 
-  while (true) {
+  while (true)
     if (tokenizer->consume(TokenType::EXP_TOKEN))
       entity = new BinaryOp(Operator::EXP_OP, entity, primary());
     else break;
-  }
 
   return entity;
 }
