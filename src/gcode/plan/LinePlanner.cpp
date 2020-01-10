@@ -388,7 +388,7 @@ void LinePlanner::push(PlannerCommand *cmd) {
   SetCommand *sc = dynamic_cast<SetCommand *>(cmd);
   if (sc) {
     const string &name = sc->getName();
-    flush = name != "line" && name != "speed";
+    flush = name != "line" && name != "speed" && name != "_feed";
   }
 
   // Flush pre-plan queue
@@ -433,6 +433,10 @@ bool LinePlanner::merge(LineCommand *next, LineCommand *prev,
     // Restore last speed
     if (!std::isnan(lastSpeed)) pushSetCommand("speed", lastSpeed);
   }
+
+  // Restore last feed
+  if (getFeed() != prev->feed && !prev->rapid)
+    pushSetCommand("_feed", getFeed());
 
   return true;
 }
@@ -488,7 +492,7 @@ unsigned LinePlanner::blendSegments(double arcError, double arcAngle,
 
 void LinePlanner::blend(LineCommand *next, LineCommand *prev,
                         double lastSpeed, int lastLine) {
-  if (!next->canBlend() || !prev->canBlend() || next->rapid != prev->rapid)
+  if (!next->canBlend() || !prev->canBlend() || next->feed != prev->feed)
     return;
 
   // Get unit vectors
@@ -637,7 +641,7 @@ void LinePlanner::enqueue(LineCommand *lc, bool rapid) {
     else if (sc->getName() == "line" && lastLine == -1)
       lastLine = sc->getValue().getS32();
 
-    else break;
+    else if (sc->getName() != "_feed") break;
   }
 
   // Add the move

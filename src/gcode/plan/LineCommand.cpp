@@ -99,6 +99,10 @@ bool LineCommand::merge(const LineCommand &lc, const PlannerConfig &config,
   // Handle speed
   if (!std::isnan(speed)) speeds.push_back(Speed(length, speed));
 
+  // Merge feed rates
+  if (feed != lc.feed)
+    feed = (feed * length + lc.feed * lc.length) / (length + lc.length);
+
   // Merge
   merged.push_back(target);
   target = lc.target;
