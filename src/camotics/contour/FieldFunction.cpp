@@ -59,7 +59,7 @@ Vector3D FieldFunction::findNormal(Vector3D &a, double aDepth,
                                    Vector3D &b, double bDepth) {
   Vector3D normal;
 
-  // TODO
+  // TODO Find normal
 
   return normal;
 }

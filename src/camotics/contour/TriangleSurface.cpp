@@ -184,10 +184,7 @@ void TriangleSurface::reduce(Task &task) {
 }
 
 
-void TriangleSurface::read(const JSON::Value &value) {
-  // TODO
-  THROW("NYI");
-}
+void TriangleSurface::read(const JSON::Value &value) {THROW("NYI");}
 
 
 void TriangleSurface::write(JSON::Sink &sink) const {
