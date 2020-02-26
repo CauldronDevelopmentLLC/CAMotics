@@ -36,7 +36,7 @@ RenderJob::RenderJob(Condition &condition, FieldFunction &func, RenderMode mode,
                      GridTreeRef &tree) :
   condition(condition), func(func), tree(tree) {
   switch (mode) {
-  case RenderMode::MCUBES_MODE: generator = new CorrectedMC33;          break;
+  case RenderMode::MCUBES_MODE: generator = new MarchingCubes;          break;
   case RenderMode::CMS_MODE:    generator = new CubicalMarchingSquares; break;
   default: THROW("Invalid or unsupported render mode " << mode);
   }
