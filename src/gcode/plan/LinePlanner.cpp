@@ -238,7 +238,10 @@ void LinePlanner::setPathMode(path_mode_t mode, double motionBlending,
 }
 
 
-void LinePlanner::changeTool(unsigned tool) {pushSetCommand("tool", tool);}
+void LinePlanner::changeTool(unsigned tool) {
+  MachineState::changeTool(tool);
+  pushSetCommand("tool", tool);
+}
 
 
 void LinePlanner::input(port_t port, input_mode_t mode, double timeout) {
