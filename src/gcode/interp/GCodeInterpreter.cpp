@@ -173,10 +173,7 @@ string GCodeInterpreter::interpolate(const string &s) {
     case NAME_STATE:
       if (*it == '>') {
         string name(refStart + 2, it);
-
-        if (hasReference(name)) result += String(lookupReference(name));
-        else result.append(1, '#');
-
+        result += String(lookupReference(name));
         state = SCAN_STATE;
       }
       break;
