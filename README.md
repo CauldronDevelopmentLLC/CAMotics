@@ -56,7 +56,8 @@ by C!, can be installed with the following command line:
 
     sudo apt-get update
     sudo apt-get -y install scons build-essential qt5-default python-six \
-      libqt5websockets5-dev libqt5opengl5-dev libnode-dev libglu1-mesa-dev git
+      libqt5websockets5-dev libqt5opengl5-dev libnode-dev libglu1-mesa-dev \
+      pkgconf git
 
 ## Building C! (cbang)
 Clone the C! git repository, build the software using scons and set the
