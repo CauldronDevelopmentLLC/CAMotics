@@ -51,8 +51,7 @@ namespace CAMotics {
     double getETA() const;
     std::string getStatus() const;
 
-    void addTask(const cb::SmartPointer<Task>::Protected &task,
-                 bool priority = true);
+    void addTask(const cb::SmartPointer<Task> &task, bool priority = true);
     bool hasMore() const;
     cb::SmartPointer<Task> remove();
     void addObserver(TaskObserver *observer);

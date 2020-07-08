@@ -59,7 +59,7 @@ string ConcurrentTaskManager::getStatus() const {
 }
 
 
-void ConcurrentTaskManager::addTask(const SmartPointer<Task>::Protected &task,
+void ConcurrentTaskManager::addTask(const SmartPointer<Task> &task,
                                     bool priority) {
   SmartLock lock(this);
 
