@@ -174,10 +174,15 @@ void OCodeInterpreter::doCall(OCode *ocode) {
         THROW("Subroutine " << name << " not found");
 
       } else if (sub.loadedFiles.insert(name).second) {
-        string path = SystemUtilities::findInPath(scriptPath, name);
+        const char *exts[] = {"", ".ngc", 0};
+        string path;
+
+        for (unsigned i = 0; path.empty() && exts[i]; i++)
+          path = SystemUtilities::findInPath(scriptPath, name);
+
         if (path.empty())
           THROW("Subroutine \"" << name
-                 << "\" file not found in GCODE_SCRIPT_PATH");
+                << "\" file not found in GCODE_SCRIPT_PATH");
 
         ProducerStack::push(new SubroutineLoader(name, subroutineCall, *this));
         ProducerStack::push(InputSource(path));
