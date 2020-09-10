@@ -1,3 +1,5 @@
+precision mediump float;
+
 varying vec3 fNormal;
 varying vec3 fPosition;
 varying vec4 fColor;
