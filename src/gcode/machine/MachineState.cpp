@@ -35,9 +35,6 @@ MachineState::MachineState() :
   started(false), feed(0), feedMode(UNITS_PER_MINUTE), speed(0),
   spinMode(REVOLUTIONS_PER_MINUTE), maxSpeed(0) {
 
-  // Init numbered parameters
-  memset(params, 0, sizeof(params));
-
   // Coordinate system
   set(CURRENT_COORD_SYSTEM, 1, NO_UNITS);
 
