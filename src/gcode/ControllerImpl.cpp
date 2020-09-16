@@ -402,7 +402,7 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   if (!angle) angle = 2 * M_PI;
 
   if ((VT_P & vars) && 1 < getVar('P'))
-    angle = angle + M_PI * 2 * (getVar('P') - 1) * (angle < 0 ? -1 : 1);
+    angle += M_PI * 2 * (getVar('P') - 1) * (angle < 0 ? -1 : 1);
 
   LOG_DEBUG(4, "Arc angle=" << angle << " startAngle=" << startAngle
             << " finishAngle=" << finishAngle << " start=" << start
@@ -1142,7 +1142,9 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 50: setSpindleDir(DIR_OFF);              break;
     case 60: toolChange();                        break; // Manual Tool Change
     case 70: setMistCoolant(true);                break;
+    case 71: setMistCoolant(false);               break;
     case 80: setFloodCoolant(true);               break;
+    case 81: setFloodCoolant(false);              break;
     case 90:
       setMistCoolant(false);
       setFloodCoolant(false);

@@ -316,8 +316,12 @@ const Code Codes::mcodes[] = {
 
   {'M', 70, PRI_COOLANT, MG::MG_COOLANT, VT::VT_NONE,
    "Turn Mist Coolant On"},
+  {'M', 71, PRI_COOLANT, MG::MG_COOLANT, VT::VT_NONE,
+   "Turn Mist Coolant Off"},
   {'M', 80, PRI_COOLANT, MG::MG_COOLANT, VT::VT_NONE,
    "Turn Flood Coolant On"},
+  {'M', 81, PRI_COOLANT, MG::MG_COOLANT, VT::VT_NONE,
+   "Turn Flood Coolant Off"},
   {'M', 90, PRI_COOLANT, MG::MG_COOLANT, VT::VT_NONE,
    "Turn All Coolant Off"},
 
