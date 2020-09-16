@@ -276,6 +276,7 @@ void View::updateMachine() {
     Vector3D offset = machine->getWorkpiece() * currentPosition;
     group->getTransform().translate(offset);
 
+    // TODO machine/tool transform is incorrect
     // TODO Work offsets should be configurable
     double z = -workpieceBounds.getDimensions().z();
     auto &t = machineView->getTransform();
