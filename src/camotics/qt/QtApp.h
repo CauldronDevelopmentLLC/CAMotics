@@ -29,16 +29,10 @@
 class QWidget;
 
 namespace CAMotics {
-  class QtWin;
-  class QApplication;
-
   class QtApp : public Application {
     int argc;
     char **argv;
     std::string projectFile;
-
-    cb::SmartPointer<QApplication> qtApp;
-    cb::SmartPointer<QtWin> qtWin;
 
     unsigned threads;
 
