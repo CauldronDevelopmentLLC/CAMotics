@@ -62,14 +62,22 @@ using namespace CAMotics;
 #define PROTECT_UI_UPDATE if (inUIUpdate) return; LOCK_UI_UPDATES
 
 
-QtWin::QtWin(Application &app) :
+QtWin::QtWin(Application &app, QApplication &qtApp) :
   QMainWindow(0), ui(new Ui::CAMoticsWindow), newDialog(this),
   newProjectDialog(this), exportDialog(this), aboutDialog(this),
   settingsDialog(this), donateDialog(this), findDialog(this, false),
   findAndReplaceDialog(this, true), toolDialog(this), camDialog(this),
   connectDialog(this), uploadDialog(this), fileDialog(*this), app(app),
-  options(app.getOptions()), view(new View(valueSet)) {
+  options(app.getOptions()), qtApp(qtApp), view(new View(valueSet)) {
 
+  // Translation
+  qtTran.load(QLocale::system(), QStringLiteral("qtbase_"));
+  qtApp.installTranslator(&qtTran);
+  tran.load(QLocale(), QLatin1String("camotics"), QLatin1String("_"),
+            QLatin1String(":/i18n"));
+  qtApp.installTranslator(&tran);
+
+  // UI
   ui->setupUi(this);
 
   // Settings dialog
@@ -158,6 +166,7 @@ QtWin::QtWin(Application &app) :
   loadMachines();
   loadExamples();
   loadRecentProjects();
+  loadLanguageMenu();
 
   // Add docks to View menu
   QMenu *menu = new QMenu;
@@ -273,6 +282,80 @@ void QtWin::setUnitLabel(QLabel *label, double value, int precision,
   double scale = isMetric() ? 1.0 : 1.0 / 25.4;
   label->setText(QString().sprintf("%.*f%s", precision, value * scale,
                                    withUnit ? (isMetric() ? "mm" : "in") : ""));
+}
+
+
+void QtWin::loadLanguageMenu() {
+  QActionGroup *langGroup = new QActionGroup(ui->menuLanguage);
+  langGroup->setExclusive(true);
+
+  connect(langGroup, SIGNAL(triggered(QAction *)), this,
+          SLOT(on_languageChanged(QAction *)));
+
+  // Format systems language
+  QString defaultLocale = QLocale::system().name();
+  defaultLocale.truncate(defaultLocale.lastIndexOf('_'));
+
+  // English
+  QAction *action = ui->menuLanguage->addAction("English");
+  action->setCheckable(true);
+  action->setData("en");
+  action->setIcon(QIcon(QString(":/flags/en.png")));
+  action->setChecked(true);
+  langGroup->addAction(action);
+
+  QDir dir(":/i18n");
+  QStringList fileNames = dir.entryList(QStringList("camotics_*.qm"));
+
+  for (int i = 0; i < fileNames.size(); ++i) {
+    // Get locale from filename
+    QString locale;
+    locale = fileNames[i];
+    locale.truncate(locale.lastIndexOf('.'));
+    locale.remove(0, locale.lastIndexOf('_') + 1);
+
+    QString lang = QLocale::languageToString(QLocale(locale).language());
+    QString flag = QString(":/flags/%1.png").arg(locale);
+    QAction *action = ui->menuLanguage->addAction(lang);
+    action->setCheckable(true);
+    action->setData(locale);
+    action->setIcon(QIcon(flag));
+    langGroup->addAction(action);
+
+    if (defaultLocale == locale) action->setChecked(true);
+  }
+}
+
+void QtWin::switchTranslator(QTranslator &translator, const QString &filename) {
+  // remove the old translator
+  qtApp.removeTranslator(&translator);
+
+  // load the new translator
+  if (translator.load(QLatin1String(":/i18n/") + filename))
+    qtApp.installTranslator(&translator);
+}
+
+void QtWin::loadLanguage(const QString &lang) {
+  if (currentLang == lang) return;
+
+  LOG_INFO(1, "Switching language from " << currentLang.toStdString()
+           << " to " << lang.toStdString());
+
+  currentLang = lang;
+  QLocale locale = QLocale(lang);
+  QLocale::setDefault(locale);
+  QString languageName = QLocale::languageToString(locale.language());
+
+  qtApp.removeTranslator(&tran);
+  if (tran.load(QString(":/i18n/camotics_%1.qm").arg(lang)))
+    qtApp.installTranslator(&tran);
+
+  //qtApp.removeTranslator(&qtTran);
+  //if (qtTran.load(QString("qt_%1.qm").arg(lang)))
+    //qtApp.installTranslator(&qtTran);
+
+  //switchTranslator(qtTran, QString("qt_%1.qm").arg(lang));
+  ui->statusbar->showMessage(tr("Language changed to %1").arg(languageName));
 }
 
 
@@ -585,20 +668,13 @@ void QtWin::showMessage(const char *msg, bool log) {
 }
 
 
-void QtWin::showMessage(const string &msg, bool log) {
-  showMessage(QString::fromUtf8(msg.c_str()), log);
+void QtWin::message(const QString &msg) {
+  QMessageBox::information(this, "CAMotics", msg, QMessageBox::Ok);
 }
 
 
-void QtWin::message(const string &msg) {
-  QMessageBox::information
-    (this, "CAMotics", QString::fromUtf8(msg.c_str()), QMessageBox::Ok);
-}
-
-
-void QtWin::warning(const string &msg) {
-  QMessageBox::warning
-    (this, "CAMotics", QString::fromUtf8(msg.c_str()), QMessageBox::Ok);
+void QtWin::warning(const QString &msg) {
+  QMessageBox::warning(this, "CAMotics", msg, QMessageBox::Ok);
 }
 
 
@@ -669,17 +745,17 @@ void QtWin::uploadGCode() {
 
   bbCtrlAPI->setFilename(filename.toUtf8().data());
   bbCtrlAPI->uploadGCode(gcode);
-  showMessage(QString("Uploading ") + filename + QString(" to ") +
-              connectDialog.getAddress());
+  showMessage(tr("Uploading %1 to %2")
+              .arg(filename).arg(connectDialog.getAddress()));
 }
 
 
 void QtWin::toolPathComplete(ToolPathTask &task) {
   if (task.getErrorCount()) {
-    const char *msg = "Errors were encountered during tool path generation.  "
-      "See the console output for more details";
+    auto msg = tr("Errors were encountered during tool path generation.  "
+      "See the console output for more details");
 
-    QMessageBox::critical(this, "Tool path errors", msg, QMessageBox::Ok);
+    QMessageBox::critical(this, tr("Tool path errors"), msg, QMessageBox::Ok);
 
     showConsole();
   }
@@ -795,32 +871,33 @@ void QtWin::redraw(bool now) {
 
 
 void QtWin::snapshot() {
-  string filename = project->getFilename();
+  QString filename = project->getFilename().c_str();
   QPixmap pixmap =
     QPixmap::fromImage(ui->simulationView->grabFramebuffer());
 
   QList<QByteArray> formats = QImageWriter::supportedImageFormats();
-  string fileTypes = "Image files (";
+  QString fileTypes = tr("Image files (");
   for (int i = 0; i < formats.size(); i++) {
-    if (i) fileTypes += ",";
-    fileTypes += "*." + String::toLower(formats.at(i).data());
+    if (i) fileTypes.append(",");
+    fileTypes.append("*.");
+    fileTypes.append(formats.at(i).data());
   }
-  fileTypes += ")";
+  fileTypes.append(")");
 
-  filename = SystemUtilities::swapExtension(filename, "png");
-  filename = openFile("Save snapshot", fileTypes, filename, true);
-  if (filename.empty()) return;
+  filename =
+    SystemUtilities::swapExtension(filename.toStdString(), "png").c_str();
+  filename = openFile(tr("Save snapshot"), fileTypes, filename, true);
+  if (filename.isEmpty()) return;
 
-  if (!pixmap.save(QString::fromUtf8(filename.c_str())))
-    warning("Failed to save snapshot.");
-  else showMessage("Snapshot saved.");
+  if (!pixmap.save(filename)) warning(tr("Failed to save snapshot."));
+  else showMessage(tr("Snapshot saved."));
 }
 
 
 void QtWin::exportData() {
   // Check what we have to export
   if (surface.isNull() && gcode.empty() && simRun.isNull()) {
-    warning("Nothing to export.\nRun a simulation first.");
+    warning(tr("Nothing to export.\nRun a simulation first."));
     return;
   }
 
@@ -832,34 +909,36 @@ void QtWin::exportData() {
   if (exportDialog.exec() != QDialog::Accepted) return;
 
   // Select output file
-  string title = "Export ";
-  string fileTypes;
+  QString title = tr("Export ");
+  QString fileTypes;
   string ext;
 
   if (exportDialog.surfaceSelected()) {
-    title += "Surface";
-    fileTypes = "STL Files (*.stl)";
+    title.append(tr("Surface"));
+    fileTypes = tr("STL Files (*.stl)");
     ext = "stl";
 
   } else if (exportDialog.gcodeSelected()) {
-    title += "GCode";
-    fileTypes = "GCode Files (*.gcode *.nc *.ngc *.tap)";
+    title.append(tr("GCode"));
+    fileTypes = tr("GCode Files (*.gcode *.nc *.ngc *.tap)");
     ext = "gcode";
 
   } else {
-    title += "Simulation Data";
-    fileTypes = "JSON Files (*.json)";
+    title.append(tr("Simulation Data"));
+    fileTypes = tr("JSON Files (*.json)");
     ext = "json";
   }
 
   fileTypes += ";;All Files (*.*)";
 
   // Open output file
-  string filename = SystemUtilities::swapExtension(project->getFilename(), ext);
+  QString filename =
+    SystemUtilities::swapExtension(project->getFilename(), ext).c_str();
   filename = openFile(title, fileTypes, filename, true);
 
-  if (filename.empty()) return;
-  SmartPointer<iostream> stream = SystemUtilities::open(filename, ios::out);
+  if (filename.isEmpty()) return;
+  SmartPointer<iostream> stream =
+    SystemUtilities::open(filename.toStdString(), ios::out);
 
   // Export
   if (exportDialog.surfaceSelected()) {
@@ -917,11 +996,12 @@ bool QtWin::runCAMDialog(const string &filename) {
 }
 
 
-string QtWin::openFile(const string &title, const string &filters,
-                       const string &_filename, bool save, bool anyFile) {
-  string filename = _filename;
-  if (filename.empty() && !project.isNull())
-    filename = SystemUtilities::dirname(project->getFilename());
+QString QtWin::openFile(const QString &title, const QString &filters,
+                       const QString &_filename, bool save, bool anyFile) {
+  QString filename = _filename;
+  if (filename.isEmpty() && !project.isNull())
+    filename =
+      QString(SystemUtilities::dirname(project->getFilename()).c_str());
 
   return fileDialog.open(title, filters, filename, save, anyFile);
 }
@@ -989,7 +1069,7 @@ void QtWin::openProject(const string &_filename) {
   }
 
   updateRecentProjects(filename);
-  showMessage("Opening " + filename);
+  showMessage(tr("Opening %1").arg(filename.c_str()));
 
   try {
     // Check for project file
@@ -1051,33 +1131,35 @@ void QtWin::openProject(const string &_filename) {
 
 
 bool QtWin::saveProject(bool saveAs) {
-  string filename = project->getFilename();
-  string ext = SystemUtilities::extension(filename);
+  QString filename = project->getFilename().c_str();
+  string ext = SystemUtilities::extension(filename.toStdString());
 
-  if (saveAs || filename.empty() || ext != "camotics" || !project->isOnDisk()) {
-    if (filename.empty()) filename = "project.camotics";
-    else filename = SystemUtilities::swapExtension(filename, "camotics");
+  if (saveAs || filename.isEmpty() || ext != "camotics" ||
+      !project->isOnDisk()) {
+    if (filename.isEmpty()) filename = "project.camotics";
+    else filename = SystemUtilities::swapExtension(filename.toStdString(),
+                                                   "camotics").c_str();
 
     filename =
-      openFile("Save Project", "Projects (*.camotics)", filename, true);
-    if (filename.empty()) return false;
+      openFile(tr("Save Project"), tr("Projects (*.camotics)"), filename, true);
+    if (filename.isEmpty()) return false;
 
-    string ext = SystemUtilities::extension(filename);
-    if (ext.empty()) filename += ".camotics";
+    string ext = SystemUtilities::extension(filename.toStdString());
+    if (ext.empty()) filename.append(".camotics");
     else if (ext != "camotics") {
-      warning("Project file must have .camotics extension, not saved!");
+      warning(tr("Project file must have .camotics extension, not saved!"));
       return false;
     }
   }
 
   try {
-    project->save(filename);
+    project->save(filename.toStdString());
     ui->fileTabManager->saveAll();
-    showMessage("Saved " + filename);
+    showMessage(tr("Saved %1").arg(filename));
     return true;
 
   } catch (const Exception &e) {
-    warning("Could not save project: " + e.getMessage());
+    warning(tr("Could not save project: ").append(e.getMessage().c_str()));
   }
 
   return false;
@@ -1088,7 +1170,7 @@ void QtWin::revertProject() {
   string filename = project->getFilename();
 
   if (filename.empty()) {
-    warning("Cannot revert project.");
+    warning(tr("Cannot revert project."));
     return;
   }
 
@@ -1117,46 +1199,47 @@ void QtWin::updateFiles() {
 
 
 void QtWin::newFile(bool tpl) {
-  string filename = project->getFilename();
-  if (filename.empty()) filename = "newfile";
-  filename = SystemUtilities::swapExtension(filename, tpl ? "tpl" : "nc");
+  QString filename = project->getFilename().c_str();
+  if (filename.isEmpty()) filename = "newfile";
+  filename = SystemUtilities::swapExtension
+    (filename.toStdString(), tpl ? "tpl" : "nc").c_str();
 
-  filename = openFile(tpl ? "New TPL file" : "New GCode file",
-                      tpl ? "TPL (*.tpl);;All files (*.*)" :
-                      "GCode (*.nc *.ngc *.gcode *.tap);;All files (*.*)",
+  filename = openFile(tpl ? tr("New TPL file") : tr("New GCode file"),
+                      tpl ? tr("TPL (*.tpl);;All files (*.*)") :
+                      tr("GCode (*.nc *.ngc *.gcode *.tap);;All files (*.*)"),
                       filename, false, true);
-  if (filename.empty()) return;
+  if (filename.isEmpty()) return;
 
-  string ext = SystemUtilities::extension(filename);
-  if (ext.empty()) filename += tpl ? ".tpl" : ".gcode";
+  string ext = SystemUtilities::extension(filename.toStdString());
+  if (ext.empty()) filename.append(tpl ? ".tpl" : ".gcode");
 
   else if (tpl && ext != "tpl") {
-    warning("TPL file must have .tpl extension");
+    warning(tr("TPL file must have .tpl extension"));
     return;
 
   } else if (!tpl && (ext == "camotics" || ext == "xml" || ext == "tpl")) {
-    warning("GCode file cannot have .tpl, .camotics or .xml extension");
+    warning(tr("GCode file cannot have .tpl, .camotics or .xml extension"));
     return;
   }
 
-  project->addFile(filename);
+  project->addFile(filename.toStdString());
   updateFiles();
 }
 
 
 void QtWin::addFile() {
-  string filename =
-    openFile("Add file", "Supported Files (*.dxf, *.nc *.ngc "
-             "*.gcode *.tap *.tpl);;All Files (*.*)", "", false);
-  if (filename.empty()) return;
+  QString filename =
+    openFile(tr("Add file"), tr("Supported Files (*.dxf, *.nc *.ngc "
+             "*.gcode *.tap *.tpl);;All Files (*.*)"), "", false);
+  if (filename.isEmpty()) return;
 
-  if (String::toLower(SystemUtilities::extension(filename)) == "dxf") {
+  if (SystemUtilities::extension(filename.toLower().toStdString()) == "dxf") {
     THROW("DXF supported not yet implemented");
-     if (!runCAMDialog(filename)) return;
+     if (!runCAMDialog(filename.toStdString())) return;
     // TODO handle CAM JSON
   }
 
-  project->addFile(filename);
+  project->addFile(filename.toStdString());
   updateFiles();
 }
 
@@ -1314,31 +1397,31 @@ void QtWin::exportToolTable() {
   if (project.isNull()) return;
   const GCode::ToolTable &tools = project->getTools();
 
-  string filename =
-    SystemUtilities::dirname(project->getFilename()) + "/tools.json";
+  QString filename =
+    (SystemUtilities::dirname(project->getFilename()) + "/tools.json").c_str();
 
-  filename = openFile("Export tool table", "Tool table files (*.json)",
+  filename = openFile(tr("Export tool table"), tr("Tool table files (*.json)"),
                       filename, true);
 
-  if (filename.empty()) return;
+  if (filename.isEmpty()) return;
 
-  *SystemUtilities::oopen(filename) << tools;
+  *SystemUtilities::oopen(filename.toStdString()) << tools;
 }
 
 
 void QtWin::importToolTable() {
   if (project.isNull()) return;
 
-  string filename =
-    openFile("Import tool table", "Tool table files (*.json)", "", false);
+  QString filename = openFile
+    (tr("Import tool table"), tr("Tool table files (*.json)"), "", false);
 
-  if (filename.empty()) return;
+  if (filename.isEmpty()) return;
 
   GCode::ToolTable tools;
-  *SystemUtilities::iopen(filename) >> tools;
+  *SystemUtilities::iopen(filename.toStdString()) >> tools;
 
   if (tools.empty()) {
-    warning("'" + filename + "' empty or not a tool table");
+    warning(tr("'") + filename + tr("' empty or not a tool table"));
     return;
   }
 
@@ -1354,7 +1437,7 @@ void QtWin::saveDefaultToolTable(const GCode::ToolTable &tools) {
   QSettings settings;
   settings.setValue("ToolTable/Default", QString::fromUtf8(str.str().c_str()));
 
-  showMessage("Default tool table saved");
+  showMessage(tr("Default tool table saved"));
 }
 
 
@@ -1534,7 +1617,7 @@ void QtWin::hideConsole() {
 
 
 void QtWin::updatePlaySpeed(const string &name, unsigned value) {
-  showMessage(String::printf("Playback speed %dx", view->getSpeed()), false);
+  showMessage(tr("Playback speed %1x").arg(view->getSpeed()), false);
 }
 
 
@@ -1683,6 +1766,28 @@ void QtWin::resizeEvent(QResizeEvent *event) {
 }
 
 
+void QtWin::changeEvent(QEvent *event) {
+  if (!event) return;
+
+  switch (event->type()) {
+  case QEvent::LanguageChange: // New translator loaded
+    ui->retranslateUi(this);
+    break;
+
+  case QEvent::LocaleChange: { // System language changed
+    QString locale = QLocale::system().name();
+    locale.truncate(locale.lastIndexOf('_'));
+    loadLanguage(locale);
+    break;
+  }
+
+  default: break;
+  }
+
+  QMainWindow::changeEvent(event);
+}
+
+
 void QtWin::animate() {
   try {
     // Check if OpenGL is initialized
@@ -1725,7 +1830,7 @@ void QtWin::animate() {
           if (eta) s += "ETA " + TimeInterval(eta).toString();
           ui->progressBar->setFormat(QString::fromUtf8(s.c_str()));
 
-          showMessage(s, false);
+          showMessage(s.c_str(), false);
 
         } else {
           ui->progressBar->setValue(0);
@@ -1777,14 +1882,14 @@ void QtWin::on_bbctrlDisconnect() {
 void QtWin::on_bbctrlConnected() {
   connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
   if (connectDialog.isVisible()) connectDialog.accept();
-  showMessage(QString("Connected to ") + connectDialog.getAddress());
+  showMessage(tr("Connected to ") + connectDialog.getAddress());
   uploadGCode();
 }
 
 
 void QtWin::on_bbctrlDisconnected() {
   connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
-  showMessage(QString("Disconnected from ") + connectDialog.getAddress());
+  showMessage(tr("Disconnected from ") + connectDialog.getAddress());
 }
 
 
@@ -1955,6 +2060,11 @@ void QtWin::on_yOffsetDoubleSpinBox_valueChanged(double value) {
 void QtWin::on_zOffsetDoubleSpinBox_valueChanged(double value) {
   PROTECT_UI_UPDATE;
   setWorkpieceOffset(2, value);
+}
+
+
+void QtWin::on_languageChanged(QAction *action) {
+  if (action) loadLanguage(action->data().toString());
 }
 
 

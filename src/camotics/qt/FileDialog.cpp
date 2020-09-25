@@ -26,6 +26,7 @@
 #include <cbang/log/Logger.h>
 
 #include <QString>
+#include <QObject>
 
 using namespace CAMotics;
 using namespace cb;
@@ -35,10 +36,10 @@ using namespace std;
 FileDialog::FileDialog(QtWin &win) : win(win) {}
 
 
-string FileDialog::open(const string &title, const string &filters,
-                        const string &filename, bool save, bool anyFile) {
+QString FileDialog::open(const QString &title, const QString &filters,
+                        const QString &filename, bool save, bool anyFile) {
   // Find a resonable directory & file to start from
-  QString qPath = QString::fromUtf8(filename.c_str());
+  QString qPath = filename;
 
   if (qPath.isEmpty()) {
     if (QFileInfo(QDir::currentPath()).isWritable())
@@ -46,8 +47,7 @@ string FileDialog::open(const string &title, const string &filters,
     else qPath = QDir::homePath();
   }
 
-  QFileDialog dialog(&win, QString::fromUtf8(title.c_str()), qPath,
-                     QString::fromUtf8(filters.c_str()));
+  QFileDialog dialog(&win, title, qPath, filters);
 
   if (save || anyFile) dialog.setFileMode(QFileDialog::AnyFile);
   else dialog.setFileMode(QFileDialog::ExistingFile);
@@ -70,9 +70,9 @@ string FileDialog::open(const string &title, const string &filters,
   qPath = files.first();
 
   if (QFileInfo(qPath).isDir()) {
-    win.warning("Cannot open directory");
+    win.warning(QObject::tr("Cannot open directory"));
     return "";
   }
 
-  return qPath.isEmpty() ? "" : qPath.toUtf8().data();
+  return qPath;
 }

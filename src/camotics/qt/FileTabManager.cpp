@@ -173,7 +173,7 @@ bool FileTabManager::checkSaveAll() {
     return true;
 
   } catch (const Exception &e) {
-    win->warning("Failed to save: " + e.getMessage());
+    win->warning(tr("Failed to save: %1").arg(e.getMessage().c_str()));
   }
 
   return false;
@@ -197,41 +197,42 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
   // Get absolute path
   NCEdit *editor = (NCEdit *)QTabWidget::widget(tab);
   Project::File &file = *editor->getFile();
-  string path = file.getPath();
+  QString path = file.getPath().c_str();
 
   // Get type
   bool tpl = editor->isTPL();
 
   if (saveAs) {
-    path = win->openFile("Save file", tpl ? "TPL (*.tpl)" :
+    path = win->openFile(tr("Save file"), tpl ? "TPL (*.tpl)" :
                          "GCode (*.nc *.ngc *.gcode)", path, true);
-    if (path.empty()) return;
+    if (path.isEmpty()) return;
 
-    string ext = SystemUtilities::extension(path);
-    if (ext.empty()) path += tpl ? ".tpl" : ".gcode";
+    string ext = SystemUtilities::extension(path.toStdString());
+    if (ext.empty()) path.append(tpl ? ".tpl" : ".gcode");
 
     else if (tpl && ext != "tpl") {
-      win->warning("TPL file must have .tpl extension");
+      win->warning(tr("TPL file must have .tpl extension"));
       return;
 
     } else if (!tpl && (ext == "xml" || ext == "tpl")) {
-      win->warning("GCode file cannot have .tpl or .xml extension");
+      win->warning(tr("GCode file cannot have .tpl or .xml extension"));
       return;
     }
   }
 
   // Save data
   QString content = editor->toPlainText();
-  QFile qFile(QString::fromUtf8(path.c_str()));
+  QFile qFile(path);
   if (!qFile.open(QFile::WriteOnly | QIODevice::Truncate))
-    THROW("Could not save '" << path << "'");
+    THROW("Could not save '" << path.toStdString() << "'");
   qFile.write(content.toUtf8());
   qFile.close();
 
   // Update file path
-  path = SystemUtilities::absolute(path);
-  if (path != file.getPath()) {
-    file.setPath(path);
+  string _path = path.toStdString();
+  _path = SystemUtilities::absolute(_path);
+  if (_path != file.getPath()) {
+    file.setPath(_path);
 
     // Update tab title
     QString title(QString::fromUtf8(file.getBasename().c_str()));
@@ -242,7 +243,7 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
   editor->document()->setModified(false);
 
   // Notify
-  win->showMessage("Saved " + file.getBasename());
+  win->showMessage(tr("Saved %1").arg(file.getBasename().c_str()));
 }
 
 
@@ -280,7 +281,7 @@ void FileTabManager::revert(unsigned tab) {
   editor->document()->setModified(false);
 
   // Notify
-  win->showMessage("Reverted " + file.getBasename());
+  win->showMessage(tr("Reverted %1").arg(file.getBasename().c_str()));
 }
 
 

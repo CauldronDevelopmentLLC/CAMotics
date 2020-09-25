@@ -48,6 +48,8 @@
 
 #include <QtWidgets>
 #include <QSignalMapper>
+#include <QApplication>
+#include <QTranslator>
 
 namespace cb {class Application;}
 namespace Ui {class CAMoticsWindow;}
@@ -96,9 +98,14 @@ namespace CAMotics {
     QIcon backwardIcon;
 
     QLabel *statusLabel;
+    QString currentLang;
 
     cb::Application &app;
     cb::Options &options;
+
+    QApplication &qtApp;
+    QTranslator qtTran;
+    QTranslator tran;
 
     ValueSet valueSet;
     cb::SmartPointer<Project::Project> project;
@@ -127,7 +134,7 @@ namespace CAMotics {
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
   public:
-    QtWin(cb::Application &app);
+    QtWin(cb::Application &app, QApplication &qtApp);
     ~QtWin();
 
     View &getView() const {return *view;}
@@ -140,6 +147,10 @@ namespace CAMotics {
 
     void setUnitLabel(QLabel *label, double value, int precision = 2,
                       bool withUnit = false);
+
+    void loadLanguageMenu();
+    void switchTranslator(QTranslator &translator, const QString &name);
+    void loadLanguage(const QString &lang);
 
     void loadMachine(const std::string &machine);
     void loadMachines();
@@ -161,9 +172,8 @@ namespace CAMotics {
 
     void showMessage(const QString &msg, bool log = true);
     void showMessage(const char *msg, bool log = true);
-    void showMessage(const std::string &msg, bool log = true);
-    void message(const std::string &msg);
-    void warning(const std::string &msg);
+    void message(const QString &msg);
+    void warning(const QString &msg);
 
     void loadToolPath(const cb::SmartPointer<GCode::ToolPath> &toolPath,
                       bool simulate);
@@ -189,10 +199,9 @@ namespace CAMotics {
 
     bool runCAMDialog(const std::string &filename);
 
-    std::string openFile(const std::string &title,
-                         const std::string &filters,
-                         const std::string &filename, bool save,
-                         bool anyFile = false);
+    QString openFile(const QString &title, const QString &filters,
+                     const QString &filename, bool save,
+                     bool anyFile = false);
     const cb::SmartPointer<Project::Project> &getProject() const
     {return project;}
     void loadProject();
@@ -273,6 +282,7 @@ namespace CAMotics {
     bool event(QEvent *event);
     void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
+    void changeEvent(QEvent *event);
 
   protected slots:
     void animate();
@@ -304,6 +314,8 @@ namespace CAMotics {
     void on_xOffsetDoubleSpinBox_valueChanged(double value);
     void on_yOffsetDoubleSpinBox_valueChanged(double value);
     void on_zOffsetDoubleSpinBox_valueChanged(double value);
+
+    void on_languageChanged(QAction *action);
 
     void on_actionQuit_triggered();
     void on_actionNew_triggered();

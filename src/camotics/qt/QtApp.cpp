@@ -109,16 +109,7 @@ void QtApp::run() {
   int argc = args.size();
   QApplication qtApp(argc, (char **)&args[0]);
 
-  QTranslator qtTran;
-  qtTran.load(QLocale::system(), QStringLiteral("qtbase_"));
-  qtApp.installTranslator(&qtTran);
-
-  QTranslator tran;
-  tran.load(QLocale(), QLatin1String("camotics"), QLatin1String("_"),
-            QLatin1String(":/i18n"));
-  qtApp.installTranslator(&tran);
-
-  QtWin qtWin(*this);
+  QtWin qtWin(*this, qtApp);
   qtWin.init();
 
   // Options

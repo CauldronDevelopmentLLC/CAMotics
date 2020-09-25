@@ -313,7 +313,7 @@
      <x>0</x>
      <y>0</y>
      <width>1004</width>
-     <height>24</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -429,11 +429,17 @@
     <addaction name="actionLoadDefaultToolTable"/>
     <addaction name="actionAddTool"/>
    </widget>
+   <widget class="QMenu" name="menuLanguage">
+    <property name="title">
+     <string>&amp;Language</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuTools"/>
    <addaction name="menuSimulate"/>
    <addaction name="menuView_2"/>
+   <addaction name="menuLanguage"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="projectToolBar">

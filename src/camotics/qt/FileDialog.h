@@ -22,6 +22,7 @@
 
 
 #include <QFileDialog>
+#include <QString>
 
 #include <string>
 
@@ -35,8 +36,7 @@ namespace CAMotics {
   public:
     FileDialog(QtWin &win);
 
-    std::string open(const std::string &title, const std::string &filters,
-                     const std::string &filename, bool save,
-                     bool anyFile = false);
+    QString open(const QString &title, const QString &filters,
+                 const QString &filename, bool save, bool anyFile = false);
   };
 }

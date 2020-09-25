@@ -74,5 +74,7 @@
         <file>images/buildbotics_with_gamepad_and_steppers.png</file>
         <file>icons/welcome.png</file>
         <file>i18n/camotics_de.qm</file>
+        <file>flags/en.png</file>
+        <file>flags/de.png</file>
     </qresource>
 </RCC>
