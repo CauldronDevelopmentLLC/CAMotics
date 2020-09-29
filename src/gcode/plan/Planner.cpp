@@ -114,6 +114,7 @@ void Planner::stop() {
   if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(0);
   planner.stop();
   runners.clear();
+  ControllerImpl::stop();
 }
 
 

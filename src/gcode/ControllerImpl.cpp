@@ -787,6 +787,16 @@ void ControllerImpl::end() {
 }
 
 
+void ControllerImpl::stop() {
+  // The spindle is stopped (M5)
+  setSpindleDir(DIR_OFF);
+
+  // Coolant is turned off (M9)
+  setMistCoolant(false);
+  setFloodCoolant(false);
+}
+
+
 double ControllerImpl::get(address_t addr, Units units) const {
   return machine.get(addr, units);
 }

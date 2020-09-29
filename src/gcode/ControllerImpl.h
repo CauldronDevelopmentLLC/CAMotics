@@ -181,6 +181,7 @@ namespace GCode {
 
     // Program control
     void end();
+    void stop();
 
     // Params
     double get(address_t addr, Units units) const;
