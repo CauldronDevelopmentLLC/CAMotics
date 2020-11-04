@@ -3,9 +3,6 @@
  <author>Joseph Coffland</author>
  <class>CAMoticsWindow</class>
  <widget class="QMainWindow" name="CAMoticsWindow">
-  <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
