@@ -55,6 +55,7 @@ public:
   // From CommandLineApp
   void run() {
     build(pipeline);
+    ctx.setStream(stream);
 
     if (!simJSON.empty())
       ctx.setSim(JSON::Reader::parse(StringInputSource(simJSON)));
