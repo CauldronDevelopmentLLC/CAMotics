@@ -52,7 +52,7 @@ Application::Application(const string &name, hasFeature_t hasFeature) :
   cb::SystemUtilities::setenv("LC_NUMERIC", "C");
 
   cb::Logger::instance().setScreenStream(cerr);
-  cb::Logger::instance().setLogThreadPrefix(true);
+  cb::Logger::instance().setLogPrefix(true);
   cb::Logger::instance().setLogTime(false);
 
   if (hasFeature(FEATURE_INFO)) {

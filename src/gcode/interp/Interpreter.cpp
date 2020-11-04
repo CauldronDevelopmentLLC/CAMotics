@@ -25,7 +25,7 @@
 
 #include <cbang/SStream.h>
 #include <cbang/util/SmartToggle.h>
-#include <cbang/log/SmartLogThreadPrefix.h>
+#include <cbang/log/SmartLogPrefix.h>
 
 using namespace std;
 using namespace cb;
@@ -92,7 +92,7 @@ void Interpreter::operator()(const SmartPointer<Block> &block) {
 
   FileLocation location = block->getLocation().getStart();
   location.setCol(-1);
-  SmartLogThreadPrefix prefix(SSTR(location << ":"));
+  SmartLogPrefix prefix(SSTR(location << ":"));
 
   try {
     OCodeInterpreter::operator()(block);
