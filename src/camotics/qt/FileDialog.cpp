@@ -37,7 +37,7 @@ FileDialog::FileDialog(QtWin &win) : win(win) {}
 
 
 QString FileDialog::open(const QString &title, const QString &filters,
-                        const QString &filename, bool save, bool anyFile) {
+                         const QString &filename, bool save, bool anyFile) {
   // Find a resonable directory & file to start from
   QString qPath = filename;
 
@@ -52,7 +52,6 @@ QString FileDialog::open(const QString &title, const QString &filters,
   if (save || anyFile) dialog.setFileMode(QFileDialog::AnyFile);
   else dialog.setFileMode(QFileDialog::ExistingFile);
 
-  dialog.setOption(QFileDialog::DontResolveSymlinks);
   if (!save) dialog.setOption(QFileDialog::DontConfirmOverwrite);
 
   if (save) dialog.setAcceptMode(QFileDialog::AcceptSave);
