@@ -42,7 +42,7 @@ namespace GCode {
     bool isImperial() const {return units == IMPERIAL;}
     void setImperial() {setUnits(IMPERIAL);}
 
-    /// @return the currently programed units.
+    /// @return the currently programmed units.
     Units getUnits() const {return units;}
 
     /***

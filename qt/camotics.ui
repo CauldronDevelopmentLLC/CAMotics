@@ -3049,7 +3049,7 @@
     <string>Save Tool Table &amp;As Default</string>
    </property>
    <property name="toolTip">
-    <string>Save curent tool table as default</string>
+    <string>Save current tool table as default</string>
    </property>
   </action>
   <action name="actionLoadDefaultToolTable">

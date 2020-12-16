@@ -43,7 +43,7 @@ Vector3D QEF::evaluate(double mat[12][3], double vec[12], int rows) {
   //   u is a matrix of rows x 3 (same as mat);
   //   v is a square matrix 3 x 3 (for 3 columns in mat);
   //   d is vector of 3 values representing the diagonal matrix 3 x 3
-  //     (for 3 colums in mat).
+  //     (for 3 columns in mat).
   double u[MAXROWS][3], v[3][3], d[3];
 
   computeSVD(mat, u, v, d, rows);
@@ -535,7 +535,7 @@ void QEF::qrstep_cols2(double u[12][3], double v[3][3], double tau_u[3],
       v[i][1] = vip * s + viq * c;
     }
 
-  } else { // make colums orthogonal
+  } else { // make columns orthogonal
     double c, s;
 
     // perform Schur rotation on B

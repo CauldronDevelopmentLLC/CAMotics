@@ -9,7 +9,7 @@ cut({z: -3}); // Cut down to depth
 cut({x: 11}); // Cut to second corner
 cut({y: 11}); // Cut to third corner
 cut({x: 1}); // Cut to forth corner
-cut({y: 1}); // Cut back to begining
+cut({y: 1}); // Cut back to beginning
 
 rapid({z: 5}); // Move back to safe position
 speed(0); // Stop spinning

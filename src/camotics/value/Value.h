@@ -38,7 +38,7 @@ namespace CAMotics {
 
   public:
     Value(const std::string &name) : name(name) {}
-    virtual ~Value() {} // Complier needs this
+    virtual ~Value() {} // Compiler needs this
 
     const std::string &getName() const {return name;}
     void add(const cb::SmartPointer<Observer> &o) {observers.push_back(o);}

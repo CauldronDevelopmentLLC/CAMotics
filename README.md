@@ -51,7 +51,7 @@ you can try.
   - SCons      - http://www.scons.org/
   - v8         - https://developers.google.com/v8/
 
-On Debian based systems all the prerequisites, including thoese needed
+On Debian based systems all the prerequisites, including those needed
 by C!, can be installed with the following command line:
 
     sudo apt-get update

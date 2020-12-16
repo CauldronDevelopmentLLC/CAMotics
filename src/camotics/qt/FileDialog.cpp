@@ -38,7 +38,7 @@ FileDialog::FileDialog(QtWin &win) : win(win) {}
 
 QString FileDialog::open(const QString &title, const QString &filters,
                          const QString &filename, bool save, bool anyFile) {
-  // Find a resonable directory & file to start from
+  // Find a reasonable directory & file to start from
   QString qPath = filename;
 
   if (qPath.isEmpty()) {

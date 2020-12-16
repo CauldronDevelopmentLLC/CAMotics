@@ -1262,7 +1262,7 @@ bool QtWin::checkSave(bool canCancel) {
 
   int response =
     QMessageBox::question(this, "Project Modified", "The current project has "
-                          "been modifed.  Would you like to save it?",
+                          "been modified.  Would you like to save it?",
                           (canCancel ?
                            QMessageBox::Cancel : QMessageBox::NoButton) |
                           QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
