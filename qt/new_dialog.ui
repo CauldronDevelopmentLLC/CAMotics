@@ -38,7 +38,7 @@
       <item>
        <widget class="QRadioButton" name="newTPLRadioButton">
         <property name="toolTip">
-         <string>Create a new TPL file by selecting a non-existing filename or select an exsiting TPL file and add it to the current project.</string>
+         <string>Create a new TPL file by selecting a non-existing filename or select an existing TPL file and add it to the current project.</string>
         </property>
         <property name="text">
          <string>TPL File (Tool Path Language)</string>
@@ -51,7 +51,7 @@
       <item>
        <widget class="QRadioButton" name="newGCodeRadioButton">
         <property name="toolTip">
-         <string>Create a new GCode file by selecting a non-existing filename or select an exsiting GCode file and add it to the current project.</string>
+         <string>Create a new GCode file by selecting a non-existing filename or select an existing GCode file and add it to the current project.</string>
         </property>
         <property name="text">
          <string>G-Code File</string>

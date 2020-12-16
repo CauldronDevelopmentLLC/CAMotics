@@ -135,7 +135,7 @@ bool FileTabManager::checkSave(unsigned tab) {
 
   int response =
     QMessageBox::question(this, "File Modified", "The current file has "
-                          "been modifed.  Would you like to save it?",
+                          "been modified.  Would you like to save it?",
                           QMessageBox::Cancel | QMessageBox::No |
                           QMessageBox::Yes, QMessageBox::Yes);
 
@@ -157,7 +157,7 @@ bool FileTabManager::checkSaveAll() {
 
           int response =
             QMessageBox::question(this, "File Modified", "The current file has "
-                                  "been modifed.  Would you like to save?",
+                                  "been modified.  Would you like to save?",
                                   QMessageBox::Cancel | QMessageBox::No |
                                   QMessageBox::Save | QMessageBox::SaveAll,
                                   QMessageBox::SaveAll);

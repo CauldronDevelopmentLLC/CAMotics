@@ -70,7 +70,7 @@ namespace GCode {
      */
     virtual void setFeedMode(feed_mode_t mode) = 0;
 
-    /// @return the currently programed spindle speed.
+    /// @return the currently programmed spindle speed.
     virtual double getSpeed() const = 0;
 
     /***
@@ -82,7 +82,7 @@ namespace GCode {
     virtual void setSpeed(double speed) = 0;
 
     /***
-     * @return the currently programed spin mode and optionally the max speed.
+     * @return the currently programmed spin mode and optionally the max speed.
      */
     virtual spin_mode_t getSpinMode(double *max = 0) const = 0;
 
@@ -94,7 +94,7 @@ namespace GCode {
      * spindle speed in meters per minute.
      *
      * If @param mode is CONSTANT_SURFACE_SPEED and @param max is greater than
-     * zero then @param max is the maxiumum spindle revolutions per minute.
+     * zero then @param max is the maximum spindle revolutions per minute.
      *
      * @throw cb::Exception @param mode is invalid.
      */
@@ -122,9 +122,9 @@ namespace GCode {
      * Wait for input change.
      *
      * @param port the input port to input on.
-     * @param mode one of IMEDIATE, RISE, FALL, HIGH or LOW
+     * @param mode one of IMMEDIATE, RISE, FALL, HIGH or LOW
      * @param timeout the maximum amount of time to input or zero to input
-     *   indefinately.  It is an error of the port does not change to the
+     *   indefinitely.  It is an error of the port does not change to the
      *   specified state before the timeout expires.
      */
     virtual void input(port_t port, input_mode_t mode, double timeout) = 0;

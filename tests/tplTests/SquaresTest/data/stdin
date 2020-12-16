@@ -3,7 +3,7 @@ function square(size, depth, safe) {
   icut({x: size}); // Cut to second corner
   icut({y: size}); // Cut to third corner
   icut({x: -size}); // Cut to forth corner
-  icut({y: -size}); // Cut back to begining
+  icut({y: -size}); // Cut back to beginning
   rapid({z: safe}); // Move back to safe position
 }
 

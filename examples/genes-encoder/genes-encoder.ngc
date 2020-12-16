@@ -6,7 +6,7 @@
 ( This encoder ring mounts on the lathe spindle drive pulley. )
 ( Ring encoder provides A,B,Z phases using 3 H21TLB slot sensors. )
 ( The H21TLB sensor use 5v and can directly drive parallel port pins. )
-( The sensor apeture is 0.035", so I used double that for the slot length )
+( The sensor aperture is 0.035", so I used double that for the slot length )
 ( to allow for some runout on mounting the ring. )
 ( The main constraint is that the main track opto has to be able to physically )
 ( read the inner track... reaching over the outer index track )
@@ -122,7 +122,7 @@ o10 do
   #<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
   #<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]
   g0 z[#<_ztmp> - #<_zinc>]
-  g1 x[#<myx>] y[#<myy>] z[#<_ztmp>] f[#<_feedrate>]  ( decend to cut depth )
+  g1 x[#<myx>] y[#<myy>] z[#<_ztmp>] f[#<_feedrate>]  ( descend to cut depth )
 
   #<myangle> = [#<angle> + [#<slot_deg>/2.0] - [#<icutter_deg>/2.0]]
   #<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
@@ -170,7 +170,7 @@ g0 x[#<centerx>] y[#<centery>]
 #<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]
 #<myy> = [#<inner_dia>/2.0 * sin[#<myangle>]]
 g0 z[#<_ztmp> - #<_zinc>]
-g1 x[#<myx>] y[#<myy>] z[#<_ztmp>] f[#<_feedrate>]  ( decend to cut depth )
+g1 x[#<myx>] y[#<myy>] z[#<_ztmp>] f[#<_feedrate>]  ( descend to cut depth )
 
 #<myangle> = [#<angle> + [#<slot_deg>/2.0] - [#<icutter_deg>/2.0]]
 #<myx> = [#<inner_dia>/2.0 * cos[#<myangle>]]

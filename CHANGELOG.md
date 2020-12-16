@@ -36,7 +36,7 @@
  - Show feed in project units. (hpmachining)
  - Handle long or even infinite GCode programs better.
  - Implemented M70-M73
- - More direct prespective view.
+ - More direct perspective view.
  - Fixed view reset during rotation bug.
  - Added Ctrl-R for reload/run.
  - Fixed recent projects list.
@@ -140,7 +140,7 @@
  - Allow exporting GCode from GUI
  - Ability to run simulations from the command line
  - Fixed STL export in Windows #81
- - Fixed problems runing with different locale settings #100
+ - Fixed problems running with different locale settings #100
  - Fixed v8 linking problems
  - Fixed problems with automatic workpiece z-axis #105
  - Fixed filename problems when opening and saving files #87
@@ -212,7 +212,7 @@
  - Added icut() and irapid().
  - Fixed play/pause button update.
  - Added loop check box, off by default.
- - Display "inf" when time is infinate due to zero feed.
+ - Display "inf" when time is infinite due to zero feed.
 
 ## v0.1.2:
 
@@ -253,7 +253,7 @@
 
  - Automatically calculate render resolution based on workpiece.  #3
  - Don't allow unquoted expressions in assignment, not allowed by LinuxCNC.
- - Don't execute an implict motion if a non-modal group 0 code is issued.
+ - Don't execute an implicit motion if a non-modal group 0 code is issued.
  - Fixed global offsets.  G92, G92.1, G92.2, G92.3
  - Added stretching cat array example.
  - Correctly implement named local/global variables in sub routines.
@@ -275,7 +275,7 @@
 
 2012-02-18
 
- - Case insenstive G-Code.
+ - Case insensitive G-Code.
  - Detect G-Code vs. project files on command line.  #36
  - Compute angle functions in degrees not radians.
  - Fixed operator associativity.

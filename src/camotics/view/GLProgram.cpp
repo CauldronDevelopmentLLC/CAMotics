@@ -93,7 +93,7 @@ void GLProgram::link() {
     THROW("Failed to link GL program: " << &error[0]);
   }
 
-  // Detatch all shaders
+  // Detach all shaders
   GLint count;
   gl.glGetProgramiv(program, GL_ATTACHED_SHADERS, &count);
 

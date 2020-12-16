@@ -668,7 +668,7 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
   if (velocity <= Math::nextUp(0)) return true;
 
   // Check if there is enough velocity change in the following blocks to
-  // deccelerate to zero if necessary.
+  // decelerate to zero if necessary.
   unsigned count = 0;
   while (cmd->next) {
     cmd = cmd->next;
@@ -687,7 +687,7 @@ bool LinePlanner::isFinal(PlannerCommand *cmd) const {
         count++;
 
         if (cmd->getExitVelocity() <= velocity) {
-          LOG_DEBUG(3, "Hit lookahead limit but successfuly planed reverse "
+          LOG_DEBUG(3, "Hit lookahead limit but successfully planned reverse "
                     "speed up from zero to " << cmd->getExitVelocity()
                     << " in " << count << " moves");
 
@@ -727,7 +727,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
   LOG_DEBUG(3, "Planning " << cmd->getID());
   LOG_DEBUG(4, "Planning " << cmd->toString());
 
-  // Set entry velocity when at begining
+  // Set entry velocity when at beginning
   bool backplan = false;
   if (!cmd->prev) cmd->setEntryVelocity(lastExitVel);
 
