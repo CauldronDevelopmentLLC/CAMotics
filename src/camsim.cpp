@@ -30,9 +30,14 @@
 #include <cbang/ApplicationMain.h>
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/os/SystemInfo.h>
+#include <cbang/config.h>
 
 #include <iostream>
 #include <limits>
+
+#ifdef HAVE_V8
+#include <cbang/js/v8/JSImpl.h>
+#endif
 
 using namespace cb;
 using namespace std;
@@ -155,5 +160,8 @@ namespace CAMotics {
 
 
 int main(int argc, char *argv[]) {
+#ifdef HAVE_V8
+  cb::gv8::JSImpl::init(0, 0);
+#endif
   return doApplication<CAMotics::SimApp>(argc, argv);
 }

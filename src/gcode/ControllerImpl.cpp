@@ -962,7 +962,8 @@ void ControllerImpl::popScope() {
 
 void ControllerImpl::startBlock() {
   if (syncState != SYNC_NONE) {
-    LOG_WARNING("Position after synchronized command unknown in simulator.");
+    if (syncState != SYNC_PAUSE)
+      LOG_WARNING("Position after synchronized command unknown in simulator.");
     syncState = SYNC_NONE;
   }
   state.moveInAbsoluteCoords = false;

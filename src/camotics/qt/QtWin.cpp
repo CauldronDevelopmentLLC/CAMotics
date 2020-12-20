@@ -326,6 +326,7 @@ void QtWin::loadLanguageMenu() {
   }
 }
 
+
 void QtWin::switchTranslator(QTranslator &translator, const QString &filename) {
   // remove the old translator
   qtApp.removeTranslator(&translator);
@@ -334,6 +335,7 @@ void QtWin::switchTranslator(QTranslator &translator, const QString &filename) {
   if (translator.load(QLatin1String(":/i18n/") + filename))
     qtApp.installTranslator(&translator);
 }
+
 
 void QtWin::loadLanguage(const QString &lang) {
   if (currentLang == lang) return;
@@ -344,17 +346,16 @@ void QtWin::loadLanguage(const QString &lang) {
   currentLang = lang;
   QLocale locale = QLocale(lang);
   QLocale::setDefault(locale);
-  QString languageName = QLocale::languageToString(locale.language());
 
   qtApp.removeTranslator(&tran);
   if (tran.load(QString(":/i18n/camotics_%1.qm").arg(lang)))
     qtApp.installTranslator(&tran);
 
-  //qtApp.removeTranslator(&qtTran);
-  //if (qtTran.load(QString("qt_%1.qm").arg(lang)))
-    //qtApp.installTranslator(&qtTran);
+  qtApp.removeTranslator(&qtTran);
+  if (qtTran.load(QString("qt_%1.qm").arg(lang)))
+    qtApp.installTranslator(&qtTran);
 
-  //switchTranslator(qtTran, QString("qt_%1.qm").arg(lang));
+  QString languageName = QLocale::languageToString(locale.language());
   ui->statusbar->showMessage(tr("Language changed to %1").arg(languageName));
 }
 
@@ -1124,9 +1125,11 @@ void QtWin::openProject(const string &_filename) {
       project->setUnits(units);
       project->getTools() = toolTable;
     }
+
+    return loadProject();
   } CATCH_ERROR;
 
-  loadProject();
+  warning("Failed to open project.  See console for errors.");
 }
 
 
@@ -2109,17 +2112,22 @@ void QtWin::on_actionRevertFile_triggered() {ui->fileTabManager->revert();}
 
 
 void QtWin::on_actionSaveDefaultToolTable_triggered() {
-  if (!project.isNull()) saveDefaultToolTable(project->getTools());
+  if (project.isSet()) saveDefaultToolTable(project->getTools());
+  else warning("No project loaded");
 }
 
 
 void QtWin::on_actionLoadDefaultToolTable_triggered() {
-  if (!project.isNull()) project->getTools() = loadDefaultToolTable();
+  if (project.isSet()) {
+    project->getTools() = loadDefaultToolTable();
+    updateToolTables();
+
+  } else warning("No project loaded");
 }
 
 
 void QtWin::on_actionSettings_triggered() {
-  if (!project.isNull() && settingsDialog.exec(*project, *view)) {
+  if (project.isSet() && settingsDialog.exec(*project, *view)) {
     loadMachine(settingsDialog.getMachineName());
     updateUnits();
   }

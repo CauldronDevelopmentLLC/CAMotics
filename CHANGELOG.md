@@ -18,6 +18,9 @@
  - Handle LASER intensity correctly for M4 as well as M3.
  - Implemented ``(DEBUG,)``, ``(PRINT,)`` & ``(LOG,)`` comments.
  - Better handling of spaces in GCode named reference.
+ - Fixed default tool table loading.
+ - Don't output synchronization warning after a program pause.
+ - Resolve simlinks in file dialog.
 
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.

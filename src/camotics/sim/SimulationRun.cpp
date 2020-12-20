@@ -54,7 +54,7 @@ SmartPointer<Surface> SimulationRun::compute(Task &task) {
   Rectangle3D bbox;
 
   double start = Timer::now();
-  double simTime = sim.time;
+  double simTime = std::min(sim.path->getTime(), sim.time);
 
   LOG_INFO(1, "Computing surface at " << TimeInterval(simTime));
 

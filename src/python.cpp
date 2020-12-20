@@ -19,29 +19,50 @@
 \******************************************************************************/
 
 #include "python/PyPlanner.h"
+#include "python/PySimulation.h"
 
 #include <cbang/log/Logger.h>
 
+#ifdef HAVE_EPOLL // Python.h defines this
+#undef HAVE_EPOLL
+#endif
+#include <cbang/config.h>
+
+#ifdef HAVE_V8
+#include <cbang/js/v8/JSImpl.h>
+#endif
+
 
 static struct PyModuleDef module = {
-  PyModuleDef_HEAD_INIT, "gplan", 0, -1, 0, 0, 0, 0, 0
+  PyModuleDef_HEAD_INIT, "camotics", 0, -1, 0, 0, 0, 0, 0
 };
 
 
-PyMODINIT_FUNC PyInit_gplan() {
+static void addType(PyObject *mod, const char *name, PyTypeObject *type) {
+  if (0 <= PyType_Ready(type)) {
+    Py_INCREF(type);
+    PyModule_AddObject(mod, name, (PyObject *)type);
+  }
+}
+
+
+PyMODINIT_FUNC PyInit_camotics() {
+#ifdef HAVE_V8
+  cb::gv8::JSImpl::init(0, 0);
+#endif
+
   // Configure logger
   cb::Logger::instance().setLogTime(false);
   cb::Logger::instance().setLogShortLevel(true);
-  cb::Logger::instance().setLogColor(false);
   cb::Logger::instance().setLogPrefix(true);
 
-  PyObject *m = PyModule_Create(&module);
-  if (!m) return 0;
+  if (!PyEval_ThreadsInitialized()) PyEval_InitThreads();
 
-  if (0 <= PyType_Ready(&PlannerType)) {
-    Py_INCREF(&PlannerType);
-    PyModule_AddObject(m, "Planner", (PyObject *)&PlannerType);
-  }
+  PyObject *mod = PyModule_Create(&module);
+  if (!mod) return 0;
 
-  return m;
+  addType(mod, "Planner",    &PlannerType);
+  addType(mod, "Simulation", &SimulationType);
+
+  return mod;
 }

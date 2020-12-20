@@ -76,13 +76,13 @@ if not env.GetOption('clean'):
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
 
-    # Python
-    pyenv = env.Clone()
-    conf.env = pyenv
-    have_python = conf.CBConfig('python', False)
-    conf.env = env
-
     if env['PLATFORM'] != 'win32': env.AppendUnique(CCFLAGS = ['-fPIC'])
+
+    # Python
+    #pyenv = env.Clone()
+    #conf.env = pyenv
+    have_python = conf.CBConfig('python', False)
+    #conf.env = env
 
     if env['with_tpl']:
         if not (env.CBConfigEnabled('chakra') or env.CBConfigEnabled('v8')):
@@ -137,15 +137,15 @@ env.Prepend(LIBS = lib)
 # libSTL
 src = Glob('src/stl/*.cpp')
 src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
-lib = env.Library('build/libSTL', src)
-env.Prepend(LIBS = lib)
+libSTL = env.Library('build/libSTL', src)
+env.Prepend(LIBS = libSTL)
 
 
 # libDXF
 src = Glob('src/dxf/*.cpp')
 src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
-lib = env.Library('build/libDXF', src)
-env.Prepend(LIBS = lib)
+libDXF = env.Library('build/libDXF', src)
+env.Prepend(LIBS = libDXF)
 
 
 # Source
@@ -171,8 +171,9 @@ if env['with_tpl']:
 
 # DXFlib
 if not have_dxflib:
-    lib = SConscript('src/dxflib/SConscript', variant_dir = 'build/dxflib')
-    env.Append(LIBS = lib)
+    libDXFlib = SConscript('src/dxflib/SConscript',
+                           variant_dir = 'build/dxflib')
+    env.Append(LIBS = libDXFlib)
 
 
 # Build GUI
@@ -233,8 +234,8 @@ if env['with_gui']:
 
 
 # Build lib
-lib = env.Library('build/libCAMotics', src)
-env.Prepend(LIBS = lib)
+libCAMotics = env.Library('build/libCAMotics', src)
+env.Prepend(LIBS = libCAMotics)
 
 
 # Build other programs
@@ -252,10 +253,20 @@ for prog in progs.split():
 
 # Python module
 if have_python:
-    pyenv['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
-    mod = pyenv.SharedLibrary('gplan', ['build/gplan.cpp', libGCode],
-                              SHLIBPREFIX = '')
-    Default(mod)
+    # Python source
+    src = Glob('src/python/*.cpp')
+    src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
+    lib = env.Library('build/libCAMoticsPy', src)
+
+    env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
+
+    env.Prepend(LIBS = [lib])
+
+    Default(env.SharedLibrary('gplan', ['build/gplan.cpp'],
+                              SHLIBPREFIX = ''))
+
+    Default(env.SharedLibrary('camotics', ['build/python.cpp'],
+                              SHLIBPREFIX = ''))
 
 # Clean
 Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])

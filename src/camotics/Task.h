@@ -25,18 +25,16 @@
 
 namespace CAMotics {
   class Task : public cb::Condition {
-    bool interrupted;
+    bool interrupted = false;
 
-    double startTime;
-    double endTime;
-    std::string status;
-    double progress;
-    double eta;
+    double startTime = 0;
+    double endTime = 0;
+    std::string status = "Idle";
+    double progress = 0;
+    double eta = 0;
 
   public:
-    Task() :
-      interrupted(false), startTime(0), endTime(0), status("Idle"), progress(0),
-      eta(0) {}
+    Task() {}
     virtual ~Task() {}
 
     virtual void interrupt() {interrupted = true;}
@@ -45,6 +43,8 @@ namespace CAMotics {
     virtual double getProgress() const;
     virtual double getETA() const;
     virtual double getTime() const;
+
+    virtual void updated(const std::string &status, double progress) {}
 
     void begin(const std::string &status);
     bool update(double progress);

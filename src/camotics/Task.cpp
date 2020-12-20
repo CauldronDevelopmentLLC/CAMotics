@@ -70,5 +70,7 @@ bool Task::update(double progress) {
   if (progress && 1 < delta) eta = delta / progress - delta;
   else eta = 0;
 
+  updated(status, progress);
+
   return !shouldQuit();
 }
