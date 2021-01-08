@@ -28,7 +28,6 @@
 #include <cbang/config.h>
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
-#include <cbang/io/StringInputSource.h>
 #include <cbang/json/Reader.h>
 #include <cbang/Catch.h>
 
@@ -58,7 +57,7 @@ public:
     ctx.setStream(stream);
 
     if (!simJSON.empty())
-      ctx.setSim(JSON::Reader::parse(StringInputSource(simJSON)));
+      ctx.setSim(JSON::Reader::parseString(simJSON));
 
     CommandLineApp::run();
   }

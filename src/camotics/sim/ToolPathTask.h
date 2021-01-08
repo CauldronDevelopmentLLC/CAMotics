@@ -63,9 +63,6 @@ namespace CAMotics {
     cb::SmartPointer<GCode::ToolPath> path;
     std::ostringstream gcode;
 
-    cb::SmartPointer<cb::Subprocess> proc;
-    cb::SmartPointer<cb::Thread> logCopier;
-
     cb::SmartPointer<tplang::TPLContext> tplCtx;
 
     public:
@@ -76,11 +73,13 @@ namespace CAMotics {
     const cb::SmartPointer<GCode::ToolPath> &getPath() const {return path;}
     std::string getGCode() const {return gcode.str();}
 
-    void interpGCode(const cb::InputSource &src);
-
+    void runTPL(const cb::InputSource &src);
     void runTPL(const std::string &filename);
-    void runTPLInProcess(const std::string &filename);
+    void runTPLString(const std::string &s);
+
+    void runGCode(const cb::InputSource &src);
     void runGCode(const std::string &filename);
+    void runGCodeString(const std::string &gcode);
 
     // From Task
     void run();

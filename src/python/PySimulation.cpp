@@ -38,6 +38,8 @@
 
 #include <limits>
 
+#include <strings.h>
+
 using namespace CAMotics;
 using namespace cb;
 using namespace std;
@@ -118,21 +120,23 @@ namespace {
   }
 
 
-  PyObject *_set_resolution(PySimulation *self, PyObject *args,
-                            PyObject *kwds) {
+  PyObject *_is_metric(PySimulation *self) {
+    if (self->s->project.isMetric()) Py_RETURN_TRUE;
+    else Py_RETURN_FALSE;
+  }
+
+
+  PyObject *_set_metric(PySimulation *self, PyObject *args, PyObject *kwds) {
     try {
-      Simulation &s = *self->s;
+      const char *kwlist[] = {"metric", 0};
+      int metric = true;
 
-      const char *kwlist[] = {"resolution", "mode", 0};
-      double resolution = 0;
-      const char *mode = 0;
-
-      if (!PyArg_ParseTupleAndKeywords(args, kwds, "ds", (char **)kwlist,
-                                       &resolution, &mode))
+      if (!PyArg_ParseTupleAndKeywords(args, kwds, "|p", (char **)kwlist,
+                                       &metric))
         return 0;
 
-      if (mode) s.project.setResolutionMode(ResolutionMode::parse(mode));
-      if (resolution) s.project.setResolution(resolution);
+      auto units = metric ? GCode::Units::METRIC : GCode::Units::IMPERIAL;
+      self->s->project.setUnits(units);
 
       Py_RETURN_NONE;
 
@@ -142,24 +146,201 @@ namespace {
   }
 
 
-  PyObject *_compute_path(PySimulation *self) {
+  PyObject *_get_resolution(PySimulation *self) {
+    try {
+      auto &p = self->s->project;
+      string mode = p.getResolutionMode().toString();
+
+      return Py_BuildValue("ds", p.getResolution(), mode.data());
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_set_resolution(PySimulation *self, PyObject *args,
+                            PyObject *kwds) {
+    try {
+      auto &p = self->s->project;
+
+      const char *kwlist[] = {"resolution", 0};
+      PyObject *res = 0;
+
+      if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", (char **)kwlist, &res))
+        return 0;
+
+      if (PyFloat_Check(res)) {
+        p.setResolutionMode(ResolutionMode::RESOLUTION_MANUAL);
+        p.setResolution(PyFloat_AsDouble(res));
+
+      } else if (PyUnicode_Check(res)) {
+        Py_ssize_t size;
+        const char *mode = PyUnicode_AsUTF8AndSize(res, &size);
+        if (!mode) THROW("Conversion from Python object to string failed");
+
+        p.setResolutionMode(ResolutionMode::parse(string(mode, size)));
+
+      } else THROW("Invalid argument type");
+
+      Py_RETURN_NONE;
+
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_get_tools(PySimulation *self) {
+    try {
+      PyJSONSink sink;
+      self->s->project.getTools().write(sink);
+      return sink.getRoot();
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_set_tools(PySimulation *self, PyObject *args, PyObject *kwds) {
+    try {
+      Simulation &s = *self->s;
+
+      const char *kwlist[] = {"tools", 0};
+      PyObject *tools = 0;
+
+      if (!PyArg_ParseTupleAndKeywords
+          (args, kwds, "O", (char **)kwlist, &tools))
+        return 0;
+
+      if (!tools) THROW("``tools`` not set'");
+      s.project.getTools().read(*PyJSON(tools).toJSON());
+
+      Py_RETURN_NONE;
+
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_set_tool(PySimulation *self, PyObject *args, PyObject *kwds) {
+    try {
+      auto &tools = self->s->project.getTools();
+
+      const char *kwlist[] = {
+        "number", "metric", "shape", "length", "diameter", "snub",
+        "description", 0};
+      unsigned number = 1;
+      int metric = true;
+      const char *shape = 0;
+      double length = 0;
+      double diameter = 0;
+      double snub = 0;
+      const char *desc = 0;
+
+      if (!PyArg_ParseTupleAndKeywords
+          (args, kwds, "Ipsdd|ds", (char **)kwlist, &number, &metric, &shape,
+           &length, &diameter, &snub, &desc))
+        return 0;
+
+      auto units = metric ? GCode::Units::METRIC : GCode::Units::IMPERIAL;
+      GCode::Tool t(number, 0, units);
+      t.setShape(GCode::ToolShape::parse(shape));
+      t.setLength(length);
+      t.setDiameter(diameter);
+      t.setSnubDiameter(snub);
+      if (desc) t.setDescription(desc);
+
+      tools.set(t);
+
+      Py_RETURN_NONE;
+
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_get_workpiece(PySimulation *self) {
+    try {
+      PyJSONSink sink;
+      self->s->project.getWorkpiece().write(sink);
+      return sink.getRoot();
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_set_workpiece(PySimulation *self, PyObject *args, PyObject *kwds) {
+    try {
+      Simulation &s = *self->s;
+
+      const char *kwlist[] = {"min", "max", "automatic", "margin", 0};
+      double minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
+      int automatic = false;
+      double margin = 5;
+
+      if (!PyArg_ParseTupleAndKeywords
+          (args, kwds, "|(ddd)(ddd)pd", (char **)kwlist, &minX, &minY, &minZ,
+           &maxX, &maxY, &maxZ, &automatic, &margin))
+        return 0;
+
+      auto &w = s.project.getWorkpiece();
+
+      if (automatic) {
+        w.setAutomatic(true);
+        w.setMargin(margin);
+
+      } else {
+        Rectangle3D bounds(Vector3D(minX, minY, minZ),
+                           Vector3D(maxX, maxY, maxZ));
+        w.setAutomatic(false);
+        w.setBounds(bounds);
+      }
+
+      Py_RETURN_NONE;
+
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_compute_path(PySimulation *self, PyObject *args, PyObject *kwds) {
     try {
       class Runner : public PyTask {
         Simulation &s;
+        string gcode;
+        string tpl;
         ToolPathTask task;
 
       public:
-        Runner(PySimulation *self) : s(*self->s), task(s.project) {start();}
+        Runner(PySimulation *self, const string &gcode, const string &tpl) :
+          s(*self->s), gcode(gcode), tpl(tpl), task(s.project) {start();}
 
         // From Thread
         void run() {
-          task.run();
+          if (!gcode.empty()) task.runGCodeString(gcode);
+          else if (!tpl.empty()) task.runTPLString(tpl);
+          else task.run();
+
           SmartPyGIL gil;
           s.path = task.getPath();
         }
       };
 
-      set_task(self, new Runner(self));
+      const char *kwlist[] = {"gcode", "tpl", 0};
+      const char *gcode = 0;
+      const char *tpl = 0;
+
+      if (!PyArg_ParseTupleAndKeywords
+          (args, kwds, "|ss", (char **)kwlist, &gcode, &tpl))
+        return 0;
+
+      if (gcode && tpl) THROW("Cannot set both ``gcode`` and ``tpl``");
+
+      set_task(self, new Runner(self, gcode ? gcode : "", tpl ? tpl : ""));
 
       Py_RETURN_NONE;
     } CATCH_PYTHON;
@@ -211,8 +392,8 @@ namespace {
           if (!s.path.isSet()) THROW("Missing tool path");
 
           path = s.path;
-          bounds = s.project.getWorkpiece().getBounds();
           s.project.getWorkpiece().update(*path);
+          bounds = s.project.getWorkpiece().getBounds();
           resolution = s.project.getResolution();
 
           start();
@@ -243,17 +424,6 @@ namespace {
   }
 
 
-  PyObject *_get_surface(PySimulation *self) {
-    try {
-      PyJSONSink sink;
-      self->s->surface->write(sink);
-      return sink.getRoot();
-    } CATCH_PYTHON;
-
-    return 0;
-  }
-
-
   PyObject *_write_surface(PySimulation *self, PyObject *args, PyObject *kwds) {
     try {
       Simulation &s = *self->s;
@@ -275,6 +445,41 @@ namespace {
                           "CAMotics Surface", "");
 
       Py_RETURN_NONE;
+
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
+  PyObject *_get_surface(PySimulation *self, PyObject *args, PyObject *kwds) {
+    try {
+      Simulation &s = *self->s;
+
+      const char *kwlist[] = {"format", 0};
+      const char *format = "binary";
+
+      if (!PyArg_ParseTupleAndKeywords(args, kwds, "|s", (char **)kwlist,
+                                       &format))
+        return 0;
+
+
+      if (strcasecmp(format, "python") == 0) {
+        PyJSONSink sink;
+        s.surface->write(sink);
+        return sink.getRoot();
+      }
+
+      bool binary;
+      if (strcasecmp(format, "binary") == 0) binary = true;
+      else if (strcasecmp(format, "ascii") == 0) binary = false;
+      else THROW("Invalid format");
+
+      ostringstream str;
+      s.surface->writeSTL(str, binary, "CAMotics Surface", "");
+      string data = str.str();
+
+      return PyBytes_FromStringAndSize(data.data(), data.length());
 
     } CATCH_PYTHON;
 
@@ -325,17 +530,32 @@ namespace {
   PyMethodDef _methods[] = {
     {"open", (PyCFunction)_open, METH_VARARGS | METH_KEYWORDS,
      "Open a CAMotics project, GCode or TPL file."},
+    {"is_metric", (PyCFunction)_is_metric, METH_NOARGS,
+     "Return true if project is in metric mode."},
+    {"set_metric", (PyCFunction)_set_metric,
+     METH_VARARGS | METH_KEYWORDS, "Enable or disable metric mode."},
+    {"get_resolution", (PyCFunction)_get_resolution, METH_NOARGS,
+     "Get resolution and mode."},
     {"set_resolution", (PyCFunction)_set_resolution,
-     METH_VARARGS | METH_KEYWORDS, "Set simulation resolution and mode."},
-    {"compute_path", (PyCFunction)_compute_path, METH_NOARGS,
+     METH_VARARGS | METH_KEYWORDS, "Set simulation resolution."},
+    {"get_tools", (PyCFunction)_get_tools, METH_NOARGS, "Get tool table."},
+    {"set_tools", (PyCFunction)_set_tools,
+     METH_VARARGS | METH_KEYWORDS, "Set tool table."},
+    {"set_tool", (PyCFunction)_set_tool,
+     METH_VARARGS | METH_KEYWORDS, "Set tool table."},
+    {"get_workpiece", (PyCFunction)_get_workpiece, METH_NOARGS,
+     "Get workpiece dimensions."},
+    {"set_workpiece", (PyCFunction)_set_workpiece,
+     METH_VARARGS | METH_KEYWORDS, "Set workpiece dimensions."},
+    {"compute_path", (PyCFunction)_compute_path, METH_VARARGS | METH_KEYWORDS,
      "Compute tool path"},
     {"get_path", (PyCFunction)_get_path, METH_NOARGS, ""},
     {"start", (PyCFunction)_start, METH_VARARGS | METH_KEYWORDS,
      "Start a simulation run."},
-    {"get_surface", (PyCFunction)_get_surface, METH_NOARGS,
-     "Get surface mesh."},
     {"write_surface", (PyCFunction)_write_surface, METH_VARARGS | METH_KEYWORDS,
      "Write surface STL to named file."},
+    {"get_surface", (PyCFunction)_get_surface, METH_VARARGS | METH_KEYWORDS,
+     "Get surface as STL data or Python object."},
     {"is_running", (PyCFunction)_is_running, METH_NOARGS,
      "Returns true if a task is running."},
     {"wait", (PyCFunction)_wait, METH_NOARGS, "Wait on running task."},

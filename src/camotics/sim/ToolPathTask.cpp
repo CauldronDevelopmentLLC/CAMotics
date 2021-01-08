@@ -38,7 +38,6 @@
 #include <cbang/Catch.h>
 
 #include <cbang/os/SystemUtilities.h>
-#include <cbang/os/Subprocess.h>
 
 #include <cbang/iostream/VectorDevice.h>
 #include <cbang/iostream/TeeFilter.h>
@@ -50,6 +49,7 @@
 
 #include <boost/ref.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/device/file.hpp>
 namespace io = boost::iostreams;
 
@@ -86,7 +86,41 @@ ToolPathTask::ToolPathTask(const Project::Project &project) :
 ToolPathTask::~ToolPathTask() {interrupt();}
 
 
-void ToolPathTask::interpGCode(const InputSource &source) {
+void ToolPathTask::runTPL(const InputSource &src) {
+  Task::begin("Running TPL");
+
+  tplCtx = new tplang::TPLContext(SmartPointer<ostream>::Phony(&cerr), machine);
+  tplCtx->setSim(JSON::Reader::parseString(simJSON));
+
+  // Interpret
+  try {
+    try {
+      tplang::Interpreter(*tplCtx).read(src);
+    } catch (const js::JSInterrupted &e) {
+      LOG_WARNING("TPL run interrupted");
+    }
+    return tplCtx.release();
+
+  } CATCH_ERROR;
+  errors++;
+
+  tplCtx.release();
+}
+
+
+void ToolPathTask::runTPL(const string &filename) {
+  runTPL(InputSource(filename));
+}
+
+
+void ToolPathTask::runTPLString(const std::string &s) {
+  runTPL(StringInputSource(s));
+}
+
+
+void ToolPathTask::runGCode(const InputSource &source) {
+  Task::begin("Running GCode");
+
   GCode::Interpreter interp(controller);
   interp.push(source);
   machine.start();
@@ -105,88 +139,7 @@ void ToolPathTask::interpGCode(const InputSource &source) {
 }
 
 
-void ToolPathTask::runTPL(const string &filename) {
-  Task::begin("Running TPL");
-
-  // Get executable name
-  string xdir = SystemUtilities::dirname(SystemUtilities::getExecutablePath());
-  string cmd = SystemUtilities::joinPath(xdir, "tplang");
-#ifdef _WIN32
-  cmd += ".exe";
-#endif
-
-  if (!SystemUtilities::exists(cmd)) cmd = "tplang";
-
-  // Build args
-  vector<string> args;
-  args.push_back(cmd);
-
-  // Add units
-  args.push_back(string("--") + String::toLower(units.toString()));
-
-  // Add simulation JSON
-  args.push_back("--sim-json=" + simJSON);
-
-  // Add file
-  args.push_back(filename);
-
-  // Create process
-  proc = new Subprocess;
-
-  // Add pipe
-  unsigned pipe = proc->createPipe(false);
-  args.push_back("--pipe");
-  args.push_back(String((uint64_t)proc->getPipeHandle(pipe)));
-
-  // Execute
-  proc->exec(args, Subprocess::REDIR_STDOUT |
-             Subprocess::MERGE_STDOUT_AND_STDERR |
-             Subprocess::W32_HIDE_WINDOW, ProcessPriority::PRIORITY_LOW);
-
-  // Copy output to log
-  logCopier = new AsyncCopyStreamToLog(proc->getStream(1));
-  logCopier->start();
-
-  // Parse GCode
-  SmartPointer<istream> stream = proc->getStream(pipe);
-  // Change file name so GCode error messages make sense
-  interpGCode(InputSource(*stream, "<generated gcode>"));
-
-  // Wait for Subprocess
-  if (proc->waitFor(5, 10)) errors++;
-
-  // Stop the log copier
-  logCopier->join();
-  logCopier.release();
-
-  proc.release();
-}
-
-void ToolPathTask::runTPLInProcess(const string &filename) {
-  Task::begin("Running TPL");
-
-  tplCtx = new tplang::TPLContext(SmartPointer<ostream>::Phony(&cerr), machine);
-  tplCtx->setSim(JSON::Reader::parse(StringInputSource(simJSON)));
-
-  // Interpret
-  try {
-    try {
-      tplang::Interpreter(*tplCtx).read(filename);
-    } catch (const js::JSInterrupted &e) {
-      LOG_WARNING("TPL run interrupted");
-    }
-    return tplCtx.release();
-
-  } CATCH_ERROR;
-  errors++;
-
-  tplCtx.release();
-}
-
-
 void ToolPathTask::runGCode(const string &filename) {
-  Task::begin("Running GCode");
-
   SmartPointer<istream> stream;
   io::filtering_istream filter;
 
@@ -196,7 +149,21 @@ void ToolPathTask::runGCode(const string &filename) {
 
   // Interpret GCode
   filter.push(io::file_source(filename));
-  interpGCode(InputSource(filter, filename));
+  runGCode(InputSource(filter, filename));
+}
+
+
+void ToolPathTask::runGCodeString(const string &gcode) {
+  SmartPointer<istream> stream;
+  io::filtering_istream filter;
+
+  // Track the file load
+  TaskFilter taskFilter(*this, gcode.size());
+  filter.push(boost::ref(taskFilter));
+
+  // Interpret GCode
+  filter.push(io::array_source(gcode.data(), gcode.length()));
+  runGCode(InputSource(filter, "<string>"));
 }
 
 
@@ -206,10 +173,14 @@ void ToolPathTask::run() {
     for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {
       const string &filename = files[i];
 
-      if (!SystemUtilities::exists(filename)) continue;
+      if (!SystemUtilities::exists(filename)) {
+        LOG_ERROR("File not found '" << filename << "'");
+        continue;
+      }
+
       bool isTPL = String::endsWith(filename, ".tpl");
 
-      if (isTPL) runTPLInProcess(filename);
+      if (isTPL) runTPL(filename);
       else runGCode(filename);
     }
   } CATCH_ERROR;
@@ -218,7 +189,5 @@ void ToolPathTask::run() {
 
 void ToolPathTask::interrupt() {
   Task::interrupt();
-  if (proc.isSet()) try {proc->kill(true);} CATCH_ERROR;
-  if (logCopier.isSet()) logCopier->stop();
   if (tplCtx.isSet()) tplCtx->interrupt();
 }
