@@ -349,6 +349,23 @@ namespace {
   }
 
 
+  PyObject *_set_path(PySimulation *self, PyObject *args, PyObject *kwds) {
+    try {
+      const char *kwlist[] = {"path", 0};
+      PyObject *path = 0;
+
+      if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", (char **)kwlist, &path))
+        return 0;
+
+      self->s->path->read(*PyJSON(path).toJSON());
+
+      Py_RETURN_NONE;
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
   PyObject *_get_path(PySimulation *self) {
     try {
       if (!self->s->path.isSet()) THROW("Tool path not set");
@@ -549,6 +566,8 @@ namespace {
      METH_VARARGS | METH_KEYWORDS, "Set workpiece dimensions."},
     {"compute_path", (PyCFunction)_compute_path, METH_VARARGS | METH_KEYWORDS,
      "Compute tool path"},
+    {"set_path", (PyCFunction)_set_path, METH_VARARGS | METH_KEYWORDS,
+     "Set tool path."},
     {"get_path", (PyCFunction)_get_path, METH_NOARGS, ""},
     {"start", (PyCFunction)_start, METH_VARARGS | METH_KEYWORDS,
      "Start a simulation run."},
