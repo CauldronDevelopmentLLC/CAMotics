@@ -87,6 +87,7 @@ namespace GCode {
                double speed);
     void restart(const Axes &position, const PlannerConfig &config);
     void insert(cb::JSON::Sink &sink) const;
+    void write(MachineInterface &machine) const;
     void cut(double length, std::vector<Speed> &speeds, double offset = 0,
              bool fromEnd = true);
 

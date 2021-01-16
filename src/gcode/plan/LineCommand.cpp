@@ -164,6 +164,26 @@ void LineCommand::insert(JSON::Sink &sink) const {
 }
 
 
+void LineCommand::write(MachineInterface &machine) const {
+  // Get moved axes
+  int axes = 0;
+
+  for (unsigned i = 0; i < target.getSize(); i++)
+    if (target[i] != start[i])
+      axes |= MachineEnum::getVarType(Axes::toAxis(i));
+
+  // Handle speeds
+  for (unsigned i = 0; i < speeds.size(); i++) {
+    const Speed &s = speeds[i];
+
+    machine.move(start + unit * s.offset, axes, rapid);
+    machine.setSpeed(s.speed);
+  }
+
+  machine.move(target, axes, rapid);
+}
+
+
 void LineCommand::cut(double length, vector<Speed> &speeds, double offset,
                       bool fromEnd) {
   this->length -= length;

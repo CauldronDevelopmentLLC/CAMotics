@@ -102,6 +102,12 @@ uint64_t Planner::next(JSON::Sink &sink) {
 }
 
 
+uint64_t Planner::next(MachineInterface &machine) {
+  if (!hasMore()) THROW("No more");
+  return planner.next(machine);
+}
+
+
 SmartPointer<JSON::Value> Planner::next() {
   return JSON::Builder::build([this] (JSON::Sink &sink) {next(sink);});
 }

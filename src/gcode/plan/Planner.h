@@ -77,6 +77,7 @@ namespace GCode {
 
     bool hasMore();
     uint64_t next(cb::JSON::Sink &sink);
+    uint64_t next(MachineInterface &machine);
     cb::SmartPointer<cb::JSON::Value> next();
     void setActive(uint64_t id);
     void stop();

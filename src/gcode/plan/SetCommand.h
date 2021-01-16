@@ -43,5 +43,6 @@ namespace GCode {
     // From PlannerCommand
     const char *getType() const {return "set";}
     void insert(cb::JSON::Sink &sink) const;
+    void write(MachineInterface &machine) const;
   };
 }

@@ -28,3 +28,11 @@ void SetCommand::insert(JSON::Sink &sink) const {
   sink.insert("name", name);
   sink.insert("value", *value);
 }
+
+
+void SetCommand::write(MachineInterface &machine) const {
+  if (name == "_feed") machine.setFeed(value->getNumber());
+  else if (name == "tool") machine.changeTool(value->getU32());
+  else if (name == "speed") machine.setSpeed(value->getNumber());
+  else machine.set(name, value->getNumber(), Units::METRIC);
+}

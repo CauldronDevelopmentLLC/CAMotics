@@ -69,7 +69,9 @@ namespace GCode {
     void checkSoftLimits(const Axes &p);
     bool isEmpty() const;
     bool hasMove() const;
+    const PlannerCommand &next();
     uint64_t next(cb::JSON::Sink &sink);
+    uint64_t next(MachineInterface &machine);
     void setActive(uint64_t id);
     void stop();
     bool restart(uint64_t id, const Axes &position);

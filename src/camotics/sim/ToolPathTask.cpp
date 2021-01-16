@@ -62,7 +62,7 @@ using namespace CAMotics;
 
 ToolPathTask::ToolPathTask(const Project::Project &project) :
   tools(project.getTools()), units(project.getUnits()),
-  simJSON(project.toString()), controller(machine, tools),
+  simJSON(project.toString()), controller(pipeline, tools),
   path(new GCode::ToolPath(tools)) {
 
   for (unsigned i = 0; i < project.getFileCount(); i++)
@@ -73,13 +73,13 @@ ToolPathTask::ToolPathTask(const Project::Project &project) :
 
   // Create machine pipeline
   // TODO load machine configuration, including rapidFeed & maxArcError
-  machine.add(new GCode::MachineUnitAdapter);
-  machine.add(new GCode::MachineLinearizer);
-  machine.add(new GCode::MoveSink(*path));
+  pipeline.add(new GCode::MachineUnitAdapter);
+  pipeline.add(new GCode::MachineLinearizer);
+  pipeline.add(new GCode::MoveSink(*path));
   if (units != GCode::Units::METRIC)
-    machine.add(new GCode::MachineUnitAdapter(GCode::Units::METRIC, units));
-  machine.add(new GCode::GCodeMachine(gcodePtr, units));
-  machine.add(new GCode::MachineState);
+    pipeline.add(new GCode::MachineUnitAdapter(GCode::Units::METRIC, units));
+  pipeline.add(new GCode::GCodeMachine(gcodePtr, units));
+  pipeline.add(new GCode::MachineState);
 }
 
 
@@ -89,7 +89,8 @@ ToolPathTask::~ToolPathTask() {interrupt();}
 void ToolPathTask::runTPL(const InputSource &src) {
   Task::begin("Running TPL");
 
-  tplCtx = new tplang::TPLContext(SmartPointer<ostream>::Phony(&cerr), machine);
+  tplCtx =
+    new tplang::TPLContext(SmartPointer<ostream>::Phony(&cerr), pipeline);
   tplCtx->setSim(JSON::Reader::parseString(simJSON));
 
   // Interpret
@@ -123,7 +124,7 @@ void ToolPathTask::runGCode(const InputSource &source) {
 
   GCode::Interpreter interp(controller);
   interp.push(source);
-  machine.start();
+  pipeline.start();
 
   try {
     while (!Task::shouldQuit() && interp.hasMore() && errors < 32)
@@ -135,7 +136,7 @@ void ToolPathTask::runGCode(const InputSource &source) {
         errors++;
       }
   } catch (const GCode::EndProgram &) {}
-  machine.end();
+  pipeline.end();
 }
 
 

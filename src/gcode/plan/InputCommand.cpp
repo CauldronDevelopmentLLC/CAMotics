@@ -44,3 +44,8 @@ void InputCommand::insert(JSON::Sink &sink) const {
 
   sink.insert("timeout", timeout);
 }
+
+
+void InputCommand::write(MachineInterface &machine) const {
+  machine.input(port, mode, timeout);
+}
