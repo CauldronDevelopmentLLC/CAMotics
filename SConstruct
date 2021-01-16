@@ -5,8 +5,9 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.2.1'
+version = '1.2.2'
 major, minor, revision = version.split('.')
+with open('build/version.txt', 'w') as f: f.write(version)
 
 # Setup
 env = Environment(ENV = os.environ,
@@ -252,6 +253,7 @@ for prog in progs.split():
 
 
 # Python module
+misc_files = []
 if have_python:
     # Python source
     src = Glob('src/python/*.cpp')
@@ -265,8 +267,10 @@ if have_python:
     Default(env.SharedLibrary('gplan', ['build/gplan.cpp'],
                               SHLIBPREFIX = ''))
 
-    Default(env.SharedLibrary('camotics', ['build/python.cpp'],
-                              SHLIBPREFIX = ''))
+    mod = env.SharedLibrary('build/camotics', ['build/python.cpp'],
+                            SHLIBPREFIX = '')
+    Default(mod)
+    misc_files.append([str(mod[0]), 'usr/lib/python3/dist-packages/'])
 
 # Clean
 Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])
@@ -367,6 +371,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         icons = ('osx/camotics.icns', 'images/camotics.png'),
         mime = [['mime.xml', 'camotics.xml']],
         platform_independent = ['tpl_lib'],
+        misc = misc_files,
 
         documents = ['README.md', 'CHANGELOG.md'] + examples + machines,
         programs = list(map(lambda x: str(x[0]), execs)),

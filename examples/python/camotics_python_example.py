@@ -353,6 +353,7 @@ while s.is_running():
 s.wait() # Must be called to clean up the background thread
 
 # Get the computed surface in STL ASCII format
+# The surface can be accessed in STL 'ascii', STL 'binary' or 'python' format.
 print('Writing surface STL')
 surface = s.get_surface('ascii')
 with open('test.stl', 'wb') as f:
