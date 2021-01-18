@@ -263,10 +263,6 @@ if have_python:
     env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME'] = 1
 
     env.Prepend(LIBS = [lib])
-
-    Default(env.SharedLibrary('gplan', ['build/gplan.cpp'],
-                              SHLIBPREFIX = ''))
-
     mod = env.SharedLibrary('build/camotics', ['build/python.cpp'],
                             SHLIBPREFIX = '')
     Default(mod)
