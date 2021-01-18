@@ -828,7 +828,11 @@ void QtWin::reload(bool now) {
 
   try {
     // Queue tool path task
-    taskMan.addTask(new ToolPathTask(*project));
+    const GCode::PlannerConfig *config = 0;
+    if (settingsDialog.getPlannerEnabled())
+      config = &settingsDialog.getPlannerConfig();
+
+    taskMan.addTask(new ToolPathTask(*project, config));
     setStatusActive(true);
   } CATCH_ERROR;
 }
@@ -2127,10 +2131,8 @@ void QtWin::on_actionLoadDefaultToolTable_triggered() {
 
 
 void QtWin::on_actionSettings_triggered() {
-  if (project.isSet() && settingsDialog.exec(*project, *view)) {
-    loadMachine(settingsDialog.getMachineName());
+  if (project.isSet() && settingsDialog.exec(*project, *view))
     updateUnits();
-  }
 }
 
 

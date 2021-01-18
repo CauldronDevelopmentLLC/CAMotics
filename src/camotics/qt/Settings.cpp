@@ -20,7 +20,12 @@
 
 #include "Settings.h"
 
+#include <cbang/json/Writer.h>
+#include <cbang/json/Reader.h>
+
+
 using namespace std;
+using namespace cb;
 using namespace CAMotics;
 
 
@@ -36,4 +41,21 @@ QVariant Settings::get(const string &name, const QVariant &defaultValue) const {
 
 void Settings::set(const string &name, const QVariant &value) {
   setValue(QString::fromUtf8(name.c_str()), value);
+}
+
+
+Vector3D Settings::getVector3D(const string &name,
+                               const Vector3D &defaultValue) const {
+  if (!has(name)) return defaultValue;
+
+  auto value = JSON::Reader::parseString(get(name).toString().toStdString());
+
+  Vector3D v;
+  v.read(*value);
+  return v;
+}
+
+
+void Settings::setVector3D(const string &name, const Vector3D &value) {
+  set(name, JSON::Writer::toString(value).c_str());
 }

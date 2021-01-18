@@ -43,6 +43,7 @@ namespace cb {
 namespace GCode {
   class Controller;
   class MachineInterface;
+  class PlannerConfig;
 }
 
 namespace tplang {class TPLContext;}
@@ -66,7 +67,8 @@ namespace CAMotics {
     cb::SmartPointer<tplang::TPLContext> tplCtx;
 
     public:
-    ToolPathTask(const Project::Project &project);
+    ToolPathTask(const Project::Project &project,
+                 const GCode::PlannerConfig *config = 0);
     ~ToolPathTask();
 
     unsigned getErrorCount() const {return errors;}

@@ -42,8 +42,8 @@ namespace GCode {
     double junctionDeviation = 0.05;
     double junctionAccel     = 200000;
 
-    Axes minSoftLimit        = std::numeric_limits<double>::quiet_NaN();
-    Axes maxSoftLimit        = std::numeric_limits<double>::quiet_NaN();
+    Axes minSoftLimit;
+    Axes maxSoftLimit;
 
     Units defaultUnits;
     Units outputUnits;
@@ -66,6 +66,8 @@ namespace GCode {
 
     bool hasOverride(const Code &code) const;
     const std::string &getOverride(const Code &code) const;
+
+    bool softLimitValid(int axis) const;
 
     // From cb::JSON::Serializable
     void read(const cb::JSON::Value &value);

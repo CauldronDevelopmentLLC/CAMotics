@@ -20,33 +20,54 @@
 
 #pragma once
 
+#include "Dialog.h"
 
 #include <camotics/project/Project.h>
 #include <camotics/view/View.h>
+
+#include <gcode/plan/PlannerConfig.h>
 
 #include <cbang/SmartPointer.h>
 
 #include <QDialog>
 
-namespace Ui {class SettingsDialog;}
 
+namespace Ui {class SettingsDialog;}
+namespace GCode {class Axes;}
 
 namespace CAMotics {
-  class SettingsDialog : public QDialog {
+  class SettingsDialog : public Dialog {
     Q_OBJECT;
 
     cb::SmartPointer<Ui::SettingsDialog> ui;
 
     cb::Rectangle3D bounds;
-    bool changing;
+    bool changing = false;
+    int selectedMachine = -1;
+
+    GCode::PlannerConfig planConf;
 
   public:
     SettingsDialog(QWidget *parent);
+
+    void setPlannerConfig(const GCode::PlannerConfig &c) {planConf = c;}
+    const GCode::PlannerConfig &getPlannerConfig() const {return planConf;}
 
     void addMachine(const std::string &name, const std::string &path);
     std::string getMachineName() const;
     std::string getMachinePath() const;
     std::string getMachinePath(const std::string &machine) const;
+
+    bool getPlannerEnabled() const;
+    void setPlannerEnabled(bool enabled);
+
+    void loadPlanVec(const std::string &widget, const std::string &var,
+                     const GCode::Axes &vec, double scale = 1);
+    void savePlanVec(const std::string &widget, const std::string &var,
+                     GCode::Axes &vec, double scale = 1);
+
+    void load(Project::Project &project, View &view);
+    void save(Project::Project &project, View &view);
 
     bool exec(Project::Project &project, View &view);
     using QDialog::exec;
@@ -58,5 +79,6 @@ namespace CAMotics {
     void on_machineComboBox_currentIndexChanged(int index);
     void on_resolutionComboBox_currentIndexChanged(int index);
     void on_resolutionDoubleSpinBox_valueChanged(double value);
+    void on_plannerEnableCheckBox_stateChanged(int checked);
   };
 }

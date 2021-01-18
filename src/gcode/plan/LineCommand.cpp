@@ -172,7 +172,10 @@ void LineCommand::write(MachineInterface &machine) const {
     if (target[i] != start[i])
       axes |= MachineEnum::getVarType(Axes::toAxis(i));
 
-  // Handle speeds
+  // Feed
+  machine.setFeed(feed);
+
+  // Speeds
   for (unsigned i = 0; i < speeds.size(); i++) {
     const Speed &s = speeds[i];
 

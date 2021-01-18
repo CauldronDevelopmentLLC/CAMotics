@@ -29,6 +29,7 @@
 #include "InputCommand.h"
 #include "SetCommand.h"
 #include "EndCommand.h"
+#include "StartCommand.h"
 
 #include <gcode/Helix.h>
 #include <gcode/machine/Transform.h>
@@ -54,7 +55,14 @@ namespace {
 }
 
 
-LinePlanner::LinePlanner() : nextID(1) {reset();}
+LinePlanner::LinePlanner(const PlannerConfig &config, bool immediate) :
+  immediate(immediate) {
+  reset();
+  setConfig(config);
+}
+
+
+LinePlanner::LinePlanner(bool immediate) : immediate(immediate) {reset();}
 
 
 void LinePlanner::reset() {
@@ -78,14 +86,12 @@ void LinePlanner::setConfig(const PlannerConfig &config) {
 void LinePlanner::checkSoftLimits(const Axes &p) {
   for (unsigned axis = 0; axis < Axes::getSize(); axis++)
     if (isfinite(p[axis])) {
-      if (isfinite(config.minSoftLimit[axis]) &&
-          p[axis] < config.minSoftLimit[axis])
+      if (config.softLimitValid(axis) && p[axis] < config.minSoftLimit[axis])
         THROW(Axes::toAxisName(axis) << " axis position " << p[axis]
                << "mm is less than minimum soft limit "
                << config.minSoftLimit[axis] << "mm");
 
-      if (isfinite(config.maxSoftLimit[axis]) &&
-          config.maxSoftLimit[axis] < p[axis])
+      if (config.softLimitValid(axis) && config.maxSoftLimit[axis] < p[axis])
         THROW(Axes::toAxisName(axis) << " axis position " << p[axis]
                << "mm is greater than maximum soft limit "
                << config.maxSoftLimit[axis] << "mm");
@@ -204,18 +210,19 @@ void LinePlanner::dumpQueue(JSON::Sink &sink) {
 
 void LinePlanner::start() {
   reset();
-  MachineState::start();
+  state.start();
+  push(new StartCommand);
 }
 
 
 void LinePlanner::end() {
-  MachineState::end();
+  state.end();
   push(new EndCommand);
 }
 
 
 void LinePlanner::setSpeed(double speed) {
-  MachineState::setSpeed(speed);
+  state.setSpeed(speed);
 
   if (this->speed != speed) {
     this->speed = speed;
@@ -225,7 +232,7 @@ void LinePlanner::setSpeed(double speed) {
 
 
 void LinePlanner::setSpinMode(spin_mode_t mode, double max) {
-  MachineState::setSpinMode(mode, max);
+  state.setSpinMode(mode, max);
 
   switch (mode) {
   case REVOLUTIONS_PER_MINUTE: pushSetCommand("spin-mode", "rpm"); break;
@@ -252,19 +259,19 @@ void LinePlanner::setPathMode(path_mode_t mode, double motionBlending,
 
 
 void LinePlanner::changeTool(unsigned tool) {
-  MachineState::changeTool(tool);
+  state.changeTool(tool);
   pushSetCommand("tool", tool);
 }
 
 
 void LinePlanner::input(port_t port, input_mode_t mode, double timeout) {
-  MachineState::input(port, mode, timeout);
+  state.input(port, mode, timeout);
   push(new InputCommand(port, mode, timeout));
 }
 
 
 void LinePlanner::seek(port_t port, bool active, bool error) {
-  MachineState::seek(port, active, error);
+  state.seek(port, active, error);
   push(new SeekCommand(port, active, error));
   seeking = true;
 }
@@ -272,19 +279,19 @@ void LinePlanner::seek(port_t port, bool active, bool error) {
 
 
 void LinePlanner::output(port_t port, double value) {
-  MachineState::output(port, value);
+  state.output(port, value);
   push(new OutputCommand(port, value));
 }
 
 
 void LinePlanner::dwell(double seconds) {
-  MachineState::dwell(seconds);
+  state.dwell(seconds);
   push(new DwellCommand(seconds));
 }
 
 
 void LinePlanner::move(const Axes &target, int axes, bool rapid) {
-  Axes start = getPosition();
+  Axes start = state.getPosition();
 
   LOG_DEBUG(3, "move(" << target << ", " << (rapid ? "true" : "false")
             << ") from " << start);
@@ -292,13 +299,13 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   // Check limits
   checkSoftLimits(target);
 
-  MachineState::move(target, axes, rapid);
+  state.move(target, axes, rapid);
 
-  double feed = rapid ? numeric_limits<double>::max() : getFeed();
+  double feed = rapid ? numeric_limits<double>::max() : state.getFeed();
   if (!feed) THROW("Non-rapid move with zero feed rate");
 
   // TODO Handle feed rate mode
-  if (getFeedMode() != UNITS_PER_MINUTE)
+  if (state.getFeedMode() != UNITS_PER_MINUTE)
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
   // Handle rapid auto off
@@ -333,14 +340,14 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
 
 
 void LinePlanner::pause(pause_t type) {
-  MachineState::pause(type);
+  state.pause(type);
   push(new PauseCommand(type));
 }
 
 
 void LinePlanner::set(const string &name, double value, Units units) {
-  double oldValue = MachineState::get(name, units);
-  MachineState::set(name, value, units);
+  double oldValue = state.get(name, units);
+  state.set(name, value, units);
 
   if (name.length() == 2 && name[0] == '_' && Axes::isAxis(name[1])) return;
   if (oldValue == value && !String::endsWith(name, "_home")) return;
@@ -351,7 +358,7 @@ void LinePlanner::set(const string &name, double value, Units units) {
 
 
 void LinePlanner::setLocation(const LocationRange &location) {
-  MachineState::setLocation(location);
+  state.setLocation(location);
   int line = location.getStart().getLine();
 
   if (0 <= line && line != this->line)
@@ -360,7 +367,7 @@ void LinePlanner::setLocation(const LocationRange &location) {
 
 
 void LinePlanner::message(const string &s) {
-  MachineState::message(s);
+  state.message(s);
   pushSetCommand("message", s);
 }
 
@@ -426,6 +433,11 @@ void LinePlanner::push(PlannerCommand *cmd) {
     cmds.push_back(cmd);
     plan(cmd);
   }
+
+  // Output to pipeline
+  if (immediate)
+    while (hasMove())
+      setActive(next(*getParent()));
 }
 
 
@@ -451,8 +463,8 @@ bool LinePlanner::merge(LineCommand *next, LineCommand *prev,
   }
 
   // Restore last feed
-  if (getFeed() != prev->feed && !prev->rapid)
-    pushSetCommand("_feed", getFeed());
+  if (state.getFeed() != prev->feed && !prev->rapid)
+    pushSetCommand("_feed", state.getFeed());
 
   return true;
 }

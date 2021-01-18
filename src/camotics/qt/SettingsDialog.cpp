@@ -29,7 +29,7 @@ using namespace CAMotics;
 
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::SettingsDialog), changing(false) {
+  Dialog(parent), ui(new Ui::SettingsDialog) {
   ui->setupUi(this);
 
 #ifndef DEBUG
@@ -64,13 +64,39 @@ string SettingsDialog::getMachinePath() const {
 }
 
 
-bool SettingsDialog::exec(Project::Project &project, View &view) {
+bool SettingsDialog::getPlannerEnabled() const {
+  return Settings().get("Settings/Planner", 0).toInt();
+}
+
+
+void SettingsDialog::setPlannerEnabled(bool enabled) {
+  Settings().set("Settings/Planner", (int)enabled);
+}
+
+
+void SettingsDialog::loadPlanVec(const string &widget, const string &var,
+                                 const GCode::Axes &vec,
+                                 double scale) {
+  auto v = Settings().getVector3D("Settings/" + var, vec.getXYZ() / scale);
+  setVector3D(widget, v);
+}
+
+
+void SettingsDialog::savePlanVec(const string &widget, const string &var,
+                                 GCode::Axes &vec, double scale) {
+  auto v = getVector3D(widget);
+  Settings().setVector3D("Settings/" + var, v);
+  vec.setXYZ(v * scale);
+}
+
+
+void SettingsDialog::load(Project::Project &project, View &view) {
   Settings settings;
 
   bounds = project.getWorkpiece().getBounds();
 
   // Select machine
-  int selectedMachine = ui->machineComboBox->findText
+  selectedMachine = ui->machineComboBox->findText
     (settings.get("Settings/Machine", "Taig Mini Mill").toString());
   if (selectedMachine != -1)
     ui->machineComboBox->setCurrentIndex(selectedMachine);
@@ -89,11 +115,20 @@ bool SettingsDialog::exec(Project::Project &project, View &view) {
   ui->aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
   ui->aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
-  if (QDialog::exec() != QDialog::Accepted) {
-    if (selectedMachine != -1)
-      ui->machineComboBox->setCurrentIndex(selectedMachine);
-    return false;
-  }
+  bool enabled = getPlannerEnabled();
+  ui->plannerGroupBox->setEnabled(enabled);
+  ui->plannerEnableCheckBox->setChecked(enabled);
+
+  loadPlanVec("maxVel",   "MaxVelocity",      planConf.maxVel,   1e3);
+  loadPlanVec("maxAccel", "MaxAccelleration", planConf.maxAccel, 1e6);
+  loadPlanVec("maxJerk",  "MaxJerk",          planConf.maxJerk,  1e6);
+  loadPlanVec("min",      "MinCoordinates",   planConf.minSoftLimit);
+  loadPlanVec("max",      "MaxCoordinates",   planConf.maxSoftLimit);
+}
+
+
+void SettingsDialog::save(Project::Project &project, View &view) {
+  Settings settings;
 
   settings.set("Settings/Machine", ui->machineComboBox->currentText());
 
@@ -113,6 +148,27 @@ bool SettingsDialog::exec(Project::Project &project, View &view) {
 
   view.setFlag(View::SHOW_BBTREE_FLAG, ui->aabbCheckBox->isChecked());
   view.setFlag(View::BBTREE_LEAVES_FLAG, ui->aabbLeavesCheckBox->isChecked());
+
+  setPlannerEnabled(ui->plannerEnableCheckBox->isChecked());
+
+  savePlanVec("maxVel",   "MaxVelocity",      planConf.maxVel,   1e3);
+  savePlanVec("maxAccel", "MaxAccelleration", planConf.maxAccel, 1e6);
+  savePlanVec("maxJerk",  "MaxJerk",          planConf.maxJerk,  1e6);
+  savePlanVec("min",      "MinCoordinates",   planConf.minSoftLimit);
+  savePlanVec("max",      "MaxCoordinates",   planConf.maxSoftLimit);
+}
+
+
+bool SettingsDialog::exec(Project::Project &project, View &view) {
+  load(project, view);
+
+  if (QDialog::exec() != QDialog::Accepted) {
+    if (selectedMachine != -1)
+      ui->machineComboBox->setCurrentIndex(selectedMachine);
+    return false;
+  }
+
+  save(project, view);
 
   return true;
 }
@@ -142,4 +198,9 @@ void SettingsDialog::on_resolutionDoubleSpinBox_valueChanged(double value) {
   changing = true;
   ui->resolutionComboBox->setCurrentIndex(ResolutionMode::RESOLUTION_MANUAL);
   changing = false;
+}
+
+
+void SettingsDialog::on_plannerEnableCheckBox_stateChanged(int checked) {
+  ui->plannerGroupBox->setEnabled(checked);
 }

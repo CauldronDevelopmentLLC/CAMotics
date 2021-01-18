@@ -18,25 +18,21 @@
 
 \******************************************************************************/
 
-#include "SetCommand.h"
+#pragma once
 
-using namespace cb;
-using namespace GCode;
+#include "PlannerCommand.h"
 
-
-void SetCommand::insert(JSON::Sink &sink) const {
-  sink.insert("name", name);
-  sink.insert("value", *value);
-}
+#include <cbang/json/Value.h>
 
 
-void SetCommand::write(MachineInterface &machine) const {
-  if (name == "_feed") machine.setFeed(value->getNumber());
-  else if (name == "tool") machine.changeTool(value->getU32());
-  else if (name == "speed") machine.setSpeed(value->getNumber());
-  else if (name == "spin-mode") ; // TODO machine.setSpinMode()
-  else if (name == "max-rpm")   ; // TODO machine.setSpinMode()
-  else if (name == "message") machine.message(value->getString());
-  else if (name == "line")      ; // TODO machine.setLocation()
-  else machine.set(name, value->getNumber(), Units::METRIC);
+namespace GCode {
+  class StartCommand : public PlannerCommand {
+  public:
+    // From PlannerCommand
+    const char *getType() const {return "start";}
+    double getEntryVelocity() const {return 0;}
+    double getExitVelocity() const {return 0;}
+    void insert(cb::JSON::Sink &sink) const {}
+    void write(MachineInterface &machine) const {machine.start();}
+  };
 }

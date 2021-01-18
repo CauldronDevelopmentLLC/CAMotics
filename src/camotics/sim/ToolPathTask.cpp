@@ -35,6 +35,8 @@
 #include <gcode/machine/GCodeMachine.h>
 #include <gcode/machine/MoveSink.h>
 
+#include <gcode/plan/LinePlanner.h>
+
 #include <cbang/Catch.h>
 
 #include <cbang/os/SystemUtilities.h>
@@ -60,7 +62,8 @@ using namespace cb;
 using namespace CAMotics;
 
 
-ToolPathTask::ToolPathTask(const Project::Project &project) :
+ToolPathTask::ToolPathTask(const Project::Project &project,
+                           const GCode::PlannerConfig *config) :
   tools(project.getTools()), units(project.getUnits()),
   simJSON(project.toString()), controller(pipeline, tools),
   path(new GCode::ToolPath(tools)) {
@@ -75,6 +78,10 @@ ToolPathTask::ToolPathTask(const Project::Project &project) :
   // TODO load machine configuration, including rapidFeed & maxArcError
   pipeline.add(new GCode::MachineUnitAdapter);
   pipeline.add(new GCode::MachineLinearizer);
+
+  // Setup planner
+  if (config) pipeline.add(new GCode::LinePlanner(*config, true));
+
   pipeline.add(new GCode::MoveSink(*path));
   if (units != GCode::Units::METRIC)
     pipeline.add(new GCode::MachineUnitAdapter(GCode::Units::METRIC, units));

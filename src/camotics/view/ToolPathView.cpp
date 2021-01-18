@@ -193,6 +193,7 @@ void ToolPathView::update() {
       double s =
         (showIntensity && maxSpeed) ? fabs(move.getSpeed()) / maxSpeed : 1;
       Color color = getColor(move.getType(), s);
+
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
         vertices.push_back(start[i]);

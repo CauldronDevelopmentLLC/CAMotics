@@ -38,7 +38,8 @@ using namespace GCode;
 
 
 ControllerImpl::ControllerImpl(MachineInterface &machine,
-                               const ToolTable &tools) : tools(tools) {
+                               const ToolTable &tools) :
+tools(tools) {
   state.units                      = this->machine.getUnits();
   state.plane                      = XY;
   state.cutterRadiusComp           = false;
@@ -962,8 +963,10 @@ void ControllerImpl::popScope() {
 
 void ControllerImpl::startBlock() {
   if (syncState != SYNC_NONE) {
-    if (syncState != SYNC_PAUSE)
+    if (syncState != SYNC_PAUSE) {
       LOG_WARNING("Position after synchronized command unknown in simulator.");
+      synchronize(0);
+    }
     syncState = SYNC_NONE;
   }
   state.moveInAbsoluteCoords = false;

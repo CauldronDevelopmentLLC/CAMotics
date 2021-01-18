@@ -23,6 +23,7 @@
 #include <gcode/plan/Planner.h>
 #include <gcode/machine/GCodeMachine.h>
 #include <gcode/machine/MachinePipeline.h>
+#include <gcode/machine/MachineState.h>
 
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
@@ -93,7 +94,6 @@ public:
     else {
       pipeline.add(new GCodeMachine(stream, outputUnits));
       pipeline.add(new MachineState);
-      pipeline.start();
     }
 
     while (!shouldQuit() && planner.hasMore()) {
@@ -105,10 +105,7 @@ public:
 
       } else id = planner.next(pipeline);
 
-      planner.setActive(id);
-
-      // Cannot synchronize with actual machine so fake it.
-      if (planner.isSynchronizing()) planner.synchronize(0);
+      planner.setActive(id); // Flush planner
     }
 
     if (writer.isSet()) writer->endList();

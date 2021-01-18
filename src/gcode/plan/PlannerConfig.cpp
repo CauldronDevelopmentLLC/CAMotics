@@ -45,6 +45,11 @@ const string &PlannerConfig::getOverride(const Code &code) const {
 }
 
 
+bool PlannerConfig::softLimitValid(int axis) const {
+  return minSoftLimit[axis] < maxSoftLimit[axis];
+}
+
+
 void PlannerConfig::read(const JSON::Value &value) {
   defaultUnits = Units::parse(value.getString("default-units", "METRIC"));
   outputUnits = Units::parse(value.getString("output-units", "METRIC"));

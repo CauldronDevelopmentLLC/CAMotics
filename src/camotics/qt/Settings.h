@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <cbang/geom/Vector.h>
 
 #include <QSettings>
 
@@ -33,5 +34,9 @@ namespace CAMotics {
     QVariant get(const std::string &name,
                  const QVariant &defaultValue = QVariant()) const;
     void set(const std::string &name, const QVariant &value);
+
+    cb::Vector3D getVector3D(const std::string &name,
+                 const cb::Vector3D &defaultValue = cb::Vector3D()) const;
+    void setVector3D(const std::string &name, const cb::Vector3D &value);
   };
 }
