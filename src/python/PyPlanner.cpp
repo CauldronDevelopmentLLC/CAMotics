@@ -47,15 +47,13 @@ namespace {
 
 
   PyObject *_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-    PyPlanner *self = (PyPlanner *)type->tp_alloc(type, 0);
-    return (PyObject *)self;
+    return type->tp_alloc(type, 0);
   }
 
 
   int _init(PyPlanner *self, PyObject *args, PyObject *kwds) {
     try {
       self->planner = new GCode::Planner;
-
       return 0;
     } CATCH_PYTHON;
 

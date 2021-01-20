@@ -46,6 +46,7 @@ Planner::Planner() : ControllerImpl(pipeline), started(false) {
   pipeline.add(SmartPointer<MachineLinearizer>::Phony(&linearizer));
   pipeline.add(new ParamResolver(*this));
   pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
+  pipeline.add(new MachineState);
 }
 
 
