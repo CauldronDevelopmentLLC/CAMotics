@@ -60,9 +60,6 @@ if 'dist' in COMMAND_LINE_TARGETS:
 
 have_cairo, have_dxflib, have_python = False, False, False
 if not env.GetOption('clean'):
-    # Qt5 needs C++11
-    env.Replace(cxxstd = 'c++11')
-
     # Configure compiler
     conf.CBConfig('compiler')
 
@@ -80,10 +77,7 @@ if not env.GetOption('clean'):
     if env['PLATFORM'] != 'win32': env.AppendUnique(CCFLAGS = ['-fPIC'])
 
     # Python
-    #pyenv = env.Clone()
-    #conf.env = pyenv
     have_python = conf.CBConfig('python', False)
-    #conf.env = env
 
     if env['with_tpl']:
         if not (env.CBConfigEnabled('chakra') or env.CBConfigEnabled('v8')):
