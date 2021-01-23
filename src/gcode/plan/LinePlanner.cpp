@@ -55,14 +55,13 @@ namespace {
 }
 
 
-LinePlanner::LinePlanner(const PlannerConfig &config, bool immediate) :
-  immediate(immediate) {
+LinePlanner::LinePlanner(const PlannerConfig &config) {
   reset();
   setConfig(config);
 }
 
 
-LinePlanner::LinePlanner(bool immediate) : immediate(immediate) {reset();}
+LinePlanner::LinePlanner() {reset();}
 
 
 void LinePlanner::reset() {
@@ -210,19 +209,19 @@ void LinePlanner::dumpQueue(JSON::Sink &sink) {
 
 void LinePlanner::start() {
   reset();
-  state.start();
+  MachineState::start();
   push(new StartCommand);
 }
 
 
 void LinePlanner::end() {
-  state.end();
+  MachineState::end();
   push(new EndCommand);
 }
 
 
 void LinePlanner::setSpeed(double speed) {
-  state.setSpeed(speed);
+  MachineState::setSpeed(speed);
 
   if (this->speed != speed) {
     this->speed = speed;
@@ -232,7 +231,7 @@ void LinePlanner::setSpeed(double speed) {
 
 
 void LinePlanner::setSpinMode(spin_mode_t mode, double max) {
-  state.setSpinMode(mode, max);
+  MachineState::setSpinMode(mode, max);
 
   switch (mode) {
   case REVOLUTIONS_PER_MINUTE: pushSetCommand("spin-mode", "rpm"); break;
@@ -255,23 +254,19 @@ void LinePlanner::setPathMode(path_mode_t mode, double motionBlending,
         naiveCAM < config.minMergeError ? config.minMergeError : naiveCAM;
     if (0 <= motionBlending) config.maxBlendError = motionBlending;
   }
-}
 
-
-void LinePlanner::changeTool(unsigned tool) {
-  state.changeTool(tool);
-  pushSetCommand("tool", tool);
+  MachineState::setPathMode(mode, motionBlending, naiveCAM);
 }
 
 
 void LinePlanner::input(port_t port, input_mode_t mode, double timeout) {
-  state.input(port, mode, timeout);
+  MachineState::input(port, mode, timeout);
   push(new InputCommand(port, mode, timeout));
 }
 
 
 void LinePlanner::seek(port_t port, bool active, bool error) {
-  state.seek(port, active, error);
+  MachineState::seek(port, active, error);
   push(new SeekCommand(port, active, error));
   seeking = true;
 }
@@ -279,19 +274,19 @@ void LinePlanner::seek(port_t port, bool active, bool error) {
 
 
 void LinePlanner::output(port_t port, double value) {
-  state.output(port, value);
+  MachineState::output(port, value);
   push(new OutputCommand(port, value));
 }
 
 
 void LinePlanner::dwell(double seconds) {
-  state.dwell(seconds);
+  MachineState::dwell(seconds);
   push(new DwellCommand(seconds));
 }
 
 
 void LinePlanner::move(const Axes &target, int axes, bool rapid) {
-  Axes start = state.getPosition();
+  Axes start = MachineState::getPosition();
 
   LOG_DEBUG(3, "move(" << target << ", " << (rapid ? "true" : "false")
             << ") from " << start);
@@ -299,13 +294,13 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   // Check limits
   checkSoftLimits(target);
 
-  state.move(target, axes, rapid);
+  MachineState::move(target, axes, rapid);
 
-  double feed = rapid ? numeric_limits<double>::max() : state.getFeed();
+  double feed = rapid ? numeric_limits<double>::max() : MachineState::getFeed();
   if (!feed) THROW("Non-rapid move with zero feed rate");
 
   // TODO Handle feed rate mode
-  if (state.getFeedMode() != UNITS_PER_MINUTE)
+  if (MachineState::getFeedMode() != UNITS_PER_MINUTE)
     LOG_WARNING("Inverse time and units per rev feed modes are not supported");
 
   // Handle rapid auto off
@@ -340,14 +335,14 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
 
 
 void LinePlanner::pause(pause_t type) {
-  state.pause(type);
+  MachineState::pause(type);
   push(new PauseCommand(type));
 }
 
 
 void LinePlanner::set(const string &name, double value, Units units) {
-  double oldValue = state.get(name, units);
-  state.set(name, value, units);
+  double oldValue = MachineState::get(name, units);
+  MachineState::set(name, value, units);
 
   if (name.length() == 2 && name[0] == '_' && Axes::isAxis(name[1])) return;
   if (oldValue == value && !String::endsWith(name, "_home")) return;
@@ -358,7 +353,7 @@ void LinePlanner::set(const string &name, double value, Units units) {
 
 
 void LinePlanner::setLocation(const LocationRange &location) {
-  state.setLocation(location);
+  MachineState::setLocation(location);
   int line = location.getStart().getLine();
 
   if (0 <= line && line != this->line)
@@ -367,7 +362,7 @@ void LinePlanner::setLocation(const LocationRange &location) {
 
 
 void LinePlanner::message(const string &s) {
-  state.message(s);
+  MachineState::message(s);
   pushSetCommand("message", s);
 }
 
@@ -433,11 +428,6 @@ void LinePlanner::push(PlannerCommand *cmd) {
     cmds.push_back(cmd);
     plan(cmd);
   }
-
-  // Output to pipeline
-  if (immediate)
-    while (hasMove())
-      setActive(next(*getParent()));
 }
 
 
@@ -463,8 +453,8 @@ bool LinePlanner::merge(LineCommand *next, LineCommand *prev,
   }
 
   // Restore last feed
-  if (state.getFeed() != prev->feed && !prev->rapid)
-    pushSetCommand("_feed", state.getFeed());
+  if (MachineState::getFeed() != prev->feed && !prev->rapid)
+    pushSetCommand("_feed", MachineState::getFeed());
 
   return true;
 }

@@ -47,7 +47,8 @@ namespace GCode {
   };
 
 
-  class Planner : public ControllerImpl {
+  class Planner {
+    ControllerImpl controller;
     MachineUnitAdapter unitAdapter;
     MachineLinearizer linearizer;
     MachinePipeline pipeline;
@@ -56,7 +57,7 @@ namespace GCode {
     std::list<cb::SmartPointer<Runner> > runners;
     cb::SmartPointer<NameResolver> resolver;
 
-    bool started;
+    bool started = false;
 
   public:
     Planner();
@@ -72,6 +73,8 @@ namespace GCode {
     {this->resolver = resolver;}
 
     bool isRunning() const;
+    bool isSynchronizing() const {return controller.isSynchronizing();}
+    void synchronize(double result) {controller.synchronize(result);}
 
     void load(const cb::InputSource &source, const PlannerConfig &config);
 

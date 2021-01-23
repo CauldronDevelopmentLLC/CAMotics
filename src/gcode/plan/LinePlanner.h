@@ -24,7 +24,6 @@
 #include "PlannerCommand.h"
 #include "List.h"
 
-#include <gcode/machine/MachineAdapter.h>
 #include <gcode/machine/MachineState.h>
 
 #include <cbang/SmartPointer.h>
@@ -37,10 +36,7 @@ namespace GCode {
   class LineCommand;
 
 
-  class LinePlanner : public MachineAdapter {
-    bool immediate;
-
-    MachineState state;
+  class LinePlanner : public MachineState {
     PlannerConfig config;
 
     // Move state
@@ -63,8 +59,8 @@ namespace GCode {
     double distance;
 
   public:
-    LinePlanner(const PlannerConfig &config, bool immediate = false);
-    LinePlanner(bool immediate = false);
+    LinePlanner(const PlannerConfig &config);
+    LinePlanner();
 
     double getTime() const {return time;}
     double getDistance() const {return distance;}
@@ -85,38 +81,18 @@ namespace GCode {
     // From MachineInterface
     void start();
     void end();
-    double getFeed() const {return state.getFeed();}
-    void setFeed(double feed) {state.setFeed(feed);}
-    feed_mode_t getFeedMode() const {return state.getFeedMode();}
-    void setFeedMode(feed_mode_t mode) {state.setFeedMode(mode);}
-    double getSpeed() const {return state.getSpeed();}
     void setSpeed(double speed);
     void setSpinMode(spin_mode_t mode, double max);
     void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
-    void changeTool(unsigned tool);
     void input(port_t port, input_mode_t mode, double timeout);
     void seek(port_t port, bool active, bool error);
     void output(port_t port, double value);
-    Axes getPosition() const {return state.getPosition();}
-    cb::Vector3D getPosition(axes_t axes) const
-      {return state.getPosition(axes);}
-    void setPosition(const Axes &position) {state.setPosition(position);}
     void dwell(double seconds);
     void move(const Axes &position, int axes, bool rapid);
     void arc(const Axes &offset, double angle, plane_t plane)
       {CBANG_THROW("LinePlanner does not implement arc()");}
-    Transforms &getTransforms() {return state.getTransforms();}
     void pause(pause_t type);
-    double get(address_t addr, Units units) const
-      {return state.get(addr, units);}
-    void set(address_t addr, double value, Units units)
-      {state.set(addr, value, units);}
-    bool has(const std::string &name) const {return state.has(name);}
-    double get(const std::string &name, Units units) const
-    {return state.get(name, units);}
     void set(const std::string &name, double value, Units units);
-    void clear(const std::string &name) {state.clear(name);}
-    const cb::LocationRange &getLocation() const {return state.getLocation();}
     void setLocation(const cb::LocationRange &location);
     void comment(const std::string &s) const {} // TODO
     void message(const std::string &s);
@@ -127,7 +103,7 @@ namespace GCode {
 
     template <typename T>
     void pushSetCommand(const std::string &name, const T &value);
-    void push(PlannerCommand *cmd);
+    virtual void push(PlannerCommand *cmd);
     bool merge(LineCommand *next, LineCommand *prev, double lastSpeed);
     double computeMaxAccel(const cb::Vector3D &v) const;
     double computeJunctionVelocity(const cb::Vector3D &v, double radius) const;

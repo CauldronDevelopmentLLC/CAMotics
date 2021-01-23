@@ -28,7 +28,7 @@ using namespace std;
 using namespace GCode;
 
 
-Planner::Planner() : ControllerImpl(pipeline), started(false) {
+Planner::Planner() : controller(pipeline) {
   class ParamResolver : public MachineAdapter {
     Planner &planner;
 
@@ -46,20 +46,19 @@ Planner::Planner() : ControllerImpl(pipeline), started(false) {
   pipeline.add(SmartPointer<MachineLinearizer>::Phony(&linearizer));
   pipeline.add(new ParamResolver(*this));
   pipeline.add(SmartPointer<LinePlanner>::Phony(&planner));
-  pipeline.add(new MachineState);
 }
 
 
 void Planner::setPosition(const Axes &position) {
   pipeline.setPosition(position);
-  setAbsolutePosition(position, METRIC);
+  controller.setAbsolutePosition(position, Units::METRIC);
 }
 
 
 void Planner::setConfig(const PlannerConfig &config) {
-  setUnits(config.defaultUnits);
+  controller.setUnits(config.defaultUnits);
   unitAdapter.setTargetUnits(config.outputUnits);
-  set("_max_arc_error", config.maxArcError, METRIC);
+  pipeline.set("_max_arc_error", config.maxArcError, Units::METRIC);
   planner.setConfig(config);
 }
 
@@ -68,7 +67,7 @@ bool Planner::isRunning() const {return !runners.empty() || !planner.isEmpty();}
 
 
 void Planner::load(const InputSource &source, const PlannerConfig &config) {
-  runners.push_back(new Runner(*this, source, config));
+  runners.push_back(new Runner(controller, source, config));
 }
 
 
@@ -81,7 +80,7 @@ bool Planner::hasMore() {
     }
 
     if (planner.hasMove()) return true;
-    if (ControllerImpl::isSynchronizing() || runners.empty()) return false;
+    if (isSynchronizing() || runners.empty()) return false;
 
     Runner &runner = *runners.front();
 
@@ -118,16 +117,16 @@ void Planner::setActive(uint64_t id) {planner.setActive(id);}
 
 
 void Planner::stop() {
-  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(0);
+  if (isSynchronizing()) synchronize(0);
   planner.stop();
   runners.clear();
-  ControllerImpl::stop();
+  controller.stop();
 }
 
 
 void Planner::restart(uint64_t id, const Axes &position) {
   if (!planner.restart(id, position)) setPosition(position);
-  if (ControllerImpl::isSynchronizing()) ControllerImpl::synchronize(1);
+  if (isSynchronizing()) synchronize(1);
 }
 
 

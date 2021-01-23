@@ -27,7 +27,7 @@
 #include "ClipperModule.h"
 #include "STLModule.h"
 
-#include <gcode/machine/MachineAdapter.h>
+#include <gcode/machine/MachineNode.h>
 
 #include <cbang/js/Javascript.h>
 #include <cbang/config/Options.h>
@@ -35,14 +35,13 @@
 
 
 namespace tplang {
-  class TPLContext : public cb::js::Javascript {
+  class TPLContext : public cb::js::Javascript, public GCode::MachineNode {
     GCodeModule gcodeMod;
     MatrixModule matrixMod;
     ClipperModule clipperMod;
     DXFModule dxfMod;
     STLModule stlMod;
 
-    GCode::MachineInterface &machine;
     cb::JSON::ValuePtr sim;
 
   public:
@@ -50,17 +49,9 @@ namespace tplang {
                GCode::MachineInterface &machine,
                const std::string &jsImpl = std::string());
 
-    GCode::MachineInterface &getMachine() {return machine;}
+    GCode::MachineInterface &getMachine() {return *getNextNode();}
     void setSim(const cb::JSON::ValuePtr &sim) {this->sim = sim;}
     const cb::JSON::Value &getSim() const {return *sim;}
-
-    template <typename T>
-    T &find() {
-      GCode::MachineAdapter *adapter =
-        dynamic_cast<GCode::MachineAdapter *>(&machine);
-      if (!adapter) THROW("Not found");
-      return adapter->find<T>();
-    }
 
     // From cb::js::Javascript
     void pushPath(const std::string &path);

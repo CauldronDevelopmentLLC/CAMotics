@@ -35,7 +35,7 @@
 #include <gcode/machine/GCodeMachine.h>
 #include <gcode/machine/MoveSink.h>
 
-#include <gcode/plan/LinePlanner.h>
+#include <gcode/plan/PlannerMachine.h>
 
 #include <cbang/Catch.h>
 
@@ -80,7 +80,7 @@ ToolPathTask::ToolPathTask(const Project::Project &project,
   pipeline.add(new GCode::MachineLinearizer);
 
   // Setup planner
-  if (config) pipeline.add(new GCode::LinePlanner(*config, true));
+  if (config) pipeline.add(new GCode::PlannerMachine(*config));
 
   pipeline.add(new GCode::MoveSink(*path));
   if (units != GCode::Units::METRIC)

@@ -67,7 +67,7 @@ tools(tools) {
   state.naiveCamTolerance          = -1;
   state.moveInAbsoluteCoords       = false;
 
-  this->machine.setParent(SmartPointer<MachineInterface>::Phony(&machine));
+  this->machine.setNextNode(SmartPointer<MachineInterface>::Phony(&machine));
 
   memset(varValues, 0, sizeof(varValues));
 

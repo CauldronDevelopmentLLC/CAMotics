@@ -25,13 +25,11 @@ using namespace GCode;
 
 
 void MachinePipeline::add(const SmartPointer<MachineInterface> &m) {
-  if (pipeline.empty()) setParent(m);
+  if (pipeline.empty()) setNextNode(m);
   else {
-    MachineAdapter *adapter =
-      dynamic_cast<MachineAdapter *>(pipeline.back().get());
-
-    if (!adapter) THROW("Pipeline already terminated");
-    adapter->setParent(m);
+    MachineNode *node = dynamic_cast<MachineNode *>(pipeline.back().get());
+    if (!node) THROW("Pipeline already terminated");
+    node->setNextNode(m);
   }
 
   pipeline.push_back(m);

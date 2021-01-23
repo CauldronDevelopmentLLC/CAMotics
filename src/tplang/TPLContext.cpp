@@ -31,8 +31,10 @@ using namespace tplang;
 
 TPLContext::TPLContext(const SmartPointer<ostream> &stream,
                        GCode::MachineInterface &machine, const string &jsImpl) :
-  js::Javascript(jsImpl, stream), gcodeMod(*this), matrixMod(*this),
-  dxfMod(*this), stlMod(*this), machine(machine), sim(new JSON::Dict) {
+  js::Javascript(jsImpl, stream),
+  GCode::MachineNode(SmartPointer<GCode::MachineInterface>::Phony(&machine)),
+  gcodeMod(*this), matrixMod(*this), dxfMod(*this), stlMod(*this),
+  sim(new JSON::Dict) {
 
   // Add modules
   define(gcodeMod);
@@ -70,11 +72,11 @@ TPLContext::TPLContext(const SmartPointer<ostream> &stream,
 
 void TPLContext::pushPath(const string &path) {
   Javascript::pushPath(path);
-  machine.setLocation(FileLocation(path));
+  getMachine().setLocation(FileLocation(path));
 }
 
 
 void TPLContext::popPath() {
   Javascript::popPath();
-  machine.setLocation(FileLocation(getCurrentPath()));
+  getMachine().setLocation(FileLocation(getCurrentPath()));
 }
