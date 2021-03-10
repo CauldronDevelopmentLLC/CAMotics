@@ -386,6 +386,7 @@ namespace {
         double time = 0;
         unsigned threads = 0;
         int reduce = false;
+        PyObject *done = 0;
 
         SmartPointer<GCode::ToolPath> path;
         Rectangle3D bounds;
@@ -394,11 +395,13 @@ namespace {
       public:
         Runner(PySimulation *self, PyObject *args, PyObject *kwds) :
           s(*self->s) {
-          const char *kwlist[] = {"callback", "time", "threads", "reduce", 0};
+          const char *kwlist[] =
+            {"callback", "time", "threads", "reduce", "done", 0};
           PyObject *cb = 0;
 
-          if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OdIp", (char **)kwlist,
-                                           &cb, &time, &threads, &reduce))
+          if (!PyArg_ParseTupleAndKeywords(
+                args, kwds, "|OdIp", (char **)kwlist, &cb, &time, &threads,
+                &reduce, &done))
             THROW("Invalid arguments");
 
           setCallback(cb);
@@ -427,6 +430,16 @@ namespace {
 
           SmartPyGIL gil;
           s.surface = surface;
+
+          if (!done) return;
+          try {
+            PyObject *args = PyTuple_New(0);
+            if (!args) THROW("Failed to allocate tuple");
+
+            PyObject *result = PyObject_Call(done, args, 0);
+            Py_DECREF(args);
+            if (result) Py_DECREF(result);
+          } CATCH_ERROR;
         }
       };
 
