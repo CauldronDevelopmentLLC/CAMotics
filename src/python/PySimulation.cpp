@@ -505,6 +505,8 @@ namespace {
       else if (strcasecmp(format, "ascii") == 0) binary = false;
       else THROW("Invalid format");
 
+      if (s.surface.isNull()) Py_RETURN_NONE;
+
       ostringstream str;
       s.surface->writeSTL(str, binary, "CAMotics Surface", "");
       string data = str.str();
