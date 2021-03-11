@@ -316,8 +316,11 @@ namespace {
         ToolPathTask task;
 
       public:
-        Runner(PySimulation *self, const string &gcode, const string &tpl) :
-          s(*self->s), gcode(gcode), tpl(tpl), task(s.project) {start();}
+        Runner(PySimulation *self, const string &gcode, const string &tpl,
+               GCode::PlannerConfig *config) :
+          s(*self->s), gcode(gcode), tpl(tpl), task(s.project, config) {
+          start();
+        }
 
         // From Thread
         void run() {
@@ -330,17 +333,22 @@ namespace {
         }
       };
 
-      const char *kwlist[] = {"gcode", "tpl", 0};
+      const char *kwlist[] = {"gcode", "tpl", "config", 0};
       const char *gcode = 0;
       const char *tpl = 0;
+      PyObject *config = 0;
 
       if (!PyArg_ParseTupleAndKeywords
-          (args, kwds, "|ss", (char **)kwlist, &gcode, &tpl))
+          (args, kwds, "|ss", (char **)kwlist, &gcode, &tpl, &config))
         return 0;
 
       if (gcode && tpl) THROW("Cannot set both ``gcode`` and ``tpl``");
 
-      set_task(self, new Runner(self, gcode ? gcode : "", tpl ? tpl : ""));
+      GCode::PlannerConfig planConfig;
+      if (config) planConfig.read(*PyJSON(config).toJSON());
+
+      set_task(self, new Runner(self, gcode ? gcode : "", tpl ? tpl : "",
+                                config ? &planConfig : 0));
 
       Py_RETURN_NONE;
     } CATCH_PYTHON;

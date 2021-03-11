@@ -66,7 +66,7 @@ namespace CAMotics {
 
     cb::SmartPointer<tplang::TPLContext> tplCtx;
 
-    public:
+  public:
     ToolPathTask(const Project::Project &project,
                  const GCode::PlannerConfig *config = 0);
     ~ToolPathTask();
