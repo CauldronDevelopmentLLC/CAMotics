@@ -317,6 +317,10 @@ def callback(status, progress):
   print('%s %0.1f%%' % (status, progress * 100))
 
 
+def done(success):
+  print('success=%s' % success)
+
+
 
 # Replace the CTRL-C interrupt handler so we can shutdown the background
 # thread gracefully.
@@ -343,7 +347,7 @@ s.wait() # Must be called to clean up the background thread
 # the same path format that get_path() returns.
 
 # Start the simulation, passing a progress callback function
-s.start(callback)
+s.start(callback, done = done)
 
 while s.is_running():
   # Do other stuff here

@@ -387,6 +387,21 @@ namespace {
   }
 
 
+  void call_done(PyObject *done, bool success) {
+    if (!done) return;
+
+    try {
+      PyObject *args = PyTuple_New(1);
+      if (!args) THROW("Failed to allocate tuple");
+      PyTuple_SetItem(args, 0, success ? Py_True : Py_False);
+
+      PyObject *result = PyObject_Call(done, args, 0);
+      Py_DECREF(args);
+      if (result) Py_DECREF(result);
+    } CATCH_ERROR;
+  }
+
+
   PyObject *_start(PySimulation *self, PyObject *args, PyObject *kwds) {
     try {
       class Runner : public PyTask {
@@ -403,54 +418,56 @@ namespace {
       public:
         Runner(PySimulation *self, PyObject *args, PyObject *kwds) :
           s(*self->s) {
-          const char *kwlist[] =
-            {"callback", "time", "threads", "reduce", "done", 0};
-          PyObject *cb = 0;
+          try {
+            const char *kwlist[] =
+              {"callback", "time", "threads", "reduce", "done", 0};
+            PyObject *cb = 0;
 
-          if (!PyArg_ParseTupleAndKeywords(
-                args, kwds, "|OdIp", (char **)kwlist, &cb, &time, &threads,
-                &reduce, &done))
-            THROW("Invalid arguments");
+            if (!PyArg_ParseTupleAndKeywords(
+                  args, kwds, "|OdIpO", (char **)kwlist, &cb, &time, &threads,
+                  &reduce, &done))
+              THROW("Invalid arguments");
 
-          setCallback(cb);
+            setCallback(cb);
 
-          if (!threads) threads = SystemInfo::instance().getCPUCount();
-          if (!time) time = numeric_limits<double>::max();
+            if (!threads) threads = SystemInfo::instance().getCPUCount();
+            if (!time) time = numeric_limits<double>::max();
 
-          if (!s.path.isSet()) THROW("Missing tool path");
+            if (!s.path.isSet()) THROW("Missing tool path");
 
-          path = s.path;
-          s.project.getWorkpiece().update(*path);
-          bounds = s.project.getWorkpiece().getBounds();
-          resolution = s.project.getResolution();
+            path = s.path;
+            s.project.getWorkpiece().update(*path);
+            bounds = s.project.getWorkpiece().getBounds();
+            resolution = s.project.getResolution();
 
-          start();
+            start();
+
+          } catch (...) {
+            call_done(done, false);
+            throw;
+          }
         }
 
 
         // From Thread
         void run() {
-          CAMotics::Simulation
-            sim(path, 0, 0, bounds, resolution, time, RenderMode(), threads);
-
-          auto surface = SimulationRun(sim).compute(*this);
-          if (reduce) surface->reduce(*this);
-
-          SmartPyGIL gil;
-          s.surface = surface;
-
-          if (!done) return;
           try {
-            PyObject *args = PyTuple_New(0);
-            if (!args) THROW("Failed to allocate tuple");
+            CAMotics::Simulation
+              sim(path, 0, 0, bounds, resolution, time, RenderMode(), threads);
 
-            PyObject *result = PyObject_Call(done, args, 0);
-            Py_DECREF(args);
-            if (result) Py_DECREF(result);
+            auto surface = SimulationRun(sim).compute(*this);
+            if (reduce) surface->reduce(*this);
+
+            SmartPyGIL gil;
+            s.surface = surface;
+
+            call_done(done, surface.isSet());
+            return;
           } CATCH_ERROR;
+
+          call_done(done, false);
         }
       };
-
 
       set_task(self, new Runner(self, args, kwds));
 
