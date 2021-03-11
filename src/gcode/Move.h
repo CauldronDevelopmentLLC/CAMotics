@@ -34,23 +34,21 @@
 namespace GCode {
   class Move : protected cb::Segment3D, public MoveType {
   protected:
-    MoveType type;
+    MoveType type = MoveType::MOVE_RAPID;
     Axes start;
     Axes end;
-    int tool;
-    double feed;
-    double speed;
-    unsigned line;
-
-    double dist;
-    double time;
-    double startTime;
+    double startTime = 0;
+    int tool = 0;
+    double feed = 0;
+    double speed = 0;
+    unsigned line = 0;
+    double time = 0;
+    double dist = 0;
 
   public:
-    Move() : type(MoveType::MOVE_RAPID), tool(0), feed(0), speed(0), line(0),
-             dist(0), time(0), startTime(0) {}
-    Move(MoveType type, const Axes &start, const Axes &end,
-         double startTime, int tool, double feed, double speed, unsigned line);
+    Move() {}
+    Move(MoveType type, const Axes &start, const Axes &end, double startTime,
+         int tool, double feed, double speed, unsigned line, double time);
 
     MoveType getType() const {return type;}
     const Axes &getStart() const {return start;}
@@ -59,7 +57,6 @@ namespace GCode {
     const cb::Vector3D &getEndPt() const {return cb::Segment3D::getEnd();}
     int getTool() const {return tool;}
     double getFeed() const {return feed;}
-    void setFeed(double feed);
     double getSpeed() const {return speed;}
     unsigned getLine() const {return line;}
 

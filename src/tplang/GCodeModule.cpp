@@ -148,14 +148,14 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::rapidCB(const js::Value &args, js::Sink &sink) {
   Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position, args.getBoolean("incremental"));
-  ctx.getMachine().move(position, axes, true);
+  ctx.getMachine().move(position, axes, true, 0);
 }
 
 
 void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
   Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position, args.getBoolean("incremental"));
-  ctx.getMachine().move(position, axes, false);
+  ctx.getMachine().move(position, axes, false, 0);
 }
 
 
@@ -182,7 +182,7 @@ void GCodeModule::probeCB(const js::Value &args, js::Sink &sink) {
 
   Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position);
-  ctx.getMachine().move(position, axes, false);
+  ctx.getMachine().move(position, axes, false, 0);
 }
 
 

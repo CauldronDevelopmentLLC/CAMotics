@@ -29,22 +29,13 @@ using namespace std;
 
 
 Move::Move(MoveType type, const Axes &start, const Axes &end, double startTime,
-           int tool, double feed, double speed, unsigned line) :
-  Segment3D(start.getXYZ(), end.getXYZ()), type(type),
-  start(start), end(end), tool(tool), speed(speed), line(line),
-  dist(start.distance(end)), startTime(startTime) {
+           int tool, double feed, double speed, unsigned line, double time) :
+  Segment3D(start.getXYZ(), end.getXYZ()), type(type), start(start), end(end),
+  startTime(startTime), tool(tool), feed(feed), speed(speed), line(line),
+  time(time), dist(start.distance(end))  {
 
-  if (type != MoveType::MOVE_RAPID && !feed)
-    THROW("Cutting move with zero feed");
-  if (type == MoveType::MOVE_RAPID) feed = 10000; // TODO FIXME!!!!
-
-  setFeed(feed); // Computes time too
-}
-
-
-void Move::setFeed(double feed) {
-  this->feed = feed;
-  time = feed ? dist / feed * 60 : 0; // in seconds
+  // Estimate time in seconds from feed and distance
+  if (!time) this->time = feed ? dist / feed * 60 : 0;
 }
 
 

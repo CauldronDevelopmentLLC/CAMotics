@@ -40,12 +40,11 @@ namespace GCode {
     public GCode::MoveStream, public cb::JSON::Serializable {
     GCode::ToolTable tools;
 
-    double time;
-    double distance;
+    double time = 0;
+    double distance = 0;
 
   public:
-    ToolPath(const GCode::ToolTable &tools) :
-      tools(tools), time(0), distance(0) {}
+    ToolPath(const GCode::ToolTable &tools) : tools(tools) {}
     ~ToolPath();
 
     const cb::Rectangle3D &getBounds() const {return *this;}

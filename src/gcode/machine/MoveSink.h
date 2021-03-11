@@ -32,15 +32,15 @@ namespace GCode {
   class MoveSink : public MachineAdapter {
     MoveStream &stream;
 
-    bool probePending;
-    double time;
+    bool probePending = false;
+    double time = 0;
 
   public:
-    MoveSink(MoveStream &stream);
+    MoveSink(MoveStream &stream) : stream(stream) {}
 
     // From MachineInterface
     void seek(port_t port, bool active, bool error);
-    void move(const Axes &position, int axes, bool rapid);
+    void move(const Axes &position, int axes, bool rapid, double time);
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
              double degrees, plane_t plane);
   };

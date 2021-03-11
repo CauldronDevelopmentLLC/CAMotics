@@ -157,7 +157,7 @@ void Opt::extract(GCode::ToolPath &path) const {
   sink.setNextNode(new GCode::MachineState);
 
   GCode::Axes position = sink.getPosition();
-  sink.move(position, VT_X | VT_Y | VT_Z, true);
+  sink.move(position, VT_X | VT_Y | VT_Z, true, 0);
 
   for (paths_t::const_iterator it = paths.begin(); it != paths.end() &&
          !shouldQuit(); it++) {
@@ -171,14 +171,14 @@ void Opt::extract(GCode::ToolPath &path) const {
     if (last != next) {
       position = sink.getPosition();
       position.setZ(zSafe);
-      sink.move(position, VT_Z, true);
+      sink.move(position, VT_Z, true, 0);
 
       position.setX(next.x());
       position.setY(next.y());
-      sink.move(position, VT_X | VT_Y, true);
+      sink.move(position, VT_X | VT_Y, true, 0);
 
       position.setZ(next.z());
-      sink.move(position, VT_Z, false);
+      sink.move(position, VT_Z, false, 0);
     }
 
     for (unsigned i = 0; i < it->size(); i++) {
@@ -187,13 +187,13 @@ void Opt::extract(GCode::ToolPath &path) const {
       sink.changeTool(move.getTool());
       sink.setFeed(move.getFeed());
       sink.setSpeed(move.getSpeed());
-      sink.move(move.getEnd(), VT_X | VT_Y, false);
+      sink.move(move.getEnd(), VT_X | VT_Y, false, 0);
     }
   }
 
   position = sink.getPosition();
   position.setZ(zSafe);
-  sink.move(position, VT_Z, true);
+  sink.move(position, VT_Z, true, 0);
 }
 
 

@@ -21,6 +21,7 @@
 #pragma once
 
 #include "Dialog.h"
+#include "Settings.h"
 
 #include <camotics/project/Project.h>
 #include <camotics/view/View.h>
@@ -41,6 +42,7 @@ namespace CAMotics {
 
     cb::SmartPointer<Ui::SettingsDialog> ui;
 
+    Settings settings;
     cb::Rectangle3D bounds;
     bool changing = false;
     int selectedMachine = -1;
@@ -62,9 +64,12 @@ namespace CAMotics {
     void setPlannerEnabled(bool enabled);
 
     void loadPlanVec(const std::string &widget, const std::string &var,
-                     const GCode::Axes &vec, double scale = 1);
+                     GCode::Axes &vec, double scale = 1);
     void savePlanVec(const std::string &widget, const std::string &var,
                      GCode::Axes &vec, double scale = 1);
+
+    void loadPlanConfig();
+    void savePlanConfig();
 
     void load(Project::Project &project, View &view);
     void save(Project::Project &project, View &view);

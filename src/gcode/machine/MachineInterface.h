@@ -174,7 +174,8 @@ namespace GCode {
      * @throw cb::Exception if the feed rate is zero or the move would go
      * beyond the limits of the machine.
      */
-    virtual void move(const Axes &position, int axes, bool rapid) = 0;
+    virtual void move(const Axes &position, int axes, bool rapid,
+                      double time) = 0;
 
     /***
      * Program a helical move.

@@ -246,8 +246,9 @@ bool is_near(double x, double y) {
 }
 
 
-void GCodeMachine::move(const Axes &_target, int axes, bool rapid) {
-  MachineAdapter::move(_target, axes, rapid);
+void GCodeMachine::move(const Axes &_target, int axes, bool rapid,
+                        double time) {
+  MachineAdapter::move(_target, axes, rapid, time);
 
   bool first = true;
   bool imperial = units == Units::IMPERIAL;
@@ -275,6 +276,8 @@ void GCodeMachine::move(const Axes &_target, int axes, bool rapid) {
 
     *stream << ' ' << *axis << next;
   }
+
+  if (time) *stream << " (" << dtos(time, false) << "s)";
 
   if (!first) {
     *stream << '\n';

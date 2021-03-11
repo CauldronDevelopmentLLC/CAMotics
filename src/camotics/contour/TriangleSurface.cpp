@@ -184,7 +184,28 @@ void TriangleSurface::reduce(Task &task) {
 }
 
 
-void TriangleSurface::read(const JSON::Value &value) {THROW("NYI");}
+void TriangleSurface::read(const JSON::Value &value) {
+  if (value.hasList("vertices")) {
+    vertices.clear();
+    bounds = Rectangle3D();
+    auto l = value.get("vertices");
+
+    for (unsigned i = 0; i < l->size(); i++) {
+      vertices.push_back(l->getNumber(i));
+
+      unsigned n = vertices.size();
+      if (n % 3 == 0)
+        bounds.add(Vector3D(vertices[n - 3], vertices[n - 2], vertices[n - 1]));
+    }
+  }
+
+  if (value.hasList("normals")) {
+    normals.clear();
+    auto l = value.get("normals");
+    for (unsigned i = 0; i < l->size(); i++)
+      normals.push_back(l->getNumber(i));
+  }
+}
 
 
 void TriangleSurface::write(JSON::Sink &sink) const {

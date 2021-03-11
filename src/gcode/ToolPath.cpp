@@ -53,9 +53,7 @@ int ToolPath::find(double time, unsigned first, unsigned last) const {
 }
 
 
-int ToolPath::find(double time) const {
-  return find(time, 0, size());
-}
+int ToolPath::find(double time) const {return find(time, 0, size());}
 
 
 void ToolPath::read(const JSON::Value &value) {
@@ -80,8 +78,9 @@ void ToolPath::read(const JSON::Value &value) {
     tool = dict.getNumber("tool", tool);
     feed = dict.getNumber("feed", feed);
     speed = dict.getNumber("speed", speed);
+    double delta = dict.getNumber("time", 0);
 
-    GCode::Move m(type, start, end, time, tool, feed, speed, line);
+    GCode::Move m(type, start, end, time, tool, feed, speed, line, delta);
     move(m);
 
     time += m.getTime();
@@ -128,6 +127,8 @@ void ToolPath::write(JSON::Sink &sink) const {
     // Speed
     if (speed != move.getSpeed())
       sink.insert("speed", speed = move.getSpeed());
+
+    sink.insert("time", move.getTime());
 
     sink.endDict();
   }

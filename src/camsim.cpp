@@ -134,7 +134,7 @@ namespace CAMotics {
       Rectangle3D bounds = project.getWorkpiece().getBounds();
       project.getWorkpiece().update(*path);
 
-      Simulation sim(path, bounds, project.getResolution(),
+      Simulation sim(path, 0, 0, bounds, project.getResolution(),
                      time ? time : numeric_limits<double>::max(),
                      renderMode, threads);
 

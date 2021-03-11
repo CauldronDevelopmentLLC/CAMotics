@@ -423,7 +423,7 @@ namespace {
         // From Thread
         void run() {
           CAMotics::Simulation
-            sim(path, bounds, resolution, time, RenderMode(), threads);
+            sim(path, 0, 0, bounds, resolution, time, RenderMode(), threads);
 
           auto surface = SimulationRun(sim).compute(*this);
           if (reduce) surface->reduce(*this);

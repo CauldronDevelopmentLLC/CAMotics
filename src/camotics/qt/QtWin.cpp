@@ -701,10 +701,7 @@ void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
   view->setSurface(0);
   view->setMoveLookup(0);
 
-  if (!simulate) {
-    setStatusActive(false);
-    return;
-  }
+  if (!simulate) return setStatusActive(false);
 
   // Auto play
   if (autoPlay) {
@@ -715,9 +712,12 @@ void QtWin::loadToolPath(const SmartPointer<GCode::ToolPath> &toolPath,
   }
 
   // Simulation
+  SmartPointer<GCode::PlannerConfig> planConf =
+    settingsDialog.getPlannerEnabled() ?
+    new GCode::PlannerConfig(settingsDialog.getPlannerConfig()) : 0;
   RenderMode mode =
     (RenderMode::enum_t)Settings().get("Settings/RenderMode", 0).toInt();
-  Simulation sim(toolPath, project->getWorkpiece().getBounds(),
+  Simulation sim(toolPath, planConf, 0, project->getWorkpiece().getBounds(),
                  project->getResolution(), view->getTime(),
                  mode, options["threads"].toInteger());
 
@@ -962,8 +962,9 @@ void QtWin::exportData() {
 
   } else {
     JSON::Writer writer(*stream, 0, exportDialog.compactJSONSelected());
-    simRun->getSimulation().write
-      (writer, true, exportDialog.withCutSurfaceSelected() ? surface : 0);
+    Simulation sim = simRun->getSimulation();
+    sim.surface = exportDialog.withCutSurfaceSelected() ? surface : 0;
+    sim.write(writer);
     writer.close();
   }
 }

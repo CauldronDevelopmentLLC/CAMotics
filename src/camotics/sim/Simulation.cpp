@@ -19,13 +19,10 @@
 \******************************************************************************/
 
 #include "Simulation.h"
-#include <gcode/ToolPath.h>
 #include "Workpiece.h"
 
 #include <camotics/SHA256.h>
-#include <camotics/contour/Surface.h>
-
-#include <gcode/ToolTable.h>
+#include <camotics/contour/TriangleSurface.h>
 
 #include <cbang/json/JSON.h>
 #include <cbang/iostream/UpdateStreamFilter.h>
@@ -39,6 +36,9 @@ namespace io = boost::iostreams;
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
+
+
+Simulation::~Simulation() {}
 
 
 string Simulation::computeHash() const {
@@ -69,13 +69,25 @@ void Simulation::read(const JSON::Value &value) {
   if (value.has("workpiece")) workpiece.read(*value.get("workpiece"));
   else workpiece = Rectangle3D();
 
-  path = new GCode::ToolPath(tools);
-  if (value.has("path")) path->read(*value.get("path"));
+  if (value.has("path")) {
+    path = new GCode::ToolPath(tools);
+    path->read(*value.get("path"));
+  }
+
+  if (value.has("surface")) {
+    SmartPointer<TriangleSurface> surface = new TriangleSurface;
+    surface->read(*value.get("surface"));
+    this->surface = surface;
+  }
+
+  if (value.has("planner")) {
+    planConf = new GCode::PlannerConfig;
+    planConf->read(*value.get("planner"));
+  }
 }
 
 
-void Simulation::write(JSON::Sink &sink, bool withPath,
-                       const cb::SmartPointer<Surface> &surface) const {
+void Simulation::write(JSON::Sink &sink) const {
   sink.beginDict();
 
   sink.insert("resolution", resolution);
@@ -92,14 +104,19 @@ void Simulation::write(JSON::Sink &sink, bool withPath,
     workpiece.write(sink);
   }
 
-  if (withPath && !path.isNull()) {
+  if (path.isSet()) {
     sink.beginInsert("path");
     path->write(sink);
   }
 
-  if (!surface.isNull()) {
+  if (surface.isSet()) {
     sink.beginInsert("surface");
     surface->write(sink);
+  }
+
+  if (planConf.isSet()) {
+    sink.beginInsert("planner");
+    planConf->write(sink);
   }
 
   sink.endDict();

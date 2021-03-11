@@ -25,6 +25,7 @@
 
 #include <gcode/ToolTable.h>
 #include <gcode/ToolPath.h>
+#include <gcode/plan/PlannerConfig.h>
 
 #include <camotics/render/RenderMode.h>
 #include <camotics/contour/Surface.h>
@@ -34,8 +35,8 @@
 
 #include <string>
 
-namespace cb {namespace JSON {class Sink;}}
 
+namespace cb {namespace JSON {class Sink;}}
 
 namespace CAMotics {
   class Workpiece;
@@ -43,6 +44,8 @@ namespace CAMotics {
   class Simulation : public cb::JSON::Serializable {
   public:
     cb::SmartPointer<GCode::ToolPath> path;
+    cb::SmartPointer<GCode::PlannerConfig> planConf;
+    cb::SmartPointer<Surface> surface;
     Workpiece workpiece;
     double resolution;
     double time;
@@ -50,22 +53,22 @@ namespace CAMotics {
     unsigned threads;
 
     Simulation(const cb::SmartPointer<GCode::ToolPath> &path,
+               const cb::SmartPointer<GCode::PlannerConfig> &planConf,
+               const cb::SmartPointer<Surface> &surface,
                const Workpiece &workpiece, double resolution, double time,
                RenderMode mode, unsigned threads) :
-      path(path), workpiece(workpiece), resolution(resolution),
-      time(time), mode(mode), threads(threads) {}
+      path(path), planConf(planConf), surface(surface), workpiece(workpiece),
+      resolution(resolution), time(time), mode(mode), threads(threads) {}
+    ~Simulation();
 
     const GCode::ToolTable &getTools() const {return path->getTools();}
 
     std::string computeHash() const;
 
-    virtual void write(cb::JSON::Sink &sink, bool withPath,
-                       const cb::SmartPointer<Surface> &surface) const;
-
     // From JSON::Serializable
     using cb::JSON::Serializable::read;
     using cb::JSON::Serializable::write;
     void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const {write(sink, false, 0);}
+    void write(cb::JSON::Sink &sink) const;
   };
 }

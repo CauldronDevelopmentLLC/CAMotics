@@ -70,10 +70,10 @@ void MachineLinearizer::arc(const Vector3D &offset, const Vector3D &target,
     current[axisIndex[0]] = p.x();
     current[axisIndex[1]] = p.y();
     current[axisIndex[2]] = p.z();
-    move(current, axes, false);
+    move(current, axes, false, 0);
   }
 
   // Last segment, move to target exactly
   current.setXYZ(target);
-  move(current, axes, false);
+  move(current, axes, false, 0);
 }

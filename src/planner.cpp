@@ -72,7 +72,8 @@ public:
         if (s[0] == '{') source = new StringInputSource(s);
         else source = new InputSource(s);
 
-        config.read(*JSON::Reader::parse(*source));
+        auto data = JSON::Reader::parse(*source);
+        config.read(data->hasDict("planner") ? *data->get("planner") : *data);
       }
     }
 

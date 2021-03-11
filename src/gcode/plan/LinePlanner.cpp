@@ -285,7 +285,7 @@ void LinePlanner::dwell(double seconds) {
 }
 
 
-void LinePlanner::move(const Axes &target, int axes, bool rapid) {
+void LinePlanner::move(const Axes &target, int axes, bool rapid, double time) {
   Axes start = MachineState::getPosition();
 
   LOG_DEBUG(3, "move(" << target << ", " << (rapid ? "true" : "false")
@@ -294,7 +294,7 @@ void LinePlanner::move(const Axes &target, int axes, bool rapid) {
   // Check limits
   checkSoftLimits(target);
 
-  MachineState::move(target, axes, rapid);
+  MachineState::move(target, axes, rapid, time);
 
   double feed = rapid ? numeric_limits<double>::max() : MachineState::getFeed();
   if (!feed) THROW("Non-rapid move with zero feed rate");

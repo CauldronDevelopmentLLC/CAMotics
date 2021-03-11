@@ -300,7 +300,7 @@ bool ControllerImpl::isPositionChanging(int vars, bool incremental) const {
 
 
 void ControllerImpl::move(const Axes &pos, int axes, bool rapid) {
-  machine.move(pos, axes, rapid);
+  machine.move(pos, axes, rapid, 0);
   setAbsolutePosition(pos, getUnits());
 }
 

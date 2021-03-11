@@ -27,17 +27,13 @@ using namespace GCode;
 using namespace GCode;
 
 
-MoveSink::MoveSink(MoveStream &stream) :
-  stream(stream), probePending(false), time(0) {}
-
-
 void MoveSink::seek(port_t port, bool active, bool error) {
   probePending = true;
   return MachineAdapter::seek(port, active, error);
 }
 
 
-void MoveSink::move(const Axes &position, int axes, bool rapid) {
+void MoveSink::move(const Axes &position, int axes, bool rapid, double time) {
   if (getPosition() != position) {
     MoveType type = rapid ? Move::MOVE_RAPID :
       (probePending ? Move::MOVE_PROBE : Move::MOVE_CUTTING);
@@ -56,17 +52,17 @@ void MoveSink::move(const Axes &position, int axes, bool rapid) {
     Axes end = getTransforms().transform(position);
     double feed = rapid ? 10000 : getFeed(); // TODO Get rapid feed from machine
 
-    Move move(type, start, end, time, get(TOOL_NUMBER, NO_UNITS),
-              feed, getSpeed(), getLocation().getStart().getLine());
+    Move move(type, start, end, this->time, get(TOOL_NUMBER, NO_UNITS),
+              feed, getSpeed(), getLocation().getStart().getLine(), time);
 
-    time += move.getTime();
+    this->time += move.getTime();
 
     stream.move(move);
 
     probePending = false;
   }
 
-  MachineAdapter::move(position, axes, rapid);
+  MachineAdapter::move(position, axes, rapid, time);
 }
 
 

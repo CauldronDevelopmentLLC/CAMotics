@@ -173,17 +173,24 @@ void LineCommand::write(MachineInterface &machine) const {
       axes |= MachineEnum::getVarType(Axes::toAxis(i));
 
   // Feed
-  machine.setFeed(feed);
+  if (!rapid) machine.setFeed(feed);
 
   // Speeds
+  double time = getTime();
+  double offset = 0;
   for (unsigned i = 0; i < speeds.size(); i++) {
     const Speed &s = speeds[i];
 
-    machine.move(start + unit * s.offset, axes, rapid);
+    // Approximate move time
+    double delta = (s.offset - offset) / length * time;
+    offset += s.offset;
+
+    machine.move(start + unit * s.offset, axes, rapid, delta);
     machine.setSpeed(s.speed);
   }
 
-  machine.move(target, axes, rapid);
+  if (offset) time = (length - offset) / length * time;
+  machine.move(target, axes, rapid, time);
 }
 
 

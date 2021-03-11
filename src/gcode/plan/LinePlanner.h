@@ -88,7 +88,7 @@ namespace GCode {
     void seek(port_t port, bool active, bool error);
     void output(port_t port, double value);
     void dwell(double seconds);
-    void move(const Axes &position, int axes, bool rapid);
+    void move(const Axes &position, int axes, bool rapid, double time);
     void arc(const Axes &offset, double angle, plane_t plane)
       {CBANG_THROW("LinePlanner does not implement arc()");}
     void pause(pause_t type);

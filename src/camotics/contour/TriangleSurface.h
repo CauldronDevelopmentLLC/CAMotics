@@ -39,11 +39,11 @@ namespace CAMotics {
     cb::Rectangle3D bounds;
 
   public:
+    TriangleSurface() {}
     TriangleSurface(const GridTree &tree);
     TriangleSurface(STL::Source &source, Task *task = 0);
     TriangleSurface(std::vector<cb::SmartPointer<Surface> > &surfaces);
     TriangleSurface(const TriangleSurface &o);
-    TriangleSurface() {}
 
     void add(const cb::Vector3F vertices[3]);
     void add(const cb::Vector3F vertices[3], const cb::Vector3F &normal);

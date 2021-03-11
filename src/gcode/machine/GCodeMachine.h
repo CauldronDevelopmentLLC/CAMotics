@@ -60,7 +60,7 @@ namespace GCode {
     void setPosition(const Axes &position);
 
     void dwell(double seconds);
-    void move(const Axes &position, int axes, bool rapid);
+    void move(const Axes &position, int axes, bool rapid, double time);
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
              double angle, plane_t plane);
     void pause(pause_t pause);

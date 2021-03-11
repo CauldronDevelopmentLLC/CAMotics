@@ -19,7 +19,6 @@
 \******************************************************************************/
 
 #include "SettingsDialog.h"
-#include "Settings.h"
 
 #include "ui_settings_dialog.h"
 
@@ -38,6 +37,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 #endif
 
   ui->tabWidget->setCurrentIndex(0); // Select first tab
+
+  loadPlanConfig();
 }
 
 
@@ -65,19 +66,19 @@ string SettingsDialog::getMachinePath() const {
 
 
 bool SettingsDialog::getPlannerEnabled() const {
-  return Settings().get("Settings/Planner", 0).toInt();
+  return settings.get("Settings/Planner", 0).toInt();
 }
 
 
 void SettingsDialog::setPlannerEnabled(bool enabled) {
-  Settings().set("Settings/Planner", (int)enabled);
+  settings.set("Settings/Planner", (int)enabled);
 }
 
 
 void SettingsDialog::loadPlanVec(const string &widget, const string &var,
-                                 const GCode::Axes &vec,
-                                 double scale) {
-  auto v = Settings().getVector3D("Settings/" + var, vec.getXYZ() / scale);
+                                 GCode::Axes &axes, double scale) {
+  auto v = settings.getVector3D("Settings/" + var, axes.getXYZ() / scale);
+  axes.setXYZ(v * scale);
   setVector3D(widget, v);
 }
 
@@ -85,14 +86,52 @@ void SettingsDialog::loadPlanVec(const string &widget, const string &var,
 void SettingsDialog::savePlanVec(const string &widget, const string &var,
                                  GCode::Axes &vec, double scale) {
   auto v = getVector3D(widget);
-  Settings().setVector3D("Settings/" + var, v);
+  settings.setVector3D("Settings/" + var, v);
   vec.setXYZ(v * scale);
 }
 
 
-void SettingsDialog::load(Project::Project &project, View &view) {
-  Settings settings;
+void SettingsDialog::loadPlanConfig() {
+  bool enabled = getPlannerEnabled();
+  ui->plannerGroupBox->setEnabled(enabled);
+  ui->plannerEnableCheckBox->setChecked(enabled);
 
+  double maxDeviation = planConf.maxBlendError;
+  maxDeviation = settings.get("Settings/MaxDeviation", maxDeviation).toDouble();
+  ui->maxDeviationDoubleSpinBox->setValue(maxDeviation);
+
+  if (settings.has("Settings/MaxDeviation")) {
+    planConf.maxBlendError = maxDeviation;
+    planConf.maxMergeError = maxDeviation;
+    planConf.maxArcError   = maxDeviation / 10;
+  }
+
+  loadPlanVec("maxVel",   "MaxVelocity",      planConf.maxVel,   1e3);
+  loadPlanVec("maxAccel", "MaxAccelleration", planConf.maxAccel, 1e6);
+  loadPlanVec("maxJerk",  "MaxJerk",          planConf.maxJerk,  1e6);
+  loadPlanVec("min",      "MinCoordinates",   planConf.minSoftLimit);
+  loadPlanVec("max",      "MaxCoordinates",   planConf.maxSoftLimit);
+}
+
+
+void SettingsDialog::savePlanConfig() {
+  setPlannerEnabled(ui->plannerEnableCheckBox->isChecked());
+
+  double maxDeviation = ui->maxDeviationDoubleSpinBox->value();
+  settings.set("Settings/MaxDeviation", maxDeviation);
+  planConf.maxBlendError = maxDeviation;
+  planConf.maxMergeError = maxDeviation;
+  planConf.maxArcError   = maxDeviation / 10;
+
+  savePlanVec("maxVel",   "MaxVelocity",      planConf.maxVel,   1e3);
+  savePlanVec("maxAccel", "MaxAccelleration", planConf.maxAccel, 1e6);
+  savePlanVec("maxJerk",  "MaxJerk",          planConf.maxJerk,  1e6);
+  savePlanVec("min",      "MinCoordinates",   planConf.minSoftLimit);
+  savePlanVec("max",      "MaxCoordinates",   planConf.maxSoftLimit);
+}
+
+
+void SettingsDialog::load(Project::Project &project, View &view) {
   bounds = project.getWorkpiece().getBounds();
 
   // Select machine
@@ -115,21 +154,11 @@ void SettingsDialog::load(Project::Project &project, View &view) {
   ui->aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
   ui->aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
-  bool enabled = getPlannerEnabled();
-  ui->plannerGroupBox->setEnabled(enabled);
-  ui->plannerEnableCheckBox->setChecked(enabled);
-
-  loadPlanVec("maxVel",   "MaxVelocity",      planConf.maxVel,   1e3);
-  loadPlanVec("maxAccel", "MaxAccelleration", planConf.maxAccel, 1e6);
-  loadPlanVec("maxJerk",  "MaxJerk",          planConf.maxJerk,  1e6);
-  loadPlanVec("min",      "MinCoordinates",   planConf.minSoftLimit);
-  loadPlanVec("max",      "MaxCoordinates",   planConf.maxSoftLimit);
+  loadPlanConfig();
 }
 
 
 void SettingsDialog::save(Project::Project &project, View &view) {
-  Settings settings;
-
   settings.set("Settings/Machine", ui->machineComboBox->currentText());
 
   ResolutionMode mode =
@@ -149,13 +178,7 @@ void SettingsDialog::save(Project::Project &project, View &view) {
   view.setFlag(View::SHOW_BBTREE_FLAG, ui->aabbCheckBox->isChecked());
   view.setFlag(View::BBTREE_LEAVES_FLAG, ui->aabbLeavesCheckBox->isChecked());
 
-  setPlannerEnabled(ui->plannerEnableCheckBox->isChecked());
-
-  savePlanVec("maxVel",   "MaxVelocity",      planConf.maxVel,   1e3);
-  savePlanVec("maxAccel", "MaxAccelleration", planConf.maxAccel, 1e6);
-  savePlanVec("maxJerk",  "MaxJerk",          planConf.maxJerk,  1e6);
-  savePlanVec("min",      "MinCoordinates",   planConf.minSoftLimit);
-  savePlanVec("max",      "MaxCoordinates",   planConf.maxSoftLimit);
+  savePlanConfig();
 }
 
 
