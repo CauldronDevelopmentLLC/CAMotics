@@ -37,6 +37,7 @@
 
 #include <gcode/plan/PlannerMachine.h>
 
+#include <cbang/config.h>
 #include <cbang/Catch.h>
 
 #include <cbang/os/SystemUtilities.h>
@@ -75,7 +76,6 @@ ToolPathTask::ToolPathTask(const Project::Project &project,
   SmartPointer<ostream>::Phony gcodePtr(&gcode);
 
   // Create machine pipeline
-  // TODO load machine configuration, including rapidFeed & maxArcError
   pipeline.add(new GCode::MachineUnitAdapter);
   pipeline.add(new GCode::MachineLinearizer);
 
@@ -114,6 +114,9 @@ void ToolPathTask::runTPL(const InputSource &src) {
   errors++;
 
   tplCtx.release();
+
+#else
+  THROW("TPL not supported in this build");
 #endif
 }
 
