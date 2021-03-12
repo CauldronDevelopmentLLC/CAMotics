@@ -465,6 +465,7 @@ namespace {
             return;
           } CATCH_ERROR;
 
+          SmartPyGIL gil;
           call_done(done, false);
         }
       };
