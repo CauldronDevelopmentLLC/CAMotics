@@ -18,6 +18,7 @@
 
 \******************************************************************************/
 
+#include "PyPtr.h"
 #include "PySimulation.h"
 #include "PyJSON.h"
 #include "PyJSONSink.h"
@@ -339,7 +340,7 @@ namespace {
       PyObject *config = 0;
 
       if (!PyArg_ParseTupleAndKeywords
-          (args, kwds, "|ss", (char **)kwlist, &gcode, &tpl, &config))
+          (args, kwds, "|ssO", (char **)kwlist, &gcode, &tpl, &config))
         return 0;
 
       if (gcode && tpl) THROW("Cannot set both ``gcode`` and ``tpl``");
@@ -387,7 +388,7 @@ namespace {
   }
 
 
-  void call_done(PyObject *done, bool success) {
+  void call_done(PyPtr &done, bool success) {
     if (!done) return;
 
     try {
@@ -395,7 +396,7 @@ namespace {
       if (!args) THROW("Failed to allocate tuple");
       PyTuple_SetItem(args, 0, success ? Py_True : Py_False);
 
-      PyObject *result = PyObject_Call(done, args, 0);
+      PyObject *result = PyObject_Call(done.get(), args, 0);
       Py_DECREF(args);
       if (result) Py_DECREF(result);
     } CATCH_ERROR;
@@ -409,7 +410,7 @@ namespace {
         double time = 0;
         unsigned threads = 0;
         int reduce = false;
-        PyObject *done = 0;
+        PyPtr done;
 
         SmartPointer<GCode::ToolPath> path;
         Rectangle3D bounds;
@@ -422,12 +423,14 @@ namespace {
             const char *kwlist[] =
               {"callback", "time", "threads", "reduce", "done", 0};
             PyObject *cb = 0;
+            PyObject *done = 0;
 
             if (!PyArg_ParseTupleAndKeywords(
                   args, kwds, "|OdIpO", (char **)kwlist, &cb, &time, &threads,
                   &reduce, &done))
               THROW("Invalid arguments");
 
+            this->done = done;
             setCallback(cb);
 
             if (!threads) threads = SystemInfo::instance().getCPUCount();

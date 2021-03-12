@@ -21,7 +21,9 @@
 #include "python/PyPlanner.h"
 #include "python/PySimulation.h"
 
+#include <cbang/Info.h>
 #include <cbang/log/Logger.h>
+#include <cbang/util/Version.h>
 
 #ifdef HAVE_EPOLL // Python.h defines this
 #undef HAVE_EPOLL
@@ -31,6 +33,13 @@
 #ifdef HAVE_V8
 #include <cbang/js/v8/JSImpl.h>
 #endif
+
+
+namespace CAMotics {
+  namespace BuildInfo {
+    void addBuildInfo(const char *category);
+  }
+}
 
 
 static struct PyModuleDef module = {
@@ -63,6 +72,11 @@ PyMODINIT_FUNC PyInit_camotics() {
 
   addType(mod, "Planner",    &PlannerType);
   addType(mod, "Simulation", &SimulationType);
+
+  CAMotics::BuildInfo::addBuildInfo("CAMotics");
+  cb::Version version(cb::Info::instance().get("CAMotics", "Version"));
+  PyObject *v = Py_BuildValue("(iii)", version[0], version[1], version[2]);
+  PyModule_AddObject(mod, "VERSION", v);
 
   return mod;
 }

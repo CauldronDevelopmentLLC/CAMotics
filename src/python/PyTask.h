@@ -20,18 +20,17 @@
 
 #pragma once
 
+#include "PyPtr.h"
 
 #include <camotics/Task.h>
 
 #include <cbang/os/Thread.h>
 
-#include <Python.h>
-
 #include <string>
 
 
 class PyTask : public CAMotics::Task, public cb::Thread {
-  PyObject *cb = 0;
+  PyPtr cb;
 
 public:
   void setCallback(PyObject *cb);
