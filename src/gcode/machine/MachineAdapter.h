@@ -23,6 +23,7 @@
 
 #include "MachineNode.h"
 
+#include <cbang/Catch.h>
 #include <cbang/SmartPointer.h>
 
 
@@ -31,8 +32,10 @@ namespace GCode {
     class _ {
       const MachineAdapter &adapter;
     public:
-      _(const MachineAdapter *adapter) : adapter(*adapter) {adapter->enter();}
-      ~_() {adapter.exit();}
+      _(const MachineAdapter *adapter) : adapter(*adapter) {
+        CBANG_TRY_CATCH_ERROR(adapter->enter());
+      }
+      ~_() {CBANG_TRY_CATCH_ERROR(adapter.exit());}
     };
 
   public:

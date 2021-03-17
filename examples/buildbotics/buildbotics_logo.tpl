@@ -17,7 +17,7 @@ dxf.cut_layer_offset(layers.Head,    0.5, zSafe, cutDepth);
 dxf.cut_layer_offset(layers.Ears,   -0.5, zSafe, cutDepth);
 dxf.cut_layer_offset(layers.Eyes,   -0.5, zSafe, cutDepth * 0.66);
 dxf.cut_layer_offset(layers.Pupils, -1.2, zSafe, cutDepth * 0.66);
-dxf.cut_layer_offset(layers.Outline  , 0, zSafe, cutDepth);
+dxf.cut_layer_offset(layers.Outline,   0, zSafe, cutDepth);
 
 rapid({z: zSafe});
 speed(0);

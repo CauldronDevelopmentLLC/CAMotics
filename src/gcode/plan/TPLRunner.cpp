@@ -53,7 +53,11 @@ TPLRunner::~TPLRunner() {
 }
 
 
-void TPLRunner::enter() const {Condition::lock();}
+void TPLRunner::enter() const {
+  Condition::lock();
+  auto trace = ctx->getStackTrace(1);
+  if (!trace->empty()) getNextNode()->setLocation(trace->at(0));
+}
 
 
 void TPLRunner::exit() const {

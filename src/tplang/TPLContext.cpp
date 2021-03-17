@@ -70,13 +70,5 @@ TPLContext::TPLContext(const SmartPointer<ostream> &stream,
 }
 
 
-void TPLContext::pushPath(const string &path) {
-  Javascript::pushPath(path);
-  getMachine().setLocation(FileLocation(path));
-}
-
-
-void TPLContext::popPath() {
-  Javascript::popPath();
-  getMachine().setLocation(FileLocation(getCurrentPath()));
-}
+void TPLContext::pushPath(const string &path) {Javascript::pushPath(path);}
+void TPLContext::popPath() {Javascript::popPath();}

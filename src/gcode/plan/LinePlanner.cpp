@@ -68,6 +68,7 @@ void LinePlanner::reset() {
   lastExitVel = 0;
   seeking = false;
   firstMove = true;
+  filename = string();
   line = -1;
   speed = numeric_limits<double>::quiet_NaN();
   rapidAutoOff = false;
@@ -354,7 +355,13 @@ void LinePlanner::set(const string &name, double value, Units units) {
 
 void LinePlanner::setLocation(const LocationRange &location) {
   MachineState::setLocation(location);
+  string filename = location.getStart().getFilename();
   int line = location.getStart().getLine();
+
+  if (!filename.empty() && filename != this->filename) {
+    pushSetCommand("filename", this->filename = filename);
+    this->line = -1;
+  }
 
   if (0 <= line && line != this->line)
     pushSetCommand("line", this->line = line);

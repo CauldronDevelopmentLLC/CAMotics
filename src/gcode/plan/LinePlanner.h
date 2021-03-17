@@ -51,6 +51,7 @@ namespace GCode {
 
     uint64_t nextID = 1;
 
+    std::string filename;
     int line;
     double speed;
     bool rapidAutoOff;
