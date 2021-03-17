@@ -339,7 +339,9 @@ s.compute_path(gcode)
 s.wait() # Must be called to clean up the background thread
 
 # The tool path can be accessed
-#print(s.get_path())
+path = s.get_path()
+total = sum([step['time'] for step in s.get_path()])
+print('Total time %0.2fs' % total)
 
 # Alternatively, you can set the tool path with s.set_path(path) using
 # the same path format that get_path() returns.

@@ -19,7 +19,8 @@
 \******************************************************************************/
 
 #include "Planner.h"
-#include "Runner.h"
+#include "GCodeRunner.h"
+#include "TPLRunner.h"
 
 #include <cbang/json/Builder.h>
 
@@ -66,8 +67,10 @@ void Planner::setConfig(const PlannerConfig &config) {
 bool Planner::isRunning() const {return !runners.empty() || !planner.isEmpty();}
 
 
-void Planner::load(const InputSource &source, const PlannerConfig &config) {
-  runners.push_back(new Runner(controller, source, config));
+void Planner::load(const InputSource &source, const PlannerConfig &config,
+                   bool tpl) {
+  if (tpl) runners.push_back(new TPLRunner(pipeline, source, config));
+  else runners.push_back(new GCodeRunner(controller, source, config));
 }
 
 
@@ -90,7 +93,7 @@ bool Planner::hasMore() {
       started = true;
     }
 
-    // Push a line of GCode to the planner
+    // Advance the interpreter
     runner.step();
   }
 }

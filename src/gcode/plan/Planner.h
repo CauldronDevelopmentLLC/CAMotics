@@ -37,7 +37,6 @@ namespace cb {namespace JSON {class Sink;}}
 
 namespace GCode {
   class Controller;
-  class Runner;
 
 
   class NameResolver {
@@ -76,7 +75,8 @@ namespace GCode {
     bool isSynchronizing() const {return controller.isSynchronizing();}
     void synchronize(double result) {controller.synchronize(result);}
 
-    void load(const cb::InputSource &source, const PlannerConfig &config);
+    void load(const cb::InputSource &source, const PlannerConfig &config,
+              bool tpl);
 
     bool hasMore();
     uint64_t next(cb::JSON::Sink &sink);

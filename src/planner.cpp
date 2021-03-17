@@ -25,6 +25,7 @@
 #include <gcode/machine/MachinePipeline.h>
 #include <gcode/machine/MachineState.h>
 
+#include <cbang/config.h>
 #include <cbang/Exception.h>
 #include <cbang/ApplicationMain.h>
 #include <cbang/json/Writer.h>
@@ -32,6 +33,10 @@
 #include <cbang/io/StringInputSource.h>
 #include <cbang/time/TimeInterval.h>
 #include <cbang/log/Logger.h>
+
+#ifdef HAVE_V8
+#include <cbang/js/v8/JSImpl.h>
+#endif
 
 #include <iostream>
 
@@ -86,7 +91,7 @@ public:
     MachinePipeline pipeline;
 
     Planner planner;
-    planner.load(source, config);
+    planner.load(source, config, String::endsWith(source.getName(), ".tpl"));
 
     SmartPointer<JSON::Writer> writer;
     if (!gcode) writer = new JSON::Writer(cout, 0, false, 2, precision);
@@ -119,5 +124,8 @@ public:
 
 
 int main(int argc, char *argv[]) {
+#ifdef HAVE_V8
+  cb::gv8::JSImpl::init(0, 0);
+#endif
   return doApplication<PlannerApp>(argc, argv);
 }

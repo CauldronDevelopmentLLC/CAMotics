@@ -27,6 +27,7 @@
 
 #include <gcode/plan/Planner.h>
 
+#include <cbang/String.h>
 #include <cbang/io/StringStreamInputSource.h>
 #include <cbang/log/Logger.h>
 
@@ -140,19 +141,23 @@ namespace {
   }
 
 
-  PyObject *_load_string(PyPlanner *self, PyObject *args) {
+  PyObject *_load_string(PyPlanner *self, PyObject *args, PyObject *kwds) {
     try {
       GCode::PlannerConfig config;
 
+      const char *kwlist[] = {"code", "config", "tpl", 0};
+      const char *code;
       PyObject *_config = 0;
-      const char *gcode;
+      int tpl = false;
 
-      if (!PyArg_ParseTuple(args, "s|O", &gcode, &_config)) return 0;
+      if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|Op", (char **)kwlist,
+                                       &code, &_config, &tpl)) return 0;
 
       // Convert Python object to JSON config
       if (_config) config.read(*PyJSON(_config).toJSON());
 
-      self->planner->load(cb::StringStreamInputSource(gcode, "<MDI>"), config);
+      cb::StringStreamInputSource stream(code, "<MDI>");
+      self->planner->load(stream, config, tpl);
       Py_RETURN_NONE;
 
     } CATCH_PYTHON;
@@ -161,19 +166,23 @@ namespace {
   }
 
 
-  PyObject *_load(PyPlanner *self, PyObject *args) {
+  PyObject *_load(PyPlanner *self, PyObject *args, PyObject *kwds) {
     try {
       GCode::PlannerConfig config;
 
+      const char *kwlist[] = {"path", "config", 0};
+      const char *path;
       PyObject *_config = 0;
-      const char *filename;
 
-      if (!PyArg_ParseTuple(args, "s|O", &filename, &_config)) return 0;
+      if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O", (char **)kwlist,
+                                       &path, &_config)) return 0;
 
       // Convert Python object to JSON config
       if (_config) config.read(*PyJSON(_config).toJSON());
 
-      self->planner->load(std::string(filename), config);
+      bool tpl = cb::String::endsWith(path, ".tpl");
+
+      self->planner->load(std::string(path), config, tpl);
       Py_RETURN_NONE;
 
     } CATCH_PYTHON;
@@ -290,8 +299,10 @@ namespace {
      "Set logger callback"},
     {"set_position", (PyCFunction)_set_position, METH_VARARGS,
      "Set planner position"},
-    {"load_string", (PyCFunction)_load_string, METH_VARARGS, "Load GCode string"},
-    {"load", (PyCFunction)_load, METH_VARARGS, "Load GCode by filename"},
+    {"load_string", (PyCFunction)_load_string, METH_VARARGS | METH_KEYWORDS,
+     "Load GCode or TPL string"},
+    {"load", (PyCFunction)_load, METH_VARARGS | METH_KEYWORDS,
+     "Load GCode or TPL by filename"},
     {"has_more", (PyCFunction)_has_more, METH_NOARGS,
      "True if the planner has more data"},
     {"next", (PyCFunction)_next, METH_NOARGS, "Get next planner data"},

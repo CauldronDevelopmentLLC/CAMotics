@@ -28,72 +28,85 @@
 
 namespace GCode {
   class MachineAdapter : public MachineNode, public MachineInterface {
+    class _ {
+      const MachineAdapter &adapter;
+    public:
+      _(const MachineAdapter *adapter) : adapter(*adapter) {adapter->enter();}
+      ~_() {adapter.exit();}
+    };
+
   public:
     MachineAdapter(const cb::SmartPointer<MachineInterface> &next = 0) :
       MachineNode(next) {}
 
+    virtual void enter() const {}
+    virtual void exit() const {}
+
     // From MachineInterface
-    void start() {next->start();}
-    void end() {next->end();}
+    void start() {_ _(this); next->start();}
+    void end() {_ _(this); next->end();}
 
-    double getFeed() const {return next->getFeed();}
-    void setFeed(double feed) {next->setFeed(feed);}
-    feed_mode_t getFeedMode() const {return next->getFeedMode();}
-    void setFeedMode(feed_mode_t mode){next->setFeedMode(mode);}
+    double getFeed() const {_ _(this); return next->getFeed();}
+    void setFeed(double feed) {_ _(this); next->setFeed(feed);}
+    feed_mode_t getFeedMode() const {_ _(this); return next->getFeedMode();}
+    void setFeedMode(feed_mode_t mode){_ _(this); next->setFeedMode(mode);}
 
-    double getSpeed() const {return next->getSpeed();}
-    void setSpeed(double speed) {next->setSpeed(speed);}
+    double getSpeed() const {_ _(this); return next->getSpeed();}
+    void setSpeed(double speed) {_ _(this); next->setSpeed(speed);}
 
     spin_mode_t getSpinMode(double *max = 0) const
-    {return next->getSpinMode(max);}
+    {_ _(this); return next->getSpinMode(max);}
     void setSpinMode(spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
-                     double max = 0) {next->setSpinMode(mode, max);}
+                     double max = 0) {_ _(this); next->setSpinMode(mode, max);}
 
     void setPathMode(path_mode_t mode, double motionBlending = 0,
                      double naiveCAM = 0)
-    {next->setPathMode(mode, motionBlending, naiveCAM);}
+    {_ _(this); next->setPathMode(mode, motionBlending, naiveCAM);}
 
-    void changeTool(unsigned tool) {next->changeTool(tool);}
+    void changeTool(unsigned tool) {_ _(this); next->changeTool(tool);}
 
     void input(port_t port, input_mode_t mode, double timeout)
-    {next->input(port, mode, timeout);}
+    {_ _(this); next->input(port, mode, timeout);}
     void seek(port_t port, bool active, bool error)
-    {next->seek(port, active, error);}
-    void output(port_t port, double value) {next->output(port, value);}
+    {_ _(this); next->seek(port, active, error);}
+    void output(port_t port, double value)
+    {_ _(this); next->output(port, value);}
 
-    Axes getPosition() const {return next->getPosition();}
+    Axes getPosition() const {_ _(this); return next->getPosition();}
     cb::Vector3D getPosition(axes_t axes) const
-    {return next->getPosition(axes);}
-    void setPosition(const Axes &position) {next->setPosition(position);}
+    {_ _(this); return next->getPosition(axes);}
+    void setPosition(const Axes &position)
+    {_ _(this); next->setPosition(position);}
 
-    void dwell(double seconds) {next->dwell(seconds);}
+    void dwell(double seconds) {_ _(this); next->dwell(seconds);}
     void move(const Axes &position, int axes, bool rapid, double time)
-    {next->move(position, axes, rapid, time);}
+    {_ _(this); next->move(position, axes, rapid, time);}
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
              double angle, plane_t plane)
-    {next->arc(offset, target, angle, plane);}
+    {_ _(this); next->arc(offset, target, angle, plane);}
 
-    Transforms &getTransforms() {return next->getTransforms();}
+    Transforms &getTransforms() {_ _(this); return next->getTransforms();}
 
-    void pause(pause_t type) {next->pause(type);}
+    void pause(pause_t type) {_ _(this); next->pause(type);}
 
     double get(address_t addr, Units units) const
-    {return next->get(addr, units);}
+    {_ _(this); return next->get(addr, units);}
     void set(address_t addr, double value, Units units)
-    {next->set(addr, value, units);}
+    {_ _(this); next->set(addr, value, units);}
 
-    bool has(const std::string &name) const {return next->has(name);}
+    bool has(const std::string &name) const {_ _(this); return next->has(name);}
     double get(const std::string &name, Units units) const
-    {return next->get(name, units);}
+    {_ _(this); return next->get(name, units);}
     void set(const std::string &name, double value, Units units)
-    {next->set(name, value, units);}
-    void clear(const std::string &name) {next->clear(name);}
+    {_ _(this); next->set(name, value, units);}
+    void clear(const std::string &name) {_ _(this); next->clear(name);}
 
-    const cb::LocationRange &getLocation() const {return next->getLocation();}
+    const cb::LocationRange &getLocation() const
+    {_ _(this); return next->getLocation();}
     void setLocation(const cb::LocationRange &location)
-    {next->setLocation(location);}
+    {_ _(this); next->setLocation(location);}
 
-    void comment(const std::string &s) const {next->comment(s);}
-    void message(const std::string &s) {next->message(s);}
+    void comment(const std::string &s) const {_ _(this); next->comment(s);}
+    void message(const std::string &s) {_ _(this); next->message(s);}
   };
 }

@@ -22,21 +22,18 @@
 
 #include "PlannerConfig.h"
 
-#include <gcode/interp/Interpreter.h>
-
 
 namespace GCode {
-  class Controller;
-
-  class Runner : public Interpreter {
+  class Runner {
     PlannerConfig config;
 
   public:
-    Runner(Controller &controller, const cb::InputSource &source,
-           const PlannerConfig &config);
+    Runner(const PlannerConfig &config) : config(config) {}
+    virtual ~Runner() {}
 
     const PlannerConfig &getConfig() const {return config;}
 
-    void step();
+    virtual bool hasMore() const = 0;
+    virtual void step() = 0;
   };
 }

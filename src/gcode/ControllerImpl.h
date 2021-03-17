@@ -81,10 +81,10 @@ namespace GCode {
       bool mist;                       // M7, M9
       bool flood;                      // M8, M9
       double speedOverride;            // M48, M51 TODO unsupported
-      double feedOverride;             // M40, M50 TODO unsupported
+      double feedOverride;             // M49, M50 TODO unsupported
       bool adaptiveFeed;               // M52 TODO unsupported
       bool feedHold;                   // M53 TODO unsupported
-      double motionBlendingTolerance;  // G64 TODO unsupported
+      double motionBlendingTolerance;  // G64
       double naiveCamTolerance;        // G64
       bool moveInAbsoluteCoords;       // G53
     } state_t;

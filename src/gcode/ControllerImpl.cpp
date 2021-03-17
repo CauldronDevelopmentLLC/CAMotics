@@ -1173,7 +1173,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 640: digitalOutput(getVar('P'), true,  false); break;
     case 650: digitalOutput(getVar('P'), false, false); break;
 
-    case 660:
+    case 660: // Wait on input
       input((vars & VT_P) ? getVar('P') : getVar('E'), vars & VT_P,
             (input_mode_t)(unsigned)((vars & VT_L) ? getVar('L') : 0),
             (vars & VT_Q) ? getVar('Q') : 0);
@@ -1194,6 +1194,8 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 610: // Set current tool
     case 670: // Synchronized analog output
     case 680: // Immediate analog output
+    case 980: // Fanuc style call
+    case 990: // Fanuc style return
 
     default: implemented = false;
     }

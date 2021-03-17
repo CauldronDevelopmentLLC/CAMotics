@@ -233,6 +233,12 @@ libCAMotics = env.Library('build/libCAMotics', src)
 env.Prepend(LIBS = libCAMotics)
 
 
+# Force two pass link to resolve circular dependencies
+if env['PLATFORM'] == 'posix':
+    env['_LIBFLAGS'] = \
+        '-Wl,--start-group ' + env['_LIBFLAGS'] + ' -Wl,--end-group'
+
+
 # Build other programs
 docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
 progs = 'gcodetool planner'
