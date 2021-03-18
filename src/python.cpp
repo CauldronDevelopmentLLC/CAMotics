@@ -20,6 +20,8 @@
 
 #include "python/PyPlanner.h"
 #include "python/PySimulation.h"
+#include "python/PyLogger.h"
+#include "python/Catch.h"
 
 #include <cbang/Info.h>
 #include <cbang/log/Logger.h>
@@ -42,8 +44,45 @@ namespace CAMotics {
 }
 
 
+PyObject *_set_logger(PyObject *mod, PyObject *args, PyObject *kwds) {
+  try {
+    const char *kwlist[] = {"callback", "level", "domainsLevels", 0};
+    PyObject *cb;
+    int level = -1;
+    const char *domainLevels = 0;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|is", (char **)kwlist,
+                                     &cb, &level, &domainLevels)) return 0;
+
+    if (cb == Py_None) cb::Logger::instance().setScreenStream(0);
+    else cb::Logger::instance().setScreenStream(new PyLoggerStream(cb));
+
+    if (0 <= level) cb::Logger::instance().setVerbosity(level);
+    if (domainLevels) cb::Logger::instance().setLogDomainLevels(domainLevels);
+
+    Py_RETURN_NONE;
+
+  } CATCH_PYTHON;
+
+  return 0;
+}
+
+
+static PyMethodDef _methods[] = {
+  {"set_logger", (PyCFunction)_set_logger, METH_VARARGS | METH_KEYWORDS,
+   "Set logger callback"},
+  {0, 0, 0, 0}
+};
+
+
+
 static struct PyModuleDef module = {
-  PyModuleDef_HEAD_INIT, "camotics", 0, -1, 0, 0, 0, 0, 0
+  PyModuleDef_HEAD_INIT,
+  "camotics",
+  "CAMotics CNC simulator",
+  -1,
+  _methods,
+  0, 0, 0, 0
 };
 
 
@@ -64,6 +103,7 @@ PyMODINIT_FUNC PyInit_camotics() {
   cb::Logger::instance().setLogTime(false);
   cb::Logger::instance().setLogShortLevel(true);
   cb::Logger::instance().setLogPrefix(true);
+  cb::Logger::instance().setLogColor(false);
 
   if (!PyEval_ThreadsInitialized()) PyEval_InitThreads();
 

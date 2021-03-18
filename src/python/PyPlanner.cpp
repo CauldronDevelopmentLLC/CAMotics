@@ -22,14 +22,12 @@
 #include "PyNameResolver.h"
 #include "PyJSON.h"
 #include "PyJSONSink.h"
-#include "PyLogger.h"
 #include "Catch.h"
 
 #include <gcode/plan/Planner.h>
 
 #include <cbang/String.h>
 #include <cbang/io/StringStreamInputSource.h>
-#include <cbang/log/Logger.h>
 
 #include <limits>
 
@@ -90,28 +88,6 @@ namespace {
 
       if (cb == Py_None) self->planner->setResolver(0);
       else self->planner->setResolver(new PyNameResolver(cb));
-
-      Py_RETURN_NONE;
-
-    } CATCH_PYTHON;
-
-    return 0;
-  }
-
-
-  PyObject *_set_logger(PyPlanner *self, PyObject *args) {
-    try {
-      PyObject *cb;
-      int level = -1;
-      const char *domainLevels = 0;
-
-      if (!PyArg_ParseTuple(args, "O|is", &cb, &level, &domainLevels)) return 0;
-
-      if (cb == Py_None) cb::Logger::instance().setScreenStream(0);
-      else cb::Logger::instance().setScreenStream(new PyLoggerStream(cb));
-
-      if (0 <= level) cb::Logger::instance().setVerbosity(level);
-      if (domainLevels) cb::Logger::instance().setLogDomainLevels(domainLevels);
 
       Py_RETURN_NONE;
 
@@ -295,8 +271,6 @@ namespace {
      "True if the planner is synchronizing"},
     {"set_resolver", (PyCFunction)_set_resolver, METH_VARARGS,
      "Set name resolver callback"},
-    {"set_logger", (PyCFunction)_set_logger, METH_VARARGS,
-     "Set logger callback"},
     {"set_position", (PyCFunction)_set_position, METH_VARARGS,
      "Set planner position"},
     {"load_string", (PyCFunction)_load_string, METH_VARARGS | METH_KEYWORDS,
