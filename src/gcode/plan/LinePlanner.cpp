@@ -84,8 +84,10 @@ void LinePlanner::setConfig(const PlannerConfig &config) {
 
 
 void LinePlanner::checkSoftLimits(const Axes &p) {
-  for (unsigned axis = 0; axis < Axes::getSize(); axis++)
-    if (isfinite(p[axis])) {
+  for (unsigned axis = 0; axis < Axes::getSize(); axis++) {
+    string homed = String::printf("_%c_homed", Axes::toAxis(axis, true));
+
+    if (isfinite(p[axis]) && MachineState::get(homed, NO_UNITS)) {
       if (config.softLimitValid(axis) && p[axis] < config.minSoftLimit[axis])
         THROW(Axes::toAxisName(axis) << " axis position " << p[axis]
                << "mm is less than minimum soft limit "
@@ -96,6 +98,7 @@ void LinePlanner::checkSoftLimits(const Axes &p) {
                << "mm is greater than maximum soft limit "
                << config.maxSoftLimit[axis] << "mm");
     }
+  }
 }
 
 
