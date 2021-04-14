@@ -22,6 +22,7 @@
  - Don't output synchronization warning after a program pause.
  - Resolve simlinks in file dialog.
  - Allow running planner in CAMotics GUI.
+ - Fixed swapped G98 and G99.
 
 ## v1.2.0:
  - Improved Buildbotics CNC controller connectivity.
