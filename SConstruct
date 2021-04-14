@@ -7,6 +7,7 @@ cbang = os.environ.get('CBANG_HOME')
 # Version
 version = '1.2.2'
 major, minor, revision = version.split('.')
+if not os.path.exists('build'): os.mkdir('build')
 with open('build/version.txt', 'w') as f: f.write(version)
 
 # Setup
