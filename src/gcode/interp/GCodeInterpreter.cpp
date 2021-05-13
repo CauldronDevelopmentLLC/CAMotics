@@ -53,13 +53,13 @@ void GCodeInterpreter::setReference(address_t addr, double value) {
 
 void GCodeInterpreter::setReference(const string &name, double value) {
   LOG_DEBUG(3, "Set global variable #<" << name << "> = " << value);
-  controller.set(name, value);
+  controller.set(canonical(name), value);
 }
 
 
 void GCodeInterpreter::clearReference(const string &name) {
   LOG_DEBUG(3, "Clear global variable #<" << name << ">");
-  controller.clear(name);
+  controller.clear(canonical(name));
 }
 
 
