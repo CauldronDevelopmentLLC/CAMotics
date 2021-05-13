@@ -1140,8 +1140,7 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 970: setSpinMode(REVOLUTIONS_PER_MINUTE); break;
 
     case 980: state.returnMode = RETURN_TO_OLD_Z;  break;
-    case 990: state.returnMode = RETURN_TO_R;
-break;
+    case 990: state.returnMode = RETURN_TO_R;      break;
 
     default: implemented = false;
     }
