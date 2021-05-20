@@ -229,7 +229,7 @@ void LinePlanner::setSpeed(double speed) {
 
   if (this->speed != speed) {
     this->speed = speed;
-    pushSetCommand("speed", speed);
+    if (!rapidAutoOff) pushSetCommand("speed", speed);
   }
 }
 
