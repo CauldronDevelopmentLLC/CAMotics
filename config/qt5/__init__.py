@@ -42,12 +42,18 @@ import SCons.Tool
 import SCons.Util
 
 
+try:
+    from SCons.Warnings import Warning as SConsWarning
+except:
+    from SCons.Warnings import SConsWarning
+
+
 def _bytes_to_str(s):
     if isinstance(s, bytes): return s.decode()
     return s
 
 
-class ToolQt5Warning(SCons.Warnings.Warning): pass
+class ToolQt5Warning(SConsWarning): pass
 class GeneratedMocFileNotIncluded(ToolQt5Warning): pass
 class QtdirNotFound(ToolQt5Warning): pass
 
