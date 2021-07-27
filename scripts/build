@@ -1,0 +1,30 @@
+#!/bin/bash -e
+
+cd "$(dirname "$0")/.."
+
+CPUS=$(grep -c ^processor /proc/cpuinfo)
+
+# Prerequisites
+sudo apt-get update
+sudo apt-get -y install scons build-essential libssl-dev libqt5websockets5-dev \
+     libqt5opengl5-dev libglu1-mesa-dev pkgconf git python3 python3-six
+
+# V8
+if [ ! -e embedded-v8 ]; then
+  git clone --depth=1 https://github.com/CauldronDevelopmentLLC/embedded-v8
+fi
+./embedded-v8/build.sh
+export V8_HOME=$PWD/embedded-v8
+
+# C!
+if [ ! -e cbang ]; then
+  git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
+fi
+scons -C cbang -j$CPUS
+export CBANG_HOME=$PWD/cbang
+
+# Build
+scons -j$CPUS
+scons package
+
+echo Success
