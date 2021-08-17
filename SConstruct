@@ -298,9 +298,9 @@ save you time and money and open up a world of creative possibilities by
 allowing you to rapidly visualize and improve upon designs with out wasting
 material or breaking tools.'''
 
-# Package checked in examples & machinse
+# Package checked in examples & machines
 examples = []
-machinse = []
+machines = []
 if 'package' in COMMAND_LINE_TARGETS:
     import subprocess
 
