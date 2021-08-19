@@ -241,7 +241,7 @@ if env['PLATFORM'] == 'posix':
 
 
 # Build other programs
-docs = ('README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md')
+docs = ['README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md']
 progs = 'gcodetool planner'
 if env['with_tpl']: progs += ' tplang'
 
@@ -272,9 +272,17 @@ if have_python:
 # Clean
 Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])
 
-
 # Install
-env.Alias('install', [env.get('install_prefix')])
+prefix = env.get('install_prefix')
+env.Alias('install', [prefix])
+
+for target in docs + ['examples', 'machines']:
+    env.Install(prefix + '/share/doc/camotics/', target)
+
+env.Install(prefix + '/share/camotics/', 'tpl_lib')
+env.Install(prefix + '/share/pixmaps', 'images/camotics.png')
+env.Install(prefix + '/share/applications', 'CAMotics.desktop')
+env.Install(prefix + '/share/mime/packages/camotics.xml', 'mime.xml')
 
 description = '''CAMotics is an Open-Source software which can simulate
 3-axis NC machining. It is a fast, flexible and user friendly simulation
@@ -298,13 +306,12 @@ save you time and money and open up a world of creative possibilities by
 allowing you to rapidly visualize and improve upon designs with out wasting
 material or breaking tools.'''
 
-# Package checked in examples & machines
-examples = []
-machines = []
+# Package
 if 'package' in COMMAND_LINE_TARGETS:
     import subprocess
 
     # Examples
+    examples = []
     cmd = 'git ls-files examples/'
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     examples = p.communicate()[0]
@@ -312,14 +319,13 @@ if 'package' in COMMAND_LINE_TARGETS:
     examples = list(map(lambda x: [x, x], examples.split()))
 
     # Machines
+    machines = []
     cmd = 'git ls-files machines/'
     p = subprocess.Popen(cmd, shell = True, stdout = subprocess.PIPE)
     machines = p.communicate()[0]
     if isinstance(machines, bytes): machines = machines.decode()
     machines = list(map(lambda x: [x, x], machines.split()))
 
-# Package
-if 'package' in COMMAND_LINE_TARGETS:
     # Code sign key password
     path = os.environ.get('CODE_SIGN_KEY_PASS_FILE')
     if path is not None:
