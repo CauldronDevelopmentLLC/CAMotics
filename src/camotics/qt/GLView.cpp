@@ -100,9 +100,15 @@ void GLView::initializeGL() {
 #ifdef DEBUG
     if (logger.isNull()) {
       logger = new QOpenGLDebugLogger(this);
-      logger->initialize();
-      connect(logger.get(), &QOpenGLDebugLogger::messageLogged, this,
-              &GLView::handleLoggedMessage);
+
+      if (logger->initialize())
+        connect(logger.get(), &QOpenGLDebugLogger::messageLogged, this,
+                &GLView::handleLoggedMessage);
+
+      else {
+        logger.release();
+        LOG_ERROR("initializeGL() Failed to initialize OpenGL logger");
+      }
     }
 #endif
 
@@ -177,6 +183,7 @@ namespace {
 
 GLView::SmartLog GLView::startLog() {
   if (logger.isSet()) logger->startLogging();
+  GLContext().clearErrors();
   return new SmartFunctor<GLView>(this, &GLView::logErrors);
 }
 

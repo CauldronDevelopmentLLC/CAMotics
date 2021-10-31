@@ -48,6 +48,8 @@ namespace CAMotics {
     void applyMatrix(const Transform &t);
     void popMatrix();
 
+    void clearErrors();
+    std::string getErrors();
     void logErrors();
 
     static bool isActive();

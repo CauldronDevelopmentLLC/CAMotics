@@ -25,6 +25,7 @@
 #include <cbang/log/Logger.h>
 
 using namespace CAMotics;
+using namespace std;
 
 
 namespace {
@@ -92,14 +93,30 @@ void GLContext::popMatrix() {
 }
 
 
-void GLContext::logErrors() {
+void GLContext::clearErrors() {
+  while (glGetError() != GL_NO_ERROR) continue;
+}
+
+
+string GLContext::getErrors() {
   GLenum err;
+  string errors;
 
   do {
     err = glGetError();
     if (err == GL_NO_ERROR) break;
-    LOG_ERROR("GL error: " << err << ": " << glErrorString(err));
+
+    if (!errors.empty()) errors += "\n";
+    errors += SSTR("GL error: " << err << ": " << glErrorString(err));
   } while (err != GL_CONTEXT_LOST);
+
+  return errors;
+}
+
+
+void GLContext::logErrors() {
+  string errors = getErrors();
+  if (!errors.empty()) LOG_ERROR(errors);
 }
 
 
