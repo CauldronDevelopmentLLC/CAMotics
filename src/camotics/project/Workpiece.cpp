@@ -63,10 +63,11 @@ void Workpiece::update(GCode::ToolPath &path) {
 
   if (bounds == Rectangle3D()) return;
 
-  // Start from z = 0
+  // Compute auto workpiece bounds
   Vector3D bMin = bounds.getMin();
   Vector3D bMax = bounds.getMax();
-  bounds = Rectangle3D(bMin, Vector3D(bMax.x(), bMax.y(), 0));
+  double zMax = 0 <= bMin.z() ? bMax.z() : 0;
+  bounds = Rectangle3D(bMin, Vector3D(bMax.x(), bMax.y(), zMax));
 
   // At least 2mm thick
   if (bounds.getHeight() < 2)
