@@ -995,7 +995,7 @@ double LinePlanner::peakAccelFromLength(double Vi, double jerk,
   //   q = p^3 + (b * c - 3 * a * d) / (6 * a^2)
   //   r = c / (3 *a)
   //
-  // The standard cubic polynomal looks like this:
+  // The standard cubic polynomial looks like this:
   //
   //   a * x^3 + b * x^2 + c * x + d = 0
   //
@@ -1017,7 +1017,7 @@ double LinePlanner::peakAccelFromLength(double Vi, double jerk,
   //   r = 2/3 * Vi * Jm
   //
   //--------------------------------------------------------------------------
-  // Since negative velocity is impossible, we never want a decceleration
+  // Since negative velocity is impossible, we never want a deceleration
   // that would lead to a negative ending velocity.  When the target velocity
   // Vt is zero we have:
   //
@@ -1184,7 +1184,7 @@ double LinePlanner::planVelocityTransition(double Vi, double Vt,
 
   } else times[1] = 0;
 
-  // Decceleration segment
+  // Deceleration segment
   times[2] = times[0];
   length += SCurve::distance(times[0], vel, peakAccel, -maxJerk);
 
