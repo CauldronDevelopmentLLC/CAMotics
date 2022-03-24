@@ -44,15 +44,17 @@ void Reader::read(const InputSource &source) {
 void Reader::addEntity(const SmartPointer<Entity> &entity) {
   if (inBlock) return; // TODO handle blocks
 
-  layers_t::iterator it = layers.find(attributes.getLayer());
+  auto layer = attributes.getLayer();
+  layers_t::iterator it = layers.find(layer);
   if (it == layers.end())
-    THROW("DXF Undefined layer '" << attributes.getLayer() << "'");
+    it = layers.insert(layers_t::value_type(layer, layer_t())).first;
 
   it->second.push_back(entity);
 }
 
 
 void Reader::addLayer(const DL_LayerData &data) {
+  LOG_DEBUG(3, "Adding DXF layer " << data.name);
   layers[data.name] = layer_t();
 }
 
