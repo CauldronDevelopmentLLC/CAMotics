@@ -359,7 +359,19 @@ module.exports = extend({
   },
 
 
-  line_cut: function(l) {cut(l.end.x, l.end.y);},
+  point_cut: function(p, zCut) {
+    var v = first(this.element_vertices(p));
+    cut({z: zCut});
+    cut(v.x, v.y);
+  },
+
+
+  line_cut: function(l, zCut) {
+    var v = first(this.element_vertices(l));
+    cut({z: zCut});
+    cut(v.x, v.y);
+    cut(l.end.x, l.end.y);
+  },
 
 
   arc_angle: function(a) {
@@ -371,7 +383,11 @@ module.exports = extend({
   },
 
 
-  arc_cut: function(a) {
+  arc_cut: function(a, zCut) {
+    var v = first(this.element_vertices(a));
+    cut({z: zCut});
+    cut(v.x, v.y);
+
     var p = position();
 
     var offset = {
@@ -383,7 +399,11 @@ module.exports = extend({
   },
 
 
-  polyline_cut: function(pl) {
+  polyline_cut: function(pl, zCut) {
+    var v = first(this.element_vertices(pl));
+    cut({z: zCut});
+    cut(v.x, v.y);
+
     for (var i = 1; i < pl.vertices.length; i++)
       cut(pl.vertices[i].x, pl.vertices[i].y);
 
@@ -391,41 +411,92 @@ module.exports = extend({
   },
 
 
-  spline_cut: function(s, res) {
+  spline_cut: function(s, zSafe, zCut, res) {
     if (typeof res == 'undefined') res = units() == METRIC ? 1 : 1 / 25.4;
 
     if (s.degree == 2) {
-      var steps = Math.ceil(quad_bezier_length(s.ctrlPts) / res);
-      var delta = 1 / steps;
+      rapid({z: zSafe});
+      // Move to the beginning of the spline and start cutting
+      var segment_start = [];
+      segment_start.push(s.ctrlPts[(s.ctrlPts.length-1)%s.ctrlPts.length]);
+      segment_start.push(s.ctrlPts[(s.ctrlPts.length+0)%s.ctrlPts.length]);
+      segment_start.push(s.ctrlPts[(s.ctrlPts.length+1)%s.ctrlPts.length]);
+      v = quad_bezier(segment_start, 0.0);
+      rapid (v.x/2.0+segment_start[1].x/2.0, v.y/2.0+segment_start[1].y/2.0);
+      cut({z: zCut});
 
-      for (var i = 0; i < steps; i++) {
-        v = quad_bezier(s.ctrlPts, delta * (i + 1));
-        cut(v.x, v.y);
+      for(var seg=0; seg<s.ctrlPts.length; seg++)
+      {
+        var segment = [];
+        segment.push(s.ctrlPts[(s.ctrlPts.length+seg-1)%s.ctrlPts.length]);
+        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+0)%s.ctrlPts.length]);
+        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+1)%s.ctrlPts.length]);
+
+        var steps = Math.ceil(quad_bezier_length(segment) / res);
+        var delta = 1.0 / steps;
+
+        // Cut the spline segment at delta increments
+        var t = delta;
+        while(t<1.0) {
+          v = quad_bezier(segment, t);
+          cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
+          t += delta;
+        }
+
+        // Make sure to cut until t=1.0
+        v = quad_bezier(segment, 1.0);
+        cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
       }
-
-
     } else if (s.degree == 3) {
-      var steps = Math.ceil(cubic_bezier_length(s.ctrlPts) / res);
-      var delta = 1 / steps;
+      rapid({z: zSafe});
+      // Move to the beginning of the spline and start cutting
+      var segment_start = [];
+      segment_start.push(s.ctrlPts[(s.ctrlPts.length-1)%s.ctrlPts.length]);
+      segment_start.push(s.ctrlPts[(s.ctrlPts.length+0)%s.ctrlPts.length]);
+      segment_start.push(s.ctrlPts[(s.ctrlPts.length+1)%s.ctrlPts.length]);
+      segment_start.push(s.ctrlPts[(s.ctrlPts.length+2)%s.ctrlPts.length]);
+      v = cubic_bezier(segment_start, 0.0);
+      rapid (v.x/2.0+segment_start[1].x/2.0, v.y/2.0+segment_start[1].y/2.0);
+      cut({z: zCut});
 
-      for (var i = 0; i < steps; i++) {
-        var v = cubic_bezier(s.ctrlPts, delta * (i + 1));
-        cut(v.x, v.y);
+      for(var seg=0; seg<s.ctrlPts.length; seg++)
+      {
+        var segment = [];
+        segment.push(s.ctrlPts[(s.ctrlPts.length+seg-1)%s.ctrlPts.length]);
+        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+0)%s.ctrlPts.length]);
+        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+1)%s.ctrlPts.length]);
+        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+2)%s.ctrlPts.length]);
+
+        var steps = Math.ceil(cubic_bezier_length(segment) / res);
+        var delta = 1.0 / steps;
+
+        // Cut the spline segment at delta increments
+        var t = delta;
+        while(t<1.0) {
+          v = cubic_bezier(segment, t);
+          cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
+          t += delta;
+        }
+
+        // Make sure to cut until t=1.0
+        v = cubic_bezier(segment, 1.0);
+        cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
       }
-
-    } else
-      for (var i = 1; i < s.ctrlPts.length; i++)
+    } else {
+      cut({z: zCut});
+      for (var i = 0; i < s.ctrlPts.length; i++)
         cut(s.ctrlPts[i].x, s.ctrlPts[i].y);
+    }
   },
 
 
-  element_cut: function(e, res) {
+  element_cut: function(e, zSafe, zCut, res) {
     switch (e.type) {
-    case _dxf.POINT:    return;
-    case _dxf.LINE:     return this.line_cut(e);
-    case _dxf.ARC:      return this.arc_cut(e);
-    case _dxf.POLYLINE: return this.polyline_cut(e);
-    case _dxf.SPLINE:   return this.spline_cut(e, res);
+    case _dxf.POINT:    return this.point_cut(e, zCut);
+    case _dxf.LINE:     return this.line_cut(e, zCut);
+    case _dxf.ARC:      return this.arc_cut(e, zCut);
+    case _dxf.POLYLINE: return this.polyline_cut(e, zCut);
+    case _dxf.SPLINE:   return this.spline_cut(e, zSafe, zCut, res);
     default: throw 'Unsupported DXF element type ' + e.type;
     }
   },
@@ -450,10 +521,7 @@ module.exports = extend({
         rapid(v.x, v.y);
       }
 
-      cut({z: zCut});
-      cut(v.x, v.y);
-
-      this.element_cut(e, res);
+      this.element_cut(e, zSafe, zCut, res);
 
       layer.splice(match.i, 1);
     }
