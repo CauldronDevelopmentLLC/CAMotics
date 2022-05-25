@@ -411,11 +411,10 @@ module.exports = extend({
   },
 
 
-  spline_cut: function(s, zSafe, zCut, res) {
+  spline_cut: function(s, zCut, res) {
     if (typeof res == 'undefined') res = units() == METRIC ? 1 : 1 / 25.4;
 
     if (s.degree == 2) {
-      rapid({z: zSafe});
       // Move to the beginning of the spline and start cutting
       var segment_start = [];
       segment_start.push(s.ctrlPts[(s.ctrlPts.length-1)%s.ctrlPts.length]);
@@ -448,7 +447,6 @@ module.exports = extend({
         cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
       }
     } else if (s.degree == 3) {
-      rapid({z: zSafe});
       // Move to the beginning of the spline and start cutting
       var segment_start = [];
       segment_start.push(s.ctrlPts[(s.ctrlPts.length-1)%s.ctrlPts.length]);
@@ -490,13 +488,13 @@ module.exports = extend({
   },
 
 
-  element_cut: function(e, zSafe, zCut, res) {
+  element_cut: function(e, zCut, res) {
     switch (e.type) {
     case _dxf.POINT:    return this.point_cut(e, zCut);
     case _dxf.LINE:     return this.line_cut(e, zCut);
     case _dxf.ARC:      return this.arc_cut(e, zCut);
     case _dxf.POLYLINE: return this.polyline_cut(e, zCut);
-    case _dxf.SPLINE:   return this.spline_cut(e, zSafe, zCut, res);
+    case _dxf.SPLINE:   return this.spline_cut(e, zCut, res);
     default: throw 'Unsupported DXF element type ' + e.type;
     }
   },
@@ -521,7 +519,7 @@ module.exports = extend({
         rapid(v.x, v.y);
       }
 
-      this.element_cut(e, zSafe, zCut, res);
+      this.element_cut(e, zCut, res);
 
       layer.splice(match.i, 1);
     }
