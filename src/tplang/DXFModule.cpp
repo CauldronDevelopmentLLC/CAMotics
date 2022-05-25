@@ -130,6 +130,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         const DXF::Spline &spline = dynamic_cast<const DXF::Spline &>(entity);
 
         sink.insert("degree", spline.getDegree());
+        sink.insert("flags", spline.getFlags());
 
         // Control points
         const vector<Vector3D> &ctrlPts = spline.getControlPoints();

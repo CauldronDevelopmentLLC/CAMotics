@@ -28,13 +28,22 @@
 namespace DXF {
   class Spline : public Entity {
     unsigned degree;
+    /* Spline flag (bit coded):
+     * 1 = Closed spline
+     * 2 = Periodic spline
+     * 4 = Rational spline
+     * 8 = Planar
+     * 16 = Linear (planar bit is also set)
+     */
+    unsigned flags;
     std::vector<cb::Vector3D> ctrlPts;
     std::vector<double> knots;
 
   public:
-    Spline(unsigned degree) : degree(degree) {}
+    Spline(unsigned degree, unsigned flags) : degree(degree), flags(flags) {}
 
     unsigned getDegree() const {return degree;}
+    unsigned getFlags() const {return flags;}
     const std::vector<cb::Vector3D> &getControlPoints() const {return ctrlPts;}
     const std::vector<double> &getKnots() const {return knots;}
 

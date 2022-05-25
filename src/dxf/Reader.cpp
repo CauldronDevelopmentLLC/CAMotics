@@ -97,7 +97,7 @@ void Reader::addVertex(const DL_VertexData &vertex) {
 
 void Reader::addSpline(const DL_SplineData &spline) {
   if (!entity.isNull()) THROW("DXF Already in DXF entity");
-  addEntity(entity = new Spline(spline.degree));
+  addEntity(entity = new Spline(spline.degree, spline.flags));
 }
 
 
