@@ -283,7 +283,7 @@ for target in docs + ['examples', 'machines']:
 env.Install(prefix + '/share/camotics/', 'tpl_lib')
 env.Install(prefix + '/share/pixmaps', 'images/camotics.png')
 env.Install(prefix + '/share/applications', 'CAMotics.desktop')
-env.Install(prefix + '/share/mime/packages/camotics.xml', 'mime.xml')
+env.InstallAs(prefix + '/share/mime/packages/camotics.xml', 'mime.xml')
 
 description = '''CAMotics is an Open-Source software which can simulate
 3-axis NC machining. It is a fast, flexible and user friendly simulation
