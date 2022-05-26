@@ -149,46 +149,93 @@ function bounds_center(bounds) {
 }
 
 
-function quad_bezier(p, t) {
-  var c = [sqr(1 - t), 2 * (1 - t) * t, sqr(t)];
+function nurbs_interpolate(t, spl) {
+  var degree = spl.degree;
+  var points = spl.ctrlPts;
+  var knots = spl.knots;
+  var weights = []; /* spl.weights; */ for(i=0; i<points.length; i++) { weights.push(1.0); } /* TODO */
+  /* TODO: handle open/closed nurbs */
+
+  var i,j,s,l;              // function-scoped iteration variables
+  var n = points.length;    // points count
+  var dimensionality = 2;   // only x and y coordinates
+
+  if(degree < 1) throw new Error('degree must be at least 1 (linear)');
+  if(degree > (n-1)) throw new Error('degree must be less than or equal to point count - 1');
+
+  if(!weights) {
+    // build weight vector of length [n]
+    weights = [];
+    for(i=0; i<n; i++) {
+      weights[i] = 1;
+    }
+  }
+
+  if(!knots) {
+    // build knot vector of length [n + degree + 1]
+    var knots = [];
+    for(i=0; i<n+degree+1; i++) {
+      knots.push(i);
+    }
+  } else {
+    if(knots.length !== n+degree+1) throw new Error('bad knot vector length');
+  }
+
+  var domain = [
+    degree,
+    knots.length-1 - degree
+  ];
+
+  // remap t to the domain where the spline is defined
+  var low  = knots[domain[0]];
+  var high = knots[domain[1]];
+  t = t * (high - low) + low;
+
+  if(t < low || t > high) throw new Error('out of bounds');
+
+  // find s (the spline segment) for the [t] value provided
+  for(s=domain[0]; s<domain[1]; s++) {
+    if(t >= knots[s] && t <= knots[s+1]) {
+      break;
+    }
+  }
+
+  // convert points to homogeneous coordinates
+  var v = [];
+  for(i=0; i<n; i++) {
+    v[i] = [];
+    v[i][0] = points[i].x * weights[i];
+    v[i][1] = points[i].y * weights[i];
+    v[i][dimensionality] = weights[i];
+  }
+
+  // l (level) goes from 1 to the curve degree + 1
+  var alpha;
+  for(l=1; l<=degree+1; l++) {
+    // build level l of the pyramid
+    for(i=s; i>s-degree-1+l; i--) {
+      alpha = (t - knots[i]) / (knots[i+degree+1-l] - knots[i]);
+
+      // interpolate each component
+      for(j=0; j<dimensionality+1; j++) {
+        v[i][j] = (1 - alpha) * v[i-1][j] + alpha * v[i][j];
+      }
+    }
+  }
 
   return {
-    x: c[0] * p[0].x + c[1] * p[1].x + c[2] * p[2].x,
-    y: c[0] * p[0].y + c[1] * p[1].y + c[2] * p[2].y
-  }
+    x: v[s][0] / v[s][dimensionality],
+    y: v[s][1] / v[s][dimensionality]
+  } 
 }
 
 
-function quad_bezier_length(p) {
+function nurbs_length(spl) {
   var l = 0;
-  var v = p[0];
+  var v = nurbs_interpolate(0.0, spl);
 
   for (var i = 1; i <= 100; i++) {
-    var u = quad_bezier(p, 0.01 * i);
-    l += distance2D(v, u);
-    v = u;
-  }
-
-  return l;
-}
-
-
-function cubic_bezier(p, t) {
-  var c = [cube(1 - t), 3 * sqr(1 - t) * t, 3 * (1 - t) * sqr(t), cube(t)];
-
-  return {
-    x: c[0] * p[0].x + c[1] * p[1].x + c[2] * p[2].x + c[3] * p[3].x,
-    y: c[0] * p[0].y + c[1] * p[1].y + c[2] * p[2].y + c[3] * p[3].y
-  }
-}
-
-
-function cubic_bezier_length(p) {
-  var l = 0;
-  var v = p[0];
-
-  for (var i = 1; i <= 100; i++) {
-    var u = cubic_bezier(p, 0.01 * i);
+    var u = nurbs_interpolate(0.0*i, spl);
     l += distance2D(v, u);
     v = u;
   }
@@ -414,77 +461,27 @@ module.exports = extend({
   spline_cut: function(s, zCut, res) {
     if (typeof res == 'undefined') res = units() == METRIC ? 1 : 1 / 25.4;
 
-    if (s.degree == 2) {
-      // Move to the beginning of the spline and start cutting
-      var segment_start = [];
-      segment_start.push(s.ctrlPts[(s.ctrlPts.length-1)%s.ctrlPts.length]);
-      segment_start.push(s.ctrlPts[(s.ctrlPts.length+0)%s.ctrlPts.length]);
-      segment_start.push(s.ctrlPts[(s.ctrlPts.length+1)%s.ctrlPts.length]);
-      v = quad_bezier(segment_start, 0.0);
-      rapid (v.x/2.0+segment_start[1].x/2.0, v.y/2.0+segment_start[1].y/2.0);
-      cut({z: zCut});
+    var steps = Math.ceil(nurbs_length(s) / res);
+    //var delta = 1.0 / steps;
+    var delta = 0.01;
 
-      for(var seg=0; seg<s.ctrlPts.length; seg++)
-      {
-        var segment = [];
-        segment.push(s.ctrlPts[(s.ctrlPts.length+seg-1)%s.ctrlPts.length]);
-        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+0)%s.ctrlPts.length]);
-        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+1)%s.ctrlPts.length]);
+    // Move to the exact beginning of the spline and start cutting
+    var v = nurbs_interpolate(0.0, s);
+    rapid (v.x, v.y);
+    cut({z: zCut});
 
-        var steps = Math.ceil(quad_bezier_length(segment) / res);
-        var delta = 1.0 / steps;
+    var t = delta;
 
-        // Cut the spline segment at delta increments
-        var t = delta;
-        while(t<1.0) {
-          v = quad_bezier(segment, t);
-          cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
-          t += delta;
-        }
-
-        // Make sure to cut until t=1.0
-        v = quad_bezier(segment, 1.0);
-        cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
-      }
-    } else if (s.degree == 3) {
-      // Move to the beginning of the spline and start cutting
-      var segment_start = [];
-      segment_start.push(s.ctrlPts[(s.ctrlPts.length-1)%s.ctrlPts.length]);
-      segment_start.push(s.ctrlPts[(s.ctrlPts.length+0)%s.ctrlPts.length]);
-      segment_start.push(s.ctrlPts[(s.ctrlPts.length+1)%s.ctrlPts.length]);
-      segment_start.push(s.ctrlPts[(s.ctrlPts.length+2)%s.ctrlPts.length]);
-      v = cubic_bezier(segment_start, 0.0);
-      rapid (v.x/2.0+segment_start[1].x/2.0, v.y/2.0+segment_start[1].y/2.0);
-      cut({z: zCut});
-
-      for(var seg=0; seg<s.ctrlPts.length; seg++)
-      {
-        var segment = [];
-        segment.push(s.ctrlPts[(s.ctrlPts.length+seg-1)%s.ctrlPts.length]);
-        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+0)%s.ctrlPts.length]);
-        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+1)%s.ctrlPts.length]);
-        segment.push(s.ctrlPts[(s.ctrlPts.length+seg+2)%s.ctrlPts.length]);
-
-        var steps = Math.ceil(cubic_bezier_length(segment) / res);
-        var delta = 1.0 / steps;
-
-        // Cut the spline segment at delta increments
-        var t = delta;
-        while(t<1.0) {
-          v = cubic_bezier(segment, t);
-          cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
-          t += delta;
-        }
-
-        // Make sure to cut until t=1.0
-        v = cubic_bezier(segment, 1.0);
-        cut(v.x/2.0+segment[1].x/2.0, v.y/2.0+segment[1].y/2.0);
-      }
-    } else {
-      cut({z: zCut});
-      for (var i = 0; i < s.ctrlPts.length; i++)
-        cut(s.ctrlPts[i].x, s.ctrlPts[i].y);
+    // Cut the spline segment at delta increments
+    while(t<1.0) {
+      v = nurbs_interpolate(t, s);
+      cut(v.x, v.y);
+      t += delta;
     }
+
+    // Make sure to cut until exactly t=1.0
+    v = nurbs_interpolate(1.0, s);
+    cut(v.x, v.y);
   },
 
 
