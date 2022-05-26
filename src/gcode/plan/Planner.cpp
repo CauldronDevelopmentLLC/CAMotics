@@ -69,8 +69,13 @@ bool Planner::isRunning() const {return !runners.empty() || !planner.isEmpty();}
 
 void Planner::load(const InputSource &source, const PlannerConfig &config,
                    bool tpl) {
-  if (tpl) runners.push_back(new TPLRunner(pipeline, source, config));
-  else runners.push_back(new GCodeRunner(controller, source, config));
+  if (tpl) {
+#if !defined(CAMOTICS_NO_TPL) && (defined(HAVE_V8) || defined(HAVE_CHAKRA))
+    runners.push_back(new TPLRunner(pipeline, source, config));
+#else
+    THROW("TPL not supported in this build");
+#endif
+  } else runners.push_back(new GCodeRunner(controller, source, config));
 }
 
 

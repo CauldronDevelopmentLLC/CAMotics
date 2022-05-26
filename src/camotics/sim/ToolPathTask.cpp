@@ -94,7 +94,7 @@ ToolPathTask::~ToolPathTask() {interrupt();}
 
 
 void ToolPathTask::runTPL(const InputSource &src) {
-#if defined(HAVE_V8) || defined(HAVE_CHAKRA)
+#if !defined(CAMOTICS_NO_TPL) && (defined(HAVE_V8) || defined(HAVE_CHAKRA))
   Task::begin("Running TPL");
 
   tplCtx =

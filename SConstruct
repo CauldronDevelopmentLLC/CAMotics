@@ -85,6 +85,7 @@ if not env.GetOption('clean'):
             raise Exception(
                 'Chakra or V8 support is required, please rebuild C! You may '
                 'need to set CHAKRA_CORE_HOME or V8_HOME.')
+    else: env.CBDefine('CAMOTICS_NO_TPL')
 
     if env['with_gui']:
         # Qt
