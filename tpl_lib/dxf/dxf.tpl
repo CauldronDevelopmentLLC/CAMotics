@@ -148,10 +148,10 @@ function bounds_center(bounds) {
   }
 }
 
-function get_knot_value(knots, i, is_closed) {
+function get_knot_value(knots, i, is_periodic) {
   var klen = knots.length;
 
-  if(is_closed) {
+  if(is_periodic) {
     if(i>=klen) {
       return knots[klen-1]+( knots[(klen+i+1-klen)%klen]-knots[0] )
     } else if (i<0) {
@@ -163,22 +163,30 @@ function get_knot_value(knots, i, is_closed) {
 
 }
 
-function get_segment_index(knots, t, degree) {
+function get_segment_index(knots, t, degree, is_closed) {
   // find the spline segment for the t value provided
-  for(var segment = degree; segment<knots.length; segment++) {
-    if(t >= knots[segment] && t <= knots[segment+1]) {
-      return segment;
+
+  /* TODO: can this be unified? */
+  if(is_closed) {
+    for(var segment = 0; segment<knots.length; segment++) {
+      if(knots[segment]>t) return segment-1;
+    }
+  } else {
+    for(var segment = degree; segment<knots.length; segment++) {
+      if(t >= knots[segment] && t <= knots[segment+1]) {
+        return segment;
+      }
     }
   }
-  return -1;;
+
+  throw new Error('segment not found');
 }
 
 function nurbs_interpolate(t, spl) {
   var degree = spl.degree;
-  var knots = spl.knots;
 
   /* TODO: handle flags */
-  var is_closed = false;
+  var is_closed = true;
   var is_periodic = false;
   var is_rational = false; /* TODO: pass weights from C++ when is_rational is true */
   var is_planar = false;
@@ -189,15 +197,49 @@ function nurbs_interpolate(t, spl) {
   if(degree < 1) throw new Error('degree must be at least 1 (linear)');
   if(degree > (npts-1)) throw new Error('degree must be less than or equal to point count - 1');
 
-  if(!knots) {
-    // build knot vector of length [npts + degree + 1]
-    var knots = [];
-    for(var i=0; i<npts+degree+1; i++) {
-      knots.push(i);
+  // convert spl.ctrlPts to homogeneous coordinates
+  var v = [];
+  if(is_closed) {
+    for(var i=0; i<npts+degree*2; i++) {
+      v[i] = [];
+      var j = (npts + i - degree) % npts;
+      v[i][2] = is_rational ? spl.ctrlPts[j].w : 1.0;
+      v[i][0] = spl.ctrlPts[j].x * v[i][2];
+      v[i][1] = spl.ctrlPts[j].y * v[i][2];
     }
+    npts = npts+degree*2;
   } else {
-    if(knots.length !== npts+degree+1) {
-      throw new Error('bad knot vector length');
+    for(var i=0; i<npts; i++) {
+      v[i] = [];
+      v[i][2] = is_rational ? spl.ctrlPts[i].w : 1.0;
+      v[i][0] = spl.ctrlPts[i].x * v[i][2];
+      v[i][1] = spl.ctrlPts[i].y * v[i][2];
+    }
+  }
+
+  var knots = [];
+  if(is_closed) {
+      /* TODO: is it right to rewrite the knots values? */
+      var delta = 1.0/(npts+degree+1);
+      var knot = 0.0;
+      for(var i=0; i<npts+degree; i++) {
+        knots.push(knot);
+        knot+=delta;
+      }
+      knots.push(1.0);
+  } else {
+    if(!knots) {
+      // build knot vector of length [npts + degree + 1]
+      for(var i=0; i<npts+degree+1; i++) {
+        knots.push(i);
+      }
+    } else {
+      for(var i=0; i<spl.knots.length; i++) {
+        knots.push(spl.knots[i]);
+      }
+      if(knots.length !== npts+degree+1) {
+        throw new Error('bad knot vector length');
+      }
     }
   }
 
@@ -205,20 +247,19 @@ function nurbs_interpolate(t, spl) {
     throw new Error('t out of bounds');
   }
 
-  var segment = get_segment_index(knots, t, degree);
-
-  // convert spl.ctrlPts to homogeneous coordinates
-  var v = [];
-  for(var i=0; i<npts; i++) {
-    v[i] = [];
-    v[i][2] = is_rational ? spl.ctrlPts[i].w : 1.0;
-    v[i][0] = spl.ctrlPts[i].x * v[i][2];
-    v[i][1] = spl.ctrlPts[i].y * v[i][2];
+  if(is_closed) {
+    min = knots[degree+1];
+    max = knots[knots.length-degree-1];
+    t = min + (max-min) * t;
+  } else {
+    min = knots[degree];
+    max = knots[knots.length-degree];
+    t = min + (max-min) * t;
   }
 
-  /* TODO: the derivative of the nurbs does not look continue when is_close is true */
-  var level = is_closed ? 0 : 1;
-  for(; level<=degree+1; level++) {
+  var segment = get_segment_index(knots, t, degree, is_closed);
+
+  for(var level=1; level<=degree+1; level++) {
     // build level of the pyramid
     for(var i=segment; i>segment-degree-1+level; i--) {
       var vai_1 = get_knot_value(knots, i, is_periodic);
@@ -228,14 +269,14 @@ function nurbs_interpolate(t, spl) {
       // interpolate each component
       var components = 3; // x, y, w
       for(var j=0; j<components; j++) {
-        v[(npts+i)%npts][j] = (1 - alpha) * v[(npts+i-1)%npts][j] + alpha * v[(npts+i)%npts][j];
+        v[(npts+i)%npts][j] = (1 - alpha) * v[(i-1+npts)%npts][j] + alpha * v[(npts+i)%npts][j];
       }
     }
   }
 
   return {
-    x: v[segment][0] / v[segment][2],
-    y: v[segment][1] / v[segment][2]
+    x: v[segment%npts][0] / v[segment%npts][2],
+    y: v[segment%npts][1] / v[segment%npts][2]
   } 
 }
 
