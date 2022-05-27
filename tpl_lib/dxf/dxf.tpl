@@ -248,12 +248,12 @@ function nurbs_interpolate(t, spl) {
   }
 
   if(is_closed) {
-    min = knots[degree+1];
-    max = knots[knots.length-degree-1];
+    var min = knots[degree+1];
+    var max = knots[knots.length-degree-1];
     t = min + (max-min) * t;
   } else {
-    min = knots[degree];
-    max = knots[knots.length-degree];
+    var min = knots[degree];
+    var max = knots[knots.length-degree];
     t = min + (max-min) * t;
   }
 
