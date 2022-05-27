@@ -130,10 +130,15 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         const DXF::Spline &spline = dynamic_cast<const DXF::Spline &>(entity);
 
         sink.insert("degree", spline.getDegree());
-        sink.insert("flags", spline.getFlags());
+        sink.insert("isClosed",     (spline.getFlags()&(1<<0))!=0 );
+        sink.insert("isPeriodical", (spline.getFlags()&(1<<1))!=0 );
+        sink.insert("isRational",   (spline.getFlags()&(1<<2))!=0 );
+        sink.insert("isPlanar",     (spline.getFlags()&(1<<3))!=0 );
+        sink.insert("isLinear",     (spline.getFlags()&(1<<4))!=0 );
 
         // Control points
         const vector<Vector3D> &ctrlPts = spline.getControlPoints();
+        const std::vector<double> &weights = spline.getWeights();
         sink.insertList("ctrlPts");
 
         for (unsigned k = 0; k < ctrlPts.size(); k++) {
@@ -141,6 +146,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
           sink.insert("x", ctrlPts[k].x());
           sink.insert("y", ctrlPts[k].y());
           sink.insert("z", ctrlPts[k].z());
+          sink.insert("w", weights[k]);
           sink.insert("type", DXF::Entity::DXF_POINT);
           sink.endDict();
         }

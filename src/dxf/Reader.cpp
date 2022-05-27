@@ -102,7 +102,7 @@ void Reader::addSpline(const DL_SplineData &spline) {
 
 
 void Reader::addControlPoint(const DL_ControlPointData &ctrlPt) {
-  entity->addVertex(cb::Vector3D(ctrlPt.x, ctrlPt.y, ctrlPt.z));
+  entity->addVertex(cb::Vector3D(ctrlPt.x, ctrlPt.y, ctrlPt.z), ctrlPt.w);
 }
 
 

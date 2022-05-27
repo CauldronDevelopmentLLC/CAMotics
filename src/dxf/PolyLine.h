@@ -36,7 +36,7 @@ namespace DXF {
     const std::vector<cb::Vector3D> &getVertices() const {return vertices;}
 
     // From Entity
-    void addVertex(const cb::Vector3D &v) {vertices.push_back(v);}
+    void addVertex(const cb::Vector3D &v, double weight = 0.0) {vertices.push_back(v);}
     type_t getType() const {return DXF_POLYLINE;}
   };
 }

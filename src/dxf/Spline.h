@@ -37,6 +37,7 @@ namespace DXF {
      */
     unsigned flags;
     std::vector<cb::Vector3D> ctrlPts;
+    std::vector<double> weights;
     std::vector<double> knots;
 
   public:
@@ -45,11 +46,12 @@ namespace DXF {
     unsigned getDegree() const {return degree;}
     unsigned getFlags() const {return flags;}
     const std::vector<cb::Vector3D> &getControlPoints() const {return ctrlPts;}
+    const std::vector<double> &getWeights() const {return weights;}
     const std::vector<double> &getKnots() const {return knots;}
 
     // From Entity
     void addKnot(double k) {knots.push_back(k);}
-    void addVertex(const cb::Vector3D &v) {ctrlPts.push_back(v);}
+    void addVertex(const cb::Vector3D &v, double weight = 1.0) {ctrlPts.push_back(v); weights.push_back(weight);}
     type_t getType() const {return DXF_SPLINE;}
   };
 }
