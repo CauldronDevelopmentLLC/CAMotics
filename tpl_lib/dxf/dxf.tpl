@@ -148,10 +148,6 @@ function bounds_center(bounds) {
   }
 }
 
-function get_knot_value(knots, i) {
-  var klen = knots.length;
-	return knots[(klen+i)%klen]
-}
 
 function get_segment_index(knots, t, degree, is_closed) {
   // find the spline segment for the t value provided
@@ -172,13 +168,9 @@ function get_segment_index(knots, t, degree, is_closed) {
   throw new Error('segment not found');
 }
 
+
 function nurbs_build_verts(spl) {
   var degree = spl.degree;
-
-  if(!spl.isPlanar) {
-    throw new Error('Spline is not planar');
-  }
-
   var npts = spl.ctrlPts.length;
 
   if(degree < 1) throw new Error('degree must be at least 1 (linear)');
@@ -190,22 +182,25 @@ function nurbs_build_verts(spl) {
     for(var i=0; i<npts+degree*2; i++) {
       verts[i] = [];
       var j = (npts + i - degree) % npts;
-      verts[i][2] = spl.isRational ? spl.ctrlPts[j].w : 1.0;
-      verts[i][0] = spl.ctrlPts[j].x * verts[i][2];
-      verts[i][1] = spl.ctrlPts[j].y * verts[i][2];
+      verts[i][3] = spl.isRational ? spl.ctrlPts[j].w : 1.0;
+      verts[i][0] = spl.ctrlPts[j].x * verts[i][3];
+      verts[i][1] = spl.ctrlPts[j].y * verts[i][3];
+      verts[i][2] = spl.ctrlPts[j].z * verts[i][3];
     }
     npts = npts+degree*2;
   } else {
     for(var i=0; i<npts; i++) {
       verts[i] = [];
-      verts[i][2] = spl.isRational ? spl.ctrlPts[i].w : 1.0;
-      verts[i][0] = spl.ctrlPts[i].x * verts[i][2];
-      verts[i][1] = spl.ctrlPts[i].y * verts[i][2];
+      verts[i][3] = spl.isRational ? spl.ctrlPts[i].w : 1.0;
+      verts[i][0] = spl.ctrlPts[i].x * verts[i][3];
+      verts[i][1] = spl.ctrlPts[i].y * verts[i][3];
+      verts[i][2] = spl.ctrlPts[i].z * verts[i][3];
     }
   }
 
   return verts;
 }
+
 
 function nurbs_build_knots(spl) {
   var degree = spl.degree;
@@ -240,6 +235,7 @@ function nurbs_build_knots(spl) {
   return knots;
 }
 
+
 function nurbs_interpolate(t, spl, vertices, knots) {
 
   var degree = spl.degree;
@@ -264,25 +260,27 @@ function nurbs_interpolate(t, spl, vertices, knots) {
 
   var segment = get_segment_index(knots, t, degree, spl.isClosed);
 
-  /* Deep copy verts since we need to modify it */
-  /* TODO: only copy enough for the for loop below */
+	/* Only deep copy the vertices that we are going to modify */
   var verts = [];
-  for(var i=0; i<npts; i++) {
-    verts[i] = [];
-    verts[i][2] = vertices[i][2];
-    verts[i][0] = vertices[i][0];
-    verts[i][1] = vertices[i][1];
-  }
+	for(var j=segment; j>segment-degree-1; j--) {
+		var i = (npts+j)%npts;
+		verts[i] = [];
+		verts[i][0] = vertices[i][0];
+		verts[i][1] = vertices[i][1];
+		verts[i][2] = vertices[i][2];
+		verts[i][3] = vertices[i][3];
+	}
 
   for(var level=1; level<=degree+1; level++) {
     // build level of the pyramid
     for(var i=segment; i>segment-degree-1+level; i--) {
-      var vai_1 = get_knot_value(knots, i);
-      var vaip_r = get_knot_value(knots, i+degree+1-level);
+			var klen = knots.length;
+      var vai_1 = knots[(i+klen)%klen];
+      var vaip_r = knots[(i+degree+1-level+klen)%klen];
       var alpha = (t - vai_1) / (vaip_r - vai_1);
 
       // interpolate each component
-      var components = 3; // x, y, w
+      var components = 4; // x, y, z, w
       for(var j=0; j<components; j++) {
         verts[(npts+i)%npts][j] = (1 - alpha) * verts[(i-1+npts)%npts][j] + alpha * verts[(npts+i)%npts][j];
       }
@@ -290,10 +288,12 @@ function nurbs_interpolate(t, spl, vertices, knots) {
   }
 
   return {
-    x: verts[segment%npts][0] / verts[segment%npts][2],
-    y: verts[segment%npts][1] / verts[segment%npts][2]
+    x: verts[segment%npts][0] / verts[segment%npts][3],
+    y: verts[segment%npts][1] / verts[segment%npts][3],
+    z: verts[segment%npts][2] / verts[segment%npts][3]
   } 
 }
+
 
 function nurbs_length(spl, verts, knots) {
   var l = 0;
@@ -537,7 +537,7 @@ module.exports = extend({
 
     var t = delta;
 
-    // Cut the spline segment at delta increments
+    // Cut the spline at delta increments
     while(t<1.0) {
       v = nurbs_interpolate(t, s, verts, knots);
       cut(v.x, v.y);
