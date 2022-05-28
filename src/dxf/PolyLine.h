@@ -28,15 +28,27 @@
 
 namespace DXF {
   class PolyLine : public Entity {
+    /* Polyline flag (bit-coded; default = 0):
+     * 1 = This is a closed polyline (or a polygon mesh closed in the M direction)
+     * 2 = Curve-fit vertices have been added
+     * 4 = Spline-fit vertices have been added
+     * 8 = This is a 3D polyline
+     * 16 = This is a 3D polygon mesh
+     * 32 = The polygon mesh is closed in the N direction
+		 * 64 = The polyline is a polyface mesh
+		 * 128 = The linetype pattern is generated continuously around the vertices of this polyline
+		 */
+    unsigned flags;
     std::vector<cb::Vector3D> vertices;
 
   public:
-    PolyLine() {}
+    PolyLine(unsigned flags) : flags(flags) {}
 
     const std::vector<cb::Vector3D> &getVertices() const {return vertices;}
 
     // From Entity
     void addVertex(const cb::Vector3D &v, double weight = 0.0) {vertices.push_back(v);}
+    unsigned getFlags() const {return flags;}
     type_t getType() const {return DXF_POLYLINE;}
   };
 }

@@ -110,6 +110,8 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
       case DXF::Entity::DXF_POLYLINE: {
         const DXF::PolyLine &polyLine =
           dynamic_cast<const DXF::PolyLine &>(entity);
+				/* TODO: expose other flags. */
+        sink.insert("isClosed", (polyLine.getFlags()&(1<<0))!=0 );
         const vector<Vector3D> &vertices = polyLine.getVertices();
         sink.insertList("vertices");
 
