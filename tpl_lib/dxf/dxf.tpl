@@ -172,41 +172,48 @@ function get_segment_index(knots, t, degree, is_closed) {
   throw new Error('segment not found');
 }
 
-function nurbs_interpolate(t, spl) {
+function nurbs_build_verts(spl) {
   var degree = spl.degree;
 
   if(!spl.isPlanar) {
     throw new Error('Spline is not planar');
   }
 
-  var npts = spl.ctrlPts.length;    // spl.ctrlPts count
+  var npts = spl.ctrlPts.length;
 
   if(degree < 1) throw new Error('degree must be at least 1 (linear)');
   if(degree > (npts-1)) throw new Error('degree must be less than or equal to point count - 1');
 
   // convert spl.ctrlPts to homogeneous coordinates
-  var v = [];
+  var verts = [];
   if(spl.isClosed) {
     for(var i=0; i<npts+degree*2; i++) {
-      v[i] = [];
+      verts[i] = [];
       var j = (npts + i - degree) % npts;
-      v[i][2] = spl.isRational ? spl.ctrlPts[j].w : 1.0;
-      v[i][0] = spl.ctrlPts[j].x * v[i][2];
-      v[i][1] = spl.ctrlPts[j].y * v[i][2];
+      verts[i][2] = spl.isRational ? spl.ctrlPts[j].w : 1.0;
+      verts[i][0] = spl.ctrlPts[j].x * verts[i][2];
+      verts[i][1] = spl.ctrlPts[j].y * verts[i][2];
     }
     npts = npts+degree*2;
   } else {
     for(var i=0; i<npts; i++) {
-      v[i] = [];
-      v[i][2] = spl.isRational ? spl.ctrlPts[i].w : 1.0;
-      v[i][0] = spl.ctrlPts[i].x * v[i][2];
-      v[i][1] = spl.ctrlPts[i].y * v[i][2];
+      verts[i] = [];
+      verts[i][2] = spl.isRational ? spl.ctrlPts[i].w : 1.0;
+      verts[i][0] = spl.ctrlPts[i].x * verts[i][2];
+      verts[i][1] = spl.ctrlPts[i].y * verts[i][2];
     }
   }
 
+  return verts;
+}
+
+function nurbs_build_knots(spl) {
+  var degree = spl.degree;
+  var npts = spl.ctrlPts.length;
   var knots = [];
   if(spl.isClosed) {
       /* TODO: is it right to rewrite the knots values? */
+      npts = npts+degree*2;
       var delta = 1.0/(npts+degree+1);
       var knot = 0.0;
       for(var i=0; i<npts+degree; i++) {
@@ -230,6 +237,17 @@ function nurbs_interpolate(t, spl) {
     }
   }
 
+  return knots;
+}
+
+function nurbs_interpolate(t, spl, vertices, knots) {
+
+  var degree = spl.degree;
+  var npts = spl.ctrlPts.length;
+  if(spl.isClosed) {
+    npts = npts+degree*2;
+  }
+
   if(t < knots[0] || t > knots[knots.length-1]) {
     throw new Error('t out of bounds');
   }
@@ -246,6 +264,16 @@ function nurbs_interpolate(t, spl) {
 
   var segment = get_segment_index(knots, t, degree, spl.isClosed);
 
+  /* Deep copy verts since we need to modify it */
+  /* TODO: only copy enough for the for loop below */
+  var verts = [];
+  for(var i=0; i<npts; i++) {
+    verts[i] = [];
+    verts[i][2] = vertices[i][2];
+    verts[i][0] = vertices[i][0];
+    verts[i][1] = vertices[i][1];
+  }
+
   for(var level=1; level<=degree+1; level++) {
     // build level of the pyramid
     for(var i=segment; i>segment-degree-1+level; i--) {
@@ -256,28 +284,26 @@ function nurbs_interpolate(t, spl) {
       // interpolate each component
       var components = 3; // x, y, w
       for(var j=0; j<components; j++) {
-        v[(npts+i)%npts][j] = (1 - alpha) * v[(i-1+npts)%npts][j] + alpha * v[(npts+i)%npts][j];
+        verts[(npts+i)%npts][j] = (1 - alpha) * verts[(i-1+npts)%npts][j] + alpha * verts[(npts+i)%npts][j];
       }
     }
   }
 
   return {
-    x: v[segment%npts][0] / v[segment%npts][2],
-    y: v[segment%npts][1] / v[segment%npts][2]
+    x: verts[segment%npts][0] / verts[segment%npts][2],
+    y: verts[segment%npts][1] / verts[segment%npts][2]
   } 
 }
 
-
-function nurbs_length(spl) {
+function nurbs_length(spl, verts, knots) {
   var l = 0;
-  var v = nurbs_interpolate(0.0, spl);
+  var v = nurbs_interpolate(0.0, spl, verts, knots);
 
   for (var i = 1; i <= 100; i++) {
-    var u = nurbs_interpolate(0.01*i, spl);
+    var u = nurbs_interpolate(0.01*i, spl, verts, knots);
     l += distance2D(v, u);
     v = u;
   }
-
   return l;
 }
 
@@ -497,13 +523,15 @@ module.exports = extend({
 
 
   spline_cut: function(s, zCut, res) {
-    if (typeof res == 'undefined') res = units() == METRIC ? 1 : 1 / 25.4;
+    var verts = nurbs_build_verts(s);
+    var knots = nurbs_build_knots(s);
 
-    var steps = Math.ceil(nurbs_length(s) / res);
+    if (typeof res == 'undefined') res = units() == METRIC ? 1 : 1 / 25.4;
+    var steps = Math.ceil(nurbs_length(s, verts, knots) / res);
     var delta = 1.0 / steps;
 
     // Move to the exact beginning of the spline and start cutting
-    var v = nurbs_interpolate(0.0, s);
+    var v = nurbs_interpolate(0.0, s, verts, knots);
     rapid (v.x, v.y);
     cut({z: zCut});
 
@@ -511,13 +539,13 @@ module.exports = extend({
 
     // Cut the spline segment at delta increments
     while(t<1.0) {
-      v = nurbs_interpolate(t, s);
+      v = nurbs_interpolate(t, s, verts, knots);
       cut(v.x, v.y);
       t += delta;
     }
 
     // Make sure to cut until exactly t=1.0
-    v = nurbs_interpolate(1.0, s);
+    v = nurbs_interpolate(1.0, s, verts, knots);
     cut(v.x, v.y);
   },
 
