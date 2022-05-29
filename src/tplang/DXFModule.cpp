@@ -111,7 +111,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         const DXF::PolyLine &polyLine =
           dynamic_cast<const DXF::PolyLine &>(entity);
 				/* TODO: expose other flags. */
-        sink.insert("isClosed", (polyLine.getFlags()&(1<<0))!=0 );
+				sink.insertBoolean("isClosed", (polyLine.getFlags()&(1<<0))!=0 );
         const vector<Vector3D> &vertices = polyLine.getVertices();
         sink.insertList("vertices");
 
@@ -132,11 +132,11 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         const DXF::Spline &spline = dynamic_cast<const DXF::Spline &>(entity);
 
         sink.insert("degree", spline.getDegree());
-        sink.insert("isClosed",     (spline.getFlags()&(1<<0))!=0 );
-        sink.insert("isPeriodical", (spline.getFlags()&(1<<1))!=0 );
-        sink.insert("isRational",   (spline.getFlags()&(1<<2))!=0 );
-        sink.insert("isPlanar",     (spline.getFlags()&(1<<3))!=0 );
-        sink.insert("isLinear",     (spline.getFlags()&(1<<4))!=0 );
+        sink.insertBoolean("isClosed",     (spline.getFlags()&(1<<0))!=0 );
+        sink.insertBoolean("isPeriodical", (spline.getFlags()&(1<<1))!=0 );
+        sink.insertBoolean("isRational",   (spline.getFlags()&(1<<2))!=0 );
+        sink.insertBoolean("isPlanar",     (spline.getFlags()&(1<<3))!=0 );
+        sink.insertBoolean("isLinear",     (spline.getFlags()&(1<<4))!=0 );
 
         // Control points
         const vector<Vector3D> &ctrlPts = spline.getControlPoints();

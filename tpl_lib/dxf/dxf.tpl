@@ -68,7 +68,7 @@ function dtoa(n, width) {
 
 
 function str(x) {
-  return (typeof x == 'string') ? x : JSON.stringify(x);
+  return (typeof x == 'string') ? x : JSON.stringify(x, null, '  ');
 }
 
 
@@ -419,17 +419,28 @@ module.exports = extend({
   polyline_flip: function(pl) {
     return {
       type: _dxf.POLYLINE,
+      isClosed: pl.isClosed,
       vertices: [].concat(pl.vertices).reverse()
     }
   },
 
 
   spline_flip: function(s) {
+		ik = [];
+		for(var i=0; i<s.knots.length; i++) {
+			ik[i] = 1.0 - s.knots[i];
+		}
+
     return {
       type: _dxf.SPLINE,
       degree: s.degree,
+      isClosed: s.isClosed,
+      isPeriodical: s.isPeriodical,
+      isRational: s.isRational,
+      isPlanar: s.isPlanar,
+      isLinear: s.isLinear,
       ctrlPts: [].concat(s.ctrlPts).reverse(),
-      knots: s.knots
+      knots: [].concat(ik).reverse()
     }
   },
 
