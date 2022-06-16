@@ -28,27 +28,31 @@
 
 namespace DXF {
   class PolyLine : public Entity {
-    /* Polyline flag (bit-coded; default = 0):
-     * 1 = This is a closed polyline (or a polygon mesh closed in the M direction)
-     * 2 = Curve-fit vertices have been added
-     * 4 = Spline-fit vertices have been added
-     * 8 = This is a 3D polyline
-     * 16 = This is a 3D polygon mesh
-     * 32 = The polygon mesh is closed in the N direction
-		 * 64 = The polyline is a polyface mesh
-		 * 128 = The linetype pattern is generated continuously around the vertices of this polyline
-		 */
-    unsigned flags;
+    unsigned flags; ///< See flag_t
     std::vector<cb::Vector3D> vertices;
 
   public:
+    typedef enum {
+      POLYLINE_FLAG_CLOSED        = 1 << 0, // Closed polyline or M closed mesh
+      POLYLINE_FLAG_CURVE_FIT     = 1 << 1, // Curve-fit vertices added
+      POLYLINE_FLAG_SPLINE_FIT    = 1 << 2, // Spline-fit vertices added
+      POLYLINE_FLAG_3D_LINE       = 1 << 3, // 3D polyline
+      POLYLINE_FLAG_3D_MESH       = 1 << 4, // 3D polygon mesh
+      POLYLINE_FLAG_N_CLOSED_MESH = 1 << 5, // Mesh closed in N direction
+      POLYLINE_FLAG_FACE_MESH     = 1 << 6, // Polyline is a polyface mesh
+      POLYLINE_FLAG_CONTINUOUS    = 1 << 7, // Continuous linetype pattern
+    } flag_t;
+
+
     PolyLine(unsigned flags) : flags(flags) {}
 
+    unsigned getFlags() const {return flags;}
+    bool isClosed() const {return flags & POLYLINE_FLAG_CLOSED;}
     const std::vector<cb::Vector3D> &getVertices() const {return vertices;}
 
     // From Entity
-    void addVertex(const cb::Vector3D &v, double weight = 0.0) {vertices.push_back(v);}
-    unsigned getFlags() const {return flags;}
+    void addVertex(const cb::Vector3D &v, double weight = 0)
+      {vertices.push_back(v);}
     type_t getType() const {return DXF_POLYLINE;}
   };
 }

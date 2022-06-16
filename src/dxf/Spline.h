@@ -28,30 +28,37 @@
 namespace DXF {
   class Spline : public Entity {
     unsigned degree;
-    /* Spline flag (bit coded):
-     * 1 = Closed spline
-     * 2 = Periodic spline
-     * 4 = Rational spline
-     * 8 = Planar
-     * 16 = Linear (planar bit is also set)
-     */
-    unsigned flags;
+    unsigned flags; ///< See flag_t
     std::vector<cb::Vector3D> ctrlPts;
     std::vector<double> weights;
     std::vector<double> knots;
 
   public:
+    typedef enum {
+      SPLINE_FLAG_CLOSED   = 1 << 0, // Closed spline
+      SPLINE_FLAG_PERIODIC = 1 << 1, // Periodic spline
+      SPLINE_FLAG_RATIONAL = 1 << 2, // Rational spline
+      SPLINE_FLAG_PLANAR   = 1 << 3, // Planar
+      SPLINE_FLAG_LINEAR   = 1 << 4, // Linear (planar bit is also set)
+    } flag_t;
+
     Spline(unsigned degree, unsigned flags) : degree(degree), flags(flags) {}
 
     unsigned getDegree() const {return degree;}
     unsigned getFlags() const {return flags;}
+    bool isClosed()   const {return flags & SPLINE_FLAG_CLOSED;}
+    bool isPeriodic() const {return flags & SPLINE_FLAG_PERIODIC;}
+    bool isRational() const {return flags & SPLINE_FLAG_RATIONAL;}
+    bool isPlanar()   const {return flags & SPLINE_FLAG_PLANAR;}
+    bool isLinear()   const {return flags & SPLINE_FLAG_LINEAR;}
     const std::vector<cb::Vector3D> &getControlPoints() const {return ctrlPts;}
     const std::vector<double> &getWeights() const {return weights;}
     const std::vector<double> &getKnots() const {return knots;}
 
     // From Entity
     void addKnot(double k) {knots.push_back(k);}
-    void addVertex(const cb::Vector3D &v, double weight = 1.0) {ctrlPts.push_back(v); weights.push_back(weight);}
+    void addVertex(const cb::Vector3D &v, double weight = 1)
+      {ctrlPts.push_back(v); weights.push_back(weight);}
     type_t getType() const {return DXF_SPLINE;}
   };
 }
