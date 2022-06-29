@@ -52,7 +52,7 @@ namespace CAMotics {
 
 
     struct VertexSort {
-      bool operator() (const Vertex *a, const Vertex *b) {return *a < *b;}
+      bool operator() (const Vertex *a, const Vertex *b) const {return *a < *b;}
     };
 
 
