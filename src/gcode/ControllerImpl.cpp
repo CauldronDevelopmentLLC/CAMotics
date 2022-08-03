@@ -173,7 +173,12 @@ void ControllerImpl::input(unsigned index, bool digital, input_mode_t mode,
   }
 
   if (INPUT_LOW < mode) {
-    LOG_WARNING("Invalid input mode " << mode);
+    LOG_WARNING("Unsupported input mode " << mode);
+    return;
+  }
+
+  if (!digital && mode != INPUT_IMMEDIATE) {
+    LOG_WARNING("Analog input mode can only be immediate");
     return;
   }
 
