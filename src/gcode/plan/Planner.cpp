@@ -129,6 +129,7 @@ void Planner::stop() {
   planner.stop();
   runners.clear();
   controller.stop();
+  started = false;
 }
 
 

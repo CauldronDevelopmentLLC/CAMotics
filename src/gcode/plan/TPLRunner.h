@@ -24,10 +24,10 @@
 
 #include <gcode/machine/MachineAdapter.h>
 
+#include <cbang/config.h>
 #include <cbang/os/Thread.h>
 #include <cbang/os/Condition.h>
 #include <cbang/io/InputSource.h>
-
 
 namespace tplang {class TPLContext;}
 

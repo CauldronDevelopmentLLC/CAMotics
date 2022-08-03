@@ -69,7 +69,6 @@ void PlannerConfig::read(const JSON::Value &value) {
   minTravel = value.getNumber("min-travel", minTravel);
   maxArcError = value.getNumber("max-arc-error", maxArcError);
   maxLookahead = value.getNumber("max-lookahead", maxLookahead);
-  minMoveSecs = value.getNumber("min-move-seconds", minMoveSecs);
   if (value.hasString("path-mode"))
     pathMode = PathMode::parse(value.getString("path-mode"));
   maxBlendError = value.getNumber("max-blend-error", maxBlendError);
@@ -119,7 +118,6 @@ void PlannerConfig::write(JSON::Sink &sink) const {
   sink.insert("min-travel", minTravel);
   sink.insert("max-arc-error", maxArcError);
   sink.insert("max-lookahead", maxLookahead);
-  sink.insert("min-move-seconds", minMoveSecs);
   sink.insert("path-mode", PathMode(pathMode).toString());
   sink.insert("max-blend-error", maxBlendError);
   sink.insert("min-merge-error", minMergeError);

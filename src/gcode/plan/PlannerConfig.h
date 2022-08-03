@@ -50,7 +50,6 @@ namespace GCode {
     double minTravel         = 0.000001;
     double maxArcError       = 0.01;
     unsigned maxLookahead    = 4096;
-    double minMoveSecs       = 0.02;
     path_mode_t pathMode     = CONTINUOUS_MODE;
     double maxBlendError     = 0.1;   // mm
     double minMergeError     = 0.001; // mm
