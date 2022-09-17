@@ -47,10 +47,10 @@ namespace GCode {
 
 
   class Planner {
+    MachinePipeline pipeline;
     ControllerImpl controller;
     MachineUnitAdapter unitAdapter;
     MachineLinearizer linearizer;
-    MachinePipeline pipeline;
     LinePlanner planner;
 
     std::list<cb::SmartPointer<Runner> > runners;
