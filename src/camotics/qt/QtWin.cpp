@@ -37,7 +37,6 @@
 
 #include <cbang/Application.h>
 #include <cbang/os/SystemUtilities.h>
-#include <cbang/os/SystemInfo.h>
 #include <cbang/os/DirectoryWalker.h>
 #include <cbang/log/Logger.h>
 #include <cbang/util/SmartInc.h>
