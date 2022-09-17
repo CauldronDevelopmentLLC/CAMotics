@@ -51,7 +51,7 @@ void Mesh::add(unsigned count, const float *vertices, const float *normals) {
 void Mesh::add(const vector<float> &vertices, const vector<float> &normals) {
   if (vertices.size() != normals.size())
     THROW("Number of vertices not equal to number of normals");
-  add(vertices.size() / 3, &vertices[0], &normals[0]);
+  if (!vertices.empty()) add(vertices.size() / 3, &vertices[0], &normals[0]);
 }
 
 
