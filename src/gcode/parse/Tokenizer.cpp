@@ -55,6 +55,12 @@ void Tokenizer::comment() {
 
 
 void Tokenizer::parenComment() {
+  // TODO The RS-274 standard says:
+  //   Once a left parenthesis is placed on a line, a matching right
+  //   parenthesis must appear before the end of the line.
+  //
+  // This implementation allows multiline comments.
+
   scanner->match('(');
   current.setType(PAREN_COMMENT_TOKEN);
 
