@@ -277,9 +277,11 @@ Clean(execs, ['build', 'config.log', 'dist.txt', 'package.txt'])
 prefix = env.get('install_prefix')
 env.Alias('install', [prefix])
 
-env.Install(prefix + '/share/doc/camotics/', 'examples')
-env.Install(prefix + '/share/camotics/', 'machines')
+for target in docs + ['examples']:
+    env.Install(prefix + '/share/doc/camotics/', target)
 
+
+env.Install(prefix + '/share/camotics/', 'machines')
 env.Install(prefix + '/share/camotics/', 'tpl_lib')
 env.Install(prefix + '/share/pixmaps', 'images/camotics.png')
 env.Install(prefix + '/share/applications', 'CAMotics.desktop')
