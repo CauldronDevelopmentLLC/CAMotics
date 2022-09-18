@@ -372,9 +372,15 @@ void QtWin::loadMachine(const string &machine) {
 void QtWin::loadMachines() {
   try {
     vector<string> paths;
-    paths.push_back(SystemUtilities::getPathPrefix() +
-                    "/share/doc/camotics/machines");
+
+    QStringList list = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, "camotics/machines", QStandardPaths::LocateDirectory);
+    for (int i = 0; i < list.size(); i++)
+      paths.push_back(list .at(i).toUtf8().constData());
+
+#ifdef __APPLE__
     paths.push_back("../SharedSupport/machines");
+#endif
+
     paths.push_back("machines");
 
     string root = ".";
@@ -387,7 +393,6 @@ void QtWin::loadMachines() {
       if (path[0] != '/') path = root + "/" + path;
 
       if (SystemUtilities::isDirectory(path)) {
-        unsigned count = 0;
         DirectoryWalker walker(path, ".*\\.json", 1);
 
         while (walker.hasNext()) {
@@ -397,12 +402,9 @@ void QtWin::loadMachines() {
             SmartPointer<JSON::Value> data = JSON::Reader::parse(filename);
             if (!data->hasString("name") || !data->hasString("model")) continue;
 
-            count++;
             settingsDialog.addMachine(data->getString("name"), filename);
           } CATCH_ERROR;
         }
-
-        if (count) break;
       }
     }
 
