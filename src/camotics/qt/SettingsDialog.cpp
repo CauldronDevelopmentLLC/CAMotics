@@ -45,7 +45,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 void SettingsDialog::addMachine(const string &name, const string &path) {
   if (ui->machineComboBox->findText(QString::fromUtf8(name.c_str())) < 0)
     ui->machineComboBox->addItem(QString::fromUtf8(name.c_str()),
-                                QString::fromUtf8(path.c_str()));
+                                 QString::fromUtf8(path.c_str()));
 }
 
 
