@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   DL_CreationAdapter adapter;
 
   // Test for acceptance of std::istream in API
-  dxf.in(std::cin, adapter);
+  dxf.in(std::cin, &adapter);
 
   return 0;
 }
