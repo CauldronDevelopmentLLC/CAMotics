@@ -178,7 +178,7 @@ void OCodeInterpreter::doCall(OCode *ocode) {
         string path;
 
         for (unsigned i = 0; path.empty() && exts[i]; i++)
-          path = SystemUtilities::findInPath(scriptPath, name);
+          path = SystemUtilities::findInPath(scriptPath, name + exts[i]);
 
         if (path.empty())
           THROW("Subroutine \"" << name
