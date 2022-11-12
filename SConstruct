@@ -42,6 +42,7 @@ if env['with_gui']:
     env.EnableQtModules = env.EnableQt5Modules
     env.Uic = env.Uic5
     env.Qrc = env.Qrc5
+    env.Qm  = env.Qm5
 
 # Dist
 if 'dist' in COMMAND_LINE_TARGETS:
@@ -193,7 +194,32 @@ if env['with_gui']:
         uic.append(env.Uic('build/ui_%s_dialog.h' % dialog,
                            'qt/%s_dialog.ui' % dialog))
 
-    qrc = env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')
+    # I18n
+    langs = Glob('languages/*.ts')
+    regex = r'^languages/camotics_(.*)\.ts$'
+    langs = map(lambda path: re.sub(regex, r'\1', str(path)), langs)
+
+    qm_files = []
+    for lang in langs:
+        lang_dst = 'build/i18n/camotics_%s.qm' % lang
+        lang_src = 'languages/camotics_%s.ts' % lang
+        qm = env.Qm(lang_dst, lang_src)
+        qm_files.append(qm)
+
+    def build_i18n_qrc(target, source, env):
+        with open(str(target[0]), 'w') as f:
+            f.write('<RCC><qresource prefix="/">\n')
+            for src in source:
+                src = str(src).replace('build/', '')
+                f.write('  <file>%s</file>\n' % src)
+            f.write('</qresource></RCC>\n')
+
+    env.Append(BUILDERS = {'I18NQRC': env.Builder(action = build_i18n_qrc)})
+    i18n_qrc = env.I18NQRC('build/i18n.qrc', qm_files)
+    qrc = [env.Qrc('build/qrc_i18n.cpp', i18n_qrc)]
+
+    # Qt Resources
+    qrc += [env.Qrc('build/qrc_camotics.cpp', 'qt/camotics.qrc')]
 
     # Resources
     res = env.Resources('build/resources.cpp', ['#/src/resources'])
@@ -217,7 +243,7 @@ if env['with_gui']:
 
     # GUI progs
     for prog in 'camotics camsim'.split():
-        p = _env.Program(prog, ['build/%s.cpp' % prog, qrc])
+        p = _env.Program(prog, ['build/%s.cpp' % prog] + qrc)
         _env.Precious(p)
         _env.Install(_env.get('install_prefix') + '/bin/', p)
         Default(p)

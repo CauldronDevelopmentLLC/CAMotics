@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>1004</width>
-    <height>797</height>
+    <height>815</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -310,7 +310,7 @@
      <x>0</x>
      <y>0</y>
      <width>1004</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -811,7 +811,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -829,7 +828,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -853,7 +851,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -894,7 +891,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -935,7 +931,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -976,7 +971,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -1087,7 +1081,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -1118,7 +1111,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -1149,7 +1141,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -1180,7 +1171,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -1211,7 +1201,6 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -3168,7 +3157,7 @@
      <normaloff>:/icons/intensity.png</normaloff>:/icons/intensity.png</iconset>
    </property>
    <property name="text">
-    <string>actionIntensity</string>
+    <string>Intensity</string>
    </property>
    <property name="toolTip">
     <string>Show tool path intensity.  Useful for LASER paths that vary the S parameter.</string>

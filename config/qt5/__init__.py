@@ -651,7 +651,7 @@ def Qrc5(env, target, source = None, *args, **kw):
 
     result = []
     for t, s in zip(target, source):
-        result.extend(__qrc_builder.__call__(env, t, s, **kw))
+        result.extend(__qrc_builder.__call__(env, t, str(s), **kw))
 
     return result
 

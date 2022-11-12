@@ -27,9 +27,11 @@
 using namespace CAMotics;
 
 
+#define UI() Dialog::getUI<Ui::ExportDialog>()
+
+
 ExportDialog::ExportDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::ExportDialog) {
-  ui->setupUi(this);
+  Dialog(parent, new UI<Ui::ExportDialog>) {
 #ifdef _WIN32
   bool crlf = true;
 #else
@@ -37,28 +39,28 @@ ExportDialog::ExportDialog(QWidget *parent) :
 #endif
 
   crlf = QSettings().value("Settings/GCode/CRLF", crlf).toBool();
-  ui->crlfCheckBox->setChecked(crlf);
+  UI().crlfCheckBox->setChecked(crlf);
 }
 
 
 int ExportDialog::exec() {
   bool change = false;
 
-  if (!ui->gcodeRadioButton->isEnabled() && gcodeSelected()) change = true;
-  if (!ui->surfaceRadioButton->isEnabled() && surfaceSelected()) change = true;
-  if (!ui->simDataRadioButton->isEnabled() && simDataSelected()) change = true;
+  if (!UI().gcodeRadioButton->isEnabled() && gcodeSelected()) change = true;
+  if (!UI().surfaceRadioButton->isEnabled() && surfaceSelected()) change = true;
+  if (!UI().simDataRadioButton->isEnabled() && simDataSelected()) change = true;
 
   if (change) {
-    if (ui->gcodeRadioButton->isEnabled()) {
-      ui->gcodeRadioButton->setChecked(true);
+    if (UI().gcodeRadioButton->isEnabled()) {
+      UI().gcodeRadioButton->setChecked(true);
       on_gcodeRadioButton_clicked();
 
-    } else if (ui->surfaceRadioButton->isEnabled()) {
-      ui->surfaceRadioButton->setChecked(true);
+    } else if (UI().surfaceRadioButton->isEnabled()) {
+      UI().surfaceRadioButton->setChecked(true);
       on_surfaceRadioButton_clicked();
 
-    } else if (ui->simDataRadioButton->isEnabled()) {
-      ui->simDataRadioButton->setChecked(true);
+    } else if (UI().simDataRadioButton->isEnabled()) {
+      UI().simDataRadioButton->setChecked(true);
       on_simDataRadioButton_clicked();
     }
   }
@@ -73,72 +75,72 @@ int ExportDialog::exec() {
 
 
 void ExportDialog::enableSurface(bool enable) {
-  ui->surfaceFrame->setEnabled(enable && surfaceSelected());
-  ui->surfaceRadioButton->setEnabled(enable);
-  ui->cutSurfaceCheckBox->setEnabled(enable);
-  if (!enable) ui->cutSurfaceCheckBox->setChecked(false);
+  UI().surfaceFrame->setEnabled(enable && surfaceSelected());
+  UI().surfaceRadioButton->setEnabled(enable);
+  UI().cutSurfaceCheckBox->setEnabled(enable);
+  if (!enable) UI().cutSurfaceCheckBox->setChecked(false);
 }
 
 
 void ExportDialog::enableGCode(bool enable) {
-  ui->gcodeRadioButton->setEnabled(enable);
+  UI().gcodeRadioButton->setEnabled(enable);
 }
 
 
 void ExportDialog::enableSimData(bool enable) {
-  ui->simDataFrame->setEnabled(enable && simDataSelected());
-  ui->simDataRadioButton->setEnabled(enable);
+  UI().simDataFrame->setEnabled(enable && simDataSelected());
+  UI().simDataRadioButton->setEnabled(enable);
 }
 
 
 bool ExportDialog::crlfSelected() const {
-  return ui->crlfCheckBox->isChecked();
+  return UI().crlfCheckBox->isChecked();
 }
 
 
 bool ExportDialog::surfaceSelected() const {
-  return ui->surfaceRadioButton->isChecked();
+  return UI().surfaceRadioButton->isChecked();
 }
 
 
 bool ExportDialog::gcodeSelected() const {
-  return ui->gcodeRadioButton->isChecked();
+  return UI().gcodeRadioButton->isChecked();
 }
 
 
 bool ExportDialog::simDataSelected() const {
-  return ui->simDataRadioButton->isChecked();
+  return UI().simDataRadioButton->isChecked();
 }
 
 
 bool ExportDialog::binarySTLSelected() const {
-  return ui->binarySTLRadioButton->isChecked();
+  return UI().binarySTLRadioButton->isChecked();
 }
 
 
 bool ExportDialog::compactJSONSelected() const {
-  return ui->compactJSONRadioButton->isChecked();
+  return UI().compactJSONRadioButton->isChecked();
 }
 
 
 bool ExportDialog::withCutSurfaceSelected() const {
-  return ui->cutSurfaceCheckBox->isChecked();
+  return UI().cutSurfaceCheckBox->isChecked();
 }
 
 
 void ExportDialog::on_surfaceRadioButton_clicked() {
-  ui->surfaceFrame->setEnabled(true);
-  ui->simDataFrame->setEnabled(false);
+  UI().surfaceFrame->setEnabled(true);
+  UI().simDataFrame->setEnabled(false);
 }
 
 
 void ExportDialog::on_gcodeRadioButton_clicked() {
-  ui->surfaceFrame->setEnabled(false);
-  ui->simDataFrame->setEnabled(false);
+  UI().surfaceFrame->setEnabled(false);
+  UI().simDataFrame->setEnabled(false);
 }
 
 
 void ExportDialog::on_simDataRadioButton_clicked() {
-  ui->surfaceFrame->setEnabled(false);
-  ui->simDataFrame->setEnabled(true);
+  UI().surfaceFrame->setEnabled(false);
+  UI().simDataFrame->setEnabled(true);
 }

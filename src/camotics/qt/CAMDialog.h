@@ -22,19 +22,10 @@
 
 #include "CAMLayerDialog.h"
 
-#include <cbang/SmartPointer.h>
-
-#include <QDialog>
-
-
-namespace Ui {class CAMDialog;}
-
 
 namespace CAMotics {
-  class CAMDialog : public QDialog, public cb::JSON::Serializable {
+  class CAMDialog : public Dialog, public cb::JSON::Serializable {
     Q_OBJECT;
-
-    cb::SmartPointer<Ui::CAMDialog> ui;
 
     CAMLayerDialog layerDialog;
     bool metric;

@@ -20,20 +20,12 @@
 
 #pragma once
 
-
-#include <cbang/SmartPointer.h>
-
-#include <QDialog>
-
-
-namespace Ui {class UploadDialog;}
+#include "Dialog.h"
 
 
 namespace CAMotics {
-  class UploadDialog : public QDialog {
+  class UploadDialog : public Dialog {
     Q_OBJECT;
-
-    cb::SmartPointer<Ui::UploadDialog> ui;
 
   public:
     UploadDialog(QWidget *parent);

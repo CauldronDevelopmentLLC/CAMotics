@@ -20,23 +20,19 @@
 
 #pragma once
 
+#include "Dialog.h"
+
 #include <gcode/Units.h>
 
-#include <cbang/SmartPointer.h>
 #include <cbang/json/JSON.h>
 
-#include <QDialog>
 #include <QTableWidget>
 
 
-namespace Ui {class CAMLayerDialog;}
-
-
 namespace CAMotics {
-  class CAMLayerDialog : public QDialog, public cb::JSON::Serializable {
+  class CAMLayerDialog : public Dialog, public cb::JSON::Serializable {
     Q_OBJECT;
 
-    cb::SmartPointer<Ui::CAMLayerDialog> ui;
     bool metric;
 
   public:

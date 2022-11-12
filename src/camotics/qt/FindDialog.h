@@ -20,20 +20,12 @@
 
 #pragma once
 
-
-#include <cbang/SmartPointer.h>
-
-#include <QDialog>
-
-
-namespace Ui {class FindDialog;}
+#include "Dialog.h"
 
 
 namespace CAMotics {
-  class FindDialog : public QDialog {
+  class FindDialog : public Dialog {
     Q_OBJECT;
-
-    cb::SmartPointer<Ui::FindDialog> ui;
 
     bool wasReplace;
 

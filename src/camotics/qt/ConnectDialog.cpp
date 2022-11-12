@@ -28,28 +28,31 @@ using namespace CAMotics;
 using namespace std;
 
 
+#define UI() Dialog::getUI<Ui::ConnectDialog>()
+
+
 ConnectDialog::ConnectDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::ConnectDialog) {ui->setupUi(this);}
+  Dialog(parent, new UI<Ui::ConnectDialog>) {}
 
 
-QString ConnectDialog::getAddress() const {return ui->addressLineEdit->text();}
+QString ConnectDialog::getAddress() const {return UI().addressLineEdit->text();}
 
 
 bool ConnectDialog::isSystemProxyEnabled() const {
-  return ui->systemProxyCheckBox->isChecked();
+  return UI().systemProxyCheckBox->isChecked();
 }
 
 
 void ConnectDialog::setNetworkStatus(const string &status) {
-  ui->networkStatusLabel->setText(status.c_str());
+  UI().networkStatusLabel->setText(status.c_str());
 
   if (status == "Disconnected") {
-    ui->connectPushButton->setEnabled(true);
-    ui->disconnectPushButton->setEnabled(false);
+    UI().connectPushButton->setEnabled(true);
+    UI().disconnectPushButton->setEnabled(false);
 
   } else {
-    ui->connectPushButton->setEnabled(false);
-    ui->disconnectPushButton->setEnabled(true);
+    UI().connectPushButton->setEnabled(false);
+    UI().disconnectPushButton->setEnabled(true);
   }
 
   string bg;
@@ -58,7 +61,7 @@ void ConnectDialog::setNetworkStatus(const string &status) {
   else bg = "#f2ad46";
 
   string css ="padding: 3px; background: " + bg;
-  ui->networkStatusLabel->setStyleSheet(css.c_str());
+  UI().networkStatusLabel->setStyleSheet(css.c_str());
 }
 
 
@@ -66,15 +69,15 @@ int ConnectDialog::exec() {
   QSettings settings;
 
   QString addr = settings.value("Connect/Address", "bbctrl").toString();
-  ui->addressLineEdit->setText(addr);
+  UI().addressLineEdit->setText(addr);
 
   bool useProxy = settings.value("Connect/UseSystemProxy", true).toBool();
-  ui->systemProxyCheckBox->setChecked(useProxy);
+  UI().systemProxyCheckBox->setChecked(useProxy);
 
   int ret = QDialog::exec();
 
   if (ret == QDialog::Accepted) {
-    settings.setValue("Connect/Address", ui->addressLineEdit->text());
+    settings.setValue("Connect/Address", UI().addressLineEdit->text());
     settings.setValue("Connect/UseSystemProxy", isSystemProxyEnabled());
   }
 

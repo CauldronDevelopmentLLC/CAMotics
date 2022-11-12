@@ -334,7 +334,7 @@ void FileTabManager::on_modificationChanged(NCEdit *editor, bool changed) {
   QString title = QTabWidget::tabText(tab);
 
   if (changed && !title.endsWith(" *"))
-    QTabWidget::setTabText(tab, title + tr(" *"));
+    QTabWidget::setTabText(tab, title + QString(" *"));
 
   else if (!changed && title.endsWith(" *"))
     QTabWidget::setTabText(tab, title.left(title.size() - 2));

@@ -20,20 +20,12 @@
 
 #pragma once
 
-
-#include <cbang/SmartPointer.h>
-
-#include <QDialog>
-
-
-namespace Ui {class ConnectDialog;}
+#include "Dialog.h"
 
 
 namespace CAMotics {
-  class ConnectDialog : public QDialog {
+  class ConnectDialog : public Dialog {
     Q_OBJECT;
-
-    cb::SmartPointer<Ui::ConnectDialog> ui;
 
   public:
     ConnectDialog(QWidget *parent);

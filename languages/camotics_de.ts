@@ -71,7 +71,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../qt/cam_dialog.ui" line="64"/>
         <source>Translate</source>
         <translatorcomment>context not clear? did not find in app</translatorcomment>
-        <translation type="unfinished">Umwandeln?</translation>
+        <translation>Umsetzen</translation>
     </message>
     <message>
         <location filename="../qt/cam_dialog.ui" line="76"/>
@@ -87,12 +87,12 @@ p, li { white-space: pre-wrap; }
         <location filename="../qt/cam_dialog.ui" line="95"/>
         <source>Flip</source>
         <translatorcomment>Drehen (rotate)</translatorcomment>
-        <translation type="unfinished">Spiegeln (mirror)?</translation>
+        <translation>Spiegeln</translation>
     </message>
     <message>
         <location filename="../qt/cam_dialog.ui" line="107"/>
         <source>Array</source>
-        <translation type="unfinished">Feld?</translation>
+        <translation>Reihe</translation>
     </message>
     <message>
         <location filename="../qt/cam_dialog.ui" line="119"/>
@@ -206,7 +206,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../qt/cam_layer_dialog.ui" line="91"/>
         <source>Max step down</source>
         <translatorcomment>Maximale Schnitttiefe</translatorcomment>
-        <translation type="unfinished">Maximale Tiefenzustellung</translation>
+        <translation>Maximale Abstieg</translation>
     </message>
     <message>
         <location filename="../qt/cam_layer_dialog.ui" line="103"/>
@@ -241,12 +241,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../qt/cam_layer_dialog.ui" line="181"/>
         <source>Outset</source>
-        <translation>am Anfang</translation>
+        <translation>Positiv</translation>
     </message>
     <message>
         <location filename="../qt/cam_layer_dialog.ui" line="186"/>
         <source>Inset</source>
-        <translation type="unfinished">Innenliegend</translation>
+        <translation>Negativ</translation>
     </message>
     <message>
         <location filename="../qt/cam_layer_dialog.ui" line="191"/>
@@ -267,288 +267,463 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>CAMotics::FileTabManager</name>
     <message>
-        <location filename="../src/camotics/qt/FileTabManager.cpp" line="336"/>
-        <source> *</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/FileTabManager.cpp" line="176"/>
+        <source>Failed to save: %1</source>
+        <translation>Fehler beim Speichern %1</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/FileTabManager.cpp" line="206"/>
+        <source>Save file</source>
+        <translation>Datei speichern</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/FileTabManager.cpp" line="214"/>
+        <source>TPL file must have .tpl extension</source>
+        <translation>Die TPL-Datei muss die Erweiterung .tpl haben</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/FileTabManager.cpp" line="218"/>
+        <source>GCode file cannot have .tpl or .xml extension</source>
+        <translation>Die GCode-Datei darf nicht die Erweiterung .tpl oder .xml haben</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/FileTabManager.cpp" line="246"/>
+        <source>Saved %1</source>
+        <translation>Gespeichert %1</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/FileTabManager.cpp" line="284"/>
+        <source>Reverted %1</source>
+        <translation>Zurückgesetzte %1</translation>
     </message>
 </context>
 <context>
     <name>CAMotics::QtWin</name>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="134"/>
-        <source>Alt+-</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="358"/>
+        <source>Language changed to %1</source>
+        <translation>Sprache auf %1 geändert</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="135"/>
-        <source>Alt+=</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="753"/>
+        <source>Uploading %1 to %2</source>
+        <translation>Hochladen %1 nach %2</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="135"/>
-        <source>Alt++</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="760"/>
+        <source>Errors were encountered during tool path generation.  See the console output for more details</source>
+        <translation>Während der Werkzeugweggenerierung sind Fehler aufgetreten. Weitere Einzelheiten finden Sie in der Konsolenausgabe</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="136"/>
-        <source>Alt+A</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="763"/>
+        <source>Tool path errors</source>
+        <translation>Werkzeugbahnfehler</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="137"/>
-        <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <source>Image files (</source>
+        <translation type="vanished">Bilddateien (</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="138"/>
-        <source>Alt+1</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="888"/>
+        <source>Image files</source>
+        <translation>Bilddateien</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="139"/>
-        <source>Alt+2</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="898"/>
+        <source>Save snapshot</source>
+        <translation>Schnappschuss speichern</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="140"/>
-        <source>Alt+3</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="901"/>
+        <source>Failed to save snapshot.</source>
+        <translation>Schnappschuss konnte nicht gespeichert werden.</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="141"/>
-        <source>Alt+4</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="902"/>
+        <source>Snapshot saved.</source>
+        <translation>Schnappschuss gespeichert.</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="142"/>
-        <source>Alt+5</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="909"/>
+        <source>Nothing to export.
+Run a simulation first.</source>
+        <translation>Nichts zu exportieren.\nFühren Sie zuerst eine Simulation aus.</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="143"/>
-        <source>Alt+6</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="921"/>
+        <source>Export </source>
+        <translation>Exportieren </translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="144"/>
-        <source>Alt+7</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="926"/>
+        <source>Surface</source>
+        <translation>Oberfläche</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="145"/>
-        <source>Ctrl+R</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="927"/>
+        <source>STL Files</source>
+        <translation>STL Dateien</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="145"/>
-        <source>F5</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="932"/>
+        <source>GCode Files</source>
+        <translation>GCode Dateien</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="982"/>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="937"/>
+        <source>JSON Files</source>
+        <translation>JSON Dateien</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1073"/>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1247"/>
+        <source>Supported Files</source>
+        <translation>Unterstützte Dateien</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1075"/>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1249"/>
+        <source>All Files</source>
+        <translation>Alle Dateien</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1156"/>
+        <source>Projects</source>
+        <translation>Projekte</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1221"/>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1224"/>
+        <source>All files</source>
+        <translation>Alle Dateien</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1419"/>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1432"/>
+        <source>Tool table files</source>
+        <translation>Werkzeugtabellendateien</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1441"/>
+        <source>&apos;%1&apos; empty or not a tool table</source>
+        <translation>%1 leer oder keine Werkzeugtabelle</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1902"/>
+        <source>Connected to %1</source>
+        <translation>Verbunden mit %1</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1909"/>
+        <source>Disconnected from %1</source>
+        <translation>Von %1 getrennt</translation>
+    </message>
+    <message>
+        <source>STL Files (*.stl)</source>
+        <translation type="vanished">STL Dateien (*.stl)</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="931"/>
+        <source>GCode</source>
+        <translation>GCode</translation>
+    </message>
+    <message>
+        <source>GCode Files (*.gcode *.nc *.ngc *.tap)</source>
+        <translation type="obsolete">GCode Dateien (*.gcode *.nc *.ngc *.tap)</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="936"/>
+        <source>Simulation Data</source>
+        <translation>Simulationsdaten</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1072"/>
         <source>Open File</source>
         <translation>Datei öffnen</translation>
     </message>
     <message>
-        <location filename="../src/camotics/qt/QtWin.cpp" line="983"/>
         <source>Supported Files (*.camotics *.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;All Files (*.*)</source>
-        <translation>Unterstützte Dateiformate (*.camotics *.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;All Files (*.*)</translation>
+        <translation type="vanished">Unterstützte Dateiformate (*.camotics *.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;All Files (*.*)</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1082"/>
+        <source>Opening %1</source>
+        <translation>Öffnet %1</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1155"/>
+        <source>Save Project</source>
+        <translation>Projekt Speichern</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1163"/>
+        <source>Project file must have .camotics extension, not saved!</source>
+        <translation>Projektdatei muss die Erweiterung .camotics haben, nicht gespeichert!</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1171"/>
+        <source>Saved %1</source>
+        <translation>Gespeichert %1</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1175"/>
+        <source>Could not save project: </source>
+        <translation>Projekt konnte nicht gespeichert werden: </translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1186"/>
+        <source>Cannot revert project.</source>
+        <translation>Projekt kann nicht zurückgesetzt werden.</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1220"/>
+        <source>New TPL file</source>
+        <translation>Neue TPL-Datei</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1220"/>
+        <source>New GCode file</source>
+        <translation>Neue GCode-Datei</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1232"/>
+        <source>TPL file must have .tpl extension</source>
+        <translation>Die TPL-Datei muss die Erweiterung .tpl haben</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1236"/>
+        <source>GCode file cannot have .tpl, .camotics or .xml extension</source>
+        <translation>Die GCode-Datei darf nicht die Erweiterung .tpl, .camotics oder .xml haben</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1247"/>
+        <source>Add file</source>
+        <translation>Datei hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1419"/>
+        <source>Export tool table</source>
+        <translation>Werkzeugtabelle exportieren</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1432"/>
+        <source>Import tool table</source>
+        <translation>Werkzeugtabelle importieren</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1457"/>
+        <source>Default tool table saved</source>
+        <translation>Standard-Werkzeugtabelle gespeichert</translation>
+    </message>
+    <message>
+        <location filename="../src/camotics/qt/QtWin.cpp" line="1637"/>
+        <source>Playback speed %1x</source>
+        <translation>Wiedergabegeschwindigkeit %1</translation>
+    </message>
+    <message>
+        <source>Connected to </source>
+        <translation type="obsolete">?</translation>
     </message>
 </context>
 <context>
     <name>CAMoticsWindow</name>
     <message>
-        <location filename="../qt/camotics.ui" line="18"/>
+        <location filename="../qt/camotics.ui" line="15"/>
         <source>CAMotics[*]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="77"/>
+        <location filename="../qt/camotics.ui" line="74"/>
         <source>Simulation View</source>
         <translation>Simulationsansicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="128"/>
+        <location filename="../qt/camotics.ui" line="125"/>
         <source>Set tool path position</source>
         <translation>Werkzeugwegposition einstellen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="164"/>
+        <location filename="../qt/camotics.ui" line="161"/>
         <source>Position</source>
         <translation>Position</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="189"/>
+        <location filename="../qt/camotics.ui" line="186"/>
         <source>Errors</source>
         <translation>Fehlermeldungen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="196"/>
+        <location filename="../qt/camotics.ui" line="193"/>
         <source>Warnings</source>
         <translation>Warnungen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="227"/>
+        <location filename="../qt/camotics.ui" line="224"/>
         <source>Clear console.</source>
         <translation>Bereinige Konsole.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="275"/>
+        <location filename="../qt/camotics.ui" line="272"/>
         <source>Progress</source>
         <translation>Fortschritt</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="296"/>
+        <location filename="../qt/camotics.ui" line="293"/>
         <source>Progressbar</source>
         <translation>Fortschrittsanzeige</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="321"/>
+        <location filename="../qt/camotics.ui" line="318"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="325"/>
+        <location filename="../qt/camotics.ui" line="322"/>
         <source>&amp;Recent projects</source>
         <translation>&amp;Letzte Projekte</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="347"/>
-        <location filename="../qt/camotics.ui" line="2821"/>
+        <location filename="../qt/camotics.ui" line="344"/>
+        <location filename="../qt/camotics.ui" line="2813"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="355"/>
+        <location filename="../qt/camotics.ui" line="352"/>
         <source>&amp;Edit</source>
         <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="370"/>
+        <location filename="../qt/camotics.ui" line="367"/>
         <source>&amp;View</source>
         <translation>Ansi&amp;cht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="406"/>
+        <location filename="../qt/camotics.ui" line="403"/>
         <source>Si&amp;mulate</source>
         <translation>Si&amp;mulieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="420"/>
+        <location filename="../qt/camotics.ui" line="417"/>
         <source>&amp;Tools</source>
         <translation>&amp;Werkzeuge</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="441"/>
+        <location filename="../qt/camotics.ui" line="431"/>
+        <source>&amp;Language</source>
+        <translation>&amp;Sprache</translation>
+    </message>
+    <message>
+        <location filename="../qt/camotics.ui" line="444"/>
         <source>Project Toolbar</source>
         <translation>Symbolleiste Programm</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="469"/>
+        <location filename="../qt/camotics.ui" line="472"/>
         <source>View Toolbar</source>
         <translation>Symbolleiste Darstellung</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="497"/>
+        <location filename="../qt/camotics.ui" line="500"/>
         <source>Playback Toolbar</source>
         <translation>Symbolleiste Wiedergabe</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="522"/>
+        <location filename="../qt/camotics.ui" line="525"/>
         <source>Perspective Toolbar</source>
         <translation>Symbolleiste 3D-Betrachter</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="565"/>
+        <location filename="../qt/camotics.ui" line="568"/>
         <source>Tool Position</source>
         <translation>Werkzeug Position</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="622"/>
+        <location filename="../qt/camotics.ui" line="625"/>
         <source>Current Z position</source>
         <translation>Aktuelle Z-Position</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="625"/>
-        <location filename="../qt/camotics.ui" line="688"/>
-        <location filename="../qt/camotics.ui" line="729"/>
+        <location filename="../qt/camotics.ui" line="628"/>
+        <location filename="../qt/camotics.ui" line="691"/>
+        <location filename="../qt/camotics.ui" line="732"/>
         <location filename="../qt/camotics.ui" line="866"/>
         <location filename="../qt/camotics.ui" line="876"/>
-        <location filename="../qt/camotics.ui" line="907"/>
-        <location filename="../qt/camotics.ui" line="917"/>
-        <location filename="../qt/camotics.ui" line="948"/>
-        <location filename="../qt/camotics.ui" line="958"/>
-        <location filename="../qt/camotics.ui" line="989"/>
-        <location filename="../qt/camotics.ui" line="999"/>
-        <location filename="../qt/camotics.ui" line="1131"/>
-        <location filename="../qt/camotics.ui" line="1162"/>
-        <location filename="../qt/camotics.ui" line="1410"/>
-        <location filename="../qt/camotics.ui" line="1420"/>
-        <location filename="../qt/camotics.ui" line="1430"/>
-        <location filename="../qt/camotics.ui" line="1452"/>
-        <location filename="../qt/camotics.ui" line="1462"/>
-        <location filename="../qt/camotics.ui" line="1472"/>
-        <location filename="../qt/camotics.ui" line="1494"/>
-        <location filename="../qt/camotics.ui" line="1504"/>
-        <location filename="../qt/camotics.ui" line="1514"/>
-        <location filename="../qt/camotics.ui" line="1651"/>
-        <location filename="../qt/camotics.ui" line="1661"/>
-        <location filename="../qt/camotics.ui" line="1671"/>
-        <location filename="../qt/camotics.ui" line="1693"/>
-        <location filename="../qt/camotics.ui" line="1703"/>
-        <location filename="../qt/camotics.ui" line="1713"/>
-        <location filename="../qt/camotics.ui" line="1735"/>
-        <location filename="../qt/camotics.ui" line="1745"/>
-        <location filename="../qt/camotics.ui" line="1755"/>
+        <location filename="../qt/camotics.ui" line="906"/>
+        <location filename="../qt/camotics.ui" line="916"/>
+        <location filename="../qt/camotics.ui" line="946"/>
+        <location filename="../qt/camotics.ui" line="956"/>
+        <location filename="../qt/camotics.ui" line="986"/>
+        <location filename="../qt/camotics.ui" line="996"/>
+        <location filename="../qt/camotics.ui" line="1126"/>
+        <location filename="../qt/camotics.ui" line="1156"/>
+        <location filename="../qt/camotics.ui" line="1402"/>
+        <location filename="../qt/camotics.ui" line="1412"/>
+        <location filename="../qt/camotics.ui" line="1422"/>
+        <location filename="../qt/camotics.ui" line="1444"/>
+        <location filename="../qt/camotics.ui" line="1454"/>
+        <location filename="../qt/camotics.ui" line="1464"/>
+        <location filename="../qt/camotics.ui" line="1486"/>
+        <location filename="../qt/camotics.ui" line="1496"/>
+        <location filename="../qt/camotics.ui" line="1506"/>
+        <location filename="../qt/camotics.ui" line="1643"/>
+        <location filename="../qt/camotics.ui" line="1653"/>
+        <location filename="../qt/camotics.ui" line="1663"/>
+        <location filename="../qt/camotics.ui" line="1685"/>
+        <location filename="../qt/camotics.ui" line="1695"/>
+        <location filename="../qt/camotics.ui" line="1705"/>
+        <location filename="../qt/camotics.ui" line="1727"/>
+        <location filename="../qt/camotics.ui" line="1737"/>
+        <location filename="../qt/camotics.ui" line="1747"/>
         <source>0.0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="650"/>
-        <location filename="../qt/camotics.ui" line="1487"/>
-        <location filename="../qt/camotics.ui" line="1728"/>
-        <location filename="../qt/camotics.ui" line="2197"/>
+        <location filename="../qt/camotics.ui" line="653"/>
+        <location filename="../qt/camotics.ui" line="1479"/>
+        <location filename="../qt/camotics.ui" line="1720"/>
+        <location filename="../qt/camotics.ui" line="2189"/>
         <source>Z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="672"/>
-        <location filename="../qt/camotics.ui" line="1403"/>
-        <location filename="../qt/camotics.ui" line="1644"/>
-        <location filename="../qt/camotics.ui" line="2072"/>
+        <location filename="../qt/camotics.ui" line="675"/>
+        <location filename="../qt/camotics.ui" line="1395"/>
+        <location filename="../qt/camotics.ui" line="1636"/>
+        <location filename="../qt/camotics.ui" line="2064"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="685"/>
+        <location filename="../qt/camotics.ui" line="688"/>
         <source>Current X position</source>
         <translation>Aktuelle X-Position</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="713"/>
-        <location filename="../qt/camotics.ui" line="1445"/>
-        <location filename="../qt/camotics.ui" line="1686"/>
-        <location filename="../qt/camotics.ui" line="2141"/>
+        <location filename="../qt/camotics.ui" line="716"/>
+        <location filename="../qt/camotics.ui" line="1437"/>
+        <location filename="../qt/camotics.ui" line="1678"/>
+        <location filename="../qt/camotics.ui" line="2133"/>
         <source>Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="726"/>
+        <location filename="../qt/camotics.ui" line="729"/>
         <source>Current Y position</source>
         <translation>Aktuelle Y-Position</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="755"/>
+        <location filename="../qt/camotics.ui" line="758"/>
         <source>Estimates</source>
         <translation>Referenzwerte</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="817"/>
+        <location filename="../qt/camotics.ui" line="819"/>
         <source>Time</source>
         <translation>Zeit</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="835"/>
+        <location filename="../qt/camotics.ui" line="836"/>
         <source>Distance</source>
         <translation>Distanz</translation>
     </message>
@@ -558,911 +733,913 @@ p, li { white-space: pre-wrap; }
         <translation>Aktuell</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="900"/>
+        <location filename="../qt/camotics.ui" line="899"/>
         <source>Remaining</source>
         <translation>Verbleibende</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="941"/>
+        <location filename="../qt/camotics.ui" line="939"/>
         <source>Total</source>
         <translation>Gesamt</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="982"/>
+        <location filename="../qt/camotics.ui" line="979"/>
         <source>Percent</source>
         <translation>Prozent</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1025"/>
+        <location filename="../qt/camotics.ui" line="1022"/>
         <source>Machine Status</source>
         <translation>Maschinenstatus</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1093"/>
+        <location filename="../qt/camotics.ui" line="1089"/>
         <source>Tool</source>
         <translation>Werkzeug</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1100"/>
-        <location filename="../qt/camotics.ui" line="1224"/>
+        <location filename="../qt/camotics.ui" line="1096"/>
+        <location filename="../qt/camotics.ui" line="1216"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1124"/>
+        <location filename="../qt/camotics.ui" line="1119"/>
         <source>Feed</source>
         <translation>Vorschub</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1155"/>
+        <location filename="../qt/camotics.ui" line="1149"/>
         <source>Speed</source>
-        <translatorcomment>Geschwindigkeit</translatorcomment>
-        <translation type="unfinished">Spindeldrehzahl</translation>
+        <translation>Geschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1186"/>
+        <location filename="../qt/camotics.ui" line="1179"/>
         <source>Spin</source>
         <translation>Drehrichtung</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1193"/>
+        <location filename="../qt/camotics.ui" line="1186"/>
         <source>Clockwise</source>
         <translation>Im Uhrzeigersinn</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1217"/>
+        <location filename="../qt/camotics.ui" line="1209"/>
         <source>Program Line</source>
         <translation>Programmzeile</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1253"/>
+        <location filename="../qt/camotics.ui" line="1245"/>
         <source>Files</source>
         <translation>Dateien</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1281"/>
-        <location filename="../qt/camotics.ui" line="1803"/>
+        <location filename="../qt/camotics.ui" line="1273"/>
+        <location filename="../qt/camotics.ui" line="1795"/>
         <source>Right click for menu.</source>
         <translation>Rechtsklick für Menü.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1302"/>
+        <location filename="../qt/camotics.ui" line="1294"/>
         <source>Tool Path Bounds</source>
         <translation>Werkzeugpfadgrenzen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1358"/>
-        <location filename="../qt/camotics.ui" line="1599"/>
+        <location filename="../qt/camotics.ui" line="1350"/>
+        <location filename="../qt/camotics.ui" line="1591"/>
         <source>Min</source>
         <translation>Minimum</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1373"/>
-        <location filename="../qt/camotics.ui" line="1614"/>
+        <location filename="../qt/camotics.ui" line="1365"/>
+        <location filename="../qt/camotics.ui" line="1606"/>
         <source>Max</source>
         <translation>Maximum</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1388"/>
-        <location filename="../qt/camotics.ui" line="1629"/>
+        <location filename="../qt/camotics.ui" line="1380"/>
+        <location filename="../qt/camotics.ui" line="1621"/>
         <source>Dim</source>
-        <translation type="unfinished">Abmessungen</translation>
+        <translation>Abmessungen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1540"/>
+        <location filename="../qt/camotics.ui" line="1532"/>
         <source>Workpiece Bounds</source>
         <translation>Werkstückgrenzen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1775"/>
+        <location filename="../qt/camotics.ui" line="1767"/>
         <source>Tool Table</source>
         <translation>Werkzeugtabelle</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1824"/>
+        <location filename="../qt/camotics.ui" line="1816"/>
         <source>Workpiece</source>
         <translation>Werkstück</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1873"/>
+        <location filename="../qt/camotics.ui" line="1865"/>
         <source>Automatic</source>
         <translation>Automatisch</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1923"/>
+        <location filename="../qt/camotics.ui" line="1915"/>
         <source>Margin</source>
-        <translation type="unfinished">Variabler Rand</translation>
+        <translation>Marge</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1937"/>
+        <location filename="../qt/camotics.ui" line="1929"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="1989"/>
+        <location filename="../qt/camotics.ui" line="1981"/>
         <source>Manual</source>
         <translatorcomment>Manuell</translatorcomment>
         <translation>Benutzerdefiniert</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2033"/>
+        <location filename="../qt/camotics.ui" line="2025"/>
         <source>Dimension</source>
         <translation>Abmessung</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2048"/>
+        <location filename="../qt/camotics.ui" line="2040"/>
         <source>Offset</source>
         <translation>Versatz</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2266"/>
+        <location filename="../qt/camotics.ui" line="2258"/>
         <source>&amp;New Project</source>
         <translation>&amp;Neues Projekt</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2269"/>
+        <location filename="../qt/camotics.ui" line="2261"/>
         <source>Create a new project.</source>
         <translation>Neues Projekt erstellen.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2272"/>
+        <location filename="../qt/camotics.ui" line="2264"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2282"/>
+        <location filename="../qt/camotics.ui" line="2274"/>
         <source>&amp;Open Project</source>
         <translation>Projekt &amp;Öffnen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2285"/>
+        <location filename="../qt/camotics.ui" line="2277"/>
         <source>Open an existing project or NC file.</source>
         <translation>Öffnen Sie ein vorhandenes Projekt oder eine NC-Datei.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2288"/>
+        <location filename="../qt/camotics.ui" line="2280"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2297"/>
+        <location filename="../qt/camotics.ui" line="2289"/>
         <source>Save A&amp;ll</source>
         <translation>A&amp;lles Speichern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2300"/>
+        <location filename="../qt/camotics.ui" line="2292"/>
         <source>Save the current project</source>
         <translation>Aktuelles Projekt speichern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2309"/>
+        <location filename="../qt/camotics.ui" line="2301"/>
         <source>Save Project &amp;As</source>
         <translation>Projekt Speichern &amp;Als</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2312"/>
+        <location filename="../qt/camotics.ui" line="2304"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2321"/>
+        <location filename="../qt/camotics.ui" line="2313"/>
         <source>&amp;Export</source>
         <translation>&amp;Exportieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2324"/>
+        <location filename="../qt/camotics.ui" line="2316"/>
         <source>Export surface, gcode or simulation data</source>
         <translation>Exportieren der Oberflächen-, GCode- oder Simulationsdaten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2327"/>
+        <location filename="../qt/camotics.ui" line="2319"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2336"/>
+        <location filename="../qt/camotics.ui" line="2328"/>
         <source>&amp;Screenshot</source>
         <translation>Bild&amp;schirmfoto</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2339"/>
+        <location filename="../qt/camotics.ui" line="2331"/>
         <source>Screenshot</source>
         <translation>Bildschirmfoto</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2342"/>
+        <location filename="../qt/camotics.ui" line="2334"/>
         <source>Save a snapshot of the current view</source>
         <translation>Speichern einen Schnappschuss der aktuellen Ansicht ab</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2351"/>
+        <location filename="../qt/camotics.ui" line="2343"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2354"/>
+        <location filename="../qt/camotics.ui" line="2346"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2363"/>
+        <location filename="../qt/camotics.ui" line="2355"/>
         <source>&amp;About</source>
         <translation>Über C&amp;AMotics</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2375"/>
+        <location filename="../qt/camotics.ui" line="2367"/>
         <source>Show Wire Surface</source>
         <translation>Drahtoberfläche Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2378"/>
+        <location filename="../qt/camotics.ui" line="2370"/>
         <source>Ctrl+2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2393"/>
+        <location filename="../qt/camotics.ui" line="2385"/>
         <source>Show Workpiece Bounds</source>
         <translation>Werkstückgrenzen Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2396"/>
+        <location filename="../qt/camotics.ui" line="2388"/>
         <source>Show workpiece bounds</source>
         <translation>Werkstückgrenzen anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2399"/>
+        <location filename="../qt/camotics.ui" line="2391"/>
         <source>Ctrl+7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2414"/>
+        <location filename="../qt/camotics.ui" line="2406"/>
         <source>Show Tool</source>
         <translation>Werkzeug Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2417"/>
+        <location filename="../qt/camotics.ui" line="2409"/>
         <source>Ctrl+6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2432"/>
+        <location filename="../qt/camotics.ui" line="2424"/>
         <source>Show Cut Surface</source>
         <translation>Bearbeitete Oberfläche Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2435"/>
+        <location filename="../qt/camotics.ui" line="2427"/>
         <source>Show cut surface</source>
         <translation>Bearbeitete Oberfläche anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2438"/>
+        <location filename="../qt/camotics.ui" line="2430"/>
         <source>Ctrl+1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2453"/>
+        <location filename="../qt/camotics.ui" line="2445"/>
         <source>Show Axes</source>
         <translation>Achsen Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2456"/>
+        <location filename="../qt/camotics.ui" line="2448"/>
         <source>Ctrl+8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2471"/>
+        <location filename="../qt/camotics.ui" line="2463"/>
         <source>Show Tool Path</source>
         <translation>Werkzeugpfad Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2474"/>
+        <location filename="../qt/camotics.ui" line="2466"/>
         <source>Ctrl+5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2483"/>
+        <location filename="../qt/camotics.ui" line="2475"/>
         <source>Isometric</source>
         <translation>Isometrisch</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2486"/>
+        <location filename="../qt/camotics.ui" line="2478"/>
         <source>Snap to isometric view</source>
         <translation>Zeige isometrische Ansicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2489"/>
+        <location filename="../qt/camotics.ui" line="2481"/>
         <source>Alt+1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2498"/>
+        <location filename="../qt/camotics.ui" line="2490"/>
         <source>Front</source>
         <translation>Vorderseite</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2501"/>
+        <location filename="../qt/camotics.ui" line="2493"/>
         <source>Snap to front view</source>
         <translation>Zeige Vorderansicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2504"/>
+        <location filename="../qt/camotics.ui" line="2496"/>
         <source>Alt+2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2513"/>
+        <location filename="../qt/camotics.ui" line="2505"/>
         <source>Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2516"/>
+        <location filename="../qt/camotics.ui" line="2508"/>
         <source>Snap to back view</source>
         <translation>Zeige Rückansicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2519"/>
+        <location filename="../qt/camotics.ui" line="2511"/>
         <source>Alt+3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2528"/>
+        <location filename="../qt/camotics.ui" line="2520"/>
         <source>Left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2531"/>
+        <location filename="../qt/camotics.ui" line="2523"/>
         <source>Snap to left view</source>
         <translation>Zeige Linksansicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2534"/>
+        <location filename="../qt/camotics.ui" line="2526"/>
         <source>Alt+4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2543"/>
+        <location filename="../qt/camotics.ui" line="2535"/>
         <source>Right</source>
         <translatorcomment>Richtig?</translatorcomment>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2546"/>
+        <location filename="../qt/camotics.ui" line="2538"/>
         <source>Snap to right view</source>
         <translation>Zeige Rechtsansicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2549"/>
+        <location filename="../qt/camotics.ui" line="2541"/>
         <source>Alt+5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2558"/>
+        <location filename="../qt/camotics.ui" line="2550"/>
         <source>Top</source>
         <translation>Draufsicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2561"/>
+        <location filename="../qt/camotics.ui" line="2553"/>
         <source>Snap to top view</source>
         <translation>Zeige Draufsicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2564"/>
+        <location filename="../qt/camotics.ui" line="2556"/>
         <source>Alt+6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2573"/>
+        <location filename="../qt/camotics.ui" line="2565"/>
         <source>Bottom</source>
         <translation>Unterseite</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2576"/>
+        <location filename="../qt/camotics.ui" line="2568"/>
         <source>Snap to bottom view</source>
         <translation>Zeige Unteransicht</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2579"/>
+        <location filename="../qt/camotics.ui" line="2571"/>
         <source>Alt+7</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2588"/>
+        <location filename="../qt/camotics.ui" line="2580"/>
         <source>Slower</source>
         <translation>Langsamer</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2591"/>
+        <location filename="../qt/camotics.ui" line="2583"/>
         <source>Slow down tool path animation</source>
         <translation>Verlangsamen der Werkzeugpfadanimation</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2600"/>
+        <location filename="../qt/camotics.ui" line="2592"/>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2603"/>
+        <location filename="../qt/camotics.ui" line="2595"/>
         <source>Start or stop tool path animation</source>
         <translation>Starten oder Stoppen der Werkzeugpfadanimation</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2612"/>
+        <location filename="../qt/camotics.ui" line="2604"/>
         <source>Faster</source>
         <translation>Schneller</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2615"/>
+        <location filename="../qt/camotics.ui" line="2607"/>
         <source>Speed up tool path animation</source>
         <translation>Beschleunigen der Werkzeugpfadanimation</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2624"/>
+        <location filename="../qt/camotics.ui" line="2616"/>
         <source>Direction</source>
         <translation>Richtung</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2627"/>
+        <location filename="../qt/camotics.ui" line="2619"/>
         <source>Change tool path animation direction</source>
         <translation>Richtungsänderung der Werkzeugpfadanimation</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2636"/>
+        <location filename="../qt/camotics.ui" line="2628"/>
         <source>&amp;New Tool</source>
         <translation>&amp;Neues Werkzeug</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2639"/>
+        <location filename="../qt/camotics.ui" line="2631"/>
         <source>Add a new tool</source>
         <translation>Neues Werkzeug hinzufügen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2648"/>
+        <location filename="../qt/camotics.ui" line="2640"/>
         <source>Remove Tool</source>
         <translation>Werkzeug entfernen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2651"/>
+        <location filename="../qt/camotics.ui" line="2643"/>
         <source>Remove the selected tool</source>
         <translation>Ausgewähltes Werkzeug entfernen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2660"/>
+        <location filename="../qt/camotics.ui" line="2652"/>
         <source>A&amp;dd File</source>
         <translation>&amp;Datei Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2663"/>
+        <location filename="../qt/camotics.ui" line="2655"/>
         <source>Add a new file to the project</source>
         <translation>Eine neue Datei dem Projekt hinzufügen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2672"/>
+        <location filename="../qt/camotics.ui" line="2664"/>
         <source>Remove File</source>
         <translation>Datei löschen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2675"/>
+        <location filename="../qt/camotics.ui" line="2667"/>
         <source>Remove the currently selected file</source>
         <translation>Aktuell ausgewählte Datei entfernen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2687"/>
+        <location filename="../qt/camotics.ui" line="2679"/>
         <source>Hide Surface</source>
         <translation>Oberfläche ausblenden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2690"/>
+        <location filename="../qt/camotics.ui" line="2682"/>
         <source>Ctrl+4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2699"/>
+        <location filename="../qt/camotics.ui" line="2691"/>
         <source>Stop</source>
         <translation>Anhalten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2702"/>
+        <location filename="../qt/camotics.ui" line="2694"/>
         <source>Stop the simulation</source>
         <translation>Die Simulation anhalten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2705"/>
+        <location filename="../qt/camotics.ui" line="2697"/>
         <source>F6</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2714"/>
+        <location filename="../qt/camotics.ui" line="2706"/>
         <source>Run</source>
         <translatorcomment>maybe run is not the word for this case</translatorcomment>
         <translation>Neu Berechnen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2717"/>
+        <location filename="../qt/camotics.ui" line="2709"/>
         <source>Run or restart the simulation</source>
         <translation>Simulation durch neu berechnen neu starten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2720"/>
+        <location filename="../qt/camotics.ui" line="2712"/>
         <source>F5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2732"/>
+        <location filename="../qt/camotics.ui" line="2724"/>
         <source>Reduce</source>
         <translation>Reduzieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2735"/>
+        <location filename="../qt/camotics.ui" line="2727"/>
         <source>Reduce the cut surface triangle count for more compact export.</source>
         <translatorcomment>Reduzieren Sie die Anzahl der Schnittfläche Dreiecke für einen kompakteren Export.</translatorcomment>
         <translation>Modell vereinfachen für eine kleinere Dateigrösse.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2744"/>
+        <location filename="../qt/camotics.ui" line="2736"/>
         <source>&amp;Welcome</source>
         <translation>&amp;Willkommen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2747"/>
+        <location filename="../qt/camotics.ui" line="2739"/>
         <source>Please consider support this software.</source>
         <translation>Bitte erwägen Sie die Unterstützung dieser Software.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2759"/>
+        <location filename="../qt/camotics.ui" line="2751"/>
         <source>Show Workpiece</source>
         <translation>Werkstück anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2762"/>
+        <location filename="../qt/camotics.ui" line="2754"/>
         <source>Show uncut workpiece</source>
         <translation>Unbearbeitetes Werkstück anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2765"/>
+        <location filename="../qt/camotics.ui" line="2757"/>
         <source>Ctrl+3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2770"/>
+        <location filename="../qt/camotics.ui" line="2762"/>
         <source>&amp;Default Layout</source>
         <translation>&amp;Standardlayout</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2778"/>
+        <location filename="../qt/camotics.ui" line="2770"/>
         <source>&amp;Examples</source>
         <translation>&amp;Beispiele</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2783"/>
+        <location filename="../qt/camotics.ui" line="2775"/>
         <source>&amp;Minimal Layout</source>
         <translation>&amp;Minimales Layout</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2788"/>
+        <location filename="../qt/camotics.ui" line="2780"/>
         <source>&amp;Full Layout</source>
         <translation>&amp;Vollständiges Layout</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2791"/>
+        <location filename="../qt/camotics.ui" line="2783"/>
         <source>Full Layout</source>
         <translation>Vollständiges Layout</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2796"/>
+        <location filename="../qt/camotics.ui" line="2788"/>
         <source>&amp;Toolbars</source>
         <translation>Symbolleis&amp;ten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2801"/>
+        <location filename="../qt/camotics.ui" line="2793"/>
         <source>Doc&amp;ks</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2809"/>
+        <location filename="../qt/camotics.ui" line="2801"/>
         <source>Fullscreen</source>
         <translation>Vollbild</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2812"/>
+        <location filename="../qt/camotics.ui" line="2804"/>
         <source>F11</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2824"/>
+        <location filename="../qt/camotics.ui" line="2816"/>
         <source>F1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2836"/>
+        <location filename="../qt/camotics.ui" line="2828"/>
         <source>Re&amp;vert File</source>
         <translation>Datei &amp;Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2839"/>
+        <location filename="../qt/camotics.ui" line="2831"/>
         <source>Revert changes to NC file.</source>
         <translation>Änderungen an der NC-Datei rückgängig machen.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2851"/>
+        <location filename="../qt/camotics.ui" line="2843"/>
         <source>Save File A&amp;s</source>
         <translation>Datei speichern al&amp;s</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2854"/>
+        <location filename="../qt/camotics.ui" line="2846"/>
         <source>Save NC file to a specified location.</source>
         <translation>Speichern Sie die NC-Datei an einem bestimmten Speicherort ab.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2866"/>
+        <location filename="../qt/camotics.ui" line="2858"/>
         <source>Save &amp;File</source>
         <translation>&amp;Datei Speichern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2869"/>
+        <location filename="../qt/camotics.ui" line="2861"/>
         <source>Save file.</source>
         <translation>Datei speichern.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2878"/>
+        <location filename="../qt/camotics.ui" line="2870"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2881"/>
+        <location filename="../qt/camotics.ui" line="2873"/>
         <source>Undo most recent edit.</source>
         <translation>Letzte Bearbeitung rückgängig machen.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2884"/>
+        <location filename="../qt/camotics.ui" line="2876"/>
         <source>Ctrl+Z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2893"/>
+        <location filename="../qt/camotics.ui" line="2885"/>
         <source>Redo</source>
         <translation>Wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2896"/>
+        <location filename="../qt/camotics.ui" line="2888"/>
         <source>Redo recent edit.</source>
         <translation>Letzte Bearbeitung Wiederherstellen.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2899"/>
+        <location filename="../qt/camotics.ui" line="2891"/>
         <source>Ctrl+Shift+Z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2908"/>
+        <location filename="../qt/camotics.ui" line="2900"/>
         <source>Cut</source>
-        <translation type="unfinished">Ausschneiden</translation>
+        <translation>Ausschneiden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2911"/>
+        <location filename="../qt/camotics.ui" line="2903"/>
         <source>Cut selected text to clipboard.</source>
         <translation>Ausgewählten Text in die Zwischenablage ausschneiden.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2914"/>
+        <location filename="../qt/camotics.ui" line="2906"/>
         <source>Ctrl+X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2923"/>
+        <location filename="../qt/camotics.ui" line="2915"/>
         <source>Copy</source>
         <translation>Kopieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2926"/>
+        <location filename="../qt/camotics.ui" line="2918"/>
         <source>Copy selected text to clipboard.</source>
         <translation>Kopiert den ausgewählten Text in die Zwischenablage.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2929"/>
+        <location filename="../qt/camotics.ui" line="2921"/>
         <source>Ctrl+C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2938"/>
+        <location filename="../qt/camotics.ui" line="2930"/>
         <source>Paste</source>
         <translation>Einfügen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2941"/>
+        <location filename="../qt/camotics.ui" line="2933"/>
         <source>Paste clipboard contents to editor.</source>
         <translation>Inhalt der Zwischenablage in den Editor einfügen.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2944"/>
+        <location filename="../qt/camotics.ui" line="2936"/>
         <source>Ctrl+V</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2953"/>
+        <location filename="../qt/camotics.ui" line="2945"/>
         <source>Select &amp;All</source>
         <translation>&amp;Alles Auswählen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2956"/>
+        <location filename="../qt/camotics.ui" line="2948"/>
         <source>Select all text in editor.</source>
         <translation>Den gesamten Text im Editor auswählen.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2959"/>
+        <location filename="../qt/camotics.ui" line="2951"/>
         <source>Ctrl+A</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2971"/>
+        <location filename="../qt/camotics.ui" line="2963"/>
         <source>Hide Console</source>
         <translatorcomment>??Konsole ausblenden</translatorcomment>
         <translation>Konsole Ausblenden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2974"/>
+        <location filename="../qt/camotics.ui" line="2966"/>
         <source>Hide console</source>
         <translation>Konsole ausblenden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2986"/>
+        <location filename="../qt/camotics.ui" line="2978"/>
         <source>Show Console</source>
         <translation>Konsole Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2989"/>
+        <location filename="../qt/camotics.ui" line="2981"/>
         <source>Show console</source>
         <translation>Konsole anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="2998"/>
+        <location filename="../qt/camotics.ui" line="2990"/>
         <source>Optimize</source>
         <translation>Optimieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3001"/>
+        <location filename="../qt/camotics.ui" line="2993"/>
         <source>Optimize rapid moves</source>
         <translation>Optimieren der schnellen Bewegungen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3010"/>
+        <location filename="../qt/camotics.ui" line="3002"/>
         <source>Edit Tool</source>
         <translation>Werkzeug bearbeiten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3013"/>
+        <location filename="../qt/camotics.ui" line="3005"/>
         <source>Edit selected tool</source>
         <translation>Ausgewähltes Werkzeug bearbeiten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3022"/>
+        <location filename="../qt/camotics.ui" line="3014"/>
         <source>E&amp;xport Tool Table</source>
         <translation>Werkzeugtabelle e&amp;xportieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3025"/>
+        <location filename="../qt/camotics.ui" line="3017"/>
         <source>Export tool table</source>
         <translation>Werkzeugtabelle exportieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3034"/>
+        <location filename="../qt/camotics.ui" line="3026"/>
         <source>&amp;Import Tool Table</source>
         <translation>Werkzeugtabelle &amp;Importieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3037"/>
+        <location filename="../qt/camotics.ui" line="3029"/>
         <source>Import tool table</source>
         <translation>Werkzeugtabelle importieren</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3046"/>
+        <location filename="../qt/camotics.ui" line="3038"/>
         <source>Save Tool Table &amp;As Default</source>
         <translation>Werkzeugtabelle &amp;Als Standard Speichern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3049"/>
-        <source>Save curent tool table as default</source>
-        <translation>Werkzeugtabelle als Standard speichern</translation>
+        <location filename="../qt/camotics.ui" line="3041"/>
+        <source>Save current tool table as default</source>
+        <translation>Aktuelle Werkzeugtabelle als Standard speichern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3058"/>
+        <location filename="../qt/camotics.ui" line="3160"/>
+        <source>Intensity</source>
+        <translation>Intensität</translation>
+    </message>
+    <message>
+        <source>Save curent tool table as default</source>
+        <translation type="vanished">Werkzeugtabelle als Standard speichern</translation>
+    </message>
+    <message>
+        <location filename="../qt/camotics.ui" line="3050"/>
         <source>&amp;Load Default Tool Table</source>
         <translation>Standardwerkzeugtabelle &amp;Laden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3061"/>
+        <location filename="../qt/camotics.ui" line="3053"/>
         <source>Load default tool table</source>
         <translation>Standardwerkzeugtabelle laden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3070"/>
+        <location filename="../qt/camotics.ui" line="3062"/>
         <source>&amp;Settings</source>
         <translation>Ein&amp;stellungen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3073"/>
+        <location filename="../qt/camotics.ui" line="3065"/>
         <source>Edit settings</source>
         <translation>Einstellungen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3082"/>
+        <location filename="../qt/camotics.ui" line="3074"/>
         <source>Edit File</source>
         <translation>Datei bearbeiten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3085"/>
+        <location filename="../qt/camotics.ui" line="3077"/>
         <source>Edit selected file</source>
         <translation>Ausgewählte Datei bearbeiten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3094"/>
+        <location filename="../qt/camotics.ui" line="3086"/>
         <source>&amp;Connect</source>
         <translation>&amp;Verbinden</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3097"/>
+        <location filename="../qt/camotics.ui" line="3089"/>
         <source>Connect to a Buildbotics CNC Controller</source>
         <translation>Verbindung zur Buildbotics-CNC herstellen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3109"/>
+        <location filename="../qt/camotics.ui" line="3101"/>
         <source>Show Machine</source>
         <translation>Maschine Anzeigen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3112"/>
+        <location filename="../qt/camotics.ui" line="3104"/>
         <source>Toggle machine display.</source>
         <translation>Fräsmaschine sichtbar oder unsichtbar machen.</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3115"/>
+        <location filename="../qt/camotics.ui" line="3107"/>
         <source>Ctrl+9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3120"/>
-        <location filename="../qt/camotics.ui" line="3123"/>
+        <location filename="../qt/camotics.ui" line="3112"/>
+        <location filename="../qt/camotics.ui" line="3115"/>
         <source>Toggle &amp;Console</source>
         <translation>&amp;Konsole Umschalten</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3126"/>
+        <location filename="../qt/camotics.ui" line="3118"/>
         <source>Alt+C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3131"/>
+        <location filename="../qt/camotics.ui" line="3123"/>
         <source>Zoom +</source>
         <translation>Vergrössern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3134"/>
+        <location filename="../qt/camotics.ui" line="3126"/>
         <source>Zoom Larger</source>
         <translation>Vergrössern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3139"/>
+        <location filename="../qt/camotics.ui" line="3131"/>
         <source>Zoom -</source>
         <translation>Verkleinern</translation>
     </message>
     <message>
+        <location filename="../qt/camotics.ui" line="3134"/>
         <location filename="../qt/camotics.ui" line="3142"/>
-        <location filename="../qt/camotics.ui" line="3150"/>
         <source>Zoom Smaller</source>
         <translation>Verkleinern</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3147"/>
+        <location filename="../qt/camotics.ui" line="3139"/>
         <source>Zoom All</source>
         <translation>Auf Objekt Zoomen</translation>
     </message>
     <message>
-        <location filename="../qt/camotics.ui" line="3168"/>
-        <source>actionIntensity</source>
-        <translatorcomment>Aktionsintensität</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qt/camotics.ui" line="3171"/>
+        <location filename="../qt/camotics.ui" line="3163"/>
         <source>Show tool path intensity.  Useful for LASER paths that vary the S parameter.</source>
         <translation>Werkzeugwegintensität anzeigen. Nützlich für LASER-Pfade, die den S-Parameter variieren.</translation>
     </message>
@@ -1500,7 +1677,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../qt/connect_dialog.ui" line="103"/>
         <source>bbctrl</source>
-        <translation type="unfinished"></translation>
+        <translation>bbctrl</translation>
     </message>
     <message>
         <location filename="../qt/connect_dialog.ui" line="117"/>
@@ -1599,7 +1776,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../qt/export_dialog.ui" line="101"/>
         <source>Windows line endings</source>
-        <translation type="unfinished">Windows-Zeilenenden (&apos;\r\n&apos;)</translation>
+        <translation>Windows-Zeilenenden (&apos;\r\n&apos;)</translation>
     </message>
     <message>
         <location filename="../qt/export_dialog.ui" line="111"/>
@@ -1644,7 +1821,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../qt/export_dialog.ui" line="228"/>
         <source>With cut surface</source>
-        <translation type="unfinished">Mit bearbeiteter Oberfläche</translation>
+        <translation>Mit Schnittfläche</translation>
     </message>
 </context>
 <context>
@@ -1668,7 +1845,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../qt/find_dialog.ui" line="57"/>
         <source>Regular expression</source>
-        <translation type="unfinished">Platzhalter verwenden (Regex)</translation>
+        <translation>Platzhalter verwenden (Regex)</translation>
     </message>
     <message>
         <location filename="../qt/find_dialog.ui" line="64"/>
@@ -1715,8 +1892,17 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../qt/new_dialog.ui" line="41"/>
+        <source>Create a new TPL file by selecting a non-existing filename or select an existing TPL file and add it to the current project.</source>
+        <translation>Erstellen Sie eine neue TPL-Datei, indem Sie einen nicht vorhandenen Dateinamen auswählen, oder wählen Sie eine vorhandene TPL-Datei aus und fügen Sie sie dem jetziges Projekt hinzu.</translation>
+    </message>
+    <message>
+        <location filename="../qt/new_dialog.ui" line="54"/>
+        <source>Create a new GCode file by selecting a non-existing filename or select an existing GCode file and add it to the current project.</source>
+        <translation>Erstellen Sie eine neue GCode-Datei, indem Sie einen nicht vorhandenen Dateinamen auswählen, oder wählen Sie eine vorhandene GCode-Datei aus und fügen Sie sie dem jetziges Projekt hinzu.</translation>
+    </message>
+    <message>
         <source>Create a new TPL file by selecting a non-existing filename or select an exsiting TPL file and add it to the current project.</source>
-        <translation>Erstellen Sie eine neue TPL-Datei, indem Sie einen nicht vorhandenen Dateinamen auswählen,
+        <translation type="vanished">Erstellen Sie eine neue TPL-Datei, indem Sie einen nicht vorhandenen Dateinamen auswählen,
 oder wählen Sie eine vorhandene TPL-Datei aus, welche Sie dem aktuellen Projekt hinzufügen.</translation>
     </message>
     <message>
@@ -1725,9 +1911,8 @@ oder wählen Sie eine vorhandene TPL-Datei aus, welche Sie dem aktuellen Projekt
         <translation>TPL Datei (Tool Path Language)</translation>
     </message>
     <message>
-        <location filename="../qt/new_dialog.ui" line="54"/>
         <source>Create a new GCode file by selecting a non-existing filename or select an exsiting GCode file and add it to the current project.</source>
-        <translation>Erstellen Sie eine neue G-Code-Datei, indem Sie einen nicht vorhandenen Dateinamen auswählen,
+        <translation type="vanished">Erstellen Sie eine neue G-Code-Datei, indem Sie einen nicht vorhandenen Dateinamen auswählen,
 oder wählen Sie eine vorhandene G-Code-Datei aus, welche Sie dem aktuellen Projekt hinzufügen.</translation>
     </message>
     <message>
@@ -1741,7 +1926,7 @@ oder wählen Sie eine vorhandene G-Code-Datei aus, welche Sie dem aktuellen Proj
     <message>
         <location filename="../qt/new_project_dialog.ui" line="26"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Dialog</translation>
     </message>
     <message>
         <location filename="../qt/new_project_dialog.ui" line="32"/>
@@ -1790,6 +1975,14 @@ oder wählen Sie eine vorhandene G-Code-Datei aus, welche Sie dem aktuellen Proj
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/camotics/qt/FileDialog.cpp" line="72"/>
+        <source>Cannot open directory</source>
+        <translation>Verzeichnis kann nicht geöffnet werden</translation>
+    </message>
+</context>
+<context>
     <name>SettingsDialog</name>
     <message>
         <location filename="../qt/settings_dialog.ui" line="26"/>
@@ -1808,7 +2001,7 @@ oder wählen Sie eine vorhandene G-Code-Datei aus, welche Sie dem aktuellen Proj
     </message>
     <message>
         <location filename="../qt/settings_dialog.ui" line="90"/>
-        <location filename="../qt/settings_dialog.ui" line="337"/>
+        <location filename="../qt/settings_dialog.ui" line="343"/>
         <source>Simulation</source>
         <translation>Simulation</translation>
     </message>
@@ -1848,66 +2041,161 @@ oder wählen Sie eine vorhandene G-Code-Datei aus, welche Sie dem aktuellen Proj
         <translation>Sehr Hoch</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="191"/>
+        <location filename="../qt/settings_dialog.ui" line="193"/>
         <source>Resolution</source>
         <translation>Auflösung</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="209"/>
+        <location filename="../qt/settings_dialog.ui" line="211"/>
         <source>Units</source>
         <translation>Einheiten</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="237"/>
+        <location filename="../qt/settings_dialog.ui" line="241"/>
         <source>Project Units</source>
         <translation>Projekt Einheiten</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="245"/>
-        <location filename="../qt/settings_dialog.ui" line="271"/>
+        <location filename="../qt/settings_dialog.ui" line="249"/>
+        <location filename="../qt/settings_dialog.ui" line="277"/>
+        <location filename="../qt/settings_dialog.ui" line="490"/>
+        <location filename="../qt/settings_dialog.ui" line="872"/>
+        <location filename="../qt/settings_dialog.ui" line="923"/>
+        <location filename="../qt/settings_dialog.ui" line="930"/>
+        <location filename="../qt/settings_dialog.ui" line="1019"/>
+        <location filename="../qt/settings_dialog.ui" line="1070"/>
+        <location filename="../qt/settings_dialog.ui" line="1077"/>
         <source>mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="250"/>
-        <location filename="../qt/settings_dialog.ui" line="276"/>
+        <location filename="../qt/settings_dialog.ui" line="254"/>
+        <location filename="../qt/settings_dialog.ui" line="282"/>
         <source>inch</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="263"/>
+        <location filename="../qt/settings_dialog.ui" line="269"/>
         <source>Default Units</source>
         <translation>Standardeinheiten</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="316"/>
+        <location filename="../qt/settings_dialog.ui" line="322"/>
         <source>Advanced</source>
         <translation>Fortgeschritten</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="350"/>
+        <location filename="../qt/settings_dialog.ui" line="356"/>
         <source>Render mode</source>
         <translation>Rendermodus</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="358"/>
+        <location filename="../qt/settings_dialog.ui" line="364"/>
         <source>Marching Cubes</source>
-        <translation type="unfinished"></translation>
+        <translation>Marschierende Kubus</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="363"/>
+        <location filename="../qt/settings_dialog.ui" line="369"/>
         <source>Cubical Marching Squares</source>
-        <translation type="unfinished"></translation>
+        <translation>Kubisches marschierende Quadrate</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="386"/>
+        <location filename="../qt/settings_dialog.ui" line="392"/>
         <source>Show AABB (Axis Aligned Bounding Box)</source>
         <translation>AABB anzeigen (Achsenausgerichtete Begrenzungsbox)</translation>
     </message>
     <message>
-        <location filename="../qt/settings_dialog.ui" line="393"/>
+        <location filename="../qt/settings_dialog.ui" line="399"/>
         <source>Show AABB leaves only</source>
-        <translation type="unfinished">Zeige nur AABB Blätter</translation>
+        <translation>Zeige nur AABB Blätter</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="423"/>
+        <source>Planner</source>
+        <translation>Planer</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="429"/>
+        <source>Enable</source>
+        <translation>Ermöglichen</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="467"/>
+        <source>Maximum Deviation</source>
+        <translation>Maximale Abweichung</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="514"/>
+        <source>Max Velocity</source>
+        <translation>Max Geschwindigkeit</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="535"/>
+        <location filename="../qt/settings_dialog.ui" line="554"/>
+        <location filename="../qt/settings_dialog.ui" line="611"/>
+        <source>m/min</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="547"/>
+        <location filename="../qt/settings_dialog.ui" line="678"/>
+        <location filename="../qt/settings_dialog.ui" line="816"/>
+        <location filename="../qt/settings_dialog.ui" line="966"/>
+        <location filename="../qt/settings_dialog.ui" line="1113"/>
+        <source>Y</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="604"/>
+        <location filename="../qt/settings_dialog.ui" line="690"/>
+        <location filename="../qt/settings_dialog.ui" line="828"/>
+        <location filename="../qt/settings_dialog.ui" line="978"/>
+        <location filename="../qt/settings_dialog.ui" line="1208"/>
+        <source>Z</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="623"/>
+        <location filename="../qt/settings_dialog.ui" line="702"/>
+        <location filename="../qt/settings_dialog.ui" line="840"/>
+        <location filename="../qt/settings_dialog.ui" line="990"/>
+        <location filename="../qt/settings_dialog.ui" line="1132"/>
+        <source>X</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="652"/>
+        <source>Max Jerk</source>
+        <translation>Max Ruck</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="728"/>
+        <location filename="../qt/settings_dialog.ui" line="773"/>
+        <location filename="../qt/settings_dialog.ui" line="780"/>
+        <source>km/min³</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="790"/>
+        <source>Min Coordinate</source>
+        <translation>Min Coordinate</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="940"/>
+        <source>Max Coordinate</source>
+        <translation>Max Koordinate</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="1087"/>
+        <source>Max Acceleration</source>
+        <translation>Max Beschleunigung</translation>
+    </message>
+    <message>
+        <location filename="../qt/settings_dialog.ui" line="1120"/>
+        <location filename="../qt/settings_dialog.ui" line="1177"/>
+        <location filename="../qt/settings_dialog.ui" line="1215"/>
+        <source>km/min²</source>
+        <translation></translation>
     </message>
 </context>
 <context>

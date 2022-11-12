@@ -36,7 +36,7 @@ using namespace cb;
 using namespace CAMotics;
 
 
-QtApp::QtApp(QWidget *parent) :
+QtApp::QtApp() :
   // NOTE MSVC requires the explicit _hasFeature reference
   CAMotics::Application("CAMotics", CAMotics::Application::_hasFeature),
   threads(SystemInfo::instance().getCPUCount()) {

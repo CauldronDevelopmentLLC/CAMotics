@@ -28,19 +28,14 @@
 
 #include <gcode/plan/PlannerConfig.h>
 
-#include <cbang/SmartPointer.h>
-
 #include <QDialog>
 
 
-namespace Ui {class SettingsDialog;}
 namespace GCode {class Axes;}
 
 namespace CAMotics {
   class SettingsDialog : public Dialog {
     Q_OBJECT;
-
-    cb::SmartPointer<Ui::SettingsDialog> ui;
 
     Settings settings;
     cb::Rectangle3D bounds;

@@ -20,20 +20,12 @@
 
 #pragma once
 
-
-#include <cbang/SmartPointer.h>
-
-#include <QDialog>
-
-
-namespace Ui {class ExportDialog;}
+#include "Dialog.h"
 
 
 namespace CAMotics {
-  class ExportDialog : public QDialog {
+  class ExportDialog : public Dialog {
     Q_OBJECT;
-
-    cb::SmartPointer<Ui::ExportDialog> ui;
 
   public:
     ExportDialog(QWidget *parent);

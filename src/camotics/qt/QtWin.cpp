@@ -62,12 +62,12 @@ using namespace CAMotics;
 
 
 QtWin::QtWin(Application &app, QApplication &qtApp) :
-  QMainWindow(0), ui(new Ui::CAMoticsWindow), newDialog(this),
-  newProjectDialog(this), exportDialog(this), aboutDialog(this),
-  settingsDialog(this), donateDialog(this), findDialog(this, false),
-  findAndReplaceDialog(this, true), toolDialog(this), camDialog(this),
-  connectDialog(this), uploadDialog(this), fileDialog(*this), app(app),
-  options(app.getOptions()), qtApp(qtApp), view(new View(valueSet)) {
+  ui(new Ui::CAMoticsWindow), newDialog(this), newProjectDialog(this),
+  exportDialog(this), aboutDialog(this), settingsDialog(this),
+  donateDialog(this), findDialog(this, false), findAndReplaceDialog(this, true),
+  toolDialog(this), camDialog(this), connectDialog(this), uploadDialog(this),
+  fileDialog(*this), app(app), options(app.getOptions()), qtApp(qtApp),
+  view(new View(valueSet)) {
 
   // Translation
   qtTran.load(QLocale::system(), QStringLiteral("qtbase_"));
@@ -138,18 +138,18 @@ QtWin::QtWin(Application &app, QApplication &qtApp) :
   ui->actionOptimize->setVisible(false);
 
   // Set action shortcuts
-  ui->actionZoomIn->setShortcut(tr("Alt+-"));
-  ui->actionZoomOut->setShortcuts({tr("Alt+="), tr("Alt++")});
-  ui->actionZoomAll->setShortcut(tr("Alt+A"));
-  ui->actionToggleConsole->setShortcut(tr("Alt+C"));
-  ui->actionTopView->setShortcut(tr("Alt+1"));
-  ui->actionFrontView->setShortcut(tr("Alt+2"));
-  ui->actionBackView->setShortcut(tr("Alt+3"));
-  ui->actionLeftView->setShortcut(tr("Alt+4"));
-  ui->actionRightView->setShortcut(tr("Alt+5"));
-  ui->actionBottomView->setShortcut(tr("Alt+6"));
-  ui->actionIsoView->setShortcut(tr("Alt+7"));
-  ui->actionRun->setShortcuts({tr("Ctrl+R"), tr("F5")});
+  ui->actionZoomIn->setShortcut(QString("Alt+-"));
+  ui->actionZoomOut->setShortcuts({QString("Alt+="), QString("Alt++")});
+  ui->actionZoomAll->setShortcut(QString("Alt+A"));
+  ui->actionToggleConsole->setShortcut(QString("Alt+C"));
+  ui->actionTopView->setShortcut(QString("Alt+1"));
+  ui->actionFrontView->setShortcut(QString("Alt+2"));
+  ui->actionBackView->setShortcut(QString("Alt+3"));
+  ui->actionLeftView->setShortcut(QString("Alt+4"));
+  ui->actionRightView->setShortcut(QString("Alt+5"));
+  ui->actionBottomView->setShortcut(QString("Alt+6"));
+  ui->actionIsoView->setShortcut(QString("Alt+7"));
+  ui->actionRun->setShortcuts({QString("Ctrl+R"), QString("F5")});
 
   // Load icons
   playIcon.addFile(QString::fromUtf8(":/icons/play.png"), QSize(),
@@ -306,7 +306,7 @@ void QtWin::loadLanguageMenu() {
   QDir dir(":/i18n");
   QStringList fileNames = dir.entryList(QStringList("camotics_*.qm"));
 
-  for (int i = 0; i < fileNames.size(); ++i) {
+  for (int i = 0; i < fileNames.size(); i++) {
     // Get locale from filename
     QString locale;
     locale = fileNames[i];
@@ -885,7 +885,7 @@ void QtWin::snapshot() {
     QPixmap::fromImage(ui->simulationView->grabFramebuffer());
 
   QList<QByteArray> formats = QImageWriter::supportedImageFormats();
-  QString fileTypes = tr("Image files (");
+  QString fileTypes = tr("Image files") + QString(" (");
   for (int i = 0; i < formats.size(); i++) {
     if (i) fileTypes.append(",");
     fileTypes.append("*.");
@@ -924,17 +924,17 @@ void QtWin::exportData() {
 
   if (exportDialog.surfaceSelected()) {
     title.append(tr("Surface"));
-    fileTypes = tr("STL Files (*.stl)");
+    fileTypes = tr("STL Files") + QString(" (*.stl)");
     ext = "stl";
 
   } else if (exportDialog.gcodeSelected()) {
     title.append(tr("GCode"));
-    fileTypes = tr("GCode Files (*.gcode *.nc *.ngc *.tap)");
+    fileTypes = tr("GCode Files") + QString(" (*.gcode *.nc *.ngc *.tap)");
     ext = "gcode";
 
   } else {
     title.append(tr("Simulation Data"));
-    fileTypes = tr("JSON Files (*.json)");
+    fileTypes = tr("JSON Files") + QString(" (*.json)");
     ext = "json";
   }
 
@@ -1070,9 +1070,9 @@ void QtWin::openProject(const string &_filename) {
 
     filename = QFileDialog::getOpenFileName
       (this, tr("Open File"), lastDir,
-       tr("Supported Files "
-          "(*.camotics *.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;"
-          "All Files (*.*)")).toUtf8().data();
+       (tr("Supported Files") +
+        QString("(*.camotics *.xml *.nc *.ngc *.gcode *.tap *.tpl *.dxf);;") +
+        tr("All Files") + QString(" (*.*)"))).toUtf8().data();
 
     if (filename.empty()) return;
     settings.setValue("Projects/lastDir", QString::fromUtf8(filename.c_str()));
@@ -1152,8 +1152,9 @@ bool QtWin::saveProject(bool saveAs) {
     else filename = SystemUtilities::swapExtension(filename.toStdString(),
                                                    "camotics").c_str();
 
-    filename =
-      openFile(tr("Save Project"), tr("Projects (*.camotics)"), filename, true);
+    filename = openFile(tr("Save Project"),
+                        tr("Projects") + QString(" (*.camotics)"),
+                        filename, true);
     if (filename.isEmpty()) return false;
 
     string ext = SystemUtilities::extension(filename.toStdString());
@@ -1217,9 +1218,11 @@ void QtWin::newFile(bool tpl) {
     (filename.toStdString(), tpl ? "tpl" : "nc").c_str();
 
   filename = openFile(tpl ? tr("New TPL file") : tr("New GCode file"),
-                      tpl ? tr("TPL (*.tpl);;All files (*.*)") :
-                      tr("GCode (*.nc *.ngc *.gcode *.tap);;All files (*.*)"),
-                      filename, false, true);
+                      tpl ? QString("TPL (*.tpl);;") + tr("All files") +
+                      QString(" (*.*)") :
+                      (QString("GCode (*.nc *.ngc *.gcode *.tap);;") +
+                       tr("All files") + QString(" (*.*)")), filename, false,
+                      true);
   if (filename.isEmpty()) return;
 
   string ext = SystemUtilities::extension(filename.toStdString());
@@ -1241,8 +1244,9 @@ void QtWin::newFile(bool tpl) {
 
 void QtWin::addFile() {
   QString filename =
-    openFile(tr("Add file"), tr("Supported Files (*.dxf, *.nc *.ngc "
-             "*.gcode *.tap *.tpl);;All Files (*.*)"), "", false);
+    openFile(tr("Add file"), tr("Supported Files") +
+             QString(" (*.dxf, *.nc *.ngc *.gcode *.tap *.tpl);;") +
+             tr("All Files") + QString(" (*.*)"), "", false);
   if (filename.isEmpty()) return;
 
   if (SystemUtilities::extension(filename.toLower().toStdString()) == "dxf") {
@@ -1412,8 +1416,8 @@ void QtWin::exportToolTable() {
   QString filename =
     (SystemUtilities::dirname(project->getFilename()) + "/tools.json").c_str();
 
-  filename = openFile(tr("Export tool table"), tr("Tool table files (*.json)"),
-                      filename, true);
+  filename = openFile(tr("Export tool table"), tr("Tool table files") +
+                      QString(" (*.json)"), filename, true);
 
   if (filename.isEmpty()) return;
 
@@ -1425,7 +1429,8 @@ void QtWin::importToolTable() {
   if (project.isNull()) return;
 
   QString filename = openFile
-    (tr("Import tool table"), tr("Tool table files (*.json)"), "", false);
+    (tr("Import tool table"), tr("Tool table files") + QString(" (*.json)"),
+     "", false);
 
   if (filename.isEmpty()) return;
 
@@ -1433,7 +1438,7 @@ void QtWin::importToolTable() {
   *SystemUtilities::iopen(filename.toStdString()) >> tools;
 
   if (tools.empty()) {
-    warning(tr("'") + filename + tr("' empty or not a tool table"));
+    warning(tr("'%1' empty or not a tool table").arg(filename));
     return;
   }
 
@@ -1894,14 +1899,14 @@ void QtWin::on_bbctrlDisconnect() {
 void QtWin::on_bbctrlConnected() {
   connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
   if (connectDialog.isVisible()) connectDialog.accept();
-  showMessage(tr("Connected to ") + connectDialog.getAddress());
+  showMessage(tr("Connected to %1").arg(connectDialog.getAddress()));
   uploadGCode();
 }
 
 
 void QtWin::on_bbctrlDisconnected() {
   connectDialog.setNetworkStatus(bbCtrlAPI->getStatus());
-  showMessage(tr("Disconnected from ") + connectDialog.getAddress());
+  showMessage(tr("Disconnected from %1").arg(connectDialog.getAddress()));
 }
 
 

@@ -25,29 +25,30 @@
 using namespace CAMotics;
 
 
+#define UI() Dialog::getUI<Ui::NewProjectDialog>()
+
+
 NewProjectDialog::NewProjectDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::NewProjectDialog) {
-  ui->setupUi(this);
-}
+  Dialog(parent, new UI<Ui::NewProjectDialog>) {}
 
 
 void NewProjectDialog::setUnits(GCode::Units units) {
-  ui->unitsComboBox->setCurrentIndex
+  UI().unitsComboBox->setCurrentIndex
     (units == GCode::Units::METRIC ? 0 : 1);
 }
 
 
 GCode::Units NewProjectDialog::getUnits() const {
-  return ui->unitsComboBox->currentIndex() == 0 ?
+  return UI().unitsComboBox->currentIndex() == 0 ?
     GCode::Units::METRIC : GCode::Units::IMPERIAL;
 }
 
 
 bool NewProjectDialog::defaultToolTableSelected() const {
-  return ui->toolTableComboBox->currentIndex() == 0;
+  return UI().toolTableComboBox->currentIndex() == 0;
 }
 
 
 bool NewProjectDialog::currentToolTableSelected() const {
-  return ui->toolTableComboBox->currentIndex() == 1;
+  return UI().toolTableComboBox->currentIndex() == 1;
 }

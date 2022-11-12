@@ -20,21 +20,18 @@
 
 #pragma once
 
-
+#include "Dialog.h"
 #include "ToolScene.h"
 
 #include <cbang/SmartPointer.h>
 
 #include <QtWidgets>
 
-namespace Ui {class ToolDialog;}
-
 
 namespace CAMotics {
-  class ToolDialog : public QDialog, public GCode::ToolShape {
+  class ToolDialog : public Dialog, public GCode::ToolShape {
     Q_OBJECT;
 
-    cb::SmartPointer<Ui::ToolDialog> ui;
     ToolScene scene;
     GCode::Tool tool;
     bool updating;

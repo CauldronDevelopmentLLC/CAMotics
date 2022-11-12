@@ -31,39 +31,40 @@ using namespace cb;
 using namespace CAMotics;
 
 
-FindDialog::FindDialog(QWidget *parent, bool replace) :
-  QDialog(parent), ui(new Ui::FindDialog), wasReplace(false) {
-  ui->setupUi(this);
+#define UI() Dialog::getUI<Ui::FindDialog>()
 
+
+FindDialog::FindDialog(QWidget *parent, bool replace) :
+  Dialog(parent, new UI<Ui::FindDialog>), wasReplace(false) {
   if (!replace) {
-    ui->replaceLabel->setVisible(false);
-    ui->replaceLineEdit->setVisible(false);
-    ui->replaceButton->setVisible(false);
-    ui->replaceAllButton->setVisible(false);
+    UI().replaceLabel->setVisible(false);
+    UI().replaceLineEdit->setVisible(false);
+    UI().replaceButton->setVisible(false);
+    UI().replaceAllButton->setVisible(false);
   }
 
-  connect(ui->replaceButton, SIGNAL(clicked()), this, SLOT(replace()));
-  //  connect(ui->replaceButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(ui->replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
-  //  connect(ui->replaceAllButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(ui->findButton, SIGNAL(clicked()), this, SLOT(find()));
-  //  connect(ui->findButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(UI().replaceButton, SIGNAL(clicked()), this, SLOT(replace()));
+  //  connect(UI().replaceButton, SIGNAL(clicked()), this, SLOT(accept()));
+  connect(UI().replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
+  //  connect(UI().replaceAllButton, SIGNAL(clicked()), this, SLOT(accept()));
+  connect(UI().findButton, SIGNAL(clicked()), this, SLOT(find()));
+  //  connect(UI().findButton, SIGNAL(clicked()), this, SLOT(accept()));
+  connect(UI().cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 
 void FindDialog::findReplace(bool find, bool all) {
-  QString findText = ui->findLineEdit->text();
-  QString replaceText = ui->replaceLineEdit->text();
-  bool regex = ui->regexCheckBox->isChecked();
+  QString findText = UI().findLineEdit->text();
+  QString replaceText = UI().replaceLineEdit->text();
+  bool regex = UI().regexCheckBox->isChecked();
   int options = 0;
 
   if (findText.isEmpty()) return;
 
-  if (ui->caseSensitiveCheckBox->isChecked())
+  if (UI().caseSensitiveCheckBox->isChecked())
     options |= QTextDocument::FindCaseSensitively;
 
-  if (ui->wholeWordsCheckBox->isChecked())
+  if (UI().wholeWordsCheckBox->isChecked())
     options |= QTextDocument::FindWholeWords;
 
   wasReplace = !find;
@@ -74,9 +75,9 @@ void FindDialog::findReplace(bool find, bool all) {
 
 
 void FindDialog::show() {
-  ui->messageLabel->setText("");
-  ui->replaceButton->setEnabled(false);
-  ui->replaceAllButton->setEnabled(false);
+  UI().messageLabel->setText("");
+  UI().replaceButton->setEnabled(false);
+  UI().replaceAllButton->setEnabled(false);
   QDialog::show();
 }
 
@@ -87,11 +88,11 @@ void FindDialog::find() {
 
 
 void FindDialog::findResult(bool found) {
-  ui->messageLabel->setText((found || wasReplace) ? "" :
+  UI().messageLabel->setText((found || wasReplace) ? "" :
                             "<b><font color='red'>Not found!</font></b>");
 
-  ui->replaceButton->setEnabled(found);
-  ui->replaceAllButton->setEnabled(found);
+  UI().replaceButton->setEnabled(found);
+  UI().replaceAllButton->setEnabled(found);
 }
 
 

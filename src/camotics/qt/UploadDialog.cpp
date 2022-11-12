@@ -27,22 +27,25 @@
 using namespace CAMotics;
 
 
+#define UI() Dialog::getUI<Ui::UploadDialog>()
+
+
 UploadDialog::UploadDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::UploadDialog) {ui->setupUi(this);}
+  Dialog(parent, new UI<Ui::UploadDialog>) {}
 
 
 QString UploadDialog::getFilename() const {
-  return ui->filenameLineEdit->text();
+  return UI().filenameLineEdit->text();
 }
 
 
 void UploadDialog::setFilename(QString filename) {
-  ui->filenameLineEdit->setText(filename);
+  UI().filenameLineEdit->setText(filename);
 }
 
 
 bool UploadDialog::isAutomatic() const {
-  return ui->automaticCheckBox->isChecked();
+  return UI().automaticCheckBox->isChecked();
 }
 
 
@@ -50,7 +53,7 @@ int UploadDialog::exec() {
   QSettings settings;
 
   bool automatic = settings.value("Upload/Automatic", true).toBool();
-  ui->automaticCheckBox->setChecked(automatic);
+  UI().automaticCheckBox->setChecked(automatic);
 
   int ret = QDialog::exec();
 

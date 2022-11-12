@@ -27,42 +27,43 @@ using namespace cb;
 using namespace CAMotics;
 
 
-SettingsDialog::SettingsDialog(QWidget *parent) :
-  Dialog(parent), ui(new Ui::SettingsDialog) {
-  ui->setupUi(this);
+#define UI() Dialog::getUI<Ui::SettingsDialog>()
 
+
+SettingsDialog::SettingsDialog(QWidget *parent) :
+  Dialog(parent, new UI<Ui::SettingsDialog>) {
 #ifndef DEBUG
   // Hide advanced controls
-  ui->tabWidget->removeTab(1);
+  UI().tabWidget->removeTab(1);
 #endif
 
-  ui->tabWidget->setCurrentIndex(0); // Select first tab
+  UI().tabWidget->setCurrentIndex(0); // Select first tab
 
   loadPlanConfig();
 }
 
 
 void SettingsDialog::addMachine(const string &name, const string &path) {
-  if (ui->machineComboBox->findText(QString::fromUtf8(name.c_str())) < 0)
-    ui->machineComboBox->addItem(QString::fromUtf8(name.c_str()),
+  if (UI().machineComboBox->findText(QString::fromUtf8(name.c_str())) < 0)
+    UI().machineComboBox->addItem(QString::fromUtf8(name.c_str()),
                                  QString::fromUtf8(path.c_str()));
 }
 
 
 string SettingsDialog::getMachineName() const {
-  return ui->machineComboBox->currentText().toUtf8().data();
+  return UI().machineComboBox->currentText().toUtf8().data();
 }
 
 
 string SettingsDialog::getMachinePath(const string &machine) const {
-  int i = ui->machineComboBox->findText(QString::fromUtf8(machine.c_str()));
+  int i = UI().machineComboBox->findText(QString::fromUtf8(machine.c_str()));
   if (i == -1) THROW("Machine '" << machine << "' not found");
-  return ui->machineComboBox->itemData(i).toString().toUtf8().data();
+  return UI().machineComboBox->itemData(i).toString().toUtf8().data();
 }
 
 
 string SettingsDialog::getMachinePath() const {
-  return ui->machineComboBox->currentData().toString().toUtf8().data();
+  return UI().machineComboBox->currentData().toString().toUtf8().data();
 }
 
 
@@ -94,12 +95,12 @@ void SettingsDialog::savePlanVec(const string &widget, const string &var,
 
 void SettingsDialog::loadPlanConfig() {
   bool enabled = getPlannerEnabled();
-  ui->plannerGroupBox->setEnabled(enabled);
-  ui->plannerEnableCheckBox->setChecked(enabled);
+  UI().plannerGroupBox->setEnabled(enabled);
+  UI().plannerEnableCheckBox->setChecked(enabled);
 
   double maxDeviation = planConf.maxBlendError;
   maxDeviation = settings.get("Settings/MaxDeviation", maxDeviation).toDouble();
-  ui->maxDeviationDoubleSpinBox->setValue(maxDeviation);
+  UI().maxDeviationDoubleSpinBox->setValue(maxDeviation);
 
   if (settings.has("Settings/MaxDeviation")) {
     planConf.maxBlendError = maxDeviation;
@@ -116,9 +117,9 @@ void SettingsDialog::loadPlanConfig() {
 
 
 void SettingsDialog::savePlanConfig() {
-  setPlannerEnabled(ui->plannerEnableCheckBox->isChecked());
+  setPlannerEnabled(UI().plannerEnableCheckBox->isChecked());
 
-  double maxDeviation = ui->maxDeviationDoubleSpinBox->value();
+  double maxDeviation = UI().maxDeviationDoubleSpinBox->value();
   settings.set("Settings/MaxDeviation", maxDeviation);
   planConf.maxBlendError = maxDeviation;
   planConf.maxMergeError = maxDeviation;
@@ -136,48 +137,48 @@ void SettingsDialog::load(Project::Project &project, View &view) {
   bounds = project.getWorkpiece().getBounds();
 
   // Select machine
-  selectedMachine = ui->machineComboBox->findText
+  selectedMachine = UI().machineComboBox->findText
     (settings.get("Settings/Machine", "Taig Mini Mill").toString());
   if (selectedMachine != -1)
-    ui->machineComboBox->setCurrentIndex(selectedMachine);
+    UI().machineComboBox->setCurrentIndex(selectedMachine);
 
-  ui->resolutionDoubleSpinBox->setValue(project.getResolution());
-  ui->resolutionComboBox->setCurrentIndex(project.getResolutionMode());
-  ui->unitsComboBox->setCurrentIndex(project.getUnits());
+  UI().resolutionDoubleSpinBox->setValue(project.getResolution());
+  UI().resolutionComboBox->setCurrentIndex(project.getResolutionMode());
+  UI().unitsComboBox->setCurrentIndex(project.getUnits());
 
-  ui->defaultUnitsComboBox->
+  UI().defaultUnitsComboBox->
     setCurrentIndex(settings.get("Settings/Units",
                                  GCode::Units::METRIC).toInt());
 
-  ui->renderModeComboBox->
+  UI().renderModeComboBox->
     setCurrentIndex(settings.get("Settings/RenderMode", 0).toInt());
 
-  ui->aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
-  ui->aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
+  UI().aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
+  UI().aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
   loadPlanConfig();
 }
 
 
 void SettingsDialog::save(Project::Project &project, View &view) {
-  settings.set("Settings/Machine", ui->machineComboBox->currentText());
+  settings.set("Settings/Machine", UI().machineComboBox->currentText());
 
   ResolutionMode mode =
-    (ResolutionMode::enum_t)ui->resolutionComboBox->currentIndex();
+    (ResolutionMode::enum_t)UI().resolutionComboBox->currentIndex();
   project.setResolutionMode(mode);
 
   if (mode == ResolutionMode::RESOLUTION_MANUAL)
-    project.setResolution(ui->resolutionDoubleSpinBox->value());
+    project.setResolution(UI().resolutionDoubleSpinBox->value());
 
   GCode::Units units =
-    (GCode::Units::enum_t)ui->unitsComboBox->currentIndex();
+    (GCode::Units::enum_t)UI().unitsComboBox->currentIndex();
   project.setUnits(units);
-  settings.set("Settings/Units", ui->defaultUnitsComboBox->currentIndex());
+  settings.set("Settings/Units", UI().defaultUnitsComboBox->currentIndex());
 
-  settings.set("Settings/RenderMode", ui->renderModeComboBox->currentIndex());
+  settings.set("Settings/RenderMode", UI().renderModeComboBox->currentIndex());
 
-  view.setFlag(View::SHOW_BBTREE_FLAG, ui->aabbCheckBox->isChecked());
-  view.setFlag(View::BBTREE_LEAVES_FLAG, ui->aabbLeavesCheckBox->isChecked());
+  view.setFlag(View::SHOW_BBTREE_FLAG, UI().aabbCheckBox->isChecked());
+  view.setFlag(View::BBTREE_LEAVES_FLAG, UI().aabbLeavesCheckBox->isChecked());
 
   savePlanConfig();
 }
@@ -188,7 +189,7 @@ bool SettingsDialog::exec(Project::Project &project, View &view) {
 
   if (QDialog::exec() != QDialog::Accepted) {
     if (selectedMachine != -1)
-      ui->machineComboBox->setCurrentIndex(selectedMachine);
+      UI().machineComboBox->setCurrentIndex(selectedMachine);
     return false;
   }
 
@@ -199,8 +200,8 @@ bool SettingsDialog::exec(Project::Project &project, View &view) {
 
 
 void SettingsDialog::on_machineComboBox_currentIndexChanged(int index) {
-  emit machineChanged(ui->machineComboBox->currentText(),
-                      ui->machineComboBox->currentData().toString());
+  emit machineChanged(UI().machineComboBox->currentText(),
+                      UI().machineComboBox->currentData().toString());
 }
 
 
@@ -211,7 +212,7 @@ void SettingsDialog::on_resolutionComboBox_currentIndexChanged(int index) {
   double resolution = Project::Project::computeResolution(mode, bounds);
 
   changing = true;
-  ui->resolutionDoubleSpinBox->setValue(resolution);
+  UI().resolutionDoubleSpinBox->setValue(resolution);
   changing = false;
 }
 
@@ -220,11 +221,11 @@ void SettingsDialog::on_resolutionDoubleSpinBox_valueChanged(double value) {
   if (changing) return;
 
   changing = true;
-  ui->resolutionComboBox->setCurrentIndex(ResolutionMode::RESOLUTION_MANUAL);
+  UI().resolutionComboBox->setCurrentIndex(ResolutionMode::RESOLUTION_MANUAL);
   changing = false;
 }
 
 
 void SettingsDialog::on_plannerEnableCheckBox_stateChanged(int checked) {
-  ui->plannerGroupBox->setEnabled(checked);
+  UI().plannerGroupBox->setEnabled(checked);
 }

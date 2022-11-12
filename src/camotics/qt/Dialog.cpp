@@ -20,10 +20,19 @@
 
 #include "Dialog.h"
 
+#include <QEvent>
+#include <QDoubleSpinBox>
+#include <QAbstractButton>
+
 
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
+
+
+bool Dialog::isChecked(const string &name) const {
+  return get<QAbstractButton>(name).isChecked();
+}
 
 
 Vector3D Dialog::getVector3D(const string &name) const {
@@ -42,4 +51,10 @@ void Dialog::setVector3D(const string &name, const Vector3D &v) const {
 
   for (unsigned i = 0; i < 3; i++)
     get<QDoubleSpinBox>(name + axes[i] + "DoubleSpinBox").setValue(v[i]);
+}
+
+
+void Dialog::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) ui->retranslateUi(this);
+  else QDialog::changeEvent(event);
 }

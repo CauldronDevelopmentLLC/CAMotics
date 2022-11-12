@@ -20,18 +20,44 @@
 
 #pragma once
 
+#include <cbang/SmartPointer.h>
 #include <cbang/geom/Vector.h>
 
 #include <QDialog>
-#include <QDoubleSpinBox>
 
 
 namespace CAMotics {
   class Dialog : public QDialog {
-  public:
-    Dialog(QWidget *parent) : QDialog(parent) {}
+  protected:
+    class UIBase {
+    public:
+      virtual ~UIBase() {}
+      virtual void setupUi(QDialog *dialog) = 0;
+      virtual void retranslateUi(QDialog *dialog) = 0;
+    };
 
-    QDoubleSpinBox *getDoubleSpinBox(const std::string &name) const;
+
+    template <class T> class UI : public UIBase {
+      cb::SmartPointer<T> ui;
+
+    public:
+      UI() : ui(new T) {}
+
+      T &getUI() const {return *ui;}
+
+      // From UIBase
+      void setupUi(QDialog *dialog) {ui->setupUi(dialog);}
+      void retranslateUi(QDialog *dialog) {ui->retranslateUi(dialog);}
+    };
+
+    cb::SmartPointer<UIBase> ui;
+
+  public:
+    Dialog(QWidget *parent, const cb::SmartPointer<UIBase> &ui,
+           Qt::WindowFlags flags = Qt::WindowFlags()) :
+      QDialog(parent, flags), ui(ui) {ui->setupUi(this);}
+
+    template <class T> T &getUI() const {return ui.cast<UI<T> >()->getUI();}
 
     template <typename T> T &get(const std::string &name) const {
       T *widget = findChild<T *>(name.c_str());
@@ -39,7 +65,12 @@ namespace CAMotics {
       return *widget;
     }
 
+    bool isChecked(const std::string &name) const;
+
     cb::Vector3D getVector3D(const std::string &name) const;
     void setVector3D(const std::string &name, const cb::Vector3D &v) const;
+
+    // From QDialog
+    void changeEvent(QEvent *event);
   };
 }

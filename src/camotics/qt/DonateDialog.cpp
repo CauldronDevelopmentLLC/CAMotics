@@ -32,10 +32,11 @@ using namespace CAMotics;
 using namespace cb;
 
 
+#define UI() Dialog::getUI<Ui::DonateDialog>()
+
+
 DonateDialog::DonateDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::DonateDialog) {
-  ui->setupUi(this);
-}
+  Dialog(parent, new UI<Ui::DonateDialog>) {}
 
 
 QString DonateDialog::getVersion() const {
@@ -59,8 +60,8 @@ void DonateDialog::showEvent(QShowEvent *event) {
   QDialog::showEvent(event);
 
   // Resize dialog to fit content up to screen height
-  double h = ui->textBrowser->document()->size().height();
-  h += height() - ui->textBrowser->size().height() + 5;
+  double h = UI().textBrowser->document()->size().height();
+  h += height() - UI().textBrowser->size().height() + 5;
 
   double maxH = QApplication::desktop()->screenGeometry().height() - 5;
   if (maxH < h) h = maxH;

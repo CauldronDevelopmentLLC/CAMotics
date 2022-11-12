@@ -25,17 +25,6 @@
 using namespace CAMotics;
 
 
-NewDialog::NewDialog(QWidget *parent) :
-  QDialog(parent), ui(new Ui::NewDialog) {
-  ui->setupUi(this);
-}
-
-
-bool NewDialog::tplSelected() const {
-  return ui->newTPLRadioButton->isChecked();
-}
-
-
-bool NewDialog::gcodeSelected() const {
-  return ui->newGCodeRadioButton->isChecked();
-}
+NewDialog::NewDialog(QWidget *parent) : Dialog(parent, new UI<Ui::NewDialog>) {}
+bool NewDialog::tplSelected() const {return isChecked("newTPLRadioButton");}
+bool NewDialog::gcodeSelected() const {return isChecked("newGCodeRadioButton");}

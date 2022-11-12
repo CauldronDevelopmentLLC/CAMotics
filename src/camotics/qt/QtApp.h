@@ -37,7 +37,7 @@ namespace CAMotics {
     unsigned threads;
 
   public:
-    explicit QtApp(QWidget *parent = 0);
+    explicit QtApp();
     ~QtApp();
 
     // From cb::Application
