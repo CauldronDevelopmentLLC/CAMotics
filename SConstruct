@@ -5,7 +5,7 @@ if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.2.2'
+version = '1.3.0'
 major, minor, revision = version.split('.')
 if not os.path.exists('build'): os.mkdir('build')
 with open('build/version.txt', 'w') as f: f.write(version)

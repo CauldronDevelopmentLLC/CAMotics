@@ -1,5 +1,14 @@
 # CAMotics Changelog
 
+## v1.3.0:
+ - Multi-language support.
+ - German language translation. (Joël Plüss)
+ - Look for O-Code program files with ``.ngc`` extension as well as with none.
+ - Debian package improvements and more. (Sergey Mende)
+ - Mime file install fix + C++17 support. (Paul Hentschel)
+ - Improved automatic workpiece generation.
+ - Typo fixes (@tpimh & @lzpaz)
+
 ## v1.2.1:
  - Implemented tool offsets (G43, G43.1, G43.2, G49)
  - Implemented coord XY rotation (G10 L2)
