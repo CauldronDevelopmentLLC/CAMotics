@@ -107,4 +107,7 @@ command and restarting CAMotics:
 
     gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
 
+# Sponsors
+<img src="https://uploads-ssl.webflow.com/5ac3c046c82724970fc60918/5c019d917bba312af7553b49_MacStadium-developerlogo.png" alt="MacStadium Logo" width="200"/>
+
 [1]: https://raw.githubusercontent.com/CauldronDevelopmentLLC/CAMotics/master/images/camotics-logo.png
