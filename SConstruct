@@ -386,7 +386,8 @@ if 'package' in COMMAND_LINE_TARGETS:
                 raise Exception('Call to windeployqt failed')
 
             for name in os.listdir('build/win32'):
-                if 'vcredist' in name: env['VCREDIST'] = name
+                if 'vcredist' in name or 'vc_redist' in name:
+                    env['VCREDIST'] = name
                 install_files.append('build\\win32\\' + name)
 
     else: qt_pkgs = ''
