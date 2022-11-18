@@ -210,7 +210,7 @@ if env['with_gui']:
         with open(str(target[0]), 'w') as f:
             f.write('<RCC><qresource prefix="/">\n')
             for src in source:
-                src = str(src).replace('build/', '')
+                src = str(src).replace('\\', '/').replace('build/', '')
                 f.write('  <file>%s</file>\n' % src)
             f.write('</qresource></RCC>\n')
 
