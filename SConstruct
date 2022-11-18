@@ -201,8 +201,8 @@ if env['with_gui']:
 
     qm_files = []
     for lang in langs:
-        lang_dst = 'build/i18n/camotics_%s.qm' % lang
-        lang_src = 'languages/camotics_%s.ts' % lang
+        lang_dst = 'build/i18n/camotics_%s' % lang
+        lang_src = 'languages/camotics_%s' % lang
         qm = env.Qm(lang_dst, lang_src)
         qm_files.append(qm)
 
