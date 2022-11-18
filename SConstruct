@@ -196,13 +196,13 @@ if env['with_gui']:
 
     # I18n
     langs = Glob('languages/*.ts')
-    regex = r'^languages/camotics_([^.]*)\.ts$'
+    regex = r'^.*camotics_(.*)\.ts$'
     langs = map(lambda path: re.sub(regex, r'\1', str(path)), langs)
 
     qm_files = []
     for lang in langs:
-        lang_dst = 'build/i18n/camotics_%s' % lang
-        lang_src = 'languages/camotics_%s' % lang
+        lang_dst = 'build/i18n/camotics_%s.qm' % lang
+        lang_src = 'languages/camotics_%s.ts' % lang
         qm = env.Qm(lang_dst, lang_src)
         qm_files.append(qm)
 
