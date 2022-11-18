@@ -32,7 +32,7 @@
 ; Config
 Name "${DISPLAY_NAME} ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_TARGET}"
-InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
+InstallDir "$PROGRAMFILES64\${PRODUCT_NAME}"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
@@ -60,6 +60,8 @@ FunctionEnd
 
 ; Sections
 Section -Install
+  SetRegView 64
+
   ; Install files
   SetOutPath "$INSTDIR"
   File ${PRODUCT_EXE}
