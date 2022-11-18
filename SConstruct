@@ -29,12 +29,12 @@ conf = env.CBConfigure()
 # Config vars
 env.Replace(PACKAGE_VERSION = version)
 env.Replace(PACKAGE_AUTHOR = 'Joseph Coffland <joseph@cauldrondevelopment.com>')
-env.Replace(PACKAGE_COPYRIGHT = '2011-2019, Joseph Coffland')
-env.Replace(PACKAGE_HOMEPAGE = 'https://camotics.org/')
-env.Replace(PACKAGE_ORG = 'Cauldron Development LLC')
-env.Replace(PACKAGE_LICENSE = 'https://www.gnu.org/licenses/gpl-2.0.txt')
-env.Replace(BUILD_INFO_NS = 'CAMotics::BuildInfo')
-env.Replace(RESOURCES_NS = 'CAMotics')
+env.Replace(PACKAGE_COPYRIGHT = '2011-2022, Joseph Coffland')
+env.Replace(PACKAGE_HOMEPAGE  = 'https://camotics.org/')
+env.Replace(PACKAGE_ORG       = 'Cauldron Development LLC')
+env.Replace(PACKAGE_LICENSE   = 'https://www.gnu.org/licenses/gpl-2.0.txt')
+env.Replace(BUILD_INFO_NS     = 'CAMotics::BuildInfo')
+env.Replace(RESOURCES_NS      = 'CAMotics')
 
 # Qt5 tool
 if env['with_gui']:
@@ -196,7 +196,7 @@ if env['with_gui']:
 
     # I18n
     langs = Glob('languages/*.ts')
-    regex = r'^languages/camotics_(.*)\.ts$'
+    regex = r'^languages/camotics_([^.]*)\.ts$'
     langs = map(lambda path: re.sub(regex, r'\1', str(path)), langs)
 
     qm_files = []

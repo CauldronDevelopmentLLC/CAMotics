@@ -20,15 +20,18 @@
 
 #include "GLDisk.h"
 
+#include <vector>
+
 using namespace CAMotics;
 using namespace cb;
+using namespace std;
 
 
 GLDisk::GLDisk(double radius, unsigned segments) :
   radius(radius), segments(segments) {
 
   const unsigned count = (1 + segments) * 2;
-  float v[count];
+  vector<float> v(count);
 
   v[0] = v[1] = 0;
 
@@ -39,7 +42,7 @@ GLDisk::GLDisk(double radius, unsigned segments) :
   }
 
   vertices.allocate(count * sizeof(float));
-  vertices.add(count, v);
+  vertices.add(count, v.data());
 }
 
 

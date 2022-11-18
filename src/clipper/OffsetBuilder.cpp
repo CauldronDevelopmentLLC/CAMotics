@@ -35,6 +35,7 @@
 #include "Util.h"
 #include "Clipper.h"
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 using namespace ClipperLib;

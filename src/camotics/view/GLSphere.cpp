@@ -20,8 +20,11 @@
 
 #include "GLSphere.h"
 
+#include <vector>
+
 using namespace CAMotics;
 using namespace cb;
+using namespace std;
 
 
 namespace {
@@ -35,8 +38,8 @@ GLSphere::GLSphere(float radius, unsigned lats, unsigned lngs, bool hemi) :
   radius(radius), lats(lats), lngs(lngs) {
 
   unsigned count = lats * lngs * 6;
-  float n[count];
-  float v[count];
+  vector<float> n(count);
+  vector<float> v(count);
 
   for (unsigned i = 0; i < lats; i++) {
     float lat0 = getLat((float)i / lats, hemi);
@@ -67,8 +70,8 @@ GLSphere::GLSphere(float radius, unsigned lats, unsigned lngs, bool hemi) :
 
   vertices.allocate(count * sizeof(float));
   normals.allocate(count  * sizeof(float));
-  vertices.add(count, v);
-  normals.add(count,  n);
+  vertices.add(count, v.data());
+  normals.add(count,  n.data());
 }
 
 

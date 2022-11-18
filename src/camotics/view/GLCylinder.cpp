@@ -20,15 +20,19 @@
 
 #include "GLCylinder.h"
 
+#include <vector>
+
 using namespace CAMotics;
 using namespace cb;
+using namespace std;
+
 
 GLCylinder::GLCylinder(float base, float top, float height, unsigned segments) :
   base(base), top(top), height(height), segments(segments) {
 
   const unsigned count = segments * 6;
-  float v[count];
-  float n[count];
+  vector<float> v(count);
+  vector<float> n(count);
 
   float b = sqrt((base - top) * (base - top) + height * height);
 
@@ -52,8 +56,8 @@ GLCylinder::GLCylinder(float base, float top, float height, unsigned segments) :
 
   vertices.allocate(count * sizeof(float));
   normals.allocate(count  * sizeof(float));
-  vertices.add(count, v);
-  normals.add(count,  n);
+  vertices.add(count, v.data());
+  normals.add(count,  n.data());
 }
 
 
