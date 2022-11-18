@@ -218,7 +218,7 @@ class _Automoc:
 
             # Now, check whether the corresponding CPP file
             # includes the moc'ed output directly...
-            inc_moc_cpp = r'^\s*#\s*include\s+"%s"' % str(moc_cpp[0])
+            inc_moc_cpp = r'^\s*#\s*include\s+"%s"' % re.escape(str(moc_cpp[0]))
 
             if cpp and re.search(inc_moc_cpp, cpp_contents, re.M):
                 if moc_options['debug']:
