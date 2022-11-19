@@ -111,6 +111,11 @@ if not env.GetOption('clean'):
     if env.get('static') or env.get('mostly_static'):
         conf.CBCheckLib('selinux')
 
+    if env['PLATFORM'] == 'posix':
+        funcs = 'log logf exp expf pow powf memcpy'.split()
+        flags = list(map(lambda n: '-Wl,--wrap=' + n, funcs))
+        env.AppendUnique(LINKFLAGS = flags)
+
 conf.Finish()
 
 
@@ -149,6 +154,7 @@ src = []
 subdirs = ['', 'sim', 'probe', 'opt', 'project', 'contour', 'render']
 for subdir in subdirs: src += Glob('src/camotics/%s/*.cpp' % subdir)
 if env['with_tpl']: src += Glob('src/tplang/*.cpp')
+src += ['src/glibc.c']
 
 src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
 

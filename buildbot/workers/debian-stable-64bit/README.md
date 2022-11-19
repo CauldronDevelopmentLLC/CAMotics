@@ -1,13 +1,20 @@
+## Create and Enter chroot
+
+    sudo debootstrap --arch amd64 stable root
+    sudo chroot root /bin/bash
+
 ## Install packages
 
-    sudo apt-get update
-    sudo apt-get install -y wget git scons build-essential binutils-dev \
-      fakeroot python3-pip python3-virtualenv debian-keyring \
-      debian-archive-keyring ca-certificates libssl-dev
+    apt-get update
+    apt-get install -y wget git scons build-essential binutils-dev fakeroot \
+      python3-pip debian-keyring debian-archive-keyring ca-certificates git \
+      libssl-dev buildbot-worker python-six libqt5websockets5-dev \
+      libqt5opengl5-dev libnode-dev libglu1-mesa-dev pkgconf qttools5-dev-tools
 
-## Install systemd service
+## Install and Start Worker
 
-Install ``buildbot-worker.service`` on worker, then:
-
-    cd /home/admin/worker
-    sudo systemctl enable --now $PWD/buildbot-worker.service
+    mkdir /opt/worker
+    cd /opt/worker
+    buildbot-worker create-worker . localhost:8012 debian-stable-64bit \
+      <password>
+    buildbot-worker start
