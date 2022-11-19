@@ -1,0 +1,21 @@
+{
+  "name": "build",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "preview": "vite preview --port 4173"
+  },
+  "dependencies": {
+    "vite-plugin-vue": "^0.0.0",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.3",
+    "pug": "^3.0.2",
+    "stylus": "^0.58.1",
+    "vite": "^2.9.12"
+  }
+}

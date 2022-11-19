@@ -1,0 +1,10 @@
+#!/bin/sh
+
+SELF=$(readlink -f "$0")
+HERE=${SELF%/*}
+export PATH="${HERE}/usr/bin/:$PATH"
+export LD_LIBRARY_PATH="${HERE}/usr/lib/x86_64-linux-gnu/:${HERE}/lib/x86_64-linux-gnu/"
+export XDG_DATA_DIRS="${HERE}/usr/share/:$XDG_DATA_DIRS"
+export QT_PLUGIN_PATH="${HERE}/usr/lib/x86_64-linux-gnu/qt5/plugins/"
+
+exec camotics "$@"

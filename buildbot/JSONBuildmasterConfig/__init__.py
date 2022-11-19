@@ -1,0 +1,4 @@
+from JSONBuildmasterConfig import JSONBuildmasterConfig as _JSONBuildmasterConfig
+from JSONBuildmasterConfig import EC2InstanceWorker as _EC2InstanceWorker
+from JSONBuildmasterConfig.JSONBuildmasterConfig import JSONBuildmasterConfig
+from JSONBuildmasterConfig.EC2InstanceWorker import EC2InstanceWorker

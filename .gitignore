@@ -33,6 +33,7 @@
 /config.log
 /package.txt
 moc_*.cc
+/*.AppImage
 
 # Backup files
 *~
@@ -56,9 +57,6 @@ moc_*.cc
 .ninja_deps
 .ninja_log
 build.ninja
-
-/dockbot/run
-/dockbot/passwd
 
 # Docs
 *.aux

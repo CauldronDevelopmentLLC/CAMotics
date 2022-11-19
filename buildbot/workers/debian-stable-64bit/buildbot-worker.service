@@ -1,0 +1,14 @@
+[Unit]
+Description=F@H Build Worker
+After=network.target
+
+[Service]
+User=admin
+WorkingDirectory=/home/admin/worker
+Environment=PATH=/home/admin/worker/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=python3 bin/buildbot-worker start --nodaemon %I
+Restart=always
+RestartSec=4
+
+[Install]
+WantedBy=multi-user.target

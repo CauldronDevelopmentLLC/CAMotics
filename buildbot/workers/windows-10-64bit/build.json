@@ -1,0 +1,20 @@
+{
+  "props": {"os": "win"},
+
+  "env": {
+    "TARGET_ARCH":      "amd64",
+    "OPENSSL_HOME":     "/build/openssl-1.1/x64",
+    "V8_HOME":          "/build/v8",
+    "QTDIR":            "/Qt/5.15.2/msvc2019_64",
+    "PYTHONIOENCODING": "UTF-8"
+  },
+
+  "modes": {
+    "debug":   {"V8_LIBPATH": "/build/v8/out/x64.debug/obj"},
+    "release": {"V8_LIBPATH": "/build/v8/out/x64.release/obj"}
+  },
+
+  "builds": {
+    "camotics": {"projects": ["camotics"]}
+  }
+}

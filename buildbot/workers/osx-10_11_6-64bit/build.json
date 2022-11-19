@@ -1,0 +1,35 @@
+{
+  "props": {"os": "osx"},
+
+  "env": {
+    "TARGET_ARCH":     "universal",
+    "OPENSSL_HOME":    "$HOME/fah-local-10.7-universal",
+    "V8_HOME":         "$HOME/build/v8",
+    "V8_LIBPATH":      "$V8_HOME",
+    "SCONS_OPTIONS": {
+      "compiler":          "clang",
+      "ccflags":           "-Wno-unused-local-typedef -DQT_INIT_METAOBJECT=''",
+      "cxxflags":          "-stdlib=libc++",
+      "linkflags":         "-stdlib=libc++",
+      "cxxstd":            "c++17",
+      "disable_local":     "libevent re2",
+      "osx_min_ver":       "10.13",
+      "osx_archs":         "x86_64 arm64",
+      "package_arch":      "x86_64",
+      "sign_keychain":     "${SIGN_KEYCHAIN}",
+      "sign_id_installer": "${SIGN_ID_INSTALLER}",
+      "sign_id_app":       "${SIGN_ID_APP}",
+      "sign_prefix":       "org.camotics.",
+      "notarize_user":     "${NOTARIZE_USER}",
+      "notarize_pass":     "${NOTARIZE_PASS}"
+    }
+  },
+
+  "modes": {
+    "debug": {"SCONS_OPTIONS": {"notarize_disable": 1}}
+  },
+
+  "builds": {
+    "camotics": {"projects": ["camotics"]}
+  }
+}

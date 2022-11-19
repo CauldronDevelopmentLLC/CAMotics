@@ -1,0 +1,50 @@
+{
+  "master": {
+    "title":       "CAMotics",
+    "titleURL":    "http://camotics.org/",
+    "buildbotURL": "http://localhost:8010/",
+    "buildbotNetUsageData": "opt-out",
+    "www": {"port": 8010},
+    "protocols": {"pb": {"port": 8012}},
+    "static_dashboards": [{
+      "name":    "force",
+      "path":    "dist",
+      "caption": "Force Builds"
+    }]
+  },
+
+  "worker": {
+    "modes": {
+      "debug":   {"SCONS_OPTIONS": {"debug":  1}},
+      "release": {"SCONS_OPTIONS": {"strict": 1}}
+    },
+
+    "build": {"modes": ["debug", "release"]}
+  },
+
+  "project": {
+    "repo": {
+      "type":     "git",
+      "branch":   "master",
+      "org":      "CauldronDevelopmentLLC",
+      "protocol": "https"
+    },
+
+    "steps": {
+      "build":   {"command": ["scons", "-k"],      "enable": true},
+      "test":    {"command": ["scons", "test"],    "enable": true},
+      "package": {"command": ["scons", "package"], "upload": true}
+    }
+  },
+
+  "projects": {
+    "cbang": {},
+
+    "camotics": {
+      "deps": ["cbang"],
+      "steps": {
+        "package": {"enable": true}
+      }
+    }
+  }
+}

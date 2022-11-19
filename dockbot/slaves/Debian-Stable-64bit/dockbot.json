@@ -1,9 +1,0 @@
-{
-  "scons": {
-    "disable_local": "libevent re2"
-  },
-
-  "images": {
-    "camotics": {"projects": ["camotics"]}
-  }
-}

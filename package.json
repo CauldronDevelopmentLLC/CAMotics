@@ -1,0 +1,29 @@
+{
+  "name": "CAMotics",
+  "description": "A 3-axis GCode simulator.",
+  "homepage": "https://camotics.org/",
+  "version": "1.3.0",
+  "license": "GPL-2.0+",
+  "author": {
+    "name": "Joseph Coffland",
+    "email": "joseph@camotics.org"
+  },
+  "bugs": {
+    "url": "https://github.com/CauldronDevelopmentLLC/CAMotics/issues"
+  },
+  "funding": {
+    "type" : "individual",
+    "url" : "https://camotics.org/donate"
+  },
+  "bin": {
+    "camotics":  "./camotics",
+    "camsim":    "./camsim",
+    "gcodetool": "./gcodetool",
+    "planner":   "./planner",
+    "tplang":    "./tplang"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CauldronDevelopmentLLC/CAMotics"
+  }
+}

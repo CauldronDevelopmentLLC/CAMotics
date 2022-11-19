@@ -1,14 +1,12 @@
-import os, sys
+import os, sys, json
 
 # local cbang
 if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
 cbang = os.environ.get('CBANG_HOME')
 
 # Version
-version = '1.3.0'
-major, minor, revision = version.split('.')
-if not os.path.exists('build'): os.mkdir('build')
-with open('build/version.txt', 'w') as f: f.write(version)
+with open('package.json', 'r') as f: pkg_meta = json.load(f)
+version = pkg_meta['version']
 
 # Setup
 env = Environment(ENV = os.environ,
@@ -27,11 +25,11 @@ env.CBAddVariables(
 conf = env.CBConfigure()
 
 # Config vars
-env.Replace(PACKAGE_VERSION = version)
-env.Replace(PACKAGE_AUTHOR = 'Joseph Coffland <joseph@cauldrondevelopment.com>')
+env.Replace(PACKAGE_VERSION   = version)
+env.Replace(PACKAGE_AUTHOR    = '%(name)s <%(email)s>' % pkg_meta['author'])
 env.Replace(PACKAGE_COPYRIGHT = '2011-2022, Joseph Coffland')
-env.Replace(PACKAGE_HOMEPAGE  = 'https://camotics.org/')
-env.Replace(PACKAGE_ORG       = 'Cauldron Development LLC')
+env.Replace(PACKAGE_HOMEPAGE  = pkg_meta['homepage'])
+env.Replace(PACKAGE_ORG       = 'Cauldron Development')
 env.Replace(PACKAGE_LICENSE   = 'https://www.gnu.org/licenses/gpl-2.0.txt')
 env.Replace(BUILD_INFO_NS     = 'CAMotics::BuildInfo')
 env.Replace(RESOURCES_NS      = 'CAMotics')

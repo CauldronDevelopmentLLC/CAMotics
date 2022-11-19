@@ -1,0 +1,36 @@
+#!/bin/bash -e
+
+ROOT="$(dirname "$(dirname "$(readlink -f "$0")")")"
+DEST="$ROOT/build/AppImage"
+QT_PLUGINS="platforms imageformats iconengines platformthemes xcbglintegrations"
+QT_PLUGINS+=" platforminputcontexts"
+RUNTIME="https://github.com/AppImage/AppImageKit"
+RUNTIME+="/releases/download/continuous/runtime-x86_64"
+VERSION=$(grep version package.json | sed 's/.*: "\([^"]*\).*/\1/')
+APPIMAGE="$ROOT/CAMotics-$VERSION-x86_64.AppImage"
+
+# Install CAMotics
+scons install install_prefix="$DEST/usr"
+
+# Install AppImage files
+install "$ROOT/scripts/AppRun" "$DEST"
+install "$ROOT/CAMotics.desktop" "$DEST"
+install "$ROOT/images/camotics.png" "$DEST/.DirIcon"
+
+# Install Qt5 plugins
+LIBS=
+for NAME in $QT_PLUGINS; do
+  LIBS+=" /usr/lib/x86_64-linux-gnu/qt5/plugins/$NAME/*.so"
+done
+
+# Install libraries
+"$ROOT/scripts/find-libs" -r -I "$DEST" $LIBS
+"$ROOT/scripts/find-libs" -I "$DEST" "$DEST"/usr/bin/*
+
+# Build AppImage
+mksquashfs "$DEST" "$ROOT/build/sqashfs" -root-owned -noappend
+curl -L "$RUNTIME" > "$APPIMAGE"
+cat "$ROOT/build/sqashfs" >> "$APPIMAGE"
+chmod +x "$APPIMAGE"
+
+echo "Built $APPIMAGE"

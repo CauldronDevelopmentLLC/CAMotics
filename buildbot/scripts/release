@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+
+import os
+import shutil
+import shlex
+import grp
+import glob
+import time
+import json
+import subprocess
+import argparse
+import getpass
+
+
+def message(*args, **kwargs):
+  if options.verbose: print(*args, **kwargs)
+
+
+def execute(cmd, *args, **kwargs):
+  msg = []
+  obscure = False
+  for arg in cmd:
+    msg.append('*****' if obscure else shlex.quote(arg))
+    obscure = arg == '-pass'
+
+  message('@', *msg)
+  return subprocess.run(cmd, *args, **kwargs)
+
+
+def correct_perms(path):
+  if options.test: return
+  if os.path.isdir(path): os.chmod(path, options.dperms)
+  else: os.chmod(path, options.fperms)
+  if options.group: os.lchown(path, -1, grp.getgrnam(options.group)[2])
+
+
+def ensure_dir(path):
+  if options.test or os.path.exists(path): return
+
+  # Make sure parent exists
+  parent, child = os.path.split(os.path.normpath(path))
+  if parent and parent != path: ensure_dir(parent)
+
+  # Create directory with correct permissions and group
+  os.mkdir(path, options.dperms)
+  if options.group: os.lchown(path, -1, grp.getgrnam(options.group)[2])
+
+
+def force_link(src, dst):
+  message('ln -sf %s %s' % (src, dst))
+
+  if not options.test:
+    if os.path.islink(dst): os.remove(dst)
+    os.symlink(src, dst)
+    correct_perms(dst)
+
+
+def find_builds(path):
+  dir = os.path.dirname(os.path.realpath(__file__))
+  cmd = [dir + '/find-builds', path] + other_args
+
+  r = execute(cmd, capture_output = True)
+  if r.returncode: raise Exception(r.stderr.decode('utf-8'))
+
+  return json.loads(r.stdout.decode('utf-8'))
+
+
+win_pass = None
+def sign_win_exe(src, dst, project):
+  global win_pass
+
+  if win_pass is None:
+    win_pass = getpass.getpass('Windows Code Signing Password: ')
+
+    execute(['osslsigncode', 'sign', '-pkcs12', options.win_key, '-h', 'sha2',
+             '-pass', win_pass, '-n', project, '-i', options.sign_url,
+             '-ts', options.ts_url, '-in', src, '-out', dst])
+
+
+def publish_release(src, dst, project):
+  root = '%s/%s' % (src, project)
+  meta = find_builds(root)
+
+  for e in meta:
+    e['project'] = project
+    worker       = e['worker']
+    mode         = e['mode']
+    path         = '%s/%s' % (root, e['package'])
+    filename     = os.path.basename(path)
+    dst_dir      = '%s/%s/%s/%s' % (dst, project, worker, mode)
+
+    message('Publishing %s to %s' % (path, dst_dir))
+    ensure_dir(dst_dir)
+
+    if not options.test:
+      if path.endswith('.exe') and options.win_key:
+        sign_win_exe(path, dst_dir + '/' + filename, project)
+
+      else:
+        message('cp %s %s' % (path, dst_dir))
+        shutil.copy(path, dst_dir)
+        correct_perms(dst_dir + '/' + os.path.basename(path))
+
+    # Link to latest
+    force_link(os.path.basename(path), '%s/latest%s' % (dst_dir, e['ext']))
+
+  # Write meta data
+  with open('%s/%s/meta.json' % (dst, project), 'w') as f:
+    json.dump(meta, f, indent = 2)
+
+
+# Options
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+  '-f', '--force', action = 'store_true', help = 'force overwrite')
+parser.add_argument(
+  '-t', '--test', action = 'store_true',
+  help = 'Do not make any actual changes')
+parser.add_argument(
+  '-q', '--quiet', action = 'store_false', dest = 'verbose', default = True,
+  help = 'Do not print')
+parser.add_argument(
+  '-G', '--group', help = 'the system group to use when publishing files')
+parser.add_argument(
+  '-p', '--fperms', default = 0o644, type = int,
+  help = 'the file permissions to use when publishing files')
+parser.add_argument(
+  '-d', '--dperms', default = 0o755, type = int,
+  help = 'the directory permissions to use when publishing files')
+parser.add_argument(
+  '--builds-dir', default = './builds',
+  help = 'the directory in which to publish builds')
+parser.add_argument(
+  '--releases-dir', default = './releases',
+  help = 'the directory in which to publish releases')
+parser.add_argument(
+  '-k', '--win-key',
+  help = 'Path to Windows code signing key in pkcs12 format.')
+parser.add_argument(
+  '--sign-url', help = 'Windows code signing URL')
+parser.add_argument(
+  '--ts-url', default = 'http://timestamp.sectigo.com/',
+  help = 'Windows code signing timestamp URL')
+parser.add_argument(
+  'project', help = 'The name of the project being released.')
+
+
+def run():
+  global options, other_args
+
+  os.umask(0)
+
+  # Parse command line
+  options, other_args = parser.parse_known_args()
+
+  project = options.project.lower()
+  src = options.builds_dir
+  dst = options.releases_dir + '/' + time.strftime('%Y%m%d')
+
+  publish_release(src, dst, project)
+
+
+if __name__ == '__main__': run()
