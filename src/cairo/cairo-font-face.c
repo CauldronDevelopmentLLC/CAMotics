@@ -38,7 +38,7 @@
  *      Owen Taylor <otaylor@redhat.com>
  */
 
-#define _BSD_SOURCE /* for strdup() */
+#define _DEFAULT_SOURCE /* for strdup() */
 #include "cairoint.h"
 
 static const cairo_font_face_backend_t _cairo_toy_font_face_backend;
