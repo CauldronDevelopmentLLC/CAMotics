@@ -40,32 +40,12 @@
 static cairo_format_t
 _cairo_format_from_pixman_format (pixman_format_code_t pixman_format)
 {
-    switch (pixman_format) {
-    case PIXMAN_a8r8g8b8:
-	return CAIRO_FORMAT_ARGB32;
-    case PIXMAN_x8r8g8b8:
-	return CAIRO_FORMAT_RGB24;
-    case PIXMAN_a8:
-	return CAIRO_FORMAT_A8;
-    case PIXMAN_a1:
-	return CAIRO_FORMAT_A1;
-    case PIXMAN_a8b8g8r8: case PIXMAN_x8b8g8r8: case PIXMAN_r8g8b8:
-    case PIXMAN_b8g8r8:   case PIXMAN_r5g6b5:   case PIXMAN_b5g6r5:
-    case PIXMAN_a1r5g5b5: case PIXMAN_x1r5g5b5: case PIXMAN_a1b5g5r5:
-    case PIXMAN_x1b5g5r5: case PIXMAN_a4r4g4b4: case PIXMAN_x4r4g4b4:
-    case PIXMAN_a4b4g4r4: case PIXMAN_x4b4g4r4: case PIXMAN_r3g3b2:
-    case PIXMAN_b2g3r3:   case PIXMAN_a2r2g2b2: case PIXMAN_a2b2g2r2:
-    case PIXMAN_c8:       case PIXMAN_g8:       case PIXMAN_x4a4:
-    case PIXMAN_a4:       case PIXMAN_r1g2b1:   case PIXMAN_b1g2r1:
-    case PIXMAN_a1r1g1b1: case PIXMAN_a1b1g1r1: case PIXMAN_c4:
-    case PIXMAN_g4:       case PIXMAN_g1:
-    case PIXMAN_yuy2:     case PIXMAN_yv12:
-#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0,11,9)
-    case PIXMAN_x2b10g10r10:
-    case PIXMAN_a2b10g10r10:
-#endif
-    default:
-	return CAIRO_FORMAT_INVALID;
+    switch ((int)pixman_format) {
+    case PIXMAN_a8r8g8b8: return CAIRO_FORMAT_ARGB32;
+    case PIXMAN_x8r8g8b8: return CAIRO_FORMAT_RGB24;
+    case PIXMAN_a8:       return CAIRO_FORMAT_A8;
+    case PIXMAN_a1:       return CAIRO_FORMAT_A1;
+    default:              return CAIRO_FORMAT_INVALID;
     }
 
     return CAIRO_FORMAT_INVALID;
@@ -221,34 +201,34 @@ _pixman_format_to_masks (pixman_format_code_t	 format,
 
     switch (PIXMAN_FORMAT_TYPE (format)) {
     case PIXMAN_TYPE_ARGB:
-        masks->alpha_mask = MASK (a) << (r + g + b);
-        masks->red_mask   = MASK (r) << (g + b);
-        masks->green_mask = MASK (g) << (b);
-        masks->blue_mask  = MASK (b);
-        return;
+	masks->alpha_mask = MASK (a) << (r + g + b);
+	masks->red_mask   = MASK (r) << (g + b);
+	masks->green_mask = MASK (g) << (b);
+	masks->blue_mask  = MASK (b);
+	return;
     case PIXMAN_TYPE_ABGR:
-        masks->alpha_mask = MASK (a) << (b + g + r);
-        masks->blue_mask  = MASK (b) << (g +r);
-        masks->green_mask = MASK (g) << (r);
-        masks->red_mask   = MASK (r);
-        return;
+	masks->alpha_mask = MASK (a) << (b + g + r);
+	masks->blue_mask  = MASK (b) << (g +r);
+	masks->green_mask = MASK (g) << (r);
+	masks->red_mask   = MASK (r);
+	return;
     case PIXMAN_TYPE_A:
-        masks->alpha_mask = MASK (a);
-        masks->red_mask   = 0;
-        masks->green_mask = 0;
-        masks->blue_mask  = 0;
-        return;
+	masks->alpha_mask = MASK (a);
+	masks->red_mask   = 0;
+	masks->green_mask = 0;
+	masks->blue_mask  = 0;
+	return;
     case PIXMAN_TYPE_OTHER:
     case PIXMAN_TYPE_COLOR:
     case PIXMAN_TYPE_GRAY:
     case PIXMAN_TYPE_YUY2:
     case PIXMAN_TYPE_YV12:
     default:
-        masks->alpha_mask = 0;
-        masks->red_mask   = 0;
-        masks->green_mask = 0;
-        masks->blue_mask  = 0;
-        return;
+	masks->alpha_mask = 0;
+	masks->red_mask   = 0;
+	masks->green_mask = 0;
+	masks->blue_mask  = 0;
+	return;
     }
 }
 
@@ -872,16 +852,16 @@ _cairo_image_surface_set_attributes (cairo_image_surface_t      *surface,
 
     switch (attributes->extend) {
     case CAIRO_EXTEND_NONE:
-        pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_NONE);
+	pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_NONE);
 	break;
     case CAIRO_EXTEND_REPEAT:
-        pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_NORMAL);
+	pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_NORMAL);
 	break;
     case CAIRO_EXTEND_REFLECT:
-        pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_REFLECT);
+	pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_REFLECT);
 	break;
     case CAIRO_EXTEND_PAD:
-        pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_PAD);
+	pixman_image_set_repeat (surface->pixman_image, PIXMAN_REPEAT_PAD);
 	break;
     }
 
