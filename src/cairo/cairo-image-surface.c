@@ -54,7 +54,7 @@ _cairo_format_from_pixman_format (pixman_format_code_t pixman_format)
 static cairo_content_t
 _cairo_content_from_pixman_format (pixman_format_code_t pixman_format)
 {
-    switch (pixman_format) {
+    switch ((int)pixman_format) {
     case PIXMAN_a8r8g8b8:
     case PIXMAN_a8b8g8r8:
     case PIXMAN_a1r5g5b5:
