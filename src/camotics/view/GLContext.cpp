@@ -102,13 +102,10 @@ string GLContext::getErrors() {
   GLenum err;
   string errors;
 
-  do {
-    err = glGetError();
-    if (err == GL_NO_ERROR) break;
-
+  while ((err = glGetError()) != GL_NO_ERROR) {
     if (!errors.empty()) errors += "\n";
     errors += SSTR("GL error: " << err << ": " << glErrorString(err));
-  } while (err != GL_CONTEXT_LOST);
+  }
 
   return errors;
 }

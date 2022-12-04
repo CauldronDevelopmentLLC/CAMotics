@@ -26,7 +26,6 @@
 
 namespace CAMotics {
   class GLSphere : public GLObject {
-    float radius;
     unsigned lats;
     unsigned lngs;
 

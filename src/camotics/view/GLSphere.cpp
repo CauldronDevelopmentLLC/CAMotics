@@ -35,7 +35,7 @@ namespace {
 
 
 GLSphere::GLSphere(float radius, unsigned lats, unsigned lngs, bool hemi) :
-  radius(radius), lats(lats), lngs(lngs) {
+  lats(lats), lngs(lngs) {
 
   unsigned count = lats * lngs * 6;
   vector<float> n(count);

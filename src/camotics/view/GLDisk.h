@@ -26,7 +26,6 @@
 
 namespace CAMotics {
   class GLDisk : public GLObject {
-    double radius;
     unsigned segments;
     VBO vertices = GL_ATTR_POSITION;
 

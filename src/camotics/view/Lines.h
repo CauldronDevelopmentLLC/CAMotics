@@ -30,7 +30,6 @@
 namespace CAMotics {
   class Lines : public GLObject {
     unsigned lines    = 0;
-    unsigned vertFill = 0;
     bool withColors   = false;
     bool withNormals  = false;
 

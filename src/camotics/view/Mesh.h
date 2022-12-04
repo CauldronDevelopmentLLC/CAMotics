@@ -30,7 +30,6 @@
 namespace CAMotics {
   class Mesh : public GLObject {
     unsigned triangles;
-    unsigned vertFill = 0;
     cb::SmartPointer<Lines> lines;
 
     VBO vertices = GL_ATTR_POSITION;

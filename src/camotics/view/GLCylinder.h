@@ -26,13 +26,10 @@
 
 namespace CAMotics {
   class GLCylinder : public GLObject {
-    float base;
-    float top;
-    float height;
     unsigned segments;
 
     VBO vertices = GL_ATTR_POSITION;
-    VBO normals = GL_ATTR_NORMAL;
+    VBO normals  = GL_ATTR_NORMAL;
 
   public:
     GLCylinder(float base, float top, float height, unsigned segments);

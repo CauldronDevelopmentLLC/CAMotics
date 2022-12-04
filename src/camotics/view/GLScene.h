@@ -74,5 +74,6 @@ namespace CAMotics {
     virtual void glResize(unsigned width, unsigned height);
     virtual void glInit();
     virtual void glDraw();
+    using GLComposite::glDraw;
   };
 }

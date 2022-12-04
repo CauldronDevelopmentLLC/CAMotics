@@ -29,7 +29,7 @@ namespace GCode {
   class Transform : public cb::Matrix4x4D, public cb::JSON::Serializable {
   public:
     Transform(const cb::Matrix4x4D &m) : cb::Matrix4x4D(m) {}
-    Transform(const cb::js::Value &value) {read(value);}
+    Transform(const cb::js::Value &value)   {read(value);}
     Transform(const cb::JSON::Value &value) {read(value);}
     Transform() {toIdentity();}
 
@@ -41,6 +41,8 @@ namespace GCode {
     cb::Vector3D transform(const cb::Vector3D &p) const;
 
     void read(const cb::js::Value &value);
+    using cb::JSON::Serializable::read;
+    using cb::JSON::Serializable::write;
 
     // From cb::JSON::Serializable
     void read(const cb::JSON::Value &value);

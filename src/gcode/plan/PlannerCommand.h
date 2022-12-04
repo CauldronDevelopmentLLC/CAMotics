@@ -71,6 +71,8 @@ namespace GCode {
     // From cb::JSON::Serializable
     void read(const cb::JSON::Value &value);
     void write(cb::JSON::Sink &sink) const;
+    using cb::JSON::Serializable::read;
+    using cb::JSON::Serializable::write;
 
     virtual void insert(cb::JSON::Sink &sink) const = 0;
     virtual void write(MachineInterface &machine) const = 0;

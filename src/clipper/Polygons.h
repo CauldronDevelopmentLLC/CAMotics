@@ -63,7 +63,7 @@ namespace ClipperLib {
 
   static inline
   std::ostream &operator<<(std::ostream &stream, const Polygons &p) {
-    stream << p;
+    p.write(stream);
     return stream;
   }
 }

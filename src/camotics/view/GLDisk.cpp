@@ -27,9 +27,7 @@ using namespace cb;
 using namespace std;
 
 
-GLDisk::GLDisk(double radius, unsigned segments) :
-  radius(radius), segments(segments) {
-
+GLDisk::GLDisk(double radius, unsigned segments) : segments(segments) {
   const unsigned count = (1 + segments) * 2;
   vector<float> v(count);
 

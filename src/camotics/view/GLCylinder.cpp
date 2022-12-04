@@ -28,7 +28,7 @@ using namespace std;
 
 
 GLCylinder::GLCylinder(float base, float top, float height, unsigned segments) :
-  base(base), top(top), height(height), segments(segments) {
+  segments(segments) {
 
   const unsigned count = segments * 6;
   vector<float> v(count);
