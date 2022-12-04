@@ -1,5 +1,6 @@
 Import('*')
 env = env.Clone()
+env.AppendUnique(CCFLAGS = ['-Wno-enum-conversion'])
 
 
 # Ignore warnings
