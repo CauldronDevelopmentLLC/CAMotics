@@ -3,15 +3,13 @@
 MACDEPLOYQT=macdeployqt
 
 if [ "$QT5DIR" != "" -a -f "$QT5DIR"/bin/macdeployqt ]; then
-    MACDEPLOYQT="$QT5DIR"/bin/macdeployqt
-else
-    if [ "$QTDIR" != "" -a -f "$QTDIR"/bin/macdeployqt]; then
-        MACDEPLOYQT="$QTDIR"/bin/macdeployqt
-    fi
+  MACDEPLOYQT="$QT5DIR"/bin/macdeployqt
+elif [ "$QTDIR" != "" -a -f "$QTDIR"/bin/macdeployqt ]; then
+  MACDEPLOYQT="$QTDIR"/bin/macdeployqt
 fi
 
 "$MACDEPLOYQT" "$1"
 
 for i in "$1"/Contents/MacOS/*; do
-    install_name_tool -add_rpath @executable_path/../Frameworks/ "$i"
+  install_name_tool -add_rpath @executable_path/../Frameworks/ "$i"
 done
