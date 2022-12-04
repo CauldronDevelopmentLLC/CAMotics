@@ -2,7 +2,7 @@
   "master": {
     "title":       "CAMotics",
     "titleURL":    "http://camotics.org/",
-    "buildbotURL": "http://localhost:8010/",
+    "buildbotURL": "https://master.camotics.org/",
     "buildbotNetUsageData": "opt-out",
     "www": {"port": 8010},
     "protocols": {"pb": {"port": 8012}},

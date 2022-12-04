@@ -2,10 +2,17 @@
   "props": {"os": "osx"},
 
   "env": {
-    "TARGET_ARCH":     "universal",
-    "OPENSSL_HOME":    "$HOME/fah-local-10.7-universal",
-    "V8_HOME":         "$HOME/build/v8",
-    "V8_LIBPATH":      "$V8_HOME",
+    "TARGET_ARCH":     "x86_64",
+    "OPENSSL_HOME":    "${HOME}/build/openssl-3.0.7",
+    "V8_HOME":         "${HOME}/build/v8",
+    "QTDIR":           "${HOME}/build/Qt5.12.12/5.12.12/clang_64",
+    "PATH": [
+      "${HOME}/Library/Python/3.9/bin",
+      "${HOME}/bin",
+      "${HOME}/build/Qt5.12.12/5.12.12/clang_64/bin",
+      "${PATH}"
+    ],
+    "PKG_CONFIG_PATH": "${HOME}/build/Qt5.12.12/5.12.12/clang_64/lib/pkgconfig",
     "SCONS_OPTIONS": {
       "compiler":          "clang",
       "ccflags":           "-Wno-unused-local-typedef -DQT_INIT_METAOBJECT=''",
@@ -14,7 +21,7 @@
       "cxxstd":            "c++17",
       "disable_local":     "libevent re2",
       "osx_min_ver":       "10.13",
-      "osx_archs":         "x86_64 arm64",
+      "osx_archs":         "x86_64",
       "package_arch":      "x86_64",
       "sign_keychain":     "${SIGN_KEYCHAIN}",
       "sign_id_installer": "${SIGN_ID_INSTALLER}",
@@ -26,7 +33,11 @@
   },
 
   "modes": {
-    "debug": {"SCONS_OPTIONS": {"notarize_disable": 1}}
+    "debug": {
+      "V8_LIBPATH": "${HOME}/build/v8/out/x64.debug/obj",
+      "SCONS_OPTIONS": {"notarize_disable": 1}
+    },
+    "release": {"V8_LIBPATH": "${HOME}/build/v8/out/x64.release/obj"}
   },
 
   "builds": {
