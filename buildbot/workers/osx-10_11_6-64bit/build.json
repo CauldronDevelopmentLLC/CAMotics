@@ -27,8 +27,7 @@
       "sign_id_installer": "${SIGN_ID_INSTALLER}",
       "sign_id_app":       "${SIGN_ID_APP}",
       "sign_prefix":       "org.camotics.",
-      "notarize_user":     "${NOTARIZE_USER}",
-      "notarize_pass":     "${NOTARIZE_PASS}"
+      "notarize_profile":  "${NOTARIZE_PROFILE}"
     }
   },
 

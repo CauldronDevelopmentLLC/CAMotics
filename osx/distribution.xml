@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<installer-gui-script minSpecVersion="1">
-  <pkg-ref id="%(pkg_id)s"/>
-  <title>CAMotics</title>
+<installer-gui-script minSpecVersion="2">
+  <title>CAMotics %(version)s</title>
+  <options customize="never" require-scripts="false"
+    hostArchitectures="x86_64" />
   <license file="License.rtf"/>
-  <options customize="never" require-scripts="false"/>
+  <background alignment="bottomleft" file="camotics.png"
+    mime-type="image/png" scaling="none"/>
+  <background-darkAqua alignment="bottomleft" file="camotics.png"
+    mime-type="image/png" scaling="none"/>
   <choices-outline>
-    <line choice="default"><line choice="%(pkg_id)s"/></line>
+    <line choice="%(pkg_id)s"/>
   </choices-outline>
-  <choice id="default"/>
-  <choice id="%(pkg_id)s" visible="false">
+  <choice id="%(pkg_id)s">
     <pkg-ref id="%(pkg_id)s"/>
   </choice>
-  <pkg-ref id="%(pkg_id)s" version="0"
-           onConclusion="none">%(package_name)s.pkg</pkg-ref>
+  <pkg-ref id="%(pkg_id)s">%(package_name)s.pkg</pkg-ref>
 </installer-gui-script>

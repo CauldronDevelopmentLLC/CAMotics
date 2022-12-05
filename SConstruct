@@ -437,7 +437,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         rpm_requires = 'expat' + qt_pkgs,
         rpm_obsoletes = 'openscam',
 
-        app_id = 'org.camotics',
+        app_id = 'org.camotics.CAMotics',
         app_resources = [['osx/Resources', '.'], ['tpl_lib', 'tpl_lib']],
         app_copyright = env['PACKAGE_COPYRIGHT'],
         app_signature = 'camo',
@@ -450,6 +450,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         pkg_resources = 'osx/Resources',
         pkg_distribution = 'osx/distribution.xml',
         pkg_plist = 'osx/pkg.plist',
+        sign_apps = ['Applications/CAMotics.app'],
         )
 
     AlwaysBuild(pkg)
