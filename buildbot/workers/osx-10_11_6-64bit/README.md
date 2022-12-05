@@ -12,7 +12,7 @@ Installed Qt 5.12.12 as admin.  Linked to ``build`` directory.
 
 # OpenSSL
 
-    curl https://www.openssl.org/source/openssl-3.0.7.tar.gz > openssl-3.0.7.tar.gz
+    curl -fsSLO https://www.openssl.org/source/openssl-3.0.7.tar.gz
     tar xf openssl-3.0.7.tar.gz
     cd openssl-3.0.7
     export MACOSX_DEPLOYMENT_TARGET=10.13
@@ -22,7 +22,7 @@ Installed Qt 5.12.12 as admin.  Linked to ``build`` directory.
 # Install worker
 
     python3 -m pip install --upgrade pip
-    pip3 install buildbot_worker
+    pip3 install --user buildbot-worker
 
 Then:
     WORKER=~/Library/Python/3.9/bin/buildbot-worker
