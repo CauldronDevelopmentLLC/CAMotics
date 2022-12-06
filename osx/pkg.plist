@@ -15,7 +15,7 @@
       <key>RootRelativeBundlePath</key>
       <string>Applications/CAMotics.app</string>
       <key>BundlePostInstallScriptPath</key>
-      <string>postflight</string>
+      <string>postinstall</string>
     </dict>
   </array>
 </plist>
