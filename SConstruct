@@ -438,7 +438,8 @@ if 'package' in COMMAND_LINE_TARGETS:
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics.CAMotics',
-        app_resources = [['osx/Resources', '.'], ['tpl_lib', 'tpl_lib']],
+        app_resources = [['osx/Resources', '.'], ['tpl_lib', 'tpl_lib'],
+                        ['osx/entitlements.plist', '.']],
         app_copyright = env['PACKAGE_COPYRIGHT'],
         app_signature = 'camo',
         app_other_info = {
