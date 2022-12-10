@@ -445,6 +445,10 @@ if 'package' in COMMAND_LINE_TARGETS:
         app_other_info = {
             'CFBundleExecutable': 'camotics', # Overrides 'programs'
             'CFBundleIconFile': 'camotics.icns',
+            'CFBundleDocumentTypes': [{
+                'CFBundleTypeExtensions': ['camotics'],
+                'CFBundleTypeRole': 'Editor',
+                }],
             },
         app_finish_cmd = 'osx/deployqt',
         pkg_scripts = 'osx/Scripts',
