@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="2">
-  <title>CAMotics %(version)s</title>
+  <title>%(package_name)s %(version)s</title>
   <options customize="never" require-scripts="false"
     hostArchitectures="x86_64" />
+  <domains enable_anywhere="false" enable_currentUserHome="false"
+     enable_localSystem="true" />
+  <volume-check>
+    <allowed-os-versions>
+      <os-version min="%(osx_min_ver)s"/>
+    </allowed-os-versions>
+  </volume-check>
   <license file="License.rtf"/>
   <background alignment="bottomleft" file="camotics.png"
     mime-type="image/png" scaling="none"/>
@@ -11,8 +18,14 @@
   <choices-outline>
     <line choice="%(pkg_id)s"/>
   </choices-outline>
-  <choice id="%(pkg_id)s">
+  <choice id="%(pkg_id)s" title="%(package_name)s" description="Open-Source Simulation and Computer Aided Machining">
     <pkg-ref id="%(pkg_id)s"/>
   </choice>
   <pkg-ref id="%(pkg_id)s">%(package_name)s.pkg</pkg-ref>
+  <pkg-ref id="%(pkg_id)s">
+    <must-close>
+      <app id="%(app_id)s"/>
+      <app id="org.camotics"/>
+    </must-close>
+  </pkg-ref>
 </installer-gui-script>
