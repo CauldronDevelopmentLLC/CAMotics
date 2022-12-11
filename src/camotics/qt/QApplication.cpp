@@ -19,6 +19,8 @@
 \******************************************************************************/
 
 #include "QApplication.h"
+#include <QFileOpenEvent>
+#include <QtDebug>
 
 #include <cbang/Catch.h>
 
@@ -35,4 +37,19 @@ bool CAMotics::QApplication::notify(QObject *receiver, QEvent *e) {
   } CATCH_ERROR;
 
   return false;
+}
+
+
+bool CAMotics::QApplication::event(QEvent *event) {
+  // https://doc.qt.io/qt-5/qfileopenevent.html
+  if (event->type() == QEvent::FileOpen) {
+    // macOS file open event; file double-clicked or dropped on Dock CAMotics
+    QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
+    qDebug() << "Open file " << openEvent->file();
+    // TODO: getMainWindow(), unless there is an easier openProject()
+    // getMainWindow()->openProject((openEvent->file()).toStdString());
+    return true;
+  }
+
+  return ::QApplication::event(event);
 }

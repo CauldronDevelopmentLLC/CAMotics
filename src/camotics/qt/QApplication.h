@@ -30,5 +30,6 @@ namespace CAMotics {
 
     // From QApplication
     bool notify(QObject *receiver, QEvent *e);
+    bool event(QEvent *event);
   };
 }
