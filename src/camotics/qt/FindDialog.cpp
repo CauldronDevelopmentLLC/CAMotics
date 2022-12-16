@@ -36,28 +36,26 @@ using namespace CAMotics;
 
 FindDialog::FindDialog(QWidget *parent, bool replace) :
   Dialog(parent, new UI<Ui::FindDialog>), wasReplace(false) {
+
   if (!replace) {
-    UI().replaceLabel->setVisible(false);
-    UI().replaceLineEdit->setVisible(false);
-    UI().replaceButton->setVisible(false);
+    UI().replaceLabel    ->setVisible(false);
+    UI().replaceLineEdit ->setVisible(false);
+    UI().replaceButton   ->setVisible(false);
     UI().replaceAllButton->setVisible(false);
   }
 
-  connect(UI().replaceButton, SIGNAL(clicked()), this, SLOT(replace()));
-  //  connect(UI().replaceButton, SIGNAL(clicked()), this, SLOT(accept()));
+  connect(UI().replaceButton,    SIGNAL(clicked()), this, SLOT(replace()));
   connect(UI().replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
-  //  connect(UI().replaceAllButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(UI().findButton, SIGNAL(clicked()), this, SLOT(find()));
-  //  connect(UI().findButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(UI().cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(UI().findButton,       SIGNAL(clicked()), this, SLOT(find()));
+  connect(UI().cancelButton,     SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 
 void FindDialog::findReplace(bool find, bool all) {
-  QString findText = UI().findLineEdit->text();
+  QString findText    = UI().findLineEdit->text();
   QString replaceText = UI().replaceLineEdit->text();
-  bool regex = UI().regexCheckBox->isChecked();
-  int options = 0;
+  bool    regex       = UI().regexCheckBox->isChecked();
+  int     options     = 0;
 
   if (findText.isEmpty()) return;
 
@@ -82,9 +80,7 @@ void FindDialog::show() {
 }
 
 
-void FindDialog::find() {
-  findReplace(true, false);
-}
+void FindDialog::find() {findReplace(true, false);}
 
 
 void FindDialog::findResult(bool found) {
@@ -96,11 +92,5 @@ void FindDialog::findResult(bool found) {
 }
 
 
-void FindDialog::replace() {
-  findReplace(false, false);
-}
-
-
-void FindDialog::replaceAll() {
-  findReplace(false, true);
-}
+void FindDialog::replace()    {findReplace(false, false);}
+void FindDialog::replaceAll() {findReplace(false, true);}
