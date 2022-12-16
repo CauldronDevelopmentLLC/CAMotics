@@ -25,11 +25,16 @@
 
 namespace CAMotics {
   class QApplication : public ::QApplication {
+    Q_OBJECT;
+
   public:
     QApplication(int &argc, char *argv[]);
 
     // From QApplication
     bool notify(QObject *receiver, QEvent *e);
     bool event(QEvent *event);
+
+  signals:
+    void openProject(QString path);
   };
 }

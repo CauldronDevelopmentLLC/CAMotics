@@ -79,6 +79,10 @@ QtWin::QtWin(Application &app, QApplication &qtApp) :
   // UI
   ui->setupUi(this);
 
+  // QApplication
+  connect(&qtApp, SIGNAL(openProject(QString)), this,
+          SLOT(on_openProject(QString)));
+
   // Settings dialog
   connect(&settingsDialog, SIGNAL(machineChanged(QString, QString)),
           this, SLOT(on_machineChanged(QString, QString)));
@@ -1874,6 +1878,9 @@ void QtWin::animate() {
 void QtWin::openRecentProjectsSlot(const QString path) {
   openProject(path.toUtf8().data());
 }
+
+
+void QtWin::on_openProject(QString path) {openProject(path.toStdString());}
 
 
 void QtWin::on_bbctrlConnect() {

@@ -288,6 +288,8 @@ namespace CAMotics {
     void animate();
     void openRecentProjectsSlot(const QString path);
 
+    void on_openProject(QString path);
+
     void on_bbctrlConnect();
     void on_bbctrlDisconnect();
     void on_bbctrlConnected();
