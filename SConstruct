@@ -445,11 +445,15 @@ if 'package' in COMMAND_LINE_TARGETS:
         app_other_info = {
             'CFBundleExecutable': 'camotics', # Overrides 'programs'
             'CFBundleIconFile': 'camotics.icns',
+            'CFBundleDocumentTypes': [{
+                'CFBundleTypeExtensions': ['camotics'],
+                'CFBundleTypeRole': 'Editor',
+                }],
             },
         app_finish_cmd = 'osx/deployqt',
         pkg_scripts = 'osx/Scripts',
         pkg_resources = [['osx/Resources', '.'],
-                        ['images/camotics.png', 'en.lproj/.']],
+                      ['images/camotics-pkg-bg.png', 'en.lproj/camotics.png']],
         pkg_distribution = 'osx/distribution.xml',
         pkg_plist = 'osx/pkg.plist',
         sign_apps = ['Applications/CAMotics.app'],
