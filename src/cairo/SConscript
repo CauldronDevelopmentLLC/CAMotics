@@ -1,6 +1,8 @@
 Import('*')
 env = env.Clone()
-env.AppendUnique(CCFLAGS = ['-Wno-enum-conversion'])
+
+if env['compiler_mode'] == 'gnu':
+  env.AppendUnique(CCFLAGS = ['-Wno-enum-conversion'])
 
 
 # Ignore warnings
