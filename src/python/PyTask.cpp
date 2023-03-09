@@ -35,6 +35,13 @@ void PyTask::join() {
 }
 
 
+void PyTask::wait() {
+  Py_BEGIN_ALLOW_THREADS;
+  Thread::wait();
+  Py_END_ALLOW_THREADS;
+}
+
+
 void PyTask::setCallback(PyObject *cb) {
   if (cb && cb != Py_None && !PyCallable_Check(cb))
     THROW("`callback` object not callable");

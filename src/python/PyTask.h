@@ -37,6 +37,7 @@ public:
 
   // From cb::Thread
   void join();
+  void wait();
 
   // From CAMotics::Task
   void updated(const std::string &status, double progress);

@@ -565,7 +565,7 @@ namespace {
       auto &task = self->s->task;
 
       if (task.isSet()) {
-        task->join();
+        task->wait();
         task.release();
       }
 
