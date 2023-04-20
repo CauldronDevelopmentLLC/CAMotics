@@ -21,6 +21,8 @@ env.CBAddVariables(
     ('python_version', 'Set python version', '3'),
     BoolVariable('with_tpl', 'Enable TPL', True),
     BoolVariable('with_gui', 'Enable graphical user interface', True),
+    BoolVariable('wrap_glibc', 'Enable GlibC function wrapping',
+                 env['PLATFORM'] == 'posix'),
     )
 conf = env.CBConfigure()
 
@@ -111,7 +113,7 @@ if not env.GetOption('clean'):
     if env.get('static') or env.get('mostly_static'):
         conf.CBCheckLib('selinux')
 
-    if env['PLATFORM'] == 'posix':
+    if env['wrap_glibc']:
         funcs = 'log logf exp expf pow powf memcpy'.split()
         flags = list(map(lambda n: '-Wl,--wrap=' + n, funcs))
         env.AppendUnique(LINKFLAGS = flags)
@@ -154,7 +156,7 @@ src = []
 subdirs = ['', 'sim', 'probe', 'opt', 'project', 'contour', 'render']
 for subdir in subdirs: src += Glob('src/camotics/%s/*.cpp' % subdir)
 if env['with_tpl']: src += Glob('src/tplang/*.cpp')
-src += ['src/glibc.c']
+if env['wrap_glibc']: src += ['src/glibc.c']
 
 src = list(map(lambda path: re.sub(r'^src/', 'build/', str(path)), src))
 
