@@ -21,6 +21,7 @@
 #pragma once
 
 #include "Dialog.h"
+#include "ui_cam_layer_dialog.h"
 
 #include <gcode/Units.h>
 
@@ -32,6 +33,7 @@
 namespace CAMotics {
   class CAMLayerDialog : public Dialog, public cb::JSON::Serializable {
     Q_OBJECT;
+    CAMOTICS_DIALOG(CAMLayerDialog);
 
     bool metric;
 

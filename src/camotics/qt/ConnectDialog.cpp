@@ -20,39 +20,33 @@
 
 #include "ConnectDialog.h"
 
-#include "ui_connect_dialog.h"
-
 #include <QSettings>
 
 using namespace CAMotics;
 using namespace std;
 
 
-#define UI() Dialog::getUI<Ui::ConnectDialog>()
+ConnectDialog::ConnectDialog(QWidget *parent) : Dialog(parent) {ui.setupUi(this);}
 
 
-ConnectDialog::ConnectDialog(QWidget *parent) :
-  Dialog(parent, new UI<Ui::ConnectDialog>) {}
-
-
-QString ConnectDialog::getAddress() const {return UI().addressLineEdit->text();}
+QString ConnectDialog::getAddress() const {return ui.addressLineEdit->text();}
 
 
 bool ConnectDialog::isSystemProxyEnabled() const {
-  return UI().systemProxyCheckBox->isChecked();
+  return ui.systemProxyCheckBox->isChecked();
 }
 
 
 void ConnectDialog::setNetworkStatus(const string &status) {
-  UI().networkStatusLabel->setText(status.c_str());
+  ui.networkStatusLabel->setText(status.c_str());
 
   if (status == "Disconnected") {
-    UI().connectPushButton->setEnabled(true);
-    UI().disconnectPushButton->setEnabled(false);
+    ui.connectPushButton->setEnabled(true);
+    ui.disconnectPushButton->setEnabled(false);
 
   } else {
-    UI().connectPushButton->setEnabled(false);
-    UI().disconnectPushButton->setEnabled(true);
+    ui.connectPushButton->setEnabled(false);
+    ui.disconnectPushButton->setEnabled(true);
   }
 
   string bg;
@@ -61,7 +55,7 @@ void ConnectDialog::setNetworkStatus(const string &status) {
   else bg = "#f2ad46";
 
   string css ="padding: 3px; background: " + bg;
-  UI().networkStatusLabel->setStyleSheet(css.c_str());
+  ui.networkStatusLabel->setStyleSheet(css.c_str());
 }
 
 
@@ -69,15 +63,15 @@ int ConnectDialog::exec() {
   QSettings settings;
 
   QString addr = settings.value("Connect/Address", "bbctrl").toString();
-  UI().addressLineEdit->setText(addr);
+  ui.addressLineEdit->setText(addr);
 
   bool useProxy = settings.value("Connect/UseSystemProxy", true).toBool();
-  UI().systemProxyCheckBox->setChecked(useProxy);
+  ui.systemProxyCheckBox->setChecked(useProxy);
 
   int ret = QDialog::exec();
 
   if (ret == QDialog::Accepted) {
-    settings.setValue("Connect/Address", UI().addressLineEdit->text());
+    settings.setValue("Connect/Address", ui.addressLineEdit->text());
     settings.setValue("Connect/UseSystemProxy", isSystemProxyEnabled());
   }
 

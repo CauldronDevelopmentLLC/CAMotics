@@ -21,11 +21,13 @@
 #pragma once
 
 #include "Dialog.h"
+#include "ui_export_dialog.h"
 
 
 namespace CAMotics {
   class ExportDialog : public Dialog {
     Q_OBJECT;
+    CAMOTICS_DIALOG(ExportDialog);
 
   public:
     ExportDialog(QWidget *parent);

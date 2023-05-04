@@ -26,38 +26,17 @@
 #include <QDialog>
 
 
+#define CAMOTICS_DIALOG(NAME)                   \
+  Ui::NAME ui;                                  \
+  void retranslateUi() {ui.retranslateUi(this);}
+
+
 namespace CAMotics {
   class Dialog : public QDialog {
-  protected:
-    class UIBase {
-    public:
-      virtual ~UIBase() {}
-      virtual void setupUi(QDialog *dialog) = 0;
-      virtual void retranslateUi(QDialog *dialog) = 0;
-    };
-
-
-    template <class T> class UI : public UIBase {
-      cb::SmartPointer<T> ui;
-
-    public:
-      UI() : ui(new T) {}
-
-      T &getUI() const {return *ui;}
-
-      // From UIBase
-      void setupUi(QDialog *dialog) {ui->setupUi(dialog);}
-      void retranslateUi(QDialog *dialog) {ui->retranslateUi(dialog);}
-    };
-
-    cb::SmartPointer<UIBase> ui;
-
-  public:
-    Dialog(QWidget *parent, const cb::SmartPointer<UIBase> &ui,
-           Qt::WindowFlags flags = Qt::WindowFlags()) :
-      QDialog(parent, flags), ui(ui) {ui->setupUi(this);}
-
-    template <class T> T &getUI() const {return ui.cast<UI<T> >()->getUI();}
+ public:
+    Dialog(QWidget *parent, Qt::WindowFlags flags = Qt::WindowFlags()) :
+      QDialog(parent, flags) {}
+    virtual ~Dialog() {}
 
     template <typename T> T &get(const std::string &name) const {
       T *widget = findChild<T *>(name.c_str());
@@ -70,6 +49,8 @@ namespace CAMotics {
     cb::Vector3D getVector3D(const std::string &name) const;
     void setVector3D(const std::string &name, const cb::Vector3D &v) const;
 
+    virtual void retranslateUi() {};
+    
     // From QDialog
     void changeEvent(QEvent *event);
   };

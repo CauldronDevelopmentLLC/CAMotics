@@ -21,11 +21,13 @@
 #pragma once
 
 #include "CAMLayerDialog.h"
+#include "ui_cam_dialog.h"
 
 
 namespace CAMotics {
   class CAMDialog : public Dialog, public cb::JSON::Serializable {
     Q_OBJECT;
+    CAMOTICS_DIALOG(CAMDialog);
 
     CAMLayerDialog layerDialog;
     bool metric;

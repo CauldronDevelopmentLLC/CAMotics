@@ -55,6 +55,6 @@ void Dialog::setVector3D(const string &name, const Vector3D &v) const {
 
 
 void Dialog::changeEvent(QEvent *event) {
-  if (event->type() == QEvent::LanguageChange) ui->retranslateUi(this);
+  if (event->type() == QEvent::LanguageChange) retranslateUi();
   else QDialog::changeEvent(event);
 }

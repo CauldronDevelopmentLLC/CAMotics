@@ -22,6 +22,7 @@
 
 #include "Dialog.h"
 #include "Settings.h"
+#include "ui_settings_dialog.h"
 
 #include <camotics/project/Project.h>
 #include <camotics/view/View.h>
@@ -36,6 +37,7 @@ namespace GCode {class Axes;}
 namespace CAMotics {
   class SettingsDialog : public Dialog {
     Q_OBJECT;
+    CAMOTICS_DIALOG(SettingsDialog);
 
     Settings settings;
     cb::Rectangle3D bounds;

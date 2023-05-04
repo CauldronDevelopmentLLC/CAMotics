@@ -21,11 +21,13 @@
 #pragma once
 
 #include "Dialog.h"
+#include "ui_upload_dialog.h"
 
 
 namespace CAMotics {
   class UploadDialog : public Dialog {
     Q_OBJECT;
+    CAMOTICS_DIALOG(UploadDialog);
 
   public:
     UploadDialog(QWidget *parent);

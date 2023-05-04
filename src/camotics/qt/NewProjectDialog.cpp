@@ -20,35 +20,30 @@
 
 #include "NewProjectDialog.h"
 
-#include "ui_new_project_dialog.h"
-
 using namespace CAMotics;
 
 
-#define UI() Dialog::getUI<Ui::NewProjectDialog>()
-
-
 NewProjectDialog::NewProjectDialog(QWidget *parent) :
-  Dialog(parent, new UI<Ui::NewProjectDialog>) {}
+  Dialog(parent) {ui.setupUi(this);}
 
 
 void NewProjectDialog::setUnits(GCode::Units units) {
-  UI().unitsComboBox->setCurrentIndex
+  ui.unitsComboBox->setCurrentIndex
     (units == GCode::Units::METRIC ? 0 : 1);
 }
 
 
 GCode::Units NewProjectDialog::getUnits() const {
-  return UI().unitsComboBox->currentIndex() == 0 ?
+  return ui.unitsComboBox->currentIndex() == 0 ?
     GCode::Units::METRIC : GCode::Units::IMPERIAL;
 }
 
 
 bool NewProjectDialog::defaultToolTableSelected() const {
-  return UI().toolTableComboBox->currentIndex() == 0;
+  return ui.toolTableComboBox->currentIndex() == 0;
 }
 
 
 bool NewProjectDialog::currentToolTableSelected() const {
-  return UI().toolTableComboBox->currentIndex() == 1;
+  return ui.toolTableComboBox->currentIndex() == 1;
 }

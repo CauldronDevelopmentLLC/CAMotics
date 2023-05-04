@@ -21,11 +21,13 @@
 #pragma once
 
 #include "Dialog.h"
+#include "ui_donate_dialog.h"
 
 
 namespace CAMotics {
   class DonateDialog : public Dialog {
     Q_OBJECT;
+    CAMOTICS_DIALOG(DonateDialog);
 
   public:
     DonateDialog(QWidget *parent);

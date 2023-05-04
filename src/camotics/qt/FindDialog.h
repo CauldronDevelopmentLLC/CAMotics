@@ -21,11 +21,13 @@
 #pragma once
 
 #include "Dialog.h"
+#include "ui_find_dialog.h"
 
 
 namespace CAMotics {
   class FindDialog : public Dialog {
     Q_OBJECT;
+    CAMOTICS_DIALOG(FindDialog);
 
     bool wasReplace;
 

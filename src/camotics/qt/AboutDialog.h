@@ -21,11 +21,13 @@
 #pragma once
 
 #include "Dialog.h"
+#include "ui_about_dialog.h"
 
 
 namespace CAMotics {
   class AboutDialog : public Dialog {
     Q_OBJECT;
+    CAMOTICS_DIALOG(AboutDialog);
 
   public:
     AboutDialog(QWidget *parent);

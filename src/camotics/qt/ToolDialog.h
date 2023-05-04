@@ -22,6 +22,7 @@
 
 #include "Dialog.h"
 #include "ToolScene.h"
+#include "ui_tool_dialog.h"
 
 #include <cbang/SmartPointer.h>
 
@@ -31,7 +32,8 @@
 namespace CAMotics {
   class ToolDialog : public Dialog, public GCode::ToolShape {
     Q_OBJECT;
-
+    CAMOTICS_DIALOG(ToolDialog);
+    
     ToolScene scene;
     GCode::Tool tool;
     bool updating;

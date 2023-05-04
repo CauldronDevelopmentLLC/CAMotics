@@ -20,11 +20,9 @@
 
 #include "NewDialog.h"
 
-#include "ui_new_dialog.h"
-
 using namespace CAMotics;
 
 
-NewDialog::NewDialog(QWidget *parent) : Dialog(parent, new UI<Ui::NewDialog>) {}
+NewDialog::NewDialog(QWidget *parent) : Dialog(parent) {ui.setupUi(this);}
 bool NewDialog::tplSelected() const {return isChecked("newTPLRadioButton");}
 bool NewDialog::gcodeSelected() const {return isChecked("newGCodeRadioButton");}

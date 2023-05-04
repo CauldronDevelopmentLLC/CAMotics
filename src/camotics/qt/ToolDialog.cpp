@@ -20,8 +20,6 @@
 
 #include "ToolDialog.h"
 
-#include "ui_tool_dialog.h"
-
 #include <cbang/util/SmartToggle.h>
 
 using namespace CAMotics;
@@ -29,16 +27,11 @@ using namespace cb;
 using namespace std;
 
 
-#define UI() Dialog::getUI<Ui::ToolDialog>()
-
-
 ToolDialog::ToolDialog(QWidget *parent) :
-  Dialog(parent, new UI<Ui::ToolDialog>,
-         Qt::WindowTitleHint | Qt::CustomizeWindowHint |
-         Qt::WindowCloseButtonHint | Qt::WindowMaximizeButtonHint),
-  updating(false) {
-
-  UI().toolView->setScene(&scene);
+  Dialog(parent, Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint |
+         Qt::WindowMaximizeButtonHint), updating(false) {
+  ui.setupUi(this);
+  ui.toolView->setScene(&scene);
 }
 
 
@@ -57,43 +50,43 @@ int ToolDialog::edit() {
 
 
 void ToolDialog::updateNumber() {
-  UI().numberSpinBox->setValue((int)tool.getNumber());
+  ui.numberSpinBox->setValue((int)tool.getNumber());
 }
 
 
 void ToolDialog::updateUnits() {
   // ComboBox
-  UI().unitsComboBox->setCurrentIndex(tool.getUnits());
+  ui.unitsComboBox->setCurrentIndex(tool.getUnits());
 
   // Step
   const double step = isMetric() ? 1 : 0.125;
-  UI().lengthDoubleSpinBox->setSingleStep(step);
-  UI().diameterDoubleSpinBox->setSingleStep(step);
-  UI().snubDiameterDoubleSpinBox->setSingleStep(step);
+  ui.lengthDoubleSpinBox->setSingleStep(step);
+  ui.diameterDoubleSpinBox->setSingleStep(step);
+  ui.snubDiameterDoubleSpinBox->setSingleStep(step);
 
   // Suffix
   const char *suffix = isMetric() ? "mm" : "in";
-  UI().lengthDoubleSpinBox->setSuffix(suffix);
-  UI().diameterDoubleSpinBox->setSuffix(suffix);
-  UI().snubDiameterDoubleSpinBox->setSuffix(suffix);
+  ui.lengthDoubleSpinBox->setSuffix(suffix);
+  ui.diameterDoubleSpinBox->setSuffix(suffix);
+  ui.snubDiameterDoubleSpinBox->setSuffix(suffix);
 }
 
 
 void ToolDialog::updateShape() {
   // ComboBox
   GCode::ToolShape shape = tool.getShape();
-  UI().shapeComboBox->setCurrentIndex(shape);
+  ui.shapeComboBox->setCurrentIndex(shape);
 
   // Visibility
-  UI().angleDoubleSpinBox->setVisible(shape == TS_CONICAL);
-  UI().angleLabel->setVisible(shape == TS_CONICAL);
-  UI().snubDiameterDoubleSpinBox-> setVisible(shape == TS_SNUBNOSE);
-  UI().snubDiameterLabel->setVisible(shape == TS_SNUBNOSE);
+  ui.angleDoubleSpinBox->setVisible(shape == TS_CONICAL);
+  ui.angleLabel->setVisible(shape == TS_CONICAL);
+  ui.snubDiameterDoubleSpinBox-> setVisible(shape == TS_SNUBNOSE);
+  ui.snubDiameterLabel->setVisible(shape == TS_SNUBNOSE);
 }
 
 
 void ToolDialog::updateAngle() {
-  UI().angleDoubleSpinBox->setValue(tool.getAngle());
+  ui.angleDoubleSpinBox->setValue(tool.getAngle());
 }
 
 
@@ -106,27 +99,27 @@ void ToolDialog::limitLength() {
 
 
 void ToolDialog::updateLength() {
-  UI().lengthDoubleSpinBox->setValue(tool.getLength() * getScale());
+  ui.lengthDoubleSpinBox->setValue(tool.getLength() * getScale());
 }
 
 
 void ToolDialog::updateDiameter() {
-  UI().diameterDoubleSpinBox->setValue(tool.getDiameter() * getScale());
+  ui.diameterDoubleSpinBox->setValue(tool.getDiameter() * getScale());
 }
 
 
 void ToolDialog::updateSnubDiameter() {
-  UI().snubDiameterDoubleSpinBox->setValue(tool.getSnubDiameter() * getScale());
+  ui.snubDiameterDoubleSpinBox->setValue(tool.getSnubDiameter() * getScale());
 }
 
 
 void ToolDialog::updateDescription() {
-  UI().descriptionLineEdit->
+  ui.descriptionLineEdit->
     setText(QString::fromUtf8(tool.getDescription().c_str()));
 }
 
 
-void ToolDialog::updateScene() {scene.update(tool, UI().toolView->frameSize());}
+void ToolDialog::updateScene() {scene.update(tool, ui.toolView->frameSize());}
 
 
 void ToolDialog::update() {

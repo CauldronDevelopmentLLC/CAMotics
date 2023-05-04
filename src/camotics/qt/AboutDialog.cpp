@@ -20,8 +20,6 @@
 
 #include "AboutDialog.h"
 
-#include "ui_about_dialog.h"
-
 #include <cbang/Info.h>
 #include <cbang/log/Logger.h>
 
@@ -34,11 +32,9 @@ using namespace cb;
 using namespace CAMotics;
 
 
-#define UI() Dialog::getUI<Ui::AboutDialog>()
+AboutDialog::AboutDialog(QWidget *parent) : Dialog(parent) {
+  ui.setupUi(this);
 
-
-AboutDialog::AboutDialog(QWidget *parent) :
-  Dialog(parent, new UI<Ui::AboutDialog>) {
   // Set version
   string cat = "CAMotics";
   string version   = Info::instance().get(cat, "Version");
@@ -46,12 +42,12 @@ AboutDialog::AboutDialog(QWidget *parent) :
   string author    = Info::instance().get(cat, "Author");
   string license   = Info::instance().get(cat, "License");
 
-  QString html = UI().textBrowser->toHtml();
+  QString html = ui.textBrowser->toHtml();
   html.replace("$VERSION",   QString::fromUtf8(version.c_str()));
   html.replace("$COPYRIGHT", QString::fromUtf8(copyright.c_str()));
   html.replace("$AUTHOR",    QString::fromUtf8(author.c_str()));
   html.replace("$LICENSE",   QString::fromUtf8(license.c_str()));
-  UI().textBrowser->setHtml(html);
+  ui.textBrowser->setHtml(html);
 }
 
 
@@ -59,8 +55,8 @@ void AboutDialog::showEvent(QShowEvent *event) {
   QDialog::showEvent(event);
 
   // Resize dialog to fit content up to screen height
-  double h = UI().textBrowser->document()->size().height();
-  h += height() - UI().textBrowser->size().height() + 5;
+  double h = ui.textBrowser->document()->size().height();
+  h += height() - ui.textBrowser->size().height() + 5;
 
   double maxH = QApplication::desktop()->screenGeometry().height() - 5;
   if (maxH < h) h = maxH;

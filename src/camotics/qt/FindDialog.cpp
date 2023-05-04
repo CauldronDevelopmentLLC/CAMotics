@@ -20,8 +20,6 @@
 
 #include "FindDialog.h"
 
-#include "ui_find_dialog.h"
-
 #include <cbang/String.h>
 #include <cbang/log/Logger.h>
 
@@ -31,38 +29,36 @@ using namespace cb;
 using namespace CAMotics;
 
 
-#define UI() Dialog::getUI<Ui::FindDialog>()
-
-
 FindDialog::FindDialog(QWidget *parent, bool replace) :
-  Dialog(parent, new UI<Ui::FindDialog>), wasReplace(false) {
-
+  Dialog(parent), wasReplace(false) {
+  ui.setupUi(this);
+  
   if (!replace) {
-    UI().replaceLabel    ->setVisible(false);
-    UI().replaceLineEdit ->setVisible(false);
-    UI().replaceButton   ->setVisible(false);
-    UI().replaceAllButton->setVisible(false);
+    ui.replaceLabel    ->setVisible(false);
+    ui.replaceLineEdit ->setVisible(false);
+    ui.replaceButton   ->setVisible(false);
+    ui.replaceAllButton->setVisible(false);
   }
 
-  connect(UI().replaceButton,    SIGNAL(clicked()), this, SLOT(replace()));
-  connect(UI().replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
-  connect(UI().findButton,       SIGNAL(clicked()), this, SLOT(find()));
-  connect(UI().cancelButton,     SIGNAL(clicked()), this, SLOT(reject()));
+  connect(ui.replaceButton,    SIGNAL(clicked()), this, SLOT(replace()));
+  connect(ui.replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
+  connect(ui.findButton,       SIGNAL(clicked()), this, SLOT(find()));
+  connect(ui.cancelButton,     SIGNAL(clicked()), this, SLOT(reject()));
 }
 
 
 void FindDialog::findReplace(bool find, bool all) {
-  QString findText    = UI().findLineEdit->text();
-  QString replaceText = UI().replaceLineEdit->text();
-  bool    regex       = UI().regexCheckBox->isChecked();
+  QString findText    = ui.findLineEdit->text();
+  QString replaceText = ui.replaceLineEdit->text();
+  bool    regex       = ui.regexCheckBox->isChecked();
   int     options     = 0;
 
   if (findText.isEmpty()) return;
 
-  if (UI().caseSensitiveCheckBox->isChecked())
+  if (ui.caseSensitiveCheckBox->isChecked())
     options |= QTextDocument::FindCaseSensitively;
 
-  if (UI().wholeWordsCheckBox->isChecked())
+  if (ui.wholeWordsCheckBox->isChecked())
     options |= QTextDocument::FindWholeWords;
 
   wasReplace = !find;
@@ -73,9 +69,9 @@ void FindDialog::findReplace(bool find, bool all) {
 
 
 void FindDialog::show() {
-  UI().messageLabel->setText("");
-  UI().replaceButton->setEnabled(false);
-  UI().replaceAllButton->setEnabled(false);
+  ui.messageLabel->setText("");
+  ui.replaceButton->setEnabled(false);
+  ui.replaceAllButton->setEnabled(false);
   QDialog::show();
 }
 
@@ -84,11 +80,11 @@ void FindDialog::find() {findReplace(true, false);}
 
 
 void FindDialog::findResult(bool found) {
-  UI().messageLabel->setText((found || wasReplace) ? "" :
+  ui.messageLabel->setText((found || wasReplace) ? "" :
                             "<b><font color='red'>Not found!</font></b>");
 
-  UI().replaceButton->setEnabled(found);
-  UI().replaceAllButton->setEnabled(found);
+  ui.replaceButton->setEnabled(found);
+  ui.replaceAllButton->setEnabled(found);
 }
 
 
