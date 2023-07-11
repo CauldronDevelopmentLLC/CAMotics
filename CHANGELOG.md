@@ -308,7 +308,7 @@
  - Fixed file dialog modality problem. #27
  - Display ETA during rendering. #25
  - Fixed: Adding an NC file to a new project causes crash.  #26
- - Allow gcode program delimter '%'.
+ - Allow gcode program delimiter '%'.
  - Default tool length to 1.
  - Fix: Adding an NC file to a new project gives it an absolute path.  #30
  - Fix: Saving project causes duplicate nc file entries in .xml.  #29

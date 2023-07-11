@@ -80,7 +80,7 @@ def _render_env(props, env, translate_var_refs):
 
     else: value = render(value)
 
-    # Subsitute variable references
+    # Substitute variable references
     if translate_var_refs:
       if value is not None: value = pat.sub(subst, value)
 
