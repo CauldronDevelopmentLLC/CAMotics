@@ -112,7 +112,7 @@ double ToolSweep::depth(const Vector3D &p) const {
   vector<const GCode::Move *> moves;
   collisions(p, moves);
 
-  // Eariler moves first
+  // Earlier moves first
   sort(moves.begin(), moves.end(), move_sort());
 
   double d2 = -numeric_limits<double>::max();

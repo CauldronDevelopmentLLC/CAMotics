@@ -6,7 +6,7 @@ First update the translation files with:
 
     lupdate qt/*.ui src/camotics/qt/*.cpp -ts languages/*.ts
 
-Then use ``linguist`` from the Qt pacakge to edit the ``.ts`` files in
+Then use ``linguist`` from the Qt package to edit the ``.ts`` files in
 ``translations``.
 
 Finally, rebuild the software.
