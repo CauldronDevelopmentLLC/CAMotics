@@ -25,11 +25,11 @@
 
 #include <camotics/contour/FieldFunction.h>
 
-#include <cbang/StdTypes.h>
 #include <cbang/SmartPointer.h>
 
 #include <vector>
 #include <limits>
+#include <cinttypes>
 
 
 namespace GCode {class ToolTable;}

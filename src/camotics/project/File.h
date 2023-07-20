@@ -20,10 +20,8 @@
 
 #pragma once
 
-
-#include <cbang/StdTypes.h>
-
 #include <string>
+#include <cinttypes>
 
 
 namespace CAMotics {

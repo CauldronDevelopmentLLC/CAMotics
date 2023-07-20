@@ -21,10 +21,10 @@
 #pragma once
 
 
-#include <cbang/StdTypes.h>
 #include <cbang/geom/Vector.h>
 
 #include <string>
+#include <cinttypes>
 
 
 namespace STL {

@@ -20,9 +20,7 @@
 
 #pragma once
 
-
 #include <cbang/String.h>
-#include <cbang/StdTypes.h>
 
 
 namespace CAMotics {

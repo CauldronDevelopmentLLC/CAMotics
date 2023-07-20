@@ -23,10 +23,10 @@
 #include <gcode/Axes.h>
 #include <gcode/machine/MachineInterface.h>
 
-#include <cbang/StdTypes.h>
 #include <cbang/json/JSON.h>
 
 #include <limits>
+#include <cinttypes>
 
 
 namespace GCode {

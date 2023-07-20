@@ -23,7 +23,7 @@
 
 #include "Task.h"
 
-#include <cbang/StdTypes.h>
+#include <cinttypes>
 
 #include <iosfwd> // streamsize
 #include <boost/iostreams/concepts.hpp>

@@ -28,7 +28,8 @@
 #include <camotics/Task.h>
 
 #include <cbang/SmartPointer.h>
-#include <cbang/StdTypes.h>
+
+#include <cinttypes>
 
 
 namespace CAMotics {

@@ -22,9 +22,9 @@
 
 
 #include <cbang/geom/Vector.h>
-#include <cbang/StdTypes.h>
 
 #include <string>
+#include <cinttypes>
 
 
 namespace STL {

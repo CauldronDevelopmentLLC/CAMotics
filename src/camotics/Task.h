@@ -22,6 +22,8 @@
 
 #include <cbang/os/Condition.h>
 
+#include <string>
+
 
 namespace CAMotics {
   class Task : public cb::Condition {

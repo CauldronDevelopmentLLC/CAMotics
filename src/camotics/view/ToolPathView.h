@@ -28,9 +28,10 @@
 #include <camotics/value/ValueGroup.h>
 
 #include <cbang/SmartPointer.h>
-#include <cbang/StdTypes.h>
 
 #include <vector>
+#include <cinttypes>
+
 
 namespace CAMotics {
   class ToolPathView : public GLObject {

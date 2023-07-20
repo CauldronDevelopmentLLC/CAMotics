@@ -20,18 +20,17 @@
 
 #pragma once
 
-#include <cbang/StdTypes.h>
-
 #include <string>
 #include <ios>
+#include <cinttypes>
 
 
 namespace CAMotics {
   class SHA256 {
     uint8_t data[64];
-	uint32_t datalen;
+        uint32_t datalen;
     uint64_t bitlen;
-	uint32_t state[8];
+        uint32_t state[8];
 
   public:
     SHA256() {init();}
