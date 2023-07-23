@@ -62,7 +62,7 @@
             <number>0</number>
            </property>
            <property name="maximum">
-            <number>999</number>
+            <number>9999</number>
            </property>
           </widget>
          </item>
@@ -144,7 +144,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Angle</string>
+            <string>A&amp;ngle</string>
            </property>
            <property name="buddy">
             <cstring>lengthDoubleSpinBox</cstring>
@@ -178,7 +178,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Length</string>
+            <string>&amp;Length</string>
            </property>
            <property name="buddy">
             <cstring>lengthDoubleSpinBox</cstring>
@@ -209,7 +209,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Diameter</string>
+            <string>D&amp;iameter</string>
            </property>
            <property name="buddy">
             <cstring>diameterDoubleSpinBox</cstring>
@@ -240,7 +240,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Snub Diameter</string>
+            <string>Sn&amp;ub Diameter</string>
            </property>
            <property name="buddy">
             <cstring>snubDiameterDoubleSpinBox</cstring>

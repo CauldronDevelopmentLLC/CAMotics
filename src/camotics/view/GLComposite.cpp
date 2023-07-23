@@ -30,6 +30,8 @@ void GLComposite::glDraw(GLContext &gl) {
   for (unsigned i = 0; i < objects.size(); i++) {
     GLObject &o = *objects[i];
     if (!o.isVisible()) continue;
+    // If color picking, only draw pickable objects
+    if (gl.getPicking() && !o.isPickable()) continue;
 
     bool identity = o.getTransform().isIdentity();
 
@@ -37,6 +39,7 @@ void GLComposite::glDraw(GLContext &gl) {
 
     GLProgram &program = gl.getProgram();
 
+    program.set("doPicking", gl.getPicking());
     program.set("light.enabled", o.getLight());
     if (o.getColor() != Color()) gl.setColor(o.getColor());
 

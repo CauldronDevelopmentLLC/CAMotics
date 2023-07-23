@@ -87,6 +87,10 @@ QtWin::QtWin(Application &app, QApplication &qtApp) :
   connect(&settingsDialog, SIGNAL(machineChanged(QString, QString)),
           this, SLOT(on_machineChanged(QString, QString)));
 
+  // Comments
+  connect(ui->commentTextEdit, SIGNAL(textChanged()),
+          this, SLOT(on_commentsChanged()));
+
   // FileTabManager
   connect(ui->actionUndo, SIGNAL(triggered()),
           ui->fileTabManager, SLOT(on_actionUndo_triggered()));
@@ -102,6 +106,8 @@ QtWin::QtWin(Application &app, QApplication &qtApp) :
           ui->fileTabManager, SLOT(on_actionSelectAll_triggered()));
   connect(&recentProjectsMapper, SIGNAL(mapped(QString)),
           this, SLOT(openRecentProjectsSlot(QString)));
+  connect(ui->fileTabManager, SIGNAL(editorClicked(QString, int)),
+          this, SLOT(on_editorClicked(QString, int)));
 
   // Find
   connect(ui->console, SIGNAL(find()), &findDialog, SLOT(show()));
@@ -124,6 +130,10 @@ QtWin::QtWin(Application &app, QApplication &qtApp) :
           SIGNAL(replace(QString, QString, bool, int, bool)),
           ui->fileTabManager,
           SLOT(on_replace(QString, QString, bool, int, bool)));
+
+  // Editor Sync
+  connect(ui->syncCheckBox, SIGNAL(stateChanged(int)),
+          this, SLOT(on_syncChanged()));
 
   // BBCtrl
   connect(&connectDialog, SIGNAL(connect()), this, SLOT(on_bbctrlConnect()));
@@ -262,6 +272,7 @@ void QtWin::init() {
   valueSet["feed"]->add(this, &QtWin::updateFeed);
   valueSet["speed"]->add(this, &QtWin::updateSpeed);
   valueSet["direction"]->add(this, &QtWin::updateDirection);
+  valueSet["program_name"]->add(this, &QtWin::updateProgramName);
   valueSet["program_line"]->add(this, &QtWin::updateProgramLine);
 
   valueSet.updated();
@@ -591,6 +602,8 @@ void QtWin::saveAllState() {
   settings.set("MainWindow/State", saveState());
   settings.set("MainWindow/Geometry", saveGeometry());
   settings.set("Console/Splitter", ui->splitter->saveState());
+  settings.set("File/Splitter", ui->splitterFile->saveState());
+  settings.set("File/Sync", ui->syncCheckBox->isChecked());
 }
 
 
@@ -599,6 +612,8 @@ void QtWin::restoreAllState() {
   restoreState(settings.get("MainWindow/State").toByteArray());
   restoreGeometry(settings.get("MainWindow/Geometry").toByteArray());
   ui->splitter->restoreState(settings.get("Console/Splitter").toByteArray());
+  ui->splitterFile->restoreState(settings.get("File/Splitter").toByteArray());
+  ui->syncCheckBox->setChecked(settings.get("File/Sync", "false").toBool());
 }
 
 
@@ -632,6 +647,7 @@ void QtWin::saveFullLayout() {
 void QtWin::fullLayout() {
   restoreState(fullLayoutState);
   showConsole();
+  showText();
 }
 
 
@@ -645,6 +661,7 @@ void QtWin::defaultLayout() {
       docks.at(i)->setVisible(false);
 
   hideConsole();
+  hideText();
 }
 
 
@@ -657,6 +674,7 @@ void QtWin::minimalLayout() {
     toolBars.at(i)->setVisible(false);
 
   hideConsole();
+  hideText();
 }
 
 
@@ -833,6 +851,8 @@ void QtWin::reload(bool now) {
   // Reset console
   ui->console->document()->clear();
   ui->console->setTextColor(QColor("#d9d9d9"));
+
+  view->path->setSeparateFiles(settingsDialog.getSeparateFiles());
 
   try {
     // Queue tool path task
@@ -1038,6 +1058,7 @@ void QtWin::loadProject() {
   updateToolTables();
   updateFiles();
   updateUnits();
+  updateComment();
 }
 
 
@@ -1124,7 +1145,7 @@ void QtWin::openProject(const string &_filename) {
       if (!runNewProjectDialog()) return;
 
       if (String::toLower(SystemUtilities::extension(filename)) == "dxf") {
-        THROW("DXF supported not yet implemented");
+        THROW("DXF support not yet implemented");
         if (!runCAMDialog(filename)) return;
         // TODO handle CAM JSON
       }
@@ -1266,7 +1287,11 @@ void QtWin::addFile() {
 
 void QtWin::editFile(unsigned index) {
   SmartPointer<Project::File> file = project->getFile(index);
-  if (!file.isNull()) ui->fileTabManager->open(file);
+  if (!file.isNull()) {
+      ui->fileTabManager->open(file);
+
+      if (!ui->splitterFile->sizes()[1]) showText();
+  }
 }
 
 
@@ -1333,6 +1358,11 @@ void QtWin::updateActions() {
   ui->actionCopy->setEnabled(fileTab);
   ui->actionPaste->setEnabled(fileTab);
   ui->actionSelectAll->setEnabled(fileTab);
+}
+
+
+void QtWin::updateComment() {
+  ui->commentTextEdit->setText(QString::fromStdString(project->getComments()));
 }
 
 
@@ -1637,6 +1667,22 @@ void QtWin::hideConsole() {
 }
 
 
+void QtWin::showText() {
+  QList<int> currentSizes = ui->splitterFile->sizes();
+
+  if (!currentSizes[1]) {
+    currentSizes[0] -= 400;
+    currentSizes[1] += 400;
+    ui->splitterFile->setSizes(currentSizes);
+  }
+}
+
+
+void QtWin::hideText() {
+  ui->splitterFile->setSizes(QList<int>() << 1 << 0);
+}
+
+
 void QtWin::updatePlaySpeed(const string &name, unsigned value) {
   showMessage(tr("Playback speed %1x").arg(view->getSpeed()), false);
 }
@@ -1743,7 +1789,30 @@ void QtWin::updateDirection(const string &name, const char *value) {
 
 
 void QtWin::updateProgramLine(const string &name, unsigned value) {
-  ui->programLineLabel->setText(QString().sprintf("%d", value));
+  if (programLine != value) {
+    // Open and/or select file tab and highlight current line
+    if (ui->splitterFile->sizes()[1] > 0 && isSync()) {
+      if(!programPath.isEmpty() && !programPath.toLower().endsWith(".tpl")) {
+        SmartPointer<Project::File> file =
+                project->findFile(programPath.toStdString().c_str());
+        if (!file.isNull()) {
+          ui->fileTabManager->open(file, value-1, 0);
+        }
+      }
+    }
+    ui->programLineLabel->setText(QString().sprintf("%d", value-1));
+  }
+  programLine = value;
+}
+
+
+void QtWin::updateProgramName(const string &name, const char *value) {
+  QString filepath = QString::fromUtf8(value);
+  if (programPath != filepath) {
+    QString filename = QFileInfo(value).fileName();
+    ui->programNameLabel->setText(filename);
+  }
+  programPath = filepath;
 }
 
 
@@ -1922,6 +1991,12 @@ void QtWin::on_machineChanged(QString machine, QString path) {
 }
 
 
+void QtWin::on_editorClicked(QString filename, int line) {
+  view->path->setByLine(filename.toStdString(), line + 1);
+  redraw();
+}
+
+
 void QtWin::on_fileTabManager_currentChanged(int index) {
   redraw();
   updateActions();
@@ -2089,6 +2164,22 @@ void QtWin::on_zOffsetDoubleSpinBox_valueChanged(double value) {
 
 void QtWin::on_languageChanged(QAction *action) {
   if (action) loadLanguage(action->data().toString());
+}
+
+
+void QtWin::on_commentsChanged() {
+  std::string projectComments = project->getComments();
+  std::string htmlComments = ui->commentTextEdit->toPlainText().toStdString();
+  std::string textComments = ui->commentTextEdit->toHtml().toStdString();
+
+  if (!textComments.empty() && projectComments != htmlComments) {
+    project->setComments(htmlComments);
+  }
+}
+
+
+void QtWin::on_syncChanged() {
+  setSync(ui->syncCheckBox->checkState());
 }
 
 
@@ -2354,6 +2445,13 @@ void QtWin::on_hideConsolePushButton_clicked() {
 
 
 void QtWin::on_clearConsolePushButton_clicked() {ui->console->clear();}
+
+
+void QtWin::on_actionToggleText_triggered() {
+  QList<int> currentSizes = ui->splitterFile->sizes();
+  if (!currentSizes[1]) showText();
+  else hideText();
+}
 
 
 void QtWin::on_actionZoomIn_triggered() {

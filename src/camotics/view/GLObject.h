@@ -31,6 +31,7 @@ namespace CAMotics {
     Color color;
     bool light = true;
     bool visible = true;
+    bool pickable = false;
 
   public:
     virtual ~GLObject() {}
@@ -49,6 +50,9 @@ namespace CAMotics {
 
     void setVisible(bool visible) {this->visible = visible;}
     bool isVisible() const {return visible;}
+
+    void setPickable(bool pickable) {this->pickable = pickable;}
+    bool isPickable() const {return pickable;}
 
     virtual void glDraw(GLContext &gl) = 0;
   };

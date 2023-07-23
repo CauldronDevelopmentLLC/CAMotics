@@ -43,5 +43,6 @@ namespace CAMotics {
     static const Color CYAN;
     static const Color YELLOW;
     static const Color PURPLE;
+    static const Color WHITE;
  };
 }

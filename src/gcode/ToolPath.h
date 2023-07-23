@@ -41,6 +41,8 @@ namespace GCode {
     GCode::ToolTable tools;
 
     double time = 0;
+    double startTime = 0;
+    double endTime = 0;
     double distance = 0;
 
   public:
@@ -51,7 +53,12 @@ namespace GCode {
     const GCode::ToolTable &getTools() const {return tools;}
     GCode::ToolTable &getTools() {return tools;}
     double getTime() const {return time;}
+    double getStartTime() const {return startTime;}
+    double getEndTime() const {return endTime;}
     double getDistance() const {return distance;}
+
+    void setStartTime(double start) {startTime = start;}
+    void setEndTime(double end) {endTime = end;}
 
     int find(double time, unsigned first, unsigned last) const;
     int find(double time) const;

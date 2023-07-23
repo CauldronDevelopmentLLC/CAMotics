@@ -191,6 +191,7 @@ void NCEdit::loadLightScheme() {
   setColor(ColorComponent::Identifier, QColor("#000020"));
   setColor(ColorComponent::Keyword, QColor("#000080"));
   setColor(ColorComponent::BuiltIn, QColor("#008080"));
+  setColor(ColorComponent::Cursor, QColor("#134782" ));
   setColor(ColorComponent::Marker, QColor("#ffff00"));
 }
 
@@ -205,7 +206,7 @@ void NCEdit::loadDarkScheme() {
   setColor(ColorComponent::Identifier, QColor("#d9d9d9"));
   setColor(ColorComponent::Keyword, QColor("#00ffff"));
   setColor(ColorComponent::BuiltIn, QColor("#98fb98"));
-  setColor(ColorComponent::Cursor, QColor("#222222"));
+  setColor(ColorComponent::Cursor, QColor("#134782" ));
   setColor(ColorComponent::Marker, QColor("#d9d9d9"));
   setColor(ColorComponent::BracketMatch, QColor("#cd0000"));
 }
@@ -580,6 +581,12 @@ void NCEdit::wheelEvent(QWheelEvent *e) {
   }
 
   QPlainTextEdit::wheelEvent(e);
+}
+
+
+void NCEdit::mousePressEvent(QMouseEvent *e) {
+  QPlainTextEdit::mousePressEvent(e);
+  parent->on_editorClicked(this);
 }
 
 

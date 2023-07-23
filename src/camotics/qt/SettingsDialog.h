@@ -57,6 +57,8 @@ namespace CAMotics {
     std::string getMachinePath() const;
     std::string getMachinePath(const std::string &machine) const;
 
+    bool getSeparateFiles() const;
+
     bool getPlannerEnabled() const;
     void setPlannerEnabled(bool enabled);
 

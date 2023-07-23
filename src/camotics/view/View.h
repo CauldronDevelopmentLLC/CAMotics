@@ -128,6 +128,6 @@ namespace CAMotics {
 
     // From GLScene
     void glInit();
-    void glDraw();
+    void glDraw(bool picking = false);
   };
 }

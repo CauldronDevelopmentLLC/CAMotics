@@ -105,7 +105,7 @@ void FileTabManager::open(const SmartPointer<Project::File> &file,
     if (0 < col)
       c.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, col);
 
-    c.select(QTextCursor::LineUnderCursor);
+    //c.select(QTextCursor::LineUnderCursor);
 
     editor->setTextCursor(c);
   }
@@ -340,6 +340,26 @@ void FileTabManager::on_modificationChanged(NCEdit *editor, bool changed) {
     QTabWidget::setTabText(tab, title.left(title.size() - 2));
 
   win->updateActions();
+}
+
+
+void FileTabManager::on_editorClicked(NCEdit *editor) {
+  if (this->win->isSync()) {
+    Project::File &file = *editor->getFile();
+    QString filename = QString(file.getPath().c_str());
+
+    if (!filename.isEmpty() && !filename.toLower().endsWith(".tpl")) {
+      QTextCursor cursor = editor->textCursor();
+      int position = cursor.position();
+
+      QTextDocument &document = *editor->document();
+      QString text = document.toPlainText();
+
+      int line = text.left(position).count('\n') + 1;
+
+      emit editorClicked(filename, line);
+    }
+  }
 }
 
 

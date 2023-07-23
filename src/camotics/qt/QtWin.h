@@ -130,6 +130,9 @@ namespace CAMotics {
     std::string defaultExample;
     bool sliderMoving     = false;
     bool positionChanged  = false;
+    bool syncEditor       = false;
+    unsigned programLine  = 0;
+    QString programPath   = "";
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
@@ -220,6 +223,7 @@ namespace CAMotics {
     bool checkSave(bool canCancel = true);
     void activateFile(const std::string &filename, int line = -1, int col = -1);
 
+    void updateComment();
     void updateActions();
     void updateUnits();
     void updateToolTables();
@@ -244,9 +248,13 @@ namespace CAMotics {
 
     bool isActive() {return lastStatusActive;}
     void setStatusActive(bool active);
+    bool isSync() {return syncEditor;}
+    void setSync(bool sync) {syncEditor = sync;}
 
     void showConsole();
     void hideConsole();
+    void showText();
+    void hideText();
     void appendConsole(const std::string &line);
 
     // Value Observers
@@ -272,6 +280,7 @@ namespace CAMotics {
     void updateFeed(const std::string &name, double value);
     void updateSpeed(const std::string &name, double value);
     void updateDirection(const std::string &name, const char *value);
+    void updateProgramName(const std::string &name, const char *value);
     void updateProgramLine(const std::string &name, unsigned value);
 
   protected:
@@ -296,6 +305,7 @@ namespace CAMotics {
     void on_bbctrlDisconnected();
     void on_machineChanged(QString machine, QString path);
 
+    void on_editorClicked(QString filename, int line);
     void on_fileTabManager_currentChanged(int index);
     void on_positionSlider_valueChanged(int position);
     void on_positionSlider_sliderPressed();
@@ -318,6 +328,8 @@ namespace CAMotics {
     void on_zOffsetDoubleSpinBox_valueChanged(double value);
 
     void on_languageChanged(QAction *action);
+    void on_commentsChanged();
+    void on_syncChanged();
 
     void on_actionQuit_triggered();
     void on_actionNew_triggered();
@@ -386,6 +398,8 @@ namespace CAMotics {
     void on_actionHideConsole_triggered();
     void on_actionShowConsole_triggered();
     void on_actionToggleConsole_triggered();
+
+    void on_actionToggleText_triggered();
 
     void on_hideConsolePushButton_clicked();
     void on_clearConsolePushButton_clicked();

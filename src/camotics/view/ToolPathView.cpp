@@ -51,13 +51,15 @@ ToolPathView::ToolPathView(ValueSet &valueSet) : values(valueSet) {
   values.add("feed", this, &ToolPathView::getFeed);
   values.add("speed", this, &ToolPathView::getSpeed);
   values.add("direction", this, &ToolPathView::getDirection);
+  values.add("program_name", this, &ToolPathView::getFilename);
   values.add("program_line", this, &ToolPathView::getProgramLine);
 
   setLight(false);
+  setPickable(true);
 }
 
 
-void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path) {
+void ToolPathView::setPath(const SmartPointer<GCode::ToolPath> &path) {
   this->path = path;
 
   currentMove = GCode::Move();
@@ -76,6 +78,18 @@ void ToolPathView::setByRatio(double ratio) {
   if (byRemote || this->ratio != ratio) {
     this->ratio = ratio;
     byRemote = false;
+    byLine = false;
+    dirty = true;
+  }
+}
+
+
+void ToolPathView::setByLine(std::string filename, unsigned line) {
+  if (!byLine || this->filename != filename || this->line != line) {
+    this->filename = filename;
+    this->line = line;
+    byRemote = false;
+    byLine = true;
     dirty = true;
   }
 }
@@ -83,9 +97,10 @@ void ToolPathView::setByRatio(double ratio) {
 
 void ToolPathView::setByRemote(const Vector3D &position, unsigned line) {
   if (!byRemote || this->position != position || this->line != line) {
-    byRemote = true;
     this->position = position;
     this->line = line;
+    byRemote = true;
+    byLine = false;
     dirty = true;
   }
 }
@@ -149,18 +164,45 @@ void ToolPathView::update() {
       if (maxSpeed < fabs(it->getSpeed())) maxSpeed = fabs(it->getSpeed());
 
   // Find position on path
-  if (!path.isNull())
+  if (!path.isNull()) {
+    std::string lastFilename = "";
+    bool is_fileMatched = false;
+    uint32_t selectionState = 0;
+    uint32_t lastFileIndex = 0;
+    uint32_t lastFileLine = 0;
+    uint32_t moveIndex = 0;
+    uint32_t moveLine = 0;
+
     for (auto it = path->begin(); it != path->end(); it++) {
       GCode::Move move = *it;
       currentMove = move;
 
+      std::string moveFilename = move.getFilename();
       const Vector3D &start = move.getStartPt();
       Vector3D end = move.getEndPt();
       double moveTime = move.getTime();
       double moveDistance = move.getDistance();
-      uint32_t moveLine = move.getLine() + 1; // EMC2 counts from zero
       bool partial = false;
 
+      // Mark index of filename change
+      if (moveFilename != lastFilename) {
+        if (separateFiles) {
+          if (byLine && is_fileMatched) {
+            break;
+          } else {
+            lastFileIndex = moveIndex;
+            lastFilename = moveFilename;
+            path->setStartTime(currentTime);
+          }
+        } else {
+          // Accumulate lines up to last file change
+          lastFileLine += moveLine;
+        }
+      }
+
+      moveLine = move.getLine() + 1; // EMC2 counts from zero
+
+      // Selection by remote line
       if (byRemote) {
         if (line < moveLine && !(byRemote && line < 1)) break; // Too far
         if (line == moveLine) {
@@ -171,9 +213,24 @@ void ToolPathView::update() {
             double delta = start.distance(end);
             moveTime *= delta / moveDistance;
             moveDistance = delta;
+
             partial = true;
           }
         }
+      // Selection by line and filename
+      } else if (byLine) {
+        if (filename.empty()) { // Check accumulated lines
+          if (lastFileLine + moveLine >= line) selectionState++;
+        } else {
+          if (filename == moveFilename) { // Check filename and line
+            is_fileMatched = true;
+
+            if (moveLine >= line) selectionState++;
+          } else if (is_fileMatched && selectionState < 2) {
+            selectionState = 2;
+          }
+        }
+      // Selection by time ratio
       } else {
         double time = ratio * getTotalTime();
         if (time < currentTime + moveTime) {
@@ -184,28 +241,56 @@ void ToolPathView::update() {
           partial = true;
         }
       }
-      currentPosition = byRemote ? position : end;
-      currentLine = moveLine;
-      currentTime += moveTime;
-      currentDistance += moveDistance;
+
+      if (selectionState < 2) {
+        selectedFilename = filename;
+        selectedLine = line;
+        currentFilename = moveFilename;
+        currentLine = moveLine;
+        currentPosition = byRemote ? position : end;
+        currentTime += moveTime;
+        currentDistance += moveDistance;
+        path->setEndTime(currentTime);
+      }
 
       // Store vertex and color data
       double s =
         (showIntensity && maxSpeed) ? fabs(move.getSpeed()) / maxSpeed : 1;
       Color color = getColor(move.getType(), s);
 
+      // Change color based on specified selection
+      if (selectionState == 1) color = Color::WHITE;
+      else if (selectionState > 1) color *= Color(0.4, 0.4, 0.4);
+
+      // Convert accumulated lines + move line into an RGB picking color
+      float r = (((lastFileLine + moveLine) & 0x000000FF) >>  0) / 255.0f;
+      float g = (((lastFileLine + moveLine) & 0x0000FF00) >>  8) / 255.0f;
+      float b = (((lastFileLine + moveLine) & 0x00FF0000) >> 16) / 255.0f;
+      Color pick = Color(r, g, b);
+
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
+        picking.push_back(pick[i]);
         vertices.push_back(start[i]);
       }
 
       for (unsigned i = 0; i < 3; i++) {
         colors.push_back(color[i]);
+        picking.push_back(pick[i]);
         vertices.push_back(end[i]);
       }
 
       if (partial) break;
+      moveIndex++;
     }
+
+    // Only use paths from from last filename
+    if (separateFiles && lastFileIndex > 0) {
+      colors.erase(colors.begin(), colors.begin() + lastFileIndex * 6);
+      picking.erase(picking.begin(), picking.begin() + lastFileIndex * 6);
+      vertices.erase(vertices.begin(), vertices.begin() + lastFileIndex * 6);
+    }
+  }
 
   numColors = colors.size() / 3;
   numVertices = vertices.size() / 3;
@@ -222,11 +307,20 @@ void ToolPathView::glDraw(GLContext &gl) {
 
   if (!numColors || !numVertices) return;
 
+  // Setup picking buffers
+  if (!picking.empty()) {
+    gl.glBindBuffer(GL_ARRAY_BUFFER, pickingVBuf.get());
+    gl.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
+                    &picking[0], GL_STATIC_DRAW);
+    gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+    picking.clear();
+  }
+
   // Setup color buffers
   if (!colors.empty()) {
     gl.glBindBuffer(GL_ARRAY_BUFFER, colorVBuf.get());
-    gl.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float), &colors[0],
-                    GL_STATIC_DRAW);
+    gl.glBufferData(GL_ARRAY_BUFFER, numColors * 3 * sizeof(float),
+                    &colors[0], GL_STATIC_DRAW);
     gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
     colors.clear();
   }
@@ -239,6 +333,11 @@ void ToolPathView::glDraw(GLContext &gl) {
     gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
     vertices.clear();
   }
+
+  // Picking
+  gl.glEnableVertexAttribArray(GL_ATTR_PICKING);
+  gl.glBindBuffer(GL_ARRAY_BUFFER, pickingVBuf.get());
+  gl.glVertexAttribPointer(GL_ATTR_PICKING, 3, GL_FLOAT, false, 0, 0);
 
   // Color
   gl.glEnableVertexAttribArray(GL_ATTR_COLOR);
@@ -258,4 +357,5 @@ void ToolPathView::glDraw(GLContext &gl) {
   // Clean up
   gl.glDisableVertexAttribArray(GL_ATTR_POSITION);
   gl.glDisableVertexAttribArray(GL_ATTR_COLOR);
+  gl.glDisableVertexAttribArray(GL_ATTR_PICKING);
 }

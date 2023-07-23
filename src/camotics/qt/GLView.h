@@ -24,6 +24,7 @@
 #include <cbang/util/SmartFunctor.h>
 
 #include <QOpenGLWidget>
+#include <QOpenGLFramebufferObject>
 
 
 class QOpenGLDebugLogger;
@@ -39,6 +40,9 @@ namespace CAMotics {
 
     cb::SmartPointer<QOpenGLDebugLogger> logger;
     bool enabled;
+    bool doPicking = false;
+    int xPicking = 0;
+    int yPicking = 0;
 
   public:
     GLView(QWidget *parent = 0);

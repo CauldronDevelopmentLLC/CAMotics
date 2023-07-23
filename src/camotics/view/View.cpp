@@ -310,6 +310,7 @@ void View::glInit() {
   group->add(wireModel = new Lines(0, false, false));
   group->add(workpiece = new CuboidView);
   group->add(tool = new ToolView); // Last for transparency
+  group->setPickable(true);
 
   // Colors
   Color modelColor(0.06, 0.23, 0.42);
@@ -320,7 +321,7 @@ void View::glInit() {
 }
 
 
-void View::glDraw() {
+void View::glDraw(bool picking) {
   updateVisibility();
   updateBounds();
   path->update();
@@ -329,5 +330,5 @@ void View::glDraw() {
   updateMachine();
   updateAABB();
 
-  GLScene::glDraw();
+  GLScene::glDraw(picking);
 }
