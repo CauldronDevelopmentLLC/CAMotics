@@ -63,6 +63,11 @@ string SettingsDialog::getMachinePath() const {
 }
 
 
+bool SettingsDialog::getSeparateFiles() const {
+  return settings.get("Settings/SeparateFiles", 0).toBool();
+}
+
+
 bool SettingsDialog::getPlannerEnabled() const {
   return settings.get("Settings/Planner", 0).toInt();
 }
@@ -140,6 +145,8 @@ void SettingsDialog::load(Project::Project &project, View &view) {
 
   ui.resolutionDoubleSpinBox->setValue(project.getResolution());
   ui.resolutionComboBox->setCurrentIndex(project.getResolutionMode());
+  ui.separateFilesCheckBox->
+    setChecked(settings.get("Settings/SeparateFiles", 0).toBool());
   ui.unitsComboBox->setCurrentIndex(project.getUnits());
 
   ui.defaultUnitsComboBox->
@@ -165,6 +172,8 @@ void SettingsDialog::save(Project::Project &project, View &view) {
 
   if (mode == ResolutionMode::RESOLUTION_MANUAL)
     project.setResolution(ui.resolutionDoubleSpinBox->value());
+
+  settings.set("Settings/SeparateFiles", ui.separateFilesCheckBox->isChecked());
 
   GCode::Units units =
     (GCode::Units::enum_t)ui.unitsComboBox->currentIndex();

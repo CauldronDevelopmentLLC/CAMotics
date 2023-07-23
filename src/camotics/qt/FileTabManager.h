@@ -68,9 +68,11 @@ namespace CAMotics {
     void find();
     void findNext();
     void findResult(bool);
+    void editorClicked(QString, int);
 
   public slots:
     void on_modificationChanged(NCEdit *editor, bool changed);
+    void on_editorClicked(NCEdit *editor);
 
   protected slots:
     void on_tabCloseRequested(int index);

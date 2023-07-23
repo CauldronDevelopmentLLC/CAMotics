@@ -48,6 +48,7 @@ void GLScene::glInit() {
   // OpenGL config
   gl.glEnable(GL_DEPTH_TEST);
   gl.glEnable(GL_LINE_SMOOTH);
+  gl.glEnable(GL_MULTISAMPLE);
   gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   gl.glEnable(GL_BLEND);
   gl.glLineWidth(1);
@@ -59,6 +60,7 @@ void GLScene::glInit() {
   program->bindAttribute("position",    GL_ATTR_POSITION);
   program->bindAttribute("normal",      GL_ATTR_NORMAL);
   program->bindAttribute("color",       GL_ATTR_COLOR);
+  program->bindAttribute("picking",     GL_ATTR_PICKING);
   program->link();
 
   // Light
@@ -69,13 +71,26 @@ void GLScene::glInit() {
 }
 
 
-void GLScene::glDraw() {
+void GLScene::glDraw(bool picking) {
   GLContext gl(this);
 
-  gl.glClearColor(0, 0, 0, 0);
+  // If color picking, disable sampling and draw black background
+  if (picking) {
+    gl.setPicking(true);
+    gl.glDisable(GL_LINE_SMOOTH);
+    gl.glDisable(GL_MULTISAMPLE);
+    gl.glClearColor(0, 0, 0, 255);
+  } else {
+    gl.setPicking(false);
+    gl.glEnable(GL_LINE_SMOOTH);
+    gl.glEnable(GL_MULTISAMPLE);
+    gl.glClearColor(0, 0, 0, 0);
+  }
+
   gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   program->use();
+  program->set("doPicking", 0);
   program->set("light.enabled", 0);
 
   Transform t;
@@ -83,7 +98,7 @@ void GLScene::glDraw() {
   program->set("view",       t);
   program->set("model",      t);
 
-  if (background.isSet()) background->glDraw(gl);
+  if (!picking && background.isSet()) background->glDraw(gl);
 
   // Projection
   t.perspective(toRadians(45), getAspect(), 1, 100000);

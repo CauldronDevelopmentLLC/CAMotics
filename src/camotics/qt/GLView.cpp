@@ -65,9 +65,15 @@ void GLView::redraw(bool now) {getQtWin().redraw(now);}
 void GLView::mousePressEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton)
     getView().startRotation(event->x(), event->y());
-
-  else if (event->buttons() & (Qt::RightButton | Qt::MidButton))
+  else if (event->buttons() & Qt::MidButton)
     getView().startTranslation(event->x(), event->y());
+  else if (event->buttons() & Qt::RightButton) {
+    doPicking = true;
+    xPicking = event->x();
+    yPicking = event->y();
+
+    redraw(true);
+  }
 }
 
 
@@ -75,8 +81,7 @@ void GLView::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton) {
     getView().updateRotation(event->x(), event->y());
     redraw(true);
-
-  } else if (event->buttons() & (Qt::RightButton | Qt::MidButton)) {
+  } else if (event->buttons() & Qt::MidButton) {
     getView().updateTranslation(event->x(), event->y());
     redraw(true);
   }
@@ -133,6 +138,63 @@ void GLView::resizeGL(int w, int h) {
 void GLView::paintGL() {
   if (!enabled) return;
   LOG_DEBUG(5, "paintGL()");
+
+  // If color picking, only draw pickable objects to a unsampled framebuffer
+  if (doPicking) {
+    SmartLog log = startLog();
+    getView().glDraw(doPicking);
+
+    doPicking = false;
+    QImage image = this->grabFramebuffer();
+
+    // TODO Adjust mouse position with ratio of buffer dims by widget dims?
+    int xPos = xPicking * ((float)image.width() / (float)width());
+    int yPos = yPicking * ((float)image.height() / (float)height());
+
+    // Search area around mouse for pickable objects
+    int selRad = 6;
+    int xMin = std::max(0, xPos - selRad);
+    int xMax = std::min(image.width(), xPos + selRad);
+    int yMin = std::max(0, yPos - selRad);
+    int yMax = std::min(image.height(), yPos + selRad);
+    std::vector<unsigned> pathList;
+
+    for (int x = xMin; x <= xMax; x++) {
+      for (int y = yMin; y <= yMax; y++) {
+        QColor c = image.pixelColor(x, y);
+        if (c != QColor(0, 0, 0, 255)) {
+          // Convert picked color back to tool path line number
+          unsigned pathLine = c.red() + c.green() * 256 + c.blue() * 256 * 256;
+          if (!std::count(pathList.begin(), pathList.end(), pathLine)) {
+            pathList.push_back(pathLine);
+          }
+        }
+      }
+    }
+
+    if (!pathList.empty()) {
+      unsigned currentLine = getView().path->getSelectedLine();
+      auto nextLine = std::find(pathList.begin(), pathList.end(), currentLine);
+
+      // Rotate selection through found paths
+      if (nextLine == pathList.end()) {
+        nextLine = pathList.begin();
+      } else {
+        nextLine++;
+
+        if (nextLine == pathList.end()) {
+          nextLine = pathList.begin();
+        }
+      }
+
+      // Set tool path based on picked line
+      bool separateFiles = getView().path->getSeparateFiles();
+      std::string fileName = separateFiles ? getView().path->getFilename() : "";
+
+      getView().path->setByLine(fileName, *nextLine);
+      redraw(true);
+    }
+  }
 
   SmartLog log = startLog();
   getView().glDraw();

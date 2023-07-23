@@ -48,6 +48,13 @@ void Project::setFilename(const string &_filename) {
 }
 
 
+void Project::setComments(const string &_comments) {
+  if (_comments.empty()) return;
+  comments = _comments;
+  markDirty();
+}
+
+
 string Project::getDirectory() const {
   return filename.empty() ? SystemUtilities::getcwd() :
     SystemUtilities::dirname(filename);
@@ -170,6 +177,7 @@ void Project::save(const string &_filename) {
 
 
 void Project::read(const JSON::Value &value) {
+  if (value.has("comments")) comments = value.getString("comments");
   units = GCode::Units::parse(value.getString("units", "metric"));
 
   resolutionMode =
@@ -185,6 +193,7 @@ void Project::read(const JSON::Value &value) {
 void Project::write(JSON::Sink &sink) const {
   sink.beginDict();
 
+  sink.insert("comments", comments);
   sink.insert("units", String::toLower(units.toString()));
   sink.insert("resolution-mode", String::toLower(resolutionMode.toString()));
   sink.insert("resolution", resolution);

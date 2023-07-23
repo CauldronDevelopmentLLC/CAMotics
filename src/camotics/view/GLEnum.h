@@ -25,5 +25,6 @@ namespace CAMotics {
     GL_ATTR_POSITION,
     GL_ATTR_NORMAL,
     GL_ATTR_COLOR,
+    GL_ATTR_PICKING,
   };
 }

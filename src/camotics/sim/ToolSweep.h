@@ -41,8 +41,8 @@ namespace CAMotics {
     cb::SmartPointer<GCode::ToolPath> path;
     std::vector<cb::SmartPointer<Sweep> > sweeps;
 
-    double startTime;
-    double endTime;
+    double startTime = 0;
+    double endTime = 0;
 
     cb::SmartPointer<MoveLookup> change;
 

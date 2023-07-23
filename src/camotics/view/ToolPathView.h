@@ -36,27 +36,36 @@
 namespace CAMotics {
   class ToolPathView : public GLObject {
     ValueGroup values;
-    cb::SmartPointer<const GCode::ToolPath> path;
+    cb::SmartPointer<GCode::ToolPath> path;
 
     bool byRemote = true;
+    bool byLine = false;
+    bool separateFiles = false;
     double ratio = 1;
     cb::Vector3D position;
     unsigned line = 0;
+    std::string filename = "";
 
     double currentTime = 0;
     double currentDistance = 0;
     cb::Vector3D currentPosition;
+    std::string currentFilename = "";
     unsigned currentLine = 0;
     GCode::Move currentMove;
+
+    std::string selectedFilename = "";
+    unsigned selectedLine = 0;
 
     bool dirty = true;
     bool showIntensity = false;
 
     std::vector<float> vertices;
     std::vector<float> colors;
+    std::vector<float> picking;
 
-    VBO colorVBuf;
     VBO vertexVBuf;
+    VBO colorVBuf;
+    VBO pickingVBuf;
     unsigned numVertices = 0;
     unsigned numColors = 0;
 
@@ -66,12 +75,13 @@ namespace CAMotics {
     bool isEmpty() const {return path.isNull() || path->empty();}
 
     cb::SmartPointer<const GCode::ToolPath> getPath() const {return path;}
-    void setPath(const cb::SmartPointer<const GCode::ToolPath> &path);
+    void setPath(const cb::SmartPointer<GCode::ToolPath> &path);
 
     cb::Rectangle3D getBounds() const
     {return path.isNull() ? cb::Rectangle3D() : path->getBounds();}
 
     void setByRatio(double ratio);
+    void setByLine(std::string filename, unsigned line);
     void setByRemote(const cb::Vector3D &position, unsigned line);
 
     void incTime(double amount = 1);
@@ -94,10 +104,16 @@ namespace CAMotics {
     {return currentDistance / getTotalDistance() * 100;}
 
     const cb::Vector3D &getPosition() const {return currentPosition;}
+    const char *getFilename() const {return currentFilename.c_str();}
     unsigned getProgramLine() const {return currentLine;}
     const GCode::Move &getMove() const {return currentMove;}
 
+    const char *getSelectedFilename() const {return selectedFilename.c_str();}
+    unsigned getSelectedLine() const {return selectedLine;}
+
     void setShowIntensity(bool show);
+    void setSeparateFiles(bool value) {separateFiles = value;}
+    bool getSeparateFiles() const {return separateFiles;}
 
     unsigned getTool() const {return getMove().getTool();}
     double getFeed() const {return getMove().getFeed();}

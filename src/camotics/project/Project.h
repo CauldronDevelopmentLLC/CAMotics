@@ -46,6 +46,7 @@ namespace CAMotics {
       bool dirty;
 
       std::string filename;
+      std::string comments = "";
       bool onDisk;
 
       GCode::ToolTable tools;
@@ -67,6 +68,8 @@ namespace CAMotics {
 
       const std::string &getFilename() const {return filename;}
       void setFilename(const std::string &filename);
+      const std::string &getComments() const {return comments;}
+      void setComments(const std::string &comments);
       std::string getDirectory() const;
       std::string getUploadFilename() const;
 

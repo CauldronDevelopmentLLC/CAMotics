@@ -5,6 +5,9 @@ precision mediump float;
 varying vec3 fNormal;
 varying vec3 fPosition;
 varying vec4 fColor;
+varying vec4 fPicking;
+
+uniform bool doPicking;
 
 struct Light {
   bool enabled;
@@ -30,6 +33,13 @@ vec4 phong_color() {
 
 
 void main() {
-  if (light.enabled) gl_FragColor = phong_color();
-  else gl_FragColor = fColor;
+  if (light.enabled) {
+    gl_FragColor = phong_color();
+  } else {
+    if (doPicking) {
+      gl_FragColor = fPicking;
+    } else {
+      gl_FragColor = fColor;
+    }
+  }
 }

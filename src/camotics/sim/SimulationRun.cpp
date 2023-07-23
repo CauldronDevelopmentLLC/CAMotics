@@ -54,13 +54,20 @@ SmartPointer<Surface> SimulationRun::compute(Task &task) {
   Rectangle3D bbox;
 
   double start = Timer::now();
+  double startTime = sim.path->getStartTime();
   double simTime = std::min(sim.path->getTime(), sim.time);
 
   LOG_INFO(1, "Computing surface at " << TimeInterval(simTime));
 
-  if (sweep.isNull()) {
+  // Build full sweep once OR for each file
+  if (sweep.isNull() || startTime != lastStart) {
+    if (!sweep.isNull()) {
+      sweep.release();
+      tree.release();
+    }
+
     // GCode::Tool sweep
-    sweep = new ToolSweep(sim.path); // Build sweep for entire time period
+    sweep = new ToolSweep(sim.path, startTime);
 
     // Bounds, increased a little
     bbox = sim.workpiece.getBounds().grow(sim.resolution * 0.9);
@@ -100,5 +107,6 @@ SmartPointer<Surface> SimulationRun::compute(Task &task) {
 
   // Extract surface
   lastTime = simTime;
+  lastStart = startTime;
   return new TriangleSurface(*tree);
 }

@@ -35,6 +35,8 @@ namespace CAMotics {
     GLScene *scene;
     std::vector<Transform> stack;
 
+    bool doPicking = false;
+
   public:
     GLContext(GLScene *scene = 0);
 
@@ -56,6 +58,9 @@ namespace CAMotics {
 
     void setColor(const Color &c);
     void setColor(float r, float g, float b, float a = 1);
+
+    void setPicking(bool doPicking) {this->doPicking = doPicking;}
+    bool getPicking() const {return this->doPicking;}
 
   protected:
     void updateMatrix();

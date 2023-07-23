@@ -44,17 +44,20 @@ namespace GCode {
     unsigned line = 0;
     double time = 0;
     double dist = 0;
+    std::string filename = "";
 
   public:
     Move() {}
     Move(MoveType type, const Axes &start, const Axes &end, double startTime,
-         int tool, double feed, double speed, unsigned line, double time);
+         int tool, double feed, double speed, unsigned line, double time,
+         const std::string &filename);
 
     MoveType getType() const {return type;}
     const Axes &getStart() const {return start;}
     const Axes &getEnd() const {return end;}
     const cb::Vector3D &getStartPt() const {return cb::Segment3D::getStart();}
     const cb::Vector3D &getEndPt() const {return cb::Segment3D::getEnd();}
+    const std::string &getFilename() const {return filename;}
     int getTool() const {return tool;}
     double getFeed() const {return feed;}
     double getSpeed() const {return speed;}

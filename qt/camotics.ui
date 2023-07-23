@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1004</width>
-    <height>815</height>
+    <width>1437</width>
+    <height>869</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,22 +27,7 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_25">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
+   <layout class="QVBoxLayout" name="verticalLayout_16">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -51,127 +36,250 @@
       <property name="handleWidth">
        <number>6</number>
       </property>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayout_7">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="CAMotics::FileTabManager" name="fileTabManager">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="simulationTab">
-           <property name="styleSheet">
-            <string notr="true">QPushButton:hover {
-  border: 1px outset #71869c;
-  border-radius: 2px;
-  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 #c5d3df, stop: 1 #b2c1d1);
-} </string>
+      <widget class="QSplitter" name="splitterFile">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="handleWidth">
+        <number>6</number>
+       </property>
+       <widget class="QWidget" name="verticalLayoutWidget">
+        <layout class="QVBoxLayout" name="verticalLayout_15">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="CAMotics::GLView" name="simulationView" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
            </property>
-           <attribute name="title">
-            <string>Simulation View</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_9">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="CAMotics::GLView" name="simulationView" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>1</horstretch>
-                <verstretch>1</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>200</width>
-                <height>200</height>
-               </size>
-              </property>
-              <property name="contextMenuPolicy">
-               <enum>Qt::CustomContextMenu</enum>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QGridLayout" name="gridLayout_9">
-              <property name="horizontalSpacing">
-               <number>6</number>
-              </property>
-              <item row="0" column="1">
-               <widget class="QSlider" name="positionSlider">
-                <property name="focusPolicy">
-                 <enum>Qt::NoFocus</enum>
-                </property>
-                <property name="toolTip">
-                 <string>Set tool path position</string>
-                </property>
-                <property name="maximum">
-                 <number>10000</number>
-                </property>
-                <property name="singleStep">
-                 <number>10</number>
-                </property>
-                <property name="pageStep">
-                 <number>100</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_28">
-                <property name="minimumSize">
-                 <size>
-                  <width>70</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <underline>true</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Position</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>200</height>
+            </size>
+           </property>
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
           </widget>
-         </widget>
-        </item>
-       </layout>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout_9">
+           <property name="horizontalSpacing">
+            <number>6</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_28">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <underline>true</underline>
+              </font>
+             </property>
+             <property name="text">
+              <string>Position</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSlider" name="positionSlider">
+             <property name="focusPolicy">
+              <enum>Qt::NoFocus</enum>
+             </property>
+             <property name="toolTip">
+              <string>Set tool path position</string>
+             </property>
+             <property name="maximum">
+              <number>10000</number>
+             </property>
+             <property name="singleStep">
+              <number>1</number>
+             </property>
+             <property name="pageStep">
+              <number>100</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="CAMotics::FileTabManager" name="fileTabManager">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="tabPosition">
+            <enum>QTabWidget::West</enum>
+           </property>
+           <property name="tabShape">
+            <enum>QTabWidget::Triangular</enum>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <property name="elideMode">
+            <enum>Qt::ElideNone</enum>
+           </property>
+           <property name="documentMode">
+            <bool>false</bool>
+           </property>
+           <property name="tabsClosable">
+            <bool>false</bool>
+           </property>
+           <property name="movable">
+            <bool>false</bool>
+           </property>
+           <property name="tabBarAutoHide">
+            <bool>false</bool>
+           </property>
+           <widget class="QWidget" name="commentTab">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <attribute name="title">
+             <string>Project Comment</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QTextEdit" name="commentTextEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="syncCheckBox">
+           <property name="text">
+            <string>Sync Text Editor to Simulation</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="layoutWidget1">
        <layout class="QVBoxLayout" name="consoleFrame">
@@ -309,7 +417,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1004</width>
+     <width>1437</width>
      <height>23</height>
     </rect>
    </property>
@@ -397,6 +505,7 @@
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomAll"/>
     <addaction name="actionToggleConsole"/>
+    <addaction name="actionToggleText"/>
    </widget>
    <widget class="QMenu" name="menuSimulate">
     <property name="title">
@@ -565,7 +674,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Tool Position</string>
+    <string>Tool Positio&amp;n</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -811,6 +920,7 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -828,6 +938,7 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -851,6 +962,7 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -891,6 +1003,7 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -931,6 +1044,7 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -971,6 +1085,7 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -1019,7 +1134,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Machine Status</string>
+    <string>&amp;Machine Status</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1070,8 +1185,8 @@
           <property name="rightMargin">
            <number>0</number>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_30">
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_34">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -1081,52 +1196,13 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
             </property>
             <property name="text">
-             <string>Tool</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="toolLabel">
-            <property name="text">
-             <string>0</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_31">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <bold>false</bold>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Feed</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="feedLabel">
-            <property name="text">
-             <string>0.0</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <string>Program Name</string>
             </property>
            </widget>
           </item>
@@ -1141,6 +1217,7 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
@@ -1160,6 +1237,16 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="toolLabel">
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_33">
             <property name="sizePolicy">
@@ -1171,12 +1258,44 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
               <underline>true</underline>
              </font>
             </property>
             <property name="text">
              <string>Spin</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="feedLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_31">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Feed</string>
             </property>
            </widget>
           </item>
@@ -1190,8 +1309,8 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_34">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_30">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -1201,7 +1320,27 @@
             <property name="font">
              <font>
               <pointsize>12</pointsize>
+              <weight>50</weight>
               <bold>false</bold>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Tool</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_25">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
               <underline>true</underline>
              </font>
             </property>
@@ -1210,10 +1349,20 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="5" column="1">
            <widget class="QLabel" name="programLineLabel">
             <property name="text">
              <string>0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="programNameLabel">
+            <property name="text">
+             <string/>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1242,7 +1391,7 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Files</string>
+    <string>F&amp;iles</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -1291,7 +1440,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Tool Path Bounds</string>
+    <string>Tool Path Bo&amp;unds</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1529,7 +1678,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Workpiece Bounds</string>
+    <string>Wor&amp;kpiece Bounds</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -2364,7 +2513,7 @@
      <normaloff>:/icons/wire.png</normaloff>:/icons/wire.png</iconset>
    </property>
    <property name="text">
-    <string>Show Wire Surface</string>
+    <string>Show &amp;Wire Surface</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+2</string>
@@ -2421,7 +2570,7 @@
      <normaloff>:/icons/cut_surface.png</normaloff>:/icons/cut_surface.png</iconset>
    </property>
    <property name="text">
-    <string>Show Cut Surface</string>
+    <string>&amp;Show Cut Surface</string>
    </property>
    <property name="toolTip">
     <string>Show cut surface</string>
@@ -2442,7 +2591,7 @@
      <normaloff>:/icons/axes.png</normaloff>:/icons/axes.png</iconset>
    </property>
    <property name="text">
-    <string>Show Axes</string>
+    <string>Show A&amp;xes</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+8</string>
@@ -2460,7 +2609,7 @@
      <normaloff>:/icons/path.png</normaloff>:/icons/path.png</iconset>
    </property>
    <property name="text">
-    <string>Show Tool Path</string>
+    <string>Show Tool &amp;Path</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
@@ -2472,7 +2621,7 @@
      <normaloff>:/icons/isometric.png</normaloff>:/icons/isometric.png</iconset>
    </property>
    <property name="text">
-    <string>Isometric</string>
+    <string>&amp;Isometric</string>
    </property>
    <property name="toolTip">
     <string>Snap to isometric view</string>
@@ -2487,7 +2636,7 @@
      <normaloff>:/icons/front.png</normaloff>:/icons/front.png</iconset>
    </property>
    <property name="text">
-    <string>Front</string>
+    <string>Fro&amp;nt</string>
    </property>
    <property name="toolTip">
     <string>Snap to front view</string>
@@ -2502,7 +2651,7 @@
      <normaloff>:/icons/back.png</normaloff>:/icons/back.png</iconset>
    </property>
    <property name="text">
-    <string>Back</string>
+    <string>&amp;Back</string>
    </property>
    <property name="toolTip">
     <string>Snap to back view</string>
@@ -2517,7 +2666,7 @@
      <normaloff>:/icons/left.png</normaloff>:/icons/left.png</iconset>
    </property>
    <property name="text">
-    <string>Left</string>
+    <string>&amp;Left</string>
    </property>
    <property name="toolTip">
     <string>Snap to left view</string>
@@ -2532,7 +2681,7 @@
      <normaloff>:/icons/right.png</normaloff>:/icons/right.png</iconset>
    </property>
    <property name="text">
-    <string>Right</string>
+    <string>&amp;Right</string>
    </property>
    <property name="toolTip">
     <string>Snap to right view</string>
@@ -2547,7 +2696,7 @@
      <normaloff>:/icons/top.png</normaloff>:/icons/top.png</iconset>
    </property>
    <property name="text">
-    <string>Top</string>
+    <string>T&amp;op</string>
    </property>
    <property name="toolTip">
     <string>Snap to top view</string>
@@ -2577,7 +2726,7 @@
      <normaloff>:/icons/slower.png</normaloff>:/icons/slower.png</iconset>
    </property>
    <property name="text">
-    <string>Slower</string>
+    <string>S&amp;lower</string>
    </property>
    <property name="toolTip">
     <string>Slow down tool path animation</string>
@@ -2589,7 +2738,7 @@
      <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
    </property>
    <property name="text">
-    <string>Play</string>
+    <string>&amp;Play</string>
    </property>
    <property name="toolTip">
     <string>Start or stop tool path animation</string>
@@ -2601,7 +2750,7 @@
      <normaloff>:/icons/faster.png</normaloff>:/icons/faster.png</iconset>
    </property>
    <property name="text">
-    <string>Faster</string>
+    <string>&amp;Faster</string>
    </property>
    <property name="toolTip">
     <string>Speed up tool path animation</string>
@@ -2613,7 +2762,7 @@
      <normaloff>:/icons/forward.png</normaloff>:/icons/forward.png</iconset>
    </property>
    <property name="text">
-    <string>Direction</string>
+    <string>&amp;Direction</string>
    </property>
    <property name="toolTip">
     <string>Change tool path animation direction</string>
@@ -2676,7 +2825,7 @@
      <normaloff>:/icons/no-surface.png</normaloff>:/icons/no-surface.png</iconset>
    </property>
    <property name="text">
-    <string>Hide Surface</string>
+    <string>&amp;Hide Surface</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+4</string>
@@ -2688,7 +2837,7 @@
      <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
    </property>
    <property name="text">
-    <string>Stop</string>
+    <string>&amp;Stop</string>
    </property>
    <property name="toolTip">
     <string>Stop the simulation</string>
@@ -2703,7 +2852,7 @@
      <normaloff>:/icons/restart.png</normaloff>:/icons/restart.png</iconset>
    </property>
    <property name="text">
-    <string>Run</string>
+    <string>&amp;Run</string>
    </property>
    <property name="toolTip">
     <string>Run or restart the simulation</string>
@@ -2721,7 +2870,7 @@
      <normaloff>:/icons/reduce.png</normaloff>:/icons/reduce.png</iconset>
    </property>
    <property name="text">
-    <string>Reduce</string>
+    <string>R&amp;educe</string>
    </property>
    <property name="toolTip">
     <string>Reduce the cut surface triangle count for more compact export.</string>
@@ -2748,7 +2897,7 @@
      <normaloff>:/icons/surface.png</normaloff>:/icons/surface.png</iconset>
    </property>
    <property name="text">
-    <string>Show Workpiece</string>
+    <string>Show Workpi&amp;ece</string>
    </property>
    <property name="toolTip">
     <string>Show uncut workpiece</string>
@@ -2798,7 +2947,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Fullscreen</string>
+    <string>F&amp;ullscreen</string>
    </property>
    <property name="shortcut">
     <string>F11</string>
@@ -2867,7 +3016,7 @@
      <normaloff>:/icons/undo.png</normaloff>:/icons/undo.png</iconset>
    </property>
    <property name="text">
-    <string>Undo</string>
+    <string>&amp;Undo</string>
    </property>
    <property name="toolTip">
     <string>Undo most recent edit.</string>
@@ -2882,7 +3031,7 @@
      <normaloff>:/icons/redo.png</normaloff>:/icons/redo.png</iconset>
    </property>
    <property name="text">
-    <string>Redo</string>
+    <string>&amp;Redo</string>
    </property>
    <property name="toolTip">
     <string>Redo recent edit.</string>
@@ -2897,7 +3046,7 @@
      <normaloff>:/icons/cut.png</normaloff>:/icons/cut.png</iconset>
    </property>
    <property name="text">
-    <string>Cut</string>
+    <string>&amp;Cut</string>
    </property>
    <property name="toolTip">
     <string>Cut selected text to clipboard.</string>
@@ -2912,7 +3061,7 @@
      <normaloff>:/icons/copy.png</normaloff>:/icons/copy.png</iconset>
    </property>
    <property name="text">
-    <string>Copy</string>
+    <string>C&amp;opy</string>
    </property>
    <property name="toolTip">
     <string>Copy selected text to clipboard.</string>
@@ -2927,7 +3076,7 @@
      <normaloff>:/icons/paste.png</normaloff>:/icons/paste.png</iconset>
    </property>
    <property name="text">
-    <string>Paste</string>
+    <string>&amp;Paste</string>
    </property>
    <property name="toolTip">
     <string>Paste clipboard contents to editor.</string>
@@ -2987,7 +3136,7 @@
      <normaloff>:/icons/optimize.png</normaloff>:/icons/optimize.png</iconset>
    </property>
    <property name="text">
-    <string>Optimize</string>
+    <string>&amp;Optimize</string>
    </property>
    <property name="toolTip">
     <string>Optimize rapid moves</string>
@@ -3120,7 +3269,7 @@
   </action>
   <action name="actionZoomOut">
    <property name="text">
-    <string>Zoom +</string>
+    <string>&amp;Zoom +</string>
    </property>
    <property name="toolTip">
     <string>Zoom Larger</string>
@@ -3163,6 +3312,17 @@
     <string>Show tool path intensity.  Useful for LASER paths that vary the S parameter.</string>
    </property>
   </action>
+  <action name="actionToggleText">
+   <property name="text">
+    <string>To&amp;ggle Text Editor</string>
+   </property>
+   <property name="iconText">
+    <string>Toggle Te&amp;xt Editor</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+X</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -3173,7 +3333,7 @@
   <customwidget>
    <class>CAMotics::FileTabManager</class>
    <extends>QTabWidget</extends>
-   <header>camotics/qt/FileTabManager.h</header>
+   <header location="global">camotics/qt/FileTabManager.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

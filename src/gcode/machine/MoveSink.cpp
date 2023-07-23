@@ -53,7 +53,8 @@ void MoveSink::move(const Axes &position, int axes, bool rapid, double time) {
     double feed = rapid ? 10000 : getFeed(); // TODO Get rapid feed from machine
 
     Move move(type, start, end, this->time, get(TOOL_NUMBER, NO_UNITS),
-              feed, getSpeed(), getLocation().getStart().getLine(), time);
+              feed, getSpeed(), getLocation().getStart().getLine(), time,
+              getLocation().getStart().getFilename());
 
     this->time += move.getTime();
 

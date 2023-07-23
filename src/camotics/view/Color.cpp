@@ -28,3 +28,4 @@ const Color Color::BLUE(0, 0, 1);
 const Color Color::CYAN(0, 1, 1);
 const Color Color::YELLOW(1, 1, 0);
 const Color Color::PURPLE(1, 0, 1);
+const Color Color::WHITE(1, 1, 1);

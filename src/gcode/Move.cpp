@@ -29,10 +29,13 @@ using namespace std;
 
 
 Move::Move(MoveType type, const Axes &start, const Axes &end, double startTime,
-           int tool, double feed, double speed, unsigned line, double time) :
+           int tool, double feed, double speed, unsigned line, double time,
+           const std::string &filename) :
   Segment3D(start.getXYZ(), end.getXYZ()), type(type), start(start), end(end),
   startTime(startTime), tool(tool), feed(feed), speed(speed), line(line),
   time(time), dist(start.distance(end))  {
+
+  this->filename = filename;
 
   // Estimate time in seconds from feed and distance
   if (!time) this->time = feed ? dist / feed * 60 : 0;
