@@ -23,7 +23,7 @@
 #include <cbang/String.h>
 #include <cbang/Math.h>
 
-#include <ctype.h>
+#include <cctype>
 
 using namespace std;
 using namespace cb;

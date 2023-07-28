@@ -24,7 +24,7 @@
 #include <cbang/log/Logger.h>
 #include <cbang/debug/Debugger.h>
 
-#include <string.h> // For memset()
+#include <cstring> // For memset()
 
 using namespace std;
 using namespace cb;

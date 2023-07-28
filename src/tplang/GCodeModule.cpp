@@ -30,7 +30,7 @@
 #include <cbang/util/SmartFunctor.h>
 #include <cbang/geom/Rectangle.h>
 
-#include <math.h>
+#include <cmath>
 
 using namespace tplang;
 using namespace GCode;

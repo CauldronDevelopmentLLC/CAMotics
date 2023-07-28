@@ -26,7 +26,7 @@
 #include <cbang/xml/XMLWriter.h>
 #include <cbang/Catch.h>
 
-#include <string.h>
+#include <cstring>
 
 
 using namespace std;

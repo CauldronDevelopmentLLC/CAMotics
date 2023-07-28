@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // Int128 class (enables safe math on signed 64bit integers)
 // eg Int128 val1((int64_t)9223372036854775807); // ie 2^63 -1

@@ -27,7 +27,7 @@
 
 #include "dl_global.h"
 
-#include <string.h>
+#include <cstring>
 
 #include "dl_attributes.h"
 #include "dl_codes.h"

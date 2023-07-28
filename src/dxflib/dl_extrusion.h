@@ -27,7 +27,7 @@
 
 #include "dl_global.h"
 
-#include <math.h>
+#include <cmath>
 
 
 /**

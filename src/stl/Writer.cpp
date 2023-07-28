@@ -21,7 +21,7 @@
 #include "Writer.h"
 #include "BinaryTriangle.h"
 
-#include <string.h>
+#include <cstring>
 
 using namespace std;
 using namespace cb;

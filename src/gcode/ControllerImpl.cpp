@@ -29,7 +29,7 @@
 
 #include <limits>
 
-#include <string.h> // For memset()
+#include <cstring> // For memset()
 
 
 using namespace std;

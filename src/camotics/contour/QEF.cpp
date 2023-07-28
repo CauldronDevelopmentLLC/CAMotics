@@ -29,7 +29,7 @@
 
 #include <cbang/Math.h>
 
-#include <string.h>
+#include <cstring>
 
 using namespace cb;
 using namespace CAMotics;

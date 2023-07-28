@@ -33,7 +33,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 
 #define CLIPPER_HORIZONTAL (-1.0E+40)

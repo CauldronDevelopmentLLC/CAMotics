@@ -23,7 +23,7 @@
 
 #include <cbang/Exception.h>
 
-#include <math.h>
+#include <cmath>
 
 using namespace CAMotics;
 

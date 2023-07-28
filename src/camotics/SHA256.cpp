@@ -38,7 +38,7 @@
 
 #include <cbang/String.h>
 
-#include <string.h>
+#include <cstring>
 
 using namespace CAMotics;
 using namespace std;
