@@ -37,6 +37,9 @@ namespace CAMotics {
     void setBlue(double b)  {(*this)[2] = b;}
     void setAlpha(double a) {(*this)[3] = a;}
 
+    static unsigned toIndex(float r, float g, float b);
+    static Color fromIndex(unsigned i);
+
     static const Color RED;
     static const Color GREEN;
     static const Color BLUE;

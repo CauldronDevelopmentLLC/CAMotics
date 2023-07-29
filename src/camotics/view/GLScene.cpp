@@ -80,6 +80,7 @@ void GLScene::glDraw(bool picking) {
     gl.glDisable(GL_LINE_SMOOTH);
     gl.glDisable(GL_MULTISAMPLE);
     gl.glClearColor(0, 0, 0, 255);
+
   } else {
     gl.setPicking(false);
     gl.glEnable(GL_LINE_SMOOTH);

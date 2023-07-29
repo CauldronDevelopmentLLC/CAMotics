@@ -130,9 +130,8 @@ namespace CAMotics {
     std::string defaultExample;
     bool sliderMoving     = false;
     bool positionChanged  = false;
-    bool syncEditor       = false;
     unsigned programLine  = 0;
-    QString programPath   = "";
+    int programFile       = -1;
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
@@ -223,7 +222,6 @@ namespace CAMotics {
     bool checkSave(bool canCancel = true);
     void activateFile(const std::string &filename, int line = -1, int col = -1);
 
-    void updateComment();
     void updateActions();
     void updateUnits();
     void updateToolTables();
@@ -248,8 +246,6 @@ namespace CAMotics {
 
     bool isActive() {return lastStatusActive;}
     void setStatusActive(bool active);
-    bool isSync() {return syncEditor;}
-    void setSync(bool sync) {syncEditor = sync;}
 
     void showConsole();
     void hideConsole();
@@ -280,7 +276,7 @@ namespace CAMotics {
     void updateFeed(const std::string &name, double value);
     void updateSpeed(const std::string &name, double value);
     void updateDirection(const std::string &name, const char *value);
-    void updateProgramName(const std::string &name, const char *value);
+    void updateProgramFile(const std::string &name, int value);
     void updateProgramLine(const std::string &name, unsigned value);
 
   protected:
@@ -328,8 +324,6 @@ namespace CAMotics {
     void on_zOffsetDoubleSpinBox_valueChanged(double value);
 
     void on_languageChanged(QAction *action);
-    void on_commentsChanged();
-    void on_syncChanged();
 
     void on_actionQuit_triggered();
     void on_actionNew_triggered();

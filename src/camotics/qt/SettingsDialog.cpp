@@ -27,7 +27,7 @@ using namespace CAMotics;
 
 SettingsDialog::SettingsDialog(QWidget *parent) : Dialog(parent) {
   ui.setupUi(this);
-  
+
 #ifndef DEBUG
   // Hide advanced controls
   ui.tabWidget->removeTab(1);
@@ -60,11 +60,6 @@ string SettingsDialog::getMachinePath(const string &machine) const {
 
 string SettingsDialog::getMachinePath() const {
   return ui.machineComboBox->currentData().toString().toUtf8().data();
-}
-
-
-bool SettingsDialog::getSeparateFiles() const {
-  return settings.get("Settings/SeparateFiles", 0).toBool();
 }
 
 
@@ -145,8 +140,6 @@ void SettingsDialog::load(Project::Project &project, View &view) {
 
   ui.resolutionDoubleSpinBox->setValue(project.getResolution());
   ui.resolutionComboBox->setCurrentIndex(project.getResolutionMode());
-  ui.separateFilesCheckBox->
-    setChecked(settings.get("Settings/SeparateFiles", 0).toBool());
   ui.unitsComboBox->setCurrentIndex(project.getUnits());
 
   ui.defaultUnitsComboBox->
@@ -172,8 +165,6 @@ void SettingsDialog::save(Project::Project &project, View &view) {
 
   if (mode == ResolutionMode::RESOLUTION_MANUAL)
     project.setResolution(ui.resolutionDoubleSpinBox->value());
-
-  settings.set("Settings/SeparateFiles", ui.separateFilesCheckBox->isChecked());
 
   GCode::Units units =
     (GCode::Units::enum_t)ui.unitsComboBox->currentIndex();

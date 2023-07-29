@@ -22,8 +22,8 @@
 
 #include <cbang/log/Logger.h>
 
+using namespace std;
 using namespace cb;
-using namespace GCode;
 using namespace GCode;
 
 
@@ -52,9 +52,15 @@ void MoveSink::move(const Axes &position, int axes, bool rapid, double time) {
     Axes end = getTransforms().transform(position);
     double feed = rapid ? 10000 : getFeed(); // TODO Get rapid feed from machine
 
-    Move move(type, start, end, this->time, get(TOOL_NUMBER, NO_UNITS),
-              feed, getSpeed(), getLocation().getStart().getLine(), time,
-              getLocation().getStart().getFilename());
+    auto &location = getLocation().getStart();
+    SmartPointer<string> filename;
+
+    if (lastFile.isNull() || *lastFile != location.getFilename())
+      lastFile = filename = new string(location.getFilename());
+    else filename = lastFile;
+
+    Move move(type, start, end, this->time, get(TOOL_NUMBER, NO_UNITS), feed,
+              getSpeed(), location.getLine(), filename, time);
 
     this->time += move.getTime();
 

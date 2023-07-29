@@ -29,13 +29,11 @@ using namespace std;
 
 
 Move::Move(MoveType type, const Axes &start, const Axes &end, double startTime,
-           int tool, double feed, double speed, unsigned line, double time,
-           const std::string &filename) :
+           int tool, double feed, double speed, unsigned line,
+           const cb::SmartPointer<std::string> &filename, double time) :
   Segment3D(start.getXYZ(), end.getXYZ()), type(type), start(start), end(end),
   startTime(startTime), tool(tool), feed(feed), speed(speed), line(line),
-  time(time), dist(start.distance(end))  {
-
-  this->filename = filename;
+  filename(filename), time(time), dist(start.distance(end))  {
 
   // Estimate time in seconds from feed and distance
   if (!time) this->time = feed ? dist / feed * 60 : 0;

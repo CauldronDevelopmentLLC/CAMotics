@@ -22,6 +22,25 @@
 
 using namespace CAMotics;
 
+
+unsigned Color::toIndex(float r, float g, float b) {
+  return
+    ((unsigned)(r * 0xff) <<  0) +
+    ((unsigned)(g * 0xff) <<  8) +
+    ((unsigned)(b * 0xff) << 16) - 1;
+}
+
+
+Color Color::fromIndex(unsigned i) {
+  i++;
+
+  float r = ((i >>  0) & 0xff) / (float)0xff;
+  float g = ((i >>  8) & 0xff) / (float)0xff;
+  float b = ((i >> 16) & 0xff) / (float)0xff;
+
+  return Color(r, g, b);
+}
+
 const Color Color::RED(1, 0, 0);
 const Color Color::GREEN(0, 1, 0);
 const Color Color::BLUE(0, 0, 1);

@@ -151,7 +151,7 @@ namespace CAMotics {
     void keyReleaseEvent(QKeyEvent *e);
     void resizeEvent(QResizeEvent *e);
     void wheelEvent(QWheelEvent *e);
-    void mousePressEvent(QMouseEvent *e);
+    void mouseDoubleClickEvent(QMouseEvent *e);
 
   protected slots:
     void updateCursor();

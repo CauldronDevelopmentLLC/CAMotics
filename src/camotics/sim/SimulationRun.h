@@ -40,7 +40,6 @@ namespace CAMotics {
     cb::SmartPointer<GridTree> tree;
 
     double lastTime = 0;
-    double lastStart = 0;
 
   public:
     SimulationRun(const Simulation &sim);

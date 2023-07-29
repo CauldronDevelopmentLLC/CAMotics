@@ -43,6 +43,7 @@ namespace CAMotics {
     bool doPicking = false;
     int xPicking = 0;
     int yPicking = 0;
+    unsigned selectedMove = 0;
 
   public:
     GLView(QWidget *parent = 0);
@@ -57,6 +58,7 @@ namespace CAMotics {
   protected:
     // From QWidget
     void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void destroy(bool destroyWindow, bool destroySubWindows);

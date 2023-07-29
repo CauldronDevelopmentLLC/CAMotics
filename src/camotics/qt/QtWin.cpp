@@ -87,10 +87,6 @@ QtWin::QtWin(Application &app, QApplication &qtApp) :
   connect(&settingsDialog, SIGNAL(machineChanged(QString, QString)),
           this, SLOT(on_machineChanged(QString, QString)));
 
-  // Comments
-  connect(ui->commentTextEdit, SIGNAL(textChanged()),
-          this, SLOT(on_commentsChanged()));
-
   // FileTabManager
   connect(ui->actionUndo, SIGNAL(triggered()),
           ui->fileTabManager, SLOT(on_actionUndo_triggered()));
@@ -130,10 +126,6 @@ QtWin::QtWin(Application &app, QApplication &qtApp) :
           SIGNAL(replace(QString, QString, bool, int, bool)),
           ui->fileTabManager,
           SLOT(on_replace(QString, QString, bool, int, bool)));
-
-  // Editor Sync
-  connect(ui->syncCheckBox, SIGNAL(stateChanged(int)),
-          this, SLOT(on_syncChanged()));
 
   // BBCtrl
   connect(&connectDialog, SIGNAL(connect()), this, SLOT(on_bbctrlConnect()));
@@ -272,7 +264,7 @@ void QtWin::init() {
   valueSet["feed"]->add(this, &QtWin::updateFeed);
   valueSet["speed"]->add(this, &QtWin::updateSpeed);
   valueSet["direction"]->add(this, &QtWin::updateDirection);
-  valueSet["program_name"]->add(this, &QtWin::updateProgramName);
+  valueSet["program_file"]->add(this, &QtWin::updateProgramFile);
   valueSet["program_line"]->add(this, &QtWin::updateProgramLine);
 
   valueSet.updated();
@@ -603,7 +595,6 @@ void QtWin::saveAllState() {
   settings.set("MainWindow/Geometry", saveGeometry());
   settings.set("Console/Splitter", ui->splitter->saveState());
   settings.set("File/Splitter", ui->splitterFile->saveState());
-  settings.set("File/Sync", ui->syncCheckBox->isChecked());
 }
 
 
@@ -613,7 +604,6 @@ void QtWin::restoreAllState() {
   restoreGeometry(settings.get("MainWindow/Geometry").toByteArray());
   ui->splitter->restoreState(settings.get("Console/Splitter").toByteArray());
   ui->splitterFile->restoreState(settings.get("File/Splitter").toByteArray());
-  ui->syncCheckBox->setChecked(settings.get("File/Sync", "false").toBool());
 }
 
 
@@ -852,8 +842,6 @@ void QtWin::reload(bool now) {
   ui->console->document()->clear();
   ui->console->setTextColor(QColor("#d9d9d9"));
 
-  view->path->setSeparateFiles(settingsDialog.getSeparateFiles());
-
   try {
     // Queue tool path task
     const GCode::PlannerConfig *config = 0;
@@ -1058,7 +1046,10 @@ void QtWin::loadProject() {
   updateToolTables();
   updateFiles();
   updateUnits();
-  updateComment();
+
+  // Open first file
+  if (project.isSet() && project->getFileCount())
+    ui->fileTabManager->open(project->getFile(0));
 }
 
 
@@ -1287,10 +1278,10 @@ void QtWin::addFile() {
 
 void QtWin::editFile(unsigned index) {
   SmartPointer<Project::File> file = project->getFile(index);
-  if (!file.isNull()) {
-      ui->fileTabManager->open(file);
 
-      if (!ui->splitterFile->sizes()[1]) showText();
+  if (file.isSet()) {
+    ui->fileTabManager->open(file);
+    if (!ui->splitterFile->sizes()[1]) showText();
   }
 }
 
@@ -1324,8 +1315,8 @@ void QtWin::activateFile(const string &filename, int line, int col) {
 
 
 void QtWin::updateActions() {
-  unsigned tab = ui->fileTabManager->currentIndex();
-  bool fileTab = ui->fileTabManager->isFileTab(tab);
+  int tab = ui->fileTabManager->currentIndex();
+  bool fileTab = tab != -1;
 
   if (!fileTab) {
     ui->actionSaveFile->setEnabled(false);
@@ -1358,11 +1349,6 @@ void QtWin::updateActions() {
   ui->actionCopy->setEnabled(fileTab);
   ui->actionPaste->setEnabled(fileTab);
   ui->actionSelectAll->setEnabled(fileTab);
-}
-
-
-void QtWin::updateComment() {
-  ui->commentTextEdit->setText(QString::fromStdString(project->getComments()));
 }
 
 
@@ -1789,30 +1775,31 @@ void QtWin::updateDirection(const string &name, const char *value) {
 
 
 void QtWin::updateProgramLine(const string &name, unsigned value) {
-  if (programLine != value) {
-    // Open and/or select file tab and highlight current line
-    if (ui->splitterFile->sizes()[1] > 0 && isSync()) {
-      if(!programPath.isEmpty() && !programPath.toLower().endsWith(".tpl")) {
-        SmartPointer<Project::File> file =
-                project->findFile(programPath.toStdString().c_str());
-        if (!file.isNull()) {
-          ui->fileTabManager->open(file, value-1, 0);
-        }
-      }
-    }
-    ui->programLineLabel->setText(QString().sprintf("%d", value-1));
-  }
+  if (programLine == value) return;
   programLine = value;
+
+  // Open and/or select file tab and highlight current line
+  if (0 < ui->splitterFile->sizes()[1] && programFile != -1 &&
+      programFile < (int)project->getFileCount()) {
+
+    SmartPointer<Project::File> file = project->getFile(programFile);
+    auto &path = file->getPath();
+
+    if (!String::endsWith(path, ".tpl"))
+      ui->fileTabManager->open(file, value - 1, 0);
+  }
+
+  ui->programLineLabel->setText(QString().sprintf("%d", value - 1));
 }
 
 
-void QtWin::updateProgramName(const string &name, const char *value) {
-  QString filepath = QString::fromUtf8(value);
-  if (programPath != filepath) {
-    QString filename = QFileInfo(value).fileName();
-    ui->programNameLabel->setText(filename);
-  }
-  programPath = filepath;
+void QtWin::updateProgramFile(const string &name, int value) {
+  if (programFile == value) return;
+  programFile = value;
+
+  if (value != -1 && value < (int)project->getFileCount())
+    ui->programNameLabel->setText(
+      QString::fromStdString(project->getFile(value)->getBasename()));
 }
 
 
@@ -1992,8 +1979,9 @@ void QtWin::on_machineChanged(QString machine, QString path) {
 
 
 void QtWin::on_editorClicked(QString filename, int line) {
-  view->path->setByLine(filename.toStdString(), line + 1);
+  if (project.isNull()) return;
   redraw();
+  view->path->setByLine(filename.toUtf8().data(), line + 1);
 }
 
 
@@ -2164,22 +2152,6 @@ void QtWin::on_zOffsetDoubleSpinBox_valueChanged(double value) {
 
 void QtWin::on_languageChanged(QAction *action) {
   if (action) loadLanguage(action->data().toString());
-}
-
-
-void QtWin::on_commentsChanged() {
-  std::string projectComments = project->getComments();
-  std::string htmlComments = ui->commentTextEdit->toPlainText().toStdString();
-  std::string textComments = ui->commentTextEdit->toHtml().toStdString();
-
-  if (!textComments.empty() && projectComments != htmlComments) {
-    project->setComments(htmlComments);
-  }
-}
-
-
-void QtWin::on_syncChanged() {
-  setSync(ui->syncCheckBox->checkState());
 }
 
 

@@ -34,6 +34,7 @@ namespace GCode {
 
     bool probePending = false;
     double time = 0;
+    cb::SmartPointer<std::string> lastFile;
 
   public:
     MoveSink(MoveStream &stream) : stream(stream) {}

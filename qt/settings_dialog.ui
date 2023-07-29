@@ -196,19 +196,6 @@
             </item>
            </layout>
           </item>
-          <item>
-           <widget class="QCheckBox" name="separateFilesCheckBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Simulate each file separately</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>

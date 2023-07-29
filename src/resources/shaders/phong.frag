@@ -33,13 +33,7 @@ vec4 phong_color() {
 
 
 void main() {
-  if (light.enabled) {
-    gl_FragColor = phong_color();
-  } else {
-    if (doPicking) {
-      gl_FragColor = fPicking;
-    } else {
-      gl_FragColor = fColor;
-    }
-  }
+  if (doPicking)          gl_FragColor = fPicking;
+  else if (light.enabled) gl_FragColor = phong_color();
+  else                    gl_FragColor = fColor;
 }

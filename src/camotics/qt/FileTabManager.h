@@ -37,14 +37,12 @@ namespace CAMotics {
     Q_OBJECT;
 
     QtWin *win;
-    unsigned offset;
 
   public:
     FileTabManager(QWidget *parent = 0);
 
     void open(const cb::SmartPointer<Project::File> &file,
               int line = -1, int col = -1);
-    bool isFileTab(unsigned tab) const {return offset <= tab;}
     bool isModified(unsigned tab) const;
     const cb::SmartPointer<Project::File> &getFile(unsigned tab) const;
     bool checkSave(unsigned tab);

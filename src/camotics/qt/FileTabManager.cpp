@@ -39,9 +39,7 @@ using namespace cb;
 using namespace std;
 
 
-FileTabManager::FileTabManager(QWidget *parent) :
-  QTabWidget(parent), win(0), offset(1) {
-
+FileTabManager::FileTabManager(QWidget *parent) : QTabWidget(parent), win(0) {
   while (parent && !win) {
     win = dynamic_cast<QtWin *>(parent);
     parent = parent->parentWidget();
@@ -58,7 +56,7 @@ void FileTabManager::open(const SmartPointer<Project::File> &file,
                           int line, int col) {
   // Check if we already have this file open in a tab
   unsigned tab;
-  for (tab = offset; tab < (unsigned)QTabWidget::count(); tab++)
+  for (tab = 0; tab < (unsigned)QTabWidget::count(); tab++)
     if (getFile(tab) == file) break;
 
   // Create new tab
@@ -105,7 +103,7 @@ void FileTabManager::open(const SmartPointer<Project::File> &file,
     if (0 < col)
       c.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, col);
 
-    //c.select(QTextCursor::LineUnderCursor);
+    c.select(QTextCursor::LineUnderCursor);
 
     editor->setTextCursor(c);
   }
@@ -149,7 +147,7 @@ bool FileTabManager::checkSaveAll() {
   bool all = false;
 
   try {
-    for (int tab = offset; tab < QTabWidget::count(); tab++)
+    for (int tab = 0; tab < QTabWidget::count(); tab++)
       if (isModified(tab)) {
         if (!all) {
           // Select tab
@@ -248,7 +246,7 @@ void FileTabManager::save(unsigned tab, bool saveAs) {
 
 
 void FileTabManager::saveAll() {
-  for (int tab = offset; tab < QTabWidget::count(); tab++) save(tab);
+  for (int tab = 0; tab < QTabWidget::count(); tab++) save(tab);
 }
 
 
@@ -286,7 +284,7 @@ void FileTabManager::revert(unsigned tab) {
 
 
 void FileTabManager::revertAll() {
-  for (int tab = offset; tab < QTabWidget::count(); tab++) revert(tab);
+  for (int tab = 0; tab < QTabWidget::count(); tab++) revert(tab);
 }
 
 
@@ -298,13 +296,13 @@ void FileTabManager::close(unsigned tab, bool canSave, bool removeTab) {
 
 
 void FileTabManager::closeAll(bool canSave, bool removeTab) {
-  for (int tab = offset; tab < QTabWidget::count(); tab++)
+  for (int tab = 0; tab < QTabWidget::count(); tab++)
     close(tab, canSave, removeTab);
 }
 
 
 void FileTabManager::validateTabIndex(unsigned tab) const {
-  if (tab < offset || (unsigned)QTabWidget::count() <= tab)
+  if (tab < 0 || (unsigned)QTabWidget::count() <= tab)
     THROW("Invalid file tab index " << tab);
 }
 
@@ -321,7 +319,7 @@ NCEdit *FileTabManager::getCurrentEditor() const {
 
 
 int FileTabManager::getEditorIndex(NCEdit *editor) const {
-  for (int i = offset; i < QTabWidget::count(); i++)
+  for (int i = 0; i < QTabWidget::count(); i++)
     if (QTabWidget::widget(i) == editor) return i;
 
   return -1;
@@ -344,21 +342,15 @@ void FileTabManager::on_modificationChanged(NCEdit *editor, bool changed) {
 
 
 void FileTabManager::on_editorClicked(NCEdit *editor) {
-  if (this->win->isSync()) {
-    Project::File &file = *editor->getFile();
-    QString filename = QString(file.getPath().c_str());
+  Project::File &file = *editor->getFile();
+  QString filename = QString(file.getPath().c_str());
 
-    if (!filename.isEmpty() && !filename.toLower().endsWith(".tpl")) {
-      QTextCursor cursor = editor->textCursor();
-      int position = cursor.position();
+  if (!filename.isEmpty() && !filename.endsWith(".tpl")) {
+    int position = editor->textCursor().position();
+    QString text = editor->document()->toPlainText();
+    int line     = text.left(position).count('\n') + 1;
 
-      QTextDocument &document = *editor->document();
-      QString text = document.toPlainText();
-
-      int line = text.left(position).count('\n') + 1;
-
-      emit editorClicked(filename, line);
-    }
+    emit editorClicked(filename, line);
   }
 }
 

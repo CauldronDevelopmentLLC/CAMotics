@@ -184,7 +184,8 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
                       vars.getNumber("offset_y", 0),
                       vars.getNumber("offset_z", 0));
 
-      parent->getView().path->setByRemote(position + offset, line);
+      // TODO need filename
+      parent->getView().path->setByLine("", line, position + offset);
       parent->redraw();
     }
   } CATCH_ERROR;

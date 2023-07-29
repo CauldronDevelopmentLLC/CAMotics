@@ -59,8 +59,8 @@ int ToolPath::find(double time) const {return find(time, 0, size());}
 void ToolPath::read(const JSON::Value &value) {
   GCode::Axes start;
   GCode::MoveType type = GCode::MoveType::MOVE_RAPID;
-  std::string filename = "";
   int line = 0;
+  SmartPointer<string> filename;
   int tool = 1;
   double feed = 0;
   double speed = 0;
@@ -76,8 +76,11 @@ void ToolPath::read(const JSON::Value &value) {
     if (dict.hasString("type"))
       type = GCode::MoveType::parse(dict.getString("type"));
 
-    if (dict.hasString("filename"))
-      filename = dict.getString("filename", filename);
+    if (dict.hasString("filename")) {
+      string _filename = dict.getString("filename");
+      if (filename.isNull() || _filename != *filename)
+        filename = new string(_filename);
+    }
 
     line = dict.getNumber("line", line);
     tool = dict.getNumber("tool", tool);
@@ -86,7 +89,7 @@ void ToolPath::read(const JSON::Value &value) {
     double delta = dict.getNumber("time", 0);
 
     GCode::Move m(
-      type, start, end, time, tool, feed, speed, line, delta, filename);
+      type, start, end, time, tool, feed, speed, line, filename, delta);
     move(m);
 
     time += m.getTime();
@@ -98,8 +101,8 @@ void ToolPath::read(const JSON::Value &value) {
 void ToolPath::write(JSON::Sink &sink) const {
   GCode::Axes lastPos(numeric_limits<double>::infinity());
   GCode::MoveType type = (GCode::MoveType::enum_t)-1;
-  std::string filename = "";
   int line = -1;
+  SmartPointer<string> filename;
   int tool = -1;
   double feed = -1;
   double speed = -1;
@@ -124,8 +127,8 @@ void ToolPath::write(JSON::Sink &sink) const {
       sink.insert("line", line = move.getLine());
 
     // File name
-    if (filename != move.getFilename())
-      sink.insert("filename", filename = move.getFilename());
+    if (*filename != *move.getFilename())
+      sink.insert("filename", *(filename = move.getFilename()));
 
     // GCode::Tool
     if (tool != (int)move.getTool())

@@ -584,7 +584,7 @@ void NCEdit::wheelEvent(QWheelEvent *e) {
 }
 
 
-void NCEdit::mousePressEvent(QMouseEvent *e) {
+void NCEdit::mouseDoubleClickEvent(QMouseEvent *e) {
   QPlainTextEdit::mousePressEvent(e);
   parent->on_editorClicked(this);
 }

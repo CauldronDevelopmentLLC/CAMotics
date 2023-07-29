@@ -36,25 +36,20 @@
 namespace CAMotics {
   class ToolPathView : public GLObject {
     ValueGroup values;
-    cb::SmartPointer<GCode::ToolPath> path;
+    cb::SmartPointer<const GCode::ToolPath> path;
 
-    bool byRemote = true;
-    bool byLine = false;
-    bool separateFiles = false;
+    bool byLine = true;
     double ratio = 1;
     cb::Vector3D position;
     unsigned line = 0;
-    std::string filename = "";
+    std::string filename;
 
     double currentTime = 0;
     double currentDistance = 0;
     cb::Vector3D currentPosition;
-    std::string currentFilename = "";
     unsigned currentLine = 0;
+    std::string currentFile;
     GCode::Move currentMove;
-
-    std::string selectedFilename = "";
-    unsigned selectedLine = 0;
 
     bool dirty = true;
     bool showIntensity = false;
@@ -66,8 +61,8 @@ namespace CAMotics {
     VBO vertexVBuf;
     VBO colorVBuf;
     VBO pickingVBuf;
+
     unsigned numVertices = 0;
-    unsigned numColors = 0;
 
   public:
     ToolPathView(ValueSet &valueSet);
@@ -75,14 +70,15 @@ namespace CAMotics {
     bool isEmpty() const {return path.isNull() || path->empty();}
 
     cb::SmartPointer<const GCode::ToolPath> getPath() const {return path;}
-    void setPath(const cb::SmartPointer<GCode::ToolPath> &path);
+    void setPath(const cb::SmartPointer<const GCode::ToolPath> &path);
 
     cb::Rectangle3D getBounds() const
     {return path.isNull() ? cb::Rectangle3D() : path->getBounds();}
 
     void setByRatio(double ratio);
-    void setByLine(std::string filename, unsigned line);
-    void setByRemote(const cb::Vector3D &position, unsigned line);
+    void setByLine(const std::string &filename, unsigned line,
+                   const cb::Vector3D &position =
+                   cb::Vector3D(std::numeric_limits<double>::infinity()));
 
     void incTime(double amount = 1);
     void decTime(double amount = 1);
@@ -104,16 +100,11 @@ namespace CAMotics {
     {return currentDistance / getTotalDistance() * 100;}
 
     const cb::Vector3D &getPosition() const {return currentPosition;}
-    const char *getFilename() const {return currentFilename.c_str();}
+    const char *getProgramFile() const {return currentFile.c_str();}
     unsigned getProgramLine() const {return currentLine;}
     const GCode::Move &getMove() const {return currentMove;}
 
-    const char *getSelectedFilename() const {return selectedFilename.c_str();}
-    unsigned getSelectedLine() const {return selectedLine;}
-
     void setShowIntensity(bool show);
-    void setSeparateFiles(bool value) {separateFiles = value;}
-    bool getSeparateFiles() const {return separateFiles;}
 
     unsigned getTool() const {return getMove().getTool();}
     double getFeed() const {return getMove().getFeed();}
@@ -126,5 +117,8 @@ namespace CAMotics {
 
     // From GLObject
     void glDraw(GLContext &gl);
+
+  protected:
+    void pushVertex(const cb::Vector3D &v, const Color &color, unsigned index);
   };
 }
