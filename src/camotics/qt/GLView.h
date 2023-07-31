@@ -40,7 +40,7 @@ namespace CAMotics {
 
     cb::SmartPointer<QOpenGLDebugLogger> logger;
     bool enabled;
-    bool doPicking = false;
+    bool doPicking   = false;
     int xPicking = 0;
     int yPicking = 0;
     unsigned selectedMove = 0;

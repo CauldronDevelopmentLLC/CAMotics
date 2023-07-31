@@ -1779,27 +1779,19 @@ void QtWin::updateProgramLine(const string &name, unsigned value) {
   programLine = value;
 
   // Open and/or select file tab and highlight current line
-  if (0 < ui->splitterFile->sizes()[1] && programFile != -1 &&
-      programFile < (int)project->getFileCount()) {
+  if (0 < ui->splitterFile->sizes()[1] && programFile)
+    activateFile(programFile, value);
 
-    SmartPointer<Project::File> file = project->getFile(programFile);
-    auto &path = file->getPath();
-
-    if (!String::endsWith(path, ".tpl"))
-      ui->fileTabManager->open(file, value - 1, 0);
-  }
-
-  ui->programLineLabel->setText(QString().sprintf("%d", value - 1));
+  ui->programLineLabel->setText(QString().sprintf("%d", value));
 }
 
 
-void QtWin::updateProgramFile(const string &name, int value) {
+void QtWin::updateProgramFile(const string &name, const char *value) {
   if (programFile == value) return;
   programFile = value;
 
-  if (value != -1 && value < (int)project->getFileCount())
-    ui->programNameLabel->setText(
-      QString::fromStdString(project->getFile(value)->getBasename()));
+  ui->programNameLabel->
+    setText(QString::fromStdString(SystemUtilities::basename(value)));
 }
 
 
@@ -1981,7 +1973,7 @@ void QtWin::on_machineChanged(QString machine, QString path) {
 void QtWin::on_editorClicked(QString filename, int line) {
   if (project.isNull()) return;
   redraw();
-  view->path->setByLine(filename.toUtf8().data(), line + 1);
+  view->path->setByLine(filename.toUtf8().data(), line);
 }
 
 

@@ -118,20 +118,20 @@ namespace CAMotics {
     QSignalMapper recentProjectsMapper;
     cb::SmartPointer<BBCtrlAPI> bbCtrlAPI;
 
-    double lastRedraw     = 0;
-    bool dirty            = false;
-    bool simDirty         = false;
-    unsigned inUIUpdate   = 0;
-    double lastProgress   = 0;
+    double lastRedraw       = 0;
+    bool dirty              = false;
+    bool simDirty           = false;
+    unsigned inUIUpdate     = 0;
+    double lastProgress     = 0;
     std::string lastStatus;
-    bool lastStatusActive = false;
-    bool autoPlay         = false;
-    bool autoClose        = false;
+    bool lastStatusActive   = false;
+    bool autoPlay           = false;
+    bool autoClose          = false;
     std::string defaultExample;
-    bool sliderMoving     = false;
-    bool positionChanged  = false;
-    unsigned programLine  = 0;
-    int programFile       = -1;
+    bool sliderMoving       = false;
+    bool positionChanged    = false;
+    unsigned programLine    = 0;
+    const char *programFile = 0;
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
 
@@ -276,8 +276,8 @@ namespace CAMotics {
     void updateFeed(const std::string &name, double value);
     void updateSpeed(const std::string &name, double value);
     void updateDirection(const std::string &name, const char *value);
-    void updateProgramFile(const std::string &name, int value);
     void updateProgramLine(const std::string &name, unsigned value);
+    void updateProgramFile(const std::string &name, const char *value);
 
   protected:
     // From TaskObserver

@@ -176,7 +176,7 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
     }
 
     if (updatePosition) {
-      uint32_t line = vars.getS32("ln", 0);
+      uint32_t line = vars.getS32("ln", 1);
       Vector3D position(vars.getNumber("xp", 0),
                         vars.getNumber("yp", 0),
                         vars.getNumber("zp", 0));
@@ -185,7 +185,7 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
                       vars.getNumber("offset_z", 0));
 
       // TODO need filename
-      parent->getView().path->setByLine("", line, position + offset);
+      parent->getView().path->setByLine("", line - 1, position + offset);
       parent->redraw();
     }
   } CATCH_ERROR;

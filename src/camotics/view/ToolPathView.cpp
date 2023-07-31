@@ -32,27 +32,27 @@ using namespace CAMotics;
 
 
 ToolPathView::ToolPathView(ValueSet &valueSet) : values(valueSet) {
-  values.add("x", currentPosition.x());
-  values.add("y", currentPosition.y());
-  values.add("z", currentPosition.z());
+  values.add("x", position.x());
+  values.add("y", position.y());
+  values.add("z", position.z());
 
-  values.add("current_time", currentTime);
-  values.add("total_time", this, &ToolPathView::getTotalTime);
-  values.add("remaining_time", this, &ToolPathView::getRemainingTime);
-  values.add("time_ratio", this, &ToolPathView::getTimeRatio);
-  values.add("percent_time", this, &ToolPathView::getPercentTime);
+  values.add("current_time",       time);
+  values.add("total_time",         this, &ToolPathView::getTotalTime);
+  values.add("remaining_time",     this, &ToolPathView::getRemainingTime);
+  values.add("time_ratio",         this, &ToolPathView::getTimeRatio);
+  values.add("percent_time",       this, &ToolPathView::getPercentTime);
 
-  values.add("current_distance", currentDistance);
-  values.add("total_distance", this, &ToolPathView::getTotalDistance);
+  values.add("current_distance",   distance);
+  values.add("total_distance",     this, &ToolPathView::getTotalDistance);
   values.add("remaining_distance", this, &ToolPathView::getRemainingDistance);
-  values.add("percent_distance", this, &ToolPathView::getPercentDistance);
+  values.add("percent_distance",   this, &ToolPathView::getPercentDistance);
 
-  values.add("tool", this, &ToolPathView::getTool);
-  values.add("feed", this, &ToolPathView::getFeed);
-  values.add("speed", this, &ToolPathView::getSpeed);
-  values.add("direction", this, &ToolPathView::getDirection);
-  values.add("program_file", this, &ToolPathView::getProgramFile);
-  values.add("program_line", this, &ToolPathView::getProgramLine);
+  values.add("tool",               this, &ToolPathView::getTool);
+  values.add("feed",               this, &ToolPathView::getFeed);
+  values.add("speed",              this, &ToolPathView::getSpeed);
+  values.add("direction",          this, &ToolPathView::getDirection);
+  values.add("program_file",       this, &ToolPathView::getProgramFile);
+  values.add("program_line",       this, &ToolPathView::getProgramLine);
 
   setLight(false);
   setPickable(true);
@@ -62,7 +62,7 @@ ToolPathView::ToolPathView(ValueSet &valueSet) : values(valueSet) {
 void ToolPathView::setPath(const SmartPointer<const GCode::ToolPath> &path) {
   this->path = path;
 
-  currentMove = GCode::Move();
+  move = GCode::Move();
   dirty = true;
 
   if (path.isNull() || path->empty()) return;
@@ -84,7 +84,7 @@ void ToolPathView::setByRatio(double ratio) {
 
 
 void ToolPathView::setByLine(const string &filename, unsigned line,
-  const Vector3D &position) {
+                             const Vector3D &position) {
   if (!byLine || this->filename != filename || this->line != line ||
       this->position != position) {
     this->filename = filename;
@@ -138,12 +138,9 @@ Color ToolPathView::getColor(GCode::MoveType type, double intensity) {
 void ToolPathView::update() {
   if (!dirty) return;
 
-  currentTime = 0;
-  currentDistance = 0;
-  currentPosition = (byLine && position.isReal()) ? position : Vector3D();
-  currentLine = 0;
-  currentFile = "";
-  currentMove = GCode::Move();
+  time = 0;
+  distance = 0;
+  move = GCode::Move();
 
   vertices.clear();
   colors.clear();
@@ -161,24 +158,24 @@ void ToolPathView::update() {
     bool found = false;
 
     for (unsigned i = 0; i < path->size(); i++) {
-      const GCode::Move &move = path->at(i);
-      currentMove = move;
+      move = path->at(i);
 
       const Vector3D &start = move.getStartPt();
       Vector3D end          = move.getEndPt();
       Vector3D mid;
       double moveTime       = move.getTime();
       double moveDistance   = move.getDistance();
-      uint32_t moveLine     = move.getLine() + 1; // EMC2 counts from zero
+      uint32_t moveLine     = move.getLine();
       string moveFile;
       bool partial          = false;
 
       if (move.getFilename().isSet()) moveFile = *move.getFilename();
+      bool fileMatch = filename.empty() || filename == moveFile;
 
       if (!found) {
         if (byLine) {
           // Selection by line
-          if ((filename.empty() || filename == moveFile) && line <= moveLine) {
+          if (fileMatch && line <= moveLine) {
             found = true;
 
             if (position.isReal()) {
@@ -191,30 +188,28 @@ void ToolPathView::update() {
                 moveDistance = delta;
                 partial = true;
               }
-            }
+
+            } else position = end;
           }
 
         } else {
           // Selection by time ratio
-          double time = ratio * getTotalTime();
+          double targetTime = ratio * getTotalTime();
 
-          if (time < currentTime + moveTime) {
-            double delta = time - currentTime;
+          if (targetTime < time + moveTime) {
+            double delta = targetTime - time;
             mid = move.getPtAtTime(time);
             moveDistance *= delta / moveTime;
             moveTime = delta;
             partial = found = true;
+            line = moveLine;
+            filename = moveFile;
+            position = mid;
           }
         }
 
-        currentTime += moveTime;
-        currentDistance += moveDistance;
-
-        if (found) {
-          currentLine = moveLine;
-          currentFile = moveFile;
-          if (!position.isReal()) currentPosition = partial ? mid : end;
-        }
+        time += moveTime;
+        distance += moveDistance;
       }
 
       // Store vertex and color data
@@ -222,8 +217,8 @@ void ToolPathView::update() {
         (showIntensity && maxSpeed) ? fabs(move.getSpeed()) / maxSpeed : 1;
       Color color = getColor(move.getType(), s);
 
-      // Change color based on specified selection
-      if (byLine && line == moveLine) color = Color::WHITE;
+      // Change color based on selection
+      if (byLine && line == moveLine && fileMatch) color = Color::WHITE;
       else if (!partial && found) color *= Color(0.3, 0.3, 0.3);
 
       pushVertex(start, color, i);
@@ -234,6 +229,8 @@ void ToolPathView::update() {
       }
       pushVertex(end, color, i);
     }
+
+    if (!found) position = path->at(path->size() - 1).getEndPt();
   }
 
   numVertices = vertices.size() / 3;

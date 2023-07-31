@@ -611,7 +611,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Tool Positio&amp;n</string>
+    <string>Tool Position</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1071,7 +1071,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>&amp;Machine Status</string>
+    <string>Machine Status</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1377,7 +1377,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Tool Path Bo&amp;unds</string>
+    <string>Tool Path Bounds</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1615,7 +1615,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Wor&amp;kpiece Bounds</string>
+    <string>Workpiece Bounds</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>

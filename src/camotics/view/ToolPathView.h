@@ -44,12 +44,9 @@ namespace CAMotics {
     unsigned line = 0;
     std::string filename;
 
-    double currentTime = 0;
-    double currentDistance = 0;
-    cb::Vector3D currentPosition;
-    unsigned currentLine = 0;
-    std::string currentFile;
-    GCode::Move currentMove;
+    double time = 0;
+    double distance = 0;
+    GCode::Move move;
 
     bool dirty = true;
     bool showIntensity = false;
@@ -83,32 +80,32 @@ namespace CAMotics {
     void incTime(double amount = 1);
     void decTime(double amount = 1);
 
-    double getTime() const {return currentTime;}
+    double getTime() const {return time;}
     bool atStart() const {return getTime() == 0;}
     bool atEnd() const {return getTime() == getTotalTime();}
-    double getRemainingTime() const {return getTotalTime() - currentTime;}
+    double getRemainingTime() const {return getTotalTime() - time;}
     double getTotalTime() const {return path.isNull() ? 0 : path->getTime();}
-    double getTimeRatio() const {return currentTime / getTotalTime();}
+    double getTimeRatio() const {return time / getTotalTime();}
     double getPercentTime() const {return getTimeRatio() * 100;}
 
-    double getDistance() const {return currentDistance;}
+    double getDistance() const {return distance;}
     double getRemainingDistance() const
-    {return getTotalDistance() - currentDistance;}
+    {return getTotalDistance() - distance;}
     double getTotalDistance() const
     {return path.isNull() ? 0 : path->getDistance();}
     double getPercentDistance() const
-    {return currentDistance / getTotalDistance() * 100;}
+    {return distance / getTotalDistance() * 100;}
 
-    const cb::Vector3D &getPosition() const {return currentPosition;}
-    const char *getProgramFile() const {return currentFile.c_str();}
-    unsigned getProgramLine() const {return currentLine;}
-    const GCode::Move &getMove() const {return currentMove;}
+    const cb::Vector3D &getPosition() const {return position;}
+    const char *getProgramFile() const {return filename.c_str();}
+    unsigned getProgramLine() const {return line;}
+    const GCode::Move &getMove() const {return move;}
 
     void setShowIntensity(bool show);
 
-    unsigned getTool() const {return getMove().getTool();}
-    double getFeed() const {return getMove().getFeed();}
-    double getSpeed() const {return getMove().getSpeed();}
+    unsigned getTool()  const {return getMove().getTool();}
+    double   getFeed()  const {return getMove().getFeed();}
+    double   getSpeed() const {return getMove().getSpeed();}
     const char *getDirection() const;
 
     Color getColor(GCode::MoveType type, double intensity);

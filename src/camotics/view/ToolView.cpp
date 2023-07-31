@@ -33,8 +33,8 @@ void ToolView::set(const GCode::Tool &tool) {
   clear();
 
   double diameter = tool.getDiameter();
-  double radius = tool.getRadius();
-  double length = tool.getLength();
+  double radius   = tool.getRadius();
+  double length   = tool.getLength();
   GCode::ToolShape shape = tool.getShape();
 
   if (radius <= 0) {

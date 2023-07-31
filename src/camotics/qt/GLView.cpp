@@ -77,7 +77,6 @@ void GLView::mouseDoubleClickEvent(QMouseEvent *event) {
     doPicking = true;
     xPicking = event->x();
     yPicking = event->y();
-
     redraw(true);
   }
 }
@@ -87,6 +86,7 @@ void GLView::mouseMoveEvent(QMouseEvent *event) {
   if (event->buttons() & Qt::LeftButton) {
     getView().updateRotation(event->x(), event->y());
     redraw(true);
+
   } else if (event->buttons() & Qt::MidButton) {
     getView().updateTranslation(event->x(), event->y());
     redraw(true);
@@ -152,12 +152,16 @@ void GLView::paintGL() {
     doPicking = false;
     QImage image = grabFramebuffer();
 
+    // Adjust mouse position with ratio of buffer dims by widget dims
+    xPicking *= image.width()  / (float)width();
+    yPicking *= image.height() / (float)height();
+
     // Search area around mouse for pickable objects
     int selRad = 6;
     int xMin = max(0, xPicking - selRad);
-    int xMax = min(image.width(), xPicking + selRad);
+    int xMax = min(image.width() - 1, xPicking + selRad);
     int yMin = max(0, yPicking - selRad);
-    int yMax = min(image.height(), yPicking + selRad);
+    int yMax = min(image.height() - 1, yPicking + selRad);
     vector<unsigned> moveList;
 
     for (int x = xMin; x <= xMax; x++)
@@ -180,8 +184,9 @@ void GLView::paintGL() {
       if (nextMove == moveList.end() || ++nextMove == moveList.end())
         nextMove = moveList.begin();
 
-      // Set tool path based on picked move
       selectedMove = *nextMove;
+
+      // Set tool path based on picked move
       auto &path = *getView().path->getPath();
 
       if (selectedMove < path.size()) {
