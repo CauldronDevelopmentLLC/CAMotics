@@ -55,6 +55,8 @@ namespace CAMotics {
     void revert(unsigned tab);
     void revertAll();
     void close(unsigned tab, bool canSave = true, bool removeTab = true);
+    void close(const cb::SmartPointer<Project::File> &file,
+               bool canSave = true, bool removeTab = true);
     void closeAll(bool canSave = true, bool removeTab = true);
 
     void validateTabIndex(unsigned tab) const;
