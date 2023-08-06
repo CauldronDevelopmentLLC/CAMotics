@@ -1829,75 +1829,64 @@ void QtWin::updateProgramFile(const string &name, const char *value) {
     setText(QString::fromStdString(SystemUtilities::basename(value)));
 }
 
-void QtWin::updateMoveStartX(const string &name, double value) {
+
+void QtWin::updateNumericLabel(QLabel *label, double value) {
   double scale = isMetric() ? 1.0 : 1.0 / 25.4;
   const char *prec = isMetric() ? "%.2f" : "%.3f";
 
-  ui->xStartMoveLabel->setText(QString().sprintf(prec, value * scale));
+  label->setText(QString().sprintf(prec, value * scale));
 }
+
+
+void QtWin::updateMoveStartX(const string &name, double value) {
+  updateNumericLabel(ui->xStartMoveLabel, value);
+}
+
 
 void QtWin::updateMoveStartY(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->yStartMoveLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->yStartMoveLabel, value);
 }
+
 
 void QtWin::updateMoveStartZ(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->zStartMoveLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->zStartMoveLabel, value);
 }
+
 
 void QtWin::updateMoveEndX(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->xEndMoveLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->xEndMoveLabel, value);
 }
+
 
 void QtWin::updateMoveEndY(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->yEndMoveLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->yEndMoveLabel, value);
 }
+
 
 void QtWin::updateMoveEndZ(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->zEndMoveLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->zEndMoveLabel, value);
 }
+
 
 void QtWin::updateMoveDistanceX(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->xMoveDistanceLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->xMoveDistanceLabel, value);
 }
+
 
 void QtWin::updateMoveDistanceY(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->yMoveDistanceLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->yMoveDistanceLabel, value);
 }
+
 
 void QtWin::updateMoveDistanceZ(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->zMoveDistanceLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->zMoveDistanceLabel, value);
 }
+
 
 void QtWin::updateMoveDistanceTotal(const string &name, double value) {
-  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
-  const char *prec = isMetric() ? "%.2f" : "%.3f";
-
-  ui->moveTotalDistanceLabel->setText(QString().sprintf(prec, value * scale));
+  updateNumericLabel(ui->moveTotalDistanceLabel, value);
 }
+
 
 void QtWin::taskCompleted() {
   QCoreApplication::postEvent

@@ -46,24 +46,6 @@ GLView::GLView(QWidget *parent) : QOpenGLWidget(parent), enabled(true) {
 #endif // DEBUG
 
   setFormat(format);
-
-  // Build square spiral picking pattern, starting from center
-  pickingPattern.push_back(vector<int>{0, 0});
-
-  for (int radStep = 1; radStep <= pickingRadius; radStep++) {
-    for (int topX = -radStep; topX < radStep; topX++) {
-      pickingPattern.push_back(vector<int>{topX, radStep});
-    }
-    for (int rightY = radStep; rightY > -radStep; rightY--) {
-      pickingPattern.push_back(vector<int>{radStep, rightY});
-    }
-    for (int botX = radStep; botX > -radStep; botX--) {
-      pickingPattern.push_back(vector<int>{botX, -radStep});
-    }
-    for (int leftY = -radStep; leftY < radStep; leftY++) {
-      pickingPattern.push_back(vector<int>{-radStep, leftY});
-    }
-  }
 }
 
 
@@ -175,27 +157,36 @@ void GLView::paintGL() {
     yPicking *= image.height() / (float)height();
 
     // Search area around mouse for pickable objects
-    int xMin = max(0, xPicking - pickingRadius);
-    int xMax = min(image.width() - 1, xPicking + pickingRadius);
-    int yMin = max(0, yPicking - pickingRadius);
-    int yMax = min(image.height() - 1, yPicking + pickingRadius);
     vector<unsigned> moveList;
+    unsigned radius = 8;      // Search "radius"
+    unsigned n      = 4 * (radius + 1) * radius + 1; // Number of search pixels
+    int offset[2]   = {0, 0}; // Current x,y offset
+    unsigned r      = 1;      // Current radius
+    int axis        = 0;      // x or y
+    int dir         = 1;      // 1 or -1
 
-    for (int i = 0; i < pickingPattern.size(); i++) {
-      int x = xPicking + pickingPattern[i][0];
-      int y = yPicking + pickingPattern[i][1];
+    for (unsigned i = 0; i < n; i++) {
+      int x = xPicking + offset[0];
+      int y = yPicking + offset[1];
 
-      if (x >= xMin && x <= xMax && y >= yMin && y <= yMax) {
+      if (0 <= x && x < image.width() && 0 <= y && y < image.height()) {
         QColor c = image.pixelColor(x, y);
 
         if (c != QColor(0, 0, 0, 255)) {
           // Convert picked color back to tool path line number
           unsigned moveIndex = Color::toIndex(c.redF(), c.greenF(), c.blueF());
 
-          if (!std::count(moveList.begin(), moveList.end(), moveIndex)) {
+          if (!std::count(moveList.begin(), moveList.end(), moveIndex))
             moveList.push_back(moveIndex);
-          }
         }
+      }
+
+      // Spiral search pattern offset progression
+      offset[axis] += dir ? 1 : -1;
+      if (abs(offset[axis]) == r) {
+        axis = !axis;
+        if (axis) dir = !dir;
+        else if (dir) r++;
       }
     }
 

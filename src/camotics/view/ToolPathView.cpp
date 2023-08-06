@@ -149,19 +149,7 @@ Color ToolPathView::getColor(GCode::MoveType type, double intensity) {
 void ToolPathView::update() {
   if (!dirty) return;
 
-  time          = 0;
-  distance      = 0;
-  startX        = 0;
-  startY        = 0;
-  startZ        = 0;
-  endX          = 0;
-  endY          = 0;
-  endZ          = 0;
-  distanceX     = 0;
-  distanceY     = 0;
-  distanceZ     = 0;
-  totalDistance = 0;
-
+  time = distance = 0;
   move = GCode::Move();
 
   vertices.clear();
@@ -180,7 +168,7 @@ void ToolPathView::update() {
     bool found = false;
 
     for (unsigned i = 0; i < path->size(); i++) {
-      move = path->at(i);
+      const GCode::Move &move = path->at(i);
 
       const Vector3D &start = move.getStartPt();
       Vector3D end          = move.getEndPt();
@@ -233,19 +221,8 @@ void ToolPathView::update() {
         time += moveTime;
         distance += moveDistance;
 
-        // Update information for current move dock
-        if (position.isReal()) {
-          startX        = start[0];
-          startY        = start[1];
-          startZ        = start[2];
-          endX          = position[0];
-          endY          = position[1];
-          endZ          = position[2];
-          distanceX     = endX - startX;
-          distanceY     = endY - startY;
-          distanceZ     = endZ - startZ;
-          totalDistance = hypot(hypot(distanceX, distanceY), distanceZ);
-        }
+        // Update current move
+        if (found && position.isReal()) this->move = move;
       }
 
       // Store vertex and color data

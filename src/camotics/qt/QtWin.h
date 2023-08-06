@@ -279,6 +279,7 @@ namespace CAMotics {
     void updateProgramLine(const std::string &name, unsigned value);
     void updateProgramFile(const std::string &name, const char *value);
 
+    void updateNumericLabel(QLabel *label, double value);
     void updateMoveStartX(const std::string &name, double value);
     void updateMoveStartY(const std::string &name, double value);
     void updateMoveStartZ(const std::string &name, double value);

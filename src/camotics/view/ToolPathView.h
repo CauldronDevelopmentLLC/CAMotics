@@ -48,17 +48,6 @@ namespace CAMotics {
     double distance = 0;
     GCode::Move move;
 
-    double startX = 0;
-    double startY = 0;
-    double startZ = 0;
-    double endX = 0;
-    double endY = 0;
-    double endZ = 0;
-    double distanceX = 0;
-    double distanceY = 0;
-    double distanceZ = 0;
-    double totalDistance = 0;
-
     bool dirty = true;
     bool showIntensity = false;
 
@@ -114,21 +103,21 @@ namespace CAMotics {
 
     void setShowIntensity(bool show);
 
-    unsigned getTool()  const {return getMove().getTool();}
-    double   getFeed()  const {return getMove().getFeed();}
-    double   getSpeed() const {return getMove().getSpeed();}
+    unsigned getTool()  const {return move.getTool();}
+    double   getFeed()  const {return move.getFeed();}
+    double   getSpeed() const {return move.getSpeed();}
     const char *getDirection() const;
 
-    double getStartX() const {return startX;}
-    double getStartY() const {return startY;}
-    double getStartZ() const {return startZ;}
-    double getEndX() const {return endX;}
-    double getEndY() const {return endY;}
-    double getEndZ() const {return endZ;}
-    double getDistanceX() const {return distanceX;}
-    double getDistanceY() const {return distanceY;}
-    double getDistanceZ() const {return distanceZ;}
-    double getDistanceTotal() const {return totalDistance;}
+    double getStartX() const {return move.getStart().x();}
+    double getStartY() const {return move.getStart().y();}
+    double getStartZ() const {return move.getStart().z();}
+    double getEndX() const {return move.getEnd().x();}
+    double getEndY() const {return move.getEnd().y();}
+    double getEndZ() const {return move.getEnd().z();}
+    double getDistanceX() const {return getEndX() - getStartX();}
+    double getDistanceY() const {return getEndY() - getStartY();}
+    double getDistanceZ() const {return getEndZ() - getStartZ();}
+    double getDistanceTotal() const {return move.getDistance();}
 
     Color getColor(GCode::MoveType type, double intensity);
 

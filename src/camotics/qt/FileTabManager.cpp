@@ -297,7 +297,7 @@ void FileTabManager::close(unsigned tab, bool canSave, bool removeTab) {
 
 void FileTabManager::close(const SmartPointer<Project::File> &file,
                            bool canSave, bool removeTab) {
-  for (unsigned tab = 0; tab < (unsigned)QTabWidget::count(); tab++)
+  for (int tab = 0; tab < QTabWidget::count(); tab++)
     if (getFile(tab) == file) close(tab, canSave, removeTab);
 }
 
