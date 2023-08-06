@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1437</width>
-    <height>869</height>
+    <width>1540</width>
+    <height>931</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -196,7 +196,7 @@
             <enum>QTabWidget::Triangular</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>-1</number>
            </property>
            <property name="elideMode">
             <enum>Qt::ElideNone</enum>
@@ -354,7 +354,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1437</width>
+     <width>1540</width>
      <height>23</height>
     </rect>
    </property>
@@ -611,7 +611,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Tool Position</string>
+    <string>Tool Positio&amp;n</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1071,7 +1071,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Machine Status</string>
+    <string>&amp;Machine Status</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1377,7 +1377,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Tool Path Bounds</string>
+    <string>Tool Path Bo&amp;unds</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1615,7 +1615,7 @@
     <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
-    <string>Workpiece Bounds</string>
+    <string>Wor&amp;kpiece Bounds</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -1672,6 +1672,9 @@
              <font>
               <underline>true</underline>
              </font>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
             </property>
             <property name="text">
              <string>Min</string>
@@ -2331,6 +2334,283 @@
         </size>
        </property>
       </spacer>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="moveInformationDockWidget">
+   <property name="minimumSize">
+    <size>
+     <width>259</width>
+     <height>135</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>300</width>
+     <height>135</height>
+    </size>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="windowTitle">
+    <string>Current Move</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_7">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_9" stretch="0">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QFrame" name="frame_4">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_10" columnstretch="0,1,1,1">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_29">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Y</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_35">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Start</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_26">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>X</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_36">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>End</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_37">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Z</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="xStartMoveLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="xEndMoveLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="yStartMoveLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="yEndMoveLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="zStartMoveLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="zEndMoveLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_38">
+            <property name="font">
+             <font>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Distance</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLabel" name="xMoveDistanceLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLabel" name="yMoveDistanceLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QLabel" name="zMoveDistanceLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_39">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Total Distance</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="moveTotalDistanceLabel">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </item>
     </layout>
    </widget>

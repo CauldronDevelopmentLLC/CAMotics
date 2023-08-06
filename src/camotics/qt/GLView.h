@@ -26,6 +26,8 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFramebufferObject>
 
+#include <vector>
+
 
 class QOpenGLDebugLogger;
 class QOpenGLDebugMessage;
@@ -40,10 +42,12 @@ namespace CAMotics {
 
     cb::SmartPointer<QOpenGLDebugLogger> logger;
     bool enabled;
-    bool doPicking   = false;
+    bool doPicking = false;
     int xPicking = 0;
     int yPicking = 0;
+    int pickingRadius = 8;
     unsigned selectedMove = 0;
+    std::vector<std::vector<int>> pickingPattern;
 
   public:
     GLView(QWidget *parent = 0);

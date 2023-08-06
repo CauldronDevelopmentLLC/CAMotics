@@ -48,6 +48,17 @@ namespace CAMotics {
     double distance = 0;
     GCode::Move move;
 
+    double startX = 0;
+    double startY = 0;
+    double startZ = 0;
+    double endX = 0;
+    double endY = 0;
+    double endZ = 0;
+    double distanceX = 0;
+    double distanceY = 0;
+    double distanceZ = 0;
+    double totalDistance = 0;
+
     bool dirty = true;
     bool showIntensity = false;
 
@@ -107,6 +118,17 @@ namespace CAMotics {
     double   getFeed()  const {return getMove().getFeed();}
     double   getSpeed() const {return getMove().getSpeed();}
     const char *getDirection() const;
+
+    double getStartX() const {return startX;}
+    double getStartY() const {return startY;}
+    double getStartZ() const {return startZ;}
+    double getEndX() const {return endX;}
+    double getEndY() const {return endY;}
+    double getEndZ() const {return endZ;}
+    double getDistanceX() const {return distanceX;}
+    double getDistanceY() const {return distanceY;}
+    double getDistanceZ() const {return distanceZ;}
+    double getDistanceTotal() const {return totalDistance;}
 
     Color getColor(GCode::MoveType type, double intensity);
 

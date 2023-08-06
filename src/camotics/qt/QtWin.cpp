@@ -267,6 +267,17 @@ void QtWin::init() {
   valueSet["program_file"]->add(this, &QtWin::updateProgramFile);
   valueSet["program_line"]->add(this, &QtWin::updateProgramLine);
 
+  valueSet["move_start_x"]->add(this, &QtWin::updateMoveStartX);
+  valueSet["move_start_y"]->add(this, &QtWin::updateMoveStartY);
+  valueSet["move_start_z"]->add(this, &QtWin::updateMoveStartZ);
+  valueSet["move_end_x"]->add(this, &QtWin::updateMoveEndX);
+  valueSet["move_end_y"]->add(this, &QtWin::updateMoveEndY);
+  valueSet["move_end_z"]->add(this, &QtWin::updateMoveEndZ);
+  valueSet["move_distance_x"]->add(this, &QtWin::updateMoveDistanceX);
+  valueSet["move_distance_y"]->add(this, &QtWin::updateMoveDistanceY);
+  valueSet["move_distance_z"]->add(this, &QtWin::updateMoveDistanceZ);
+  valueSet["move_distance_total"]->add(this, &QtWin::updateMoveDistanceTotal);
+
   valueSet.updated();
 }
 
@@ -1255,6 +1266,16 @@ void QtWin::newFile(bool tpl) {
 
   project->addFile(filename.toStdString());
   updateFiles();
+
+  // Reset view
+  view->clear();
+  redraw();
+
+  // Free old sim
+  surface.release();
+  simRun.release();
+
+  reload();
 }
 
 
@@ -1287,8 +1308,22 @@ void QtWin::editFile(unsigned index) {
 
 
 void QtWin::removeFile(unsigned index) {
+  // Remove text from editor
+  ui->fileTabManager->close(project->getFile(index), false, false);
+
+  // Remove file from project
   project->removeFile(index);
   updateFiles();
+
+  // Reset view
+  view->clear();
+  redraw();
+
+  // Free old sim
+  surface.release();
+  simRun.release();
+
+  reload();
 }
 
 
@@ -1779,7 +1814,7 @@ void QtWin::updateProgramLine(const string &name, unsigned value) {
   programLine = value;
 
   // Open and/or select file tab and highlight current line
-  if (0 < ui->splitterFile->sizes()[1] && programFile)
+  if (0 < ui->splitterFile->sizes()[1] && !programFile.empty())
     activateFile(programFile, value);
 
   ui->programLineLabel->setText(QString().sprintf("%d", value));
@@ -1794,6 +1829,75 @@ void QtWin::updateProgramFile(const string &name, const char *value) {
     setText(QString::fromStdString(SystemUtilities::basename(value)));
 }
 
+void QtWin::updateMoveStartX(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->xStartMoveLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveStartY(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->yStartMoveLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveStartZ(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->zStartMoveLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveEndX(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->xEndMoveLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveEndY(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->yEndMoveLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveEndZ(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->zEndMoveLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveDistanceX(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->xMoveDistanceLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveDistanceY(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->yMoveDistanceLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveDistanceZ(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->zMoveDistanceLabel->setText(QString().sprintf(prec, value * scale));
+}
+
+void QtWin::updateMoveDistanceTotal(const string &name, double value) {
+  double scale = isMetric() ? 1.0 : 1.0 / 25.4;
+  const char *prec = isMetric() ? "%.2f" : "%.3f";
+
+  ui->moveTotalDistanceLabel->setText(QString().sprintf(prec, value * scale));
+}
 
 void QtWin::taskCompleted() {
   QCoreApplication::postEvent
