@@ -103,6 +103,19 @@ void ToolPathView::setByLine(const string &filename, unsigned line,
     this->position = position;
     byLine = true;
     dirty = true;
+    moveIndex = -1;
+  }
+}
+
+
+void ToolPathView::setByMove(unsigned i) {
+  if (path->size() <= i) THROW("Move index out of range");
+
+  if (moveIndex != (int)i) {
+    auto &move = path->at(i);
+    setByLine(*move.getFilename(), move.getLine());
+    moveIndex = i;
+    dirty = true;
   }
 }
 
@@ -181,11 +194,12 @@ void ToolPathView::update() {
 
       if (move.getFilename().isSet()) moveFile = *move.getFilename();
       bool fileMatch = filename.empty() || filename == moveFile;
+      bool moveMatch = moveIndex == -1 || moveIndex == (int)i;
 
       if (!found) {
         if (byLine) {
           // Selection by line
-          if (fileMatch && line <= moveLine) {
+          if (fileMatch && line <= moveLine && moveMatch) {
             found = true;
 
             if (position.isReal()) {
@@ -231,7 +245,8 @@ void ToolPathView::update() {
       Color color = getColor(move.getType(), s);
 
       // Change color based on selection
-      if (byLine && line == moveLine && fileMatch) color = Color::WHITE;
+      if (byLine && line == moveLine && fileMatch && moveMatch)
+        color = Color::WHITE;
       else if (!partial && found) color *= Color(0.3, 0.3, 0.3);
 
       pushVertex(start, color, i);

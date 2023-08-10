@@ -206,7 +206,7 @@ void GLView::paintGL() {
         auto &move = path.at(selectedMove);
 
         if (move.getFilename().isSet()) {
-          getView().path->setByLine(*move.getFilename(), move.getLine());
+          getView().path->setByMove(selectedMove);
           getQtWin().activateFile(*move.getFilename(), move.getLine());
           redraw(true);
         }

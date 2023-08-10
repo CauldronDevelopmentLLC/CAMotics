@@ -44,24 +44,28 @@ namespace tplang {
     GCode::MachineUnitAdapter &getUnitAdapter();
 
     // Javascript call backs
-    void gcodeCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void rapidCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void cutCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void arcCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void probeCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void dwellCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void feedCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void speedCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void toolCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void unitsCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void pauseCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void positionCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void commentCB(const cb::js::Value &args, cb::js::Sink &sink);
-    void messageCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void     gcodeCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void     rapidCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void       cutCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void       arcCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void     probeCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void     dwellCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void      feedCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void     speedCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void      toolCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void     unitsCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void     pauseCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void  positionCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void   commentCB(const cb::js::Value &args, cb::js::Sink &sink);
+    void   messageCB(const cb::js::Value &args, cb::js::Sink &sink);
     void workpieceCB(const cb::js::Value &args, cb::js::Sink &sink);
 
   protected:
     int parseAxes(const cb::js::Value &args, GCode::Axes &position,
                   bool incremental = false);
-  };
+    void move(const GCode::Axes &position, int axes, bool rapid, double time);
+    void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
+             double angle, plane_t plane);
+    void updateLocation();
+   };
 }

@@ -148,14 +148,14 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
 void GCodeModule::rapidCB(const js::Value &args, js::Sink &sink) {
   Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position, args.getBoolean("incremental"));
-  ctx.getMachine().move(position, axes, true, 0);
+  move(position, axes, true, 0);
 }
 
 
 void GCodeModule::cutCB(const js::Value &args, js::Sink &sink) {
   Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position, args.getBoolean("incremental"));
-  ctx.getMachine().move(position, axes, false, 0);
+  move(position, axes, false, 0);
 }
 
 
@@ -170,9 +170,9 @@ void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
   // Handle incremental=false
   if (!args.getBoolean("incremental")) offset -= start;
 
-  Arc arc(start, offset, angle, plane);
+  Arc a(start, offset, angle, plane);
 
-  ctx.getMachine().arc(offset, arc.getTarget(), angle, plane);
+  arc(offset, a.getTarget(), angle, plane);
 }
 
 
@@ -182,7 +182,7 @@ void GCodeModule::probeCB(const js::Value &args, js::Sink &sink) {
 
   Axes position = ctx.getMachine().getPosition();
   int axes = parseAxes(args, position);
-  ctx.getMachine().move(position, axes, false, 0);
+  move(position, axes, false, 0);
 }
 
 
@@ -377,4 +377,24 @@ int GCodeModule::parseAxes(const js::Value &args, Axes &position,
   }
 
   return axes;
+}
+
+
+void GCodeModule::move(
+  const GCode::Axes &position, int axes, bool rapid, double time) {
+  updateLocation();
+  ctx.getMachine().move(position, axes, rapid, time);
+}
+
+
+void GCodeModule::arc(
+  const Vector3D &offset, const Vector3D &target, double angle, plane_t plane) {
+  updateLocation();
+  ctx.getMachine().arc(offset, target, angle, plane);
+}
+
+
+void GCodeModule::updateLocation() {
+  auto trace = ctx.getStackTrace(1);
+  if (!trace->empty()) ctx.getMachine().setLocation(trace->at(0));
 }

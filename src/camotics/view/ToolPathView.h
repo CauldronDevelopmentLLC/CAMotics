@@ -43,6 +43,7 @@ namespace CAMotics {
     cb::Vector3D position;
     unsigned line = 0;
     std::string filename;
+    int moveIndex = -1;
 
     double time = 0;
     double distance = 0;
@@ -76,6 +77,7 @@ namespace CAMotics {
     void setByLine(const std::string &filename, unsigned line,
                    const cb::Vector3D &position =
                    cb::Vector3D(std::numeric_limits<double>::infinity()));
+    void setByMove(unsigned i);
 
     void incTime(double amount = 1);
     void decTime(double amount = 1);

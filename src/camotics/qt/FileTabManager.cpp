@@ -352,7 +352,7 @@ void FileTabManager::on_editorClicked(NCEdit *editor) {
   Project::File &file = *editor->getFile();
   QString filename = QString(file.getPath().c_str());
 
-  if (!filename.isEmpty() && !filename.endsWith(".tpl")) {
+  if (!filename.isEmpty()) {
     int position = editor->textCursor().position();
     QString text = editor->document()->toPlainText();
     int line     = text.left(position).count('\n') + 1;
