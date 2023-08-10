@@ -53,16 +53,20 @@ void MoveSink::move(const Axes &position, int axes, bool rapid, double time) {
     double feed = rapid ? 10000 : getFeed(); // TODO Get rapid feed from machine
 
     auto &location = getLocation().getStart();
+    auto line = location.getLine();
     SmartPointer<string> filename;
 
     if (lastFile.isNull() || *lastFile != location.getFilename())
       lastFile = filename = new string(location.getFilename());
     else filename = lastFile;
 
+    if (line == -1) line = count;
+
     Move move(type, start, end, this->time, get(TOOL_NUMBER, NO_UNITS), feed,
-              getSpeed(), location.getLine(), filename, time);
+              getSpeed(), line, filename, time);
 
     this->time += move.getTime();
+    count++;
 
     stream.move(move);
 
