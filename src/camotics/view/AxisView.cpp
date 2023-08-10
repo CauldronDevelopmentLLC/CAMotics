@@ -27,7 +27,10 @@ using namespace CAMotics;
 using namespace cb;
 
 
-AxisView::AxisView() {
+AxisView::AxisView(
+  const Color &color, double angle, const Vector3D &v) {
+  setColor(color);
+
   // Shaft
   add(new GLCylinder(0.05, 0.05, 1, 128));
 
@@ -37,4 +40,7 @@ AxisView::AxisView() {
   c->add(new GLDisk(0.075, 128));
   c->add(new GLCylinder(0.075, 0, 0.1, 128));
   add(c);
+
+  // Rotate
+  getTransform().rotate(angle, v);
 }

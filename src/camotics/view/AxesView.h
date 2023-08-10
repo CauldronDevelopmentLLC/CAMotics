@@ -27,8 +27,5 @@ namespace CAMotics {
   class AxesView : public GLComposite {
   public:
     AxesView();
-
-  protected:
-    void addAxis(int axis, bool up);
   };
 }

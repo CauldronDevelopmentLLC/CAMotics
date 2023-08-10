@@ -26,6 +26,6 @@
 namespace CAMotics {
   class AxisView : public GLComposite {
   public:
-    AxisView();
+    AxisView(const Color &color, double angle, const cb::Vector3D &v);
   };
 }

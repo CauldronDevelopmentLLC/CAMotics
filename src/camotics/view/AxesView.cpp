@@ -20,6 +20,7 @@
 
 #include "AxesView.h"
 #include "AxisView.h"
+#include "GLSphere.h"
 
 using namespace CAMotics;
 using namespace cb;
@@ -31,31 +32,11 @@ namespace {
 
 
 AxesView::AxesView() {
-  for (int axis = 0; axis < 3; axis++)
-    for (int up = 0; up < 2; up++)
-      addAxis(axis, up);
-}
+  add(new AxisView(Color(1, 0.00, 0.0), toRadians(90),  Vector3D(0, 1, 0)));
+  add(new AxisView(Color(0, 0.75, 0.1), toRadians(270), Vector3D(1, 0, 0)));
+  add(new AxisView(Color(0, 0.00, 1.0), toRadians(0),   Vector3D(1, 0, 0)));
 
-
-void AxesView::addAxis(int axis, bool up) {
-  SmartPointer<GLObject> o = new AxisView;
-
-  switch (axis) {
-  case 0:
-    o->setColor(1, 0, 0); // Red
-    o->getTransform().rotate(toRadians(up ? 90 : 270), 0, 1, 0);
-    break;
-
-  case 1:
-    o->setColor(0, 0.75, 0.1); // Green
-    o->getTransform().rotate(toRadians(up ? 270 : 90), 1, 0, 0);
-    break;
-
-  case 2:
-    o->setColor(0, 0, 1); // Blue
-    o->getTransform().rotate(toRadians(up ? 0 : 180), 1, 0, 0);
-    break;
-  }
-
-  add(o);
+  SmartPointer<GLSphere> center = new GLSphere(0.07, 64, 64);
+  center->setColor(0.2, 0.2, 0.2);
+  add(center);
 }
