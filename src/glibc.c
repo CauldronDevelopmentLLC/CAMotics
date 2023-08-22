@@ -18,16 +18,12 @@
 
 \******************************************************************************/
 
-#if defined(__GNUC__) && !defined(__clang__) && !defined(_WIN32)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(_WIN32) && !defined(__aarch64__) && !defined(__arm__)
 
 #include <string.h>
 #include <math.h>
 
-#if defined(__aarch64__)
-#define GLIBC_SYMVER "2.17"
-#else
 #define GLIBC_SYMVER "2.2.5"
-#endif
 
 __asm__(".symver log,log@GLIBC_"       GLIBC_SYMVER);
 __asm__(".symver logf,logf@GLIBC_"     GLIBC_SYMVER);
