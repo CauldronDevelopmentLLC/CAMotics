@@ -18,7 +18,8 @@
 
 \******************************************************************************/
 
-#if defined(__GNUC__) && !defined(__clang__) && !defined(_WIN32) && !defined(__aarch64__) && !defined(__arm__)
+#if defined(CBANG_WRAP_GLIBC) && defined(__GNUC__) && !defined(__clang__) && \
+  !defined(_WIN32) && !defined(__aarch64__) && !defined(__arm__)
 
 #include <string.h>
 #include <math.h>

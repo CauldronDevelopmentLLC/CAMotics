@@ -117,6 +117,7 @@ if not env.GetOption('clean'):
         funcs = 'log logf exp expf pow powf memcpy'.split()
         flags = list(map(lambda n: '-Wl,--wrap=' + n, funcs))
         env.AppendUnique(LINKFLAGS = flags)
+        env.CBDefine(['CBANG_WRAP_GLIBC'])
 
 conf.Finish()
 
