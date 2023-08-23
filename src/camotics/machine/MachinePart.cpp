@@ -29,66 +29,6 @@ MachinePart::MachinePart(const string &name, const JSON::ValuePtr &config) :
   name(name) {read(*config);}
 
 
-void MachinePart::readTCO(const InputSource &source,
-                          const Matrix4x4D &transform, bool reverseWinding) {
-  vector<Vector2U> lines;
-  vector<Vector3U> triangles;
-  vector<Vector3F> vertices;
-
-  while (source.getStream().good()) {
-    string line = String::trim(source.getLine());
-    if (line.empty()) break;
-
-    if (line[0] == 't' || line[0] == 'l' || line[0] == 'v') {
-      size_t equal = line.find('=');
-      if (equal == string::npos) continue;
-
-      int start = 1;
-      while (line[start] == '0') start++;
-      unsigned n = 0;
-      if (start != (int)equal) n = String::parseU32(line.substr(start));
-
-      vector<string> nums;
-      String::tokenize(line.substr(equal + 1), nums, ",");
-
-      if (line[0] == 't' && nums.size() == 3)
-        triangles.push_back
-          (Vector3U(String::parseU32(nums[0]),
-                    String::parseU32(nums[reverseWinding ? 2 : 1]),
-                    String::parseU32(nums[reverseWinding ? 1 : 2])));
-
-      else if (line[0] == 'l' && nums.size() == 2)
-        lines.push_back(Vector2U(String::parseU32(nums[0]),
-                                 String::parseU32(nums[1])));
-
-      else if (line[0] == 'v' && nums.size() == 3) {
-        if (vertices.size() < n + 1) vertices.resize((n + 1) * 1.5);
-         Vector4D v(String::parseDouble(nums[0]),
-                    String::parseDouble(nums[1]),
-                    String::parseDouble(nums[2]), 1);
-
-         v = transform * v;
-
-         vertices[n] = v.slice<3>();
-      }
-    }
-  }
-
-  // Assemble lines
-  for (unsigned i = 0; i < lines.size(); i++)
-    for (int j = 0; j < 2; j++)
-      for (int k = 0; k < 3; k++)
-        this->lines.push_back(vertices[lines[i][j]][k]);
-
-  // Assemble triangles
-  for (unsigned i = 0; i < triangles.size(); i++) {
-    Vector3F v[3];
-    for (int j = 0; j < 3; j++) v[j] = vertices[triangles[i][j]];
-    add(v);
-  }
-}
-
-
 void MachinePart::read(const JSON::Value &value) {
   if (value.hasList("color"))       color.read(value.getList("color"));
   if (value.hasList("init"))         init.read(value.getList("init"));

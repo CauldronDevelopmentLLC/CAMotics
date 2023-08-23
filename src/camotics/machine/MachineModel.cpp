@@ -28,68 +28,9 @@ using namespace cb;
 using namespace std;
 
 
-namespace {
-  Vector3U getDefaultColor(const string &name) {
-    if (name == "x") return Vector3U(25, 25, 200);
-    if (name == "y") return Vector3U(200, 200, 25);
-    if (name == "z") return Vector3U(200, 25, 25);
-    if (name == "a") return Vector3U(200, 230, 159);
-    if (name == "b") return Vector3U(200, 138, 82);
-    if (name == "f") return Vector3U(144, 238, 144);
-    if (name == "general") return Vector3U(200, 165, 25);
-    if (name == "h") return Vector3U(135, 206, 235);
-    if (name == "m") return Vector3U(207, 103, 235);
-    if (name == "p") return Vector3U(144, 238, 144);
-    if (name == "r") return Vector3U(224, 204, 235);
-
-    return Vector3U(100, 100, 100);
-  }
-}
-
-
-MachineModel::MachineModel(const InputSource &source) :
-  path(source.getName()) {read(source.getStream());}
-
-
 void MachineModel::add(const cb::SmartPointer<MachinePart> &part) {
   parts[part->getName()] = part;
   bounds.add(part->getBounds());
-}
-
-
-void MachineModel::readTCO(
-  const InputSource &source, const JSON::Value &config) {
-  auto &partConfigs = config.getDict("parts");
-
-  Matrix4x4D transform;
-  if (config.hasList("transform")) {
-    auto &t = config.getList("transform");
-
-    for (int i = 0; i < 4; i++)
-      transform[i].read(t.getList(i));
-
-  } else transform.toIdentity();
-
-  bool reverseWinding = config.getBoolean("reverse_winding", false);
-
-  while (source.getStream().good()) {
-    string line = String::trim(source.getLine());
-
-    if (!line.empty() && line[0] == '[') {
-      string name = String::toLower(line.substr(1, line.length() - 2));
-      SmartPointer<JSON::Value> partConfig;
-
-      if (partConfigs.hasDict(name)) partConfig = partConfigs.get(name);
-      else partConfig = new JSON::Dict;
-
-      if (!partConfig->has("color"))
-        partConfig->insert("color", getDefaultColor(name).getJSON());
-
-      SmartPointer<MachinePart> part = new MachinePart(name, partConfig);
-      part->readTCO(source, transform, reverseWinding);
-      if (part->getTriangleCount()) add(part);
-    }
-  }
 }
 
 
@@ -98,11 +39,7 @@ void MachineModel::read(const JSON::Value &value) {
   tool.read(value.getList("tool"));
   workpiece.read(value.getList("workpiece"));
 
-  if (value.hasString("model")) {
-    string model = SystemUtilities::absolute(path, value.getString("model"));
-    readTCO(model, value);
-
-  } else if (value.hasDict("parts")) {
+  if (value.hasDict("parts")) {
     auto &parts = *value.get("parts");
 
     for (unsigned i = 0; i < parts.size(); i++)

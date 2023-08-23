@@ -25,7 +25,6 @@
 #include <cbang/geom/Triangle.h>
 #include <cbang/geom/Rectangle.h>
 #include <cbang/geom/Matrix.h>
-#include <cbang/io/InputSource.h>
 #include <cbang/json/Value.h>
 
 #include <vector>
@@ -57,9 +56,6 @@ namespace CAMotics {
     const std::vector<float> getLines() const {return lines;}
 
     void clear() {lines.clear(); TriangleSurface::clear();}
-
-    void readTCO(const cb::InputSource &source, const cb::Matrix4x4D &transform,
-                 bool reverseWinding);
 
     // From cb::JSON::Serializable
     void read(const cb::JSON::Value &value);

@@ -418,8 +418,8 @@ void QtWin::loadMachines() {
           string filename = walker.next();
 
           try {
-            auto istr = SystemUtilities::iopen(filename, true);
-            SmartPointer<MachineModel> machine = new MachineModel(*istr);
+            SmartPointer<MachineModel> machine = new MachineModel;
+            machine->read(*SystemUtilities::iopen(filename, true));
 
             if (machines.find(machine->getName()) != machines.end()) continue;
 
