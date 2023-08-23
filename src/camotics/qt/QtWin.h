@@ -67,6 +67,7 @@ namespace CAMotics {
   class SurfaceTask;
   class ReduceTask;
   class Opt;
+  class MachineModel;
 
 
   class QtWin : public QMainWindow, public TaskObserver {
@@ -134,6 +135,8 @@ namespace CAMotics {
     std::string programFile;
 
     cb::SmartPointer<cb::LineBufferStream<ConsoleWriter> > consoleStream;
+
+    std::map<std::string, cb::SmartPointer<MachineModel>> machines;
 
   public:
     QtWin(cb::Application &app, QApplication &qtApp);

@@ -377,11 +377,9 @@ void QtWin::loadLanguage(const QString &lang) {
 }
 
 
-void QtWin::loadMachine(const string &machine) {
-  if (view->machine.isNull() || machine != view->machine->getName()) {
-    string machineFile = settingsDialog.getMachinePath(machine);
-    LOG_DEBUG(1, "Loading machine " << machine << " from " << machineFile);
-    view->setMachine(new MachineModel(machineFile));
+void QtWin::loadMachine(const string &name) {
+  if (view->machine.isNull() || name != view->machine->getName()) {
+    view->setMachine(machines[name]);
     redraw();
   }
 }
@@ -414,27 +412,34 @@ void QtWin::loadMachines() {
       if (path[0] != '/') path = root + "/" + path;
 
       if (SystemUtilities::isDirectory(path)) {
-        DirectoryWalker walker(path, ".*\\.json", 1);
+        DirectoryWalker walker(path, ".*\\.json(.bz2)?", 1);
 
         while (walker.hasNext()) {
           string filename = walker.next();
 
           try {
-            SmartPointer<JSON::Value> data = JSON::Reader::parse(filename);
-            if (!data->hasString("name") || !data->hasString("model")) continue;
+            auto istr = SystemUtilities::iopen(filename, true);
+            SmartPointer<MachineModel> machine = new MachineModel(*istr);
 
-            settingsDialog.addMachine(data->getString("name"), filename);
+            if (machines.find(machine->getName()) != machines.end()) continue;
+
+            machines[machine->getName()] = machine;
+            LOG_INFO(1, "Loaded machine " << machine->getName());
           } CATCH_ERROR;
         }
       }
     }
+
+    // Add machine names to settings dialog
+    for (auto &it: machines)
+      settingsDialog.addMachine(it.first);
 
     // Load machine
     string machine =
       Settings().get("Settings/Machine", "").toString().toUtf8().data();
     if (machine.empty()) machine = "Taig Mini Mill";
     loadMachine(machine);
-  } CATCH_ERROR;
+   } CATCH_ERROR;
 }
 
 

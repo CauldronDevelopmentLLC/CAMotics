@@ -26,46 +26,42 @@ using namespace CAMotics;
 using namespace std;
 
 
-Lines::Lines(unsigned lines, bool withColors, bool withNormals) {
+Lines::Lines(unsigned lines, bool withColors, bool withNormals)  {
   reset(lines, withColors, withNormals);
 }
 
 
 Lines::Lines(unsigned count, const float *vertices, const float *colors,
-             const float *normals) {
-  reset(count / 3, colors, normals);
+             const float *normals) : Lines(count / 3, !!colors, !!normals) {
   add(lines, vertices, colors, normals);
 }
 
 
 Lines::Lines(const vector<float> &vertices, const vector<float> &colors,
-             const vector<float> &normals) {
-  reset(vertices.size() / 3, !colors.empty(), !normals.empty());
+             const vector<float> &normals) :
+  Lines(vertices.size() / 6, !colors.empty(), !normals.empty()) {
   add(vertices, colors, normals);
 }
 
 
-Lines::Lines(const vector<float> &vertices, const vector<float> &colors) {
-  reset(vertices.size() / 3, !colors.empty());
-  add(vertices, colors);
-}
+Lines::Lines(const vector<float> &vertices, const vector<float> &colors) :
+  Lines(vertices.size() / 6, !colors.empty(), false) {add(vertices, colors);}
 
 
-Lines::Lines(const vector<float> &vertices) {
-  reset(vertices.size() / 3, false);
-  add(vertices);
-}
+Lines::Lines(const vector<float> &vertices) :
+  Lines(vertices.size() / 6, false, false) {add(vertices);}
 
 
 void Lines::reset(unsigned lines, bool withColors, bool withNormals) {
-  this->lines = lines;
-  this->withColors = withColors;
+  this->lines       = lines;
+  this->withColors  = withColors;
   this->withNormals = withNormals;
+
   setLight(withNormals);
 
   unsigned size = lines * 6 * sizeof(float);
   vertices.allocate(size);
-  if (withColors) colors.allocate(size);
+  if (withColors)  colors.allocate(size);
   if (withNormals) normals.allocate(size);
 }
 
@@ -81,7 +77,7 @@ void Lines::add(unsigned count, const float *vertices, const float *colors,
   } else if (withNormals) THROW("Missing normals");
 
   this->vertices.add(3 * count, vertices);
-  if (colors) this->colors.add(3 * count, colors);
+  if (colors)  this->colors .add(3 * count, colors);
   if (normals) this->normals.add(3 * count, normals);
 }
 

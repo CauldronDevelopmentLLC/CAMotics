@@ -33,32 +33,38 @@
 namespace CAMotics {
   class MachinePart : public TriangleSurface {
     const std::string name;
-    cb::Vector3U color;
 
+    cb::Vector3U color;
     cb::Vector3D init;
     cb::Vector3D home;
     cb::Vector3D min;
     cb::Vector3D max;
     cb::Vector3D movement;
-    cb::Vector3D offset;
+
     std::vector<float> lines;
 
   public:
-    MachinePart(const std::string &name,
-                cb::SmartPointer<cb::JSON::Value> &config);
+    MachinePart(const std::string &name, const cb::JSON::ValuePtr &config);
 
-    const cb::Vector3U &getColor() const {return color;}
-    const cb::Vector3D &getInit() const {return init;}
-    const cb::Vector3D &getHome() const {return home;}
-    const cb::Vector3D &getMin() const {return min;}
-    const cb::Vector3D &getMax() const {return max;}
-
-    const cb::Vector3D &getMovement() const {return movement;}
-    const cb::Vector3D &getOffset() const {return offset;}
+    const std::string  &getName()       const {return name;}
+    const cb::Vector3U &getColor()      const {return color;}
+    const cb::Vector3D &getInit()       const {return init;}
+    const cb::Vector3D &getHome()       const {return home;}
+    const cb::Vector3D &getMin()        const {return min;}
+    const cb::Vector3D &getMax()        const {return max;}
+    const cb::Vector3D &getMovement()   const {return movement;}
+          cb::Vector3D  getOffset()     const {return home - init;}
     const std::vector<float> getLines() const {return lines;}
 
-    void read(const cb::InputSource &source, const cb::Matrix4x4D &transform,
-              bool reverseWinding);
+    void clear() {lines.clear(); TriangleSurface::clear();}
+
+    void readTCO(const cb::InputSource &source, const cb::Matrix4x4D &transform,
+                 bool reverseWinding);
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
     using TriangleSurface::read;
+    using TriangleSurface::write;
   };
 }

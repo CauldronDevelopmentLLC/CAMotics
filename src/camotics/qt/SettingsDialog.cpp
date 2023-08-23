@@ -39,27 +39,16 @@ SettingsDialog::SettingsDialog(QWidget *parent) : Dialog(parent) {
 }
 
 
-void SettingsDialog::addMachine(const string &name, const string &path) {
-  if (ui.machineComboBox->findText(QString::fromUtf8(name.c_str())) < 0)
-    ui.machineComboBox->addItem(QString::fromUtf8(name.c_str()),
-                                 QString::fromUtf8(path.c_str()));
+void SettingsDialog::addMachine(const string &name) {
+  auto qName = QString::fromUtf8(name.c_str());
+
+  if (ui.machineComboBox->findText(qName) < 0)
+    ui.machineComboBox->addItem(qName, qName);
 }
 
 
 string SettingsDialog::getMachineName() const {
   return ui.machineComboBox->currentText().toUtf8().data();
-}
-
-
-string SettingsDialog::getMachinePath(const string &machine) const {
-  int i = ui.machineComboBox->findText(QString::fromUtf8(machine.c_str()));
-  if (i == -1) THROW("Machine '" << machine << "' not found");
-  return ui.machineComboBox->itemData(i).toString().toUtf8().data();
-}
-
-
-string SettingsDialog::getMachinePath() const {
-  return ui.machineComboBox->currentData().toString().toUtf8().data();
 }
 
 

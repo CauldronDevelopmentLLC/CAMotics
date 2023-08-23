@@ -25,23 +25,12 @@ using namespace cb;
 using namespace std;
 
 
-MachinePart::MachinePart(const string &name,
-                         SmartPointer<JSON::Value> &config) :
-  name(name) {
-  if (config->hasList("color")) color.read(config->getList("color"));
-  if (config->hasList("init")) init.read(config->getList("init"));
-  if (config->hasList("home")) home.read(config->getList("home"));
-  if (config->hasList("min")) min.read(config->getList("min"));
-  if (config->hasList("max")) max.read(config->getList("max"));
-  if (config->hasList("movement")) movement.read(config->getList("movement"));
-
-  // Offset to home
-  offset = home - init;
-}
+MachinePart::MachinePart(const string &name, const JSON::ValuePtr &config) :
+  name(name) {read(*config);}
 
 
-void MachinePart::read(const InputSource &source,
-                       const Matrix4x4D &transform, bool reverseWinding) {
+void MachinePart::readTCO(const InputSource &source,
+                          const Matrix4x4D &transform, bool reverseWinding) {
   vector<Vector2U> lines;
   vector<Vector3U> triangles;
   vector<Vector3F> vertices;
@@ -97,4 +86,71 @@ void MachinePart::read(const InputSource &source,
     for (int j = 0; j < 3; j++) v[j] = vertices[triangles[i][j]];
     add(v);
   }
+}
+
+
+void MachinePart::read(const JSON::Value &value) {
+  if (value.hasList("color"))       color.read(value.getList("color"));
+  if (value.hasList("init"))         init.read(value.getList("init"));
+  if (value.hasList("home"))         home.read(value.getList("home"));
+  if (value.hasList("min"))           min.read(value.getList("min"));
+  if (value.hasList("max"))           max.read(value.getList("max"));
+  if (value.hasList("movement")) movement.read(value.getList("movement"));
+
+  if (value.hasList("lines")) {
+    auto &lines = value.getList("lines");
+
+    for (unsigned i = 0; i < lines.size(); i++)
+      this->lines.push_back(lines.getNumber(i));
+  }
+
+  if (value.hasList("mesh")) {
+    auto &vertices = value.getList("mesh");
+
+    for (unsigned i = 0; i < vertices.size(); i += 9) {
+      Vector3F t[3];
+
+      for (unsigned j = 0; j < 3; j++)
+        for (unsigned k = 0; k < 3; k++)
+          t[j][k] = vertices.getNumber(i + j * 3 + k);
+
+      add(t);
+    }
+  }
+}
+
+
+void MachinePart::write(JSON::Sink &sink) const {
+  sink.beginDict();
+
+  sink.beginInsert("color");
+  color.write(sink);
+
+  sink.beginInsert("init");
+  init.write(sink);
+
+  sink.beginInsert("home");
+  home.write(sink);
+
+  sink.beginInsert("min");
+  min.write(sink);
+
+  sink.beginInsert("max");
+  max.write(sink);
+
+  sink.beginInsert("movement");
+  movement.write(sink);
+
+  if (!lines.empty()) {
+    sink.insertList("lines");
+    for (float x: lines) sink.append(x);
+    sink.endList();
+  }
+
+  sink.insertList("mesh");
+  for (auto &v: getVertices())
+    sink.append(v);
+  sink.endList();
+
+  sink.endDict();
 }

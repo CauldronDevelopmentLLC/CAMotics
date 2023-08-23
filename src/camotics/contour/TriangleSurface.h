@@ -57,6 +57,10 @@ namespace CAMotics {
     uint64_t getTriangleCount() const {return TriangleMesh::getTriangleCount();}
     cb::Rectangle3D getBounds() const {return bounds;}
     void getVertices(vert_cb_t cb) const;
+
+    const std::vector<float> &getVertices() const {return vertices;}
+    const std::vector<float> &getNormals()  const {return normals;}
+
     void write(STL::Sink &sink, Task *task = 0) const;
     void reduce(Task &task);
 

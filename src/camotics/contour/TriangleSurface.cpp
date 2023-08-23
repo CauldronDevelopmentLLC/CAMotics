@@ -188,7 +188,7 @@ void TriangleSurface::read(const JSON::Value &value) {
   if (value.hasList("vertices")) {
     vertices.clear();
     bounds = Rectangle3D();
-    auto l = value.get("vertices");
+    auto &l = value.get("vertices");
 
     for (unsigned i = 0; i < l->size(); i++) {
       vertices.push_back(l->getNumber(i));
@@ -201,9 +201,13 @@ void TriangleSurface::read(const JSON::Value &value) {
 
   if (value.hasList("normals")) {
     normals.clear();
-    auto l = value.get("normals");
-    for (unsigned i = 0; i < l->size(); i++)
-      normals.push_back(l->getNumber(i));
+    auto &l = value.get("normals");
+
+    // Load each normal 3 times
+    for (unsigned i = 0; i < l->size(); i += 3)
+      for (unsigned j = 0; j < 3; j++)
+        for (unsigned k = 0; k < 3; k++)
+          normals.push_back(l->getNumber(i + k));
   }
 }
 
@@ -218,9 +222,9 @@ void TriangleSurface::write(JSON::Sink &sink) const {
 
   // Only output every third normal since they are the same for a triangle.
   sink.insertList("normals");
-  for (unsigned i = 0; i < normals.size() / 9; i++)
+  for (unsigned i = 0; i < normals.size(); i += 9)
     for (unsigned j = 0; j < 3; j++)
-      sink.append(normals[i * 9 + j]);
+      sink.append(normals[i + j]);
   sink.endList();
 
   sink.endDict();

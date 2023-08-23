@@ -21,7 +21,6 @@
 #pragma once
 
 #include "GLObject.h"
-#include "Lines.h"
 #include "VBO.h"
 
 #include <vector>
@@ -30,10 +29,9 @@
 namespace CAMotics {
   class Mesh : public GLObject {
     unsigned triangles;
-    cb::SmartPointer<Lines> lines;
 
     VBO vertices = GL_ATTR_POSITION;
-    VBO normals = GL_ATTR_NORMAL;
+    VBO normals  = GL_ATTR_NORMAL;
 
   public:
     Mesh(unsigned triangles);

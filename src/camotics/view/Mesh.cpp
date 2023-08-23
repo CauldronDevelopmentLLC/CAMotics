@@ -33,7 +33,6 @@ void Mesh::reset(unsigned triangles) {
   this->triangles = triangles;
   unsigned size = triangles * 9 * sizeof(float);
 
-  lines.release();
   vertices.allocate(size);
   normals.allocate(size);
 }
@@ -42,7 +41,6 @@ void Mesh::reset(unsigned triangles) {
 void Mesh::add(unsigned count, const float *vertices, const float *normals) {
   if (count % 3) THROW("Mesh vertices array size not a multiple of 3");
 
-  lines.release();
   this->vertices.add(3 * count, vertices);
   this->normals.add(3 * count, normals);
 }
@@ -50,7 +48,8 @@ void Mesh::add(unsigned count, const float *vertices, const float *normals) {
 
 void Mesh::add(const vector<float> &vertices, const vector<float> &normals) {
   if (vertices.size() != normals.size())
-    THROW("Number of vertices not equal to number of normals");
+    THROW("Number of vertices " << vertices.size()
+          << " not equal to number of normals " << normals.size());
   if (!vertices.empty()) add(vertices.size() / 3, &vertices[0], &normals[0]);
 }
 

@@ -29,9 +29,9 @@
 
 namespace CAMotics {
   class Lines : public GLObject {
-    unsigned lines    = 0;
-    bool withColors   = false;
-    bool withNormals  = false;
+    unsigned lines;
+    bool withColors;
+    bool withNormals;
 
     VBO vertices = GL_ATTR_POSITION;
     VBO colors   = GL_ATTR_COLOR;
@@ -46,6 +46,7 @@ namespace CAMotics {
     Lines(const std::vector<float> &vertices, const std::vector<float> &colors);
     Lines(const std::vector<float> &vertices);
 
+    unsigned getCount() const {return lines;}
     bool empty() const {return !lines;}
 
     void reset(unsigned lines, bool withColors = false,

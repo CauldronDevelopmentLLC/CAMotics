@@ -52,10 +52,8 @@ namespace CAMotics {
     void setPlannerConfig(const GCode::PlannerConfig &c) {planConf = c;}
     const GCode::PlannerConfig &getPlannerConfig() const {return planConf;}
 
-    void addMachine(const std::string &name, const std::string &path);
+    void addMachine(const std::string &name);
     std::string getMachineName() const;
-    std::string getMachinePath() const;
-    std::string getMachinePath(const std::string &machine) const;
 
     bool getPlannerEnabled() const;
     void setPlannerEnabled(bool enabled);

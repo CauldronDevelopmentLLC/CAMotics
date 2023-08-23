@@ -31,6 +31,9 @@ namespace CAMotics {
     VBO(unsigned id = 0) : id(id) {}
     ~VBO();
 
+    unsigned getSize() const {return size;}
+    unsigned getFill() const {return fill;}
+
     unsigned get();
     void allocate(unsigned size);
     void add(unsigned count, const float *data);

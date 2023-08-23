@@ -47,17 +47,30 @@ namespace {
 }
 
 
-void MachineModel::readModel(const InputSource &source) {
-  JSON::Value &partConfigs = config->getDict("parts");
-  Matrix4x4D transform;
+MachineModel::MachineModel(const InputSource &source) :
+  path(source.getName()) {read(source.getStream());}
 
-  if (config->hasList("transform")) {
-    JSON::Value &t = config->getList("transform");
+
+void MachineModel::add(const cb::SmartPointer<MachinePart> &part) {
+  parts[part->getName()] = part;
+  bounds.add(part->getBounds());
+}
+
+
+void MachineModel::readTCO(
+  const InputSource &source, const JSON::Value &config) {
+  auto &partConfigs = config.getDict("parts");
+
+  Matrix4x4D transform;
+  if (config.hasList("transform")) {
+    auto &t = config.getList("transform");
 
     for (int i = 0; i < 4; i++)
       transform[i].read(t.getList(i));
 
   } else transform.toIdentity();
+
+  bool reverseWinding = config.getBoolean("reverse_winding", false);
 
   while (source.getStream().good()) {
     string line = String::trim(source.getLine());
@@ -73,26 +86,48 @@ void MachineModel::readModel(const InputSource &source) {
         partConfig->insert("color", getDefaultColor(name).getJSON());
 
       SmartPointer<MachinePart> part = new MachinePart(name, partConfig);
-      part->read(source, transform, reverseWinding);
-
-      if (!part->getTriangleCount()) continue;
-
-      parts[name] = part;
-      bounds.add(part->getBounds());
+      part->readTCO(source, transform, reverseWinding);
+      if (part->getTriangleCount()) add(part);
     }
   }
 }
 
 
-void MachineModel::read(const InputSource &source) {
-  config = JSON::Reader::parse(source);
+void MachineModel::read(const JSON::Value &value) {
+  name = value.getString("name");
+  tool.read(value.getList("tool"));
+  workpiece.read(value.getList("workpiece"));
 
-  name = config->getString("name");
-  reverseWinding = config->getBoolean("reverse_winding", false);
-  tool.read(config->getList("tool"));
-  workpiece.read(config->getList("workpiece"));
+  if (value.hasString("model")) {
+    string model = SystemUtilities::absolute(path, value.getString("model"));
+    readTCO(model, value);
 
-  string path =
-    SystemUtilities::absolute(source.getName(), config->getString("model"));
-  readModel(path);
+  } else if (value.hasDict("parts")) {
+    auto &parts = *value.get("parts");
+
+    for (unsigned i = 0; i < parts.size(); i++)
+      add(new MachinePart(parts.keyAt(i), parts.get(i)));
+  }
+}
+
+
+void MachineModel::write(JSON::Sink &sink) const {
+  sink.beginDict();
+
+  sink.insert("name", name);
+
+  sink.beginInsert("tool");
+  tool.write(sink);
+
+  sink.beginInsert("workpiece");
+  workpiece.write(sink);
+
+  sink.insertDict("parts");
+  for (auto &it: parts) {
+    sink.beginInsert(it.first);
+    it.second->write(sink);
+  }
+  sink.endDict();
+
+  sink.endDict();
 }

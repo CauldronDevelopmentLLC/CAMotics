@@ -30,33 +30,39 @@
 
 
 namespace CAMotics {
-  class MachineModel {
-    cb::SmartPointer<cb::JSON::Value> config;
+  class MachineModel : public cb::JSON::Serializable {
+    std::string path;
 
     std::string name;
-    bool reverseWinding;
     cb::Vector3D tool;
     cb::Vector3D workpiece;
 
-    cb::Vector3D offset;
     cb::Rectangle3D bounds;
 
     typedef std::map<std::string, cb::SmartPointer<MachinePart> > parts_t;
     parts_t parts;
 
   public:
-    MachineModel(const cb::InputSource &source) {read(source);}
+    MachineModel(const cb::InputSource &source);
 
     const std::string &getName() const {return name;}
     const cb::Rectangle3D &getBounds() const {return bounds;}
     const cb::Vector3D &getTool() const {return tool;}
     const cb::Vector3D &getWorkpiece() const {return workpiece;}
 
-    void readModel(const cb::InputSource &source);
-    void read(const cb::InputSource &source);
-
     typedef parts_t::const_iterator iterator;
     iterator begin() const {return parts.begin();}
     iterator end() const {return parts.end();}
+
+    void add(const cb::SmartPointer<MachinePart> &part);
+
+    void readTCO(const cb::InputSource &source,
+                 const cb::JSON::Value &config);
+
+    // From cb::JSON::Serializable
+    void read(const cb::JSON::Value &value);
+    void write(cb::JSON::Sink &sink) const;
+    using cb::JSON::Serializable::read;
+    using cb::JSON::Serializable::write;
   };
 }
