@@ -39,12 +39,9 @@ void MachineModel::read(const JSON::Value &value) {
   tool.read(value.getList("tool"));
   workpiece.read(value.getList("workpiece"));
 
-  if (value.hasDict("parts")) {
-    auto &parts = *value.get("parts");
-
-    for (unsigned i = 0; i < parts.size(); i++)
-      add(new MachinePart(parts.keyAt(i), parts.get(i)));
-  }
+  auto &parts = value.getDict("parts");
+  for (unsigned i = 0; i < parts.size(); i++)
+    add(new MachinePart(parts.keyAt(i), parts.get(i)));
 }
 
 

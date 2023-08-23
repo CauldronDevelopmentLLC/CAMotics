@@ -30,32 +30,29 @@ MachinePart::MachinePart(const string &name, const JSON::ValuePtr &config) :
 
 
 void MachinePart::read(const JSON::Value &value) {
-  if (value.hasList("color"))       color.read(value.getList("color"));
-  if (value.hasList("init"))         init.read(value.getList("init"));
-  if (value.hasList("home"))         home.read(value.getList("home"));
-  if (value.hasList("min"))           min.read(value.getList("min"));
-  if (value.hasList("max"))           max.read(value.getList("max"));
-  if (value.hasList("movement")) movement.read(value.getList("movement"));
+  color.read(value.getList("color"));
+  init.read(value.getList("init"));
+  home.read(value.getList("home"));
+  min.read(value.getList("min"));
+  max.read(value.getList("max"));
+  movement.read(value.getList("movement"));
 
   if (value.hasList("lines")) {
     auto &lines = value.getList("lines");
-
     for (unsigned i = 0; i < lines.size(); i++)
       this->lines.push_back(lines.getNumber(i));
   }
 
-  if (value.hasList("mesh")) {
-    auto &vertices = value.getList("mesh");
+  auto &vertices = value.getList("mesh");
 
-    for (unsigned i = 0; i < vertices.size(); i += 9) {
-      Vector3F t[3];
+  for (unsigned i = 0; i < vertices.size(); i += 9) {
+    Vector3F t[3];
 
-      for (unsigned j = 0; j < 3; j++)
-        for (unsigned k = 0; k < 3; k++)
-          t[j][k] = vertices.getNumber(i + j * 3 + k);
+    for (unsigned j = 0; j < 3; j++)
+      for (unsigned k = 0; k < 3; k++)
+        t[j][k] = vertices.getNumber(i + j * 3 + k);
 
-      add(t);
-    }
+    add(t);
   }
 }
 
