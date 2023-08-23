@@ -1042,8 +1042,15 @@ bool ControllerImpl::execute(const Code &code, int vars) {
     case 283: setHomed(vars, true);   break;
     case 301: storePredefined(false); break;
 
-    case 330: implemented = false; break; // TODO Spindle synchronized motion
-    case 331: implemented = false; break; // TODO Rigid tapping
+    case 330: // TODO Spindle synchronized motion
+      linear(vars, false);
+      implemented = false;
+      break;
+
+    case 331: // TODO Rigid tapping
+      linear(vars, false);
+      implemented = false;
+      break;
 
     case 382: straightProbe(vars, true,  true);  break;
     case 383: straightProbe(vars, true,  false); break;
@@ -1095,32 +1102,43 @@ bool ControllerImpl::execute(const Code &code, int vars) {
       break;
     }
 
-    case 700: implemented = false; break; // Mach3/4 Inches mode
-    case 710: implemented = false; break; // Mach3/4 MM mode
+    case 700: setUnits(Units::IMPERIAL); break; // Mach3/4 Inches mode
+    case 710: setUnits(Units::METRIC);   break; // Mach3/4 MM mode
 
-    case 730: implemented = false; break; // Drill cycle w/ chip breaking
-    case 760: implemented = false; break; // Thread cycle
+    case 730: // TODO Drill cycle w/ chip breaking
+      drill(vars, false, false, false); // Better than nothing
+      implemented = false;
+      break;
+
+    case 760: implemented = false; break; // TODO Thread cycle
 
     case 800:                                   break; // Cancel canned cycle
     case 810: drill(vars, false, false, false); break; // Drill cycle
-    case 820: drill(vars, true, false, false);  break; // Drill cycle w/ dwell
+    case 820: drill(vars, true,  false, false); break; // Drill cycle w/ dwell
+
     case 830: // TODO Peck drill
       drill(vars, false, false, false); // Better than nothing
       implemented = false;
       break;
+
     case 840: // TODO Right-hand tap
+      drill(vars, false, false, false);
       implemented = false;
       break;
-    case 850: drill(vars, false, true, false);  break; // No dwell, feed out
+
+    case 850: drill(vars, false, true,  false); break; // No dwell, feed out
     case 860: drill(vars, false, false, true);  break; // Spin stop rapid out
+
     case 870: // TODO Back boring
       drill(vars, false, false, false); // Better than nothing
       implemented = false;
       break;
+
     case 880: // TODO Spin stop manual out
       drill(vars, false, false, false); // Better than nothing
       implemented = false;
       break;
+
     case 890: drill(vars, true, true, false);   break; // Dwell, feed out
 
     case 900: state.incrementalDistanceMode    = false; break;
