@@ -53,7 +53,6 @@
 #include <boost/ref.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/array.hpp>
-#include <boost/iostreams/device/file.hpp>
 namespace io = boost::iostreams;
 
 #include <sstream>
@@ -161,7 +160,8 @@ void ToolPathTask::runGCode(const string &filename) {
   filter.push(boost::ref(taskFilter));
 
   // Interpret GCode
-  filter.push(io::file_source(filename));
+  auto file = SystemUtilities::iopen(filename);
+  filter.push(*file);
   runGCode(InputSource(filter, filename));
 }
 
