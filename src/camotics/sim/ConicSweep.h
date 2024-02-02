@@ -38,6 +38,6 @@ namespace CAMotics {
                    std::vector<cb::Rectangle3D> &bboxes,
                    double tolerance) const;
     double depth(const cb::Vector3D &start, const cb::Vector3D &end,
-               const cb::Vector3D &p) const;
+                 const cb::Vector3D &p) const;
   };
 }

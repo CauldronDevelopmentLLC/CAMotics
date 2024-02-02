@@ -45,7 +45,6 @@
 #include <cbang/iostream/VectorDevice.h>
 #include <cbang/iostream/TeeFilter.h>
 
-#include <cbang/log/AsyncCopyStreamToLog.h>
 #include <cbang/io/StringInputSource.h>
 
 #include <cbang/js/JSInterrupted.h>
