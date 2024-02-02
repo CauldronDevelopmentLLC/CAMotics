@@ -127,7 +127,7 @@ void ToolPath::write(JSON::Sink &sink) const {
       sink.insert("line", line = move.getLine());
 
     // File name
-    if (*filename != *move.getFilename())
+    if (filename.isNull() || *filename != *move.getFilename())
       sink.insert("filename", *(filename = move.getFilename()));
 
     // GCode::Tool
