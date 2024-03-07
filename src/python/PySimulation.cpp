@@ -366,6 +366,9 @@ namespace {
       if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", (char **)kwlist, &path))
         return 0;
 
+      if (self->s->path.isNull())
+        self->s->path = new GCode::ToolPath(self->s->project.getTools());
+
       self->s->path->read(*PyJSON(path).toJSON());
 
       Py_RETURN_NONE;
