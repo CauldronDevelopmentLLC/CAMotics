@@ -113,6 +113,23 @@ def _home_path(props, project):
 def home_path(project): return _home_path.withArgs(project)
 
 
+@util.renderer
+def _render_pub_url(props, mode):
+  pkg = props.getProperty('package_name')
+  m = re.match(r'(?P<project>[\w_-]+)[_-](?P<version>\d+\.\d+\.\d+)[\._-]', pkg)
+  if not m: raise Exception('Failed to parse package name "%s"' % pkg)
+
+  project, version = m.group('project', 'version')
+
+  url = '/builds/' + project + '/%(prop:workername)s/' + mode + \
+    '/v' + version + '-b%(prop:buildnumber)s/%(prop:package_name)s'
+
+  return util.Interpolate(url)
+
+
+def render_pub_url(mode): return _render_pub_url.withArgs(mode)
+
+
 def mode_matrix_build(dims, modes):
   if not len(dims): return
 
@@ -141,7 +158,6 @@ class JSONBuildmasterConfig:
     self.projects = {}
     self.config = {
       'workers': [],
-      'protocols': {},
       'change_source': changes.PBChangeSource(),
       'schedulers': [],
       'builders': [],
@@ -161,15 +177,13 @@ class JSONBuildmasterConfig:
     if repo_type in ('git', 'github'):
       if 'url' in info: url = info['url']
       else:
-        name     = info.get('name',     project)
         protocol = info.get('protocol', 'ssh')
-        user     = info.get('user',     'git')
         domain   = info.get('domain',   'github.com')
+        org      = info['org']
+        name     = info.get('name', project)
 
-        if protocol == 'ssh': url = '%s@%s:' % (user, domain)
-        else: url = protocol + '://%s/' % domain
-
-        url += '%s/%s.git' % (info['org'], name)
+        if protocol == 'ssh': url = 'git@github.com:%s/%s.git' % (org, name)
+        else: url = '%s://%s/%s/%s' % (protocol, domain, org, name)
 
       return steps.Git(repourl = url, mode = 'incremental',
                        branch = info.get('branch', None),
@@ -212,12 +226,23 @@ class JSONBuildmasterConfig:
       factory.addStep(steps.MasterShellCommand
                       (command = cmd, name = 'Delete old'))
 
-      # Upload file to master
+      # Parse package version
+      url = '/builds/' + project + '/%(prop:workername)s/' + mode + \
+        '/latest/%(prop:package_name)s'
+
+      # Upload file to builder tmp
       src = util.Interpolate('%(prop:package_name)s')
-      dst = util.Interpolate(dst_dir + '/%(prop:package_name)s')
+      dst = util.Interpolate('tmp/%(prop:buildername)s/%(prop:package_name)s')
       factory.addStep(steps.FileUpload(
         workersrc = src, masterdest = dst, workdir = project,
-        name = '%s %s upload' % (project, step)))
+        name = '%s %s upload' % (project, step), url = render_pub_url(mode)))
+
+      # Publish
+      name = '%s %s publish' % (project, step)
+      cmd = ['./scripts/publish', 'build', dst,
+             util.Interpolate('%(prop:workername)s'), mode,
+             util.Interpolate('%(prop:buildnumber)s')]
+      factory.addStep(steps.MasterShellCommand(command = cmd, name = name))
 
 
   def add_project(self, factory, project, mode, env, visited):
@@ -256,6 +281,9 @@ class JSONBuildmasterConfig:
   def add_builder(self, worker_name, build, mode, builder_config, env):
     builder_name = '%s-%s-%s' % (worker_name, build, mode)
     if self.verbose: print('  Adding builder', builder_name)
+
+    # Make tmp directory
+    os.makedirs('tmp/%s' % builder_name, exist_ok = True)
 
     # Make builder
     factory = util.BuildFactory()

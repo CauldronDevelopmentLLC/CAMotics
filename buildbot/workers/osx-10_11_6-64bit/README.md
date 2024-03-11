@@ -28,3 +28,15 @@ Then:
     WORKER=~/Library/Python/3.9/bin/buildbot-worker
     $WORKER create-worker . master.camotics.org:8012 osx-10_11_6-64bit <password>
     $WORKER start
+
+# Unlock keychain
+
+    security unlock-keychain
+
+Then enter login password.
+
+# Allow remote access for all users
+
+    sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+      -activate -configure -access -on -configure -allowAccessFor -allUsers \
+      -configure -restart -agent -privs -all
