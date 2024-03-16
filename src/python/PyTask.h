@@ -24,7 +24,7 @@
 
 #include <camotics/Task.h>
 
-#include <cbang/os/Thread.h>
+#include <cbang/thread/Thread.h>
 
 #include <string>
 

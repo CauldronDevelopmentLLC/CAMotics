@@ -45,8 +45,7 @@ namespace GCode {
     void set(char c, double value) {setIndex(toIndex(c), value);}
     double getIndex(unsigned i) const {return data[i];}
     void setIndex(unsigned i, double value) {
-      if (!cb::Math::isfinite(value))
-        THROW(toAxis(i) << " position is invalid");
+      if (!std::isfinite(value)) THROW(toAxis(i) << " position is invalid");
       data[i] = value;
     }
 

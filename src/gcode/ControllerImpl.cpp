@@ -403,12 +403,12 @@ void ControllerImpl::arc(int vars, bool clockwise) {
   double startAngle = (start - center).angleBetween(Vector2D(1, 0));
   double finishAngle = (finish - center).angleBetween(Vector2D(1, 0));
   double angle = finishAngle - startAngle;
-  if (0 <= angle) angle -= 2 * M_PI;
-  if (!clockwise) angle += 2 * M_PI;
-  if (!angle) angle = 2 * M_PI;
+  if (0 <= angle) angle -= 2 * Math::PI;
+  if (!clockwise) angle += 2 * Math::PI;
+  if (!angle) angle = 2 * Math::PI;
 
   if ((VT_P & vars) && 1 < getVar('P'))
-    angle += M_PI * 2 * (getVar('P') - 1) * (angle < 0 ? -1 : 1);
+    angle += Math::PI * 2 * (getVar('P') - 1) * (angle < 0 ? -1 : 1);
 
   LOG_DEBUG(4, "Arc angle=" << angle << " startAngle=" << startAngle
             << " finishAngle=" << finishAngle << " start=" << start
@@ -698,7 +698,7 @@ void ControllerImpl::updateOffsetParams() {
   // Apply rotation
   unsigned cs = get(CURRENT_COORD_SYSTEM);
   address_t addr = COORD_SYSTEM_ADDR(cs, COORD_SYSTEM_ROTATION_MEMBER);
-  double r = get(addr) * M_PI / 180;
+  double r = get(addr) * Math::PI / 180;
   Transform &t = machine.getTransforms().get(XYZ).pull();
   t.rotate(r, Vector3D(0, 0, 1), Vector3D(0, 0, 0));
 }

@@ -20,7 +20,7 @@
 
 #include "Task.h"
 
-#include <cbang/util/SmartLock.h>
+#include <cbang/thread/SmartLock.h>
 #include <cbang/time/Timer.h>
 
 using namespace std;

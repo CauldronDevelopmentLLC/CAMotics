@@ -23,7 +23,7 @@
 
 #include <cbang/String.h>
 #include <cbang/log/Logger.h>
-#include <cbang/util/SmartLock.h>
+#include <cbang/thread/SmartLock.h>
 
 #include <QColor>
 #include <QByteArray>

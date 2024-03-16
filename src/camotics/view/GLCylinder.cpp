@@ -38,7 +38,7 @@ GLCylinder::GLCylinder(float base, float top, float height, unsigned segments) :
 
   for (unsigned i = 0; i < segments; i++) {
     unsigned o = i * 3 * 2;
-    float a = i * 2 * M_PI / (segments - 1);
+    float a = i * 2 * Math::PI / (segments - 1);
 
     // Normals
     n[o + 0] = n[o + 3] = cos(a) * height / b;

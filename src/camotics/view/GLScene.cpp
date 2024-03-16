@@ -20,6 +20,7 @@
 
 #include "GLScene.h"
 
+#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 
 using namespace CAMotics;
@@ -28,7 +29,7 @@ using namespace std;
 
 
 namespace {
-  float toRadians(float degrees) {return degrees * M_PI / 180;}
+  float toRadians(float degrees) {return degrees * Math::PI / 180;}
 }
 
 

@@ -20,14 +20,14 @@
 
 #pragma once
 
-#include <cbang/xml/XMLHandler.h>
+#include <cbang/xml/Handler.h>
 #include <cbang/geom/Rectangle.h>
 #include <cbang/json/Sink.h>
 
 
 namespace CAMotics {
   namespace Project {
-    class XMLHandler : public cb::XMLHandler {
+    class XMLHandler : public cb::XML::Handler {
       cb::JSON::Sink &sink;
 
       bool inTools;
@@ -43,11 +43,11 @@ namespace CAMotics {
     public:
       XMLHandler(cb::JSON::Sink &sink);
 
-      // From XMLHandler
+      // From XML::Handler
       void pushFile(const std::string &filename);
       void popFile();
       void startElement(const std::string &name,
-                        const cb::XMLAttributes &attrs);
+                        const cb::XML::Attributes &attrs);
       void endElement(const std::string &name);
       void text(const std::string &text);
     };

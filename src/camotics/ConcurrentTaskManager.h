@@ -25,8 +25,8 @@
 #include "TaskObserver.h"
 
 #include <cbang/SmartPointer.h>
-#include <cbang/os/Thread.h>
-#include <cbang/os/Condition.h>
+#include <cbang/thread/Thread.h>
+#include <cbang/thread/Condition.h>
 
 #include <list>
 #include <set>

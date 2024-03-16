@@ -29,7 +29,7 @@
 #include <cbang/log/Logger.h>
 #include <cbang/time/TimeInterval.h>
 #include <cbang/time/Timer.h>
-#include <cbang/util/SmartLock.h>
+#include <cbang/thread/SmartLock.h>
 #include <cbang/Catch.h>
 
 #include <cmath>

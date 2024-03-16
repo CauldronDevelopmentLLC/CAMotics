@@ -20,8 +20,8 @@
 
 #include "ConcurrentTaskManager.h"
 
-#include <cbang/util/SmartLock.h>
-#include <cbang/util/SmartUnlock.h>
+#include <cbang/thread/SmartLock.h>
+#include <cbang/thread/SmartUnlock.h>
 #include <cbang/Catch.h>
 
 using namespace std;

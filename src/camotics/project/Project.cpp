@@ -21,7 +21,7 @@
 #include "Project.h"
 #include "XMLHandler.h"
 
-#include <cbang/xml/XMLReader.h>
+#include <cbang/xml/Reader.h>
 #include <cbang/os/SystemUtilities.h>
 
 using namespace std;
@@ -146,7 +146,7 @@ void Project::load(const string &filename) {
       JSON::Builder builder;
       CAMotics::Project::XMLHandler handler(builder);
 
-      XMLReader().read(filename, &handler);
+      XML::Reader().read(filename, &handler);
       data = builder.getRoot();
 
     } else data = JSON::Reader::parse(filename);

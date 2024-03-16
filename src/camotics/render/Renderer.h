@@ -25,7 +25,7 @@
 #include <camotics/Task.h>
 
 #include <cbang/SmartPointer.h>
-#include <cbang/os/Condition.h>
+#include <cbang/thread/Condition.h>
 #include <cbang/geom/Rectangle.h>
 
 

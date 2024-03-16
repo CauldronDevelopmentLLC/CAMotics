@@ -97,23 +97,23 @@ double Evaluator::eval(FunctionCall &e) {
   double arg1 = e.getArg1()->eval(*this);
 
   if (e.getArg2().isNull()) {
-    if (name == "ABS") return fabs(arg1);
-    if (name == "ACOS") return acos(arg1) * 180.0 / M_PI;
-    if (name == "ASIN") return asin(arg1) * 180.0 / M_PI;
-    if (name == "COS") return cos(arg1 * M_PI / 180.0);
-    if (name == "EXP") return exp(arg1);
-    if (name == "FIX") return floor(arg1);
-    if (name == "FUP") return ceil(arg1);
-    if (name == "ROUND") return Math::round(arg1);
-    if (name == "LN") return log(arg1);
-    if (name == "SIN") return sin(arg1 * M_PI / 180.0);
-    if (name == "SQRT") return sqrt(arg1);
-    if (name == "TAN") return tan(arg1 * M_PI / 180.0);
+    if (name == "ABS")   return fabs(arg1);
+    if (name == "ACOS")  return acos(arg1) * 180.0 / Math::PI;
+    if (name == "ASIN")  return asin(arg1) * 180.0 / Math::PI;
+    if (name == "COS")   return cos(arg1 * Math::PI / 180.0);
+    if (name == "EXP")   return exp(arg1);
+    if (name == "FIX")   return floor(arg1);
+    if (name == "FUP")   return ceil(arg1);
+    if (name == "ROUND") return round(arg1);
+    if (name == "LN")    return log(arg1);
+    if (name == "SIN")   return sin(arg1 * Math::PI / 180.0);
+    if (name == "SQRT")  return sqrt(arg1);
+    if (name == "TAN")   return tan(arg1 * Math::PI / 180.0);
 
   } else {
     // NOTE, ATAN is treated as a special case in Parser::functionCall()
     double arg2 = e.getArg2()->eval(*this);
-    if (name == "ATAN") return atan2(arg1, arg2) * 180.0 / M_PI;
+    if (name == "ATAN") return atan2(arg1, arg2) * 180.0 / Math::PI;
   }
 
   THROW(e.getLocation() << " Unsupported function '" << name << "'");

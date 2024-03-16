@@ -51,7 +51,7 @@ Helix::Helix(const Vector3D &start, const Vector2D &centerOffset,
 
   // Segment angle cannot be greater than 2Pi/3 because we need at least 3
   // segments in a full circle
-  segAngle = std::min(2 * M_PI / 3, segAngle);
+  segAngle = std::min(2 * Math::PI / 3, segAngle);
 
   // Compute integer number of segments that meets the error bound
   const unsigned segments = (unsigned)ceil(fabs(angle) / segAngle);
@@ -67,8 +67,8 @@ Helix::Helix(const Vector3D &start, const Vector2D &centerOffset,
 
   // We want to start at a point where a line segment intersects the circle.
   // Find the angular offset to the next such point.
-  const double beta = (M_PI - segAngle) / 2;
-  offsetAngle = M_PI - beta - asin(radius * sin(beta) / (radius - epsilon));
+  const double beta = (Math::PI - segAngle) / 2;
+  offsetAngle = Math::PI - beta - asin(radius * sin(beta) / (radius - epsilon));
 }
 
 

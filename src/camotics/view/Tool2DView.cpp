@@ -165,7 +165,7 @@ void Tool2DView::draw() {
     double radius = diameter / 2.0;
     cairo_move_to(cr, x, y);
     cairo_rel_line_to(cr, diameter, 0);
-    cairo_arc(cr, w / 2.0, y + length - radius, radius, 0, M_PI);
+    cairo_arc(cr, w / 2.0, y + length - radius, radius, 0, Math::PI);
     cairo_close_path(cr);
     break;
   }
@@ -174,7 +174,7 @@ void Tool2DView::draw() {
     cairo_save(cr);
     cairo_translate(cr, w / 2.0, y + length / 2.0);
     cairo_scale(cr, diameter / 2.0, length / 2.0);
-    cairo_arc(cr, 0, 0, 1, 0, 2 * M_PI);
+    cairo_arc(cr, 0, 0, 1, 0, 2 * Math::PI);
     cairo_restore(cr);
     break;
   }
@@ -194,7 +194,7 @@ void Tool2DView::draw() {
       drawGuide(cr, snubDiameter * scale, x, y + 15, "Snub Diameter",
                 snubDiameter);
 
-    cairo_rotate(cr, M_PI / 2.0);
+    cairo_rotate(cr, Math::PI / 2.0);
     drawGuide(cr, length * scale, h / 2.0, 3, "Length", length);
   }
 

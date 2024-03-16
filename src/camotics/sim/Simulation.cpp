@@ -25,7 +25,7 @@
 #include <camotics/contour/TriangleSurface.h>
 
 #include <cbang/json/JSON.h>
-#include <cbang/iostream/UpdateStreamFilter.h>
+#include <cbang/util/UpdateStreamFilter.h>
 #include <cbang/net/Base64.h>
 
 #include <boost/ref.hpp>

@@ -66,7 +66,7 @@ void XMLHandler::popFile() {
 
 
 void XMLHandler::startElement(const string &name,
-                              const cb::XMLAttributes &attrs) {
+                              const cb::XML::Attributes &attrs) {
   if (inTools) {
     if (name == "tool") {
       unsigned number;

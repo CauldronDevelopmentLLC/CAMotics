@@ -35,12 +35,12 @@
 #include "Util.h"
 #include "Clipper.h"
 
+#include <cbang/Math.h>
+
 #include <cmath>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
+using namespace std;
+using namespace cb;
 using namespace ClipperLib;
 
 
@@ -48,15 +48,15 @@ namespace {
   Polygon BuildArc(const IntPoint &pt, const double a1, const double a2,
                    const double r, double limit) {
     // see notes in clipper.pas regarding steps
-    double arcFrac = std::fabs(a2 - a1) / (2 * M_PI);
-    int steps = (int)(arcFrac * M_PI / std::acos(1 - limit / std::fabs(r)));
+    double arcFrac = fabs(a2 - a1) / (2 * Math::PI);
+    int steps = (int)(arcFrac * Math::PI / acos(1 - limit / fabs(r)));
     if (steps < 2) steps = 2;
     else if (steps > (int)(222.0 * arcFrac)) steps = (int)(222.0 * arcFrac);
 
-    double x = std::cos(a1);
-    double y = std::sin(a1);
-    double c = std::cos((a2 - a1) / steps);
-    double s = std::sin((a2 - a1) / steps);
+    double x = cos(a1);
+    double y = sin(a1);
+    double c = cos((a2 - a1) / steps);
+    double s = sin((a2 - a1) / steps);
     Polygon result(steps + 1);
 
     for (int i = 0; i <= steps; i++) {
@@ -87,7 +87,7 @@ OffsetBuilder::OffsetBuilder(const Polygons &in_polys, Polygons &out_polys,
 
   } else {
     if (limit <= 0) limit = 0.25;
-    else if (limit > std::fabs(delta)) limit = std::fabs(delta);
+    else if (limit > fabs(delta)) limit = fabs(delta);
   }
 
   out_polys.clear();
@@ -97,7 +97,7 @@ OffsetBuilder::OffsetBuilder(const Polygons &in_polys, Polygons &out_polys,
 
     if (len == 0 || (len < 3 && delta <= 0)) continue;
     else if (len == 1) {
-      out_polys[m_i] = BuildArc(m_p[m_i][0], 0, 2 * M_PI, delta, limit);
+      out_polys[m_i] = BuildArc(m_p[m_i][0], 0, 2 * Math::PI, delta, limit);
       continue;
     }
 
@@ -253,12 +253,12 @@ void OffsetBuilder::DoSquare() {
 
   if ((normals[m_k].X * normals[m_j].Y - normals[m_j].X * normals[m_k].Y) *
       m_delta >= 0) {
-    double a1 = std::atan2(normals[m_k].Y, normals[m_k].X);
-    double a2 = std::atan2(-normals[m_j].Y, -normals[m_j].X);
-    a1 = std::fabs(a2 - a1);
+    double a1 = atan2(normals[m_k].Y, normals[m_k].X);
+    double a2 = atan2(-normals[m_j].Y, -normals[m_j].X);
+    a1 = fabs(a2 - a1);
 
-    if (a1 > M_PI) a1 = M_PI * 2 - a1;
-    double dx = std::tan((M_PI - a1) / 4) * std::fabs(m_delta);
+    if (a1 > Math::PI) a1 = Math::PI * 2 - a1;
+    double dx = tan((Math::PI - a1) / 4) * fabs(m_delta);
 
     pt1 = IntPoint((int64_t)(pt1.X - normals[m_k].Y * dx),
                    (int64_t)(pt1.Y + normals[m_k].X * dx));
@@ -313,11 +313,11 @@ void OffsetBuilder::DoRound(double limit) {
       m_delta >= 0) {
     if (normals[m_j].X * normals[m_k].X + normals[m_j].Y * normals[m_k].Y <
         0.985) {
-      double a1 = std::atan2(normals[m_k].Y, normals[m_k].X);
-      double a2 = std::atan2(normals[m_j].Y, normals[m_j].X);
+      double a1 = atan2(normals[m_k].Y, normals[m_k].X);
+      double a2 = atan2(normals[m_j].Y, normals[m_j].X);
 
-      if (m_delta > 0 && a2 < a1) a2 += M_PI * 2;
-      else if (m_delta < 0 && a2 > a1) a2 -= M_PI * 2;
+      if (m_delta > 0 && a2 < a1) a2 += Math::PI * 2;
+      else if (m_delta < 0 && a2 > a1) a2 -= Math::PI * 2;
 
       Polygon arc = BuildArc(m_p[m_i][m_j], a1, a2, m_delta, limit);
       for (Polygon::size_type m = 0; m < arc.size(); m++)

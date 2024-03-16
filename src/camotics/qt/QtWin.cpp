@@ -290,8 +290,8 @@ void QtWin::show() {
 
 void QtWin::setUnitLabel(QLabel *label, double value, int precision,
                          bool withUnit) {
-  if (numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
-      Math::isnan(value)) {
+  if (numeric_limits<double>::max() == abs(value) || isinf(value) ||
+      isnan(value)) {
     label->setText("nan");
     return;
   }
@@ -1726,7 +1726,7 @@ void QtWin::updatePlayDirection(const string &name, bool reverse) {
 
 
 void QtWin::updateTimeRatio(const string &name, double ratio) {
-  if (!Math::isnan(ratio)) ui->positionSlider->setValue(10000 * ratio);
+  if (!isnan(ratio)) ui->positionSlider->setValue(10000 * ratio);
 }
 
 
@@ -1803,8 +1803,8 @@ void QtWin::updateFeed(const string &name, double value) {
 
 
 void QtWin::updateSpeed(const string &name, double value) {
-  if (numeric_limits<double>::max() == abs(value) || Math::isinf(value) ||
-      Math::isnan(value)) ui->speedLabel->setText("nan");
+  if (numeric_limits<double>::max() == abs(value) || isinf(value) ||
+      isnan(value)) ui->speedLabel->setText("nan");
   else ui->speedLabel->setText(QString().sprintf("%.2f RPM", value));
 }
 
@@ -2082,7 +2082,7 @@ void QtWin::on_fileTabManager_currentChanged(int index) {
 
 
 void QtWin::on_positionSlider_valueChanged(int position) {
-  if (Math::isnan(view->path->getTimeRatio())) return;
+  if (isnan(view->path->getTimeRatio())) return;
 
   double ratio = position / 10000.0;
 

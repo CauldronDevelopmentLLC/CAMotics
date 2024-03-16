@@ -37,8 +37,8 @@ bool CutWorkpiece::isValid() const {
 
   Rectangle3D bounds = getBounds();
   for (unsigned i = 0; i < 3; i++)
-    if (Math::isnan(bounds.getMin()[i]) || Math::isnan(bounds.getMax()[i]) ||
-        Math::isinf(bounds.getMin()[i]) || Math::isinf(bounds.getMax()[i]))
+    if (isnan(bounds.getMin()[i]) || isnan(bounds.getMax()[i]) ||
+        isinf(bounds.getMin()[i]) || isinf(bounds.getMax()[i]))
       return false;
 
   return true;

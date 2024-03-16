@@ -68,7 +68,8 @@ void ViewPort::startRotation(int x, int y) {
 
 void ViewPort::updateRotation(int x, int y) {
   Vector3D current = findBallVector(x, y);
-  double angle = fmod((4 * rotationStartVec.angleBetween(current)), (2 * M_PI));
+  double angle =
+    fmod((4 * rotationStartVec.angleBetween(current)), (2 * Math::PI));
   QuaternionD delta(AxisAngleD(angle, rotationStartVec.crossProduct(current)));
   QuaternionD newQuat =
     QuaternionD(delta.normalize()).multiply(rotationStart).normalize();

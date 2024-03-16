@@ -163,7 +163,7 @@ void GCodeModule::arcCB(const js::Value &args, js::Sink &sink) {
   Vector3D offset(args.has("x") ? args.getNumber("x") : 0,
                   args.has("y") ? args.getNumber("y") : 0,
                   args.has("z") ? args.getNumber("z") : 0);
-  double angle = args.has("angle") ? args.getNumber("angle") : (M_PI * 2);
+  double angle = args.has("angle") ? args.getNumber("angle") : (Math::PI * 2);
   plane_t plane = args.has("plane") ? (plane_t)args.getInteger("plane") : XY;
   Vector3D start = ctx.getMachine().getPosition().getXYZ();
 
@@ -370,7 +370,7 @@ int GCodeModule::parseAxes(const js::Value &args, Axes &position,
 
     double value =
       args.getNumber(name) + (incremental ? position.get(*axis) : 0);
-    if (!Math::isfinite(value)) THROW(*axis << " position is invalid");
+    if (!isfinite(value)) THROW(*axis << " position is invalid");
 
     position.set(*axis, value);
     axes |= getVarType(*axis);

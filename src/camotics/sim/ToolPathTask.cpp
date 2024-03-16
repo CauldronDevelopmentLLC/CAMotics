@@ -42,8 +42,8 @@
 
 #include <cbang/os/SystemUtilities.h>
 
-#include <cbang/iostream/VectorDevice.h>
-#include <cbang/iostream/TeeFilter.h>
+#include <cbang/util/VectorDevice.h>
+#include <cbang/util/TeeFilter.h>
 
 #include <cbang/io/StringInputSource.h>
 

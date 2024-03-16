@@ -504,7 +504,7 @@ unsigned LinePlanner::blendSegments(double arcError, double arcAngle,
 
   // Segment angle cannot be greater than 2Pi/3 because we need at least 3
   // segments in a full circle
-  segAngle = std::min(2 * M_PI / 3, segAngle);
+  segAngle = std::min(2 * Math::PI / 3, segAngle);
 
   // Compute integer number of segments that meets the error bound
   unsigned segments = (unsigned)ceil(arcAngle / segAngle);
@@ -548,7 +548,7 @@ void LinePlanner::blend(LineCommand *next, LineCommand *prev,
 
   // Compute radius and angle of arc
   double radius = error * sinHalfAngle / (1 - sinHalfAngle);
-  double arcAngle = M_PI - intersectAngle;
+  double arcAngle = Math::PI - intersectAngle;
 
   // Arc error cannot be greater than arc radius
   const double arcError =
@@ -790,7 +790,7 @@ bool LinePlanner::planOne(PlannerCommand *cmd) {
       if (jv < Vi) {
 #if DEBUG
         double cosTheta = -lc.unit.dot(lastLC.unit);
-        double angle = acos(cosTheta) / M_PI * 180;
+        double angle = acos(cosTheta) / Math::PI * 180;
 
         LOG_DEBUG(5, "junctionVelocity=" << jv
                   << " unitA=" << lc.unit

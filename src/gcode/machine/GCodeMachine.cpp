@@ -40,12 +40,11 @@ namespace {
 
 
     dtos(double x, bool imperial) : x(x), imperial(imperial) {
-      if (Math::isnan(x))
+      if (isnan(x))
         THROW("Numerical error in GCode stream:  NaN, caused by a divide by "
               "zero or other math error.");
 
-      if (Math::isinf(x))
-        THROW("Numerical error in GCode stream: Infinite value");
+      if (isinf(x)) THROW("Numerical error in GCode stream: Infinite value");
     }
 
 
@@ -300,9 +299,9 @@ void GCodeMachine::arc(const Vector3D &_offset, const Vector3D &_target,
   // Angle
   bool clockwise = 0 < angle;
   unsigned p = 0;
-  if (2 * M_PI < fabs(angle)) {
-    p = (unsigned)floor(fabs(angle) / (2 * M_PI));
-    angle = fmod(angle, 2 * M_PI);
+  if (2 * Math::PI < fabs(angle)) {
+    p = (unsigned)floor(fabs(angle) / (2 * Math::PI));
+    angle = fmod(angle, 2 * Math::PI);
   }
 
   // Print it

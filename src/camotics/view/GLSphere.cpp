@@ -29,7 +29,7 @@ using namespace std;
 
 namespace {
   float getLat(float ratio, bool hemi) {
-    return M_PI * (hemi ? -0.5 * ratio : (-0.5 + ratio));
+    return Math::PI * (hemi ? -0.5 * ratio : (-0.5 + ratio));
   }
 }
 
@@ -51,7 +51,7 @@ GLSphere::GLSphere(float radius, unsigned lats, unsigned lngs, bool hemi) :
     float zr1  = cos(lat1);
 
     for (unsigned j = 0; j < lngs; j++) {
-      float lng  = 2 * M_PI * (float)j / (lngs - 1);
+      float lng  = 2 * Math::PI * (float)j / (lngs - 1);
       float x    = cos(lng);
       float y    = sin(lng);
       unsigned o = ((i * lngs) + j) * 6;

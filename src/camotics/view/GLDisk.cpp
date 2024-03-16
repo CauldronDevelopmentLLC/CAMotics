@@ -34,7 +34,7 @@ GLDisk::GLDisk(double radius, unsigned segments) : segments(segments) {
   v[0] = v[1] = 0;
 
   for (unsigned i = 0; i < segments; i++) {
-    float a = i * 2 * M_PI / (segments - 1);
+    float a = i * 2 * Math::PI / (segments - 1);
     v[(i + 1) * 2 + 0] = sin(a) * radius;
     v[(i + 1) * 2 + 1] = cos(a) * radius;
   }

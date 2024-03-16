@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <cbang/os/Condition.h>
+#include <cbang/thread/Condition.h>
 
 #include <string>
 

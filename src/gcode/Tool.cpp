@@ -23,7 +23,7 @@
 #include <cbang/String.h>
 #include <cbang/Math.h>
 #include <cbang/Exception.h>
-#include <cbang/xml/XMLWriter.h>
+#include <cbang/xml/Writer.h>
 #include <cbang/Catch.h>
 
 #include <cstring>
@@ -86,18 +86,18 @@ string Tool::getText() const {
 
 
 double Tool::getAngle() const {
-  double angle = 180.0 - 360.0 * atan(getLength() / getRadius()) / M_PI;
+  double angle = 180.0 - 360.0 * atan(getLength() / getRadius()) / Math::PI;
   return round(angle * 100) / 100;
 }
 
 
 void Tool::setRadiusFromAngle(double angle) {
-  setRadius(getLength() / tan((1 - angle / 180.0) * M_PI / 2.0));
+  setRadius(getLength() / tan((1 - angle / 180.0) * Math::PI / 2.0));
 }
 
 
 void Tool::setLengthFromAngle(double angle) {
-  setLength(getRadius() * tan((1 - angle / 180.0) * M_PI / 2.0));
+  setLength(getRadius() * tan((1 - angle / 180.0) * Math::PI / 2.0));
 }
 
 
