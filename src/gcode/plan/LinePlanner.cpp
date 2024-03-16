@@ -35,7 +35,6 @@
 #include <gcode/machine/Transform.h>
 
 #include <cbang/Exception.h>
-#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 #include <cbang/json/JSON.h>
 

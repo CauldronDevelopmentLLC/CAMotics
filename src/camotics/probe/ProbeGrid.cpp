@@ -21,7 +21,6 @@
 #include "ProbeGrid.h"
 
 #include <cbang/Exception.h>
-#include <cbang/Math.h>
 
 using namespace std;
 using namespace cb;

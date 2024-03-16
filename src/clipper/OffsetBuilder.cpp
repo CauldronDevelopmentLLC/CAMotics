@@ -37,8 +37,6 @@
 
 #include <cbang/Math.h>
 
-#include <cmath>
-
 using namespace std;
 using namespace cb;
 using namespace ClipperLib;

@@ -23,7 +23,6 @@
 #include "Codes.h"
 
 #include <cbang/SStream.h>
-#include <cbang/Math.h>
 #include <cbang/Catch.h>
 #include <cbang/log/Logger.h>
 

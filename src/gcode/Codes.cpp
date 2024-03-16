@@ -21,9 +21,9 @@
 #include "Codes.h"
 
 #include <cbang/String.h>
-#include <cbang/Math.h>
 
 #include <cctype>
+#include <cmath>
 
 using namespace std;
 using namespace cb;

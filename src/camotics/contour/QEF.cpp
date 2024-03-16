@@ -27,7 +27,6 @@
 
 #include "QEF.h"
 
-#include <cbang/Math.h>
 
 #include <cstring>
 

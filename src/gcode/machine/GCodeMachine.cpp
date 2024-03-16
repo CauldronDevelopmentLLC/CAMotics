@@ -23,7 +23,6 @@
 #include <gcode/Plane.h>
 
 #include <cbang/Exception.h>
-#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 
 #include <limits>

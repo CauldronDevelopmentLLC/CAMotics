@@ -25,7 +25,6 @@
 #include <gcode/machine/MachineState.h>
 #include <gcode/machine/MoveSink.h>
 
-#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 #include <cbang/time/Time.h>
 

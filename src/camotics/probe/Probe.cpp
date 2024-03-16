@@ -20,7 +20,6 @@
 
 #include "Probe.h"
 
-#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 #include <cbang/config/Options.h>
 

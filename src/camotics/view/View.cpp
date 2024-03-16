@@ -29,7 +29,6 @@
 #include <gcode/ToolTable.h>
 
 #include <cbang/String.h>
-#include <cbang/Math.h>
 #include <cbang/Catch.h>
 #include <cbang/util/HumanNumber.h>
 #include <cbang/time/HumanTime.h>

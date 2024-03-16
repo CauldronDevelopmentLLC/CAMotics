@@ -20,7 +20,6 @@
 
 #include "Move.h"
 
-#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 
 using namespace GCode;

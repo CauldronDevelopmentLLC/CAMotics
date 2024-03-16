@@ -21,7 +21,6 @@
 #include "Tool.h"
 
 #include <cbang/String.h>
-#include <cbang/Math.h>
 #include <cbang/Exception.h>
 #include <cbang/xml/Writer.h>
 #include <cbang/Catch.h>

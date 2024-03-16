@@ -20,7 +20,6 @@
 
 #include "CutWorkpiece.h"
 
-#include <cbang/Math.h>
 
 using namespace std;
 using namespace cb;

@@ -26,7 +26,6 @@
 #include "ast/Number.h"
 
 #include <cbang/SStream.h>
-#include <cbang/Math.h>
 #include <cbang/log/Logger.h>
 
 using namespace std;

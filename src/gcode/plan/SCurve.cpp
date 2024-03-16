@@ -21,7 +21,6 @@
 #include "SCurve.h"
 
 #include <cbang/Exception.h>
-#include <cbang/Math.h>
 
 #include <limits>
 

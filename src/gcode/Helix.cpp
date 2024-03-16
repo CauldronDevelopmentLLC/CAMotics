@@ -20,7 +20,6 @@
 
 #include "Helix.h"
 
-#include <cbang/Math.h>
 
 using namespace GCode;
 using namespace cb;

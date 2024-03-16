@@ -21,7 +21,6 @@
 #pragma once
 
 #include <cbang/Exception.h>
-#include <cbang/Math.h>
 #include <cbang/geom/Vector.h>
 #include <cbang/geom/Matrix.h>
 #include <cbang/json/Serializable.h>
