@@ -20,8 +20,6 @@
 
 #include "OctTree.h"
 
-#include <cbang/Zap.h>
-
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
@@ -107,9 +105,7 @@ OctTree::OctTree(const Rectangle3D &bounds, unsigned depth) {
 }
 
 
-OctTree::~OctTree() {
-  zap(root);
-}
+OctTree::~OctTree() {delete root;}
 
 
 void OctTree::insert(const GCode::Move *move, const Rectangle3D &bbox) {

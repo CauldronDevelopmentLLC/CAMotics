@@ -20,8 +20,6 @@
 
 #include "AABB.h"
 
-#include <cbang/Zap.h>
-
 #include <algorithm>
 
 using namespace std;
@@ -81,8 +79,8 @@ AABB::AABB(AABB *nodes) : left(0), right(0), move(0) {
 
 
 AABB::~AABB() {
-  zap(left);
-  zap(right);
+  delete left;
+  delete right;
 }
 
 

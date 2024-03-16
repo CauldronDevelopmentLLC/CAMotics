@@ -20,14 +20,12 @@
 
 #include "AABBTree.h"
 
-#include <cbang/Zap.h>
-
 using namespace std;
 using namespace cb;
 using namespace CAMotics;
 
 
-AABBTree::~AABBTree() {zap(root);}
+AABBTree::~AABBTree() {delete root;}
 
 
 Rectangle3D AABBTree::getBounds() const {
