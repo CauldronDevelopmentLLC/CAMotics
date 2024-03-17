@@ -24,7 +24,7 @@
 #include "Source.h"
 
 #include <cbang/io/InputSource.h>
-#include <cbang/io/Parser.h>
+#include <cbang/parse/Parser.h>
 
 
 namespace STL {

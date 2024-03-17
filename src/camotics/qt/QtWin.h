@@ -43,7 +43,7 @@
 #include <cbang/SmartPointer.h>
 #include <cbang/Application.h>
 #ifndef Q_MOC_RUN
-#include <cbang/util/LineBufferDevice.h>
+#include <cbang/io/LineBufferStream.h>
 #endif
 
 #include <QtWidgets>

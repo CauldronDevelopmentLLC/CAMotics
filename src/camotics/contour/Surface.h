@@ -21,10 +21,10 @@
 #pragma once
 
 #include <cbang/geom/Rectangle.h>
-#include <cbang/io/OutputSink.h>
 #include <cbang/json/Serializable.h>
 
 #include <functional>
+#include <ostream>
 #include <vector>
 
 
@@ -46,7 +46,7 @@ namespace CAMotics {
     virtual void write(STL::Sink &sink, Task *task = 0) const = 0;
     virtual void reduce(Task &task) = 0;
 
-    void writeSTL(const cb::OutputSink &sink, bool binary,
+    void writeSTL(std::ostream &stream, bool binary,
                   const std::string &name, const std::string &hash) const;
 
     // From cb::JSON::Serializable

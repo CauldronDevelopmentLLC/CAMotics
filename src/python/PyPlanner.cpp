@@ -27,7 +27,6 @@
 #include <gcode/plan/Planner.h>
 
 #include <cbang/String.h>
-#include <cbang/io/StringStreamInputSource.h>
 
 #include <limits>
 
@@ -132,8 +131,7 @@ namespace {
       // Convert Python object to JSON config
       if (_config) config.read(*PyJSON(_config).toJSON());
 
-      cb::StringStreamInputSource stream(code, "<MDI>");
-      self->planner->load(stream, config, tpl);
+      self->planner->load(cb::InputSource(code, "<MDI>"), config, tpl);
       Py_RETURN_NONE;
 
     } CATCH_PYTHON;
@@ -158,7 +156,7 @@ namespace {
 
       bool tpl = cb::String::endsWith(path, ".tpl");
 
-      self->planner->load(std::string(path), config, tpl);
+      self->planner->load(cb::InputSource::open(path), config, tpl);
       Py_RETURN_NONE;
 
     } CATCH_PYTHON;

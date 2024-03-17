@@ -28,7 +28,6 @@
 #include <cbang/os/SystemUtilities.h>
 #include <cbang/log/Logger.h>
 #include <cbang/time/Time.h>
-#include <cbang/io/StringInputSource.h>
 #include <cbang/Catch.h>
 
 #include <QHttpMultiPart>
@@ -122,7 +121,7 @@ void BBCtrlAPI::uploadGCode(const char *data, unsigned length) {
 
 
 void BBCtrlAPI::uploadGCode(const string &gcode) {
-  uploadGCode(gcode.c_str(), gcode.length());
+  uploadGCode(gcode.data(), gcode.length());
 }
 
 
@@ -160,7 +159,7 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
   LOG_DEBUG(4, "CNC received: " << data);
 
   try {
-    JSON::ValuePtr json = JSON::Reader::parse(StringInputSource(data));
+    JSON::ValuePtr json = JSON::Reader::parse(data);
 
     lastMessage = Time::now();
 

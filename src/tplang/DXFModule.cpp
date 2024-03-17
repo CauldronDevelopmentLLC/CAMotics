@@ -51,7 +51,8 @@ void DXFModule::define(js::Sink &exports) {
 
 void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
   DXF::Reader reader;
-  reader.read(ctx.relativePath(args.getString("path")));
+  string path = ctx.relativePath(args.getString("path"));
+  reader.read(InputSource::open(path));
 
   const DXF::Reader::layers_t &layers = reader.getLayers();
   sink.beginDict();

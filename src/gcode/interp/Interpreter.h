@@ -23,13 +23,13 @@
 #include "OCodeInterpreter.h"
 
 #include <cbang/SmartPointer.h>
-#include <cbang/io/Reader.h>
+#include <cbang/io/InputSource.h>
 
 
 namespace GCode {
   class Tokenizer;
 
-  class Interpreter : public OCodeInterpreter, public cb::Reader {
+  class Interpreter : public OCodeInterpreter {
     bool inOverride;
     std::map<const Code, std::string> overrides;
 
@@ -44,7 +44,6 @@ namespace GCode {
     // From GCodeInterpreter
     void execute(const Code &code, int vars);
 
-    // From cb::Reader
     void read(const cb::InputSource &source);
 
     // From Processor

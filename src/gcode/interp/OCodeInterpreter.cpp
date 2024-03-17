@@ -185,7 +185,7 @@ void OCodeInterpreter::doCall(OCode *ocode) {
                 << "\" file not found in GCODE_SCRIPT_PATH");
 
         ProducerStack::push(new SubroutineLoader(name, subroutineCall, *this));
-        ProducerStack::push(InputSource(path));
+        ProducerStack::push(InputSource::open(path));
         return;
       }
     }

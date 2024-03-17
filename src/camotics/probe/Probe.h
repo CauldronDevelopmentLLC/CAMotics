@@ -30,7 +30,7 @@
 #include <gcode/interp/Interpreter.h>
 
 #include <cbang/SmartPointer.h>
-#include <cbang/io/Reader.h>
+#include <cbang/io/InputSource.h>
 
 #include <string>
 
@@ -41,7 +41,7 @@ namespace GCode {class Word;}
 namespace CAMotics {
   class Probe :
     public GCode::MachineState, public GCode::ControllerImpl,
-    public GCode::Printer, public cb::Reader {
+    public GCode::Printer {
     GCode::Interpreter interp;
 
   public:
@@ -68,7 +68,6 @@ namespace CAMotics {
   public:
     Probe(cb::Options &options, std::ostream &stream);
 
-    // From cb::Reader
     void read(const cb::InputSource &source);
 
     void outputProbe(ProbePoint &pt, unsigned address, unsigned count);

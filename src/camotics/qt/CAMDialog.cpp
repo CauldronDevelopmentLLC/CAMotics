@@ -40,7 +40,7 @@ CAMDialog::CAMDialog(QWidget *parent) :
 
 void CAMDialog::loadDXFLayers(const string &filename) {
   DXF::Reader reader;
-  reader.read(filename);
+  reader.read(InputSource::open(filename));
 
   const DXF::Reader::layers_t &layers = reader.getLayers();
 

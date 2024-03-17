@@ -27,9 +27,9 @@ using namespace cb;
 using namespace CAMotics;
 
 
-void Surface::writeSTL(const OutputSink &sink, bool binary, const string &name,
+void Surface::writeSTL(ostream &stream, bool binary, const string &name,
                        const string &hash) const {
-  STL::Writer writer(sink, binary);
+  STL::Writer writer(stream, binary);
 
   writer.writeHeader(name, getTriangleCount(), hash);
   write(writer);

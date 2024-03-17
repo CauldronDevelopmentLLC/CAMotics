@@ -24,18 +24,18 @@
 #include "Sink.h"
 
 #include <cbang/geom/Triangle.h>
-#include <cbang/io/OutputSink.h>
+
+#include <ostream>
 
 
 namespace STL {
   class Writer : public Sink {
-    cb::OutputSink sink;
     std::ostream &stream;
     bool binary;
 
   public:
-    Writer(const cb::OutputSink &sink, bool binary) :
-      sink(sink), stream(sink.getStream()), binary(binary) {}
+    Writer(std::ostream &stream, bool binary) :
+      stream(stream), binary(binary) {}
 
     void writeHeader(const std::string &name, uint32_t count,
                      const std::string &hash = std::string());

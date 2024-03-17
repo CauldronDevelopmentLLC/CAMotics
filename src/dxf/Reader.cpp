@@ -36,8 +36,8 @@ using namespace DXF;
 void Reader::read(const InputSource &source) {
   SmartPointer<DL_Dxf> dxf = new DL_Dxf;
 
-  if (!dxf->in(source.getStream(), this))
-    THROW("Failed to read '" << source << "' as DXF");
+  if (!dxf->in(source, this))
+    THROW("Failed to read '" << source.getName() << "' as DXF");
 }
 
 

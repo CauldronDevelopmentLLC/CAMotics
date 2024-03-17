@@ -30,7 +30,6 @@
 #include <cbang/ApplicationMain.h>
 #include <cbang/json/Writer.h>
 #include <cbang/json/Reader.h>
-#include <cbang/io/StringInputSource.h>
 #include <cbang/time/TimeInterval.h>
 #include <cbang/log/Logger.h>
 
@@ -72,12 +71,12 @@ public:
       string s = String::trim(cmdLine["--json"].toString());
 
       if (!s.empty()) {
-        SmartPointer<InputSource> source;
+        InputSource source;
 
-        if (s[0] == '{') source = new StringInputSource(s);
-        else source = new InputSource(s);
+        if (s[0] == '{') source = InputSource(s);
+        else source = InputSource::open(s);
 
-        auto data = JSON::Reader::parse(*source);
+        auto data = JSON::Reader::parse(source);
         config.read(data->hasDict("planner") ? *data->get("planner") : *data);
       }
     }
@@ -86,7 +85,6 @@ public:
   }
 
 
-  // From cb::Reader
   void read(const InputSource &source) {
     MachinePipeline pipeline;
 

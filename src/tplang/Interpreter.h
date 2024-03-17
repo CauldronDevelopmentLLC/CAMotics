@@ -23,14 +23,13 @@
 
 #include "TPLContext.h"
 
-#include <cbang/io/Reader.h>
-#include <cbang/io/OutputSink.h>
+#include <cbang/io/InputSource.h>
 
 #include <ostream>
 
 
 namespace tplang {
-  class Interpreter : public cb::Reader {
+  class Interpreter {
     TPLContext &ctx;
 
   public:

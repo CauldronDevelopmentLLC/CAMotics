@@ -141,7 +141,7 @@ void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
   SmartFunctor<TransformStack> pop(&stack, &TransformStack::pop);
 
   ControllerImpl controller(ctx.getMachine());
-  Interpreter(controller).read(path);
+  Interpreter(controller).read(InputSource::open(path));
 }
 
 

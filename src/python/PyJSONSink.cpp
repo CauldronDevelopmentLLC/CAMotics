@@ -133,7 +133,7 @@ void PyJSONSink::endDict() {
 
 
 PyObject *PyJSONSink::createString(const string &s) {
-  return PyUnicode_FromStringAndSize(CPP_TO_C_STR(s), s.length());
+  return PyUnicode_FromStringAndSize(s.data(), s.length());
 }
 
 

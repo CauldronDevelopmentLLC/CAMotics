@@ -29,8 +29,8 @@ using namespace STL;
 
 
 Reader::Reader(const InputSource &source) :
-  source(source), stream(source.getStream()), binary(true), count(0),
-  parser(source.getStream()) {
+  source(source), stream(source), binary(true), count(0),
+  parser(source) {
   parser.setCaseSensitive(false);
 }
 

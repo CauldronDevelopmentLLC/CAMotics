@@ -23,7 +23,6 @@
 #include "ProgramProducer.h"
 
 #include <gcode/parse/Parser.h>
-#include <cbang/io/StringStreamInputSource.h>
 
 
 using namespace GCode;
@@ -45,7 +44,7 @@ void ProducerStack::push(Program &program) {
 
 
 void ProducerStack::push(const string &gcode, const string &path) {
-  push(StringStreamInputSource(gcode, path));
+  push(InputSource(gcode, path));
 }
 
 

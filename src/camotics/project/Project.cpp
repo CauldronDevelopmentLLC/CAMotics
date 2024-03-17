@@ -149,7 +149,7 @@ void Project::load(const string &filename) {
       XML::Reader().read(filename, &handler);
       data = builder.getRoot();
 
-    } else data = JSON::Reader::parse(filename);
+    } else data = JSON::Reader::parseFile(filename);
 
     read(*data);
     onDisk = true;

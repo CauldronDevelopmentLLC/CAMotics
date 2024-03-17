@@ -21,9 +21,9 @@
 #include "Application.h"
 
 #include <cbang/Info.h>
+#include <cbang/Catch.h>
 #include <cbang/log/Logger.h>
 #include <cbang/os/SystemUtilities.h>
-#include <cbang/Catch.h>
 
 using namespace std;
 using namespace CAMotics;
@@ -66,8 +66,7 @@ Application::Application(const string &name, hasFeature_t hasFeature) :
 
 
 void Application::run() {
-  const vector<string> &args = cmdLine.getPositionalArgs();
-  if (args.empty()) read(cb::InputSource(cin, "<stdin>"));
-  vector<string>::const_iterator it;
-  for (it = args.begin(); it != args.end(); it++) read(*it);
+  auto &args = cmdLine.getPositionalArgs();
+  if (args.empty()) read(cin);
+  for (auto &arg: args) read(cb::InputSource::open(arg));
 }

@@ -56,8 +56,7 @@ public:
     build(pipeline);
     ctx.setStream(stream);
 
-    if (!simJSON.empty())
-      ctx.setSim(JSON::Reader::parseString(simJSON));
+    if (!simJSON.empty()) ctx.setSim(JSON::Reader::parse(simJSON));
 
     CommandLineApp::run();
   }
@@ -69,7 +68,6 @@ public:
   }
 
 
-  // From cb::Reader
   void read(const cb::InputSource &source) {
     tplang::Interpreter(ctx).read(source);
   }

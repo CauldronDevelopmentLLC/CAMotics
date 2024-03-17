@@ -42,10 +42,8 @@
 
 #include <cbang/os/SystemUtilities.h>
 
-#include <cbang/util/VectorDevice.h>
-#include <cbang/util/TeeFilter.h>
-
-#include <cbang/io/StringInputSource.h>
+#include <cbang/io/VectorStream.h>
+#include <cbang/io/TeeFilter.h>
 
 #include <cbang/js/JSInterrupted.h>
 
@@ -97,7 +95,7 @@ void ToolPathTask::runTPL(const InputSource &src) {
 
   tplCtx =
     new tplang::TPLContext(SmartPointer<ostream>::Phony(&cerr), pipeline);
-  tplCtx->setSim(JSON::Reader::parseString(simJSON));
+  tplCtx->setSim(JSON::Reader::parse(simJSON));
 
   // Interpret
   try {
@@ -120,13 +118,11 @@ void ToolPathTask::runTPL(const InputSource &src) {
 
 
 void ToolPathTask::runTPL(const string &filename) {
-  runTPL(InputSource(filename));
+  runTPL(InputSource::open(filename));
 }
 
 
-void ToolPathTask::runTPLString(const std::string &s) {
-  runTPL(StringInputSource(s));
-}
+void ToolPathTask::runTPLString(const std::string &s) {runTPL(s);}
 
 
 void ToolPathTask::runGCode(const InputSource &source) {

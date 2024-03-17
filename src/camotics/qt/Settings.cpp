@@ -48,7 +48,7 @@ Vector3D Settings::getVector3D(const string &name,
                                const Vector3D &defaultValue) const {
   if (!has(name)) return defaultValue;
 
-  auto value = JSON::Reader::parseString(get(name).toString().toStdString());
+  auto value = JSON::Reader::parse(get(name).toString().toStdString());
 
   Vector3D v;
   v.read(*value);

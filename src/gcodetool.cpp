@@ -63,7 +63,6 @@ public:
   }
 
 
-  // From cb::Reader
   void read(const InputSource &source) {
     if (parseOnly) {
       Printer printer(*stream, annotate);

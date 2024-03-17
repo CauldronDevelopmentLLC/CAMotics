@@ -279,7 +279,8 @@ void STLModule::define(js::Sink &exports) {
 
 void STLModule::open(const js::Value &args, js::Sink &sink) {
   // Read STL
-  STL::Reader reader(ctx.relativePath(args.getString("path")));
+  string path = ctx.relativePath(args.getString("path"));
+  STL::Reader reader(InputSource::open(path));
 
   // Header
   string name;

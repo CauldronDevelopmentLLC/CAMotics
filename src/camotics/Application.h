@@ -22,11 +22,11 @@
 
 
 #include <cbang/Application.h>
-#include <cbang/io/Reader.h>
+#include <cbang/io/InputSource.h>
 
 
 namespace CAMotics {
-  class Application : public cb::Application, public cb::Reader {
+  class Application : public cb::Application {
   public:
     Application(const std::string &name,
                 hasFeature_t hasFeature = Application::_hasFeature);

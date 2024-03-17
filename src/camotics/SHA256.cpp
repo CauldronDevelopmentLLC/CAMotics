@@ -85,7 +85,7 @@ void SHA256::update(const char *data, streamsize len) {
 
 
 void SHA256::update(const string &data) {
-  update((const uint8_t *)CBANG_CPP_TO_C_STR(data), data.length());
+  update((const uint8_t *)data.data(), data.length());
 }
 
 
