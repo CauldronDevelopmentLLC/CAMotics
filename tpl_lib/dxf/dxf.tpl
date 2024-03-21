@@ -68,7 +68,7 @@ function dtoa(n, width) {
 
 
 function str(x) {
-  return (typeof x == 'string') ? x : JSON.stringify(x);
+  return (typeof x == 'string') ? x : JSON.stringify(x, null, '  ');
 }
 
 
@@ -149,56 +149,148 @@ function bounds_center(bounds) {
 }
 
 
-function quad_bezier(p, t) {
-  var c = [sqr(1 - t), 2 * (1 - t) * t, sqr(t)];
+// Find the spline segment for the t value
+function segment_get_index(spl, knots, t) {
+  // TODO Can this be unified?
+  if (spl.isClosed) {
+    for (let segment = 0; segment < knots.length; segment++)
+      if (t < knots[segment]) return segment - 1
 
+  } else
+    for (let segment = spl.degree; segment < knots.length - 1; segment++)
+      if (knots[segment] <= t && t <= knots[segment + 1])
+        return segment
+
+  throw new Error('segment not found');
+}
+
+
+function nurbs_build_verts(spl) {
+  var degree = spl.degree
+  var npts   = spl.ctrlPts.length
+
+  if (degree < 1) throw new Error('degree must be at least 1 (linear)')
+  if (npts - 1 < degree)
+    throw new Error('degree must be less than or equal to point count - 1')
+
+  // Convert control points to homogeneous coordinates
+  var verts = []
+  let nverts = spl.isClosed ? npts + degree * 2 : npts
+
+  for (let i = 0; i < nverts; i++) {
+    let j = spl.isClosed ? (i - degree + npts) % npts : i
+    let weight = spl.isRational ? spl.ctrlPts[j].w : 1
+
+    verts.push([
+      spl.ctrlPts[j].x * weight,
+      spl.ctrlPts[j].y * weight,
+      spl.ctrlPts[j].z * weight,
+      weight
+    ])
+  }
+
+  return verts
+}
+
+
+function nurbs_build_knots(spl) {
+  var degree = spl.degree
+  var npts   = spl.ctrlPts.length
+
+  if (spl.isClosed) {
+    // TODO Is it correct to rewrite the knots values?
+    npts += degree + 1
+
+    var delta = 1.0 / (npts + degree + 1)
+    var knot  = 0
+    var knots = []
+
+    for (let i = 0; i < npts + degree; i++) {
+      knots.push(knot)
+      knot += delta
+    }
+
+    knots.push(1.0)
+    return knots
+  }
+
+  if (spl.knots.length !== npts + degree + 1)
+    throw new Error('bad knot vector length')
+
+  return spl.knots
+}
+
+
+function nurbs_interpolate(t, spl, vertices, knots) {
+  var degree = spl.degree
+  var npts   = spl.ctrlPts.length
+
+  if (t < knots[0] || knots[knots.length - 1] < t)
+    throw new Error('t out of bounds')
+
+  if (spl.isClosed) {
+    let min = knots[degree + 1]
+    let max = knots[knots.length - degree - 1]
+
+    t = min + (max - min) * t
+    npts = npts + degree * 2
+
+  } else {
+    let min = knots[degree]
+    let max = knots[knots.length - degree]
+    t = min + (max - min) * t
+  }
+
+  var segment = segment_get_index(spl, knots, t)
+
+  // Copy the vertices that we are going to modify
+  var verts = []
+  for (let j = segment; segment - degree <= j; j--) {
+    let i = (j + npts) % npts
+    verts[i] = [].concat(vertices[i])
+  }
+
+  for (let level = 0; level < degree; level++) {
+    // Build level of the pyramid
+    for (let i = segment; segment - degree + level < i; i--) {
+      var klen   = knots.length
+      var vai_1  = knots[(i + klen) % klen]
+      var vaip_r = knots[(i + degree - level + klen) % klen]
+      var alpha  = (t - vai_1) / (vaip_r - vai_1)
+
+      // Interpolate each component (x, y, z, w)
+      for (let j = 0; j < 4; j++)
+        verts[(i + npts) % npts][j] =
+          (1 - alpha) * verts[(i - 1 + npts) % npts][j] +
+          alpha * verts[(i + npts) % npts][j]
+    }
+  }
+
+  segment %= npts
   return {
-    x: c[0] * p[0].x + c[1] * p[1].x + c[2] * p[2].x,
-    y: c[0] * p[0].y + c[1] * p[1].y + c[2] * p[2].y
+    x: verts[segment][0] / verts[segment][3],
+    y: verts[segment][1] / verts[segment][3],
+    z: verts[segment][2] / verts[segment][3]
   }
 }
 
 
-function quad_bezier_length(p) {
-  var l = 0;
-  var v = p[0];
+function nurbs_length(spl, verts, knots) {
+  var l = 0
+  var v = nurbs_interpolate(0.0, spl, verts, knots)
 
-  for (var i = 1; i <= 100; i++) {
-    var u = quad_bezier(p, 0.01 * i);
-    l += distance2D(v, u);
-    v = u;
+  for (let i = 1; i <= 100; i++) {
+    var u = nurbs_interpolate(0.01 * i, spl, verts, knots)
+    l += distance2D(v, u)
+    v = u
   }
 
-  return l;
-}
-
-
-function cubic_bezier(p, t) {
-  var c = [cube(1 - t), 3 * sqr(1 - t) * t, 3 * (1 - t) * sqr(t), cube(t)];
-
-  return {
-    x: c[0] * p[0].x + c[1] * p[1].x + c[2] * p[2].x + c[3] * p[3].x,
-    y: c[0] * p[0].y + c[1] * p[1].y + c[2] * p[2].y + c[3] * p[3].y
-  }
-}
-
-
-function cubic_bezier_length(p) {
-  var l = 0;
-  var v = p[0];
-
-  for (var i = 1; i <= 100; i++) {
-    var u = cubic_bezier(p, 0.01 * i);
-    l += distance2D(v, u);
-    v = u;
-  }
-
-  return l;
+  return l
 }
 
 
 function extend(target, source) {
-  for (var i in source)
+  for (let i in source)
     if (source.hasOwnProperty(i))
       target[i] = source[i];
 
@@ -208,6 +300,7 @@ function extend(target, source) {
 
 module.exports = extend({
   arc_error: 0.0001, // In length units
+  spline_res: 1,
 
 
   // Vertices ******************************************************************
@@ -251,8 +344,34 @@ module.exports = extend({
   },
 
 
-  polyline_vertices: function(pl) {return pl.vertices;},
-  spline_vertices: function(s) {return s.ctrlPts;},
+  polyline_vertices: function(pl) {return pl.vertices},
+
+
+  compute_spline_vertices: function (s) {
+    let res = this.spline_res / (units() == METRIC ? 1 : 25.4)
+
+    let verts = nurbs_build_verts(s)
+    let knots = nurbs_build_knots(s)
+    let steps = Math.ceil(nurbs_length(s, verts, knots) / res)
+    let delta = 1.0 / steps
+    let vertices = []
+
+    for (let t = 0; t < 1; t += delta)
+      vertices.push(nurbs_interpolate(t, s, verts, knots))
+
+    // Make sure to cut until exactly t == 1
+    vertices.push(nurbs_interpolate(1, s, verts, knots))
+
+    return vertices
+  },
+
+
+  spline_vertices: function(s) {
+    if (s.__vertices__ == undefined)
+      s.__vertices__ = this.compute_spline_vertices(s)
+
+    return s.__vertices__
+  },
 
 
   element_vertices: function(e) {
@@ -294,32 +413,30 @@ module.exports = extend({
 
 
   arc_flip: function(a) {
-    return {
-      type: _dxf.ARC,
-      center: a.center,
-      radius: a.radius,
+    return Object.assign({}, a, {
       startAngle: a.endAngle,
       endAngle: a.startAngle,
       clockwise: !a.clockwise
-    }
+    })
   },
 
 
   polyline_flip: function(pl) {
-    return {
-      type: _dxf.POLYLINE,
+    return Object.assign({}, pl, {
       vertices: [].concat(pl.vertices).reverse()
-    }
+    })
   },
 
 
   spline_flip: function(s) {
-    return {
-      type: _dxf.SPLINE,
-      degree: s.degree,
+    let ik = [];
+    for (let i = 0; i < s.knots.length; i++)
+      ik[i] = 1 - s.knots[i];
+
+    return Object.assign({}, s, {
       ctrlPts: [].concat(s.ctrlPts).reverse(),
-      knots: s.knots
-    }
+      knots: [].concat(ik).reverse()
+    })
   },
 
 
@@ -359,27 +476,20 @@ module.exports = extend({
   },
 
 
-  line_cut: function(l) {cut(l.end.x, l.end.y);},
+  line_cut: function(l) {cut(l.end.x, l.end.y)},
 
 
   arc_angle: function(a) {
     var angle = (a.endAngle - a.startAngle) * (a.clockwise ? -1 : 1)
-
-    //if (angle <= 0) angle += 360;
-
     return angle * Math.PI / 180;
   },
 
 
   arc_cut: function(a) {
-    var p = position();
+    var p = position()
+    var offset = {x: a.center.x - p.x, y: a.center.y - p.y}
 
-    var offset = {
-      x: a.center.x - p.x,
-      y: a.center.y - p.y,
-    }
-
-    arc({x: offset.x, y: offset.y, angle: this.arc_angle(a)});
+    arc({x: offset.x, y: offset.y, angle: this.arc_angle(a)})
   },
 
 
@@ -387,45 +497,27 @@ module.exports = extend({
     for (var i = 1; i < pl.vertices.length; i++)
       cut(pl.vertices[i].x, pl.vertices[i].y);
 
-    if (pl.vertices.length) cut(pl.vertices[0].x, pl.vertices[0].y);
+    if (pl.isClosed) cut(pl.vertices[0].x, pl.vertices[0].y);
   },
 
 
-  spline_cut: function(s, res) {
-    if (typeof res == 'undefined') res = units() == METRIC ? 1 : 1 / 25.4;
+  spline_cut: function(s) {
+    if (s.__vertices__ == undefined)
+      s.__vertices__ = this.compute_spline_vertices(s)
 
-    if (s.degree == 2) {
-      var steps = Math.ceil(quad_bezier_length(s.ctrlPts) / res);
-      var delta = 1 / steps;
-
-      for (var i = 0; i < steps; i++) {
-        v = quad_bezier(s.ctrlPts, delta * (i + 1));
-        cut(v.x, v.y);
-      }
-
-
-    } else if (s.degree == 3) {
-      var steps = Math.ceil(cubic_bezier_length(s.ctrlPts) / res);
-      var delta = 1 / steps;
-
-      for (var i = 0; i < steps; i++) {
-        var v = cubic_bezier(s.ctrlPts, delta * (i + 1));
-        cut(v.x, v.y);
-      }
-
-    } else
-      for (var i = 1; i < s.ctrlPts.length; i++)
-        cut(s.ctrlPts[i].x, s.ctrlPts[i].y);
+    let v = s.__vertices__
+    for (let i = 0; i < v.length; i++)
+      cut(v[i].x, v[i].y)
   },
 
 
-  element_cut: function(e, res) {
+  element_cut: function(e) {
     switch (e.type) {
-    case _dxf.POINT:    return;
-    case _dxf.LINE:     return this.line_cut(e);
-    case _dxf.ARC:      return this.arc_cut(e);
-    case _dxf.POLYLINE: return this.polyline_cut(e);
-    case _dxf.SPLINE:   return this.spline_cut(e, res);
+    case _dxf.POINT:                          break
+    case _dxf.LINE:     this.line_cut(e);     break
+    case _dxf.ARC:      this.arc_cut(e);      break
+    case _dxf.POLYLINE: this.polyline_cut(e); break
+    case _dxf.SPLINE:   this.spline_cut(e);   break
     default: throw 'Unsupported DXF element type ' + e.type;
     }
   },
@@ -450,8 +542,8 @@ module.exports = extend({
         rapid(v.x, v.y);
       }
 
-      cut({z: zCut});
-      cut(v.x, v.y);
+      cut({z: zCut})
+      cut(v.x, v.y)
 
       this.element_cut(e, res);
 

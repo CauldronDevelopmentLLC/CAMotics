@@ -40,7 +40,7 @@ namespace DXF {
     virtual ~Entity() {}
 
     virtual type_t getType() const = 0;
-    virtual void addVertex(const cb::Vector3D &v) {THROW("Cannot add vertex");}
+    virtual void addVertex(const cb::Vector3D &v, double weight = 0.0) {THROW("Cannot add vertex");}
     virtual void addKnot(double k) {THROW("Cannot add knot");}
   };
 }
