@@ -85,7 +85,7 @@ void Reader::addCircle(const DL_CircleData &circle) {
 
 void Reader::addPolyline(const DL_PolylineData &polyline) {
   if (!entity.isNull()) THROW("DXF Already in DXF entity");
-  addEntity(entity = new PolyLine);
+  addEntity(entity = new PolyLine(polyline.flags));
 }
 
 
@@ -97,12 +97,12 @@ void Reader::addVertex(const DL_VertexData &vertex) {
 
 void Reader::addSpline(const DL_SplineData &spline) {
   if (!entity.isNull()) THROW("DXF Already in DXF entity");
-  addEntity(entity = new Spline(spline.degree));
+  addEntity(entity = new Spline(spline.degree, spline.flags));
 }
 
 
 void Reader::addControlPoint(const DL_ControlPointData &ctrlPt) {
-  entity->addVertex(cb::Vector3D(ctrlPt.x, ctrlPt.y, ctrlPt.z));
+  entity->addVertex(cb::Vector3D(ctrlPt.x, ctrlPt.y, ctrlPt.z), ctrlPt.w);
 }
 
 
