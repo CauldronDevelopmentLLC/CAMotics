@@ -43,7 +43,10 @@ namespace tplang {
 
     GCode::MachineUnitAdapter &getUnitAdapter();
 
+    void exec(cb::InputSource src);
+
     // Javascript call backs
+    void     gexecCB(const cb::js::Value &args, cb::js::Sink &sink);
     void     gcodeCB(const cb::js::Value &args, cb::js::Sink &sink);
     void     rapidCB(const cb::js::Value &args, cb::js::Sink &sink);
     void       cutCB(const cb::js::Value &args, cb::js::Sink &sink);

@@ -50,6 +50,7 @@ void GCodeModule::define(js::Sink &exports) {
 #define AXES XYZ ", " ABC ", " UVW
 
   exports.insert("gcode(path)", this, &GCodeModule::gcodeCB);
+  exports.insert("gexec(code)", this, &GCodeModule::gexecCB);
   exports.insert("rapid(" AXES ", incremental=false)", this,
                  &GCodeModule::rapidCB);
   exports.insert("irapid(" AXES ", incremental=true)", this,
@@ -127,21 +128,31 @@ MachineUnitAdapter &GCodeModule::getUnitAdapter() {
 }
 
 
-void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
-  string path =
-    SystemUtilities::absolute(ctx.getCurrentPath(), args.getString("path"));
 
-  ctx.pushPath(path);
+void GCodeModule::exec(InputSource src) {
+  ctx.pushPath(src.getName());
   SmartFunctor<TPLContext> popPath(&ctx, &TPLContext::popPath);
 
   // Push XYZ matrix so GCode coordinate rotations work correctly
-  TransformStack &stack =
-    ctx.getMachine().getTransforms().get(MachineEnum::XYZ);
+  auto &stack = ctx.getMachine().getTransforms().get(MachineEnum::XYZ);
   stack.push();
   SmartFunctor<TransformStack> pop(&stack, &TransformStack::pop);
 
   ControllerImpl controller(ctx.getMachine());
-  Interpreter(controller).read(InputSource::open(path));
+  Interpreter(controller).read(src);
+}
+
+
+
+void GCodeModule::gexecCB(const js::Value &args, js::Sink &sink) {
+  exec(args.getString("code"));
+}
+
+
+void GCodeModule::gcodeCB(const js::Value &args, js::Sink &sink) {
+  string cwd  = ctx.getCurrentPath();
+  string path = SystemUtilities::absolute(cwd, args.getString("path"));
+  exec(InputSource::open(path));
 }
 
 
