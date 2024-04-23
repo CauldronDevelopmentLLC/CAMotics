@@ -53,9 +53,9 @@ CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
   cmdLine.addTarget("force", force, "Force overwriting output file", 'f');
 
   cmdLine.add("metric", 0, this, &CommandLineApp::metricAction,
-              "Output in metric units.")->setType(Option::BOOLEAN_TYPE);
+              "Output in metric units.")->setType(Option::TYPE_BOOLEAN);
   cmdLine.add("imperial", 0, this, &CommandLineApp::imperialAction,
-              "Output in imperial units.")->setType(Option::BOOLEAN_TYPE);
+              "Output in imperial units.")->setType(Option::TYPE_BOOLEAN);
 
   cmdLine.addTarget("units", outputUnits, "Set output units.");
   cmdLine.addTarget("default-units", defaultUnits,
@@ -76,7 +76,7 @@ CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
 
   Option &opt = *cmdLine.add("pipe", "Specify a output file descriptor, "
                              "overrides the 'out' option");
-  opt.setType(Option::INTEGER_TYPE);
+  opt.setType(Option::TYPE_INTEGER);
   opt.setConstraint(new MinConstraint<int>(0));
 }
 

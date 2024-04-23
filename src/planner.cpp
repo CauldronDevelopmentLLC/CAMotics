@@ -53,7 +53,7 @@ public:
   PlannerApp() :
     CAMotics::CommandLineApp("CAMotics GCode Path Planner") {
     cmdLine.add("json", "JSON configuration or configuration file"
-                )->setType(Option::STRING_TYPE);
+                )->setType(Option::TYPE_STRING);
     cmdLine.addTarget("gcode", gcode, "Output GCode instead of plan JSON");
     cmdLine.addTarget("precision", precision,
                       "Decimal places in output numbers");
