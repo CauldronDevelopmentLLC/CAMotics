@@ -111,6 +111,8 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
       case DXF::Entity::DXF_POLYLINE: {
         const DXF::PolyLine &polyLine =
           dynamic_cast<const DXF::PolyLine &>(entity);
+        // TODO expose other flags
+        sink.insertBoolean("isClosed", polyLine.isClosed());
         const vector<Vector3D> &vertices = polyLine.getVertices();
         sink.insertList("vertices");
 
@@ -131,9 +133,15 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
         const DXF::Spline &spline = dynamic_cast<const DXF::Spline &>(entity);
 
         sink.insert("degree", spline.getDegree());
+        sink.insertBoolean("isClosed",   spline.isClosed());
+        sink.insertBoolean("isPeriodic", spline.isPeriodic());
+        sink.insertBoolean("isRational", spline.isRational());
+        sink.insertBoolean("isPlanar",   spline.isPlanar());
+        sink.insertBoolean("isLinear",   spline.isLinear());
 
         // Control points
         const vector<Vector3D> &ctrlPts = spline.getControlPoints();
+        const std::vector<double> &weights = spline.getWeights();
         sink.insertList("ctrlPts");
 
         for (unsigned k = 0; k < ctrlPts.size(); k++) {
@@ -141,6 +149,7 @@ void DXFModule::openCB(const js::Value &args, js::Sink &sink) {
           sink.insert("x", ctrlPts[k].x());
           sink.insert("y", ctrlPts[k].y());
           sink.insert("z", ctrlPts[k].z());
+          sink.insert("w", weights[k]);
           sink.insert("type", DXF::Entity::DXF_POINT);
           sink.endDict();
         }
