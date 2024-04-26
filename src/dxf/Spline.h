@@ -28,19 +28,30 @@
 namespace DXF {
   class Spline : public Entity {
     unsigned degree;
+    /* Spline flag (bit coded):
+     * 1 = Closed spline
+     * 2 = Periodic spline
+     * 4 = Rational spline
+     * 8 = Planar
+     * 16 = Linear (planar bit is also set)
+     */
+    unsigned flags;
     std::vector<cb::Vector3D> ctrlPts;
+    std::vector<double> weights;
     std::vector<double> knots;
 
   public:
-    Spline(unsigned degree) : degree(degree) {}
+    Spline(unsigned degree, unsigned flags) : degree(degree), flags(flags) {}
 
     unsigned getDegree() const {return degree;}
+    unsigned getFlags() const {return flags;}
     const std::vector<cb::Vector3D> &getControlPoints() const {return ctrlPts;}
+    const std::vector<double> &getWeights() const {return weights;}
     const std::vector<double> &getKnots() const {return knots;}
 
     // From Entity
     void addKnot(double k) {knots.push_back(k);}
-    void addVertex(const cb::Vector3D &v) {ctrlPts.push_back(v);}
+    void addVertex(const cb::Vector3D &v, double weight = 1.0) {ctrlPts.push_back(v); weights.push_back(weight);}
     type_t getType() const {return DXF_SPLINE;}
   };
 }
