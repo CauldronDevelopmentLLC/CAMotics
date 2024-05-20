@@ -36,7 +36,8 @@ namespace CAMotics {
     void setFilename(QString filename);
     bool isAutomatic() const;
 
-    int exec();
+    // From Dialog
+    int exec() override;
 
   protected slots:
     void on_uploadPushButton_clicked();

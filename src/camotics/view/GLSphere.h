@@ -36,6 +36,6 @@ namespace CAMotics {
     GLSphere(float radius, unsigned lats, unsigned lngs, bool hemi = false);
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
   };
 }

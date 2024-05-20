@@ -324,7 +324,7 @@ namespace {
         }
 
         // From Thread
-        void run() {
+        void run() override {
           if (!gcode.empty()) task.runGCodeString(gcode);
           else if (!tpl.empty()) task.runTPLString(tpl);
           else task.run();
@@ -456,7 +456,7 @@ namespace {
 
 
         // From Thread
-        void run() {
+        void run() override {
           try {
             CAMotics::Simulation
               sim(path, 0, 0, bounds, resolution, time, RenderMode(), threads);

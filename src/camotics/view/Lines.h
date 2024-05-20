@@ -62,6 +62,6 @@ namespace CAMotics {
     void add(const std::vector<float> &vertices);
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
   };
 }

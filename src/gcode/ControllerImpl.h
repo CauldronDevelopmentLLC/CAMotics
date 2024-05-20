@@ -195,32 +195,32 @@ namespace GCode {
     void restoreModalState();
 
     // From Controller
-    void message(const std::string &text);
+    void message(const std::string &text) override;
 
-    double get(address_t addr) const;
-    void set(address_t addr, double value);
-    bool has(const std::string &name) const;
-    double get(const std::string &name) const;
-    void set(const std::string &name, double value);
-    void clear(const std::string &name);
-    void setVar(char c, double value);
+    double get(address_t addr) const override;
+    void set(address_t addr, double value) override;
+    bool has(const std::string &name) const override;
+    double get(const std::string &name) const override;
+    void set(const std::string &name, double value) override;
+    void clear(const std::string &name) override;
+    void setVar(char c, double value) override;
 
-    unsigned getCurrentMotionMode() {return currentMotionMode;}
-    void setCurrentMotionMode(unsigned mode);
+    unsigned getCurrentMotionMode() override {return currentMotionMode;}
+    void setCurrentMotionMode(unsigned mode) override;
 
-    bool isSynchronizing() const {return syncState != SYNC_NONE;}
-    void synchronize(double result);
+    bool isSynchronizing() const override {return syncState != SYNC_NONE;}
+    void synchronize(double result) override;
 
-    void setLocation(const cb::LocationRange &location);
-    void setFeed(double feed);
-    void setSpeed(double speed);
-    void setTool(unsigned tool);
+    void setLocation(const cb::LocationRange &location) override;
+    void setFeed(double feed) override;
+    void setSpeed(double speed) override;
+    void setTool(unsigned tool) override;
 
-    void pushScope();
-    void popScope();
+    void pushScope() override;
+    void popScope() override;
 
-    void startBlock();
-    bool execute(const Code &code, int vars);
-    void endBlock();
+    void startBlock() override;
+    bool execute(const Code &code, int vars) override;
+    void endBlock() override;
   };
 }

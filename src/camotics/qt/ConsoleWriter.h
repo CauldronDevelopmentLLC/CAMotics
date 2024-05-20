@@ -42,9 +42,9 @@ namespace CAMotics {
     void writeToConsole();
 
     // From QTextEdit
-    void mouseDoubleClickEvent(QMouseEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
-    void contextMenuEvent(QContextMenuEvent *e);
+    void mouseDoubleClickEvent(QMouseEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
+    void contextMenuEvent(QContextMenuEvent *e) override;
 
     bool findOnce(QString text, bool regex, int options);
 

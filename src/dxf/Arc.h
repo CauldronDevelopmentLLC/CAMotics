@@ -45,6 +45,6 @@ namespace DXF {
     bool getClockwise() const {return clockwise;}
 
     // From Entity
-    type_t getType() const {return DXF_ARC;}
+    type_t getType() const override {return DXF_ARC;}
   };
 }

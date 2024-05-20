@@ -33,7 +33,7 @@ namespace CAMotics {
   class ToolDialog : public Dialog, public GCode::ToolShape {
     Q_OBJECT;
     CAMOTICS_DIALOG(ToolDialog);
-    
+
     ToolScene scene;
     GCode::Tool tool;
     bool updating;
@@ -62,8 +62,8 @@ namespace CAMotics {
     void update();
 
     // From QDialog
-    void resizeEvent(QResizeEvent *event);
-    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
   protected slots:
     void on_numberSpinBox_valueChanged(int value);

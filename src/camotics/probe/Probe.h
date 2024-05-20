@@ -74,9 +74,9 @@ namespace CAMotics {
     void outputProbe();
 
     // From GCode::Controller
-    bool execute(const GCode::Code &code, int vars);
+    bool execute(const GCode::Code &code, int vars) override;
 
     // From Processor
-    void operator()(const cb::SmartPointer<GCode::Block> &block);
+    void operator()(const cb::SmartPointer<GCode::Block> &block) override;
   };
 }

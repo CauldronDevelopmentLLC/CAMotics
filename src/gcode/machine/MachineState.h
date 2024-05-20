@@ -54,55 +54,56 @@ namespace GCode {
     MachineState();
 
     // From MachineInterface
-    void start();
-    void end();
+    void start() override;
+    void end() override;
 
-    double getFeed() const {return feed;}
-    void setFeed(double feed);
-    feed_mode_t getFeedMode() const {return feedMode;}
-    void setFeedMode(feed_mode_t feedMode){this->feedMode = feedMode;}
+    double getFeed() const override {return feed;}
+    void setFeed(double feed) override;
+    feed_mode_t getFeedMode() const override {return feedMode;}
+    void setFeedMode(feed_mode_t feedMode) override {this->feedMode = feedMode;}
 
-    double getSpeed() const {return speed;}
-    void setSpeed(double speed);
-    spin_mode_t getSpinMode(double *max = 0) const
+    double getSpeed() const override {return speed;}
+    void setSpeed(double speed) override;
+    spin_mode_t getSpinMode(double *max = 0) const override
     {if (max) *max = maxSpeed; return spinMode;}
-    void setSpinMode(spin_mode_t mode, double max)
+    void setSpinMode(spin_mode_t mode, double max) override
     {spinMode = mode; maxSpeed = max;}
-    void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
+    void setPathMode(path_mode_t mode, double motionBlending,
+                     double naiveCAM) override;
 
-    void changeTool(unsigned tool);
+    void changeTool(unsigned tool) override;
 
-    void input(port_t port, input_mode_t mode, double timeout) {}
-    void seek(port_t port, bool active, bool error) {}
-    void output(port_t port, double value) {}
+    void input(port_t port, input_mode_t mode, double timeout) override {}
+    void seek(port_t port, bool active, bool error) override {}
+    void output(port_t port, double value) override {}
 
-    Axes getPosition() const {return position;}
-    cb::Vector3D getPosition(axes_t axes) const;
-    void setPosition(const Axes &position);
+    Axes getPosition() const override {return position;}
+    cb::Vector3D getPosition(axes_t axes) const override;
+    void setPosition(const Axes &position) override;
 
-    void dwell(double seconds) {}
-    void move(const Axes &position, int axes, bool rapid, double time)
+    void dwell(double seconds) override {}
+    void move(const Axes &position, int axes, bool rapid, double time) override
     {setPosition(position);}
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
-             double angle, plane_t plane) {position.setXYZ(target);}
+             double angle, plane_t plane) override {position.setXYZ(target);}
 
-    Transforms &getTransforms() {return transforms;}
+    Transforms &getTransforms() override {return transforms;}
 
-    void pause(pause_t type) {}
+    void pause(pause_t type) override {}
 
-    double get(address_t addr, Units units) const;
-    void set(address_t addr, double value, Units units);
+    double get(address_t addr, Units units) const override;
+    void set(address_t addr, double value, Units units) override;
 
-    bool has(const std::string &name) const;
-    double get(const std::string &name, Units units) const;
-    void set(const std::string &name, double value, Units units);
-    void clear(const std::string &name);
+    bool has(const std::string &name) const override;
+    double get(const std::string &name, Units units) const override;
+    void set(const std::string &name, double value, Units units) override;
+    void clear(const std::string &name) override;
 
-    const cb::LocationRange &getLocation() const {return location;}
-    void setLocation(const cb::LocationRange &location)
+    const cb::LocationRange &getLocation() const override {return location;}
+    void setLocation(const cb::LocationRange &location) override
     {this->location = location;}
 
-    void comment(const std::string &s) const {}
-    void message(const std::string &s) {}
+    void comment(const std::string &s) const override {}
+    void message(const std::string &s) override {}
   };
 }

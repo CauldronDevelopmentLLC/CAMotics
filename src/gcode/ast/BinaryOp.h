@@ -41,8 +41,9 @@ namespace GCode {
     const cb::SmartPointer<Entity> &getRight() const {return right;}
 
     // From Entity
-    bool isConstant() {return left->isConstant() && right->isConstant();}
-    double eval(Evaluator &evaluator) {return evaluator.eval(*this);}
-    void print(std::ostream &stream) const;
+    bool isConstant() override
+      {return left->isConstant() && right->isConstant();}
+    double eval(Evaluator &evaluator) override {return evaluator.eval(*this);}
+    void print(std::ostream &stream) const override;
   };
 }

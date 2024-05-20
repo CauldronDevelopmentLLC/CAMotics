@@ -33,7 +33,7 @@ namespace GCode {
                unsigned count) : Loop(number, program), count(count), i(0) {}
 
     // From Producer
-    bool hasMore() const {return !isEmpty() && i < count;}
-    cb::SmartPointer<Block> next();
+    bool hasMore() const override {return !isEmpty() && i < count;}
+    cb::SmartPointer<Block> next() override;
   };
 }

@@ -40,7 +40,7 @@ namespace GCode {
       evalAtEnd(evalAtEnd), first(true) {}
 
     // From Producer
-    cb::SmartPointer<Block> next();
-    bool hasMore() const;
+    cb::SmartPointer<Block> next() override;
+    bool hasMore() const override;
   };
 }

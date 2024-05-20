@@ -80,24 +80,25 @@ namespace GCode {
     void dumpQueue(cb::JSON::Sink &sink);
 
     // From MachineInterface
-    void start();
-    void end();
-    void setSpeed(double speed);
-    void setSpinMode(spin_mode_t mode, double max);
-    void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
-    void input(port_t port, input_mode_t mode, double timeout);
-    void seek(port_t port, bool active, bool error);
-    void output(port_t port, double value);
-    void dwell(double seconds);
-    void move(const Axes &position, int axes, bool rapid, double time);
+    void start() override;
+    void end() override;
+    void setSpeed(double speed) override;
+    void setSpinMode(spin_mode_t mode, double max) override;
+    void setPathMode(path_mode_t mode, double motionBlending,
+                     double naiveCAM) override;
+    void input(port_t port, input_mode_t mode, double timeout) override;
+    void seek(port_t port, bool active, bool error) override;
+    void output(port_t port, double value) override;
+    void dwell(double seconds) override;
+    void move(const Axes &position, int axes, bool rapid, double time) override;
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
-             double angle, plane_t plane)
+             double angle, plane_t plane) override
       {CBANG_THROW("LinePlanner does not implement arc()");}
-    void pause(pause_t type);
-    void set(const std::string &name, double value, Units units);
-    void setLocation(const cb::LocationRange &location);
-    void comment(const std::string &s) const {} // TODO
-    void message(const std::string &s);
+    void pause(pause_t type) override;
+    void set(const std::string &name, double value, Units units) override;
+    void setLocation(const cb::LocationRange &location) override;
+    void comment(const std::string &s) const override {} // TODO
+    void message(const std::string &s) override;
 
   protected:
     uint64_t getNextID();

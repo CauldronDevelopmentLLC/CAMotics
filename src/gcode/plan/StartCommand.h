@@ -29,10 +29,10 @@ namespace GCode {
   class StartCommand : public PlannerCommand {
   public:
     // From PlannerCommand
-    const char *getType() const {return "start";}
-    double getEntryVelocity() const {return 0;}
-    double getExitVelocity() const {return 0;}
-    void insert(cb::JSON::Sink &sink) const {}
-    void write(MachineInterface &machine) const {machine.start();}
+    const char *getType() const override {return "start";}
+    double getEntryVelocity() const override {return 0;}
+    double getExitVelocity() const override {return 0;}
+    void insert(cb::JSON::Sink &sink) const override {}
+    void write(MachineInterface &machine) const override {machine.start();}
   };
 }

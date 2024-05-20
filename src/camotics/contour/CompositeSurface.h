@@ -42,15 +42,15 @@ namespace CAMotics {
     cb::SmartPointer<Surface> consolidate();
 
     // From Surface
-    cb::SmartPointer<Surface> copy() const;
-    uint64_t getTriangleCount() const;
-    cb::Rectangle3D getBounds() const;
-    void getVertices(vert_cb_t cb) const;
-    void write(STL::Sink &sink, Task *task = 0) const;
-    void reduce(Task &task);
+    cb::SmartPointer<Surface> copy() const override;
+    uint64_t getTriangleCount() const override;
+    cb::Rectangle3D getBounds() const override;
+    void getVertices(vert_cb_t cb) const override;
+    void write(STL::Sink &sink, Task *task = 0) const override;
+    void reduce(Task &task) override;
 
     // From cb::JSON::Serializable
-    void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const;
+    void read(const cb::JSON::Value &value) override;
+    void write(cb::JSON::Sink &sink) const override;
   };
 }

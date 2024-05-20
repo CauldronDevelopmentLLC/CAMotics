@@ -34,6 +34,6 @@ namespace CAMotics {
       Value(name), var(var) {}
 
     // From Value
-    void updated() {set(var);}
+    void updated() override {set(var);}
   };
 }

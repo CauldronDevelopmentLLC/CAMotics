@@ -35,6 +35,6 @@ namespace CAMotics {
                         unsigned y) = 0;
 
     // From ContourGenerator
-    void run(FieldFunction &func, GridTreeRef &tree);
+    void run(FieldFunction &func, GridTreeRef &tree) override;
   };
 }

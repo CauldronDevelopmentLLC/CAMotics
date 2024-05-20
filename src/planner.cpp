@@ -63,7 +63,7 @@ public:
 
 
   // From Application
-  int init(int argc, char *argv[]) {
+  int init(int argc, char *argv[]) override {
     int ret = CommandLineApp::init(argc, argv);
     if (ret == -1) return ret;
 
@@ -85,7 +85,7 @@ public:
   }
 
 
-  void read(const InputSource &source) {
+  void read(const InputSource &source) override {
     MachinePipeline pipeline;
 
     Planner planner;

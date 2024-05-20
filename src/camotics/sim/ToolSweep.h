@@ -59,8 +59,8 @@ namespace CAMotics {
     {this->change = change;}
 
     // From FieldFunction
-    bool cull(const cb::Rectangle3D &r) const;
-    double depth(const cb::Vector3D &p) const;
+    bool cull(const cb::Rectangle3D &r) const override;
+    double depth(const cb::Vector3D &p) const override;
 
     static cb::SmartPointer<Sweep> getSweep(const GCode::Tool &tool);
   };

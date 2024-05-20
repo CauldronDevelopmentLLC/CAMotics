@@ -146,12 +146,12 @@ namespace CAMotics {
     void toggleFold(int line);
 
   protected:
-    void contextMenuEvent(QContextMenuEvent *e);
-    void keyPressEvent(QKeyEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
-    void resizeEvent(QResizeEvent *e);
-    void wheelEvent(QWheelEvent *e);
-    void mouseDoubleClickEvent(QMouseEvent *e);
+    void contextMenuEvent(QContextMenuEvent *e) override;
+    void keyPressEvent(QKeyEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
+    void resizeEvent(QResizeEvent *e) override;
+    void wheelEvent(QWheelEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *e) override;
 
   protected slots:
     void updateCursor();

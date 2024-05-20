@@ -52,7 +52,7 @@ public:
   }
 
   // From CommandLineApp
-  void run() {
+  void run() override {
     build(pipeline);
     ctx.setStream(stream);
 
@@ -62,13 +62,13 @@ public:
   }
 
 
-  void requestExit() {
+  void requestExit() override {
     Application::requestExit();
     ctx.interrupt(); // Terminate Javascript execution
   }
 
 
-  void read(const cb::InputSource &source) {
+  void read(const cb::InputSource &source) override {
     tplang::Interpreter(ctx).read(source);
   }
 };

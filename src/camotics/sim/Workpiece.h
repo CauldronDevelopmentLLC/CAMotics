@@ -37,6 +37,6 @@ namespace CAMotics {
     using cb::Rectangle3D::contains;
 
     // From FieldFunction
-    double depth(const cb::Vector3D &p) const;
+    double depth(const cb::Vector3D &p) const override;
   };
 }

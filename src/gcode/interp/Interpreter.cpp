@@ -62,8 +62,8 @@ void Interpreter::execute(const Code &code, int vars) {
     SmartToggleProducer(bool &toggle) : SmartToggle(toggle) {}
 
     // From Producer
-    bool hasMore() const {return false;}
-    cb::SmartPointer<Block> next() {THROW("Invalid");}
+    bool hasMore() const override {return false;}
+    cb::SmartPointer<Block> next() override {THROW("Invalid");}
   };
 
 

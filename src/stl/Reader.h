@@ -38,11 +38,11 @@ namespace STL {
   public:
     Reader(const cb::InputSource &source);
 
-    uint32_t readHeader(std::string &name, std::string &hash);
-    uint32_t getFacetCount() const {return count;}
-    bool hasMore();
+    uint32_t readHeader(std::string &name, std::string &hash) override;
+    uint32_t getFacetCount() const override {return count;}
+    bool hasMore() override;
     void readFacet(cb::Vector3F &v1, cb::Vector3F &v2, cb::Vector3F &v3,
-                   cb::Vector3F &normal);
-    void readFooter();
+                   cb::Vector3F &normal) override;
+    void readFooter() override;
   };
 }

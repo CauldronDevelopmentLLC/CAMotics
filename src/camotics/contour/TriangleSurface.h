@@ -52,21 +52,21 @@ namespace CAMotics {
     void clear();
     void read(STL::Source &source, Task *task = 0);
 
-    // From Surface
-    cb::SmartPointer<Surface> copy() const;
-    uint64_t getTriangleCount() const {return TriangleMesh::getTriangleCount();}
-    cb::Rectangle3D getBounds() const {return bounds;}
-    void getVertices(vert_cb_t cb) const;
-
     const std::vector<float> &getVertices() const {return vertices;}
     const std::vector<float> &getNormals()  const {return normals;}
 
-    void write(STL::Sink &sink, Task *task = 0) const;
-    void reduce(Task &task);
+    // From Surface
+    cb::SmartPointer<Surface> copy() const override;
+    uint64_t getTriangleCount() const override
+      {return TriangleMesh::getTriangleCount();}
+    cb::Rectangle3D getBounds() const override {return bounds;}
+    void getVertices(vert_cb_t cb) const override;
+    void write(STL::Sink &sink, Task *task = 0) const override;
+    void reduce(Task &task) override;
 
     // From cb::JSON::Serializable
-    void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const;
+    void read(const cb::JSON::Value &value) override;
+    void write(cb::JSON::Sink &sink) const override;
     using Surface::read;
     using Surface::write;
   };

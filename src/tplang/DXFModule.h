@@ -34,9 +34,9 @@ namespace tplang {
     DXFModule(TPLContext &ctx);
 
     // From cb::js::NativeModule
-    void define(cb::js::Sink &exports);
+    void define(cb::js::Sink &exports) override;
 
-    // Javascript call backs
+    // Javascript callbacks
     void openCB(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }

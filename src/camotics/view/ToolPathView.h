@@ -126,7 +126,7 @@ namespace CAMotics {
     void update();
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
 
   protected:
     void pushVertex(const cb::Vector3D &v, const Color &color, unsigned index);

@@ -48,11 +48,13 @@ namespace CAMotics {
     void setOffsetType(const std::string &offset);
 
     void update();
-    int exec();
+
+    // From Dialog
+    int exec() override;
 
     // From cb::JSON::Serializable
-    void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const;
+    void read(const cb::JSON::Value &value) override;
+    void write(cb::JSON::Sink &sink) const override;
 
   protected slots:
     void on_offsetComboBox_currentIndexChanged(int) {update();}

@@ -58,8 +58,8 @@ namespace CAMotics {
     void interrupt();
 
     // From Thread
-    void run();
-    void stop();
+    void run() override;
+    void stop() override;
 
   protected:
     void interruptTasks();

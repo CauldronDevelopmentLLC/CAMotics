@@ -41,8 +41,8 @@ namespace GCode {
     {this->value = value;}
 
     // From PlannerCommand
-    const char *getType() const {return "set";}
-    void insert(cb::JSON::Sink &sink) const;
-    void write(MachineInterface &machine) const;
+    const char *getType() const override {return "set";}
+    void insert(cb::JSON::Sink &sink) const override;
+    void write(MachineInterface &machine) const override;
   };
 }

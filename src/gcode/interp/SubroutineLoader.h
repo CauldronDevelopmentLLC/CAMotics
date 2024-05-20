@@ -38,7 +38,7 @@ namespace GCode {
                      OCodeInterpreter &interp);
 
     // From Producer
-    bool hasMore() const;
-    cb::SmartPointer<Block> next();
+    bool hasMore() const override;
+    cb::SmartPointer<Block> next() override;
   };
 }

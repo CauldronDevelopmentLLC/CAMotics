@@ -48,8 +48,8 @@ namespace CAMotics {
       void remove(unsigned i) {files.erase(files.begin() + i);}
 
       // From JSON::Serializable
-      void read(const cb::JSON::Value &value);
-      void write(cb::JSON::Sink &sink) const;
+      void read(const cb::JSON::Value &value) override;
+      void write(cb::JSON::Sink &sink) const override;
 
       static std::string encode(const std::string &filename);
       static std::string decode(const std::string &filename);

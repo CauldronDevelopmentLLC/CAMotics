@@ -37,6 +37,6 @@ namespace DXF {
     const cb::Vector3D &getEnd() const {return end;}
 
     // From Entity
-    type_t getType() const {return DXF_LINE;}
+    type_t getType() const override {return DXF_LINE;}
   };
 }

@@ -30,6 +30,6 @@ namespace CAMotics {
     ClickWidget(QWidget *parent = 0) : QWidget(parent) {}
 
     // From QWidget
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
   };
 }

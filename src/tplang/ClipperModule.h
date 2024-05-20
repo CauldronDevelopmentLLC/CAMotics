@@ -30,9 +30,9 @@ namespace tplang {
     ClipperModule() : cb::js::NativeModule("clipper") {}
 
     // From cb::js::NativeModule
-    void define(cb::js::Sink &exports);
+    void define(cb::js::Sink &exports) override;
 
-    // Javascript call backs
+    // Javascript callbacks
     void offsetCB(const cb::js::Value &args, cb::js::Sink &sink);
   };
 }

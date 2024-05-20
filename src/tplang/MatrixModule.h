@@ -38,7 +38,7 @@ namespace tplang {
     MatrixModule(TPLContext &ctx);
 
     // From cb::js::NativeModule
-    void define(cb::js::Sink &exports);
+    void define(cb::js::Sink &exports) override;
 
     GCode::TransformStack &getTransformStack(const cb::js::Value &args);
     GCode::Transform &getTransform(const cb::js::Value &args);

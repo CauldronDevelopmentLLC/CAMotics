@@ -59,21 +59,21 @@ namespace DXF {
     void addEntity(const cb::SmartPointer<Entity> &entity);
 
     // From DL_CreationAdapter
-    void addLayer(const DL_LayerData &data);
-    void addBlock(const DL_BlockData &block) {inBlock = true;}
-    void endBlock() {inBlock = false;}
-    void addPoint(const DL_PointData &point);
-    void addLine(const DL_LineData &line);
-    void addArc(const DL_ArcData &arc);
-    void addCircle(const DL_CircleData &circle);
-    void addPolyline(const DL_PolylineData &polyline);
-    void addVertex(const DL_VertexData &vertex);
-    void addSpline(const DL_SplineData &spline);
-    void addControlPoint(const DL_ControlPointData &ctrlPt);
-    void addKnot(const DL_KnotData &knot);
-    void endEntity() {entity = 0;}
-    void addEllipse(const DL_EllipseData &ellipse);
-    void add3dFace(const DL_3dFaceData &face);
-    void addSolid(const DL_SolidData &solid);
+    void addLayer(const DL_LayerData &data) override;
+    void addBlock(const DL_BlockData &block) override {inBlock = true;}
+    void endBlock() override {inBlock = false;}
+    void addPoint(const DL_PointData &point) override;
+    void addLine(const DL_LineData &line) override;
+    void addArc(const DL_ArcData &arc) override;
+    void addCircle(const DL_CircleData &circle) override;
+    void addPolyline(const DL_PolylineData &polyline) override;
+    void addVertex(const DL_VertexData &vertex) override;
+    void addSpline(const DL_SplineData &spline) override;
+    void addControlPoint(const DL_ControlPointData &ctrlPt) override;
+    void addKnot(const DL_KnotData &knot) override;
+    void endEntity() override {entity = 0;}
+    void addEllipse(const DL_EllipseData &ellipse) override;
+    void add3dFace(const DL_3dFaceData &face) override;
+    void addSolid(const DL_SolidData &solid) override;
   };
 }

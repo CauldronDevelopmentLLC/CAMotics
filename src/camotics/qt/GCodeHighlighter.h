@@ -74,7 +74,7 @@ namespace CAMotics {
 
   protected:
     // From QSyntaxHighlighter
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
 
     void comment(GCode::Tokenizer &tokenizer);
     void word(GCode::Tokenizer &tokenizer);

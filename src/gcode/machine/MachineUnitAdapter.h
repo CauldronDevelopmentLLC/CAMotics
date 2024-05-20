@@ -53,21 +53,22 @@ namespace GCode {
     void setTargetUnits(Units units) {targetUnits = units;}
 
     // From MachineInterface
-    double getFeed() const;
-    void setFeed(double feed);
+    double getFeed() const override;
+    void setFeed(double feed) override;
 
-    double getSpeed() const;
-    void setSpeed(double speed);
+    double getSpeed() const override;
+    void setSpeed(double speed) override;
 
-    void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
+    void setPathMode(path_mode_t mode, double motionBlending,
+                     double naiveCAM) override;
 
-    Axes getPosition() const;
-    cb::Vector3D getPosition(axes_t axes) const;
-    void setPosition(const Axes &position);
+    Axes getPosition() const override;
+    cb::Vector3D getPosition(axes_t axes) const override;
+    void setPosition(const Axes &position) override;
 
-    void move(const Axes &position, int axes, bool rapid, double time);
+    void move(const Axes &position, int axes, bool rapid, double time) override;
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
-             double angle, plane_t plane);
+             double angle, plane_t plane) override;
 
     double mmInchIn() const;
     double mmInchOut() const;

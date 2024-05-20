@@ -26,9 +26,9 @@
 #include <QDialog>
 
 
-#define CAMOTICS_DIALOG(NAME)                   \
-  Ui::NAME ui;                                  \
-  void retranslateUi() {ui.retranslateUi(this);}
+#define CAMOTICS_DIALOG(NAME)                                   \
+  Ui::NAME ui;                                                  \
+  void retranslateUi() override {ui.retranslateUi(this);}
 
 
 namespace CAMotics {
@@ -50,8 +50,8 @@ namespace CAMotics {
     void setVector3D(const std::string &name, const cb::Vector3D &v) const;
 
     virtual void retranslateUi() {};
-    
+
     // From QDialog
-    void changeEvent(QEvent *event);
+    void changeEvent(QEvent *event) override;
   };
 }

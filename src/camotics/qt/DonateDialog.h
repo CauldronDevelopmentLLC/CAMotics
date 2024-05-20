@@ -37,9 +37,9 @@ namespace CAMotics {
     void onStartup();
 
     // From QDialog
-    int exec();
+    int exec() override;
 
     // From QWidget
-    void showEvent(QShowEvent *event);
+    void showEvent(QShowEvent *event) override;
   };
 }

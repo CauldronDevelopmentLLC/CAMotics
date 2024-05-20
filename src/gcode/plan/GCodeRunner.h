@@ -36,7 +36,7 @@ namespace GCode {
                 const PlannerConfig &config);
 
     // From Runner
-    bool hasMore() const {return interp.hasMore();}
-    void step();
+    bool hasMore() const override {return interp.hasMore();}
+    void step() override;
   };
 }

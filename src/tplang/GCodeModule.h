@@ -39,7 +39,7 @@ namespace tplang {
     GCodeModule(TPLContext &ctx);
 
     // From cb::js::NativeModule
-    void define(cb::js::Sink &exports);
+    void define(cb::js::Sink &exports) override;
 
     GCode::MachineUnitAdapter &getUnitAdapter();
 

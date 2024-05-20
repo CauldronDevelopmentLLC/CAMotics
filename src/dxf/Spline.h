@@ -39,8 +39,8 @@ namespace DXF {
     const std::vector<double> &getKnots() const {return knots;}
 
     // From Entity
-    void addKnot(double k) {knots.push_back(k);}
-    void addVertex(const cb::Vector3D &v) {ctrlPts.push_back(v);}
-    type_t getType() const {return DXF_SPLINE;}
+    void addKnot(double k) override {knots.push_back(k);}
+    void addVertex(const cb::Vector3D &v) override {ctrlPts.push_back(v);}
+    type_t getType() const override {return DXF_SPLINE;}
   };
 }

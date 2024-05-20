@@ -43,8 +43,7 @@ namespace GCode {
     const cb::SmartPointer<Entity> &getArg2() const {return arg2;}
 
     // From Entity
-
-    double eval(Evaluator &evaluator) {return evaluator.eval(*this);}
-    void print(std::ostream &stream) const;
+    double eval(Evaluator &evaluator) override {return evaluator.eval(*this);}
+    void print(std::ostream &stream) const override;
   };
 }

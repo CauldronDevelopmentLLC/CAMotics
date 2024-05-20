@@ -31,6 +31,6 @@ namespace GCode {
     PlannerMachine(const PlannerConfig &config) : LinePlanner(config) {}
 
     // From LinePlanner
-    void push(PlannerCommand *cmd);
+    void push(PlannerCommand *cmd) override;
   };
 }

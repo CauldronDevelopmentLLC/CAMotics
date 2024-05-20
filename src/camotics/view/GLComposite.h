@@ -32,6 +32,6 @@ namespace CAMotics {
     void clear() {objects.clear();}
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
   };
 }

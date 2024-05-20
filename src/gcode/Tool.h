@@ -90,8 +90,8 @@ namespace GCode {
     // From cb::JSON::Serializable
     using cb::JSON::Serializable::read;
     using cb::JSON::Serializable::write;
-    void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const {write(sink, true);}
+    void read(const cb::JSON::Value &value) override;
+    void write(cb::JSON::Sink &sink) const override {write(sink, true);}
 
     inline static unsigned toIndex(char var) {
       switch (std::toupper(var)) {

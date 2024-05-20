@@ -50,7 +50,7 @@ namespace GCode {
     void unwind();
 
     // From Producer
-    bool hasMore() const;
-    cb::SmartPointer<Block> next();
+    bool hasMore() const override;
+    cb::SmartPointer<Block> next() override;
   };
 }

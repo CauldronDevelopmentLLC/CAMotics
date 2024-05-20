@@ -35,9 +35,9 @@ namespace GCode {
                   public Processor {
   public:
     // From Entity
-    void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
 
     // From Processor
-    void operator()(const cb::SmartPointer<Block> &block);
+    void operator()(const cb::SmartPointer<Block> &block) override;
   };
 }

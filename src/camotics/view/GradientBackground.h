@@ -34,6 +34,6 @@ namespace CAMotics {
       top(top), bottom(bottom) {}
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
   };
 }

@@ -33,10 +33,9 @@ namespace CAMotics {
 
     // From cb::Application
     static bool _hasFeature(int feature);
-    void run();
+    void run() override;
 
-    // From cb::Reader
-    void read(const cb::InputSource &source)
-    {CBANG_THROW("read() not implemented");}
+    virtual void read(const cb::InputSource &source)
+      {CBANG_THROW("read() not implemented");}
   };
 }

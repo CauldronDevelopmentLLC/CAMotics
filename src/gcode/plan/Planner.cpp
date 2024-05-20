@@ -37,7 +37,7 @@ Planner::Planner() : controller(pipeline) {
     ParamResolver(Planner &planner) : planner(planner) {}
 
     // From MachineInterface
-    double get(const string &name, Units units) const {
+    double get(const string &name, Units units) const override {
       if (MachineAdapter::has(name)) return MachineAdapter::get(name, units);
       return planner.resolve(name, units);
     }

@@ -63,7 +63,7 @@ namespace CAMotics {
     const cb::SmartPointer<GCode::ToolPath> &getPath() const {return path;}
 
     // From Task
-    void run();
+    void run() override;
 
     double computeCost() const;
 

@@ -35,6 +35,6 @@ namespace GCode {
     bool getParen() const {return paren;}
 
     // From Entity
-    void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
   };
 }

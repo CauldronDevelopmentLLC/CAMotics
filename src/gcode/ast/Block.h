@@ -51,6 +51,6 @@ namespace GCode {
     OCode *findOCode() const;
 
     // From Entity
-    void print(std::ostream &stream) const;
+    void print(std::ostream &stream) const override;
   };
 }

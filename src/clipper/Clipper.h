@@ -92,14 +92,14 @@ namespace ClipperLib {
     bool Execute(ClipType clipType, PolyTree &polytree,
                  PolyFillType subjFillType = pftEvenOdd,
                  PolyFillType clipFillType = pftEvenOdd);
-    void Clear();
+    void Clear() override;
     bool ReverseSolution() {return m_ReverseOutput;}
     void ReverseSolution(bool value) {m_ReverseOutput = value;}
     bool ForceSimple() {return m_ForceSimple;}
     void ForceSimple(bool value) {m_ForceSimple = value;}
 
   protected:
-    void Reset();
+    void Reset() override;
     virtual bool ExecuteInternal();
 
   private:

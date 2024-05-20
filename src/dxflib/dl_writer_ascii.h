@@ -9,7 +9,7 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -39,7 +39,7 @@
 /**
  * Implements functions defined in DL_Writer for writing low
  *   level DXF constructs to an ASCII format DXF file.
- * 
+ *
  * @para fname File name of the file to be created.
  * @para version DXF version. Defaults to DL_VERSION_2002.
  *
@@ -54,11 +54,11 @@ public:
 
     bool openFailed() const;
     void close() const;
-    void dxfReal(int gc, double value) const;
-    void dxfInt(int gc, int value) const;
-    void dxfHex(int gc, int value) const;
-    void dxfString(int gc, const char* value) const;
-    void dxfString(int gc, const std::string& value) const;
+    void dxfReal(int gc, double value) const override;
+    void dxfInt(int gc, int value) const override;
+    void dxfHex(int gc, int value) const override;
+    void dxfString(int gc, const char* value) const override;
+    void dxfString(int gc, const std::string& value) const override;
 
     static void strReplace(char* str, char src, char dest);
 
@@ -71,4 +71,3 @@ private:
 };
 
 #endif
-

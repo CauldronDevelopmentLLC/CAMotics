@@ -41,6 +41,6 @@ namespace GCode {
     void continueLoop() {i = 0;}
 
     // From Producer
-    cb::SmartPointer<Block> next();
+    cb::SmartPointer<Block> next() override;
   };
 }

@@ -37,8 +37,8 @@ namespace CAMotics {
     void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &offset);
 
     // From GridTreeBase
-    unsigned getCount() const;
+    unsigned getCount() const override;
     void gather(std::vector<float> &vertices,
-                std::vector<float> &normals) const;
+                std::vector<float> &normals) const override;
   };
 }

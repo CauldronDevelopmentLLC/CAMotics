@@ -29,9 +29,12 @@
 #include <cbang/config/MinConstraint.h>
 #include <cbang/os/SystemUtilities.h>
 
+#include <cbang/boost/StartInclude.h>
 #include <boost/version.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <cbang/boost/EndInclude.h>
+
 namespace io = boost::iostreams;
 
 #if BOOST_VERSION < 104400

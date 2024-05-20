@@ -70,24 +70,23 @@ namespace GCode {
     bool canMerge() const;
 
     // From PlannerCommand
-    const char *getType() const {return "line";}
-    bool isRapid() const {return rapid;}
-    bool isSeeking() const {return seeking;}
-    bool isMove() const {return true;}
+    const char *getType() const override {return "line";}
+    bool isSeeking() const  override{return seeking;}
+    bool isMove() const override {return true;}
 
-    double getEntryVelocity() const {return entryVel;}
-    void setEntryVelocity(double entryVel) {this->entryVel = entryVel;}
-    double getExitVelocity() const {return exitVel;}
-    void setExitVelocity(double exitVel) {this->exitVel = exitVel;}
-    double getDeltaVelocity() const {return deltaV;}
-    double getLength() const {return length;}
-    double getTime() const;
+    double getEntryVelocity() const override {return entryVel;}
+    void setEntryVelocity(double entryVel) override {this->entryVel = entryVel;}
+    double getExitVelocity() const override {return exitVel;}
+    void setExitVelocity(double exitVel) override {this->exitVel = exitVel;}
+    double getDeltaVelocity() const override {return deltaV;}
+    double getLength() const  override{return length;}
+    double getTime() const override;
 
     bool merge(const LineCommand &lc, const PlannerConfig &config,
                double speed);
-    void restart(const Axes &position, const PlannerConfig &config);
-    void insert(cb::JSON::Sink &sink) const;
-    void write(MachineInterface &machine) const;
+    void restart(const Axes &position, const PlannerConfig &config) override;
+    void insert(cb::JSON::Sink &sink) const override;
+    void write(MachineInterface &machine) const override;
     void cut(double length, std::vector<Speed> &speeds, double offset = 0,
              bool fromEnd = true);
 

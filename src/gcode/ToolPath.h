@@ -71,10 +71,10 @@ namespace GCode {
     // From cb::JSON::Serializable
     using cb::JSON::Serializable::read;
     using cb::JSON::Serializable::write;
-    void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const;
+    void read(const cb::JSON::Value &value) override;
+    void write(cb::JSON::Sink &sink) const override;
 
     // From GCode::MoveStream
-    void move(GCode::Move &move);
+    void move(GCode::Move &move) override;
   };
 }

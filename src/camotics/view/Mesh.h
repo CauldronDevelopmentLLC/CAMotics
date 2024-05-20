@@ -45,6 +45,6 @@ namespace CAMotics {
              const std::vector<float> &normals);
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
   };
 }

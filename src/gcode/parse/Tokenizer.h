@@ -46,6 +46,6 @@ namespace GCode {
     void id();
 
     // From cb::Tokenizer
-    void next();
+    void next() override;
   };
 }

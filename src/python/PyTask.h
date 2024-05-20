@@ -36,9 +36,9 @@ public:
   void setCallback(PyObject *cb);
 
   // From cb::Thread
-  void join();
-  void wait();
+  void join() override;
+  void wait() override;
 
   // From CAMotics::Task
-  void updated(const std::string &status, double progress);
+  void updated(const std::string &status, double progress) override;
 };

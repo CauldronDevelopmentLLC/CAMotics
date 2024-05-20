@@ -37,8 +37,8 @@ namespace CAMotics {
 
     // From Observer
     using Observer::updated;
-    void updated(const std::string &name, const std::string &value) {}
-    void updated(const std::string &name, T value)
+    void updated(const std::string &name, const std::string &value) override {}
+    void updated(const std::string &name, T value) override
     {(*object.*member)(name, value);}
   };
 }

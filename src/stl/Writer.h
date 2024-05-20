@@ -37,12 +37,16 @@ namespace STL {
     Writer(std::ostream &stream, bool binary) :
       stream(stream), binary(binary) {}
 
+    // From Sink
     void writeHeader(const std::string &name, uint32_t count,
-                     const std::string &hash = std::string());
+                     const std::string &hash = std::string()) override;
     void writeFacet(const cb::Vector3F &v1, const cb::Vector3F &v2,
-                    const cb::Vector3F &v3, const cb::Vector3F &normal);
-    void writeFacet(const cb::Triangle3F &t, const cb::Vector3F &normal);
+                    const cb::Vector3F &v3,
+                    const cb::Vector3F &normal) override;
     void writeFooter(const std::string &name,
-                     const std::string &hash = std::string());
+                     const std::string &hash = std::string()) override;
+
+    void writeFacet(const cb::Triangle3F &t,
+                    const cb::Vector3F &normal);
   };
 }

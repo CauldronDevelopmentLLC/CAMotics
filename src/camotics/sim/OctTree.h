@@ -54,10 +54,10 @@ namespace CAMotics {
     ~OctTree();
 
     // From MoveLookup
-    cb::Rectangle3D getBounds() const {return bbox;}
-    void insert(const GCode::Move *move, const cb::Rectangle3D &bbox);
-    bool intersects(const cb::Rectangle3D &r) const;
+    cb::Rectangle3D getBounds() const override {return bbox;}
+    void insert(const GCode::Move *move, const cb::Rectangle3D &bbox) override;
+    bool intersects(const cb::Rectangle3D &r) const override;
     void collisions(const cb::Vector3D &p,
-                    std::vector<const GCode::Move *> &moves) const;
+                    std::vector<const GCode::Move *> &moves) const override;
   };
 }

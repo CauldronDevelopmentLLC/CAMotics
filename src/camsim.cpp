@@ -88,7 +88,7 @@ namespace CAMotics {
 
 
     // From Application
-    int init(int argc, char *argv[]) {
+    int init(int argc, char *argv[]) override {
       int ret = Application::init(argc, argv);
       if (ret == -1) return ret;
 
@@ -106,7 +106,7 @@ namespace CAMotics {
     }
 
 
-    void run() {
+    void run() override {
       // Open project
       string ext = SystemUtilities::extension(input);
       if (ext == "xml" || ext == "camotics") project.load(input);
@@ -151,7 +151,7 @@ namespace CAMotics {
     }
 
 
-    void requestExit() {
+    void requestExit() override {
       Application::requestExit();
       cutSim.interrupt();
     }

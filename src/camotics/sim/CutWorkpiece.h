@@ -45,7 +45,7 @@ namespace CAMotics {
     cb::Rectangle3D getBounds() const;
 
     // From FieldFunction
-    bool cull(const cb::Rectangle3D &r) const;
-    double depth(const cb::Vector3D &p) const;
+    bool cull(const cb::Rectangle3D &r) const override;
+    double depth(const cb::Vector3D &p) const override;
   };
 }

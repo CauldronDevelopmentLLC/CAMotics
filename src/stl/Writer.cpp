@@ -86,15 +86,15 @@ void Writer::writeFacet(const Vector3F &v1, const Vector3F &v2,
 }
 
 
-void Writer::writeFacet(const Triangle3F &t, const Vector3F &normal) {
-  writeFacet(t[0], t[1], t[2], normal);
-}
-
-
 void Writer::writeFooter(const string &name, const string &hash) {
   if (!binary) {
     stream << "endsolid " << name;
     if (!hash.empty()) stream << " " << hash;
     stream << '\n';
   }
+}
+
+
+void Writer::writeFacet(const Triangle3F &t, const Vector3F &normal) {
+  writeFacet(t[0], t[1], t[2], normal);
 }

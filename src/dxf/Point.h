@@ -30,6 +30,6 @@ namespace DXF {
     Point(const cb::Vector3D &p) : cb::Vector3D(p) {}
 
     // From Entity
-    type_t getType() const {return DXF_POINT;}
+    type_t getType() const override {return DXF_POINT;}
   };
 }

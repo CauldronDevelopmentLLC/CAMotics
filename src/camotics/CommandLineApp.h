@@ -51,8 +51,8 @@ namespace CAMotics {
 
     // From cb::Application
     static bool _hasFeature(int feature);
-    int init(int argc, char *argv[]);
-    void run();
+    int init(int argc, char *argv[]) override;
+    void run() override;
 
     void build(GCode::MachinePipeline &pipeline);
 

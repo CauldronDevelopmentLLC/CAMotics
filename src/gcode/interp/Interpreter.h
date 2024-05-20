@@ -42,11 +42,11 @@ namespace GCode {
     unsigned run(unsigned maxErrors = 32);
 
     // From GCodeInterpreter
-    void execute(const Code &code, int vars);
+    void execute(const Code &code, int vars) override;
 
     void read(const cb::InputSource &source);
 
     // From Processor
-    void operator()(const cb::SmartPointer<Block> &block);
+    void operator()(const cb::SmartPointer<Block> &block) override;
   };
 }

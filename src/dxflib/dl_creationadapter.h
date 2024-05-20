@@ -8,7 +8,7 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** Licensees holding valid dxflib Professional Edition licenses may use 
+** Licensees holding valid dxflib Professional Edition licenses may use
 ** this file in accordance with the dxflib Commercial License
 ** Agreement provided with the Software.
 **
@@ -30,8 +30,8 @@
 #include "dl_creationinterface.h"
 
 /**
- * An abstract adapter class for receiving DXF events when a DXF file is being read. 
- * The methods in this class are empty. This class exists as convenience for creating 
+ * An abstract adapter class for receiving DXF events when a DXF file is being read.
+ * The methods in this class are empty. This class exists as convenience for creating
  * listener objects.
  *
  * @author Andrew Mustun
@@ -39,100 +39,100 @@
 class DXFLIB_EXPORT DL_CreationAdapter : public DL_CreationInterface {
 public:
     DL_CreationAdapter() {}
-    virtual ~DL_CreationAdapter() {}
-    virtual void processCodeValuePair(unsigned int, const std::string&) {}
-    virtual void endSection() {}
-    virtual void addLayer(const DL_LayerData&) {}
-    virtual void addLinetype(const DL_LinetypeData&) {}
-    virtual void addLinetypeDash(double) {}
-    virtual void addBlock(const DL_BlockData&) {}
-    virtual void endBlock() {}
-    virtual void addTextStyle(const DL_StyleData&) {}
-    virtual void addPoint(const DL_PointData&) {}
-    virtual void addLine(const DL_LineData&) {}
-    virtual void addXLine(const DL_XLineData&) {}
-    virtual void addRay(const DL_RayData&) {}
+    ~DL_CreationAdapter() {}
+    void processCodeValuePair(unsigned int, const std::string&) override {}
+    void endSection() override {}
+    void addLayer(const DL_LayerData&) override {}
+    void addLinetype(const DL_LinetypeData&) override {}
+    void addLinetypeDash(double) override {}
+    void addBlock(const DL_BlockData&) override {}
+    void endBlock() override {}
+    void addTextStyle(const DL_StyleData&) override {}
+    void addPoint(const DL_PointData&) override {}
+    void addLine(const DL_LineData&) override {}
+    void addXLine(const DL_XLineData&) override {}
+    void addRay(const DL_RayData&) override {}
 
-    virtual void addArc(const DL_ArcData&) {}
-    virtual void addCircle(const DL_CircleData&) {}
-    virtual void addEllipse(const DL_EllipseData&) {}
-    
-    virtual void addPolyline(const DL_PolylineData&) {}
-    virtual void addVertex(const DL_VertexData&) {}
-    
-    virtual void addSpline(const DL_SplineData&) {}
-    virtual void addControlPoint(const DL_ControlPointData&) {}
-    virtual void addFitPoint(const DL_FitPointData&) {}
-    virtual void addKnot(const DL_KnotData&) {}
-    
-    virtual void addInsert(const DL_InsertData&) {}
-    
-    virtual void addMText(const DL_MTextData&) {}
-    virtual void addMTextChunk(const std::string&) {}
-    virtual void addText(const DL_TextData&) {}
-    virtual void addArcAlignedText(const DL_ArcAlignedTextData&) {}
-    virtual void addAttribute(const DL_AttributeData&) {}
-    
-    virtual void addDimAlign(const DL_DimensionData&,
-                             const DL_DimAlignedData&) {}
-    virtual void addDimLinear(const DL_DimensionData&,
-                              const DL_DimLinearData&) {}
-    virtual void addDimRadial(const DL_DimensionData&,
-                              const DL_DimRadialData&) {}
-    virtual void addDimDiametric(const DL_DimensionData&,
-                              const DL_DimDiametricData&) {}
-    virtual void addDimAngular(const DL_DimensionData&,
-                              const DL_DimAngularData&) {}
-    virtual void addDimAngular3P(const DL_DimensionData&,
-                              const DL_DimAngular3PData&) {}
-    virtual void addDimOrdinate(const DL_DimensionData&,
-                             const DL_DimOrdinateData&) {}
-    virtual void addLeader(const DL_LeaderData&) {}
-    virtual void addLeaderVertex(const DL_LeaderVertexData&) {}
-    
-    virtual void addHatch(const DL_HatchData&) {}
+    void addArc(const DL_ArcData&) override {}
+    void addCircle(const DL_CircleData&) override {}
+    void addEllipse(const DL_EllipseData&) override {}
 
-    virtual void addTrace(const DL_TraceData&) {}
-    virtual void add3dFace(const DL_3dFaceData&) {}
-    virtual void addSolid(const DL_SolidData&) {}
-    
-    virtual void addImage(const DL_ImageData&) {}
-    virtual void linkImage(const DL_ImageDefData&) {}
-    virtual void addHatchLoop(const DL_HatchLoopData&) {}
-    virtual void addHatchEdge(const DL_HatchEdgeData&) {}
+    void addPolyline(const DL_PolylineData&) override {}
+    void addVertex(const DL_VertexData&) override {}
 
-    virtual void addXRecord(const std::string&) {}
-    virtual void addXRecordString(int, const std::string&) {}
-    virtual void addXRecordReal(int, double) {}
-    virtual void addXRecordInt(int, int) {}
-    virtual void addXRecordBool(int, bool) {}
+    void addSpline(const DL_SplineData&) override {}
+    void addControlPoint(const DL_ControlPointData&) override {}
+    void addFitPoint(const DL_FitPointData&) override {}
+    void addKnot(const DL_KnotData&) override {}
 
-    virtual void addXDataApp(const std::string&) {}
-    virtual void addXDataString(int, const std::string&) {}
-    virtual void addXDataReal(int, double) {}
-    virtual void addXDataInt(int, int) {}
+    void addInsert(const DL_InsertData&) override {}
 
-    virtual void addDictionary(const DL_DictionaryData&) {}
-    virtual void addDictionaryEntry(const DL_DictionaryEntryData&) {}
+    void addMText(const DL_MTextData&) override {}
+    void addMTextChunk(const std::string&) override {}
+    void addText(const DL_TextData&) override {}
+    void addArcAlignedText(const DL_ArcAlignedTextData&) override {}
+    void addAttribute(const DL_AttributeData&) override {}
 
-    virtual void endEntity() {}
+    void addDimAlign(const DL_DimensionData&,
+                             const DL_DimAlignedData&) override {}
+    void addDimLinear(const DL_DimensionData&,
+                              const DL_DimLinearData&) override {}
+    void addDimRadial(const DL_DimensionData&,
+                              const DL_DimRadialData&) override {}
+    void addDimDiametric(const DL_DimensionData&,
+                              const DL_DimDiametricData&) override {}
+    void addDimAngular(const DL_DimensionData&,
+                              const DL_DimAngularData&) override {}
+    void addDimAngular3P(const DL_DimensionData&,
+                              const DL_DimAngular3PData&) override {}
+    void addDimOrdinate(const DL_DimensionData&,
+                             const DL_DimOrdinateData&) override {}
+    void addLeader(const DL_LeaderData&) override {}
+    void addLeaderVertex(const DL_LeaderVertexData&) override {}
 
-    virtual void addComment(const std::string&) {}
+    void addHatch(const DL_HatchData&) override {}
 
-    virtual void setVariableVector(const std::string&,  double, double, double, int) {}
-    virtual void setVariableString(const std::string&, const std::string&, int) {}
-    virtual void setVariableInt(const std::string&, int, int) {}
-    virtual void setVariableDouble(const std::string&, double, int) {}
+    void addTrace(const DL_TraceData&) override {}
+    void add3dFace(const DL_3dFaceData&) override {}
+    void addSolid(const DL_SolidData&) override {}
+
+    void addImage(const DL_ImageData&) override {}
+    void linkImage(const DL_ImageDefData&) override {}
+    void addHatchLoop(const DL_HatchLoopData&) override {}
+    void addHatchEdge(const DL_HatchEdgeData&) override {}
+
+    void addXRecord(const std::string&) override {}
+    void addXRecordString(int, const std::string&) override {}
+    void addXRecordReal(int, double) override {}
+    void addXRecordInt(int, int) override {}
+    void addXRecordBool(int, bool) override {}
+
+    void addXDataApp(const std::string&) override {}
+    void addXDataString(int, const std::string&) override {}
+    void addXDataReal(int, double) override {}
+    void addXDataInt(int, int) override {}
+
+    void addDictionary(const DL_DictionaryData&) override {}
+    void addDictionaryEntry(const DL_DictionaryEntryData&) override {}
+
+    void endEntity() override {}
+
+    void addComment(const std::string&) override {}
+
+    void setVariableVector(const std::string&,  double, double, double, int) override {}
+    void setVariableString(const std::string&, const std::string&, int) override {}
+    void setVariableInt(const std::string&, int, int) override {}
+    void setVariableDouble(const std::string&, double, int) override {}
 #ifdef DL_COMPAT
-    virtual void setVariableVector(const char*,  double, double, double, int) {}
-    virtual void setVariableString(const char*, const char*, int) {}
-    virtual void setVariableInt(const char*, int, int) {}
-    virtual void setVariableDouble(const char*, double, int) {}
-    virtual void processCodeValuePair(unsigned int, char*) {}
-    virtual void addComment(const char*) {}
-    virtual void addMTextChunk(const char*) {}
+    void setVariableVector(const char*,  double, double, double, int) override {}
+    void setVariableString(const char*, const char*, int) override {}
+    void setVariableInt(const char*, int, int) override {}
+    void setVariableDouble(const char*, double, int) override {}
+    void processCodeValuePair(unsigned int, char*) override {}
+    void addComment(const char*) override {}
+    void addMTextChunk(const char*) override {}
 #endif
-    virtual void endSequence() {}
+    void endSequence() override {}
 };
 
 #endif

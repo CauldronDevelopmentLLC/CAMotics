@@ -36,7 +36,8 @@ namespace CAMotics {
     bool isSystemProxyEnabled() const;
     void setNetworkStatus(const std::string &status);
 
-    int exec();
+    // From Dialog
+    int exec() override;
 
   signals:
     void connect();

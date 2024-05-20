@@ -49,8 +49,8 @@ namespace GCode {
     unsigned parse(Processor &processor, unsigned maxErrors = 32);
 
     // From Producer
-    bool hasMore() const {return tokenizer->hasMore();}
-    cb::SmartPointer<Block> next();
+    bool hasMore() const override {return tokenizer->hasMore();}
+    cb::SmartPointer<Block> next() override;
 
     cb::SmartPointer<Block> block();
 

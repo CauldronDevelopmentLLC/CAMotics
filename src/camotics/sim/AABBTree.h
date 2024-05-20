@@ -45,11 +45,11 @@ namespace CAMotics {
     unsigned getHeight() const {return root ? root->getTreeHeight() : 0;}
 
     // From MoveLookup
-    cb::Rectangle3D getBounds() const;
-    void insert(const GCode::Move *move, const cb::Rectangle3D &bbox);
-    bool intersects(const cb::Rectangle3D &r) const;
+    cb::Rectangle3D getBounds() const override;
+    void insert(const GCode::Move *move, const cb::Rectangle3D &bbox) override;
+    bool intersects(const cb::Rectangle3D &r) const override;
     void collisions(const cb::Vector3D &p,
-                    std::vector<const GCode::Move *> &moves) const;
-    void finalize();
+                    std::vector<const GCode::Move *> &moves) const override;
+    void finalize() override;
   };
 }

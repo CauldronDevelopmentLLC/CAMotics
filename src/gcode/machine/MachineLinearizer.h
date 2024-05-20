@@ -28,6 +28,6 @@ namespace GCode {
   public:
     // From MachineInterface
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
-             double degrees, plane_t plane);
+             double degrees, plane_t plane) override;
   };
 }

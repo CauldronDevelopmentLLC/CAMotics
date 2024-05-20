@@ -33,8 +33,8 @@ namespace GCode {
     double getValue() const {return value;}
 
     // From Entity
-    bool isConstant() {return true;}
-    double eval(Evaluator &evaluator) {return evaluator.eval(*this);}
-    void print(std::ostream &stream) const;
+    bool isConstant() override {return true;}
+    double eval(Evaluator &evaluator) override {return evaluator.eval(*this);}
+    void print(std::ostream &stream) const override;
   };
 }

@@ -31,8 +31,8 @@ namespace CAMotics {
     QApplication(int &argc, char *argv[]);
 
     // From QApplication
-    bool notify(QObject *receiver, QEvent *e);
-    bool event(QEvent *event);
+    bool notify(QObject *receiver, QEvent *e) override;
+    bool event(QEvent *event) override;
 
   signals:
     void openProject(QString path);

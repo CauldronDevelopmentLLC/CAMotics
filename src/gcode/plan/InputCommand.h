@@ -35,8 +35,8 @@ namespace GCode {
     InputCommand(port_t port, input_mode_t mode, double timeout);
 
     // From PlannerCommand
-    const char *getType() const {return "input";}
-    void insert(cb::JSON::Sink &sink) const;
-    void write(MachineInterface &machine) const;
+    const char *getType() const override {return "input";}
+    void insert(cb::JSON::Sink &sink) const override;
+    void write(MachineInterface &machine) const override;
   };
 }

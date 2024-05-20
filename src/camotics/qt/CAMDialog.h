@@ -43,8 +43,8 @@ namespace CAMotics {
     int getSelectedRow() const;
 
     // From cb::JSON::Serializable
-    void read(const cb::JSON::Value &value);
-    void write(cb::JSON::Sink &sink) const;
+    void read(const cb::JSON::Value &value) override;
+    void write(cb::JSON::Sink &sink) const override;
 
   protected slots:
     void on_addLayerPushButton_clicked();

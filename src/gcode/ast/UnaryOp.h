@@ -38,8 +38,8 @@ namespace GCode {
     const cb::SmartPointer<Entity> &getExpr() const {return expr;}
 
     // From Entity
-    bool isConstant() {return expr->isConstant();}
-    double eval(Evaluator &evaluator) {return evaluator.eval(*this);}
-    void print(std::ostream &stream) const;
+    bool isConstant() override {return expr->isConstant();}
+    double eval(Evaluator &evaluator) override {return evaluator.eval(*this);}
+    void print(std::ostream &stream) const override;
   };
 }

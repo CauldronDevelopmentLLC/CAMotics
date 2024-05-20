@@ -41,29 +41,30 @@ namespace GCode {
       sink(sink), units(units), withLocation(withLocation) {}
 
     // From MachineInterface
-    void start();
-    void end();
+    void start() override;
+    void end() override;
 
-    void setFeed(double feed);
-    void setFeedMode(feed_mode_t mode);
-    void setSpeed(double speed);
-    void setSpinMode(spin_mode_t mode, double max);
-    void setPathMode(path_mode_t mode, double motionBlending, double naiveCAM);
-    void changeTool(unsigned tool);
+    void setFeed(double feed) override;
+    void setFeedMode(feed_mode_t mode) override;
+    void setSpeed(double speed) override;
+    void setSpinMode(spin_mode_t mode, double max) override;
+    void setPathMode(path_mode_t mode, double motionBlending,
+                     double naiveCAM) override;
+    void changeTool(unsigned tool) override;
 
-    void input(port_t port, input_mode_t mode, double timeout);
-    void seek(port_t port, bool active, bool error);
-    void output(port_t port, double value);
+    void input(port_t port, input_mode_t mode, double timeout) override;
+    void seek(port_t port, bool active, bool error) override;
+    void output(port_t port, double value) override;
 
-    void dwell(double seconds);
-    void move(const Axes &position, int axes, bool rapid, double time);
+    void dwell(double seconds) override;
+    void move(const Axes &position, int axes, bool rapid, double time) override;
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
-             double angle, plane_t plane);
-    void pause(pause_t pause);
+             double angle, plane_t plane) override;
+    void pause(pause_t pause) override;
 
-    void setLocation(const cb::LocationRange &location);
+    void setLocation(const cb::LocationRange &location) override;
 
-    void comment(const std::string &s) const;
-    void message(const std::string &s);
+    void comment(const std::string &s) const override;
+    void message(const std::string &s) override;
   };
 }

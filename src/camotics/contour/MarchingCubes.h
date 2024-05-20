@@ -31,6 +31,6 @@ namespace CAMotics {
   public:
     // From SliceContourGenerator
     void doCell(GridTreeRef &tree, const CubeSlice &slice, unsigned x,
-                unsigned y);
+                unsigned y) override;
   };
 }

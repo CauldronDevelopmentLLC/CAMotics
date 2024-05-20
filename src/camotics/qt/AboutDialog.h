@@ -33,6 +33,6 @@ namespace CAMotics {
     AboutDialog(QWidget *parent);
 
     // From QWidget
-    void showEvent(QShowEvent *event);
+    void showEvent(QShowEvent *event) override;
   };
 }

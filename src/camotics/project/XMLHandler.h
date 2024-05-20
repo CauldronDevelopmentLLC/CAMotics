@@ -44,12 +44,12 @@ namespace CAMotics {
       XMLHandler(cb::JSON::Sink &sink);
 
       // From XML::Handler
-      void pushFile(const std::string &filename);
-      void popFile();
+      void pushFile(const std::string &filename) override;
+      void popFile() override;
       void startElement(const std::string &name,
-                        const cb::XML::Attributes &attrs);
-      void endElement(const std::string &name);
-      void text(const std::string &text);
+                        const cb::XML::Attributes &attrs) override;
+      void endElement(const std::string &name) override;
+      void text(const std::string &text) override;
     };
   }
 }

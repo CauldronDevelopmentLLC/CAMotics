@@ -33,5 +33,5 @@ public:
   ~PyNameResolver();
 
   // From NameResolver
-  double get(const std::string &name, GCode::Units units);
+  double get(const std::string &name, GCode::Units units) override;
 };

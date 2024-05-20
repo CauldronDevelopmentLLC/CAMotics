@@ -35,6 +35,6 @@ namespace CAMotics {
     GLCylinder(float base, float top, float height, unsigned segments);
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
   };
 }

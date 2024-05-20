@@ -42,7 +42,7 @@ namespace GCode {
     address_t evalAddress(Evaluator &evaluator);  // Used by Assign
 
     // From Entity
-    double eval(Evaluator &evaluator);
-    void print(std::ostream &stream) const;
+    double eval(Evaluator &evaluator) override;
+    void print(std::ostream &stream) const override;
   };
 }

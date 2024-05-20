@@ -127,7 +127,7 @@ namespace CAMotics {
     void updateAABB();
 
     // From GLScene
-    void glInit();
-    void glDraw(bool picking = false);
+    void glInit() override;
+    void glDraw(bool picking = false) override;
   };
 }

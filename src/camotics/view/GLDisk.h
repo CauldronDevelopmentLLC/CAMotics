@@ -33,6 +33,6 @@ namespace CAMotics {
     GLDisk(double radius, unsigned segments);
 
     // From GLObject
-    void glDraw(GLContext &gl);
+    void glDraw(GLContext &gl) override;
   };
 }

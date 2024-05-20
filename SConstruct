@@ -70,7 +70,7 @@ if not env.GetOption('clean'):
 
     conf.CBConfig('cbang')
     env.CBDefine('USING_CBANG') # Using CBANG macro namespace
-    for lib in 'mariadbclient snappy leveldb yaml re2 sqlite3 event'.split():
+    for lib in 'mariadbclient snappy leveldb yaml re2 sqlite3'.split():
         if lib in env['LIBS']: env['LIBS'].remove(lib)
 
     # Include path

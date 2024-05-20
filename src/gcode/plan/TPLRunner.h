@@ -49,14 +49,14 @@ namespace GCode {
     ~TPLRunner();
 
     // From MachineAdapter
-    void enter() const;
-    void exit() const;
+    void enter() const override;
+    void exit() const override;
 
     // From Runner
-    bool hasMore() const;
-    void step();
+    bool hasMore() const override;
+    void step() override;
 
     // From cb::Thread
-    void run();
+    void run() override;
   };
 }

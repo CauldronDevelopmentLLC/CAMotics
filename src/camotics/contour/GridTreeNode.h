@@ -40,11 +40,11 @@ namespace CAMotics {
     ~GridTreeNode();
 
     // From GridTreeBase
-    unsigned getCount() const {return count;}
+    unsigned getCount() const override {return count;}
     void insertLeaf(GridTreeLeaf *leaf, const cb::Vector3U &steps,
-                    const cb::Vector3U &offset);
+                    const cb::Vector3U &offset) override;
     void gather(std::vector<float> &vertices,
-                std::vector<float> &normals) const;
+                std::vector<float> &normals) const override;
   };
 }
 

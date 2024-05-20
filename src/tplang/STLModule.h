@@ -34,7 +34,7 @@ namespace tplang {
     STLModule(TPLContext &ctx);
 
     // From cb::js::NativeModule
-    void define(cb::js::Sink &exports);
+    void define(cb::js::Sink &exports) override;
 
     // Javascript callbacks
     void open(const cb::js::Value &args, cb::js::Sink &sink);

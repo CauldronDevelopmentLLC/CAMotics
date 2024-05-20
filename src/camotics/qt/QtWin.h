@@ -296,13 +296,13 @@ namespace CAMotics {
 
   protected:
     // From TaskObserver
-    void taskCompleted();
+    void taskCompleted() override;
 
     // From QMainWindow
-    bool event(QEvent *event);
-    void closeEvent(QCloseEvent *event);
-    void resizeEvent(QResizeEvent *event);
-    void changeEvent(QEvent *event);
+    bool event(QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void changeEvent(QEvent *event) override;
 
   protected slots:
     void animate();

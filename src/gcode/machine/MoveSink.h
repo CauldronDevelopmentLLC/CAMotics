@@ -41,9 +41,9 @@ namespace GCode {
     MoveSink(MoveStream &stream) : stream(stream) {}
 
     // From MachineInterface
-    void seek(port_t port, bool active, bool error);
-    void move(const Axes &position, int axes, bool rapid, double time);
+    void seek(port_t port, bool active, bool error) override;
+    void move(const Axes &position, int axes, bool rapid, double time) override;
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
-             double degrees, plane_t plane);
+             double degrees, plane_t plane) override;
   };
 }

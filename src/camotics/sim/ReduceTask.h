@@ -38,6 +38,6 @@ namespace CAMotics {
     const cb::SmartPointer<Surface> &getSurface() const {return surface;}
 
     // From Task
-    void run();
+    void run() override;
   };
 }

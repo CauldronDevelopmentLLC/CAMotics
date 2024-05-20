@@ -100,8 +100,8 @@ namespace CAMotics {
       void save(const std::string &filename = std::string());
 
       // From JSON::Serializable
-      void read(const cb::JSON::Value &value);
-      void write(cb::JSON::Sink &sink) const;
+      void read(const cb::JSON::Value &value) override;
+      void write(cb::JSON::Sink &sink) const override;
     };
   }
 }

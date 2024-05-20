@@ -22,8 +22,7 @@
 
 #include <Python.h>
 
-#include <boost/iostreams/categories.hpp>
-#include <boost/iostreams/stream.hpp>
+#include <cbang/boost/IOStreams.h>
 
 
 class PyLogger {

@@ -84,7 +84,7 @@ namespace CAMotics {
     void runGCodeString(const std::string &gcode);
 
     // From Task
-    void run();
-    void interrupt();
+    void run() override;
+    void interrupt() override;
   };
 }

@@ -36,8 +36,8 @@ namespace GCode {
       port(port), active(active), error(error) {}
 
     // From PlannerCommand
-    const char *getType() const {return "seek";}
-    void insert(cb::JSON::Sink &sink) const;
-    void write(MachineInterface &machine) const;
+    const char *getType() const override {return "seek";}
+    void insert(cb::JSON::Sink &sink) const override;
+    void write(MachineInterface &machine) const override;
   };
 }

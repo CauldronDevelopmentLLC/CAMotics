@@ -41,8 +41,8 @@ namespace CAMotics {
     ~QtApp();
 
     // From cb::Application
-    int init(int argc, char *argv[]);
-    void run();
-    void requestExit();
+    int init(int argc, char *argv[]) override;
+    void run() override;
+    void requestExit() override;
   };
 }

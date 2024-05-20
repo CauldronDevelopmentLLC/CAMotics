@@ -45,7 +45,7 @@ namespace GCode {
     double getExprValue() const {return exprValue;}
 
     // From Entity
-    double eval(Evaluator &evaluator);
-    void print(std::ostream &stream) const;
+    double eval(Evaluator &evaluator) override;
+    void print(std::ostream &stream) const override;
   };
 }

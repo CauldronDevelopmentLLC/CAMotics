@@ -39,6 +39,6 @@ namespace GCode {
       stream(stream), annotate(annotate), removeBlankLines(removeEmptyLines) {}
 
     // From Processor
-    void operator()(const cb::SmartPointer<Block> &block);
+    void operator()(const cb::SmartPointer<Block> &block) override;
   };
 }

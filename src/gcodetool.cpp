@@ -53,7 +53,7 @@ public:
 
 
   // From Application
-  void run() {
+  void run() override {
     if (!parseOnly) {
       build(pipeline);
       controller = new ControllerImpl(pipeline);
@@ -63,7 +63,7 @@ public:
   }
 
 
-  void read(const InputSource &source) {
+  void read(const InputSource &source) override {
     if (parseOnly) {
       Printer printer(*stream, annotate);
       Parser(source).parse(printer);

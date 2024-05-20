@@ -38,9 +38,9 @@ namespace CAMotics {
     void add(const Triangle &t);
 
     // From GridTreeBase
-    bool isLeaf() const {return true;}
-    unsigned getCount() const {return triangles.size();}
+    bool isLeaf() const override {return true;}
+    unsigned getCount() const override {return triangles.size();}
     void gather(std::vector<float> &vertices,
-                std::vector<float> &normals) const;
+                std::vector<float> &normals) const override;
   };
 }

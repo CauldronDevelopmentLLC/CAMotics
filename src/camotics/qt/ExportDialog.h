@@ -33,7 +33,7 @@ namespace CAMotics {
     ExportDialog(QWidget *parent);
 
     // From QDialog
-    int exec();
+    int exec() override;
 
     void enableSurface(bool enable);
     void enableGCode(bool enable);

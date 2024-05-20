@@ -54,7 +54,7 @@ namespace tplang {
     const cb::JSON::Value &getSim() const {return *sim;}
 
     // From cb::js::Javascript
-    void pushPath(const std::string &path);
-    void popPath();
+    void pushPath(const std::string &path) override;
+    void popPath() override;
   };
 }

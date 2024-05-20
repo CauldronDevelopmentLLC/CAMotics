@@ -36,6 +36,6 @@ namespace CAMotics {
       Value(name), object(object), member(member) {}
 
     // From Value
-    void updated() {set((*object.*member)());}
+    void updated() override {set((*object.*member)());}
   };
 }

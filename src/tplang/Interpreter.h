@@ -35,7 +35,6 @@ namespace tplang {
   public:
     Interpreter(TPLContext &ctx) : ctx(ctx) {}
 
-    // From cb::Reader
     void read(const cb::InputSource &source);
   };
 }

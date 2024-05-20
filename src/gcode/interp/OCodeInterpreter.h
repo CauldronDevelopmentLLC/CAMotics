@@ -96,14 +96,14 @@ namespace GCode {
     void doEndRepeat(OCode *ocode);
 
     // From Processor
-    void operator()(const cb::SmartPointer<Block> &block);
+    void operator()(const cb::SmartPointer<Block> &block) override;
 
     // From GCodeInterpreter
-    void setReference(address_t addr, double value);
-    void setReference(const std::string &name, double value);
+    void setReference(address_t addr, double value) override;
+    void setReference(const std::string &name, double value) override;
 
     // From Evaluator
-    double lookupReference(address_t addr);
-    double lookupReference(const std::string &name);
+    double lookupReference(address_t addr) override;
+    double lookupReference(const std::string &name) override;
   };
 }

@@ -46,70 +46,76 @@ namespace GCode {
     virtual void exit() const {}
 
     // From MachineInterface
-    void start() {_ _(this); next->start();}
-    void end() {_ _(this); next->end();}
+    void start() override {_ _(this); next->start();}
+    void end() override {_ _(this); next->end();}
 
-    double getFeed() const {_ _(this); return next->getFeed();}
-    void setFeed(double feed) {_ _(this); next->setFeed(feed);}
-    feed_mode_t getFeedMode() const {_ _(this); return next->getFeedMode();}
-    void setFeedMode(feed_mode_t mode){_ _(this); next->setFeedMode(mode);}
+    double getFeed() const override {_ _(this); return next->getFeed();}
+    void setFeed(double feed) override {_ _(this); next->setFeed(feed);}
+    feed_mode_t getFeedMode() const override
+      {_ _(this); return next->getFeedMode();}
+    void setFeedMode(feed_mode_t mode) override
+      {_ _(this); next->setFeedMode(mode);}
 
-    double getSpeed() const {_ _(this); return next->getSpeed();}
-    void setSpeed(double speed) {_ _(this); next->setSpeed(speed);}
+    double getSpeed() const override {_ _(this); return next->getSpeed();}
+    void setSpeed(double speed) override {_ _(this); next->setSpeed(speed);}
 
-    spin_mode_t getSpinMode(double *max = 0) const
-    {_ _(this); return next->getSpinMode(max);}
+    spin_mode_t getSpinMode(double *max = 0) const override
+      {_ _(this); return next->getSpinMode(max);}
     void setSpinMode(spin_mode_t mode = REVOLUTIONS_PER_MINUTE,
-                     double max = 0) {_ _(this); next->setSpinMode(mode, max);}
+                     double max = 0) override
+      {_ _(this); next->setSpinMode(mode, max);}
 
     void setPathMode(path_mode_t mode, double motionBlending = 0,
-                     double naiveCAM = 0)
-    {_ _(this); next->setPathMode(mode, motionBlending, naiveCAM);}
+                     double naiveCAM = 0) override
+      {_ _(this); next->setPathMode(mode, motionBlending, naiveCAM);}
 
-    void changeTool(unsigned tool) {_ _(this); next->changeTool(tool);}
+    void changeTool(unsigned tool) override {_ _(this); next->changeTool(tool);}
 
-    void input(port_t port, input_mode_t mode, double timeout)
-    {_ _(this); next->input(port, mode, timeout);}
-    void seek(port_t port, bool active, bool error)
-    {_ _(this); next->seek(port, active, error);}
-    void output(port_t port, double value)
-    {_ _(this); next->output(port, value);}
+    void input(port_t port, input_mode_t mode, double timeout) override
+      {_ _(this); next->input(port, mode, timeout);}
+    void seek(port_t port, bool active, bool error) override
+      {_ _(this); next->seek(port, active, error);}
+    void output(port_t port, double value) override
+      {_ _(this); next->output(port, value);}
 
-    Axes getPosition() const {_ _(this); return next->getPosition();}
-    cb::Vector3D getPosition(axes_t axes) const
-    {_ _(this); return next->getPosition(axes);}
-    void setPosition(const Axes &position)
-    {_ _(this); next->setPosition(position);}
+    Axes getPosition() const override {_ _(this); return next->getPosition();}
+    cb::Vector3D getPosition(axes_t axes) const override
+      {_ _(this); return next->getPosition(axes);}
+    void setPosition(const Axes &position) override
+      {_ _(this); next->setPosition(position);}
 
-    void dwell(double seconds) {_ _(this); next->dwell(seconds);}
-    void move(const Axes &position, int axes, bool rapid, double time)
-    {_ _(this); next->move(position, axes, rapid, time);}
+    void dwell(double seconds) override {_ _(this); next->dwell(seconds);}
+    void move(const Axes &position, int axes, bool rapid, double time) override
+      {_ _(this); next->move(position, axes, rapid, time);}
     void arc(const cb::Vector3D &offset, const cb::Vector3D &target,
-             double angle, plane_t plane)
-    {_ _(this); next->arc(offset, target, angle, plane);}
+             double angle, plane_t plane) override
+      {_ _(this); next->arc(offset, target, angle, plane);}
 
-    Transforms &getTransforms() {_ _(this); return next->getTransforms();}
+    Transforms &getTransforms() override
+      {_ _(this); return next->getTransforms();}
 
-    void pause(pause_t type) {_ _(this); next->pause(type);}
+    void pause(pause_t type) override {_ _(this); next->pause(type);}
 
-    double get(address_t addr, Units units) const
-    {_ _(this); return next->get(addr, units);}
-    void set(address_t addr, double value, Units units)
-    {_ _(this); next->set(addr, value, units);}
+    double get(address_t addr, Units units) const override
+      {_ _(this); return next->get(addr, units);}
+    void set(address_t addr, double value, Units units) override
+      {_ _(this); next->set(addr, value, units);}
 
-    bool has(const std::string &name) const {_ _(this); return next->has(name);}
-    double get(const std::string &name, Units units) const
-    {_ _(this); return next->get(name, units);}
-    void set(const std::string &name, double value, Units units)
-    {_ _(this); next->set(name, value, units);}
-    void clear(const std::string &name) {_ _(this); next->clear(name);}
+    bool has(const std::string &name) const override
+      {_ _(this); return next->has(name);}
+    double get(const std::string &name, Units units) const override
+      {_ _(this); return next->get(name, units);}
+    void set(const std::string &name, double value, Units units) override
+      {_ _(this); next->set(name, value, units);}
+    void clear(const std::string &name) override {_ _(this); next->clear(name);}
 
-    const cb::LocationRange &getLocation() const
-    {_ _(this); return next->getLocation();}
-    void setLocation(const cb::LocationRange &location)
-    {_ _(this); next->setLocation(location);}
+    const cb::LocationRange &getLocation() const override
+      {_ _(this); return next->getLocation();}
+    void setLocation(const cb::LocationRange &location) override
+      {_ _(this); next->setLocation(location);}
 
-    void comment(const std::string &s) const {_ _(this); next->comment(s);}
-    void message(const std::string &s) {_ _(this); next->message(s);}
+    void comment(const std::string &s) const override
+      {_ _(this); next->comment(s);}
+    void message(const std::string &s) override {_ _(this); next->message(s);}
   };
 }

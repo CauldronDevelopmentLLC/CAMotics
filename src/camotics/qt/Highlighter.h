@@ -52,6 +52,6 @@ namespace CAMotics {
 
   protected:
     // From QSyntaxHighlighter
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
   };
 }
