@@ -1328,7 +1328,7 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>F&amp;iles</string>
+    <string>Files</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
