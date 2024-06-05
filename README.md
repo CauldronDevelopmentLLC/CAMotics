@@ -1,7 +1,7 @@
 ![CAMotics Logo][1]
 
 CAMotics is an Open-Source software which can simulate 3-axis NC
-machining. It is a fast, flexible and user friendly simulation
+machining. It is a fast, flexible and user-friendly simulation
 software for the DIY and Open-Source community.  CAMotics works on
 Linux, OS-X and Windows.
 
@@ -16,12 +16,12 @@ and tool path generation are much easier. Such software is essential to using a
 CNC.
 
 Being able to simulate is a critical part of creating CNC tool
-paths. Programming a CNC with out a simulator is cutting with out
+paths. Programming a CNC without a simulator is cutting without
 measuring; it's both dangerous and expensive. With CAMotics you can
 preview the results of your cutting operation before you fire up your
 machine. This will save you time and money and open up a world of
 creative possibilities by allowing you to rapidly visualize and
-improve upon designs with out wasting material or breaking tools.
+improve upon designs without wasting material or breaking tools.
 
 See http://camotics.org/
 
@@ -100,8 +100,8 @@ where you built CAMotics and run `./camotics`
 # Try the Examples
 Try out some of the examples in CAMotics's File -> Examples menu.
 
-## No Icons in Menus in Linux
-If you don't see icons in CAMotics menus in Linux try running the following
+## No Icons in Menus on Linux
+If you don't see icons in CAMotics menus on Linux try running the following
 command and restarting CAMotics:
 
     gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
