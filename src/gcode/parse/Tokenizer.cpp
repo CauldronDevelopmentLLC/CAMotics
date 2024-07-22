@@ -138,7 +138,7 @@ void Tokenizer::next() {
   case 0: current.set(EOF_TOKEN, ""); return;
 
   case '%': break; // Ignore program delimiter
-  case ';': comment(); needAdvance = false; break;
+  case ';': case '\'': comment(); needAdvance = false; break;
   case '(': parenComment(); needAdvance = false; break;
 
   case '.':
