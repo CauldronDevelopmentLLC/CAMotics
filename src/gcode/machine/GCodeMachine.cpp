@@ -87,7 +87,7 @@ void GCodeMachine::beginLine() {
 void GCodeMachine::start() {
   MachineAdapter::start();
   axisSeen = 0;
-  *stream << (units == Units::METRIC ? "G21" : "G20") << '\n';
+  *stream << (units == Units::METRIC ? "G21" : "G20") << "G90\n";
   // TODO set other GCode state
 }
 
