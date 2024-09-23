@@ -1,0 +1,90 @@
+name: Build CAMotics
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build_linux:
+
+    runs-on: ubuntu-22.04
+
+    env:
+      SOURCE_DIR:   ${{ github.workspace }}
+      ARTIFACT:     CAMotics
+  
+    defaults:
+      run:
+        shell: bash
+
+    steps:  
+      - name: Install dependencies
+        run: |
+          sudo apt install -y qt5-qmake qtbase5-dev-tools libqt5serialport5-dev qttools5-dev-tools libcurl4-openssl-dev
+          sudo apt install -y scons build-essential libqt5websockets5-dev libqt5opengl5-dev libnode-dev libglu1-mesa-dev pkgconf git libv8-dev
+          sudo apt install -y scons build-essential libssl-dev binutils-dev libiberty-dev libmariadb-dev-compat libleveldb-dev libsnappy-dev git libzstd-dev
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        
+      - name: Checkout C!
+        run: |
+          git clone https://github.com/CauldronDevelopmentLLC/cbang.git
+          scons -C cbang          
+        
+      - name: Build
+        run: |
+          pwd
+          ls
+          export CBANG_HOME=$PWD/cbang
+          scons
+        
+      - name: Deploy
+        run: |
+          scons package
+      
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with: 
+          name: ${{ env.ARTIFACT }}
+          path: |
+            camotics
+  release:
+    needs: build_linux
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./
+
+      - name: List files and zip
+        run: |
+          cd CAMotics
+          ls -R ./
+          zip camotics.zip camotics
+          ls -R ./
+
+      - name: Update Current Release
+        uses: andelf/nightly-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: latest
+          name: "Latest Release $$"
+          draft: false
+          prerelease: true
+          body: |
+            This is the latest binary release.
+            On Ubuntu/Debian install before first run:
+            `sudo apt-get -y install scons build-essential libqt5websockets5-dev libqt5opengl5-dev libnode-dev libglu1-mesa-dev pkgconf git`
+
+          files: |
+            CAMotics/camotics.zip
