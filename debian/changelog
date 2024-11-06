@@ -1,4 +1,5 @@
-camotics (0.0.1) unstable; urgency=low
-  * Initial Debian package.
+camotics (0.0.1) UNRELEASED; urgency=low
+
+  * Initial release (Closes: #949344).
 
  -- Joseph Coffland <joseph@cauldrondevelopment.com>  Thu, 13 Jan 2011 20:38:52 -0800
