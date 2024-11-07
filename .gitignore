@@ -65,3 +65,5 @@ build.ninja
 *.toc
 
 /examples
+
+.vscode

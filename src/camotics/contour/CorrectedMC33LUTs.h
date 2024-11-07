@@ -1,11 +1,12 @@
 /**
- * @file    LookUpTable.h
- * @author  Thomas Lewiner <thomas.lewiner@polytechnique.org>
- * @author  Math Dept, PUC-Rio
- * @version 0.2
- * @date    12/08/2002
+ * @file      LookUpTable.h
+ * @author    Thomas Lewiner <thomas.lewiner@polytechnique.org>
+ * @author    Math Dept, PUC-Rio
+ * @copyright Thomas Lewiner (C) 2002
+ * @version   0.2
+ * @date      12/08/2002
  *
- * @brief   LookUpTable for the MarchingCubes 33 Algorithm
+ * @brief     LookUpTable for the MarchingCubes 33 Algorithm
  */
 
 #pragma once
