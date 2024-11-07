@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+
+# link to libatomic on armel and mipsel
+ifneq (,$(filter $(DEB_HOST_ARCH), armel mipsel))
+  export DEB_LDFLAGS_MAINT_APPEND += -Wl,--no-as-needed -latomic -Wl,--as-needed
+endif
+
+include /usr/share/dpkg/default.mk  # provides DEB_VERSION
+
+SCONS_OPTIONS = cycles=0 mode=release sharedlib=1 -j8 werror=0 clang=1
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	scons -c
+	find . -name __pycache__|xargs rm -rf
+	rm -rf .sconf_temp config.log
+	rm -rf .sconsign.dblite
+
+override_dh_auto_build:
+	scons $(SCONS_OPTIONS) --jobs=$(NUMJOBS) --no-cache
+
+override_dh_usrlocal:
+	true
+
+override_dh_auto_install:
+	PREFIX=/usr scons prefix=debian/camotics/usr $(SCONS_OPTIONS) install

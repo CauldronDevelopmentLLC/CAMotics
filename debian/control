@@ -1,0 +1,16 @@
+Source: camotics
+Maintainer: Joseph Coffland <joseph@cauldrondevelopment.com>
+Section: science
+Priority: optional
+Standards-Version: 4.7.0
+Homepage: https://camotics.org/
+Build-Depends: debhelper-compat (= 13), scons, libcbang0-dev
+
+Package: camotics
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: 3-axis numerical control machining simulator
+ CAMotics is an Open-Source software which can simulate 3-axis NC
+ machining. It is a fast, flexible and user-friendly simulation
+ software for the DIY and Open-Source community.  CAMotics works on
+ Linux, OS-X and Windows.
