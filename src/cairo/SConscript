@@ -1,21 +1,22 @@
 Import('*')
 env = env.Clone()
 
-if env['compiler_mode'] == 'gnu':
-  env.AppendUnique(CCFLAGS = ['-Wno-enum-conversion'])
+if not env.GetOption('clean'):
+  if env['compiler_mode'] == 'gnu':
+    env.AppendUnique(CCFLAGS = ['-Wno-enum-conversion'])
 
 
-# Ignore warnings
-import re
-flags = env.subst('${CCFLAGS}')
-flags = re.sub(r'-W((all)|(error))(=[^\s$]+)?(\s|$)', '', flags)
-env.Replace(CCFLAGS = flags)
+  # Ignore warnings
+  import re
+  flags = env.subst('${CCFLAGS}')
+  flags = re.sub(r'-W((all)|(error))(=[^\s$]+)?(\s|$)', '', flags)
+  env.Replace(CCFLAGS = flags)
 
 
-# Configure
-env.AppendUnique(CPPDEFINES = [
-        'CAIRO_NO_MUTEX', 'HAVE_INTTYPES_H', 'CAIRO_HAS_IMAGE_SURFACE'])
-env.Append(CPPPATH = ['#/src/cairo'])
+  # Configure
+  env.AppendUnique(CPPDEFINES = [
+          'CAIRO_NO_MUTEX', 'HAVE_INTTYPES_H', 'CAIRO_HAS_IMAGE_SURFACE'])
+  env.Append(CPPPATH = ['#/src/cairo'])
 
 
 # Bulid library

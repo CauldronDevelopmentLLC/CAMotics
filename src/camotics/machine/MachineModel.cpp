@@ -40,8 +40,8 @@ void MachineModel::read(const JSON::Value &value) {
   workpiece.read(value.getList("workpiece"));
 
   auto &parts = value.getDict("parts");
-  for (unsigned i = 0; i < parts.size(); i++)
-    add(new MachinePart(parts.keyAt(i), parts.get(i)));
+  for (auto e: parts.entries())
+    add(new MachinePart(e.key(), e.value()));
 }
 
 

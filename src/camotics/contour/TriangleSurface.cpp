@@ -188,10 +188,9 @@ void TriangleSurface::read(const JSON::Value &value) {
   if (value.hasList("vertices")) {
     vertices.clear();
     bounds = Rectangle3D();
-    auto &l = value.get("vertices");
 
-    for (unsigned i = 0; i < l->size(); i++) {
-      vertices.push_back(l->getNumber(i));
+    for (auto &vert: *value.get("vertices")) {
+      vertices.push_back(vert->getNumber());
 
       unsigned n = vertices.size();
       if (n % 3 == 0)
