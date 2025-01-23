@@ -78,12 +78,9 @@ void ToolTable::add(const Tool &tool) {
 void ToolTable::read(const JSON::Value &value) {
   clear();
 
-  for (unsigned i = 0; i < value.size(); i++) {
-    string key = value.keyAt(i);
-    unsigned number = String::parseU32(key);
-    Tool tool(number);
-
-    tool.read(value.getDict(i));
+  for (auto e: value.entries()) {
+    Tool tool(String::parseU32(e.key()));
+    tool.read(e.value()->getDict());
     set(tool);
   }
 }

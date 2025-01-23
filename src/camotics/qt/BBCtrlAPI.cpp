@@ -165,9 +165,9 @@ void BBCtrlAPI::onTextMessageReceived(const QString &message) {
 
     bool updatePosition = false;
 
-    for (unsigned i = 0; i < json->size(); i++) {
-      string key = json->keyAt(i);
-      vars.insert(key, json->get(key));
+    for (auto e: json->entries()) {
+      auto &key = e.key();
+      vars.insert(key, e.value());
 
       if (key == "xp" || key == "yp" || key == "zp" ||
           key == "offset_x" || key == "offset_y" || key == "offset_z")

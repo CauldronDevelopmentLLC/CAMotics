@@ -43,8 +43,8 @@ string Files::getRelativePath(unsigned i) const {
 SmartPointer<File> Files::find(const string &_path) const {
   string path = SystemUtilities::absolute(directory, _path);
 
-  for (unsigned i = 0; i < size(); i++)
-    if (path == files[i]->getPath()) return files[i];
+  for (auto &file: files)
+    if (path == file->getPath()) return file;
 
   return 0;
 }
@@ -56,16 +56,16 @@ void Files::add(const string &path) {
 
 
 void Files::read(const JSON::Value &value) {
-  for (unsigned i = 0; i < value.size(); i++)
-    add(SystemUtilities::absolute(directory, value.getString(i)));
+  for (auto v: value)
+    add(SystemUtilities::absolute(directory, v->getString()));
 }
 
 
 void Files::write(JSON::Sink &sink) const {
   sink.beginList();
 
-  for (unsigned i = 0; i < files.size(); i++)
-    sink.append(get(i)->getRelativePath(directory));
+  for (auto &file: files)
+    sink.append(file->getRelativePath(directory));
 
   sink.endList();
 }

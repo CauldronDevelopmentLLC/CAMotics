@@ -21,8 +21,7 @@ env.CBAddVariables(
     ('python_version', 'Set python version', '3'),
     BoolVariable('with_tpl', 'Enable TPL', True),
     BoolVariable('with_gui', 'Enable graphical user interface', True),
-    BoolVariable('wrap_glibc', 'Enable GlibC function wrapping',
-                 env['PLATFORM'] == 'posix'),
+    BoolVariable('wrap_glibc', 'Enable GlibC function wrapping', False)
     )
 conf = env.CBConfigure()
 
@@ -70,13 +69,11 @@ if not env.GetOption('clean'):
 
     conf.CBConfig('cbang')
     env.CBDefine('USING_CBANG') # Using CBANG macro namespace
-    for lib in 'mariadbclient snappy leveldb yaml re2 sqlite3'.split():
+    for lib in 'mariadbclient snappy leveldb yaml sqlite3'.split():
         if lib in env['LIBS']: env['LIBS'].remove(lib)
 
     # Include path
     env.AppendUnique(CPPPATH = ['#/src'])
-
-    if env['PLATFORM'] != 'win32': env.AppendUnique(CCFLAGS = ['-fPIC'])
 
     # Python
     have_python = conf.CBConfig('python', False)
@@ -176,8 +173,8 @@ if env['with_tpl']:
 
 # DXFlib
 if not have_dxflib:
-    libDXFlib = SConscript('src/dxflib/SConscript',
-                           variant_dir = 'build/dxflib')
+    libDXFlib = SConscript(
+        'src/dxflib/SConscript', variant_dir = 'build/dxflib')
     env.Append(LIBS = libDXFlib)
 
 

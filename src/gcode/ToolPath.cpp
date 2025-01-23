@@ -59,15 +59,15 @@ int ToolPath::find(double time) const {return find(time, 0, size());}
 void ToolPath::read(const JSON::Value &value) {
   GCode::Axes start;
   GCode::MoveType type = GCode::MoveType::MOVE_RAPID;
-  int line = 0;
   SmartPointer<string> filename;
-  int tool = 1;
-  double feed = 0;
+  int line     = 0;
+  int tool     = 1;
+  double feed  = 0;
   double speed = 0;
-  double time = 0;
+  double time  = 0;
 
-  for (unsigned i = 0; i < value.size(); i++) {
-    auto &dict = value.getDict(i);
+  for (auto v: value) {
+    auto &dict = v->getDict();
 
     GCode::Axes end;
     for (int j = 0; j < 9; j++)
@@ -82,9 +82,9 @@ void ToolPath::read(const JSON::Value &value) {
         filename = new string(_filename);
     }
 
-    line = dict.getNumber("line", line);
-    tool = dict.getNumber("tool", tool);
-    feed = dict.getNumber("feed", feed);
+    line  = dict.getNumber("line",  line);
+    tool  = dict.getNumber("tool",  tool);
+    feed  = dict.getNumber("feed",  feed);
     speed = dict.getNumber("speed", speed);
     double delta = dict.getNumber("time", 0);
 
