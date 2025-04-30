@@ -13,9 +13,6 @@ RUN apt-get update && \
 # clone our stuff into root's home
 WORKDIR /root
 
-# copy the repo into the working directory
-COPY . CAMotics
-
 # TODO : should this be locked to a commit?
 # clone cbang
 RUN git clone https://github.com/CauldronDevelopmentLLC/cbang.git
@@ -25,6 +22,9 @@ RUN scons -C cbang
 
 # assign the environment variable
 ENV CBANG_HOME=/root/cbang
+
+# copy the current checkout of camotics into the working directory
+COPY . CAMotics
 
 # set our working directory to the camotics checkout
 WORKDIR /root/CAMotics
@@ -39,4 +39,5 @@ RUN ls -altrsh
 
 FROM scratch
 
-COPY --from=build /root/CAMotics/*.deb .
+COPY --from=build /root/CAMotics/camotics*.deb .
+

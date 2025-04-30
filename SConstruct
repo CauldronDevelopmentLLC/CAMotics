@@ -396,6 +396,9 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     else: qt_pkgs = ''
 
+    libssl = 'libssl1.1, '
+    libssl = 'libss3t64, '
+  
     pkg = env.Packager(
         'CAMotics',
         version = version,
@@ -428,7 +431,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         deb_depends =
         'debconf | debconf-2.0, libc6, libglu1, ' +
         'libv8-3.14.5 | libv8-dev | libnode-dev, ' +
-        'libglu1-mesa, libssl1.1' + qt_pkgs,
+        'libglu1-mesa, ' + libssl + qt_pkgs,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 

@@ -29,6 +29,8 @@ if __name__ == "__main__":
         command = [
             "docker",
             "build",
+            "--progress",
+            "plain",
             "--build-arg",
             f"IMAGE={image}",
             "--build-arg",
