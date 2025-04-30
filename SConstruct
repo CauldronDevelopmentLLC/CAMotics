@@ -374,7 +374,18 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     install_files = []
     if env.get('qt_deps'):
-        qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5, libqt5websockets5'
+        
+        qt_pkgs = ['libqt5core5a|libqt5core5t64',
+                   'libqt5gui5|libqt5gui5t64',
+                   'libqt5opengl5|libqt5opengl5t64',
+                   'libqt5websockets5']
+        
+        qt_pkgs = ['libqt5core5t64',
+                   'libqt5gui5t64',
+                   'libqt5opengl5t64',
+                   'libqt5websockets5']
+        
+        
 
         if env['PLATFORM'] == 'win32':
             import shutil
@@ -394,11 +405,24 @@ if 'package' in COMMAND_LINE_TARGETS:
                     env['VCREDIST'] = name
                 install_files.append('build\\win32\\' + name)
 
-    else: qt_pkgs = ''
+    else:
+        qt_pkgs = []
 
-    libssl = 'libssl1.1, '
-    libssl = 'libss3t64, '
-  
+
+    if env['with_tpl']:
+        tpl_pkgs = 'libnode-dev'
+    else:
+        tpl_pkgs = []
+
+
+    deb_depends = ['debconf', 'libc6', 'libglu1', 'libglu1-mesa', 'libssl3t64']
+    deb_depends.extend(qt_pkgs)    
+    deb_depends.extend(tpl_pkgs)
+        
+    # clean up the delimiters
+    deb_depends = ','.join(deb_depends)
+		     
+
     pkg = env.Packager(
         'CAMotics',
         version = version,
@@ -428,16 +452,13 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
-        deb_depends =
-        'debconf | debconf-2.0, libc6, libglu1, ' +
-        'libv8-3.14.5 | libv8-dev | libnode-dev, ' +
-        'libglu1-mesa, ' + libssl + qt_pkgs,
+        deb_depends = deb_depends,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
         rpm_license = 'GPLv2+',
         rpm_group = 'Applications/Engineering',
-        rpm_requires = 'expat' + qt_pkgs,
+        rpm_requires = 'expat' + ','.join(qt_pkgs),
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics.CAMotics',

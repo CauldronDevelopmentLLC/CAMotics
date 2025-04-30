@@ -15,8 +15,7 @@ os.makedirs(results, exist_ok=True)
 # keyed as docker image : data
 images = {
     "ubuntu:24.04": {
-        "build-deps": "scons build-essential libqt5websockets5-dev libqt5opengl5-dev qttools5-dev-tools libnode-dev libglu1-mesa-dev pkgconf git ca-certificates python3-six fakeroot",
-        "install-subs": {"libssl1.1": ""},
+        "build-deps": "scons ninja-build python3 sudo build-essential libqt5websockets5-dev libqt5opengl5-dev qttools5-dev-tools libnode-dev libglu1-mesa-dev pkgconf git ca-certificates python3-six fakeroot",
     }
 }
 

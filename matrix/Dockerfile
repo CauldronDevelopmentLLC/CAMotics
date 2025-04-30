@@ -1,11 +1,14 @@
 # a debian based image, i.e. Ubuntu
-ARG IMAGE="ubuntu:24.04"
+ARG IMAGE
 
-FROM ${IMAGE} AS build
+FROM ${IMAGE} AS base
 
-# a list of apt-get packages, this may be subtly
-# different on different flavors of debian
-ARG DEPS="scons build-essential libqt5websockets5-dev libqt5opengl5-dev qttools5-dev-tools libnode-dev libglu1-mesa-dev pkgconf git ca-certificates python3-six fakeroot"
+
+########################## 
+FROM base AS build
+
+# required apt packages which may be slightly different on different flavors of debian
+ARG DEPS
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends $DEPS
@@ -15,12 +18,10 @@ WORKDIR /root
 
 # TODO : should this be locked to a commit?
 # clone cbang
-RUN git clone https://github.com/CauldronDevelopmentLLC/cbang.git
-
+RUN git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
 # build cbang
-RUN scons -C cbang
-
-# assign the environment variable
+RUN scons -C cbang v8_compress_pointers=false
+# assign the environment variable for cbang
 ENV CBANG_HOME=/root/cbang
 
 # copy the current checkout of camotics into the working directory
@@ -35,9 +36,23 @@ RUN scons
 # package the deb
 RUN scons package
 
-RUN ls -altrsh
-
-FROM scratch
+#################################
+FROM base AS test
 
 COPY --from=build /root/CAMotics/camotics*.deb .
+
+# install the deb, this will always whine about the missing dependencies
+RUN apt-get update && dpkg -i camotics*.deb || true
+
+# this should resolve the missing dependencies if we listed them correctly
+RUN apt-get install -f -y
+
+# this simple smoke test shouldn't segfault ;)
+RUN camotics --version
+
+#########################
+# copy the deb into a scratch image so we can eject it in the build command
+FROM scratch
+
+COPY --from=test camotics*.deb .
 
