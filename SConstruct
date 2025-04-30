@@ -410,7 +410,7 @@ if 'package' in COMMAND_LINE_TARGETS:
 
 
     if env['with_tpl']:
-        tpl_pkgs = 'libnode-dev'
+        tpl_pkgs = ['libnode-dev']
     else:
         tpl_pkgs = []
 

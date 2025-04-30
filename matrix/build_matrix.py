@@ -11,19 +11,30 @@ dockerfile = os.path.join(pwd, "Dockerfile")
 results = os.path.join(pwd, "debs")
 os.makedirs(results, exist_ok=True)
 
-
-# keyed as docker image : data
-images = {
-    "ubuntu:24.04": {
-        "build-deps": "scons ninja-build python3 sudo build-essential libqt5websockets5-dev libqt5opengl5-dev qttools5-dev-tools libnode-dev libglu1-mesa-dev pkgconf git ca-certificates python3-six fakeroot",
-    }
+# base debian packages
+base = {
+    "build-essential",
+    "ca-certificates",
+    "fakeroot",
+    "git",
+    "libglu1-mesa-dev",
+    "libnode-dev",
+    "libqt5opengl5-dev",
+    "libqt5websockets5-dev",
+    "ninja-build",
+    "pkgconf",
+    "python3",
+    "python3-six",
+    "qttools5-dev-tools",
+    "scons",
+    "sudo",
 }
+# keyed as docker image : data
+images = {"ubuntu:24.04": base}
 
 
 if __name__ == "__main__":
-    for image, kwargs in images.items():
-        deps = kwargs["build-deps"]
-
+    for image, deps in images.items():
         # build the dockerfile with fully specified paths
         command = [
             "docker",
@@ -33,7 +44,7 @@ if __name__ == "__main__":
             "--build-arg",
             f"IMAGE={image}",
             "--build-arg",
-            f"DEPS={deps}",
+            f"DEPS={' '.join(deps)}",
             "--output",
             results,
             "-f",
