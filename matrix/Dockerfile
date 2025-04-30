@@ -56,7 +56,7 @@ RUN camotics --version
 # apply the distro information to the deb, i.e. `ubuntu-20.04`
 COPY ./matrix/rename.py .
 # TODO : should this be in the `debian/control` info?
-RUN apt-get install python3 -y && python3 rename.py
+RUN apt-get install python3 lsb-release -y && python3 rename.py
 
 #########################
 # copy the deb into a scratch image so we can eject it in the build command
