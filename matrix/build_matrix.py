@@ -34,7 +34,7 @@ base = {
 
 # keyed as docker image : data
 images = {
-    # "ubuntu:25.04": base, # plucky : TODO : can't find v8.h despite installing libnode-dev
+    "ubuntu:25.04": base, # plucky : TODO : can't find v8.h despite installing libnode-dev
     "ubuntu:24.04": base,  # noble
     "ubuntu:22.04": base,  # jammy
     "debian:trixie": base,
@@ -43,8 +43,8 @@ images = {
 }
 
 # debugging: test with just one image
-# k = 'ubuntu:22.04'
-# images = {k: images[k]}
+k = 'ubuntu:25.04'
+images = {k: images[k]}
 
 if __name__ == "__main__":
     for image, deps in images.items():

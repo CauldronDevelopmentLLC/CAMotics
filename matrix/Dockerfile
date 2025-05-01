@@ -16,16 +16,22 @@ RUN apt-get update && \
 # clone our stuff into root's home
 WORKDIR /root
 
+############################################
 # clone and build cbang
-# TODO : should this be locked to a commit?
 RUN git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
-# build cbang
+# apply a fix for
+# https://github.com/CauldronDevelopmentLLC/cbang/issues/161
+COPY matrix/patch/cbang_v8.patch cbang/
+RUN cd cbang && \
+    git checkout d4dd5f52b0d5ee499ec5683f5930b01fdb24884b && \
+    git apply cbang_v8.patch
 
-# where v8.h is installed by libnode-dev
-RUN  scons -C cbang v8_compress_pointers=false
+# `v8.h` is provided by libnode-dev
+RUN scons -C cbang v8_compress_pointers=false
 # assign the environment variable for cbang
 ENV CBANG_HOME=/root/cbang
 
+#################################################
 # copy the current checkout of camotics into the working directory
 # note that this requires that the docker build context is the root of
 # the camotics repo i.e. `docker build -f matrix/Dockerfile .`
@@ -39,6 +45,8 @@ RUN scons
 
 # package the deb
 RUN scons package
+
+
 
 #################################
 # test the debian in an image without the build dependencies
