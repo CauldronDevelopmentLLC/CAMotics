@@ -1,4 +1,4 @@
-name: Python Wheels
+name: Debian Packages
 
 on:
   push:
@@ -18,10 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Debian Packages
-        run: | 
-          make debs
+        run: make debs
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.platform.target }}
+          name: debian-packages
           path: matrix/debs

@@ -1,5 +1,6 @@
 # a debian based image, i.e. Ubuntu
-ARG IMAGE=""
+# set to scratch so it will fail immediately if the build arg is not set
+ARG IMAGE="scratch"
 FROM ${IMAGE} AS base
 
 
@@ -10,20 +11,24 @@ FROM base AS build
 ARG DEPS=""
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends $DEPS
+    DEBIAN_FRONTEND=noninteractive apt-get install -y $DEPS
 
 # clone our stuff into root's home
 WORKDIR /root
 
+# clone and build cbang
 # TODO : should this be locked to a commit?
-# clone cbang
 RUN git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
 # build cbang
-RUN scons -C cbang v8_compress_pointers=false
+
+# where v8.h is installed by libnode-dev
+RUN  scons -C cbang v8_compress_pointers=false
 # assign the environment variable for cbang
 ENV CBANG_HOME=/root/cbang
 
 # copy the current checkout of camotics into the working directory
+# note that this requires that the docker build context is the root of
+# the camotics repo i.e. `docker build -f matrix/Dockerfile .`
 COPY . CAMotics
 
 # set our working directory to the camotics checkout
@@ -44,7 +49,9 @@ FROM base AS test
 COPY --from=build /root/CAMotics/camotics*.deb .
 
 # install the deb, this will always complain about the missing dependencies
-RUN apt-get update && dpkg -i camotics*.deb || true
+RUN apt-get update && apt-get install aptitude -y && dpkg -i camotics*.deb || true
+
+RUN apt show camotics && aptitude why-not camotics || true
 
 # this should resolve the missing dependencies if we listed them correctly
 RUN apt-get install -f -y
@@ -62,5 +69,6 @@ RUN apt-get install python3 lsb-release -y && python3 rename.py
 # copy the deb into a scratch image so we can eject it in the build command
 FROM scratch
 
+# copy from test stage so that it doesn't skip that stage
 COPY --from=test camotics*.deb .
 

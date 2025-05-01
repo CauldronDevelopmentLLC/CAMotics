@@ -1,4 +1,6 @@
-import os, sys, json
+import os
+import sys
+import json
 
 # local cbang
 if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
@@ -353,6 +355,14 @@ if 'package' in COMMAND_LINE_TARGETS:
     if isinstance(examples, bytes): examples = examples.decode()
     examples = list(map(lambda x: [x, x], examples.split()))
 
+
+    # if we're on debian get the distro code, i.e. `noble`, `trixie`
+    distro_code = subprocess.check_output(
+            ['lsb_release', '-cs']).decode().strip().lower()
+
+    print('Distro code: %s' % distro_code)
+    
+
     # Machines
     machines = []
     cmd = 'git ls-files machines/'
@@ -375,17 +385,29 @@ if 'package' in COMMAND_LINE_TARGETS:
     install_files = []
     if env.get('qt_deps'):
         
-        qt_pkgs = ['libqt5core5a|libqt5core5t64',
-                   'libqt5gui5|libqt5gui5t64',
-                   'libqt5opengl5|libqt5opengl5t64',
-                   'libqt5websockets5']
-        
-        qt_pkgs = ['libqt5core5t64',
-                   'libqt5gui5t64',
-                   'libqt5opengl5t64',
-                   'libqt5websockets5']
-        
-        
+        # debian distros keep renaming the qt packages
+        qt_lookup = {'noble': ['libqt5core5t64', # Ubuntu 24.04
+                               'libqt5gui5t64',
+                               'libqt5opengl5t64',
+                               'libqt5websockets5'],
+                    'jammy': ['libqt5core5a',    # Ubuntu 22.04
+                                'libqt5gui5',
+                                'libqt5opengl5',
+                                'libqt5websockets5']}
+            
+        if distro_code in qt_lookup:
+            qt_pkgs = qt_lookup[distro_code]
+        else:
+            # produce a generic requirements list using the OR requirement, i.e.
+            # i.e. `['libqt5core5a|libqt5core5t64', ...]`
+            # note that this logic requires `qt_lookup` values to all have the same
+            # length and correspond with each other, and if one package is dropped
+            # a `None` placeholder must be added to the list to keep the correspondence
+            qt_values = list(qt_lookup.values())
+            qt_pkgs = ['|'.join(set(v[i] for v in qt_values).difference({None}))
+                       for i in range(len(qt_values[0]))]
+
+
 
         if env['PLATFORM'] == 'win32':
             import shutil
@@ -411,16 +433,33 @@ if 'package' in COMMAND_LINE_TARGETS:
 
 
     if env['with_tpl']:
+        # this should provide v8
         tpl_pkgs = ['libnode-dev']
     else:
         tpl_pkgs = []
 
+    # SSL packages for various distros, which also keep changing names
+    ssl_lookup = {'noble': 'libssl3t64', 
+               'plucky': 'libssl3t64',
+               'jammy': 'libssl3',
+               'trixie': 'libssl3t64',
+               'bookworm': 'libssl3',
+               'buster': 'libssl1.1'}
+    if distro_code in ssl_lookup:
+        ssl_pkg = ssl_lookup[distro_code]
+    else:
+        # set as an OR of all the possible packages
+        ssl_pkg = '|'.join(ssl_lookup.values())
 
-    deb_depends = ['debconf', 'libc6', 'libglu1', 'libglu1-mesa', 'libssl3t64']
+    # base deps that work across all distros and don't need any logic
+    deb_depends = ['debconf', 'libc6', 'libglu1', 'libglu1-mesa']
+
+    # append the SSL package 
+    deb_depends.append(ssl_pkg)
     deb_depends.extend(qt_pkgs)    
     deb_depends.extend(tpl_pkgs)
         
-    # clean up the delimiters
+    # flatten into a comma delimited string
     deb_depends = ','.join(deb_depends)
 		     
 
@@ -433,7 +472,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         license = 'COPYING',
         bug_url = 'https://github.com/CauldronDevelopmentLLC/CAMotics/issues/',
         summary = 'Open-Source Simulation & Computer Aided Machining',
-        description = description,
+        description = description + '\n\n' + "Package compiled on distro `%s`" % distro_code,
         prefix = '/usr',
         icons = ('osx/camotics.icns', 'images/camotics.png'),
         mime = [['mime.xml', 'camotics.xml']],

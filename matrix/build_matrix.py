@@ -25,13 +25,26 @@ base = {
     "pkgconf",
     "python3",
     "python3-six",
+    "python3-setuptools",
     "qttools5-dev-tools",
+    "lsb-release",
     "scons",
     "sudo",
 }
-# keyed as docker image : data
-images = {"ubuntu:24.04": base}
 
+# keyed as docker image : data
+images = {
+    # "ubuntu:25.04": base, # plucky : TODO : can't find v8.h despite installing libnode-dev
+    "ubuntu:24.04": base,  # noble
+    "ubuntu:22.04": base,  # jammy
+    "debian:trixie": base,
+    "debian:bookworm": base,
+    "debian:bullseye": base,
+}
+
+# debugging: test with just one image
+# k = 'ubuntu:22.04'
+# images = {k: images[k]}
 
 if __name__ == "__main__":
     for image, deps in images.items():
@@ -54,5 +67,4 @@ if __name__ == "__main__":
 
         print(f"attempting to build: `{image}`")
         print(f"calling with: `{' '.join(command)}`")
-
         subprocess.call(command)
