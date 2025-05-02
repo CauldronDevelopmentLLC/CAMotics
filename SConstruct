@@ -403,7 +403,11 @@ if 'package' in COMMAND_LINE_TARGETS:
                                 'libqt5gui5',
                                 'libqt5opengl5',
                                 'libqt5websockets5']}
-            
+	qt_lookup['plucky'] = qt_lookup['noble']
+	qt_lookup['trixie'] = qt_lookup['noble']
+	qt_lookup['bookworm'] = qt_lookup['jammy']
+	qt_lookup['buster'] = qt_lookup['buster']
+
         if distro_code in qt_lookup:
             qt_pkgs = qt_lookup[distro_code]
         else:
