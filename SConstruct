@@ -458,8 +458,8 @@ if 'package' in COMMAND_LINE_TARGETS:
     if distro_code in ssl_lookup:
         ssl_pkg = ssl_lookup[distro_code]
     else:
-        # set as an OR of all the possible packages
-        ssl_pkg = '|'.join(ssl_lookup.values())
+        # set as an OR of all the unique possible packages
+        ssl_pkg = '|'.join(set(ssl_lookup.values()))
 
     # base deps that work across all distros and don't need any logic
     deb_depends = ['debconf', 'libc6', 'libglu1', 'libglu1-mesa']

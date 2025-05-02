@@ -44,7 +44,7 @@ images = {
 }
 
 # debugging: test with just one image
-# k = "ubuntu:25.04"
+# k = "debian:trixie"
 # images = {k: images[k]}
 
 if __name__ == "__main__":

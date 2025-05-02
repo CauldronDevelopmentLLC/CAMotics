@@ -3,8 +3,10 @@
 ARG IMAGE="scratch"
 FROM ${IMAGE} AS base
 
+# never ask questions in an apt-get install
+ENV DEBIAN_FRONTEND=noninteractive
 
-########################## 
+###########################################
 FROM base AS build
 
 # required apt packages which may be slightly different
@@ -12,7 +14,7 @@ FROM base AS build
 ARG DEPS=""
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y $DEPS
+    apt-get install -y $DEPS
 
 # use /root for checkouts
 WORKDIR /root
@@ -41,8 +43,6 @@ RUN scons
 
 # package the deb
 RUN scons package
-
-
 
 #################################
 # test the debian in an image without the build dependencies

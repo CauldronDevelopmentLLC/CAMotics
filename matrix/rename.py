@@ -23,8 +23,15 @@ def distro_string():
     # i.e. `22.04`
     # if you wanted this to be like `noble` or `jessie` switch the `-rs` to `-cs`
     version = subprocess.check_output(["lsb_release", "-rs"]).decode().lower().strip()
+    # i.e. `trixie`, `plucky`, etc
+    code = subprocess.check_output(["lsb_release", "-cs"]).decode().lower().strip()
 
-    return f"{distrib}-{version}"
+    # the version may be `n/a`
+    result = "-".join(
+        c for c in [distrib, version, code] if len(c) > 0 and "/" not in c
+    )
+
+    return result
 
 
 if __name__ == "__main__":
