@@ -403,10 +403,11 @@ if 'package' in COMMAND_LINE_TARGETS:
                                 'libqt5gui5',
                                 'libqt5opengl5',
                                 'libqt5websockets5']}
-	qt_lookup['plucky'] = qt_lookup['noble']
-	qt_lookup['trixie'] = qt_lookup['noble']
-	qt_lookup['bookworm'] = qt_lookup['jammy']
-	qt_lookup['buster'] = qt_lookup['buster']
+        # use exact versions for the other distros
+        qt_lookup['plucky'] = qt_lookup['noble']
+        qt_lookup['trixie'] = qt_lookup['noble']
+        qt_lookup['bookworm'] = qt_lookup['jammy']
+        qt_lookup['buster'] = qt_lookup['jammy']
 
         if distro_code in qt_lookup:
             qt_pkgs = qt_lookup[distro_code]
@@ -454,11 +455,11 @@ if 'package' in COMMAND_LINE_TARGETS:
     # SSL packages for various distros
     # these also keep changing names
     ssl_lookup = {'noble': 'libssl3t64', 
-               'plucky': 'libssl3t64',
-               'jammy': 'libssl3',
-               'trixie': 'libssl3t64',
-               'bookworm': 'libssl3',
-               'buster': 'libssl1.1'}
+                 'plucky': 'libssl3t64',
+                 'jammy': 'libssl3',
+                 'trixie': 'libssl3t64',
+                 'bookworm': 'libssl3',
+                 'buster': 'libssl1.1'}
     if distro_code in ssl_lookup:
         ssl_pkg = ssl_lookup[distro_code]
     else:
