@@ -10,6 +10,20 @@ cbang = os.environ.get('CBANG_HOME')
 with open('package.json', 'r') as f: pkg_meta = json.load(f)
 version = pkg_meta['version']
 
+# Debian Distro Code
+
+try:
+    # if we're on debian get the distro code, i.e. `noble`, `trixie`
+    distro_code = subprocess.check_output(
+            ['lsb_release', '-cs']).decode().strip().lower()
+except BaseException as E:
+    print(f"Not on Debian or no `apt install lsb-release: `{E}`")
+    distro_code = None
+
+# True, except on newer debian with the libnode-dev issue
+default_tpl = distro_code not in {'plucky', 'trixie'}
+
+
 # Setup
 env = Environment(ENV = os.environ,
                   TARGET_ARCH = os.environ.get('TARGET_ARCH', 'x86'))
@@ -21,7 +35,7 @@ env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     ('python_version', 'Set python version', '3'),
-    BoolVariable('with_tpl', 'Enable TPL', True),
+    BoolVariable('with_tpl', 'Enable TPL', default_tpl),
     BoolVariable('with_gui', 'Enable graphical user interface', True),
     BoolVariable('wrap_glibc', 'Enable GlibC function wrapping', False)
     )
@@ -356,11 +370,6 @@ if 'package' in COMMAND_LINE_TARGETS:
     examples = list(map(lambda x: [x, x], examples.split()))
 
 
-    # if we're on debian get the distro code, i.e. `noble`, `trixie`
-    distro_code = subprocess.check_output(
-            ['lsb_release', '-cs']).decode().strip().lower()
-
-    print('Distro code: %s' % distro_code)
     
 
     # Machines

@@ -8,6 +8,7 @@ root = os.path.abspath(os.path.join(pwd, ".."))
 # location of dockerfile
 dockerfile = os.path.join(pwd, "Dockerfile")
 
+# where to save generated `.deb` packages
 results = os.path.join(pwd, "debs")
 os.makedirs(results, exist_ok=True)
 
@@ -34,16 +35,16 @@ base = {
 
 # keyed as docker image : data
 images = {
-    "ubuntu:25.04": base, # plucky : TODO : can't find v8.h despite installing libnode-dev
+    "ubuntu:25.04": base,  # plucky : TODO : cbang can't find v8.h despite installing libnode-dev
     "ubuntu:24.04": base,  # noble
     "ubuntu:22.04": base,  # jammy
-    "debian:trixie": base,
+    "debian:trixie": base,  # : TODO : same issue as plucky
     "debian:bookworm": base,
     "debian:bullseye": base,
 }
 
 # debugging: test with just one image
-k = 'ubuntu:25.04'
+k = "ubuntu:25.04"
 images = {k: images[k]}
 
 if __name__ == "__main__":
@@ -67,4 +68,8 @@ if __name__ == "__main__":
 
         print(f"attempting to build: `{image}`")
         print(f"calling with: `{' '.join(command)}`")
+
+        # will not raise error if it fails, if you wanted
+        # to only accept full results change this to
+        # `check_call`
         subprocess.call(command)
