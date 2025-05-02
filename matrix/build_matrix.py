@@ -44,8 +44,8 @@ images = {
 }
 
 # debugging: test with just one image
-k = "ubuntu:25.04"
-images = {k: images[k]}
+# k = "ubuntu:25.04"
+# images = {k: images[k]}
 
 if __name__ == "__main__":
     for image, deps in images.items():

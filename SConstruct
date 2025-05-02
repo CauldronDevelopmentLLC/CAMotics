@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import subprocess
 
 # local cbang
 if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
@@ -359,7 +360,6 @@ material or breaking tools.'''
 
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
-    import subprocess
 
     # Examples
     examples = []
@@ -447,7 +447,8 @@ if 'package' in COMMAND_LINE_TARGETS:
     else:
         tpl_pkgs = []
 
-    # SSL packages for various distros, which also keep changing names
+    # SSL packages for various distros
+    # these also keep changing names
     ssl_lookup = {'noble': 'libssl3t64', 
                'plucky': 'libssl3t64',
                'jammy': 'libssl3',
@@ -463,14 +464,13 @@ if 'package' in COMMAND_LINE_TARGETS:
     # base deps that work across all distros and don't need any logic
     deb_depends = ['debconf', 'libc6', 'libglu1', 'libglu1-mesa']
 
-    # append the SSL package 
+    # append the platform-dependant packages
     deb_depends.append(ssl_pkg)
     deb_depends.extend(qt_pkgs)    
     deb_depends.extend(tpl_pkgs)
         
     # flatten into a comma delimited string
     deb_depends = ','.join(deb_depends)
-		     
 
     pkg = env.Packager(
         'CAMotics',
