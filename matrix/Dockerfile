@@ -53,12 +53,15 @@ FROM base AS test
 COPY --from=build /root/CAMotics/camotics*.deb .
 
 # install the deb, this will always complain about the missing dependencies
-RUN apt-get update && apt-get install aptitude -y && dpkg -i camotics*.deb || true
+RUN dpkg -i camotics*.deb || true
 
-RUN apt show camotics && aptitude why-not camotics || true
+# if the deb is not installing cleanly this debug info is helpful: 
+# RUN apt-get update && apt-get install aptitude -y && \
+#   apt show camotics && aptitude why-not camotics || true
 
 # this should resolve the missing dependencies if we listed them correctly
-RUN apt-get install -f -y
+# if we listed them incorrectly it will remove camotics
+RUN apt-get update && apt-get install -f -y
 
 # this simple smoke test shouldn't crash
 RUN camotics --version
@@ -73,5 +76,5 @@ RUN apt-get install python3 lsb-release -y && python3 rename.py
 # copy the deb into a scratch image so we can eject it in the build command
 FROM scratch
 
-# copy from test stage so that it doesn't skip that stage
+# copy renamed binary from test stage as our output
 COPY --from=test camotics*.deb .
