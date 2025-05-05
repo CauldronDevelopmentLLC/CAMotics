@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   debs:
+    name: Build Debian Packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +35,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: packages-*
-          path: dist
+          merge-multiple: true
+          path: ./dist
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
@@ -42,4 +44,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           body: ${{ github.event.head_commit.message }}
-          artifacts: "dist/*.deb"
+          artifacts: ./dist/*.deb

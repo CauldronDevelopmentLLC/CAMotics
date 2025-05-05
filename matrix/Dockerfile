@@ -52,16 +52,13 @@ FROM base AS test
 # copy our built package
 COPY --from=build /root/CAMotics/camotics*.deb .
 
-# install the deb, this will always complain about the missing dependencies
-RUN dpkg -i camotics*.deb || true
-
 # if the deb is not installing cleanly this debug info is helpful: 
 # RUN apt-get update && apt-get install aptitude -y && \
 #   apt show camotics && aptitude why-not camotics || true
 
 # this should resolve the missing dependencies if we listed them correctly
 # if we listed them incorrectly it will remove camotics
-RUN apt-get update && apt-get install -f -y
+RUN apt-get update && apt install --no-install-recommends -y ./*.deb
 
 # this simple smoke test shouldn't crash
 RUN camotics --version

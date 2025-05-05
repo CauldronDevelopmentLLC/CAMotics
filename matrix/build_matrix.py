@@ -12,8 +12,9 @@ dockerfile = os.path.join(pwd, "Dockerfile")
 results = os.path.join(pwd, "debs")
 os.makedirs(results, exist_ok=True)
 
-# base debian packages
-base = {
+
+# the packages required to build CAMotics on Debian.
+build_deps = {
     "build-essential",
     "ca-certificates",
     "fakeroot",
@@ -33,14 +34,14 @@ base = {
     "sudo",
 }
 
-# keyed as docker image : data
+# keyed as docker image : build deps
 images = {
-    "ubuntu:25.04": base,  # plucky : TODO : cbang can't find v8.h despite installing libnode-dev
-    "ubuntu:24.04": base,  # noble
-    "ubuntu:22.04": base,  # jammy
-    "debian:trixie": base,  # : TODO : same issue as plucky
-    "debian:bookworm": base,
-    "debian:bullseye": base,
+    "ubuntu:25.04": build_deps,  # plucky : TODO : cbang can't find v8.h despite installing libnode-dev
+    "ubuntu:24.04": build_deps,  # noble
+    "ubuntu:22.04": build_deps,  # jammy
+    "debian:trixie": build_deps,  # : TODO : same issue as plucky
+    "debian:bookworm": build_deps,
+    "debian:bullseye": build_deps,
 }
 
 # debugging: test with just one image
@@ -69,7 +70,6 @@ if __name__ == "__main__":
         print(f"attempting to build: `{image}`")
         print(f"calling with: `{' '.join(command)}`")
 
-        # will not raise error if it fails, if you wanted
-        # to only accept full results change this to
-        # `check_call`
-        subprocess.call(command)
+        # to accept partial results or not change between:
+        # `subprocess.call` <-> `subprocess.check_call`
+        subprocess.check_call(command)
