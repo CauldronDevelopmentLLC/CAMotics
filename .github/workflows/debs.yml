@@ -3,7 +3,7 @@ name: Debian Packages
 on:
   push:
     tags:
-      - '*'
+      - '*-release'
 
 permissions:
   contents: read
