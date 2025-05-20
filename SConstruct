@@ -1,4 +1,7 @@
-import os, sys, json
+import os
+import sys
+import json
+import subprocess
 
 # local cbang
 if not os.environ.get('CBANG_HOME'): os.environ['CBANG_HOME'] = './cbang'
@@ -7,6 +10,20 @@ cbang = os.environ.get('CBANG_HOME')
 # Version
 with open('package.json', 'r') as f: pkg_meta = json.load(f)
 version = pkg_meta['version']
+
+# Debian Distro Code
+
+try:
+    # if we're on debian get the distro code, i.e. `noble`, `trixie`
+    distro_code = subprocess.check_output(
+            ['lsb_release', '-cs']).decode().strip().lower()
+except BaseException as E:
+    print(f"Not on Debian or no `apt install lsb-release: `{E}`")
+    distro_code = None
+
+# True, except on newer debian with the libnode-dev issue
+default_tpl = distro_code not in {'plucky', 'trixie'}
+
 
 # Setup
 env = Environment(ENV = os.environ,
@@ -19,7 +36,7 @@ env.CBAddVariables(
     ('install_prefix', 'Installation directory prefix', '/usr/local/'),
     BoolVariable('qt_deps', 'Enable Qt package dependencies', True),
     ('python_version', 'Set python version', '3'),
-    BoolVariable('with_tpl', 'Enable TPL', True),
+    BoolVariable('with_tpl', 'Enable TPL', default_tpl),
     BoolVariable('with_gui', 'Enable graphical user interface', True),
     BoolVariable('wrap_glibc', 'Enable GlibC function wrapping', False)
     )
@@ -343,7 +360,6 @@ material or breaking tools.'''
 
 # Package
 if 'package' in COMMAND_LINE_TARGETS:
-    import subprocess
 
     # Examples
     examples = []
@@ -352,6 +368,9 @@ if 'package' in COMMAND_LINE_TARGETS:
     examples = p.communicate()[0]
     if isinstance(examples, bytes): examples = examples.decode()
     examples = list(map(lambda x: [x, x], examples.split()))
+
+
+    
 
     # Machines
     machines = []
@@ -374,13 +393,42 @@ if 'package' in COMMAND_LINE_TARGETS:
 
     install_files = []
     if env.get('qt_deps'):
-        qt_pkgs = ', libqt5core5a, libqt5gui5, libqt5opengl5, libqt5websockets5'
+        
+        # debian distros keep renaming the qt packages
+        qt_lookup = {'noble': ['libqt5core5t64', # Ubuntu 24.04
+                               'libqt5gui5t64',
+                               'libqt5opengl5t64',
+                               'libqt5websockets5'],
+                    'jammy': ['libqt5core5a',    # Ubuntu 22.04
+                                'libqt5gui5',
+                                'libqt5opengl5',
+                                'libqt5websockets5']}
+        # use exact versions for the other distros
+        qt_lookup['plucky'] = qt_lookup['noble']
+        qt_lookup['trixie'] = qt_lookup['noble']
+        qt_lookup['bookworm'] = qt_lookup['jammy']
+        qt_lookup['buster'] = qt_lookup['jammy']
+
+        if distro_code in qt_lookup:
+            qt_pkgs = qt_lookup[distro_code]
+        else:
+            # produce a generic requirements list using the OR requirement, i.e.
+            # i.e. `['libqt5core5a|libqt5core5t64', ...]`
+            # note that this logic requires `qt_lookup` values to all have the same
+            # length and correspond with each other, and if one package is dropped
+            # a `None` placeholder must be added to the list to keep the correspondence
+            qt_values = list(qt_lookup.values())
+            qt_pkgs = ['|'.join(set(v[i] for v in qt_values).difference({None}))
+                       for i in range(len(qt_values[0]))]
+
+
 
         if env['PLATFORM'] == 'win32':
             import shutil
             try:
                 shutil.rmtree('build/win32')
-            except: pass
+            except:
+                pass
 
             cmd = [env['QTDIR'] + '\\bin\\windeployqt.exe', '--dir',
                    'build\\win32', '--no-system-d3d-compiler', '--no-opengl-sw',
@@ -394,7 +442,40 @@ if 'package' in COMMAND_LINE_TARGETS:
                     env['VCREDIST'] = name
                 install_files.append('build\\win32\\' + name)
 
-    else: qt_pkgs = ''
+    else:
+        qt_pkgs = []
+
+
+    if env['with_tpl']:
+        # this should provide v8
+        tpl_pkgs = ['libnode-dev']
+    else:
+        tpl_pkgs = []
+
+    # SSL packages for various distros
+    # these also keep changing names
+    ssl_lookup = {'noble': 'libssl3t64', 
+                 'plucky': 'libssl3t64',
+                 'jammy': 'libssl3',
+                 'trixie': 'libssl3t64',
+                 'bookworm': 'libssl3',
+                 'buster': 'libssl1.1'}
+    if distro_code in ssl_lookup:
+        ssl_pkg = ssl_lookup[distro_code]
+    else:
+        # set as an OR of all the unique possible packages
+        ssl_pkg = '|'.join(set(ssl_lookup.values()))
+
+    # base deps that work across all distros and don't need any logic
+    deb_depends = ['debconf', 'libc6', 'libglu1', 'libglu1-mesa']
+
+    # append the platform-dependant packages
+    deb_depends.append(ssl_pkg)
+    deb_depends.extend(qt_pkgs)    
+    deb_depends.extend(tpl_pkgs)
+        
+    # flatten into a comma delimited string
+    deb_depends = ','.join(deb_depends)
 
     pkg = env.Packager(
         'CAMotics',
@@ -405,7 +486,7 @@ if 'package' in COMMAND_LINE_TARGETS:
         license = 'COPYING',
         bug_url = 'https://github.com/CauldronDevelopmentLLC/CAMotics/issues/',
         summary = 'Open-Source Simulation & Computer Aided Machining',
-        description = description,
+        description = description + '\n\n' + "Package compiled on distro `%s`" % distro_code,
         prefix = '/usr',
         icons = ('osx/camotics.icns', 'images/camotics.png'),
         mime = [['mime.xml', 'camotics.xml']],
@@ -425,16 +506,13 @@ if 'package' in COMMAND_LINE_TARGETS:
 
         deb_directory = 'debian',
         deb_section = 'miscellaneous',
-        deb_depends =
-        'debconf | debconf-2.0, libc6, libglu1, ' +
-        'libv8-3.14.5 | libv8-dev | libnode-dev, ' +
-        'libglu1-mesa, libssl1.1' + qt_pkgs,
+        deb_depends = deb_depends,
         deb_priority = 'optional',
         deb_replaces = 'openscam',
 
         rpm_license = 'GPLv2+',
         rpm_group = 'Applications/Engineering',
-        rpm_requires = 'expat' + qt_pkgs,
+        rpm_requires = 'expat' + ','.join(qt_pkgs),
         rpm_obsoletes = 'openscam',
 
         app_id = 'org.camotics.CAMotics',

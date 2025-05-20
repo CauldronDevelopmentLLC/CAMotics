@@ -1,0 +1,47 @@
+name: Debian Packages
+
+on:
+  push:
+    tags:
+      - '*-release'
+
+permissions:
+  contents: read
+
+jobs:
+  debs:
+    name: Build Debian Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Debian Packages
+        run: make debs
+      - name: Upload Debian Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-debian
+          path: matrix/debs
+
+  release:
+    permissions:
+      contents: write  # for actions/create-release
+    name: Create GitHub Release
+    needs: [debs]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download Debian Packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          merge-multiple: true
+          path: ./dist
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body: ${{ github.event.head_commit.message }}
+          artifacts: ./dist/*.deb
