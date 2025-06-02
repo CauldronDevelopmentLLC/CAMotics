@@ -31,7 +31,6 @@
 #include <cbang/String.h>
 #include <cbang/Catch.h>
 #include <cbang/util/HumanNumber.h>
-#include <cbang/time/HumanTime.h>
 #include <cbang/log/Logger.h>
 #include <cbang/config/Options.h>
 

@@ -105,7 +105,9 @@ PyMODINIT_FUNC PyInit_camotics() {
   cb::Logger::instance().setLogPrefix(true);
   cb::Logger::instance().setLogColor(false);
 
+#if PY_MAJOR_VERSION < 3 || PY_MINOR_VERSION < 7
   if (!PyEval_ThreadsInitialized()) PyEval_InitThreads();
+#endif
 
   PyObject *mod = PyModule_Create(&module);
   if (!mod) return 0;

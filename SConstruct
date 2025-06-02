@@ -21,9 +21,12 @@ env.CBAddVariables(
     ('python_version', 'Set python version', '3'),
     BoolVariable('with_tpl', 'Enable TPL', True),
     BoolVariable('with_gui', 'Enable graphical user interface', True),
-    BoolVariable('wrap_glibc', 'Enable GlibC function wrapping', False)
+    BoolVariable('wrap_glibc', 'Enable GlibC function wrapping', False),
+    EnumVariable('cxxstd', 'Set C++ language standard', 'c++17',
+      allowed_values = ('c++14', 'c++17', 'c++20')),
     )
 conf = env.CBConfigure()
+
 
 # Config vars
 env.Replace(PACKAGE_VERSION   = version)
