@@ -75,5 +75,6 @@
         <file>icons/welcome.png</file>
         <file>flags/en.png</file>
         <file>flags/de.png</file>
+        <file>flags/ka.png</file>
     </qresource>
 </RCC>
