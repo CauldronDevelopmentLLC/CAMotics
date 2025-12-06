@@ -61,6 +61,8 @@ namespace GCode {
   public:
     Planner();
 
+    ControllerImpl &getController() {return controller;}
+
     double getTime() const {return planner.getTime();}
     double getDistance() const {return planner.getDistance();}
 

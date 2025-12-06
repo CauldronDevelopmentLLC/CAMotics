@@ -262,6 +262,37 @@ namespace {
   }
 
 
+  PyObject *_get_modal_state(PyPlanner *self) {
+    try {
+      PyObject *dict = PyDict_New();
+      if (!dict) return 0;
+
+      auto &controller = self->planner->getController();
+
+      // Units: G20 (IMPERIAL) or G21 (METRIC)
+      auto units = controller.getUnits();
+      PyDict_SetItemString(dict, "units",
+        PyLong_FromLong(units == GCode::Units::METRIC ? 21 : 20));
+
+      // Distance mode: G90 (absolute) or G91 (incremental)
+      bool incremental = controller.getIncrementalDistanceMode();
+      PyDict_SetItemString(dict, "distance_mode",
+        PyLong_FromLong(incremental ? 91 : 90));
+
+      // Plane: G17 (XY), G18 (XZ), G19 (YZ)
+      auto plane = controller.getPlane();
+      int planeCode = 17; // default XY
+      if (plane == GCode::MachineEnum::XZ) planeCode = 18;
+      else if (plane == GCode::MachineEnum::YZ) planeCode = 19;
+      PyDict_SetItemString(dict, "plane", PyLong_FromLong(planeCode));
+
+      return dict;
+    } CATCH_PYTHON;
+
+    return 0;
+  }
+
+
   PyMethodDef _methods[] = {
     {"is_running", (PyCFunction)_is_running, METH_NOARGS,
      "True if the planner is active"},
@@ -286,6 +317,8 @@ namespace {
     {"synchronize", (PyCFunction)_synchronize, METH_VARARGS | METH_KEYWORDS,
      "Continue with result synchronized command"},
     {"get_queue", (PyCFunction)_get_queue, METH_NOARGS, "Dump planner queue"},
+    {"get_modal_state", (PyCFunction)_get_modal_state, METH_NOARGS,
+     "Get current modal state (units, distance_mode, plane)"},
     {0}
   };
 }

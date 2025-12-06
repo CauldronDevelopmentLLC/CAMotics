@@ -121,6 +121,9 @@ namespace GCode {
     void setPlane(plane_t plane);
     Plane getPlane() {return Plane(state.plane);}
 
+    // Distance Mode
+    bool getIncrementalDistanceMode() const {return state.incrementalDistanceMode;}
+
     // Path mode
     void setPathMode(path_mode_t mode, double motionBlending = 0,
                      double naiveCAM = 0);
