@@ -124,6 +124,9 @@ namespace GCode {
     // Distance Mode
     bool getIncrementalDistanceMode() const {return state.incrementalDistanceMode;}
 
+    // Plane (raw enum value)
+    plane_t getPlaneValue() const {return state.plane;}
+
     // Path mode
     void setPathMode(path_mode_t mode, double motionBlending = 0,
                      double naiveCAM = 0);
