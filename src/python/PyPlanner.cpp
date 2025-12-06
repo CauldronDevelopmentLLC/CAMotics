@@ -282,8 +282,8 @@ namespace {
       // Plane: G17 (XY), G18 (XZ), G19 (YZ)
       auto plane = controller.getPlane();
       int planeCode = 17; // default XY
-      if (plane == GCode::MachineEnum::XZ) planeCode = 18;
-      else if (plane == GCode::MachineEnum::YZ) planeCode = 19;
+      if (plane == GCode::Plane(GCode::MachineEnum::XZ)) planeCode = 18;
+      else if (plane == GCode::Plane(GCode::MachineEnum::YZ)) planeCode = 19;
       PyDict_SetItemString(dict, "plane", PyLong_FromLong(planeCode));
 
       return dict;
