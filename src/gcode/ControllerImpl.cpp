@@ -195,6 +195,15 @@ void ControllerImpl::input(unsigned index, bool digital, input_mode_t mode,
 void ControllerImpl::setPlane(plane_t plane) {
   if (VW < plane) THROW("Invalid plane: " << plane);
   state.plane = plane;
+  // Propagate through pipeline for synchronized state updates
+  set("_plane", plane, NO_UNITS);
+}
+
+
+void ControllerImpl::setIncrementalDistanceMode(bool enable) {
+  state.incrementalDistanceMode = enable;
+  // Propagate through pipeline: send G-code value (90=absolute, 91=incremental)
+  set("_distance_mode", enable ? 91 : 90, NO_UNITS);
 }
 
 
@@ -765,7 +774,7 @@ void ControllerImpl::end() {
   setPlane(XY);
 
   // Distance mode is set to absolute mode (G90)
-  state.incrementalDistanceMode = false;
+  setIncrementalDistanceMode(false);
 
   // Feed rate mode is set to units per minute (G94)
   setFeedMode(UNITS_PER_MINUTE);
@@ -1140,9 +1149,9 @@ bool ControllerImpl::execute(const Code &code, int vars) {
 
     case 890: drill(vars, true, true, false);   break; // Dwell, feed out
 
-    case 900: state.incrementalDistanceMode    = false; break;
+    case 900: setIncrementalDistanceMode(false); break;
     case 901: state.arcIncrementalDistanceMode = false; break;
-    case 910: state.incrementalDistanceMode    = true;  break;
+    case 910: setIncrementalDistanceMode(true);  break;
     case 911: state.arcIncrementalDistanceMode = true;  break;
 
     case 920: setGlobalOffsets(vars, true); break;

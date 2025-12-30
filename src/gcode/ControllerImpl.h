@@ -123,6 +123,7 @@ namespace GCode {
 
     // Distance Mode
     bool getIncrementalDistanceMode() const {return state.incrementalDistanceMode;}
+    void setIncrementalDistanceMode(bool enable);
 
     // Plane (raw enum value)
     plane_t getPlaneValue() const {return state.plane;}
