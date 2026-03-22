@@ -249,7 +249,7 @@ if env['with_gui']:
         _env.AppendUnique(LINKFLAGS = ['-Wl,--subsystem,windows'])
 
     # GUI progs
-    for prog in 'camotics camsim'.split():
+    for prog in 'camotics'.split():
         p = _env.Program(prog, ['build/%s.cpp' % prog] + qrc)
         _env.Precious(p)
         _env.Install(_env.get('install_prefix') + '/bin/', p)
@@ -276,7 +276,7 @@ if env['PLATFORM'] == 'posix':
 
 # Build other programs
 docs = ['README.md', 'LICENSE', 'COPYING', 'CHANGELOG.md']
-progs = 'gcodetool planner'
+progs = 'gcodetool planner camsim'
 if env['with_tpl']: progs += ' tplang'
 
 for prog in progs.split():
