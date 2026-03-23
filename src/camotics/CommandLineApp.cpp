@@ -84,14 +84,6 @@ CommandLineApp::CommandLineApp(const string &name, hasFeature_t hasFeature) :
 }
 
 
-bool CommandLineApp::_hasFeature(int feature) {
-  switch (feature) {
-  case FEATURE_SIGNAL_HANDLER: return false;
-  default: return Application::_hasFeature(feature);
-  }
-}
-
-
 int CommandLineApp::init(int argc, char *argv[]) {
   int ret = Application::init(argc, argv);
   if (ret == -1) return ret;

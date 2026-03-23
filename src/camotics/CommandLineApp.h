@@ -47,10 +47,9 @@ namespace CAMotics {
 
   public:
     CommandLineApp(const std::string &name,
-                   hasFeature_t hasFeature = CommandLineApp::_hasFeature);
+                   hasFeature_t hasFeature = Application::_hasFeature);
 
     // From cb::Application
-    static bool _hasFeature(int feature);
     int init(int argc, char *argv[]) override;
     void run() override;
 
