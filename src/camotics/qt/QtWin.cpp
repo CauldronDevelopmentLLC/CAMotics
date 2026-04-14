@@ -1006,12 +1006,25 @@ bool QtWin::runNewProjectDialog() {
   // Initialize dialog
   newProjectDialog.setUnits(getDefaultUnits());
 
+  // Skip dialog if configured
+  if (QSettings().value("Settings/SkipNewProjectDialog", false).toBool())
+    return true;
+
   // Run dialog
   return newProjectDialog.exec() == QDialog::Accepted;
 }
 
 
 GCode::ToolTable QtWin::getNewToolTable() {
+  // When dialog was skipped, use the configured default tool table
+  if (QSettings().value("Settings/SkipNewProjectDialog", false).toBool()) {
+    int toolTable = QSettings().value("Settings/DefaultToolTable", 0).toInt();
+    if (toolTable == 0) return loadDefaultToolTable();
+    if (toolTable == 1)
+      return project.isNull() ? GCode::ToolTable() : project->getTools();
+    return GCode::ToolTable();
+  }
+
   if (newProjectDialog.defaultToolTableSelected())
     return loadDefaultToolTable();
 
@@ -1333,6 +1346,9 @@ void QtWin::removeFile(unsigned index) {
 
 
 bool QtWin::checkSave(bool canCancel) {
+  if (QSettings().value("Settings/SkipSaveConfirmation", false).toBool())
+    return true;
+
   if (!ui->fileTabManager->checkSaveAll()) return false;
   if (project.isNull() || !project->isDirty()) return true;
 

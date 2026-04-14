@@ -80,5 +80,6 @@ namespace CAMotics {
     void on_resolutionComboBox_currentIndexChanged(int index);
     void on_resolutionDoubleSpinBox_valueChanged(double value);
     void on_plannerEnableCheckBox_stateChanged(int checked);
+    void on_skipNewProjectCheckBox_stateChanged(int checked);
   };
 }

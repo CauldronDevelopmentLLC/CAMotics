@@ -33,6 +33,7 @@
 #include <QFile>
 #include <QString>
 #include <QMessageBox>
+#include <QSettings>
 
 using namespace CAMotics;
 using namespace cb;
@@ -126,6 +127,9 @@ const SmartPointer<Project::File> &FileTabManager::getFile(unsigned tab) const {
 
 
 bool FileTabManager::checkSave(unsigned tab) {
+  if (QSettings().value("Settings/SkipSaveConfirmation", false).toBool())
+    return true;
+
   if (!isModified(tab)) return true;
 
   // Select tab
@@ -144,6 +148,9 @@ bool FileTabManager::checkSave(unsigned tab) {
 
 
 bool FileTabManager::checkSaveAll() {
+  if (QSettings().value("Settings/SkipSaveConfirmation", false).toBool())
+    return true;
+
   bool all = false;
 
   try {
