@@ -138,6 +138,16 @@ void SettingsDialog::load(Project::Project &project, View &view) {
   ui.renderModeComboBox->
     setCurrentIndex(settings.get("Settings/RenderMode", 0).toInt());
 
+  // Dialog settings
+  bool skipNewProject =
+    settings.get("Settings/SkipNewProjectDialog", false).toBool();
+  ui.skipNewProjectCheckBox->setChecked(skipNewProject);
+  ui.defaultToolTableComboBox->setEnabled(skipNewProject);
+  ui.defaultToolTableComboBox->
+    setCurrentIndex(settings.get("Settings/DefaultToolTable", 0).toInt());
+  ui.skipSaveConfirmCheckBox->
+    setChecked(settings.get("Settings/SkipSaveConfirmation", false).toBool());
+
   ui.aabbCheckBox->setChecked(view.isFlagSet(View::SHOW_BBTREE_FLAG));
   ui.aabbLeavesCheckBox->setChecked(view.isFlagSet(View::BBTREE_LEAVES_FLAG));
 
@@ -161,6 +171,14 @@ void SettingsDialog::save(Project::Project &project, View &view) {
   settings.set("Settings/Units", ui.defaultUnitsComboBox->currentIndex());
 
   settings.set("Settings/RenderMode", ui.renderModeComboBox->currentIndex());
+
+  // Dialog settings
+  settings.set("Settings/SkipNewProjectDialog",
+               ui.skipNewProjectCheckBox->isChecked());
+  settings.set("Settings/DefaultToolTable",
+               ui.defaultToolTableComboBox->currentIndex());
+  settings.set("Settings/SkipSaveConfirmation",
+               ui.skipSaveConfirmCheckBox->isChecked());
 
   view.setFlag(View::SHOW_BBTREE_FLAG, ui.aabbCheckBox->isChecked());
   view.setFlag(View::BBTREE_LEAVES_FLAG, ui.aabbLeavesCheckBox->isChecked());
@@ -213,4 +231,9 @@ void SettingsDialog::on_resolutionDoubleSpinBox_valueChanged(double value) {
 
 void SettingsDialog::on_plannerEnableCheckBox_stateChanged(int checked) {
   ui.plannerGroupBox->setEnabled(checked);
+}
+
+
+void SettingsDialog::on_skipNewProjectCheckBox_stateChanged(int checked) {
+  ui.defaultToolTableComboBox->setEnabled(checked);
 }
