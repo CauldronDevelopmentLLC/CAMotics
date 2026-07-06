@@ -23,7 +23,10 @@
 #include <cbang/SmartPointer.h>
 
 
-namespace GCode {class ToolPath;}
+namespace GCode {
+  class Axes;
+  class ToolPath;
+}
 
 namespace CAMotics {
   namespace Project {class Project;}
@@ -40,7 +43,8 @@ namespace CAMotics {
     ~CutSim();
 
     cb::SmartPointer<GCode::ToolPath>
-    computeToolPath(const Project::Project &project);
+    computeToolPath(const Project::Project &project,
+                    const GCode::Axes *startPosition = 0);
     cb::SmartPointer<Surface> computeSurface(const Simulation &sim);
     void reduceSurface(const cb::SmartPointer<Surface> &surface);
 

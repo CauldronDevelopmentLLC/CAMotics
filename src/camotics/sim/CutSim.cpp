@@ -35,8 +35,11 @@ CutSim::~CutSim() {}
 
 
 SmartPointer<GCode::ToolPath>
-CutSim::computeToolPath(const Project::Project &project) {
+CutSim::computeToolPath(const Project::Project &project,
+                        const GCode::Axes *startPosition) {
   task = new ToolPathTask(project);
+  if (startPosition)
+    task.cast<ToolPathTask>()->setStartPosition(*startPosition);
   task->run();
   return task.cast<ToolPathTask>()->getPath();
 }

@@ -24,6 +24,8 @@
 #include <camotics/project/Project.h>
 #include <camotics/contour/Surface.h>
 
+#include <gcode/Axes.h>
+
 #include <stl/Writer.h>
 
 #include <cbang/Exception.h>
@@ -51,6 +53,7 @@ namespace CAMotics {
     bool binary = true;
     RenderMode renderMode;
     string resolution;
+    string startPosition;
     unsigned threads;
 
     string input;
@@ -79,6 +82,9 @@ namespace CAMotics {
                         "Render surface generation mode.");
       cmdLine.addTarget("resolution", resolution, "Valid values are 'low', "
                         "'medium', 'high' or a decimal value.");
+      cmdLine.addTarget("start-position", startPosition,
+                        "Tool start position as 'X,Y,Z' in millimeters.  "
+                        "Defaults to the machine origin 0,0,0.");
       cmdLine.addTarget("threads", threads, "Number of simulation threads.");
 
       Logger::instance().setLogTime(false);
@@ -127,8 +133,24 @@ namespace CAMotics {
         project.setResolutionMode(resMode);
       }
 
+      // Start position
+      GCode::Axes startPos;
+      bool hasStartPos = false;
+      if (!startPosition.empty()) {
+        vector<string> parts;
+        String::tokenize(startPosition, parts, ",", true);
+        if (parts.size() != 3)
+          THROW("Invalid --start-position '" << startPosition
+                << "', expected 'X,Y,Z'");
+        startPos.setXYZ(String::parseDouble(parts[0], true),
+                        String::parseDouble(parts[1], true),
+                        String::parseDouble(parts[2], true));
+        hasStartPos = true;
+      }
+
       // Generate tool path
-      SmartPointer<GCode::ToolPath> path = cutSim.computeToolPath(project);
+      SmartPointer<GCode::ToolPath> path =
+        cutSim.computeToolPath(project, hasStartPos ? &startPos : 0);
 
       // Simulate
       Rectangle3D bounds = project.getWorkpiece().getBounds();

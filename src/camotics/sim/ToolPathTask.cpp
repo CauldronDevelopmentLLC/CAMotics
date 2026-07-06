@@ -176,6 +176,14 @@ void ToolPathTask::runGCodeString(const string &gcode) {
 
 
 void ToolPathTask::run() {
+  // Seed the tool start position.  The interpreter otherwise starts at the
+  // machine origin, which for a workpiece containing the origin means the
+  // first move is simulated with the tool inside the material.
+  if (hasStartPosition) {
+    controller.setAbsolutePosition(startPosition, GCode::Units::METRIC);
+    pipeline.setPosition(controller.getAbsolutePosition());
+  }
+
   // Interpret files
   try {
     for (unsigned i = 0; i < files.size() && !Task::shouldQuit(); i++) {

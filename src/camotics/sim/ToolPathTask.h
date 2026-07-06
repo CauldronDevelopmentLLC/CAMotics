@@ -64,6 +64,9 @@ namespace CAMotics {
     cb::SmartPointer<GCode::ToolPath> path;
     std::ostringstream gcode;
 
+    GCode::Axes startPosition;
+    bool hasStartPosition = false;
+
     cb::SmartPointer<tplang::TPLContext> tplCtx;
 
   public:
@@ -74,6 +77,12 @@ namespace CAMotics {
     unsigned getErrorCount() const {return errors;}
     const cb::SmartPointer<GCode::ToolPath> &getPath() const {return path;}
     std::string getGCode() const {return gcode.str();}
+
+    // Start the simulated tool at @param position (XYZ in mm) instead of
+    // the machine origin, e.g. parked above the workpiece like a real
+    // machine after homing and tool touch-off.
+    void setStartPosition(const GCode::Axes &position)
+    {startPosition = position; hasStartPosition = true;}
 
     void runTPL(const cb::InputSource &src);
     void runTPL(const std::string &filename);
