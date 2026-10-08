@@ -67,3 +67,5 @@ build.ninja
 /examples
 
 .vscode
+/dist/
+/cbang/

@@ -1,0 +1,70 @@
+#!/bin/bash -e
+
+# Build a native Apple Silicon (arm64) CAMotics.app with Homebrew.
+# Usage: scripts/build-macos-arm64 [min macOS version, default 14.0]
+#
+# The V8 based TPL scripting language is not built, Homebrew's V8 is newer
+# than the C! V8 bindings.
+
+cd "$(dirname "$0")/.."
+
+[ "$(uname -s)" = Darwin ] || {
+  echo "This script must be run on macOS" >&2; exit 1; }
+[ "$(uname -m)" = arm64 ] || {
+  echo "This script requires an Apple Silicon Mac" >&2; exit 1; }
+
+MIN_VER=${1:-14.0}
+CPUS=$(sysctl -n hw.ncpu)
+
+# Prerequisites
+brew install scons qt@5
+QTDIR=$(brew --prefix qt@5)
+export QTDIR PKG_CONFIG_PATH=$QTDIR/lib/pkgconfig
+unset V8_HOME
+
+ARCH_OPTS="osx_archs=arm64 osx_min_ver=$MIN_VER"
+
+# C!
+if [ ! -e cbang ]; then
+  git clone --depth=1 https://github.com/CauldronDevelopmentLLC/cbang.git
+fi
+scons -C cbang -j$CPUS $ARCH_OPTS
+export CBANG_HOME=$PWD/cbang
+
+# CAMotics
+scons -j$CPUS with_tpl=0 optimize=3 $ARCH_OPTS
+
+# Application bundle
+VERSION=$(python3 -c "import json;print(json.load(open('package.json'))['version'])")
+APP=dist/CAMotics.app
+rm -rf "$APP"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+cp camotics camsim gcodetool "$APP/Contents/MacOS/"
+cp osx/camotics.icns "$APP/Contents/Resources/"
+cp -R machines examples "$APP/Contents/Resources/"
+
+cat > "$APP/Contents/Info.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleExecutable</key><string>camotics</string>
+<key>CFBundleIdentifier</key><string>org.camotics.CAMotics</string>
+<key>CFBundleName</key><string>CAMotics</string>
+<key>CFBundleDisplayName</key><string>CAMotics</string>
+<key>CFBundleIconFile</key><string>camotics</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>$VERSION</string>
+<key>CFBundleVersion</key><string>$VERSION</string>
+<key>LSMinimumSystemVersion</key><string>$MIN_VER</string>
+<key>LSArchitecturePriority</key><array><string>arm64</string></array>
+<key>NSHighResolutionCapable</key><true/>
+<key>NSSupportsAutomaticGraphicsSwitching</key><true/>
+</dict></plist>
+PLIST
+
+# Bundle Qt and ad-hoc sign
+PATH=$QTDIR/bin:$PATH osx/deployqt "$APP"
+xattr -cr "$APP"
+codesign --force --deep -s - "$APP"
+
+echo "Built $APP"

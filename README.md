@@ -81,6 +81,17 @@ In the CAMotics source code directory run:
     scons package
     sudo dpkg -i camotics_*.deb
 
+## Building on macOS (Apple Silicon)
+A native arm64 `CAMotics.app` can be built with [Homebrew](https://brew.sh/)
+by running:
+
+    scripts/build-macos-arm64
+
+This installs SCons and Qt5, builds C! and CAMotics for arm64 and creates
+`dist/CAMotics.app` with Qt bundled and ad-hoc code signed.  The optional
+argument sets the minimum macOS version, 14.0 by default.  The V8 based TPL
+scripting language is not included in this build.
+
 ## Build Warnings/Errors
 If you get any build warnings, by default, the build will stop.  If you have
 problems building, especially with warnings related to the boost library you
