@@ -51,7 +51,6 @@ selection method.
 
 import os.path
 import re
-import six
 import subprocess
 
 import SCons.Action
@@ -381,7 +380,7 @@ class _Automoc:
         for obj in source:
             if not moc_options['auto_scan']: break
 
-            if isinstance(obj, six.string_types):
+            if isinstance(obj, str):
                 print("scons: qt5: '%s' MAYBE USING AN OLD SCONS VERSION AND "
                       "NOT CONVERTED TO 'File'. Discarded." % obj)
                 continue

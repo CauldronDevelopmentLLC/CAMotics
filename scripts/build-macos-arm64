@@ -64,6 +64,22 @@ PLIST
 
 # Bundle Qt and ad-hoc sign
 PATH=$QTDIR/bin:$PATH osx/deployqt "$APP"
+# macdeployqt misses some indirect @rpath dependencies (e.g. libbrotlicommon),
+# which stops the Qt cocoa platform plugin from loading
+FW="$APP/Contents/Frameworks"
+for lib in "$FW"/*.dylib; do
+  for dep in $(otool -L "$lib" | awk '/@rpath\/.*\.dylib/ {print $1}'); do
+    name=${dep#@rpath/}
+    [ -e "$FW/$name" ] && continue
+    src=$(find -L "$(brew --prefix)/opt" -maxdepth 3 -path '*/lib/*' \
+      -name "$name" | head -1)
+    [ -n "$src" ] || { echo "Missing dependency $name" >&2; exit 1; }
+    cp -L "$src" "$FW/$name"
+    chmod u+w "$FW/$name"
+    install_name_tool -id "@executable_path/../Frameworks/$name" "$FW/$name"
+  done
+done
+
 xattr -cr "$APP"
 codesign --force --deep -s - "$APP"
 
