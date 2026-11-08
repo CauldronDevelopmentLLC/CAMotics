@@ -67,3 +67,6 @@ build.ninja
 /examples
 
 .vscode
+/dist/
+/cbang/
+.DS_Store
