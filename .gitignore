@@ -69,3 +69,4 @@ build.ninja
 .vscode
 /dist/
 /cbang/
+.DS_Store
