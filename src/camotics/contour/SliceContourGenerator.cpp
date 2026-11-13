@@ -39,17 +39,17 @@ void SliceContourGenerator::run(FieldFunction &func, GridTreeRef &grid) {
   Task::begin("Contouring cut surface");
 
   for (unsigned z = 0; z < steps.z(); z++) {
-    p.z() = grid.getOffset().z() + resolution * z;
+    p.z() = grid.coord(2, z);
 
     if (z) slice.shift();
     slice.compute(*this, func);
     doSlice(func, slice, z);
 
     for (unsigned y = 0; y < steps.y(); y++) {
-      p.y() = grid.getOffset().y() + resolution * y;
+      p.y() = grid.coord(1, y);
 
       for (unsigned x = 0; x < steps.x(); x++) {
-        p.x() = grid.getOffset().x() + resolution * x;
+        p.x() = grid.coord(0, x);
 
         if (!func.cull(p, resolution * 1.1)) doCell(grid, slice, x, y);
 

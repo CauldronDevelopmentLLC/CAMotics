@@ -30,12 +30,20 @@ Grid::Grid(const Rectangle3D &bounds, double resolution) :
 
   Vector3D dims((Vector3D)steps * resolution);
   offset = bounds.rmin - Vector3D(dims - bounds.getDimensions()) / 2;
+  origin = offset;
 }
 
 
 Grid::Grid(const Vector3D &offset, const Vector3U &steps,
            double resolution) :
-  offset(offset), resolution(resolution), steps(steps) {}
+  offset(offset), resolution(resolution), steps(steps), origin(offset) {}
+
+
+void Grid::setLattice(const Vector3D &origin, const Vector3U &index) {
+  this->origin = origin;
+  this->index = index;
+  offset = point(0, 0, 0);
+}
 
 
 Rectangle3D Grid::getBounds() const {
@@ -49,14 +57,14 @@ unsigned Grid::getTotalCells() const {
 
 
 Grid Grid::slice(const Vector3U &start) const {
-  return
-    Grid(offset + (Vector3D)start * resolution, steps - start, resolution);
+  return slice(start, steps);
 }
 
 
 Grid Grid::slice(const Vector3U &start, const Vector3U &end) const {
-  return
-    Grid(offset + (Vector3D)start * resolution, end - start, resolution);
+  Grid grid(offset, end - start, resolution);
+  grid.setLattice(origin, index + start);
+  return grid;
 }
 
 
@@ -93,11 +101,13 @@ pair<Grid, Grid> Grid::split(unsigned axis) const {
   Vector3U stepOffset;
   stepOffset[axis] = steps[axis] / 2;
   result.first = Grid(offset, steps - stepOffset, resolution);
+  result.first.setLattice(origin, index);
 
   // Right
-  Vector3D rOffset(offset + (Vector3D)stepOffset * resolution);
+  Vector3U rIndex(index + stepOffset);
   stepOffset = steps - result.first.getSteps();
-  result.second = Grid(rOffset, steps - stepOffset, resolution);
+  result.second = Grid(offset, steps - stepOffset, resolution);
+  result.second.setLattice(origin, rIndex);
 
   return result;
 }

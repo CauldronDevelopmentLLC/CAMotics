@@ -55,19 +55,16 @@ void CubeSlice::compute(Task &task, FieldFunction &func) {
   };
 
   double resolution = grid.getResolution();
-  Vector3D offsets[5];
-  for (unsigned i = 0; i < 5; i++)
-    offsets[i] = (Vector3D)vIndex[i] * resolution;
 
   // For each cell
-  Vector3D p(0, 0, grid.getOffset().z() + resolution * z);
+  Vector3D p(0, 0, grid.coord(2, z));
 
   for (unsigned x = 0; x <= steps.x(); x++) {
-    p.x() = grid.getOffset().x() + resolution * x;
+    p.x() = grid.coord(0, x);
 
     for (unsigned y = 0; y <= steps.y(); y++) {
       if (task.shouldQuit()) return;
-      p.y() = grid.getOffset().y() + resolution * y;
+      p.y() = grid.coord(1, y);
 
       Vector3D a = p;
       double aDepth = left->depth(x, y);
@@ -77,7 +74,8 @@ void CubeSlice::compute(Task &task, FieldFunction &func) {
         if (x == steps.x() && (i == 0 || i == 3)) continue;
         if (y == steps.y() && (i == 1 || i == 4)) continue;
 
-        Vector3D b = p + offsets[i];
+        Vector3D b = grid.point(x + vIndex[i].x(), y + vIndex[i].y(),
+                                z + vIndex[i].z());
         double bDepth = depth(x, y, vIndex[i]);
 
         if ((aDepth < 0) != (bDepth < 0) && !cull)

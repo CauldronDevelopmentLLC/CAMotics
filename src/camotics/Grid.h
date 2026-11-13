@@ -32,6 +32,12 @@ namespace CAMotics {
     double resolution;
     cb::Vector3U steps;
 
+    // Grid points are computed as origin + resolution * (index + i) so that
+    // grids split into separate render jobs compute bit-identical
+    // coordinates on the planes they share.
+    cb::Vector3D origin;
+    cb::Vector3U index;
+
   public:
     Grid() : resolution(0) {}
     Grid(const cb::Rectangle3D &bounds, double resolution);
@@ -44,6 +50,15 @@ namespace CAMotics {
 
     const cb::Vector3D &getOffset() const {return offset;}
     void setOffset(const cb::Vector3D &offset) {this->offset = offset;}
+
+    const cb::Vector3D &getOrigin() const {return origin;}
+    const cb::Vector3U &getIndex() const {return index;}
+    void setLattice(const cb::Vector3D &origin, const cb::Vector3U &index);
+
+    double coord(unsigned axis, unsigned i) const
+    {return origin[axis] + resolution * (double)(index[axis] + i);}
+    cb::Vector3D point(unsigned x, unsigned y, unsigned z) const
+    {return cb::Vector3D(coord(0, x), coord(1, y), coord(2, z));}
 
     double getResolution() const {return resolution;}
     void setResolution(double resolution) {this->resolution = resolution;}
