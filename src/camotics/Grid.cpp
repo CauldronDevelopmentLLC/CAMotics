@@ -92,11 +92,12 @@ pair<Grid, Grid> Grid::split(unsigned axis) const {
   // Left
   Vector3U stepOffset;
   stepOffset[axis] = steps[axis] / 2;
-  result.first = Grid(offset, steps - stepOffset, resolution);
+  Vector3U leftSteps(steps);
+  leftSteps[axis] = stepOffset[axis];
+  result.first = Grid(offset, leftSteps, resolution);
 
   // Right
   Vector3D rOffset(offset + (Vector3D)stepOffset * resolution);
-  stepOffset = steps - result.first.getSteps();
   result.second = Grid(rOffset, steps - stepOffset, resolution);
 
   return result;
