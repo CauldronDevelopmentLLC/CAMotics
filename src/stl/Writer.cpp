@@ -21,6 +21,7 @@
 #include "Writer.h"
 #include "BinaryTriangle.h"
 
+#include <algorithm>
 #include <cstring>
 
 using namespace std;
@@ -34,7 +35,8 @@ void Writer::writeHeader(const string &name, uint32_t count,
     // Header
     char header[81];
     memset(header, 0, 81);
-    if (!hash.empty()) memcpy(header, hash.c_str(), 80);
+    if (!hash.empty())
+      memcpy(header, hash.data(), std::min<size_t>(hash.size(), 80));
     stream.write(header, 80);
 
     // Count
