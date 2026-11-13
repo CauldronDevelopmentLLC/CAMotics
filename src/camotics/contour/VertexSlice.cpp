@@ -38,13 +38,13 @@ void VertexSlice::compute(FieldFunction &func) {
          vector<double>(steps.y() + 1, -numeric_limits<double>::max()));
 
   double resolution = grid.getResolution();
-  Vector3D p = Vector3D(0, 0, grid.getOffset().z() + resolution * z);
+  Vector3D p = Vector3D(0, 0, grid.coord(2, z));
 
   for (unsigned x = 0; x <= steps.x(); x++) {
-    p.x() = grid.getOffset().x() + resolution * x;
+    p.x() = grid.coord(0, x);
 
     for (unsigned y = 0; y <= steps.y(); y++) {
-      p.y() = grid.getOffset().y() + resolution * y;
+      p.y() = grid.coord(1, y);
 
       if (!func.cull(p, 2.1 * resolution)) at(x).at(y) = func.depth(p);
     }

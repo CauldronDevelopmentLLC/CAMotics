@@ -31,7 +31,7 @@ GridTreeRef::GridTreeRef(GridTree *ref, const Vector3U &offset,
                          const Vector3U &steps) : ref(ref), offset(offset) {
 
   setResolution(ref->getResolution());
-  setOffset(ref->getOffset() + (Vector3D)offset * ref->getResolution());
+  setLattice(ref->getOrigin(), ref->getIndex() + offset);
   setSteps(steps);
 }
 
