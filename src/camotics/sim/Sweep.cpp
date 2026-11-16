@@ -30,7 +30,7 @@ using namespace CAMotics;
 void Sweep::getBBoxes(const Vector3D &start, const Vector3D &end,
                       vector<Rectangle3D> &bboxes, double radius,
                       double length, double zOffset, double tolerance) const {
-  const unsigned maxLen = radius * 16;
+  const double maxLen = radius * 16;
   double len = start.distance(end);
   unsigned steps = (len <= maxLen) ? 1 : (len / maxLen);
   double stride = 1.0 / steps;
